@@ -1,0 +1,17 @@
+{
+    "include": [
+        "app"
+    ],
+    "pythonVersion": "3.12",
+    "exclude": [
+        ".venv",
+        "venv",
+        "node_modules",
+        "**/__pycache__",
+        "build",
+        "dist"
+    ],
+    "typeCheckingMode": "strict",
+    "reportMissingTypeStubs": false,
+    "stubPath": "./typings"
+}

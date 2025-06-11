@@ -1,11 +1,11 @@
 [project]
 name = "t3-chat-clone-py"
 version = "0.1.0"
-description = "Default template for PDM package"
+description = "FastAPI ML microservice for t3-chat-clone"
 authors = [
     {name = "Andrew Ross", email = "andrew@windycitydevs.io"},
 ]
-dependencies = ["python-dotenv>=1.1.0", "pydantic>=2.11.5", "uvicorn>=0.34.3", "boto3>=1.38.34", "python-multipart>=0.0.20", "fastapi>=0.115.12"]
+dependencies = ["python-dotenv>=1.1.0", "pydantic>=2.11.5", "uvicorn>=0.34.3", "boto3>=1.38.34", "python-multipart>=0.0.20", "fastapi>=0.115.12", "pydantic-settings>=2.9.1", "pillow>=11.2.1"]
 requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
@@ -23,4 +23,6 @@ dev = [
     "mypy>=1.16.0",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=6.1.1",
+    "boto3-stubs[s3]>=1.38.34",
+    "types-boto3>=1.38.34",
 ]

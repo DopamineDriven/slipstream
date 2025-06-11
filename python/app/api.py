@@ -1,20 +1,23 @@
-# app/api.py
-
 from fastapi import APIRouter, UploadFile, File
-from pydantic import BaseModel
+from app.models import GenRequest, GenResponse, UploadResponse
+from app.inference import generate_image
+from app.storage import upload_fileobj
+import os
 
 router = APIRouter()
 
-class GenRequest(BaseModel):
-    prompt: str
 
-@router.post("/generate")
+@router.post("/generate", response_model=GenResponse)
 async def generate(req: GenRequest):
-    # Insert model inference call (or fake for demo)
-    url = "https://your-r2-bucket/path/to/generated.png"
+    # Generate image file (blocking for now)
+    image_path = generate_image(req.prompt)
+    with open(image_path, "rb") as f:
+        url = upload_fileobj(f, os.path.basename(image_path), "image/png")
+    os.remove(image_path)
     return {"url": url}
 
-@router.post("/upload")
-async def upload(file: UploadFile = File(...)):
-    # You could stream this to R2 using boto3
-    return {"filename": file.filename}
+
+@router.post("/upload", response_model=UploadResponse)
+async def upload(file: UploadFile = File(...)) -> UploadResponse:
+    url = upload_fileobj(file.file, file.filename, file.content_type)
+    return UploadResponse(filename=file.filename, url=url)
