@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "incremental": true,
+    "sourceMap": true,
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "moduleResolution": "bundler",
+    "importHelpers": false,
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "ScriptHost"]
+  }
+}

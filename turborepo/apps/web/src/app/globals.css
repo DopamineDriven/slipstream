@@ -1,0 +1,221 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@config "../../tailwind.config.ts";
+@plugin "tailwindcss-motion";
+
+/*
+  https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
+
+  Uncomment the following to use a CSS Selector instead of the `prefers-color-scheme` media-query
+
+  @custom-variant dark (&:where(.dark, .dark *));
+*/
+
+/*
+  https://tailwindcss.com/docs/dark-mode#using-a-data-attribute
+
+  Using a data-attribute instead of a dark theme selector
+
+*/
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@font-face {
+  font-family: "CalSans";
+  src: url("/fonts/CalSans-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CalSans";
+  src: url("/fonts/CalSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-cal-sans: CalSans, sans-serif;
+  --font-inter: var(--font-inter);
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.14 0.0044 285.82);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.14 0.0044 285.82);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.14 0.0044 285.82);
+  --color-primary: oklch(0.21 0.0059 285.88);
+  --color-primary-foreground: oklch(0.98 0 0);
+  --color-secondary: oklch(0.97 0.0013 286.38);
+  --color-secondary-foreground: oklch(0.21 0.0059 285.88);
+  --color-muted: oklch(0.97 0.0013 286.38);
+  --color-muted-foreground: oklch(0.55 0.0137 285.94);
+  --color-accent: oklch(0.97 0.0013 286.38);
+  --color-accent-foreground: oklch(0.21 0.0059 285.88);
+  --color-destructive: oklch(0.64 0.2078 25.33);
+  --color-destructive-foreground: oklch(0.98 0 0);
+  --color-border: oklch(0.92 0.004 286.32);
+  --color-input: oklch(0.92 0.004 286.32);
+  --color-ring: oklch(0.21 0.0059 285.88);
+  --color-chart-1: oklch(0.546 0.2153 262.87);
+  --color-chart-2: oklch(0.5409 0.2468 292.95);
+  --color-chart-3: oklch(0.6624 0.2895 320.92);
+  --color-chart-4: oklch(0.6924 0.1426 165.69);
+  --color-chart-5: oklch(0.8372 0.1644 84.53);
+  --color-hue-0: oklch(0.9434 0.199 105.96);
+  --color-hue-1: oklch(0.6477 0.263 359.98);
+  --color-hue-2: oklch(0.6404 0.300 324.36);
+  --color-hue-3: oklch(0.5636 0.292 301.63);
+  --color-hue-4: oklch(0.5898 0.211 259.36);
+  --color-hue-5: oklch(0.8203 0.141 210.49);
+  --color-hue-6: oklch(0.8842 0.107 168.47);
+
+  --radius-sm: 0.25rem;
+
+  --container-8xl: 96rem;
+  --container-9xl: 120rem;
+  --container-10xl: 173.75rem;
+
+  --spacing-8xl: 96rem;
+  --spacing-9xl: 120rem;
+  --spacing-10xl: 173.75rem;
+
+  --perspective-1000: 1000px;
+
+  --text-sxs: 0.625rem;
+  --text-sxs--line-height: calc(0.875 / 0.625);
+  --text-xxs: 0.5rem;
+  --text-xxs--line-height: calc(0.75 / 0.5);
+
+  --animate-shimmer: shimmer 3s cubic-bezier(0.4, 0.7, 0.6, 1) infinite;
+  @keyframes shimmer {
+    0% {
+      opacity: 0.5;
+    } /* Start with a semi-transparent state */
+    50% {
+      opacity: 1;
+    } /* Become fully visible */
+    100% {
+      opacity: 0.5;
+    } /* Return to semi-transparent */
+  }
+
+  --animate-twinkle: twinkle 5s infinite;
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.2;
+    }
+  }
+}
+
+@layer theme {
+  .dark {
+    --color-background: oklch(0.14 0.0044 285.82);
+    --color-foreground: oklch(0.98 0 0);
+    --color-card: oklch(0.14 0.0044 285.82);
+    --color-card-foreground: oklch(0.98 0 0);
+    --color-popover: oklch(0.14 0.0044 285.82);
+    --color-popover-foreground: oklch(0.98 0 0);
+    --color-primary: oklch(0.98 0 0);
+    --color-primary-foreground: oklch(0.21 0.0059 285.88);
+    --color-secondary: oklch(0.27 0.0055 286.03);
+    --color-secondary-foreground: oklch(0.98 0 0);
+    --color-muted: oklch(0.27 0.0055 286.03);
+    --color-muted-foreground: oklch(0.71 0.0129 286.07);
+    --color-accent: oklch(0.27 0.0055 286.03);
+    --color-accent-foreground: oklch(0.98 0 0);
+    --color-destructive: oklch(0.4 0.1331 25.72);
+    --color-destructive-foreground: oklch(0.98 0 0);
+    --color-border: oklch(0.27 0.0055 286.03);
+    --color-input: oklch(0.27 0.0055 286.03);
+    --color-ring: oklch(0.87 0.0055 286.29);
+    --color-chart-1: oklch(0.546 0.2153 262.87);
+    --color-chart-2: oklch(0.5409 0.2468 292.95);
+    --color-chart-3: oklch(0.6624 0.2895 320.92);
+    --color-chart-4: oklch(0.6924 0.1426 165.69);
+    --color-chart-5: oklch(0.8372 0.1644 84.53);
+    --color-hue-0: oklch(0.9434 0.199 105.96);
+    --color-hue-1: oklch(0.6477 0.263 359.98);
+    --color-hue-2: oklch(0.6404 0.300 324.36);
+    --color-hue-3: oklch(0.5636 0.292 301.63);
+    --color-hue-4: oklch(0.5898 0.211 259.36);
+    --color-hue-5: oklch(0.8203 0.141 210.49);
+    --color-hue-6: oklch(0.8842 0.107 168.47);
+  }
+}
+
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+
+:root {
+  --radius: 0.5rem;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+@supports not (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    background-color: color-mix(
+      in oklab,
+      var(--color-background) 90%,
+      transparent
+    );
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .container {
+    margin-inline: auto;
+    @apply [padding-inline:1rem] sm:[padding-inline:2rem] lg:[padding-inline:3rem];
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+body {
+  overflow-x: hidden;
+}

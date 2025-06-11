@@ -1,0 +1,32 @@
+{
+  "name": "@t3-chat-clone/jest-presets",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./browser": "./browser/jest-preset.mjs",
+    "./node": "./node/jest-preset.mjs"
+  },
+  "files": [
+    "browser/jest-preset.mjs",
+    "node/jest-preset.mjs"
+  ],
+  "scripts": {
+    "clean": "git clean -xdf node_modules"
+  },
+  "peerDependencies": {
+    "jest": ">=30.0.0"
+  },
+  "dependencies": {
+    "ts-jest": "^29.3.4"
+  },
+  "devDependencies": {
+    "@t3-chat-clone/prettier-config": "workspace:*",
+    "@t3-chat-clone/tsconfig": "workspace:*",
+    "jest-environment-jsdom": "^30.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  },
+  "prettier": "@t3-chat-clone/prettier-config"
+}
