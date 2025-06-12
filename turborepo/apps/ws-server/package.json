@@ -5,7 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsup --config tsup.config.dev.ts",
+    "build": "tsup",
+    "builds": "tsup src/auth/index.ts src/logger/index.ts src/pubsub/index.ts src/types/index.ts src/ws-server/index.ts src/index.ts --format esm --dts --watch --onSuccess \"node dist/index.js\""
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "dependencies": {
@@ -14,6 +16,7 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
+    "@d0paminedriven/fs": "^6.1.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
@@ -22,6 +25,7 @@
     "dotenv": "^16.5.0",
     "dotenv-cli":"^8.0.0",
     "dotenv-expand": "^12.0.2",
+    "esbuild-plugin-pino": "^2.2.2",
     "eslint": "^9.28.0",
     "jiti": "^2.4.2",
     "pino": "^9.7.0",

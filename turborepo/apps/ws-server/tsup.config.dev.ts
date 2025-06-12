@@ -24,7 +24,7 @@ const tsupConfig = (options: Options) =>
     format: "esm",
     sourcemap: true,
     noExternal: ["pino", "pino-pretty"],
-    // onSuccess: "node dist/index.js",
+    onSuccess: "node dist/index.js",
     tsconfig: relative(process.cwd(), "tsconfig.json"),
     clean: true,
     outDir: "dist",

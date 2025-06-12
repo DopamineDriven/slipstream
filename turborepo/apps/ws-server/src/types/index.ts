@@ -13,7 +13,11 @@ export type TypingIndicator = {
   conversationId: string;
 };
 
-export type AnyEvent = ChatMessage | TypingIndicator;
+export type PingMessage = {
+  type: "ping";
+}
+
+export type AnyEvent = ChatMessage | TypingIndicator | PingMessage;
 /**
  * helper workup for use in XOR type below
  * makes properties from U optional and undefined in T, and vice versa
@@ -34,7 +38,8 @@ export type EventUnion = XOR<ChatMessage, TypingIndicator>;
 
 export type EventTypeMap = {
   message: ChatMessage;
-  typing: TypingIndicator
+  typing: TypingIndicator;
+  ping: PingMessage;
 }
 
 export type EventMap<T extends keyof EventTypeMap> = {
@@ -42,6 +47,3 @@ export type EventMap<T extends keyof EventTypeMap> = {
 }[T];
 
 
-type GetEvent<T extends EventUnion['type']> = T extends "typing" ? TypingIndicator : ChatMessage;
-
-const x = (props: EventMap<"message">) => props;

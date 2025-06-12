@@ -1,13 +1,14 @@
 import type { PrettyOptions } from "pino-pretty";
-import { pino } from "pino";
 
-const pinoPrettyOpts = {
+export const pinoPrettyOpts = {
   colorize: true,
   levelFirst: true,
   translateTime: true
 } satisfies PrettyOptions;
 
-const isProd = process.env.NODE_ENV === "production";
+export const isProd = process.env.NODE_ENV === "production";
+
+const pino = await import("pino").then(d => d.pino);
 
 export const logger = pino({
   name: "ws-server",

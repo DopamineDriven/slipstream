@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String?
+  email         String?        @unique
+  emailVerified DateTime?
+  image         String? // avatar URL
+  profile       Profile?
+  accounts      Account[]
+  sessions      Session[]
+  keys          UserKey[]
+  conversations Conversation[]
+  settings      Settings?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Profile {
+  id       String  @id @default(uuid())
+  bio      String?
+  location String?
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String  @unique
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  expires      DateTime
+}
+
+model UserKey {
+  id        String   @id @default(uuid())
+  userId    String
+  provider  String // e.g. 'openai', 'anthropic', etc
+  apiKey    String // encrypted or hashed if possible
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Settings {
+  id     String  @id @default(uuid())
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id])
+  theme  String? // dark/light, etc
+  // Add more user preferences as needed
+}
+
+model AiAgent {
+  id            String         @id @default(uuid())
+  provider      String // e.g. 'openai', 'anthropic', etc
+  model         String // e.g. 'gpt-4', 'claude-3'
+  displayName   String?
+  description   String?
+  messages      Message[]      @relation("AgentMessages")
+  conversations Conversation[] @relation("AgentConversations")
+}
+
+model Conversation {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  title       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  messages    Message[]
+  aiAgentId   String?
+  aiAgent     AiAgent?     @relation("AgentConversations", fields: [aiAgentId], references: [id])
+  branchId    String? // For branching conversations
+  parentId    String? // For chat branching
+  attachments Attachment[]
+  isShared    Boolean      @default(false)
+  shareToken  String?      @unique
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String? // User or AI Agent (if user, references User)
+  senderType     String // "user" | "ai" | "system"
+  content        String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  aiAgentId      String?
+  attachments    Attachment[]
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  aiAgent        AiAgent?     @relation("AgentMessages", fields: [aiAgentId], references: [id])
+}
+
+model Attachment {
+  id             String        @id @default(uuid())
+  messageId      String
+  url            String
+  type           String // e.g., "image", "pdf"
+  createdAt      DateTime      @default(now())
+  conversationId String? // <-- add this
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  message        Message       @relation(fields: [messageId], references: [id])
+}

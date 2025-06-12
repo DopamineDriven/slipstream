@@ -13,7 +13,7 @@
     "dev": "turbo dev --parallel --continue",
     "format": "prettier --write \"**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx}\" --ignore-unknown --cache",
     "lint": "turbo lint",
-    "prepare": "husky",
+    "prepare": "cd .. && husky turborepo/.husky",
     "typecheck": "turbo typecheck",
     "clean:house": "cd tooling/eslint && git clean -xdf node_modules .turbo && cd ../prettier && git clean -xdf node_modules .turbo && cd ../typescript && git clean -xdf .turbo node_modules && cd ../jest-presets && git clean -xdf node_modules .turbo && cd ../../packages/ui && git clean -xdf dist .turbo node_modules && cd ../../apps/web && git clean -xdf node_modules .next .turbo && cd ../ws-server && git clean -xdf node_modules dist .turbo && cd ../.. && git clean -xdf node_modules pnpm-lock.yaml && pnpm install && pnpm build:targeted",
     "generate:base64": "openssl rand -base64 64",

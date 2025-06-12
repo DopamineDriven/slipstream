@@ -1,6 +1,6 @@
-import type { Config } from "typescript-eslint";
 import baseConfig from "@t3-chat-clone/eslint-config/base";
 
+/** @type {import('typescript-eslint').Config} */
 export default [
   ...baseConfig,
   {
@@ -13,4 +13,4 @@ export default [
     },
     ignores: ["dist/**"]
   }
-] satisfies Config;
+];

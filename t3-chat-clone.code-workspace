@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "python"
+    },
+    {
+      "path": "turborepo"
+    }
+  ],
+  "settings": {
+    "eslint.useFlatConfig": true,
+    "typescript.enablePromptUseWorkspaceTsdk": true
+  }
+}
