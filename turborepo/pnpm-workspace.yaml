@@ -2,3 +2,10 @@ packages:
   - apps/*
   - packages/*
   - tooling/*
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - prisma

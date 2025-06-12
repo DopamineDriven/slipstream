@@ -2,11 +2,12 @@
   "name": "@t3-chat-clone/root",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.8.0",
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
   "scripts": {
     "build:targeted": "pnpm build:ui",
     "build:ui": "turbo build --filter=@t3-chat-clone/ui",
     "build:web": "turbo build --filter=@t3-chat-clone/web",
+    "build:ws-server": "turbo build --filter=@t3-chat-clone/ws-server",
     "changeset": "changeset",
     "clean": "git clean -xdf node_modules",
     "dev": "turbo dev --parallel --continue",
@@ -14,7 +15,7 @@
     "lint": "turbo lint",
     "prepare": "husky",
     "typecheck": "turbo typecheck",
-    "clean:house": "cd tooling/eslint && git clean -xdf node_modules .turbo && cd ../prettier && git clean -xdf node_modules .turbo && cd ../typescript && git clean -xdf .turbo node_modules && cd ../jest-presets && git clean -xdf node_modules .turbo && cd ../../packages/ui && git clean -xdf dist .turbo node_modules && cd ../../apps/web && git clean -xdf node_modules .next .turbo && cd ../.. && git clean -xdf node_modules pnpm-lock.yaml && pnpm install && pnpm build:targeted",
+    "clean:house": "cd tooling/eslint && git clean -xdf node_modules .turbo && cd ../prettier && git clean -xdf node_modules .turbo && cd ../typescript && git clean -xdf .turbo node_modules && cd ../jest-presets && git clean -xdf node_modules .turbo && cd ../../packages/ui && git clean -xdf dist .turbo node_modules && cd ../../apps/web && git clean -xdf node_modules .next .turbo && cd ../ws-server && git clean -xdf node_modules dist .turbo && cd ../.. && git clean -xdf node_modules pnpm-lock.yaml && pnpm install && pnpm build:targeted",
     "generate:base64": "openssl rand -base64 64",
     "generate:hex": "openssl rand -hex 64",
     "npm:registry": "npm set registry https://registry.npmjs.org",
@@ -23,23 +24,24 @@
     "update:pnpm": "curl -fsSL https://get.pnpm.io/install.sh | sh -"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.4",
+    "@d0paminedriven/turbogen": "^5.6.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@changesets/cli": "^2.29.4",
-    "@d0paminedriven/turbogen": "^5.6.0",
-    "@types/node": "^24.0.0",
+    "@types/node": "^24.0.1",
     "dotenv": "^16.5.0",
     "eslint": "^9.28.0",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.4",
+    "tsx": "^4.20.1",
     "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vercel": "^43.0.0"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=9",
     "pnpm": ">=9"
   }
