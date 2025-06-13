@@ -10,7 +10,15 @@
     "build": "next build",
     "format": "prettier --write \"**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx,graphql,gql}\" --ignore-unknown --cache",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "migrate:dev": "dotenv -- pnpm migrate:dev:workup",
+    "migrate:dev:workup": "DATABASE_URL=$DATABASE_URL_UNPOOLED prisma migrate dev",
+    "migrate:deploy": "dotenv -- pnpm migrate:deploy:workup",
+    "migrate:deploy:workup": "DATABASE_URL=$DATABASE_URL_UNPOOLED prisma migrate deploy",
+    "prisma:studio": "prisma studio --browser none --port 7777",
+    "db:push": "dotenv -- pnpm db:push:workup",
+    "db:push:workup": "DATABASE_URL=$DATABASE_URL_UNPOOLED prisma db push"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
@@ -44,6 +52,8 @@
     "@vercel/functions": "^2.1.0",
     "autoprefixer": "^10.4.21",
     "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0",
+    "dotenv-expand": "^12.0.2",
     "eslint": "^9.28.0",
     "eslint-config-next": "^15.3.3",
     "motion-dom": "^12.17.0",
