@@ -1,47 +1,59 @@
+import type {
+  RedisClientType,
+  RedisDefaultModules,
+  RedisFunctions,
+  RedisModules,
+  RedisScripts,
+  RespVersions,
+  TypeMapping
+} from "redis";
 import type { RawData } from "ws";
 import { createClient } from "redis";
 import { WebSocket, WebSocketServer } from "ws";
-import type { AnyEvent, EventTypeMap } from "@/types/index.ts";
+import type {
+  EventTypeMap,
+  HandlerMap,
+  MessageHandler,
+  WSServerOptions
+} from "@/types/index.ts";
 import { verifyJWT } from "@/auth/index.ts";
 import { logger } from "@/logger/index.ts";
-import type {RedisModules, RedisFunctions, RedisScripts, RespVersions, TypeMapping, RedisClientType, RedisDefaultModules} from "redis";
-
-interface WSServerOptions {
-  port: number;
-  redisUrl: string;
-  jwtSecret: string;
-  channel?: string;
-}
-
-type MessageHandler<T extends keyof EventTypeMap> = (
-  event: EventTypeMap[T],
-  ws: WebSocket,
-  userId: string
-) => Promise<void> | void;
-
-type HandlerMap = {
-  [K in keyof EventTypeMap]?: MessageHandler<K>;
-};
-/**
- * <M extends RedisModules, F extends RedisFunctions, S extends RedisScripts, RESP extends RespVersions, TYPE_MAPPING extends TypeMapping>(options?: RedisClientOptions<M, F, S, RESP, TYPE_MAPPING>): RedisClientType<RedisDefaultModules & M, F, S, RESP, TYPE_MAPPING>
- */
-
-// type M<T extends keyof EventTypeMap> = {
-//   [P in T]: MessageHandler<P>;
-// }[T];
 
 export class WSServer {
   private wss: WebSocketServer;
-  private redis: RedisClientType<RedisDefaultModules & RedisModules, RedisFunctions, RedisScripts, RespVersions, TypeMapping>;
-  private readonly channel: string;
+  public redis: RedisClientType<
+    RedisDefaultModules & RedisModules,
+    RedisFunctions,
+    RedisScripts,
+    RespVersions,
+    TypeMapping
+  >;
+  public readonly channel: string;
   private readonly jwtSecret: string;
-  private readonly handlers: HandlerMap = {};
+  public readonly handlers: HandlerMap = {};
+  private resolver?: {
+    handleRawMessage: (
+      ws: WebSocket,
+      userId: string,
+      raw: RawData
+    ) => void | Promise<void>;
+  };
 
   constructor(private opts: WSServerOptions) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
     this.wss = new WebSocketServer({ port: opts.port });
     this.redis = createClient({ url: opts.redisUrl });
+  }
+
+  public setResolver(resolver: {
+    handleRawMessage: (
+      ws: WebSocket,
+      userId: string,
+      raw: RawData
+    ) => void | Promise<void>;
+  }) {
+    this.resolver = resolver;
   }
 
   public async start(): Promise<void> {
@@ -66,7 +78,13 @@ export class WSServer {
     if (!userId) return;
 
     logger.info(`User ${userId} connected`);
-    ws.on("message", raw => this.handleMessage(ws, userId, raw));
+    ws.on("message", raw => {
+      if (this.resolver) {
+        this.resolver.handleRawMessage(ws, userId, raw);
+      } else {
+        ws.send(JSON.stringify({ error: "No resolver configured" }));
+      }
+    });
     ws.on("close", () => logger.info(`User ${userId} disconnected`));
   }
 
@@ -91,73 +109,10 @@ export class WSServer {
 
   private extractTokenFromUrl(url: string): string | null {
     try {
-      return new URL(url, "ws://dummy").searchParams.get("token");
+      return new URL(url, "ws://ws-server.d0paminedriven.com").searchParams.get(
+        "token"
+      );
     } catch {
-      return null;
-    }
-  }
-
-  private async handleMessage(
-    ws: WebSocket,
-    userId: string,
-    raw: RawData
-  ): Promise<void> {
-    const event = this.parseEvent(raw);
-    if (!event) {
-      ws.send(JSON.stringify({ error: "Invalid message" }));
-      return;
-    }
-
-    // Do a type-safe dispatch using event.type
-    switch (event.type) {
-      case "message":
-        if (this.handlers.message) {
-          await this.handlers.message(event, ws, userId);
-        }
-        break;
-      case "typing":
-        if (this.handlers.typing) {
-          await this.handlers.typing(event, ws, userId);
-        }
-        break;
-      case "ping":
-        if (this.handlers.ping) {
-          await this.handlers.ping(event, ws, userId);
-        }
-        break;
-      default:
-        await this.redis.publish(
-          this.channel,
-          // event is of type never
-          JSON.stringify({ event: "never", userId, timestamp: Date.now() })
-        );
-    }
-  }
-
-  private parseEvent(raw: RawData): AnyEvent | null {
-    const EVENT_TYPES = Array.of<EventTypeMap[keyof EventTypeMap]["type"]>();
-    let msg: EventTypeMap[keyof EventTypeMap];
-    try {
-      if (Array.isArray(raw)) {
-        msg = JSON.parse(
-          Buffer.concat(raw).toString()
-        ) as EventTypeMap[keyof EventTypeMap];
-      } else
-        msg = JSON.parse(
-          Buffer.from(raw).toString()
-        ) as EventTypeMap[keyof EventTypeMap];
-      // Basic shape/type validation
-      if (
-        typeof msg !== "object" ||
-        !msg ||
-        typeof msg.type !== "string" ||
-        !(msg.type in EVENT_TYPES)
-      ) {
-        return null;
-      }
-      return msg as AnyEvent;
-    } catch {
-      logger.error("Invalid message received");
       return null;
     }
   }

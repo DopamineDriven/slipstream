@@ -3,14 +3,45 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "index.js",
+  "source": "src/index.ts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+    "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/*/index.d.ts"
+      ],
+      "auth": [
+        "dist/auth/index.d.ts"
+      ],
+      "logger": [
+        "dist/logger/index.d.ts"
+      ],
+      "pubsub": [
+        "dist/pubsub/index.d.ts"
+      ],
+      "r2-helper": [
+        "dist/r2-helper/index.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
+      ],
+      "ws-server": [
+        "dist/ws-server/index.d.ts"
+      ]
+    }
+  },
   "scripts": {
-    "dev": "tsup --config tsup.config.dev.ts",
     "build": "tsup",
-    "builds": "tsup src/auth/index.ts src/logger/index.ts src/pubsub/index.ts src/types/index.ts src/ws-server/index.ts src/index.ts --format esm --dts --watch --onSuccess \"node dist/index.js\""
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "dev": "tsup --config tsup.config.dev.ts",
+    "lint": "eslint"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.828.0",
     "jose": "^6.0.11",
     "redis": "^5.5.6",
     "ws": "^8.18.2"

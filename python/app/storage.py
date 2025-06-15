@@ -16,7 +16,7 @@ def upload_fileobj(
     s3 = get_s3()
     if filename is None:
         raise ValueError("filename must be defined")
-    key = f"uploads/{uuid4()}-{filename}"
+    key = f"generated-images/{uuid4()}-{filename}"  # or "uploads/" if you prefer
     if content_type is None:
         content_type = "application/octet-stream"
     s3.upload_fileobj(
@@ -25,5 +25,6 @@ def upload_fileobj(
         key,
         ExtraArgs={"ContentType": content_type},
     )
-    url = f"https://{settings.s3_bucket}.s3.{settings.s3_region}.amazonaws.com/{key}"
+    # Return public Cloudflare URL, not AWS S3 URL
+    url = f"{settings.r2_public_base}/{key}"
     return url

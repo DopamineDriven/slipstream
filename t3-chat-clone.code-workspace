@@ -1,9 +1,10 @@
 {
   "folders": [
-    {
+    { "name": "python",
       "path": "python"
     },
     {
+      "name": "turborepo",
       "path": "turborepo"
     }
   ]

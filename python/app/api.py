@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.models import GenRequest, GenResponse, UploadResponse
 from app.inference import generate_image
 from app.storage import upload_fileobj
@@ -9,11 +9,14 @@ router = APIRouter()
 
 @router.post("/generate", response_model=GenResponse)
 async def generate(req: GenRequest):
-    # Generate image file (blocking for now)
     image_path = generate_image(req.prompt)
-    with open(image_path, "rb") as f:
-        url = upload_fileobj(f, os.path.basename(image_path), "image/png")
-    os.remove(image_path)
+    try:
+        with open(image_path, "rb") as f:
+            url = upload_fileobj(f, os.path.basename(image_path), "image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"upload failed: {e}")
+    finally:
+        os.remove(image_path)
     return {"url": url}
 
 
