@@ -1,5 +1,9 @@
 // src/index.ts
+import { Resolver } from "./resolver/index.ts";
 import { WSServer } from "./ws-server/index.ts";
+import * as dotenv from "dotenv";
+dotenv.config();
+
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const jwtSecret =
@@ -8,11 +12,10 @@ const jwtSecret =
 const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 4000;
 
 const wsServer = new WSServer({ port, redisUrl, jwtSecret });
-
-wsServer.on("typing", async (event, _ws, userId) => {
-  wsServer.broadcast("typing", { ...event, userId });
-});
+const resolver = new Resolver(wsServer);
+resolver.registerAll();
+wsServer.setResolver(resolver);
 
 wsServer.start();
 
-export{};
+export {};

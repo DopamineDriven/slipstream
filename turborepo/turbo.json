@@ -47,6 +47,7 @@
     "R2_ACCOUNT_TOKEN",
     "R2_ACCESS_KEY_ID",
     "R2_SECRET_ACCESS_KEY",
-    "GITHUB_PAT"
+    "GITHUB_PAT",
+    "FASTAPI_URL"
   ]
 }
