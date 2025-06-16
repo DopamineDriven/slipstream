@@ -3,8 +3,41 @@
 import { Button, Icon } from "@t3-chat-clone/ui";
 import Link from "next/link";
 import { motion } from "motion/react";
+import type { Session } from "@auth/core/types";
 
-export function LandingPage() {
+export type LandingPagePrps = { session: Session | null };
+function AuthConditionalHeader({ session }: LandingPagePrps) {
+  if (session?.user) {
+    return (
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="font-cal-sans text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
+        Welcome to your&nbsp;
+        <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          Turbo
+        </span>
+        &nbsp; powered workspace {session?.user.name}!
+      </motion.h1>
+    );
+  } else
+    return (
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="font-cal-sans text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
+        Welcome to your&nbsp;
+        <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          Turbo
+        </span>
+        &nbsp; powered workspace
+      </motion.h1>
+    );
+}
+
+export function LandingPage({ session }: LandingPagePrps) {
   return (
     <>
       <section className="font-cal-sans mx-auto flex justify-center space-y-6 pt-6 pb-8 md:pt-10 md:pb-12 lg:py-32">
@@ -16,17 +49,7 @@ export function LandingPage() {
             className="bg-muted rounded-2xl px-4 py-1.5 text-sm font-medium">
             Your workspace is ready
           </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="font-cal-sans text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
-            Welcome to your&nbsp;
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Turbo
-            </span>
-            &nbsp; powered workspace
-          </motion.h1>
+          <AuthConditionalHeader session={session} />
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
