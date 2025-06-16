@@ -111,6 +111,9 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
     devDependencies:
+      '@d0paminedriven/fs':
+        specifier: ^6.1.0
+        version: 6.1.0
       '@playwright/test':
         specifier: ^1.53.0
         version: 1.53.0
