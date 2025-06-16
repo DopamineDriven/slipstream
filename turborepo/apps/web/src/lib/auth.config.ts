@@ -1,9 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 // pages/api/auth/[...nextauth].ts
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
-import GitHub from "@auth/core/providers/github";
-import Google from "@auth/core/providers/google";
-import type { GoogleProfile } from "@auth/core/providers/google";
+import type { GoogleProfile } from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 
 export interface AccessTokenSuccess {
   access_token: string;
