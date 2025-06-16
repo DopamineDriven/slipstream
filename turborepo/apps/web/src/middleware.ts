@@ -74,8 +74,10 @@ function detectDeviceAndSetCookies(
 export default auth(async function middleware(req, _ctx) {
   const nextUrl = req.nextUrl;
   const pathname = nextUrl.pathname;
-  if (!req.auth?.user && !pathname.startsWith("/api")) {
-    const res = NextResponse.redirect(new URL("/api/auth/signin", nextUrl));
+  if (!req.auth || !pathname.startsWith("/api")) {
+    const res = NextResponse.redirect(
+      new URL("/api/auth/signin", nextUrl.origin)
+    );
     return detectDeviceAndSetCookies(req, res);
   }
   const res = NextResponse.next();
