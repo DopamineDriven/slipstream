@@ -1,4 +1,4 @@
-import { default as prisma } from "@/lib/prisma";
+import { prismaClient as prisma } from "@/lib/prisma";
 import { errHelper } from "@/orm/err-helper";
 
 export const getUser = async <
