@@ -2,6 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 // pages/api/auth/[...nextauth].ts
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
 import type { GoogleProfile } from "next-auth/providers/google";
+import { redirect } from "next/navigation";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 
@@ -38,15 +39,25 @@ export const authConfig = <NextAuthConfig>{
       clientSecret: process.env.AUTH_GITHUB_SECRET
     })
   ],
+  trustHost: true,
+  debug: true,
   session: {
     strategy: "jwt"
   },
   secret: process.env.AUTH_SECRET,
+
   callbacks: {
-    async jwt({ token, account, user }) {
-      if (user.id) {
-        token.id = user.id;
+    async authorized(params) {
+      const nextUrl = params.request.nextUrl;
+      console.log({ nextUrl: nextUrl });
+      if (!params.auth?.user) {
+        return false;
+      } else {
+        return true;
       }
+    },
+    async jwt({ token, account }) {
+
       if (account) {
         return {
           ...token,
@@ -98,7 +109,6 @@ export const authConfig = <NextAuthConfig>{
       // Expose any error and fresh access token in session
       session.error = token.error;
       session.accessToken = token.access_token;
-      session.user.id = token.id;
       return session;
     }
   }
@@ -106,7 +116,6 @@ export const authConfig = <NextAuthConfig>{
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string;
     provider?: string;
     access_token: string;
     expires_at: number; // seconds
@@ -115,7 +124,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-declare module "@auth/core/types" {
+declare module "next-auth" {
   interface DefaultUser {
     id?: string;
     name?: string | null;
@@ -124,7 +133,7 @@ declare module "@auth/core/types" {
     createdAt?: string;
     updatedAt?: string;
   }
-  interface Session {
+  interface Session extends DefaultUser {
     error?: "RefreshTokenError";
     accessToken?: string;
   }

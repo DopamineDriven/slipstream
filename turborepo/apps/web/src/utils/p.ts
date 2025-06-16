@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { default as prisma } from "@/lib/prisma";
+import { prismaClient as prisma } from "@/lib/prisma";
 
 dotenv.config();
 

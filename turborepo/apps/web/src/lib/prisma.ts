@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 declare global {
-  // eslint-disable-next-line no-var
-  var prismaClient: typeof prisma;
+    // eslint-disable-next-line no-var
+    var prisma: PrismaClient | undefined
 }
 
-if (process.env.NODE_ENV !== "production") global.prismaClient = prisma;
 
-export default prisma;
+export const prismaClient = globalThis.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+    globalThis.prisma = prismaClient
+}
