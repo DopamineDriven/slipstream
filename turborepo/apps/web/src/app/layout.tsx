@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { PageLayout } from "@/ui/page-layout";
 import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/lib/auth";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,14 +34,21 @@ export const metadata = {
   description: "@t3-chat-clone/web scaffolded by @d0paminedriven/turbogen"
 } satisfies Metadata;
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <html suppressHydrationWarning lang="en">
       <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+          crossOrigin="anonymous"
+        />
         <script
           async={true}
           id="prevent-flash-of-wrong-theme"
@@ -63,7 +72,9 @@ export default function RootLayout({
           inter.variable
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
-          <PageLayout>{children}</PageLayout>
+          <SessionProvider session={session}>
+            <PageLayout>{children}</PageLayout>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
