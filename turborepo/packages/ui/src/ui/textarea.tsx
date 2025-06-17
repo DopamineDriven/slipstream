@@ -3,7 +3,7 @@
 import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
 
-export interface TextareaProps extends ComponentPropsWithRef<"textarea"> {}
+ interface TextareaProps extends ComponentPropsWithRef<"textarea"> {}
 
 const Textarea = ({ ref, className, ...rest }: TextareaProps) => {
   return (
@@ -20,4 +20,4 @@ const Textarea = ({ ref, className, ...rest }: TextareaProps) => {
 
 Textarea.displayName = "Textarea";
 
-export { Textarea };
+export { Textarea, type TextareaProps };

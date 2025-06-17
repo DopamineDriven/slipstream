@@ -2,7 +2,6 @@ import type { NextAuthConfig } from "next-auth";
 // pages/api/auth/[...nextauth].ts
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
 import type { GoogleProfile } from "next-auth/providers/google";
-import { redirect } from "next/navigation";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 
@@ -48,8 +47,7 @@ export const authConfig = <NextAuthConfig>{
 
   callbacks: {
     async authorized(params) {
-      const nextUrl = params.request.nextUrl;
-      console.log({ nextUrl: nextUrl });
+      const _nextUrl = params.request.nextUrl;
       if (!params.auth?.user) {
         return false;
       } else {
