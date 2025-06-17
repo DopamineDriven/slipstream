@@ -1,9 +1,10 @@
 // src/index.ts
+import * as dotenv from "dotenv";
+import { openai } from "@/openai/index.ts";
 import { Resolver } from "./resolver/index.ts";
 import { WSServer } from "./ws-server/index.ts";
-import * as dotenv from "dotenv";
-dotenv.config();
 
+dotenv.config();
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 const jwtSecret =
@@ -12,7 +13,7 @@ const jwtSecret =
 const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 4000;
 
 const wsServer = new WSServer({ port, redisUrl, jwtSecret });
-const resolver = new Resolver(wsServer);
+const resolver = new Resolver(wsServer, openai, wsServer.redis);
 resolver.registerAll();
 wsServer.setResolver(resolver);
 

@@ -47,6 +47,7 @@
     "MY_GITHUB_PAT",
     "NODE_ENV",
     "OPEN_AI_KEY",
+    "OPENAI_API_KEY",
     "PGDATABASE",
     "PGHOST",
     "PGHOST_UNPOOLED",

@@ -1,22 +1,33 @@
 services:
   ws-server:
-    build: ./turborepo/apps/ws-server
+    build:
+      context: ./turborepo/apps/ws-server
+      dockerfile: Dockerfile
     env_file:
       - ./turborepo/apps/ws-server/.env
     ports:
       - "4000:4000"
     depends_on:
-      - python-image-service
-      - redis
+      redis:
+        condition: service_started
+      python-image-service:
+        condition: service_healthy
 
   python-image-service:
-    build: ./python
+    build: 
+      context: ./python
+      dockerfile: Dockerfile
     env_file:
       - ./python/.env
     ports:
       - "8000:8000"
     depends_on:
       - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
 
   redis:
     image: redis:7

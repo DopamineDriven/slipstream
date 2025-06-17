@@ -11,7 +11,7 @@ export const r2 = new S3Client({
   region: "auto",
   endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
   credentials: { accessKeyId, secretAccessKey },
-  logger: logger
+  logger: logger.child({name: "r2"})
 });
 
 export async function uploadToR2({
