@@ -3,7 +3,6 @@ import React from "react";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { cn } from "@/lib/utils";
-import { PageLayout } from "@/ui/page-layout";
 import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
 import { SessionProvider } from "next-auth/react";
@@ -73,7 +72,7 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
-            <PageLayout>{children}</PageLayout>
+              {children}
           </SessionProvider>
         </ThemeProvider>
       </body>
