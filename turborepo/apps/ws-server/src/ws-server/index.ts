@@ -1,3 +1,6 @@
+import http from "http";
+import { TLSSocket } from "tls";
+import type { IncomingMessage } from "http";
 import type {
   RedisClientType,
   RedisDefaultModules,
@@ -35,6 +38,8 @@ export class WSServer {
 
   private userMap = new Map<WebSocket, string>();
 
+  private httpServer: http.Server;
+
   public readonly handlers: HandlerMap = {};
   private resolver?: {
     handleRawMessage: (
@@ -47,11 +52,28 @@ export class WSServer {
   constructor(private opts: WSServerOptions) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
-    this.wss = new WebSocketServer({ port: opts.port });
     this.redis = createClient({ url: opts.redisUrl });
-  }
 
-  public wsHostname = process.env.WS_HOSTNAME ?? "localhost:4000";
+    this.httpServer = http.createServer((req, res) => {
+      const startTime = performance.now();
+
+      if (req.url === "/health") {
+        const processingTime = performance.now() - startTime;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            status: "ok",
+            processingTime: `${processingTime.toFixed(4)}ms`
+          })
+        );
+      } else {
+        res.writeHead(426, { "Content-Type": "text/plain" });
+        res.end("Upgrade Required");
+      }
+    });
+
+    this.wss = new WebSocketServer({ server: this.httpServer });
+  }
 
   public setResolver(resolver: {
     handleRawMessage: (
@@ -66,10 +88,14 @@ export class WSServer {
   public async start(): Promise<void> {
     await this.redis.connect();
     console.info(`Connected to Redis at ${this.opts.redisUrl}`);
-    console.info(`WebSocket server listening on ws://${this.wsHostname}`);
+    // now we listen on our HTTP server (which also speaks WS)
+    this.httpServer.listen(this.opts.port, () => {
+      console.info(`HTTP+WebSocket server listening on port ${this.opts.port}`);
+    });
 
+    // handle _all_ WS connections
     this.wss.on("connection", (ws, req) => {
-      this.handleConnection(ws, req.url ?? "");
+      this.handleConnection(ws, req);
     });
 
     // Redis pub/sub for broadcast
@@ -77,13 +103,11 @@ export class WSServer {
     await sub.connect();
     await sub.subscribe(this.channel, msg => this.broadcastRaw(msg));
   }
-
-  // private async handlePoolQuery(ws: Websocket, userId: string) {
-
-  // }
-
-  private async handleConnection(ws: WebSocket, url: string): Promise<void> {
-    const userId = await this.authenticateConnection(ws, url);
+  private async handleConnection(
+    ws: WebSocket,
+    req: IncomingMessage
+  ): Promise<void> {
+    const userId = await this.authenticateConnection(ws, req);
     if (!userId) return;
     this.userMap.set(ws, userId);
     console.info(`User ${userId} connected`);
@@ -103,9 +127,9 @@ export class WSServer {
 
   private async authenticateConnection(
     ws: WebSocket,
-    url: string
+    req: IncomingMessage
   ): Promise<string | null> {
-    const userEmail = this.extractUserEmailFromUrl(url);
+    const userEmail = this.extractUserEmailFromUrl(req);
     if (!userEmail) {
       ws.close(4001, "no user email, connection closed");
       return null;
@@ -126,10 +150,18 @@ export class WSServer {
     }
   }
 
-  private extractUserEmailFromUrl(url: string): string | null {
+  private extractUserEmailFromUrl(req: IncomingMessage): string | null {
+    const rawPath = req?.url ?? "";
+    const host = req?.headers?.host;
+    if (!host) return null;
+
+    const isSecure = req.socket instanceof TLSSocket;
+    // pick the right WS protocol (wss if TLS, otherwise ws)
+    const scheme = isSecure ? "wss" : "ws";
+    // build a full URL so URL.searchParams works
     try {
-      const u = new URL(url, `ws://${this.wsHostname}`);
-      return u.searchParams.get("email");
+      const full = new URL(`${scheme}://${host}${rawPath}`);
+      return full.searchParams.get("email");
     } catch {
       return null;
     }

@@ -3,7 +3,6 @@ import { openai } from "@/openai/index.ts";
 import { Resolver } from "./resolver/index.ts";
 import { WSServer } from "./ws-server/index.ts";
 
-
 dotenv.config();
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
