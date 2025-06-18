@@ -1,0 +1,56 @@
+# --- Node/PNPM/Turbo stuff ---
+node_modules
+.pnpm
+.pnp.*
+.yarn*
+package-lock.json
+
+# --- Output/Build artifacts ---
+dist
+build
+out
+.cache
+turbo
+.turbo
+.next
+coverage
+*.log
+
+# --- editor files ---
+.vscode
+.idea
+*.swp
+*.swo
+*.tmp
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- dotenv files ---
+.env
+.env.*
+!.env.example
+
+# --- polyrepo (python service) precaution ---
+python/
+**/__pycache__/
+**/*.pyc
+
+# --- Test/CI artifacts ---
+tests/
+__tests__/
+test-results/
+coverage/
+reports/
+
+# --- Docker build artifacts ---
+docker-out/
+.docker/
+*.pid
+
+# --- Ignore root lockfiles if only using workspace-level lockfiles ---
+# (Uncomment if you keep only pnpm-lock.yaml in the workspace root)
+# package-lock.json
+# yarn.lock
+

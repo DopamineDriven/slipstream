@@ -21,7 +21,13 @@ import { MessageInputBar } from "@/ui/message-input-bar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { Sidebar } from "@/ui/sidebar";
-import { ThemeToggle } from "@/ui/theme-toggle"; // Import new ThemeToggle
+import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import dynamic from "next/dynamic";
+
+const ThemeToggle = dynamic(
+  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  { ssr: false }
+);
 
 const SCROLL_THRESHOLD = 100;
 
@@ -32,6 +38,8 @@ export function ChatPage({ user }: { user?: User }) {
       originalText: typeof msg.text === "string" ? msg.text : ""
     }))
   );
+
+  const {} = useChatWebSocketContext()
   const [isChatEmpty, setIsChatEmpty] = useState(messages.length === 0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedModel, setSelectedModel] = useState<Model>(
@@ -112,7 +120,7 @@ export function ChatPage({ user }: { user?: User }) {
         minute: "2-digit"
       }),
       model: modelId,
-      avatar: "/placeholder.svg?width=32&height=32"
+      avatar: "/globe.svg?width=32&height=32"
     };
     setMessages(prev => [...prev, thinkingMessage]);
 

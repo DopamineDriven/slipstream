@@ -8,6 +8,7 @@ import type {
   TypeMapping
 } from "redis";
 import type { RawData } from "ws";
+import * as dotenv from "dotenv";
 import { createClient } from "redis";
 import { WebSocket, WebSocketServer } from "ws";
 import type {
@@ -16,8 +17,9 @@ import type {
   MessageHandler,
   WSServerOptions
 } from "@/types/index.ts";
-import { verifyJWT } from "@/auth/index.ts";
-import { logger } from "@/logger/index.ts";
+import { db } from "@/db/index.ts";
+
+dotenv.config();
 
 export class WSServer {
   private wss: WebSocketServer;
@@ -30,6 +32,9 @@ export class WSServer {
   >;
   public readonly channel: string;
   private readonly jwtSecret: string;
+
+  private userMap = new Map<WebSocket, string>();
+
   public readonly handlers: HandlerMap = {};
   private resolver?: {
     handleRawMessage: (
@@ -46,6 +51,8 @@ export class WSServer {
     this.redis = createClient({ url: opts.redisUrl });
   }
 
+  public wsHostname = process.env.WS_HOSTNAME ?? "localhost:4000";
+
   public setResolver(resolver: {
     handleRawMessage: (
       ws: WebSocket,
@@ -58,10 +65,8 @@ export class WSServer {
 
   public async start(): Promise<void> {
     await this.redis.connect();
-    logger.info(`Connected to Redis at ${this.opts.redisUrl}`);
-    logger.info(
-      `WebSocket server listening on ws://localhost:${this.opts.port}`
-    );
+    console.info(`Connected to Redis at ${this.opts.redisUrl}`);
+    console.info(`WebSocket server listening on ws://${this.wsHostname}`);
 
     this.wss.on("connection", (ws, req) => {
       this.handleConnection(ws, req.url ?? "");
@@ -73,45 +78,58 @@ export class WSServer {
     await sub.subscribe(this.channel, msg => this.broadcastRaw(msg));
   }
 
+  // private async handlePoolQuery(ws: Websocket, userId: string) {
+
+  // }
+
   private async handleConnection(ws: WebSocket, url: string): Promise<void> {
     const userId = await this.authenticateConnection(ws, url);
     if (!userId) return;
-
-    logger.info(`User ${userId} connected`);
+    this.userMap.set(ws, userId);
+    console.info(`User ${userId} connected`);
     ws.on("message", raw => {
       if (this.resolver) {
-        this.resolver.handleRawMessage(ws, userId, raw);
+        const uid = this.userMap.get(ws) ?? "";
+        this.resolver.handleRawMessage(ws, uid, raw);
       } else {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
     });
-    ws.on("close", () => logger.info(`User ${userId} disconnected`));
+    ws.on("close", () => {
+      this.userMap.delete(ws);
+      console.info(`User ${userId} disconnected`);
+    });
   }
 
   private async authenticateConnection(
     ws: WebSocket,
     url: string
   ): Promise<string | null> {
-    const token = this.extractTokenFromUrl(url);
-    if (!token) {
-      ws.close(4001, "Missing auth token");
+    const userEmail = this.extractUserEmailFromUrl(url);
+    if (!userEmail) {
+      ws.close(4001, "no user email, connection closed");
+      return null;
+    }
+    if (userEmail === "no-user-email") {
+      ws.close(4001, "no user email, connection closed");
       return null;
     }
     try {
-      const user = await verifyJWT(token);
-      if (!user) throw new Error("Invalid JWT");
-      return user.sub;
+      const decodedEmail = decodeURIComponent(userEmail);
+      const userIsValid = await db.isValidUserAndSessionByEmail(decodedEmail);
+      if (userIsValid === false) throw new Error("Invalid Session");
+      if (userIsValid.valid === false) throw new Error("Invalid Session");
+      return userIsValid.id;
     } catch {
       ws.close(4001, "Auth failed");
       return null;
     }
   }
 
-  private extractTokenFromUrl(url: string): string | null {
+  private extractUserEmailFromUrl(url: string): string | null {
     try {
-      return new URL(url, "ws://ws-server.d0paminedriven.com").searchParams.get(
-        "token"
-      );
+      const u = new URL(url, `ws://${this.wsHostname}`);
+      return u.searchParams.get("email");
     } catch {
       return null;
     }
@@ -146,6 +164,6 @@ export class WSServer {
   public async stop(): Promise<void> {
     await this.redis.quit();
     this.wss.close();
-    logger.info("Server shut down.");
+    console.info("Server shut down.");
   }
 }

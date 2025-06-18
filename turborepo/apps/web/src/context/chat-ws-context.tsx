@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
+import { useSession } from "next-auth/react";
 import type { ChatWsEvent } from "@/types/chat-ws";
 import { useChatWebSocket } from "@/hooks/use-chat-ws";
 
@@ -16,12 +17,17 @@ const ChatWebSocketContext = createContext<ChatWebSocketContextValue | null>(
 
 export function ChatWebSocketProvider({
   children,
-  wsUrl
+  email
 }: {
   children: React.ReactNode;
-  wsUrl: string;
+  email?: string;
 }) {
-  const { lastEvent, isConnected, sendEvent } = useChatWebSocket(wsUrl);
+  const { data: session } = useSession();
+
+  console.log(JSON.stringify(session, null, 2));
+  const { lastEvent, isConnected, sendEvent } = useChatWebSocket(
+    `${process.env.NEXT_PUBLIC_WS_URL}?email=${email ?? session?.user?.email}`
+  );
 
   return (
     <ChatWebSocketContext.Provider

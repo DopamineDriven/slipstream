@@ -1,8 +1,8 @@
-// src/index.ts
 import * as dotenv from "dotenv";
 import { openai } from "@/openai/index.ts";
 import { Resolver } from "./resolver/index.ts";
 import { WSServer } from "./ws-server/index.ts";
+
 
 dotenv.config();
 

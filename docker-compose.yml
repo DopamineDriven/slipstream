@@ -1,17 +1,15 @@
 services:
   ws-server:
     build:
-      context: ./turborepo/apps/ws-server
+      context: ./turborepo
       dockerfile: Dockerfile
     env_file:
       - ./turborepo/apps/ws-server/.env
     ports:
       - "4000:4000"
     depends_on:
-      redis:
-        condition: service_started
-      python-image-service:
-        condition: service_healthy
+      - redis
+      - python-image-service
 
   python-image-service:
     build: 

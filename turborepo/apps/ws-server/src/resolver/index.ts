@@ -15,10 +15,12 @@ import type {
   AnyEventTypeUnion,
   EventTypeMap
 } from "@/types/index.ts";
-import { logger } from "@/logger/index.ts";
 import { bucket, uploadToR2 } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import OpenAI from "openai";
+import * as dotenv from "dotenv";
+dotenv.config();
+
 
 const FASTAPI_URL =
   process.env.FASTAPI_URL ?? "http://localhost:8000/generate-image";
@@ -172,7 +174,7 @@ export class Resolver {
       }
       return msg as AnyEvent;
     } catch {
-      logger.error("Invalid message received");
+      console.error("Invalid message received");
       return null;
     }
   }
@@ -202,6 +204,7 @@ export class Resolver {
     ws: WebSocket,
     userId: string
   ): Promise<void> {
+    console.log(event.type);
     ws.send(JSON.stringify({ type: "pong", userId }));
   }
 
