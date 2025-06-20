@@ -15,7 +15,6 @@ export function Nav() {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    // Check if user prefers dark mode
     const prefersDark =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -36,6 +35,7 @@ export function Nav() {
       }
     }
   }, [resolvedTheme]);
+  
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 max-w-9xl sticky top-0 z-40 w-full self-center border-b backdrop-blur">
       <div className="container flex h-14 items-center">
