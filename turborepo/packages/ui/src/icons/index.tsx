@@ -9,7 +9,9 @@ import { Bot } from "./bot";
 import { Camera } from "./camera";
 import { Check } from "./check";
 import { ChevronDown } from "./chevron-down";
+import { ChevronRight } from "./chevron-right";
 import { CirclePlus } from "./circle-plus";
+import { Circle } from "./circle";
 import { Code } from "./code";
 import { Compass } from "./compass";
 import { Copy } from "./copy";
@@ -51,7 +53,9 @@ const IconComponents = {
   Camera,
   Check,
   ChevronDown,
+  ChevronRight,
   CirclePlus,
+  Circle,
   Code,
   Compass,
   Copy,
@@ -128,7 +132,9 @@ export {
   Camera,
   Check,
   ChevronDown,
+  ChevronRight,
   CirclePlus,
+  Circle,
   Code,
   Compass,
   Copy,

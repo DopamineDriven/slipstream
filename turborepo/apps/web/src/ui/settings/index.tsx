@@ -1,15 +1,43 @@
 "use client";
 
+import type { User } from "next-auth";
 import { Button, Icon } from "@t3-chat-clone/ui";
+import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { SettingsLayout } from "@/ui/settings/settings-layout";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import type { User } from "next-auth";
 
-export function SettingsPage({user}: {user?: User}) {
-  const { theme, setTheme } = useTheme();
+const ThemeToggle = dynamic(
+  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  { ssr: false }
+);
+export function SettingsPage({ user }: { user?: User }) {
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    // Check if user prefers dark mode
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    // Apply theme based on system preference during initial load
+    if (!resolvedTheme) {
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      // Apply theme based on resolvedTheme once it's available
+      if (resolvedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [resolvedTheme]);
 
   return (
     <div className="bg-brand-background text-brand-text flex h-screen flex-col">
@@ -29,19 +57,15 @@ export function SettingsPage({user}: {user?: User}) {
           </Link>
         </Button>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-            {theme === "dark" ? <Icon.Sun /> : <Icon.Moon />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
           <Button
             variant="outline"
+            asChild
             className="border-red-400/50 text-red-400 hover:border-red-300/50 hover:bg-red-400/10 hover:text-red-300">
-            <Icon.LogOut className="mr-1 h-4 w-4 sm:mr-2" />{" "}
-            <span className="hidden sm:inline">Sign </span>Out
+            <Link href="/api/auth/signout">
+              <Icon.LogOut className="mr-1 size-3 sm:mr-1.5" />{" "}
+              <span className="hidden sm:inline">Sign </span>Out
+            </Link>{" "}
           </Button>
         </div>
       </motion.header>
@@ -50,7 +74,13 @@ export function SettingsPage({user}: {user?: User}) {
       <div className="flex-1 gap-4 overflow-hidden px-2 pb-2 sm:gap-6 sm:px-4 sm:pb-4 md:gap-8 md:px-6 md:pb-6 lg:grid lg:grid-cols-12 lg:px-8 lg:pb-8">
         <div className="lg:col-span-4 lg:overflow-y-auto xl:col-span-3">
           {/* Left column: scrollable if content overflows */}
-          <UserProfileCard user={{messageUsage: {current: 4, limit: 20}, plan: "Free", ...user}} />
+          <UserProfileCard
+            user={{
+              messageUsage: { current: 4, limit: 20 },
+              plan: "Free",
+              ...user
+            }}
+          />
         </div>
         <div className="lg:col-span-8 lg:overflow-y-auto xl:col-span-9">
           {/* Right column: scrollable if content overflows */}

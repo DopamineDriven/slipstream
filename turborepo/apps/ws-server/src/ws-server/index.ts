@@ -1,3 +1,6 @@
+import http from "http";
+import { TLSSocket } from "tls";
+import type { IncomingMessage } from "http";
 import type {
   RedisClientType,
   RedisDefaultModules,
@@ -8,6 +11,7 @@ import type {
   TypeMapping
 } from "redis";
 import type { RawData } from "ws";
+import * as dotenv from "dotenv";
 import { createClient } from "redis";
 import { WebSocket, WebSocketServer } from "ws";
 import type {
@@ -16,8 +20,9 @@ import type {
   MessageHandler,
   WSServerOptions
 } from "@/types/index.ts";
-import { verifyJWT } from "@/auth/index.ts";
-import { logger } from "@/logger/index.ts";
+import { DbService } from "@/db/index.ts";
+
+dotenv.config();
 
 export class WSServer {
   private wss: WebSocketServer;
@@ -30,6 +35,11 @@ export class WSServer {
   >;
   public readonly channel: string;
   private readonly jwtSecret: string;
+
+  private userMap = new Map<WebSocket, string>();
+
+  private httpServer: http.Server;
+
   public readonly handlers: HandlerMap = {};
   private resolver?: {
     handleRawMessage: (
@@ -39,11 +49,30 @@ export class WSServer {
     ) => void | Promise<void>;
   };
 
-  constructor(private opts: WSServerOptions) {
+  constructor(private opts: WSServerOptions, private db: DbService) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
-    this.wss = new WebSocketServer({ port: opts.port });
     this.redis = createClient({ url: opts.redisUrl });
+
+    this.httpServer = http.createServer((req, res) => {
+      const startTime = performance.now();
+
+      if (req.url === "/health") {
+        const processingTime = performance.now() - startTime;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            status: "ok",
+            processingTime: `${processingTime.toFixed(4)}ms`
+          })
+        );
+      } else {
+        res.writeHead(426, { "Content-Type": "text/plain" });
+        res.end("Upgrade Required");
+      }
+    });
+
+    this.wss = new WebSocketServer({ server: this.httpServer });
   }
 
   public setResolver(resolver: {
@@ -58,13 +87,16 @@ export class WSServer {
 
   public async start(): Promise<void> {
     await this.redis.connect();
-    logger.info(`Connected to Redis at ${this.opts.redisUrl}`);
-    logger.info(
-      `WebSocket server listening on ws://localhost:${this.opts.port}`
-    );
+    console.info(`Connected to Redis at ${this.opts.redisUrl}`);
+    // now we listen on our HTTP server (which also speaks WS)
+    this.httpServer.listen(this.opts.port, () => {
+      console.info(`HTTP+WebSocket server listening on port ${this.opts.port}`);
+    });
 
+    // handle _all_ WS connections
     this.wss.on("connection", (ws, req) => {
-      this.handleConnection(ws, req.url ?? "");
+      ws._socket.setKeepAlive(true, 60_000);
+      this.handleConnection(ws, req);
     });
 
     // Redis pub/sub for broadcast
@@ -72,46 +104,65 @@ export class WSServer {
     await sub.connect();
     await sub.subscribe(this.channel, msg => this.broadcastRaw(msg));
   }
-
-  private async handleConnection(ws: WebSocket, url: string): Promise<void> {
-    const userId = await this.authenticateConnection(ws, url);
+  private async handleConnection(
+    ws: WebSocket,
+    req: IncomingMessage
+  ): Promise<void> {
+    const userId = await this.authenticateConnection(ws, req);
     if (!userId) return;
-
-    logger.info(`User ${userId} connected`);
+    this.userMap.set(ws, userId);
+    console.info(`User ${userId} connected`);
     ws.on("message", raw => {
       if (this.resolver) {
-        this.resolver.handleRawMessage(ws, userId, raw);
+        const uid = this.userMap.get(ws) ?? "";
+        this.resolver.handleRawMessage(ws, uid, raw);
       } else {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
     });
-    ws.on("close", () => logger.info(`User ${userId} disconnected`));
+    ws.on("close", () => {
+      this.userMap.delete(ws);
+      console.info(`User ${userId} disconnected`);
+    });
   }
 
   private async authenticateConnection(
     ws: WebSocket,
-    url: string
+    req: IncomingMessage
   ): Promise<string | null> {
-    const token = this.extractTokenFromUrl(url);
-    if (!token) {
-      ws.close(4001, "Missing auth token");
+    const userEmail = this.extractUserEmailFromUrl(req);
+    if (!userEmail) {
+      ws.close(4001, "no user email, connection closed");
+      return null;
+    }
+    if (userEmail === "no-user-email") {
+      ws.close(4001, "no user email, connection closed");
       return null;
     }
     try {
-      const user = await verifyJWT(token);
-      if (!user) throw new Error("Invalid JWT");
-      return user.sub;
+      const decodedEmail = decodeURIComponent(userEmail);
+      const userIsValid = await this.db.isValidUserAndSessionByEmail(decodedEmail);
+      if (userIsValid === false) throw new Error("Invalid Session");
+      if (userIsValid.valid === false) throw new Error("Invalid Session");
+      return userIsValid.id;
     } catch {
       ws.close(4001, "Auth failed");
       return null;
     }
   }
 
-  private extractTokenFromUrl(url: string): string | null {
+  private extractUserEmailFromUrl(req: IncomingMessage): string | null {
+    const rawPath = req?.url ?? "";
+    const host = req?.headers?.host;
+    if (!host) return null;
+
+    const isSecure = req.socket instanceof TLSSocket;
+    // pick the right WS protocol (wss if TLS, otherwise ws)
+    const scheme = isSecure ? "wss" : "ws";
+    // build a full URL so URL.searchParams works
     try {
-      return new URL(url, "ws://ws-server.d0paminedriven.com").searchParams.get(
-        "token"
-      );
+      const full = new URL(`${scheme}://${host}${rawPath}`);
+      return full.searchParams.get("email");
     } catch {
       return null;
     }
@@ -146,6 +197,6 @@ export class WSServer {
   public async stop(): Promise<void> {
     await this.redis.quit();
     this.wss.close();
-    logger.info("Server shut down.");
+    console.info("Server shut down.");
   }
 }

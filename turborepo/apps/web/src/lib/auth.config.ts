@@ -1,31 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
 // pages/api/auth/[...nextauth].ts
-import type { JWT as NextAuthJWT } from "next-auth/jwt";
 import type { GoogleProfile } from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-
-export interface AccessTokenSuccess {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  refresh_token: string;
-  scope?: string;
-}
-
-export interface AccessTokenError {
-  error_description?: string;
-  error_uri?: string;
-  error: string;
-}
-
-/**
- * see https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
- */
-export type AccessTokenResUnion = AccessTokenError | AccessTokenSuccess;
+import Passkey from "next-auth/providers/passkey";
 
 export const authConfig = <NextAuthConfig>{
   providers: [
+    Passkey,
     Google<GoogleProfile>({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
@@ -38,101 +20,11 @@ export const authConfig = <NextAuthConfig>{
       clientSecret: process.env.AUTH_GITHUB_SECRET
     })
   ],
-  trustHost: true,
-  debug: true,
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60
   },
-  secret: process.env.AUTH_SECRET,
-
-  callbacks: {
-    async authorized(params) {
-      const _nextUrl = params.request.nextUrl;
-      if (!params.auth?.user) {
-        return false;
-      } else {
-        return true;
-      }
-    },
-    async jwt({ token, account }) {
-
-      if (account) {
-        return {
-          ...token,
-          provider: account.provider,
-          access_token: account.access_token ?? token.access_token,
-          expires_at: account.expires_at ?? token.expires_at,
-          refresh_token: account.refresh_token ?? token.refresh_token
-        };
-      }
-      if (token?.provider !== "google") return token;
-      if (Date.now() < (token as NextAuthJWT).expires_at * 1000) {
-        return token;
-      }
-      // Otherwise, refresh it
-      if (!token.refresh_token) {
-        throw new Error("Missing refresh token");
-      }
-      try {
-        const resp = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            client_id: process.env.AUTH_GOOGLE_ID ?? "",
-            client_secret: process.env.AUTH_GOOGLE_SECRET ?? "",
-            grant_type: "refresh_token",
-            refresh_token: token.refresh_token
-          })
-        });
-        const data = (await resp.json()) as AccessTokenResUnion;
-        if ("error" in data) {
-          throw new Error(
-            data.error_description ?? `Token endpoint returned ${resp.status}`,
-            { cause: data }
-          );
-        } else {
-          return {
-            ...token,
-            access_token: data.access_token,
-            expires_at: Math.floor(Date.now() / 1000 + data.expires_in),
-            refresh_token: data.refresh_token ?? token.refresh_token
-          };
-        }
-      } catch (err) {
-        console.error("RefreshTokenError", err);
-        return { ...token, error: "RefreshTokenError" };
-      }
-    },
-    async session({ session, token }) {
-      // Expose any error and fresh access token in session
-      session.error = token.error;
-      session.accessToken = token.access_token;
-      return session;
-    }
-  }
+  experimental: { enableWebAuthn: true },
+  trustHost: true,
+  debug: true
 };
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    provider?: string;
-    access_token: string;
-    expires_at: number; // seconds
-    refresh_token?: string;
-    error?: "RefreshTokenError";
-  }
-}
-
-declare module "next-auth" {
-  interface DefaultUser {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-  }
-  interface Session extends DefaultUser {
-    error?: "RefreshTokenError";
-    accessToken?: string;
-  }
-}

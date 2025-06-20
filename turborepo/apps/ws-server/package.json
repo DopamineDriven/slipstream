@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "source": "src/index.ts",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
-    "typesVersions": {
+  "typesVersions": {
     "*": {
       "*": [
         "dist/*.d.ts",
@@ -16,14 +17,20 @@
       "auth": [
         "dist/auth/index.d.ts"
       ],
-      "logger": [
-        "dist/logger/index.d.ts"
+      "db": [
+        "dist/db/index.d.ts"
+      ],
+      "openai": [
+        "dist/openai/index.d.ts"
       ],
       "pubsub": [
         "dist/pubsub/index.d.ts"
       ],
       "r2-helper": [
         "dist/r2-helper/index.d.ts"
+      ],
+      "resolver": [
+        "dist/resolver/index.d.ts"
       ],
       "types": [
         "dist/types/index.d.ts"
@@ -36,37 +43,42 @@
   "scripts": {
     "build": "tsup",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "dev": "tsup --config tsup.config.dev.ts",
-    "lint": "eslint"
+    "devv": "tsup --config tsup.config.dev.ts",
+    "dev": "nodemon --watch src --ext ts --exec \"tsx src/index.ts\"",
+    "lint": "eslint",
+    "output:md": "tsx src/test/to-md.ts --target root false"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.828.0",
+    "@aws-sdk/client-s3": "^3.832.0",
+    "@neondatabase/serverless": "^1.0.1",
+    "@types/node": "^24.0.3",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0",
+    "dotenv-expand": "^12.0.2",
     "jose": "^6.0.11",
+    "openai": "^5.5.1",
     "redis": "^5.5.6",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3",
     "ws": "^8.18.2"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^6.1.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
+    "@t3-chat-clone/jest-presets": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.3",
-    "@types/ws": "^8.18.1",
-    "dotenv": "^16.5.0",
-    "dotenv-cli":"^8.0.0",
-    "dotenv-expand": "^12.0.2",
-    "esbuild-plugin-pino": "^2.2.2",
+    "@types/jest": "^30.0.0",
     "eslint": "^9.29.0",
+    "jest": "^30.0.2",
     "jiti": "^2.4.2",
-    "pino": "^9.7.0",
-    "pino-pretty": "^13.0.0",
+    "nodemon": "^3.1.10",
     "prettier": "^3.5.3",
-    "terser": "^5.42.0",
-    "tslib": "^2.8.1",
+    "terser": "^5.43.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.0"
+    "typescript-eslint": "^8.34.1"
   }
 }

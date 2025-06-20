@@ -1,6 +1,7 @@
 "use client";
 
-import { Icon } from "@t3-chat-clone/ui";
+import type { ComponentPropsWithRef, HTMLAttributes } from "react";
+import { X } from "@t3-chat-clone/ui";
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
@@ -13,11 +14,14 @@ const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
 
+type DialogProps<T extends "Overlay" | "Content" | "Title" | "Description"> =
+  ComponentPropsWithRef<(typeof DialogPrimitive)[T]>;
+
 const DialogOverlay = ({
   className,
   ref,
   ...props
-}: React.ComponentPropsWithRef<typeof DialogPrimitive.Overlay>) => (
+}: DialogProps<"Overlay">) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
@@ -34,7 +38,7 @@ const DialogContent = ({
   ref,
   children,
   ...props
-}: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) => (
+}: DialogProps<"Content">) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -46,7 +50,7 @@ const DialogContent = ({
       {...props}>
       {children}
       <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-        <Icon.X className="h-4 w-4" />
+        <X className="size-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
@@ -57,7 +61,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 const DialogHeader = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+}: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
@@ -71,7 +75,7 @@ DialogHeader.displayName = "DialogHeader";
 const DialogFooter = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+}: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
@@ -82,11 +86,7 @@ const DialogFooter = ({
 );
 DialogFooter.displayName = "DialogFooter";
 
-const DialogTitle = ({
-  className,
-  ref,
-  ...props
-}: React.ComponentPropsWithRef<typeof DialogPrimitive.Title>) => (
+const DialogTitle = ({ className, ref, ...props }: DialogProps<"Title">) => (
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
@@ -102,7 +102,7 @@ const DialogDescription = ({
   className,
   ref,
   ...props
-}: React.ComponentPropsWithRef<typeof DialogPrimitive.Description>) => (
+}: DialogProps<"Description">) => (
   <DialogPrimitive.Description
     ref={ref}
     className={cn("text-muted-foreground text-sm", className)}
@@ -121,5 +121,6 @@ export {
   DialogHeader,
   DialogFooter,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
+  type DialogProps
 };

@@ -1,1 +1,4 @@
 .env
+ecs-task-trust.json
+ws-server-taskdef.json
+python-service-taskdef.json

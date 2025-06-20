@@ -20,6 +20,7 @@
     "generate:hex": "openssl rand -hex 64",
     "npm:registry": "npm set registry https://registry.npmjs.org",
     "run:web": "turbo dev --filter=@t3-chat-clone/web",
+        "run:ws-server": "turbo dev --filter=@t3-chat-clone/ws-server",
     "latest:pnpm": "corepack use pnpm@latest",
     "update:pnpm": "curl -fsSL https://get.pnpm.io/install.sh | sh -"
   },
@@ -37,7 +38,7 @@
     "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "vercel": "^43.2.0"
+    "vercel": "^43.3.0"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {

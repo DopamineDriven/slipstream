@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
 import { SessionProvider } from "next-auth/react";
+import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { auth } from "@/lib/auth";
 
 const inter = Inter({
@@ -72,7 +73,9 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
+            <ChatWebSocketProvider email={session?.user?.email ?? undefined}>
               {children}
+            </ChatWebSocketProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

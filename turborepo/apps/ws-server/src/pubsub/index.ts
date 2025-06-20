@@ -1,5 +1,7 @@
 import { createClient } from "redis";
-import { logger } from "@/logger/index.ts";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const REDIS_URL = process.env.REDIS_URL ?? "redis://localhost:6379";
 export const redis = createClient({ url: REDIS_URL });
@@ -14,7 +16,7 @@ export function subscribeToMessages(
     sub.subscribe(channel, msg => {
       cb(msg);
     });
-    logger.info(`Subscribed to ${channel}`);
+    console.info(`Subscribed to ${channel}`);
   });
   return async () => {
     await sub.unsubscribe(channel);

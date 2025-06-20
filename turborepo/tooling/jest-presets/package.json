@@ -15,16 +15,14 @@
   "scripts": {
     "clean": "git clean -xdf node_modules"
   },
-  "peerDependencies": {
-    "jest": ">=30.0.0"
-  },
   "dependencies": {
     "ts-jest": "^29.4.0"
   },
   "devDependencies": {
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "jest-environment-jsdom": "^30.0.0",
+    "jest": "^30.0.2",
+    "jest-environment-jsdom": "^30.0.2",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3"
   },

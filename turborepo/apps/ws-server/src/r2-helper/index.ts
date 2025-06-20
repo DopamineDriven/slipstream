@@ -1,6 +1,8 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
-import { logger } from "@/logger/index.ts";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 export const accountId = process.env.R2_ACCOUNT_ID ?? "";
 export const accessKeyId = process.env.R2_ACCESS_KEY_ID ?? "";
@@ -10,8 +12,7 @@ export const bucket = process.env.R2_BUCKET ?? "t3-chat-clone-pg";
 export const r2 = new S3Client({
   region: "auto",
   endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-  credentials: { accessKeyId, secretAccessKey },
-  logger: logger
+  credentials: { accessKeyId, secretAccessKey }
 });
 
 export async function uploadToR2({
@@ -28,13 +29,13 @@ export async function uploadToR2({
     typeof uploadIt.$metadata.httpStatusCode !== "undefined" &&
     uploadIt.$metadata.httpStatusCode < 300
   ) {
-    logger.info(
+    console.info(
       { Key, Bucket, status: uploadIt.$metadata.httpStatusCode },
       "R2 upload success"
     );
     return `https://t3-clone.asrosscloud.com/${Key}`;
   } else {
-    logger.error(
+    console.error(
       { Key, Bucket, meta: uploadIt.$metadata },
       "R2 upload failure"
     );

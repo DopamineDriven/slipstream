@@ -1,15 +1,11 @@
-import { NextResponse, userAgent } from "next/server";
-import NextAuth, { NextAuthConfig, NextAuthRequest } from "next-auth";
-import { authConfig } from "@/lib/auth.config";
-
-const { auth } = NextAuth({ ...authConfig } as NextAuthConfig);
+import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
 };
 
 function detectDeviceAndSetCookies(
-  request: NextAuthRequest,
+  request: NextRequest,
   response: NextResponse
 ) {
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
@@ -71,13 +67,11 @@ function detectDeviceAndSetCookies(
   return response;
 }
 
-export default auth(async function middleware(req, _ctx) {
-  const nextUrl = req.nextUrl;
-  const pathname = nextUrl.pathname;
-  if (!req.auth?.user && !pathname.startsWith("/api")) {
-    const res = NextResponse.redirect(new URL("/api/auth/signin", nextUrl));
-    return detectDeviceAndSetCookies(req, res);
-  }
+export default async function middleware(req: NextRequest) {
+  // if (!req.auth?.user && !pathname.startsWith("/api")) {
+  //   const res = NextResponse.redirect(new URL("/api/auth/signin", nextUrl));
+  //   return detectDeviceAndSetCookies(req, res);
+  // }
   const res = NextResponse.next();
   return detectDeviceAndSetCookies(req, res);
-});
+}

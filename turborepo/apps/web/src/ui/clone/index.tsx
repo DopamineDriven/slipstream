@@ -3,9 +3,12 @@
 import type { User } from "next-auth";
 import { Button, Icon } from "@t3-chat-clone/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
+// import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
+import { useTheme } from "next-themes";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import type { Message, Model } from "@/types/ui";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -21,7 +24,11 @@ import { MessageInputBar } from "@/ui/message-input-bar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { Sidebar } from "@/ui/sidebar";
-import { ThemeToggle } from "@/ui/theme-toggle"; // Import new ThemeToggle
+
+const ThemeToggle = dynamic(
+  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  { ssr: false }
+);
 
 const SCROLL_THRESHOLD = 100;
 
@@ -32,6 +39,8 @@ export function ChatPage({ user }: { user?: User }) {
       originalText: typeof msg.text === "string" ? msg.text : ""
     }))
   );
+
+  // const {} = useChatWebSocketContext()
   const [isChatEmpty, setIsChatEmpty] = useState(messages.length === 0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedModel, setSelectedModel] = useState<Model>(
@@ -43,6 +52,31 @@ export function ChatPage({ user }: { user?: User }) {
   const chatAreaContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollToBottomButton, setShowScrollToBottomButton] =
     useState(false);
+
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    // Check if user prefers dark mode
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    // Apply theme based on system preference during initial load
+    if (!resolvedTheme) {
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      // Apply theme based on resolvedTheme once it's available
+      if (resolvedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [resolvedTheme]);
 
   useEffect(() => {
     setIsSidebarOpen(isDesktop);
@@ -85,7 +119,7 @@ export function ChatPage({ user }: { user?: User }) {
     isEditSubmit = false
   ) => {
     const newMessage: Message = {
-      id: String(Date.now()),
+      id: crypto.randomUUID(),
       sender: "user",
       text,
       originalText: text,
@@ -112,7 +146,7 @@ export function ChatPage({ user }: { user?: User }) {
         minute: "2-digit"
       }),
       model: modelId,
-      avatar: "/placeholder.svg?width=32&height=32"
+      avatar: "/globe.svg?width=32&height=32"
     };
     setMessages(prev => [...prev, thinkingMessage]);
 

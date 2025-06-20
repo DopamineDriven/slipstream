@@ -5,7 +5,7 @@ const fs = new Fs(process.cwd());
 const readDir = fs.readDir("src/icons", { recursive: true });
 
 if (process.argv[3] === "exports") {
-  const workup = readDir.map(
+  const workup = readDir.filter((t) => /index/.test(t) === false).map(
     t =>
       [
         `./icons/${t.replace(".tsx", "")}`,

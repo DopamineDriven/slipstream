@@ -2,9 +2,13 @@
 
 import { Button, Icon } from "@t3-chat-clone/ui";
 import { useEffect, useState } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { useTheme } from "next-themes";
 
-export function ThemeToggle() {
+export function ThemeToggle({
+  style,
+  ...props
+}: Omit<ComponentPropsWithRef<typeof Button>, "variant" | "size" | "onClick">) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -23,9 +27,11 @@ export function ThemeToggle() {
 
     return (
       <Button
+        {...props}
         variant="ghost"
         size="icon"
         style={{
+          ...style,
           backgroundColor: "transparent",
           border: "none",
           cursor: "pointer",
@@ -61,10 +67,12 @@ export function ThemeToggle() {
 
   return (
     <Button
+      {...props}
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
       style={{
+        ...style,
         backgroundColor: "transparent",
         border: "none",
         cursor: "pointer",
