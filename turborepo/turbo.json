@@ -45,6 +45,7 @@
     "GOOGLE_CLIENT_SECRET",
     "JWT_SECRET",
     "MY_GITHUB_PAT",
+    "NPM_RC",
     "NODE_ENV",
     "OPEN_AI_KEY",
     "OPENAI_API_KEY",
