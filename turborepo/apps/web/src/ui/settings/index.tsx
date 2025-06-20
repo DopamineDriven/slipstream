@@ -1,12 +1,10 @@
 "use client";
 
 import type { User } from "next-auth";
-import { Button, Icon } from "@t3-chat-clone/ui";
-import { useEffect } from "react";
+import { ArrowLeft, LogOut, Button } from "@t3-chat-clone/ui";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { useTheme } from "next-themes";
 import { SettingsLayout } from "@/ui/settings/settings-layout";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
 
@@ -15,30 +13,6 @@ const ThemeToggle = dynamic(
   { ssr: false }
 );
 export function SettingsPage({ user }: { user?: User }) {
-  const { resolvedTheme } = useTheme();
-  useEffect(() => {
-    // Check if user prefers dark mode
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    // Apply theme based on system preference during initial load
-    if (!resolvedTheme) {
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else {
-      // Apply theme based on resolvedTheme once it's available
-      if (resolvedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  }, [resolvedTheme]);
-
   return (
     <div className="bg-brand-background text-brand-text flex h-screen flex-col">
       <motion.header
@@ -52,21 +26,17 @@ export function SettingsPage({ user }: { user?: User }) {
           asChild
           className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
           <Link href="/">
-            <Icon.ArrowLeft className="mr-1 size-4 sm:mr-2" />{" "}
+            <ArrowLeft className="mr-1 size-4 sm:mr-2" />{" "}
             <span className="hidden sm:inline">Back to </span>Chat
           </Link>
         </Button>
         <div className="flex items-center space-x-2">
-          <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
-          <Button
-            variant="outline"
-            asChild
-            className="border-red-400/50 text-red-400 hover:border-red-300/50 hover:bg-red-400/10 hover:text-red-300">
-            <Link href="/api/auth/signout">
-              <Icon.LogOut className="mr-1 size-3 sm:mr-1.5" />{" "}
+          <ThemeToggle className="text-brand-text-muted cursor-pointer hover:text-brand-text hover:bg-brand-component" />
+
+            <Link href="/api/auth/signout" className="p-2.5 my-auto align-middle text-brand-text-muted hover:text-brand-text hover:bg-brand-component inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
+              <LogOut className="mr-1 size-5 sm:mr-2 hover:bg-accent hover:text-accent-foreground" />{" "}
               <span className="hidden sm:inline">Sign </span>Out
-            </Link>{" "}
-          </Button>
+            </Link>
         </div>
       </motion.header>
 
