@@ -27,9 +27,18 @@ export type AIChatResponse = {
 export type AIChatChunk = {
   type: "ai_chat_chunk";
   conversationId: string;
+  userId: string;
   chunk: string;
   done: boolean;
 };
+
+export type AIChatError = {
+  type: "ai_chat_error";
+  conversationId: string;
+  userId: string;
+  message: string;
+  done: true;
+}
 
 export type TypingIndicator = {
   type: "typing";
@@ -80,6 +89,7 @@ export type AnyEvent =
   | AssetUploadRequest
   | AssetUploadResponse
   | AIChatChunk
+  | AIChatError
   | AIChatRequest
   | AIChatResponse
   | ChatMessage
@@ -109,6 +119,7 @@ export type EventUnion = XOR<ChatMessage, TypingIndicator>;
 
 export type EventTypeMap = {
   ai_chat_chunk: AIChatChunk;
+  ai_chat_error: AIChatError;
   ai_chat_request: AIChatRequest;
   ai_chat_response: AIChatResponse;
   asset_upload_request: AssetUploadRequest;

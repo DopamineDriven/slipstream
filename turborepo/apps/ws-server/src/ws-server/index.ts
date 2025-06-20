@@ -20,7 +20,7 @@ import type {
   MessageHandler,
   WSServerOptions
 } from "@/types/index.ts";
-import { db } from "@/db/index.ts";
+import { DbService } from "@/db/index.ts";
 
 dotenv.config();
 
@@ -49,7 +49,7 @@ export class WSServer {
     ) => void | Promise<void>;
   };
 
-  constructor(private opts: WSServerOptions) {
+  constructor(private opts: WSServerOptions, private db: DbService) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
     this.redis = createClient({ url: opts.redisUrl });
@@ -95,6 +95,7 @@ export class WSServer {
 
     // handle _all_ WS connections
     this.wss.on("connection", (ws, req) => {
+      ws._socket.setKeepAlive(true, 60_000);
       this.handleConnection(ws, req);
     });
 
@@ -140,7 +141,7 @@ export class WSServer {
     }
     try {
       const decodedEmail = decodeURIComponent(userEmail);
-      const userIsValid = await db.isValidUserAndSessionByEmail(decodedEmail);
+      const userIsValid = await this.db.isValidUserAndSessionByEmail(decodedEmail);
       if (userIsValid === false) throw new Error("Invalid Session");
       if (userIsValid.valid === false) throw new Error("Invalid Session");
       return userIsValid.id;

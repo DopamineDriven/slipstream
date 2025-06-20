@@ -1,6 +1,4 @@
 import type { ChatCompletionChunk } from "openai/resources/index.mjs";
-import type { RawData } from "ws";
-import { WebSocket } from "ws";
 import type {
   RedisClientType,
   RedisDefaultModules,
@@ -10,6 +8,10 @@ import type {
   RespVersions,
   TypeMapping
 } from "redis";
+import type { RawData } from "ws";
+import * as dotenv from "dotenv";
+import OpenAI from "openai";
+import { WebSocket } from "ws";
 import type {
   AnyEvent,
   AnyEventTypeUnion,
@@ -17,22 +19,24 @@ import type {
 } from "@/types/index.ts";
 import { bucket, uploadToR2 } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import OpenAI from "openai";
-import * as dotenv from "dotenv";
-dotenv.config();
 
+dotenv.config();
 
 const FASTAPI_URL =
   process.env.FASTAPI_URL ?? "http://localhost:8000/generate-image";
 
 export class Resolver {
-  constructor(public wsServer: WSServer, private openai: OpenAI, private redis: RedisClientType<
+  constructor(
+    public wsServer: WSServer,
+    private openai: OpenAI,
+    private redis: RedisClientType<
       RedisDefaultModules & RedisModules,
       RedisFunctions,
       RedisScripts,
       RespVersions,
       TypeMapping
-    >) {}
+    >
+  ) {}
 
   /** Register all event handlers here */
   public registerAll() {
@@ -51,6 +55,20 @@ export class Resolver {
     // You can also register response handlers if needed (for internal use)
   }
 
+  public safeErrMsg(err: unknown) {
+    if (err instanceof Error) {
+      return err.message;
+    } else if (typeof err === "object" && err != null) {
+      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+    } else if (typeof err === "string") {
+      return err;
+    } else if (typeof err === "number") {
+      return err.toPrecision(5);
+    } else if (typeof err === "boolean") {
+      return `${err}`;
+    } else return String(err);
+  }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -61,47 +79,65 @@ export class Resolver {
       ? this.openai.withOptions({ apiKey: event.apiKey })
       : this.openai;
 
-    // 2) open the streaming iterator
-    const stream = (await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      // reasoning_effort: "high" | "medium" | "low",
-      messages: [{ role: "user", content: event.prompt }],
-      stream: true
-    })) satisfies AsyncIterable<ChatCompletionChunk>;
-
     const streamKey = `stream:${event.conversationId}`;
+    let agg = "";
+    try {
+      // 2) open the streaming iterator
+      const stream = (await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        // supports audio response conditionally with certain models
+        // modalities: ["text", "audio"],
+        // reasoning_effort: "high" | "medium" | "low",
+        messages: [{ role: "user", content: event.prompt }],
+        stream: true
+      })) satisfies AsyncIterable<ChatCompletionChunk>;
 
-    // 3) walk the stream
-    for await (const chunk of stream) {
-      const choice = chunk.choices[0];
+      await this.redis.expire(streamKey, 3600);
 
-      const text = choice?.delta.content;
-      const done = choice?.finish_reason != null;
+      // 3) walk the stream
+      for await (const chunk of stream) {
+        const choice = chunk.choices[0];
+        const text = choice?.delta.content;
+        const done = choice?.finish_reason != null;
 
-      if (text) {
-        await this.redis.rPush(streamKey, text);
-        ws.send(
-          JSON.stringify({
-            type: "ai_chat_response",
-            conversationId: event.conversationId,
-            userId, // server-derived
-            chunk: text,
-            done: false
-          } as EventTypeMap["ai_chat_response"])
-        );
+        if (text) {
+          await this.redis.rPush(streamKey, text);
+          agg += text;
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_chunk",
+              conversationId: event.conversationId,
+              userId,
+              chunk: text,
+              done: false
+            } satisfies EventTypeMap["ai_chat_chunk"])
+          );
+        }
+
+        if (done) {
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_response",
+              conversationId: event.conversationId,
+              userId,
+              chunk: agg,
+              done: true
+            } satisfies EventTypeMap["ai_chat_response"])
+          );
+          break;
+        }
       }
-
-      if (done) {
-        ws.send(
-          JSON.stringify({
-            type: "ai_chat_response",
-            conversationId: event.conversationId,
-            userId,
-            chunk: "",
-            done: true
-          } as EventTypeMap["ai_chat_response"])
-        );
-      }
+    } catch (err) {
+      console.error(`AI Stream Error`, err);
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_error",
+          conversationId: event.conversationId,
+          userId,
+          done: true,
+          message: err instanceof Error ? err.message : String(err)
+        } satisfies EventTypeMap["ai_chat_error"])
+      );
     }
   }
   /** Dispatches incoming events to handlers */
@@ -131,6 +167,9 @@ export class Resolver {
       case "image_gen_request":
         await this.handleImageGenRequest(event, ws, userId);
         break;
+      case "ai_chat_request":
+        await this.handleAIChat(event, ws, userId);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -149,7 +188,8 @@ export class Resolver {
     "asset_upload_request",
     "asset_upload_response",
     "ai_chat_chunk",
-    "ai_chat_request"
+    "ai_chat_request",
+    "ai_chat_error"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */
@@ -283,14 +323,15 @@ export class Resolver {
           success: true
         } as EventTypeMap["asset_upload_response"])
       );
-    } catch (error) {
+    } catch (err) {
+      const error = this.safeErrMsg(err);
       ws.send(
         JSON.stringify({
           type: "asset_upload_response",
           userId,
           conversationId: event.conversationId,
           success: false,
-          error: error instanceof Error ? error.message : String(error)
+          error
         } as EventTypeMap["asset_upload_response"])
       );
     }

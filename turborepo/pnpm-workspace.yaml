@@ -8,6 +8,7 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - '@swc/core'
   - '@tailwindcss/oxide'
+  - cbor-extract
   - esbuild
   - prisma
   - sharp

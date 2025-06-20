@@ -7,32 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SenderType {
+  USER
+  AI
+  SYSTEM
+}
+
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum Provider {
+  OPENAI
+  ANTHROPIC
+  X_AI
+  GEMINI
+  META
+}
+
 model User {
-  id            String         @id @default(uuid())
+  id            String         @id @default(cuid(2))
   name          String?
-  email         String?        @unique
+  email         String        @unique
   emailVerified DateTime?
-  image         String? // avatar URL
+  image         String?
   profile       Profile?
   accounts      Account[]
   sessions      Session[]
   keys          UserKey[]
   conversations Conversation[]
+  authenticator Authenticator[]
   settings      Settings?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
 
 model Profile {
-  id       String  @id @default(uuid())
+  id       String  @id @default(cuid(2))
   bio      String?
-  location String?
+  city     String?
+  country  String?
+
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String  @unique
 }
 
 model Account {
-  id                String  @id @default(uuid())
+  id                String @id @default(cuid(2))
   userId            String
   type              String
   provider          String
@@ -50,43 +73,43 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(uuid())
+  id String @id @default(cuid(2))
   sessionToken String   @unique
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserKey {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid(2))
   userId    String
-  provider  String // e.g. 'openai', 'anthropic', etc
-  apiKey    String // encrypted or hashed if possible
+  provider  String
+  apiKey    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
-  id     String  @id @default(uuid())
+  id     String  @id @default(cuid(2))
   userId String  @unique
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme  String? // dark/light, etc
-  // Add more user preferences as needed
+  theme  ThemePreference? @default(SYSTEM)
 }
 
 model AiAgent {
-  id            String         @id @default(uuid())
-  provider      String // e.g. 'openai', 'anthropic', etc
-  model         String // e.g. 'gpt-4', 'claude-3'
+  id            String         @id @default(cuid(2))
+  provider      Provider
+  model         String
   displayName   String?
   description   String?
-  messages      Message[]      @relation("AgentMessages")
   conversations Conversation[] @relation("AgentConversations")
 }
 
 model Conversation {
-  id          String       @id @default(uuid())
+  id          String       @id @default(cuid(2))
   userId      String
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String?
@@ -103,21 +126,20 @@ model Conversation {
 }
 
 model Message {
-  id             String       @id @default(uuid())
+  id             String       @id @default(cuid(2))
   conversationId String
-  senderId       String? // User or AI Agent (if user, references User)
-  senderType     String // "user" | "ai" | "system"
+  userId         String?
+  senderType     SenderType @default(USER)
   content        String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   aiAgentId      String?
   attachments    Attachment[]
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  aiAgent        AiAgent?     @relation("AgentMessages", fields: [aiAgentId], references: [id], onDelete: Cascade)
 }
 
 model Attachment {
-  id             String        @id @default(uuid())
+  id             String        @id @default(cuid(2))
   messageId      String
   url            String
   type           String // e.g., "image", "pdf"
@@ -125,4 +147,27 @@ model Attachment {
   conversationId String? // <-- add this
   conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   message        Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, credentialID])
 }

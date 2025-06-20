@@ -1,68 +1,21 @@
-```py
-# python/scripts/ensure_sync.py
-from typing import List, Dict
-import tomlkit
-import subprocess
-import sys
+## Python Service
 
-def load_dependencies(pyproject_path: str) -> List[str]:
-    text = open(pyproject_path, "r").read()
-    doc = tomlkit.parse(text)
+deployed to subdomain py.d0paminedriven.com
 
-    try:
-        project = doc["project"]
-        deps = project["dependencies"]
-    except KeyError as e:
-        raise ValueError(f"Missing key in pyproject.toml: {e}")
+#### Deployed to AWS Fargate 
 
-    if not isinstance(deps, list):
-        raise ValueError(f"Expected a list for 'dependencies', got {type(deps)}")
+shares a cluster and load balancer with ws-server but has its own dedicated security group etc
 
-    return [str(item) for item in deps]
+#### How to
 
+- spin up locally
 
-def load_lock_packages(lock_path: str) -> Dict[str, str]:
-    text = open(lock_path, "r").read()
-    lock_doc = tomlkit.parse(text)
+```bash
+pdm run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-    try:
-        pkgs = lock_doc["package"]
-    except KeyError:
-        raise ValueError("Missing 'package' in pdm.lock")
+- spin up Docker locallyy
 
-    if not isinstance(pkgs, list):
-        raise ValueError(f"Expected a list for lockfile packages, got {type(pkgs)}")
-
-    result: Dict[str, str] = {}
-    for entry in pkgs:
-        if not isinstance(entry, dict):
-            raise ValueError(f"Lock entry not a table: {entry!r}")
-        name = entry.get("name")
-        version = entry.get("version")
-        if not isinstance(name, str) or not isinstance(version, str):
-            raise ValueError(f"Invalid lock entry: {entry!r}")
-        result[name] = version
-
-    return result
-
-
-def main():
-    try:
-        deps = load_dependencies("pyproject.toml")
-        lock_pkgs = load_lock_packages("pdm.lock")
-    except Exception as e:
-        print(f"Error reading TOML: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    missing = [d.split()[0] for d in deps if d.split()[0] not in lock_pkgs]
-    if missing:
-        print(f"Lockfile missing {missing}, regenerating…")
-        subprocess.run(["pdm", "lock"], check=True)
-
-    subprocess.run(["pdm", "sync", "--prod"], check=True)
-
-
-if __name__ == "__main__":
-    main()
-
+```bash
+docker compose -d up
 ```

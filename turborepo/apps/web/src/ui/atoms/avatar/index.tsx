@@ -1,50 +1,49 @@
 "use client";
 
-import type { ComponentPropsWithRef, FC } from "react";
+import type { ComponentPropsWithRef } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import { cn } from "@/lib/utils";
 
-const Avatar: FC<ComponentPropsWithRef<typeof AvatarPrimitive.Root>> = ({
-  className,
-  ref,
-  ...props
-}) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex size-10 shrink-0 overflow-hidden rounded-sm",
-      className
-    )}
-    {...props}
-  />
-);
+type AvatarProps<T extends "Root" | "Image" | "Fallback"> =
+  ComponentPropsWithRef<(typeof AvatarPrimitive)[T]>;
+
+function Avatar({ className, ref, ...props }: AvatarProps<"Root">) {
+  return (
+    <AvatarPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative flex size-10 shrink-0 overflow-hidden rounded-sm",
+        className
+      )}
+      {...props}
+    />
+  );
+}
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-const AvatarImage: FC<ComponentPropsWithRef<typeof AvatarPrimitive.Image>> = ({
-  className,
-  ref,
-  ...props
-}) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
-    {...props}
-  />
-);
+function AvatarImage({ className, ref, ...props }: AvatarProps<"Image">) {
+  return (
+    <AvatarPrimitive.Image
+      ref={ref}
+      className={cn("aspect-square h-full w-full", className)}
+      {...props}
+    />
+  );
+}
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
-const AvatarFallback: FC<
-  ComponentPropsWithRef<typeof AvatarPrimitive.Fallback>
-> = ({ className, ref, ...props }) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn(
-      "flex h-full w-full items-center justify-center rounded-sm bg-muted",
-      className
-    )}
-    {...props}
-  />
-);
+function AvatarFallback({ className, ref, ...props }: AvatarProps<"Fallback">) {
+  return (
+    <AvatarPrimitive.Fallback
+      ref={ref}
+      className={cn(
+        "bg-muted flex h-full w-full items-center justify-center rounded-sm",
+        className
+      )}
+      {...props}
+    />
+  );
+}
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Avatar, AvatarImage, AvatarFallback };
+export { Avatar, AvatarImage, AvatarFallback, type AvatarProps };

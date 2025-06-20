@@ -3,10 +3,6 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
-
 export type UserQuery = {
   id: string;
   name: string;
@@ -53,7 +49,7 @@ export class DbService {
   }
 }
 
-export const db = new DbService(pool);
+// export const db = new DbService(pool);
 
 // const _test = db.isValidUserAndSession("9f51e5e2-e89c-40a9-825e-2b9b4f9bbfd5");
 // const test2 = db.isValidUserAndSessionByEmail("andrew@windycitydevs.io")
