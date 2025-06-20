@@ -23,5 +23,4 @@ declare module "http" {
     "x-vercel-ip-longitude"?: string;
   }
 }
-
 export {};
