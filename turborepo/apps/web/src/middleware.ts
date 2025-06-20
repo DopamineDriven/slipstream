@@ -68,10 +68,6 @@ function detectDeviceAndSetCookies(
 }
 
 export default async function middleware(req: NextRequest) {
-  // if (!req.auth?.user && !pathname.startsWith("/api")) {
-  //   const res = NextResponse.redirect(new URL("/api/auth/signin", nextUrl));
-  //   return detectDeviceAndSetCookies(req, res);
-  // }
   const res = NextResponse.next();
   return detectDeviceAndSetCookies(req, res);
 }
