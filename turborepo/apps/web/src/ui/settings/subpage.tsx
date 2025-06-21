@@ -19,8 +19,10 @@ import {
   User
 } from "@t3-chat-clone/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
+import { useTheme } from "next-themes";
 import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have this hook
 import { cn } from "@/lib/utils";
 import { MobileSettingsToolbar } from "@/ui/settings/mobile-settings-toolbar";
@@ -32,8 +34,11 @@ import { CustomizationSettingsSection } from "@/ui/settings/sections/customizati
 import { HistorySettingsSection } from "@/ui/settings/sections/history-settings-section";
 import { ModelsSettingsSection } from "@/ui/settings/sections/models-settings-section";
 import { SettingsNavigation } from "@/ui/settings/settings-navigation";
-import { ThemeToggle } from "@/ui/theme-toggle";
 
+const ThemeToggle = dynamic(
+  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
+  { ssr: false }
+);
 const settingsSectionsConfig = [
   {
     id: "account",
@@ -100,10 +105,54 @@ const RIGHT_COLUMN_WIDTH_DESKTOP = "w-20"; // approx 80px
 type SettingsSectionUnion = (typeof settingsSectionsConfig)[number]["id"];
 
 export default function SettingsPage({ user }: { user?: UserProps }) {
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    // Apply theme based on system preference during initial load
+    if (!resolvedTheme) {
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      // Apply theme based on resolvedTheme once it's available
+      if (resolvedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [resolvedTheme]);
+
   const [activeSection, setActiveSection] = useState<SettingsSectionUnion>(
-    settingsSectionsConfig[0].id
+    settingsSectionsConfig[0]?.id
   );
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>(null);
+
+  useEffect(() => {
+    // Initialize all section refs to null
+
+    settingsSectionsConfig.forEach(section => {
+      let refRef = sectionRefs?.current?.[section.id];
+      if (refRef) {
+        refRef = null;
+      }
+    });
+  }, []);
+
+  const createSectionRef = useCallback((sectionId: SettingsSectionUnion) => {
+    return (el: HTMLDivElement | null) => {
+      let refRef = sectionRefs?.current?.[sectionId];
+      if (refRef) {
+        refRef = el;
+      }
+    };
+  }, []);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const isNavigatingRef = useRef(false);
@@ -324,19 +373,13 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
                 <div
                   key={section.id}
                   id={section.id}
-                  ref={el => {
-                    if (!sectionRefs?.current?.[section.id]) {
-                      undefined;
-                    } else {
-                      sectionRefs.current[section.id] = el;
-                    }
-                  }}
+                  ref={createSectionRef(section.id)}
                   // Conditional padding/margin for sections
                   className="min-h-[80vh] scroll-mt-8 pt-8 pb-12">
                   <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
                     {section.title}
                   </h2>
-                  <SectionComponent />
+                  <SectionComponent user={user} />
                 </div>
               );
             })}
@@ -355,11 +398,13 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
               RIGHT_COLUMN_WIDTH_DESKTOP
             )}>
             <div className="mb-6">
-              <AvatarImage
-                src={user?.image ?? "/user.svg"}
-                className="text-brand-text-muted h-8 w-8"
-              />{" "}
-              {/* Placeholder Logo */}
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src={user?.image ?? "/user.svg"}
+                  alt={user?.name ?? "username"}
+                  className="text-brand-text-muted h-8 w-8"
+                />
+              </Avatar>
             </div>
             <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mb-auto" />
             <Button

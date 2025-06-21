@@ -21,9 +21,10 @@ function Avatar({ className, ref, ...props }: AvatarProps<"Root">) {
 }
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-function AvatarImage({ className, ref, ...props }: AvatarProps<"Image">) {
+function AvatarImage({ className, ref,src, ...props }: AvatarProps<"Image">) {
   return (
     <AvatarPrimitive.Image
+      src={src}
       ref={ref}
       className={cn("aspect-square h-full w-full", className)}
       {...props}
