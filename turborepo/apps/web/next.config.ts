@@ -7,6 +7,7 @@ export default {
   images: {
     loader: "default",
     formats: ["image/avif", "image/webp"],
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         hostname: "localhost",

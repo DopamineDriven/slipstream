@@ -98,28 +98,28 @@ export const mockKeyboardShortcuts: KeyboardShortcut[] = [
 export const availableModels = [
   // Added Model[] type
   {
-    id: "gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    icon: "/placeholder.svg?width=16&height=16&query=gemini+logo"
+    id: "gemini-2.0-flash",
+    name: "Gemini 2.0 Flash",
+    icon: "/google-gemini-icon.svg"
   },
   {
-    id: "gpt-4o-mini",
-    name: "GPT-4o mini",
-    icon: "/placeholder.svg?width=16&height=16&query=openai+logo"
+    id: "gpt-4.1",
+    name: "GPT-4.1",
+    icon: "/chatgpt-icon.svg"
   },
   {
-    id: "gpt-4o",
-    name: "GPT-4o",
-    icon: "/placeholder.svg?width=16&height=16&query=openai+logo"
+    id: "gpt-o4-mini",
+    name: "o4-mini",
+    icon: "/chatgpt-icon.svg"
   },
   {
-    id: "claude-3-sonnet",
-    name: "Claude 3 Sonnet",
-    icon: "/placeholder.svg?width=16&height=16&query=anthropic+logo"
+    id: "claude-3.5-sonnet",
+    name: "Claude 3.5 Sonnet",
+    icon: "/claude-ai-icon.svg"
   },
   {
-    id: "llama-3-70b",
-    name: "Llama 3 70B",
-    icon: "/placeholder.svg?width=16&height=16&query=meta+logo"
+    id: "xai-grok-3",
+    name: "Grok 3",
+    icon: "/grok-icon.svg"
   }
 ] satisfies Model[];
