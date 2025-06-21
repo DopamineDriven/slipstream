@@ -1,15 +1,19 @@
 "use client";
 
+import type { ComponentPropsWithRef } from "react";
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@/lib/utils";
+
+type ScrollAreaProps<T extends "Root" | "ScrollAreaScrollbar"> =
+  ComponentPropsWithRef<(typeof ScrollAreaPrimitive)[T]>;
 
 const ScrollArea = ({
   className,
   children,
   ref,
   ...props
-}: React.ComponentPropsWithRef<typeof ScrollAreaPrimitive.Root>) => (
+}: ScrollAreaProps<"Root">) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
@@ -29,9 +33,7 @@ const ScrollBar = ({
   ref,
   orientation = "vertical",
   ...props
-}: React.ComponentPropsWithRef<
-  typeof ScrollAreaPrimitive.ScrollAreaScrollbar
->) => (
+}: ScrollAreaProps<"ScrollAreaScrollbar">) => (
   <ScrollAreaPrimitive.ScrollAreaScrollbar
     ref={ref}
     orientation={orientation}
@@ -49,4 +51,4 @@ const ScrollBar = ({
 );
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
-export { ScrollArea, ScrollBar };
+export { ScrollArea, ScrollBar, type ScrollAreaProps };

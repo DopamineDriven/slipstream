@@ -10,8 +10,8 @@ import { Camera } from "./camera";
 import { Check } from "./check";
 import { ChevronDown } from "./chevron-down";
 import { ChevronRight } from "./chevron-right";
-import { CirclePlus } from "./circle-plus";
 import { Circle } from "./circle";
+import { CirclePlus } from "./circle-plus";
 import { Code } from "./code";
 import { Compass } from "./compass";
 import { Copy } from "./copy";
@@ -23,7 +23,9 @@ import { ImageIcon } from "./image-icon";
 import { KeyRound } from "./key-round";
 import { Layers } from "./layers";
 import { LogOut } from "./log-out";
+import { Mail } from "./mail";
 import { MessageCircleQuestion } from "./message-circle-question";
+import { MessageSquare } from "./message-square";
 import { MessageSquareText } from "./message-square-text";
 import { Moon } from "./moon";
 import { Package } from "./package";
@@ -67,7 +69,9 @@ const IconComponents = {
   KeyRound,
   Layers,
   LogOut,
+  Mail,
   MessageCircleQuestion,
+  MessageSquare,
   MessageSquareText,
   Moon,
   Package,
@@ -146,7 +150,9 @@ export {
   KeyRound,
   Layers,
   LogOut,
+  Mail,
   MessageCircleQuestion,
+  MessageSquare,
   MessageSquareText,
   Moon,
   Package,

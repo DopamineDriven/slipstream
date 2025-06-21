@@ -1,17 +1,6 @@
-import type { ComponentPropsWithRef } from "react";
-export function Package({
-  ...svg
-}: Omit<
-  ComponentPropsWithRef<"svg">,
-  | "viewBox"
-  | "xmlns"
-  | "fill"
-  | "role"
-  | "stroke"
-  | "strokeWidth"
-  | "strokeLinecap"
-  | "strokeLinejoin"
->) {
+import type { BaseSVGProps } from "@/icons/index";
+
+export function Package({ ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

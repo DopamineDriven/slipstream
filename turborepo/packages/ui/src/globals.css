@@ -1,4 +1,7 @@
-@import "tailwindcss";
+@layer theme;
+
+@import "tailwindcss/theme.css" layer(theme);
+
 @import "tw-animate-css";
 
 @config "../tailwind.config.ts";
@@ -26,7 +29,6 @@
 
 @theme {
   --font-cal-sans: CalSans, sans-serif;
-  --font-inter: var(--font-inter);
   --color-background: oklch(100% 0 0);
   --color-foreground: oklch(14.45% 0 0);
   --color-card: oklch(100% 0 0);
@@ -154,71 +156,4 @@
     --color-brand-text-muted: oklch(70.79% 0 0);
     --color-brand-text-emphasis: oklch(100% 0 0);
   }
-}
-
-
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-
-:root {
-  --radius: 0.5rem;
-}
-
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-  * {
-    border-color: var(--color-border);
-  }
-}
-
-@supports not (backdrop-filter: blur(4px)) {
-  .backdrop-blur-sm {
-    background-color: color-mix(
-      in oklab,
-      var(--color-background) 90%,
-      transparent
-    );
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@layer components {
-  .container {
-    margin-inline: auto;
-    @apply [padding-inline:1rem] sm:[padding-inline:2rem] lg:[padding-inline:3rem];
-  }
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
-
-body {
-  overflow-x: hidden;
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import type { ComponentPropsWithRef, HTMLAttributes } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { X } from "@t3-chat-clone/ui";
-import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 
@@ -61,7 +60,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 const DialogHeader = ({
   className,
   ...props
-}: HTMLAttributes<HTMLDivElement>) => (
+}: ComponentPropsWithRef<"div">) => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
@@ -75,7 +74,7 @@ DialogHeader.displayName = "DialogHeader";
 const DialogFooter = ({
   className,
   ...props
-}: HTMLAttributes<HTMLDivElement>) => (
+}: ComponentPropsWithRef<"div">) => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",

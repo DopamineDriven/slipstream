@@ -18,7 +18,7 @@ interface ApiKeysTabProps {
   className?: string;
 }
 
-export function ApiKeysTab({
+export function ApiKeysTabs({
   isProUser = false,
   className = ""
 }: ApiKeysTabProps) {
@@ -111,7 +111,7 @@ interface ApiKeysTabPropss {
   className?: string
 }
 
-export function ApiKeysTabs({ isProUser = false, className = "" }: ApiKeysTabPropss) {
+export function ApiKeysTab({ isProUser = false, className = "" }: ApiKeysTabPropss) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

@@ -1,12 +1,16 @@
 "use client";
 
-import { Button } from "@t3-chat-clone/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Progress
+} from "@t3-chat-clone/ui";
 import { motion } from "motion/react";
 import type { KeyboardShortcut, UserProfile } from "@/types/ui";
 import { mockKeyboardShortcuts, mockUserProfile } from "@/lib/mock";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/ui/atoms/avatar";
-import { Progress } from "@/ui/atoms/progress";
 
 export interface UserProfileCardProps {
   user?: UserProfile;
@@ -35,7 +39,7 @@ export function UserProfileCard({
             alt={user.name ?? "user avatar"}
           />
           <AvatarFallback className="text-2xl sm:text-3xl">
-            {user?.name?.substring(0, 2).toUpperCase()}
+            {`${user?.name?.split(` `)[0]?.slice(0, 1).toUpperCase()} ${user?.name?.split(` `)[1]?.slice(0, 1).toUpperCase()}`}
           </AvatarFallback>
         </Avatar>
         <h2 className="text-brand-text-emphasis text-lg font-semibold sm:text-xl">

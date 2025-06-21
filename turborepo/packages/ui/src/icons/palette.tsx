@@ -1,18 +1,6 @@
-import type { ComponentPropsWithRef } from "react";
+import type { BaseSVGProps } from "@/icons/index";
 
-export function Palette({
-  ...svg
-}: Omit<
-  ComponentPropsWithRef<"svg">,
-  | "viewBox"
-  | "xmlns"
-  | "fill"
-  | "role"
-  | "stroke"
-  | "strokeWidth"
-  | "strokeLinecap"
-  | "strokeLinejoin"
->) {
+export function Palette({ ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
