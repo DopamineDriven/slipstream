@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
-import { SettingsPage } from "@/ui/settings";
+import { default as SettingsPage } from "@/ui/settings/subpage";
 
 export const metadata = {
   title: "settings"

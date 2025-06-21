@@ -1,29 +1,117 @@
 import { Fs } from "@d0paminedriven/fs";
 
-const fs = new Fs(process.cwd());
+class GenConfig extends Fs {
+  constructor(public override cwd: string) {
+    super((cwd ??= process.cwd()));
+  }
 
-const readDir = fs.readDir("src/icons", { recursive: true });
+  private recursivelyReadDir() {
+    return this.readDir("src", { recursive: true })
+      .filter(t => /(?:(services\/))/.test(t) === false)
+      .filter(t => /\./.test(t) === true);
+  }
 
-if (process.argv[3] === "exports") {
-  const workup = readDir.filter((t) => /index/.test(t) === false).map(
-    t =>
-      [
-        `./icons/${t.replace(".tsx", "")}`,
-        `./dist/icons/${t.replace(".tsx", ".js")}`
-      ] as const
-  );
-  console.log(JSON.stringify(Object.fromEntries(workup), null, 2));
+  private exportsWorkup() {
+    return JSON.stringify(
+      Object.fromEntries(
+        this.recursivelyReadDir().map(
+          t =>
+            [
+              `./${(/(:?(icons\/index.ts|index.ts|utils\/))/g.test(t) ? t.replace("index.ts", "") && t.split(/\.ts$/)[0] : t.replace(/\.ts$/, "")) && t.replace(/\.(ts|tsx)$/, "")}`,
+              `./dist/${t.replace(/\.(ts|tsx)$/, ".js")}`
+            ] as const
+        )
+      ),
+      null,
+      2
+    );
+  }
+
+  private typesWorkup() {
+    const splitter = (target: "icons" | "ui" | "lib") =>
+      this.recursivelyReadDir()
+        .filter(t => t.includes("/"))
+        .filter(v => v.split(/\//)[0] === target)
+        .map(t => `dist/${t.replace(/\.(ts|tsx)$/, ".d.ts")}`);
+    console.log(splitter("ui"));
+
+    return JSON.stringify(
+      {
+        typesVersions: {
+          "*": {
+            "*": ["dist/*.d.ts", "dist/*.d.cts", "dist/*/index.d.ts"],
+            "globals.css": ["dist/globals.d.ts"],
+            icons: splitter("icons"),
+            lib: splitter("lib"),
+            ui: splitter("ui")
+          }
+        }
+      },
+      null,
+      2
+    );
+  }
+  private tsupWorkup() {
+    return JSON.stringify(
+      {
+        entry: this.recursivelyReadDir()
+          .map(t => `src/${t}`)
+          .concat([
+            `!src/services/read.ts`,
+            `!src/services/postbuild.ts`,
+            "!src/services/__out__/*.json"
+          ])
+      },
+      null,
+      2
+    );
+  }
+
+  public async writeTypes() {
+   return this.withWs("src/services/__out__/types.json", this.typesWorkup());
+  }
+
+  public async writeTsup() {
+   return this.withWs("src/services/__out__/tsup.json", this.tsupWorkup());
+  }
+
+  public async writeExports() {
+   return this.withWs("src/services/__out__/exports.json", this.exportsWorkup());
+  }
+
+  public exe<const T extends "types" | "exports" | "tsup" | "all">(
+    target: T
+  ) {
+    switch (target) {
+      case "exports":
+        this.writeExports();
+        break;
+      case "tsup":
+        this.writeTsup();
+        break;
+      case "types":
+        this.writeTypes();
+        break;
+      default:
+        Promise.all([this.writeTypes(), this.writeTsup(), this.writeExports()]);
+        break;
+    }
+  }
 }
 
-if (process.argv[3] === "tsup") {
-  const tsup = readDir
-          .map(t => `src/icons/${t}` as const);
+const gen = new GenConfig(process.cwd());
 
-  console.log(tsup);
-}
-
-if (process.argv[3] === "types") {
-  const types = readDir.map((t) => `dist/icons/${t.replace(".tsx", ".d.ts")}`);
-
-  console.log(JSON.stringify(types, null, 2))
+if (process.argv[3]) {
+  if (process.argv[3] === "exports") {
+    gen.exe("exports");
+  }
+   else if (process.argv[3] === "types") {
+    gen.exe("types");
+  }
+   else if (process.argv[3] === "tsup") {
+    gen.exe("tsup");
+  }
+  else {
+    gen.exe("all");
+  }
 }

@@ -1,4 +1,7 @@
-FROM python:3.12-slim AS base
+# syntax=docker/dockerfile:1.4
+FROM python:3.13.5-slim AS base
+
+RUN groupadd --system appgroup && useradd --system --gid appgroup --create-home appuser
 
 WORKDIR /app
 
@@ -12,17 +15,22 @@ RUN apt-get update \
       libpng-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Install PDM globally
-RUN pip install --no-cache-dir pdm
+ARG PDM_VERSION=2.24.2
 
-# Copy only metadata & lock for dependency resolution
-COPY pyproject.toml pdm.lock /app/
+RUN --mount=type=cache,id=python-pip,target=/root/.cache/pip \
+    --mount=type=cache,id=pdm,target=/root/.cache/pdm \
+    pip install --no-cache-dir "pdm==${PDM_VERSION}"
 
-# Sync production dependencies only
-RUN pdm sync --prod
+COPY pyproject.toml pdm.lock ./
+RUN --mount=type=cache,id=pdm,target=/root/.cache/pdm \
+    pdm sync --prod
+COPY . .
 
-# Copy your actual application code
-COPY . /app/
+# Change ownership to non-root user
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
 
 ENV PORT=8000
 EXPOSE 8000

@@ -5,8 +5,8 @@ import { defineConfig } from "tsup";
 const tsupConfig = (options: Options) =>
   ({
     entry: [
-      "src/index.ts",
       "src/globals.css",
+      "src/index.ts",
       "src/icons/arrow-down-circle.tsx",
       "src/icons/arrow-left.tsx",
       "src/icons/arrow-right.tsx",
@@ -30,8 +30,10 @@ const tsupConfig = (options: Options) =>
       "src/icons/key-round.tsx",
       "src/icons/layers.tsx",
       "src/icons/log-out.tsx",
+      "src/icons/mail.tsx",
       "src/icons/message-circle-question.tsx",
       "src/icons/message-square-text.tsx",
+      "src/icons/message-square.tsx",
       "src/icons/moon.tsx",
       "src/icons/package.tsx",
       "src/icons/palette.tsx",
@@ -51,12 +53,18 @@ const tsupConfig = (options: Options) =>
       "src/icons/x.tsx",
       "src/icons/zap.tsx",
       "src/lib/utils.ts",
+      "src/ui/avatar.tsx",
       "src/ui/button.tsx",
       "src/ui/card.tsx",
+      "src/ui/dialog.tsx",
+      "src/ui/dropdown-menu.tsx",
       "src/ui/input.tsx",
+      "src/ui/progress.tsx",
+      "src/ui/scroll-area.tsx",
       "src/ui/textarea.tsx",
+      "!src/services/read.ts",
       "!src/services/postbuild.ts",
-      "!src/services/read.ts"
+      "!src/services/__out__/*.json"
     ],
     dts: true,
     external: ["react"],

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM node:24-alpine AS base
 
 # libc6-compat only needed for some node modules (e.g., sharp). Safe to include for widest compatibility.

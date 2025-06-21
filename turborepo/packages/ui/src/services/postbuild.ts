@@ -6,7 +6,6 @@ const distJsFileArr = () => {
   return fs
     .readDir("dist", { recursive: true })
     .filter(p => /(\.)/g.test(p))
-    // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
     .filter(p => /\.js$/g.test(p));
 };
 const getTargeted = <const T extends "chunk" | "source">(

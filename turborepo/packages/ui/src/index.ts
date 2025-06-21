@@ -24,7 +24,9 @@ export { ImageIcon } from "@/icons/image-icon";
 export { KeyRound } from "@/icons/key-round";
 export { Layers } from "@/icons/layers";
 export { LogOut } from "@/icons/log-out";
+export { Mail } from "@/icons/mail";
 export { MessageCircleQuestion } from "@/icons/message-circle-question";
+export { MessageSquare } from "@/icons/message-square";
 export { MessageSquareText } from "@/icons/message-square-text";
 export { Moon } from "@/icons/moon";
 export { Package } from "@/icons/package";
@@ -47,6 +49,8 @@ export { Zap } from "@/icons/zap";
 
 export { cn } from "@/lib/utils";
 
+export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
+export type { AvatarProps } from "@/ui/avatar";
 export { Button, buttonVariants } from "@/ui/button";
 export type { ButtonProps } from "@/ui/button";
 export {
@@ -57,7 +61,42 @@ export {
   CardDescription,
   CardContent
 } from "@/ui/card";
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription
+} from "@/ui/dialog";
+export type { DialogProps } from "@/ui/dialog";
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup
+} from "@/ui/dropdown-menu";
+export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
 export type { InputProps } from "@/ui/input";
+export { Progress } from "@/ui/progress";
+export type { ProgressProps } from "@/ui/progress";
+export { ScrollArea, ScrollBar } from "@/ui/scroll-area";
+export type { ScrollAreaProps } from "@/ui/scroll-area";
 export { Textarea } from "@/ui/textarea";
 export type { TextareaProps } from "@/ui/textarea";
