@@ -1,5 +1,6 @@
 "use client";
 
+import type { User } from "next-auth";
 import {
   Avatar,
   AvatarFallback,
@@ -8,18 +9,18 @@ import {
   Progress
 } from "@t3-chat-clone/ui";
 import { motion } from "motion/react";
-import type { KeyboardShortcut, UserProfile } from "@/types/ui";
-import { mockKeyboardShortcuts, mockUserProfile } from "@/lib/mock";
+import type { KeyboardShortcut } from "@/types/ui";
+import { mockKeyboardShortcuts } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
 export interface UserProfileCardProps {
-  user?: UserProfile;
+  user?: User;
   shortcuts?: KeyboardShortcut[];
   className?: string;
 }
 
 export function UserProfileCard({
-  user = mockUserProfile,
+  user,
   shortcuts = mockKeyboardShortcuts,
   className = ""
 }: UserProfileCardProps) {
@@ -35,22 +36,24 @@ export function UserProfileCard({
       <div className="flex flex-col items-center text-center">
         <Avatar className="border-brand-primary mb-3 h-20 w-20 border-2 sm:mb-4 sm:h-24 sm:w-24">
           <AvatarImage
-            src={user.image ?? "/placeholder.svg"}
-            alt={user.name ?? "user avatar"}
+            src={user?.image ?? "/placeholder.svg"}
+            alt={user?.name ?? "user avatar"}
           />
           <AvatarFallback className="text-2xl sm:text-3xl">
             {`${user?.name?.split(` `)[0]?.slice(0, 1).toUpperCase()} ${user?.name?.split(` `)[1]?.slice(0, 1).toUpperCase()}`}
           </AvatarFallback>
         </Avatar>
         <h2 className="text-brand-text-emphasis text-lg font-semibold sm:text-xl">
-          {user.name}
+          {user?.name}
         </h2>
-        <p className="text-brand-text-muted text-xs sm:text-sm">{user.email}</p>
+        <p className="text-brand-text-muted text-xs sm:text-sm">
+          {user?.email}
+        </p>
         <Button
           variant="outline"
           size="sm"
           className="bg-brand-component border-brand-border hover:bg-brand-primary/20 text-brand-text mt-2">
-          {user.plan} Plan
+          {"Free"} Plan
         </Button>
       </div>
 
@@ -65,12 +68,11 @@ export function UserProfileCard({
         </p>
         <Progress
           id="message-usage"
-          value={(user.messageUsage.current / user.messageUsage.limit) * 100}
+          value={(4 / 20) * 100}
           className="[&>div]:bg-brand-primary h-2 w-full"
         />
         <p className="text-brand-text-muted mt-1 text-xs">
-          {user.messageUsage.limit - user.messageUsage.current} messages
-          remaining
+          {20 - 4} messages remaining
         </p>
       </div>
 

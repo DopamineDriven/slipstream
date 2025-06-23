@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, userAgent } from "next/server";
-
+export { authConfig } from "@/lib/auth.config";
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
 };

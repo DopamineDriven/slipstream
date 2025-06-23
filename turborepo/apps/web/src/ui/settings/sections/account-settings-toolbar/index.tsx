@@ -19,8 +19,6 @@ export function AccountSettingsSection({ user }: { user?: User }) {
       <UserProfileCard
         className="bg-brand-component border-brand-border"
         user={{
-          messageUsage: { current: 4, limit: 20 },
-          plan: "Free",
           ...user
         }}
       />

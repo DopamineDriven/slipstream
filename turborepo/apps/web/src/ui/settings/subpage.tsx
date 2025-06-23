@@ -325,6 +325,7 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
             sections={settingsSectionsConfig}
             activeSection={activeSection}
             onNavigate={handleNavigation}
+            user={user}
           />
         )}
 

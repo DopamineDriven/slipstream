@@ -14,7 +14,7 @@ export default {
         port: "3030",
         protocol: "http"
       },
-      {hostname: "lh3.googleusercontet.com", protocol: "https"},
+      {hostname: "lh3.googleusercontent.com", protocol: "https"},
       { hostname: "images.unsplash.com", protocol: "https" },
       { hostname: "tailwindui.com", protocol: "https" }
     ]

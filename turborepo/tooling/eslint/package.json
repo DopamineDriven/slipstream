@@ -32,7 +32,7 @@
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
     "eslint": "^9.29.0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "typescript": "^5.8.3"
   },
   "prettier": "@t3-chat-clone/prettier-config"
