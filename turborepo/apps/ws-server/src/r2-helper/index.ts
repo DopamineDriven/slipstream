@@ -1,46 +1,66 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
-import * as dotenv from "dotenv";
 
-dotenv.config();
+export interface R2InstanceProps {
+  accountId: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  r2PublicUrl: string;
+}
 
-export const accountId = process.env.R2_ACCOUNT_ID ?? "";
-export const accessKeyId = process.env.R2_ACCESS_KEY_ID ?? "";
-export const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY ?? "";
-export const bucket = process.env.R2_BUCKET ?? "t3-chat-clone-pg";
+export class R2Instance {
+  #r2: S3Client;
 
-export const r2 = new S3Client({
-  region: "auto",
-  endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-  credentials: { accessKeyId, secretAccessKey }
-});
-
-export async function uploadToR2({
-  Key,
-  Bucket = bucket,
-  ContentType = "application/octet-stream",
-  Body,
-  ...rest
-}: PutObjectCommandInput) {
-  const uploadIt = await r2.send(
-    new PutObjectCommand({ Bucket, Key, Body, ContentType, ...rest })
-  );
-  if (
-    typeof uploadIt.$metadata.httpStatusCode !== "undefined" &&
-    uploadIt.$metadata.httpStatusCode < 300
-  ) {
-    console.info(
-      { Key, Bucket, status: uploadIt.$metadata.httpStatusCode },
-      "R2 upload success"
-    );
-    return `https://t3-clone.asrosscloud.com/${Key}`;
-  } else {
-    console.error(
-      { Key, Bucket, meta: uploadIt.$metadata },
-      "R2 upload failure"
-    );
-    throw new Error(uploadIt.$metadata.requestId, {
-      cause: uploadIt.$metadata
+  constructor(public r2Props: R2InstanceProps) {
+    const { accessKeyId, accountId, secretAccessKey } = this.r2Props;
+    this.#r2 = new S3Client({
+      region: "auto",
+      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+        accountId
+      }
     });
+  }
+
+  private putObjectCommand({
+    Bucket,
+    Key,
+    ContentType = "application/octet-stream",
+    Body,
+    ...rest
+  }: PutObjectCommandInput) {
+    return new PutObjectCommand({ Bucket, Key, ContentType, Body, ...rest });
+  }
+
+  public async uploadToR2({
+    Bucket,
+    Key,
+    ContentType = "application/octet-stream",
+    Body,
+    ...rest
+  }: PutObjectCommandInput) {
+    const upload = await this.#r2.send(
+      this.putObjectCommand({ Bucket, Key, ContentType, Body, ...rest })
+    );
+    if (
+      typeof upload.$metadata.httpStatusCode !== "undefined" &&
+      upload.$metadata.httpStatusCode < 300
+    ) {
+      console.info(
+        { Key, Bucket, status: upload.$metadata.httpStatusCode },
+        "R2 upload success"
+      );
+      return `${this.r2Props.r2PublicUrl}/${Key}`;
+    } else {
+      console.error(
+        { Key, Bucket, meta: upload.$metadata },
+        "R2 upload failure"
+      );
+      throw new Error(upload.$metadata.requestId, {
+        cause: upload.$metadata
+      });
+    }
   }
 }

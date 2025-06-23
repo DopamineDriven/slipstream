@@ -1,4 +1,17 @@
-import type { WebSocket } from "ws";
+import { WebSocket } from "ws";
+
+export type ModelProvider = "openai" | "gemini";
+export type GeminiModels = "gemini-2.5-flash" | "gemini-2.5-pro";
+export type OpenAIModels =
+  | "gpt-4o-2024-11-20"
+  | "gpt-4.1"
+  | "gpt-o3-pro"
+  | "gpt-4.1-nano"
+  | "gpt-4.5-preview"
+  | "gpt-4o-mini";
+
+export type SelectedProvider<T extends ModelProvider | undefined> =
+  T extends "openai" ? OpenAIModels : GeminiModels;
 
 export type ChatMessage = {
   type: "message";
@@ -14,6 +27,8 @@ export type AIChatRequest = {
   conversationId: string;
   prompt: string;
   apiKey?: string;
+  provider?: ModelProvider;
+  model?: SelectedProvider<ModelProvider>;
 };
 
 export type AIChatResponse = {
@@ -22,6 +37,17 @@ export type AIChatResponse = {
   userId: string;
   chunk: string;
   done: boolean;
+  provider?: ModelProvider;
+  model?: string;
+};
+
+export type AIChatInlineData = {
+  type: "ai_chat_inline_data";
+  conversationId: string;
+  userId: string;
+  data: string;
+  provider?: ModelProvider;
+  model?: string;
 };
 
 export type AIChatChunk = {
@@ -30,6 +56,8 @@ export type AIChatChunk = {
   userId: string;
   chunk: string;
   done: boolean;
+  provider?: ModelProvider;
+  model?: string;
 };
 
 export type AIChatError = {
@@ -38,7 +66,9 @@ export type AIChatError = {
   userId: string;
   message: string;
   done: true;
-}
+  provider?: ModelProvider;
+  model?: string;
+};
 
 export type TypingIndicator = {
   type: "typing";
@@ -90,6 +120,7 @@ export type AnyEvent =
   | AssetUploadResponse
   | AIChatChunk
   | AIChatError
+  | AIChatInlineData
   | AIChatRequest
   | AIChatResponse
   | ChatMessage
@@ -120,6 +151,7 @@ export type EventUnion = XOR<ChatMessage, TypingIndicator>;
 export type EventTypeMap = {
   ai_chat_chunk: AIChatChunk;
   ai_chat_error: AIChatError;
+  ai_chat_inline_data: AIChatInlineData;
   ai_chat_request: AIChatRequest;
   ai_chat_response: AIChatResponse;
   asset_upload_request: AssetUploadRequest;
@@ -142,12 +174,38 @@ export interface WSServerOptions {
   channel?: string;
 }
 
+export interface UserData {
+  city?: string;
+  country?: string;
+  latlng?: string;
+  tz?: string;
+}
+
 export type MessageHandler<T extends keyof EventTypeMap> = (
   event: EventTypeMap[T],
   ws: WebSocket,
-  userId: string
+  userId: string,
+  userData?: UserData
 ) => Promise<void> | void;
 
 export type HandlerMap = {
   [K in keyof EventTypeMap]?: MessageHandler<K>;
 };
+export type BufferLike =
+  | string
+  | Buffer
+  | DataView
+  | number
+  | ArrayBufferView
+  | Uint8Array
+  | ArrayBuffer
+  | SharedArrayBuffer
+  | Blob
+  | readonly any[]
+  | readonly number[]
+  | { valueOf(): ArrayBuffer }
+  | { valueOf(): SharedArrayBuffer }
+  | { valueOf(): Uint8Array }
+  | { valueOf(): readonly number[] }
+  | { valueOf(): string }
+  | { [Symbol.toPrimitive](hint: string): string };

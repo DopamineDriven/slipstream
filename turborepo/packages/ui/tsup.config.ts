@@ -2,7 +2,21 @@ import { relative } from "node:path";
 import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-const tsupConfig = (options: Options) =>
+const tsupConfig = (
+  options: Omit<
+    Options,
+    | "entry"
+    | "dts"
+    | "external"
+    | "watch"
+    | "keepNames"
+    | "format"
+    | "sourcemap"
+    | "tsconfig"
+    | "clean"
+    | "outDir"
+  >
+) =>
   ({
     entry: [
       "src/globals.css",
@@ -31,6 +45,7 @@ const tsupConfig = (options: Options) =>
       "src/icons/layers.tsx",
       "src/icons/log-out.tsx",
       "src/icons/mail.tsx",
+      "src/icons/menu.tsx",
       "src/icons/message-circle-question.tsx",
       "src/icons/message-square-text.tsx",
       "src/icons/message-square.tsx",
@@ -61,6 +76,7 @@ const tsupConfig = (options: Options) =>
       "src/ui/input.tsx",
       "src/ui/progress.tsx",
       "src/ui/scroll-area.tsx",
+      "src/ui/separator.tsx",
       "src/ui/textarea.tsx",
       "!src/services/read.ts",
       "!src/services/postbuild.ts",

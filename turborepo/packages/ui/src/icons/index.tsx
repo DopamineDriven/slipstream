@@ -24,6 +24,7 @@ import { KeyRound } from "./key-round";
 import { Layers } from "./layers";
 import { LogOut } from "./log-out";
 import { Mail } from "./mail";
+import {Menu} from "./menu";
 import { MessageCircleQuestion } from "./message-circle-question";
 import { MessageSquare } from "./message-square";
 import { MessageSquareText } from "./message-square-text";
@@ -70,6 +71,7 @@ const IconComponents = {
   Layers,
   LogOut,
   Mail,
+  Menu,
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,
@@ -151,6 +153,7 @@ export {
   Layers,
   LogOut,
   Mail,
+  Menu,
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,

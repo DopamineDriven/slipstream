@@ -1,23 +1,16 @@
 import http from "http";
 import { TLSSocket } from "tls";
 import type { IncomingMessage } from "http";
-import type {
-  RedisClientType,
-  RedisDefaultModules,
-  RedisFunctions,
-  RedisModules,
-  RedisScripts,
-  RespVersions,
-  TypeMapping
-} from "redis";
 import type { RawData } from "ws";
+import { RedisInstance } from "@t3-chat-clone/redis-service";
 import * as dotenv from "dotenv";
-import { createClient } from "redis";
 import { WebSocket, WebSocketServer } from "ws";
 import type {
+  BufferLike,
   EventTypeMap,
   HandlerMap,
   MessageHandler,
+  UserData,
   WSServerOptions
 } from "@/types/index.ts";
 import { DbService } from "@/db/index.ts";
@@ -26,18 +19,11 @@ dotenv.config();
 
 export class WSServer {
   private wss: WebSocketServer;
-  public redis: RedisClientType<
-    RedisDefaultModules & RedisModules,
-    RedisFunctions,
-    RedisScripts,
-    RespVersions,
-    TypeMapping
-  >;
   public readonly channel: string;
   private readonly jwtSecret: string;
-
+  private unsubscribePubSub?: () => Promise<void>;
   private userMap = new Map<WebSocket, string>();
-
+  private userDataMap = new Map<string, UserData>();
   private httpServer: http.Server;
 
   public readonly handlers: HandlerMap = {};
@@ -45,15 +31,19 @@ export class WSServer {
     handleRawMessage: (
       ws: WebSocket,
       userId: string,
-      raw: RawData
+      raw: RawData,
+      userData?: UserData
     ) => void | Promise<void>;
   };
 
-  constructor(private opts: WSServerOptions, private db: DbService) {
+  constructor(
+    private opts: WSServerOptions,
+    private db: DbService,
+    public redis: RedisInstance
+  ) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
-    this.redis = createClient({ url: opts.redisUrl });
-
+    redis.url = opts.redisUrl;
     this.httpServer = http.createServer((req, res) => {
       const startTime = performance.now();
 
@@ -79,7 +69,8 @@ export class WSServer {
     handleRawMessage: (
       ws: WebSocket,
       userId: string,
-      raw: RawData
+      raw: RawData,
+      userData?: UserData
     ) => void | Promise<void>;
   }) {
     this.resolver = resolver;
@@ -100,22 +91,50 @@ export class WSServer {
     });
 
     // Redis pub/sub for broadcast
-    const sub = this.redis.duplicate();
-    await sub.connect();
-    await sub.subscribe(this.channel, msg => this.broadcastRaw(msg));
+    this.unsubscribePubSub = await this.redis.subscribeToMessages(
+      this.channel,
+      msg => this.broadcastRaw(msg)
+    );
   }
+
+  private stashUserData(
+    userId: string,
+    cookieObj: Record<keyof UserData, string> | null
+  ) {
+    if (!cookieObj) return;
+    const { city, country, latlng, tz } = cookieObj;
+    return this.userDataMap.set(userId, { city, country, latlng, tz });
+  }
+
   private async handleConnection(
     ws: WebSocket,
     req: IncomingMessage
   ): Promise<void> {
+    const cookies = req.headers.cookie;
+    const cookieObj = this.parsedCookies(cookies);
+
     const userId = await this.authenticateConnection(ws, req);
     if (!userId) return;
+    this.stashUserData(userId, cookieObj);
+    const { city, country, latlng, tz } = this.userDataMap.get(userId) ?? {
+      city: "unknown city",
+      country: "unknown country",
+      latlng: "unknown latlng",
+      tz: "unknown tz"
+    };
+
     this.userMap.set(ws, userId);
-    console.info(`User ${userId} connected`);
+    const message = `User ${userId} connected from ${city}, ${country} in the ${tz} timezone having coordinates of ${latlng}`;
+    console.info(message);
     ws.on("message", raw => {
       if (this.resolver) {
         const uid = this.userMap.get(ws) ?? "";
-        this.resolver.handleRawMessage(ws, uid, raw);
+        this.resolver.handleRawMessage(ws, uid, raw, {
+          city,
+          country,
+          latlng,
+          tz
+        });
       } else {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
@@ -141,13 +160,47 @@ export class WSServer {
     }
     try {
       const decodedEmail = decodeURIComponent(userEmail);
-      const userIsValid = await this.db.isValidUserAndSessionByEmail(decodedEmail);
+      const userIsValid =
+        await this.db.isValidUserAndSessionByEmail(decodedEmail);
       if (userIsValid === false) throw new Error("Invalid Session");
       if (userIsValid.valid === false) throw new Error("Invalid Session");
       return userIsValid.id;
     } catch {
       ws.close(4001, "Auth failed");
       return null;
+    }
+  }
+
+  private parsedCookies(cookieHeader?: string) {
+    const arr = Array.of<readonly [keyof UserData, string]>();
+    try {
+      if (cookieHeader) {
+        cookieHeader.split(";").forEach(function (cookie) {
+          const cookieKeys = ["city", "country", "latlng", "tz"];
+          const parts = cookie.match(/(.*?)=(.*)/);
+          if (parts) {
+            const k = (parts?.[1]?.trim() ?? "").trimStart();
+            const v = parts?.[2]?.trim() ?? "";
+            console.log([k, v]);
+            if (cookieKeys.includes(k)) {
+              arr.push([k as keyof UserData, decodeURIComponent(v)] as const);
+            }
+          }
+        });
+      } else {
+        console.warn("No cookies received in the WebSocket handshake.");
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(`parseCookies Error: ` + err.message);
+      } else {
+        const stringify = JSON.stringify(err, null, 2);
+        console.error(stringify);
+      }
+    } finally {
+      if (arr.length > 0) {
+        return Object.fromEntries(arr) as Record<keyof UserData, string>;
+      } else return null;
     }
   }
 
@@ -176,11 +229,19 @@ export class WSServer {
     this.handlers[event] = handler as HandlerMap[T];
   }
 
+  private broadcastRawErrorCb(err?: Error) {
+    if (err) {
+      console.error(err.message);
+    } else {
+      console.error("broadcastRaw error");
+    }
+  }
+
   /** Broadcast a raw JSON message string to all connected clients */
-  public broadcastRaw(msg: string): void {
+  public broadcastRaw(msg: BufferLike): void {
     for (const client of this.wss.clients) {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(msg);
+        client.send(msg, err => this.broadcastRawErrorCb(err));
       }
     }
   }
@@ -194,7 +255,15 @@ export class WSServer {
     this.broadcastRaw(msg);
   }
 
+  private async teardownPubSub() {
+    if (this.unsubscribePubSub) {
+      await this.unsubscribePubSub();
+      this.unsubscribePubSub = undefined;
+    }
+  }
+
   public async stop(): Promise<void> {
+    await this.teardownPubSub();
     await this.redis.quit();
     this.wss.close();
     console.info("Server shut down.");

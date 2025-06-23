@@ -7,11 +7,13 @@
         ".venv",
         "venv",
         "node_modules",
+        "__pycache__",
         "**/__pycache__",
         "build",
         "dist"
     ],
     "typeCheckingMode": "strict",
+    "useLibraryCodeForTypes": true,
     "reportMissingTypeStubs": false,
     "stubPath": "./typings"
 }

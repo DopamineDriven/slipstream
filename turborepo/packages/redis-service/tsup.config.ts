@@ -2,22 +2,13 @@ import { relative } from "node:path";
 import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-/** `outExtension({format})` -> when format passed in it outputs esm so using it as `.${format}.mjs` -> `filename.esm.mjs` on output */
 const tsupConfig = (options: Options) =>
   ({
     entry: [
       "src/index.ts",
-      "src/auth/index.ts",
-      "src/db/index.ts",
-      "src/gemini/index.ts",
-      "src/openai/index.ts",
-      "src/r2-helper/index.ts",
-      "src/resolver/index.ts",
-      "src/types/index.ts",
-      "src/ws-server/index.ts",
-      "!src/__generated__/**/*",
-      "!src/test/**/*",
-      "!public/**/*"
+      "src/service/index.ts",
+      "src/service/types.ts",
+      "!src/test/**"
     ],
     target: ["node24"],
     dts: true,

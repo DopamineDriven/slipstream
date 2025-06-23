@@ -2,5 +2,11 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true
+  },
+  "[toml]":{
+    "editor.defaultFormatter": "tombi-toml.tombi"
+  },
+  "files.associations": {
+    "*.toml": "toml"
   }
 }
