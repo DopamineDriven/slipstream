@@ -1,3 +1,15 @@
-import {prismaClient} from "@t3-chat-clone/db";
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-export  { prismaClient };
+
+const prismaClientSingleton = () => {
+  return new PrismaClient().$extends(withAccelerate());
+};
+
+declare global {
+  var prisma: ReturnType<typeof prismaClientSingleton>;
+}
+
+export const prismaClient = globalThis.prisma ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== "production") globalThis.prisma = prismaClient;
