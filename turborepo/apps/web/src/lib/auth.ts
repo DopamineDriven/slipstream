@@ -1,8 +1,5 @@
-// pages/api/auth/[...nextauth].ts
-import { randomUUID } from "crypto";
-// pages/api/auth/[...nextauth].ts
+import {nanoid} from "nanoid"
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import { prismaClient } from "@/lib/prisma";
@@ -33,7 +30,6 @@ export const {
   handlers: { GET, POST }
 } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prismaClient),
   events: {
     async signOut(message) {
       if ("token" in message) {
@@ -56,7 +52,7 @@ export const {
     },
     async jwt({ token, account, user, trigger, profile: _profile }) {
       if (trigger === "signIn" && user && account) {
-        const sessionToken = randomUUID();
+        const sessionToken = nanoid();
         token.sessionToken = sessionToken;
         token.userId = user.id;
 
@@ -147,8 +143,25 @@ declare module "next-auth/jwt" {
   }
 }
 
-declare module "next-auth" {
+declare module "@auth/core/types" {
   interface DefaultUser {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  }
+
+  interface Session {
+    sessionToken?: string;
+    error?: "RefreshTokenError";
+    accessToken?: string;
+  }
+}
+
+declare module "next-auth" {
+  interface User {
     id?: string;
     name?: string | null;
     email?: string | null;

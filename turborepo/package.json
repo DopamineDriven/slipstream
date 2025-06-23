@@ -19,7 +19,7 @@
     "clean:house": "cd tooling/eslint && git clean -xdf node_modules .turbo && cd ../prettier && git clean -xdf node_modules .turbo && cd ../typescript && git clean -xdf .turbo node_modules && cd ../jest-presets && git clean -xdf node_modules .turbo && cd ../../packages/ui && git clean -xdf dist .turbo node_modules && cd ../redis-service && git clean -xdf dist .turbo node_modules && cd ../../apps/web && git clean -xdf node_modules .next .turbo && cd ../ws-server && git clean -xdf node_modules dist .turbo && cd ../.. && git clean -xdf node_modules pnpm-lock.yaml && pnpm install && pnpm build:targeted",
     "generate:base64": "openssl rand -base64 64",
     "generate:hex": "openssl rand -hex 64",
-    "generate:config": "cd packages/ui && pnpm generate:config && cd ../..",
+    "generate:config": "pnpm --filter=@t3-chat-clone/ui generate:config",
     "npm:registry": "npm set registry https://registry.npmjs.org",
     "run:web": "turbo dev --filter=@t3-chat-clone/web",
     "run:ws-server": "turbo dev --filter=@t3-chat-clone/ws-server",
@@ -36,11 +36,11 @@
     "dotenv": "^16.5.0",
     "eslint": "^9.29.0",
     "husky": "^9.1.7",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "vercel": "^43.3.0"
+    "vercel": "^44.0.0"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {

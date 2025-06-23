@@ -277,7 +277,11 @@ export function ChatPage({ user }: { user?: User }) {
             onPromptSelect={handlePromptSelect}
           />
         ) : (
-          <ChatArea messages={messages} onUpdateMessage={handleUpdateMessage} />
+          <ChatArea
+            messages={messages}
+            onUpdateMessage={handleUpdateMessage}
+            user={user}
+          />
         )}
         {showScrollToBottomButton && (
           <Button
@@ -317,10 +321,8 @@ export function ChatPage({ user }: { user?: User }) {
                 onCollapse={() => setIsSidebarOpen(false)}
                 onExpand={() => setIsSidebarOpen(true)}>
                 <Sidebar
-                  userProfile={{
-                    ...user,
-                    plan: "Free",
-                    messageUsage: { current: 4, limit: 20 }
+                  user={{
+                    ...user
                   }}
                   onNewChat={handleNewChat}
                   onOpenSettings={() => setIsSettingsDrawerOpen(true)}
@@ -353,9 +355,7 @@ export function ChatPage({ user }: { user?: User }) {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="fixed top-0 left-0 z-50 h-full">
                     <Sidebar
-                      userProfile={{
-                        plan: "Free",
-                        messageUsage: { current: 4, limit: 20 },
+                      user={{
                         ...user
                       }}
                       onNewChat={handleNewChat}

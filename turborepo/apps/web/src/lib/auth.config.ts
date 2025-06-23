@@ -1,18 +1,22 @@
 import type { NextAuthConfig } from "next-auth";
-// pages/api/auth/[...nextauth].ts
 import type { GoogleProfile } from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import Passkey from "next-auth/providers/passkey";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import NextAuth from "next-auth";
+import { prismaClient } from "@/lib/prisma";
 
 export const authConfig = <NextAuthConfig>{
+  adapter: PrismaAdapter(prismaClient),
   providers: [
-    Passkey,
     Google<GoogleProfile>({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
       authorization: {
         params: { access_type: "offline", prompt: "consent" }
+      },
+      async profile(profile) {
+        return {...profile}
       }
     }),
     GitHub({
@@ -24,7 +28,6 @@ export const authConfig = <NextAuthConfig>{
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60
   },
-  experimental: { enableWebAuthn: true },
   trustHost: true,
   debug: true
 };

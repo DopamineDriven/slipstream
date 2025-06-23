@@ -1,33 +1,44 @@
 "use client";
 
-import { Button, Icon, Input } from "@t3-chat-clone/ui";
-import Link from "next/link";
-import { motion } from "motion/react";
-import type { ChatThread, UserProfile } from "@/types/ui";
-import { mockChatThreads, mockUserProfile } from "@/lib/mock";
-import { Avatar, AvatarFallback, AvatarImage } from "@/ui/atoms/avatar";
+import type { User } from "next-auth";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  ChevronDown,
+  CirclePlus,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/ui/atoms/dropdown-menu";
+  DropdownMenuTrigger,
+  Input,
+  LogOut,
+  MessageSquareText,
+  Search,
+  Settings
+} from "@t3-chat-clone/ui";
+import Link from "next/link";
+import { motion } from "motion/react";
+import type { ChatThread } from "@/types/ui";
+import { mockChatThreads } from "@/lib/mock";
+import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 
 interface SidebarProps {
   chatThreads?: ChatThread[];
-  userProfile?: UserProfile;
   onNewChat?: () => void;
   onSelectChat?: (id: string) => void;
   onOpenSettings?: () => void; // Kept for potential future use, but we'll link directly
   className?: string;
+  user?: User;
 }
 
 export function Sidebar({
   chatThreads = mockChatThreads,
-  userProfile = mockUserProfile,
+  user: userProfile,
   onNewChat = () => console.log("New Chat"),
   onSelectChat = id => console.log("Select Chat:", id),
   onOpenSettings: _openSettings,
@@ -38,16 +49,19 @@ export function Sidebar({
       initial={{ x: -300 }}
       animate={{ x: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`bg-brand-sidebar text-brand-text border-brand-border flex h-full flex-col space-y-4 border-r p-4 ${className}`}>
+      className={cn(
+        `bg-brand-sidebar text-brand-text border-brand-border flex h-full flex-col space-y-4 border-r p-4`,
+        className
+      )}>
       <Button
         variant="outline"
         className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start"
         onClick={onNewChat}>
-        <Icon.CirclePlus className="mr-2 h-5 w-5" /> New Chat
+        <CirclePlus className="mr-2 h-5 w-5" /> New Chat
       </Button>
 
       <div className="relative">
-        <Icon.Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+        <Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           type="search"
           placeholder="Search your threads..."
@@ -63,7 +77,7 @@ export function Sidebar({
               variant="ghost"
               className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text h-auto w-full justify-start py-2"
               onClick={() => onSelectChat(thread.id)}>
-              <Icon.MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
+              <MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
               <span className="flex-1 text-left break-words whitespace-normal">
                 {thread.title}
               </span>
@@ -93,14 +107,12 @@ export function Sidebar({
                 </Avatar>
                 <div className="text-left">
                   <p className="text-brand-text text-sm font-medium">
-                    {userProfile.name}
+                    {userProfile?.name}
                   </p>
-                  <p className="text-brand-text-muted text-xs">
-                    {userProfile.plan} Plan
-                  </p>
+                  <p className="text-brand-text-muted text-xs">{"Free"} Plan</p>
                 </div>
               </div>
-              <Icon.ChevronDown className="text-brand-text-muted h-4 w-4" />
+              <ChevronDown className="text-brand-text-muted h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -113,12 +125,12 @@ export function Sidebar({
             <DropdownMenuSeparator className="bg-brand-border" />
             <Link href="/settings" passHref>
               <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
-                <Icon.Settings className="mr-2 h-4 w-4" />
+                <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-              <Icon.LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4" />
               <span>Sign Out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
