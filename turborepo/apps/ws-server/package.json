@@ -53,7 +53,6 @@
     "@aws-sdk/client-s3": "^3.832.0",
     "@google/genai": "^1.6.0",
     "@neondatabase/serverless": "^1.0.1",
-    "@t3-chat-clone/db": "workspace:*",
     "@t3-chat-clone/redis-service": "workspace:*",
     "@types/node": "^24.0.3",
     "@types/ws": "^8.18.1",
