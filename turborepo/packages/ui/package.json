@@ -45,6 +45,7 @@
         "dist/icons/layers.d.ts",
         "dist/icons/log-out.d.ts",
         "dist/icons/mail.d.ts",
+        "dist/icons/menu.d.ts",
         "dist/icons/message-circle-question.d.ts",
         "dist/icons/message-square-text.d.ts",
         "dist/icons/message-square.d.ts",
@@ -79,6 +80,7 @@
         "dist/ui/input.d.ts",
         "dist/ui/progress.d.ts",
         "dist/ui/scroll-area.d.ts",
+        "dist/ui/separator.d.ts",
         "dist/ui/textarea.d.ts"
       ]
     }
@@ -120,6 +122,7 @@
           "dist/icons/layers.d.ts",
           "dist/icons/log-out.d.ts",
           "dist/icons/mail.d.ts",
+          "dist/icons/menu.d.ts",
           "dist/icons/message-circle-question.d.ts",
           "dist/icons/message-square-text.d.ts",
           "dist/icons/message-square.d.ts",
@@ -154,6 +157,7 @@
           "dist/ui/input.d.ts",
           "dist/ui/progress.d.ts",
           "dist/ui/scroll-area.d.ts",
+          "dist/ui/separator.d.ts",
           "dist/ui/textarea.d.ts"
         ]
       }
@@ -190,6 +194,7 @@
     "./icons/layers": "./dist/icons/layers.js",
     "./icons/log-out": "./dist/icons/log-out.js",
     "./icons/mail": "./dist/icons/mail.js",
+    "./icons/menu": "./dist/icons/menu.js",
     "./icons/message-circle-question": "./dist/icons/message-circle-question.js",
     "./icons/message-square-text": "./dist/icons/message-square-text.js",
     "./icons/message-square": "./dist/icons/message-square.js",
@@ -220,6 +225,7 @@
     "./ui/input": "./dist/ui/input.js",
     "./ui/progress": "./dist/ui/progress.js",
     "./ui/scroll-area": "./dist/ui/scroll-area.js",
+    "./ui/separator": "./dist/ui/separator.js",
     "./ui/textarea": "./dist/ui/textarea.js"
   },
   "scripts": {
@@ -227,7 +233,7 @@
     "dev": "pnpm build",
     "prebuild": "rm -rf dist",
     "postbuild": "tsx src/services/postbuild.ts flag-check",
-    "output:config": "tsx src/services/read.ts --target all",
+    "generate:config": "tsx src/services/read.ts --target all",
     "build": "tsup",
     "clean": "git clean -xdf dist node_modules",
     "types": "tsc --emitDeclarationOnly"
@@ -239,12 +245,17 @@
     "tailwindcss": ">=4.1.10"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.3.1"

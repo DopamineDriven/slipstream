@@ -68,6 +68,7 @@
     ".*variant.*",
     ".*Styles.*"
   ],
+  "cursor.composer.shouldChimeAfterChatFinishes": true,
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsserver.web.typeAcquisition.enabled": true,
   "typescript.implementationsCodeLens.enabled": true,

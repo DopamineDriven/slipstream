@@ -1,0 +1,77 @@
+{
+  "name": "@t3-chat-clone/redis-service",
+  "version": "1.0.0",
+  "description": "convenient redis util",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/*.d.ts",
+          "dist/*/index.d.ts"
+        ],
+        "redis": [
+          "dist/service/index.d.ts"
+        ],
+        "types": ["dist/service/types.d.ts"]
+      }
+    }
+  },
+  "license": "MIT",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/*/index.d.ts"
+      ],
+      "redis": [
+        "dist/service/index.d.ts"
+      ],
+      "types": ["dist/service/types.d.ts"]
+    }
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,d.ts,d.cts,css}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js",
+    "./redis": "./dist/service/index.js",
+    "./types": "./dist/service/types.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "fix": "npm pkg fix"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "dotenv-expand": "^12.0.2",
+    "redis": "^5.5.6"
+  },
+  "devDependencies": {
+    "@t3-chat-clone/eslint-config": "workspace:*",
+    "@t3-chat-clone/prettier-config": "workspace:*",
+    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@types/node": "^24.0.3",
+    "chokidar": "^4.0.3",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.29.0",
+    "jiti": "^2.4.2",
+    "prettier": "^3.5.3",
+    "terser": "^5.43.1",
+    "tslib": "^2.8.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1"
+  },
+  "prettier": "@t3-chat-clone/prettier-config"
+}

@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     fastapi_url: str = ""
     database_url: str = ""
     openai_api_key: str = ""
+    gemini_api_key: str = ""
     open_ai_key: str = ""
     s3_region: str = "us-east-1"
     s3_endpoint_url: str = ""  # For Minio/R2/other S3 clones

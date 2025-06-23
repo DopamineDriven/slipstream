@@ -1,23 +1,17 @@
 import type { ChatCompletionChunk } from "openai/resources/index.mjs";
-import type {
-  RedisClientType,
-  RedisDefaultModules,
-  RedisFunctions,
-  RedisModules,
-  RedisScripts,
-  RespVersions,
-  TypeMapping
-} from "redis";
 import type { RawData } from "ws";
+import { RedisInstance } from "@t3-chat-clone/redis-service";
+import { GenerateContentResponse, GoogleGenAI } from "@google/genai";
 import * as dotenv from "dotenv";
 import OpenAI from "openai";
 import { WebSocket } from "ws";
 import type {
   AnyEvent,
   AnyEventTypeUnion,
-  EventTypeMap
+  EventTypeMap,
+  SelectedProvider
 } from "@/types/index.ts";
-import { bucket, uploadToR2 } from "@/r2-helper/index.ts";
+import { R2Instance } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 
 dotenv.config();
@@ -29,13 +23,9 @@ export class Resolver {
   constructor(
     public wsServer: WSServer,
     private openai: OpenAI,
-    private redis: RedisClientType<
-      RedisDefaultModules & RedisModules,
-      RedisFunctions,
-      RedisScripts,
-      RespVersions,
-      TypeMapping
-    >
+    private gemini: GoogleGenAI,
+    private redis: RedisInstance,
+    private r2: R2Instance
   ) {}
 
   /** Register all event handlers here */
@@ -69,62 +59,141 @@ export class Resolver {
     } else return String(err);
   }
 
+  // can inject with userData (handled on the server now)
+  // userData?: UserData
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
     userId: string
   ) {
     // 1) pick the right client (BYOK or default)
+
+    const provider = event?.provider ?? "openai";
+
     const client = event.apiKey
       ? this.openai.withOptions({ apiKey: event.apiKey })
       : this.openai;
 
     const streamKey = `stream:${event.conversationId}`;
     let agg = "";
+
     try {
-      // 2) open the streaming iterator
-      const stream = (await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        // supports audio response conditionally with certain models
-        // modalities: ["text", "audio"],
-        // reasoning_effort: "high" | "medium" | "low",
-        messages: [{ role: "user", content: event.prompt }],
-        stream: true
-      })) satisfies AsyncIterable<ChatCompletionChunk>;
+      if (provider === "gemini") {
+        const model = (event.model ?? "gemini-2.5-flash") as SelectedProvider<
+          typeof provider
+        >;
 
-      await this.redis.expire(streamKey, 3600);
+        const chat = this.gemini.chats.create({ model });
 
-      // 3) walk the stream
-      for await (const chunk of stream) {
-        const choice = chunk.choices[0];
-        const text = choice?.delta.content;
-        const done = choice?.finish_reason != null;
+        const stream = (await chat.sendMessageStream({
+          message: event.prompt,
 
-        if (text) {
-          await this.redis.rPush(streamKey, text);
-          agg += text;
-          ws.send(
-            JSON.stringify({
-              type: "ai_chat_chunk",
-              conversationId: event.conversationId,
-              userId,
-              chunk: text,
-              done: false
-            } satisfies EventTypeMap["ai_chat_chunk"])
-          );
+          config: { thinkingConfig: { thinkingBudget: 0 } } // disables thinking
+        })) satisfies AsyncGenerator<GenerateContentResponse>;
+
+        await this.redis.expire(streamKey, 3600);
+        // 3) walk the stream
+        for await (const chunk of stream) {
+          const textPart = chunk.text;
+          const dataPart = chunk.data;
+          const done = chunk.candidates?.[0]?.finishReason;
+          const returnedModel = chunk.modelVersion ?? model;
+
+          if (textPart) {
+            await this.redis.rPush(streamKey, textPart);
+            agg += textPart;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId: event.conversationId,
+                userId,
+                model: model,
+                provider,
+                chunk: textPart,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+          }
+          if (dataPart) {
+            const _dataUrl = `data:image/png;base64,${dataPart}` as const;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_inline_data",
+                conversationId: event.conversationId,
+                data: dataPart,
+                provider,
+                model,
+                userId
+              } satisfies EventTypeMap["ai_chat_inline_data"])
+            );
+          }
+          if (done) {
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId: event.conversationId,
+                userId,
+                model: returnedModel,
+                provider,
+                chunk: agg,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            break;
+          }
         }
+      } else {
+        const model = (event.model ?? "gpt-4o-mini") as SelectedProvider<
+          typeof provider
+        >;
+        const stream = (await client.chat.completions.create({
+          model,
+          // supports audio response conditionally with certain models
+          // modalities: ["text", "audio"],
+          // reasoning_effort: "high" | "medium" | "low",
+          messages: [{ role: "user", content: event.prompt }],
+          stream: true
+        })) satisfies AsyncIterable<ChatCompletionChunk>;
 
-        if (done) {
-          ws.send(
-            JSON.stringify({
-              type: "ai_chat_response",
-              conversationId: event.conversationId,
-              userId,
-              chunk: agg,
-              done: true
-            } satisfies EventTypeMap["ai_chat_response"])
-          );
-          break;
+        await this.redis.expire(streamKey, 3600);
+
+        // 3) walk the stream
+        for await (const chunk of stream) {
+          const choice = chunk.choices[0];
+          const text = choice?.delta.content;
+          const done = choice?.finish_reason != null;
+          const returnedModel = chunk.model;
+
+          if (text) {
+            await this.redis.rPush(streamKey, text);
+            agg += text;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId: event.conversationId,
+                userId,
+                provider,
+                model: returnedModel,
+                chunk: text,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+          }
+
+          if (done) {
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId: event.conversationId,
+                userId,
+                provider,
+                model: returnedModel,
+                chunk: agg,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            break;
+          }
         }
       }
     } catch (err) {
@@ -132,6 +201,7 @@ export class Resolver {
       ws.send(
         JSON.stringify({
           type: "ai_chat_error",
+          provider: provider,
           conversationId: event.conversationId,
           userId,
           done: true,
@@ -189,6 +259,7 @@ export class Resolver {
     "asset_upload_response",
     "ai_chat_chunk",
     "ai_chat_request",
+    "ai_chat_inline_data",
     "ai_chat_error"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
@@ -308,7 +379,8 @@ export class Resolver {
     try {
       const data = Buffer.from(event.base64, "base64");
       const key = `user-assets/${userId}/${Date.now()}_${event.filename}`;
-      const url = await uploadToR2({
+      const bucket = process.env.R2_BUCKET ?? "t3-chat-clone-pg";
+      const url = await this.r2.uploadToR2({
         Key: key,
         Body: data,
         ContentType: event.contentType,

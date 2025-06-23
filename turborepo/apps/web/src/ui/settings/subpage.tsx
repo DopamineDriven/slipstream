@@ -18,14 +18,15 @@ import {
   Paperclip,
   User
 } from "@t3-chat-clone/ui";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
+import { useElementDimensions } from "@/hooks/use-element-dimensions";
 import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have this hook
 import { cn } from "@/lib/utils";
-import { MobileSettingsToolbar } from "@/ui/settings/mobile-settings-toolbar";
+import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
 import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
 import { AttachmentsSettingsSection } from "@/ui/settings/sections/attachment-settings-section";
@@ -101,6 +102,19 @@ const settingsSectionsConfig = [
 const LEFT_COLUMN_WIDTH_DESKTOP = "20dvw";
 const LEFT_COLUMN_WIDTH_COLLAPSED = "w-16"; // approx <5dvw on mobile, e.g. 64px
 const RIGHT_COLUMN_WIDTH_DESKTOP = "w-20"; // approx 80px
+const TOTAL_SECTIONS = settingsSectionsConfig.length; // 7
+const PERIPHERAL_TRANSITION_PERCENT = 0.05; // 5% buffer zones
+const ACTIVATION_THRESHOLD = 0.3; // 30% threshold for switching sections
+
+const SECTION_TITLES: Record<SettingsSectionUnion, string> = {
+  account: "Account",
+  apiKeys: "API Keys",
+  customization: "Customization",
+  history: "History & Sync",
+  models: "Models",
+  attachments: "Attachments",
+  contactUs: "Contact Us"
+} as const;
 
 type SettingsSectionUnion = (typeof settingsSectionsConfig)[number]["id"];
 
@@ -129,14 +143,63 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
     }
   }, [resolvedTheme]);
 
-  const [activeSection, setActiveSection] = useState<SettingsSectionUnion>(
-    settingsSectionsConfig[0]?.id
-  );
-  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>(null);
+  const [activeSection, setActiveSection] =
+    useState<SettingsSectionUnion>("account");
+
+  const sectionRefs = useRef<
+    Record<SettingsSectionUnion, HTMLDivElement | null>
+  >({
+    account: null,
+    apiKeys: null,
+    customization: null,
+    history: null,
+    models: null,
+    attachments: null,
+    contactUs: null
+  });
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const isNavigatingRef = useRef(false);
+  const lastActiveSection = useRef<SettingsSectionUnion>("account");
+
+  const isSmallScreen = !useMediaQuery("(min-width: 640px)");
+
+  const [isLeftSidebarManuallyCollapsed, setIsLeftSidebarManuallyCollapsed] =
+    useState(false);
+
+  const [scrollContainerDimensions] = useElementDimensions(scrollContainerRef);
+
+  const scrollMetrics = useMemo(() => {
+    if (!scrollContainerRef.current || scrollContainerDimensions.height === 0) {
+      return {
+        totalScrollHeight: 0,
+        sectionHeight: 0,
+        bufferZone: 0,
+        rootMargin: "0px"
+      };
+    }
+
+    // Get the total scrollable content height
+    const totalScrollHeight = scrollContainerRef.current.scrollHeight;
+    const containerHeight = scrollContainerDimensions.height;
+
+    // Calculate section allocation based on actual scroll content
+    const sectionHeight = totalScrollHeight / TOTAL_SECTIONS;
+    const bufferZone = sectionHeight * PERIPHERAL_TRANSITION_PERCENT;
+
+    // Create pixel-based root margin for intersection observer
+    const rootMargin = `-${Math.round(bufferZone)}px 0px -${Math.round(bufferZone)}px 0px`;
+
+    return {
+      totalScrollHeight,
+      sectionHeight,
+      bufferZone,
+      rootMargin,
+      containerHeight
+    };
+  }, [scrollContainerDimensions.height]);
 
   useEffect(() => {
-    // Initialize all section refs to null
-
     settingsSectionsConfig.forEach(section => {
       let refRef = sectionRefs?.current?.[section.id];
       if (refRef) {
@@ -153,82 +216,104 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
       }
     };
   }, []);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const isNavigatingRef = useRef(false);
-
-  const isSmallScreen = !useMediaQuery("(min-width: 640px)"); // Tailwind 'sm' breakpoint is 640px
-  const [isLeftSidebarManuallyCollapsed, setIsLeftSidebarManuallyCollapsed] =
-    useState(false);
 
   // Determine actual collapsed state based on screen size and manual toggle
-  const isLeftSidebarEffectivelyCollapsed =
-    isSmallScreen || isLeftSidebarManuallyCollapsed;
-
-  const activeSectionTitle =
-    settingsSectionsConfig.find(s => s.id === activeSection)?.title ??
-    "Settings";
-
-  const handleNavigation = useCallback(
-    (sectionId: SettingsSectionUnion) => {
-      setActiveSection(sectionId);
-      isNavigatingRef.current = true;
-      if (!sectionRefs.current) return;
-      sectionRefs.current[sectionId]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-      setTimeout(() => {
-        isNavigatingRef.current = false;
-      }, 1000);
-
-      // If on small screen and sidebar was manually expanded (overlay), collapse it after navigation
-      if (isSmallScreen && !isLeftSidebarManuallyCollapsed) {
-        // This logic needs refinement if the "expanded" state on small screens is an overlay
-        // For now, assuming the narrow bar is the primary small screen state.
-      }
-    },
+  const isLeftSidebarEffectivelyCollapsed = useMemo(
+    () => isSmallScreen || isLeftSidebarManuallyCollapsed,
     [isSmallScreen, isLeftSidebarManuallyCollapsed]
   );
 
+  const activeSectionTitle = SECTION_TITLES[activeSection] || "Settings";
+
   useEffect(() => {
     if (observerRef.current) observerRef.current.disconnect();
+
+    // Only create observer if we have valid scroll metrics
+    if (scrollMetrics.totalScrollHeight === 0) return;
+
+    // Optimized intersection observer with precise pixel-based buffer zones
     observerRef.current = new IntersectionObserver(
       entries => {
         if (isNavigatingRef.current) return;
-        const visibleSection = entries.find(
-          entry => entry.isIntersecting && entry.intersectionRatio >= 0.5
-        );
-        if (visibleSection)
-          setActiveSection(visibleSection.target.id as SettingsSectionUnion);
-        else {
-          const slightlyVisibleSections = entries.filter(
-            entry => entry.isIntersecting && entry.intersectionRatio > 0
-          );
-          if (slightlyVisibleSections.length > 0) {
-            slightlyVisibleSections.sort(
-              (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
-            );
-            setActiveSection(
-              slightlyVisibleSections?.[0]?.target?.id as SettingsSectionUnion
-            );
+
+        // Sort entries by their position for consistent behavior
+        const sortedEntries = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (sortedEntries.length === 0) return;
+
+        // Find the section that's most prominently visible (accounting for buffer zones)
+        let bestCandidate: IntersectionObserverEntry | null = null;
+        let bestScore = 0;
+
+        for (const entry of sortedEntries) {
+          const rect = entry.boundingClientRect;
+          const containerHeight = scrollMetrics.containerHeight ?? 0;
+
+          // Calculate how much of the section is in the "core" viewing area (excluding buffer zones)
+          const coreTop = scrollMetrics.bufferZone;
+          const coreBottom = containerHeight - scrollMetrics.bufferZone;
+
+          const visibleTop = Math.max(rect.top, coreTop);
+          const visibleBottom = Math.min(rect.bottom, coreBottom);
+          const coreVisibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+          // Score based on how much core area is visible
+          const score = coreVisibleHeight / (coreBottom - coreTop);
+
+          if (score > bestScore && score > ACTIVATION_THRESHOLD) {
+            bestScore = score;
+            bestCandidate = entry;
+          }
+        }
+
+        if (bestCandidate) {
+          const newActiveSection = bestCandidate.target
+            .id as SettingsSectionUnion;
+          if (newActiveSection !== lastActiveSection.current) {
+            setActiveSection(newActiveSection);
+            lastActiveSection.current = newActiveSection;
           }
         }
       },
       {
         root: scrollContainerRef.current,
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
-        rootMargin: "0px 0px -50% 0px"
+        // Optimized thresholds with buffer consideration
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        // Pixel-based root margin to account for buffer zones
+        rootMargin: scrollMetrics.rootMargin
       }
     );
+
     const currentObserver = observerRef.current;
-    if (!sectionRefs.current) return;
+
+    // Observe all sections
     Object.values(sectionRefs.current).forEach(ref => {
       if (ref) currentObserver.observe(ref);
     });
+
     return () => {
       if (currentObserver) currentObserver.disconnect();
     };
+  }, [scrollMetrics]);
+
+  const handleNavigation = useCallback((sectionId: string) => {
+    const typedSectionId = sectionId as SettingsSectionUnion;
+    setActiveSection(typedSectionId);
+    isNavigatingRef.current = true;
+
+    // Smooth scroll with optimized timing
+    sectionRefs?.current?.[typedSectionId]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest"
+    });
+
+    // Shorter timeout for better responsiveness
+    setTimeout(() => {
+      isNavigatingRef.current = false;
+    }, 800);
   }, []);
 
   return (
@@ -236,7 +321,7 @@ export default function SettingsPage({ user }: { user?: UserProps }) {
       <div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
         {/* Mobile Toolbar - shown only on small screens */}
         {isSmallScreen && (
-          <MobileSettingsToolbar
+          <MobileSettingsFAB
             sections={settingsSectionsConfig}
             activeSection={activeSection}
             onNavigate={handleNavigation}
