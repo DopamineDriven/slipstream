@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output="../generated/prisma"
 }
 
 datasource db {
@@ -38,7 +39,6 @@ model User {
   sessions      Session[]
   keys          UserKey[]
   conversations Conversation[]
-  authenticator Authenticator[]
   settings      Settings?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -157,17 +157,3 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([userId, credentialID])
-}
