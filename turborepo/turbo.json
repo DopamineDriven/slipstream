@@ -3,7 +3,7 @@
   "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^db:generate"],
       "cache": true
     },
     "test": {
@@ -11,7 +11,7 @@
       "dependsOn": []
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^lint"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -23,7 +23,17 @@
     },
     "clean": {
       "cache": false
-    }
+    },
+  "db:generate": {
+    "cache": false
+  },
+  "db:migrate": {
+    "cache": false,
+    "persistent": true
+  },
+  "db:deploy": {
+    "cache": false
+  }
   },
   "ui": "stream",
   "globalEnv": [

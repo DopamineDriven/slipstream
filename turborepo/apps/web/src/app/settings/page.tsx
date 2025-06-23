@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
-import { default as SettingsPage } from "@/ui/settings/subpage";
+import { default as SettingsPage } from "@/ui/settings";
 import { redirect } from "next/navigation";
 
 export const metadata = {

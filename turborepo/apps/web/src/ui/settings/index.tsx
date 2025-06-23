@@ -55,7 +55,6 @@ const settingsSectionsConfig = [
     title: "API Keys",
     icon: KeyRound,
     component: ApiKeysSettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -63,7 +62,6 @@ const settingsSectionsConfig = [
     title: "Customization",
     icon: Palette,
     component: CustomizationSettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -71,7 +69,6 @@ const settingsSectionsConfig = [
     title: "History & Sync",
     icon: History,
     component: HistorySettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -79,7 +76,6 @@ const settingsSectionsConfig = [
     title: "Models",
     icon: KeyRound,
     component: ModelsSettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -87,7 +83,6 @@ const settingsSectionsConfig = [
     title: "Attachments",
     icon: Paperclip,
     component: AttachmentsSettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -95,7 +90,6 @@ const settingsSectionsConfig = [
     title: "Contact Us",
     icon: MessageCircleQuestion,
     component: ContactUsSettingsSection,
-    action: () => {},
     type: "section"
   }
 ] as const;
@@ -144,12 +138,9 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
     }
   }, [resolvedTheme]);
 
-  const [activeSection, setActiveSection] =
-    useState<SectionId>("account");
+  const [activeSection, setActiveSection] = useState<SectionId>("account");
 
-  const sectionRefs = useRef<
-    Record<SectionId, HTMLDivElement | null>
-  >({
+  const sectionRefs = useRef<Record<SectionId, HTMLDivElement | null>>({
     account: null,
     apiKeys: null,
     customization: null,
@@ -270,8 +261,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
         }
 
         if (bestCandidate) {
-          const newActiveSection = bestCandidate.target
-            .id as SectionId;
+          const newActiveSection = bestCandidate.target.id as SectionId;
           if (newActiveSection !== lastActiveSection.current) {
             setActiveSection(newActiveSection);
             lastActiveSection.current = newActiveSection;
@@ -306,10 +296,10 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
         : `var(--left-sidebar-width, ${LEFT_COLUMN_WIDTH_DESKTOP})`) satisfies ValueKeyframesDefinition,
       widthInitial: (isLeftSidebarEffectivelyCollapsed
         ? LEFT_COLUMN_WIDTH_COLLAPSED
-        : LEFT_COLUMN_WIDTH_DESKTOP) satisfies MotionStyle['width'],
-        justifyContent: (isLeftSidebarEffectivelyCollapsed
-                    ? "center"
-                    : "space-between") satisfies MotionStyle['justifyContent']
+        : LEFT_COLUMN_WIDTH_DESKTOP) satisfies MotionStyle["width"],
+      justifyContent: (isLeftSidebarEffectivelyCollapsed
+        ? "center"
+        : "space-between") satisfies MotionStyle["justifyContent"]
     }),
     [isLeftSidebarEffectivelyCollapsed]
   );
@@ -331,6 +321,10 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
       isNavigatingRef.current = false;
     }, 800);
   }, []);
+
+  const navSideBarCb = useCallback(() => {
+    return setIsLeftSidebarManuallyCollapsed(!isLeftSidebarManuallyCollapsed);
+  }, [isLeftSidebarManuallyCollapsed]);
 
   return (
     <>
@@ -386,11 +380,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() =>
-                    setIsLeftSidebarManuallyCollapsed(
-                      !isLeftSidebarManuallyCollapsed
-                    )
-                  }
+                  onClick={navSideBarCb}
                   className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
                   {isLeftSidebarManuallyCollapsed ? (
                     <PanelRightClose />
@@ -501,10 +491,13 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
             </div>
             <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mb-auto" />
             <Button
+              asChild
               variant="ghost"
               className="flex h-auto w-full flex-col items-center py-2 text-red-400 hover:bg-red-400/10 hover:text-red-300">
-              <LogOut className="mb-1 h-5 w-5" />
-              <span className="text-xs">Sign Out</span>
+              <Link href="/api/auth/signout" className="appearance-none">
+                <LogOut className="mb-1 h-5 w-5" />
+                <span className="text-xs">Sign Out</span>
+              </Link>
             </Button>
           </motion.div>
         )}
