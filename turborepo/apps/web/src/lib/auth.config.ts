@@ -13,22 +13,11 @@ export const authConfig = <NextAuthConfig>{
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
       authorization: {
         params: { access_type: "offline", prompt: "consent" }
-      },
-      async profile(profile) {
-        return {...profile}
       }
     }),
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET,
-      profile(profile) {
-        return {
-          id: profile.id.toString(),
-          name: profile.name ?? profile.login,
-          email: profile.email,
-          image: profile.avatar_url
-        }
-      }
+      clientSecret: process.env.AUTH_GITHUB_SECRET
     })
   ],
   session: {

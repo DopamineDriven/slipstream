@@ -147,7 +147,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-declare module "@auth/core/types" {
+declare module "next-auth" {
   interface DefaultUser {
     id?: string;
     name?: string | null;
