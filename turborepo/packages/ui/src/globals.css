@@ -1,6 +1,7 @@
 @layer theme;
 
 @import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 @import "tw-animate-css";
 
@@ -110,6 +111,7 @@
       opacity: 0.2;
     }
   }
+
 }
 
 @layer theme {

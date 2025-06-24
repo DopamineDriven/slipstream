@@ -98,13 +98,13 @@ export const mockKeyboardShortcuts: KeyboardShortcut[] = [
 export const availableModels = [
   // Added Model[] type
   {
-    id: "gemini-2.0-flash",
-    name: "Gemini 2.0 Flash",
+    id: "gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
     icon: "/google-gemini-icon.svg"
   },
   {
     id: "gpt-4.1",
-    name: "GPT-4.1",
+    name: "gpt-4.1",
     icon: "/chatgpt-icon.svg"
   },
   {

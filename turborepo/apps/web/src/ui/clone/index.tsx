@@ -379,6 +379,7 @@ export function ChatPage({ user }: { user?: User }) {
         onSelectModel={setSelectedModel}
       />
       <SettingsDrawer
+        user={user}
         isOpen={isSettingsDrawerOpen}
         onOpenChange={setIsSettingsDrawerOpen}
       />

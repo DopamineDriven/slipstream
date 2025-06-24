@@ -8,9 +8,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Input
+  Input,
+  Label
 } from "@t3-chat-clone/ui";
-import { Label } from "@/ui/atoms/label";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
 
 export function AccountSettingsSection({ user }: { user?: User }) {

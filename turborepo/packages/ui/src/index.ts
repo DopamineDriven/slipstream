@@ -1,5 +1,6 @@
 import "./globals.css";
 
+// icons
 export { Icon } from "@/icons";
 export type { BaseSVGProps, IconName } from "@/icons";
 export { ArrowDownCircle } from "@/icons/arrow-down-circle";
@@ -48,8 +49,10 @@ export { User } from "@/icons/user";
 export { X } from "@/icons/x";
 export { Zap } from "@/icons/zap";
 
+// lib
 export { cn } from "@/lib/utils";
 
+// ui
 export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Button, buttonVariants } from "@/ui/button";
@@ -95,6 +98,8 @@ export {
 export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
 export type { InputProps } from "@/ui/input";
+export { Label } from "@/ui/label";
+export type { LabelProps } from "@/ui/label";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";
 export { ScrollArea, ScrollBar } from "@/ui/scroll-area";

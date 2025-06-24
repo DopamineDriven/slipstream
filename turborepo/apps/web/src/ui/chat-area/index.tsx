@@ -56,7 +56,7 @@ export function ChatArea({
             onUpdateMessage={onUpdateMessage}
           />
         ))}
-        <div ref={messagesEndRef} />{" "}
+        <div ref={messagesEndRef} />
         {/* Invisible element at the end for auto-scrolling */}
       </motion.div>
     </ScrollArea>

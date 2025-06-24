@@ -30,10 +30,12 @@ type DropdownMenuProps<
     | "Label"
     | "RadioItem"
 > = T extends "Label" | "Item" | "SubTrigger"
-  ? ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]> & {
-      inset?: boolean;
-    }
-  : ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]>;
+  ? {
+      [P in T]: ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[P]> & {
+        inset?: boolean;
+      };
+    }[T]
+  : { [P in T]: ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[P]> }[T];
 
 const DropdownMenuSubTrigger = ({
   className,
