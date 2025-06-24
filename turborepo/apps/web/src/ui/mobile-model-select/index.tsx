@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Icon } from "@t3-chat-clone/ui";
+import { Button, Icon, ScrollArea } from "@t3-chat-clone/ui";
 import Image from "next/image";
 import type { Model } from "@/types/ui"; // Assuming Model type is in lib/types.ts
 import { availableModels } from "@/lib/mock";
@@ -13,7 +13,6 @@ import {
   DrawerHeader,
   DrawerTitle
 } from "@/ui/atoms/drawer";
-import { ScrollArea } from "@/ui/atoms/scroll-area";
 
 interface MobileModelSelectorDrawerProps {
   isOpen: boolean;

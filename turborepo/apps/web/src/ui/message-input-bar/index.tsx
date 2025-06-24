@@ -23,7 +23,7 @@ export function MessageInputBar({
   const [message, setMessage] = useState("");
   const [showExpandButton, setShowExpandButton] = useState(false);
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleSend = () => {
     if (message.trim()) {

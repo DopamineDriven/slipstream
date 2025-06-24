@@ -17,6 +17,7 @@ import {
   Input,
   LogOut,
   MessageSquareText,
+  ScrollArea,
   Search,
   Settings
 } from "@t3-chat-clone/ui";
@@ -25,7 +26,6 @@ import { motion } from "motion/react";
 import type { ChatThread } from "@/types/ui";
 import { mockChatThreads } from "@/lib/mock";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/ui/atoms/scroll-area";
 
 interface SidebarProps {
   chatThreads?: ChatThread[];
@@ -44,6 +44,30 @@ export function Sidebar({
   onOpenSettings: _openSettings,
   className = ""
 }: SidebarProps) {
+  const dropDownMap = [
+    {
+      name: "settings-sidebar",
+      Component: () => (
+        <Link href="/settings" passHref>
+          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </DropdownMenuItem>
+        </Link>
+      )
+    },
+    {
+      name: "signout-sidebar",
+      Component: () => (
+        <Link href="/api/auth/signout" passHref>
+          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Sign Out</span>
+          </DropdownMenuItem>
+        </Link>
+      )
+    }
+  ];
   return (
     <motion.div
       initial={{ x: -300 }}
@@ -123,16 +147,9 @@ export function Sidebar({
               My Account
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-brand-border" />
-            <Link href="/settings" passHref>
-              <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign Out</span>
-            </DropdownMenuItem>
+            {dropDownMap.map(({ Component, name }) => (
+              <Component key={name} />
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

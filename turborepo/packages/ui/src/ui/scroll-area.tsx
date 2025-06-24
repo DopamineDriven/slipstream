@@ -4,8 +4,9 @@ import type { ComponentPropsWithRef } from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@/lib/utils";
 
-type ScrollAreaProps<T extends "Root" | "ScrollAreaScrollbar"> =
-  ComponentPropsWithRef<(typeof ScrollAreaPrimitive)[T]>;
+type ScrollAreaProps<T extends "Root" | "ScrollAreaScrollbar"> = {
+  [P in T]: ComponentPropsWithRef<(typeof ScrollAreaPrimitive)[T]>;
+}[T];
 
 const ScrollArea = ({
   className,

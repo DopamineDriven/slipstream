@@ -13,8 +13,9 @@ const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
 
-type DialogProps<T extends "Overlay" | "Content" | "Title" | "Description"> =
-  ComponentPropsWithRef<(typeof DialogPrimitive)[T]>;
+type DialogProps<T extends "Overlay" | "Content" | "Title" | "Description"> = {
+  [P in T]: ComponentPropsWithRef<(typeof DialogPrimitive)[P]>;
+}[T];
 
 const DialogOverlay = ({
   className,

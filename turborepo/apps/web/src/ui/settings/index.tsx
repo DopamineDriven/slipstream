@@ -47,7 +47,6 @@ const settingsSectionsConfig = [
     title: "Account",
     icon: User,
     component: AccountSettingsSection,
-    action: () => {},
     type: "section"
   },
   {
@@ -101,7 +100,7 @@ const TOTAL_SECTIONS = settingsSectionsConfig.length; // 7
 const PERIPHERAL_TRANSITION_PERCENT = 0.05; // 5% buffer zones
 const ACTIVATION_THRESHOLD = 0.3; // 30% threshold for switching sections
 
-const SECTION_TITLES: Record<SectionId, string> = {
+const SECTION_TITLES = {
   account: "Account",
   apiKeys: "API Keys",
   customization: "Customization",
@@ -111,7 +110,7 @@ const SECTION_TITLES: Record<SectionId, string> = {
   contactUs: "Contact Us"
 } as const;
 
-type SectionId = (typeof settingsSectionsConfig)[number]["id"];
+type SectionId = keyof typeof SECTION_TITLES;
 
 export default function SettingsScaffold({ user }: { user?: UserProps }) {
   const { resolvedTheme } = useTheme();
@@ -308,9 +307,9 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
     const typedSectionId = sectionId as SectionId;
     setActiveSection(typedSectionId);
     isNavigatingRef.current = true;
-
+    if (!sectionRefs.current) return;
     // Smooth scroll with optimized timing
-    sectionRefs?.current?.[typedSectionId]?.scrollIntoView({
+    sectionRefs.current?.[typedSectionId]?.scrollIntoView({
       behavior: "smooth",
       block: "start",
       inline: "nearest"
@@ -327,181 +326,176 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
   }, [isLeftSidebarManuallyCollapsed]);
 
   return (
-    <>
-      <div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
-        {/* Mobile Toolbar - shown only on small screens */}
-        {isSmallScreen && (
-          <MobileSettingsFAB
-            sections={settingsSectionsConfig}
-            activeSection={activeSection}
-            user={user}
-            onNavigate={handleNavigation}
-          />
-        )}
-
-        {/* Left Sidebar */}
-        <AnimatePresence>
-          {(!isSmallScreen ||
-            (isSmallScreen && isLeftSidebarManuallyCollapsed)) && ( // Show if not small screen OR if small screen AND manually collapsed (icon bar)
-            <motion.div
-              key="left-sidebar"
-              initial={{
-                width: styleMemo.widthInitial,
-                "--left-sidebar-width": LEFT_COLUMN_WIDTH_DESKTOP
-              }}
-              animate={{
-                width: styleMemo.widthAnimation,
-                "--left-sidebar-width": LEFT_COLUMN_WIDTH_DESKTOP
-              }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={cn(
-                "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 sm:p-4",
-                isSmallScreen ? "fixed" : "relative", // Fixed on small screens to overlay
-                isLeftSidebarEffectivelyCollapsed
-                  ? LEFT_COLUMN_WIDTH_COLLAPSED
-                  : "w-[20dvw]"
-              )}>
-              <div
-                className="mb-4 flex items-center"
-                style={{
-                  justifyContent: styleMemo.justifyContent
-                }}>
-                {!isLeftSidebarEffectivelyCollapsed && (
-                  <Button
-                    variant="ghost"
-                    asChild
-                    className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component self-start">
-                    <Link href="/">
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                    </Link>
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={navSideBarCb}
-                  className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-                  {isLeftSidebarManuallyCollapsed ? (
-                    <PanelRightClose />
-                  ) : (
-                    <PanelLeftClose />
-                  )}
-                </Button>
-              </div>
-              <SettingsNavigation
-                sections={settingsSectionsConfig}
-                activeSection={activeSection}
-                onNavigate={handleNavigation}
-                isCollapsed={isLeftSidebarEffectivelyCollapsed}
-                className="flex-grow overflow-y-auto"
-              />
-              <div
-                className={cn(
-                  "border-brand-border mt-auto border-t pt-4",
-                  isLeftSidebarEffectivelyCollapsed ? "flex justify-center" : ""
-                )}>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    src={user?.image ?? "/user.svg?width=40&height=40&query=AR"}
-                    alt={user?.name ?? "username"}
-                  />
-                  <AvatarFallback>
-                    {user?.name?.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {!isLeftSidebarEffectivelyCollapsed && (
-                  <div className="ml-3">
-                    <p className="text-brand-text-emphasis text-sm font-medium">
-                      {user?.name}
-                    </p>
-                    <p className="text-brand-text-muted text-xs">Free Plan</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Center Content Column */}
-        <div
-          className={cn(
-            "flex flex-1 flex-col overflow-hidden",
-            // Apply margin only if not small screen and corresponding sidebar is visible/expanded
-            !isSmallScreen && !isLeftSidebarManuallyCollapsed && "ml-[20dvw]",
-            !isSmallScreen && isLeftSidebarManuallyCollapsed && `ml-16`,
-            !isSmallScreen && `mr-20` // Right sidebar margin for desktop
-          )}>
-          {/* Header for mobile */}
-          {isSmallScreen && (
-            <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 items-center justify-between border-b p-3">
-              <div className="flex-1">
-                {/* Empty div to push title to center if needed or for menu button */}{" "}
-              </div>
-              <h1 className="text-brand-text-emphasis flex-1 text-center text-lg font-semibold">
-                {activeSectionTitle}
-              </h1>
-              <div className="flex flex-1 justify-end">
-                <ThemeToggle />
-              </div>
-            </header>
-          )}
-
-          <main
-            ref={scrollContainerRef}
-            className="relative flex-1 space-y-8 overflow-y-auto p-4 sm:space-y-10 sm:p-6 md:p-8">
-            {settingsSectionsConfig.map(section => {
-              const SectionComponent = section.component;
-              return (
-                <div
-                  key={section.id}
-                  id={section.id}
-                  ref={createSectionRef(section.id)}
-                  // Conditional padding/margin for sections
-                  className="min-h-[80vh] scroll-mt-8 pt-8 pb-12">
-                  <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
-                    {section.title}
-                  </h2>
-                  <SectionComponent user={user} />
-                </div>
-              );
-            })}
-          </main>
-        </div>
-
-        {/* Right Sidebar - hidden on small screens */}
-        {!isSmallScreen && (
+    <div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
+      {isSmallScreen && (
+        <MobileSettingsFAB
+          sections={settingsSectionsConfig}
+          activeSection={activeSection}
+          user={user}
+          onNavigate={handleNavigation}
+        />
+      )}
+      <AnimatePresence>
+        {(!isSmallScreen ||
+          (isSmallScreen && isLeftSidebarManuallyCollapsed)) && (
           <motion.div
-            key="right-sidebar"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
+            key="left-sidebar"
+            initial={{
+              width: styleMemo.widthInitial,
+              "--left-sidebar-width": LEFT_COLUMN_WIDTH_DESKTOP
+            }}
+            animate={{
+              width: styleMemo.widthAnimation,
+              "--left-sidebar-width": LEFT_COLUMN_WIDTH_DESKTOP
+            }}
+            exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "bg-brand-sidebar border-brand-border z-20 hidden h-full shrink-0 flex-col items-center border-l p-4 sm:flex",
-              RIGHT_COLUMN_WIDTH_DESKTOP
+              "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 sm:p-4",
+              isSmallScreen ? "fixed" : "relative", // Fixed on small screens to overlay
+              isLeftSidebarEffectivelyCollapsed
+                ? LEFT_COLUMN_WIDTH_COLLAPSED
+                : "w-[20dvw]"
             )}>
-            <div className="mb-6">
+            <div
+              className="mb-4 flex items-center"
+              style={{
+                justifyContent: styleMemo.justifyContent
+              }}>
+              {!isLeftSidebarEffectivelyCollapsed && (
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component self-start">
+                  <Link href="/">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                  </Link>
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={navSideBarCb}
+                className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+                {isLeftSidebarManuallyCollapsed ? (
+                  <PanelRightClose />
+                ) : (
+                  <PanelLeftClose />
+                )}
+              </Button>
+            </div>
+            <SettingsNavigation
+              sections={settingsSectionsConfig}
+              activeSection={activeSection}
+              onNavigate={handleNavigation}
+              isCollapsed={isLeftSidebarEffectivelyCollapsed}
+              className="flex-grow overflow-y-auto"
+            />
+            <div
+              className={cn(
+                "border-brand-border mt-auto border-t pt-4",
+                isLeftSidebarEffectivelyCollapsed ? "flex justify-center" : ""
+              )}>
               <Avatar className="h-10 w-10">
                 <AvatarImage
-                  src={user?.image ?? "/user.svg"}
+                  src={user?.image ?? "/user.svg?width=40&height=40&query=AR"}
                   alt={user?.name ?? "username"}
-                  className="text-brand-text-muted h-8 w-8"
                 />
+                <AvatarFallback>
+                  {user?.name?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
+              {!isLeftSidebarEffectivelyCollapsed && (
+                <div className="ml-3">
+                  <p className="text-brand-text-emphasis text-sm font-medium">
+                    {user?.name}
+                  </p>
+                  <p className="text-brand-text-muted text-xs">Free Plan</p>
+                </div>
+              )}
             </div>
-            <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mb-auto" />
-            <Button
-              asChild
-              variant="ghost"
-              className="flex h-auto w-full flex-col items-center py-2 text-red-400 hover:bg-red-400/10 hover:text-red-300">
-              <Link href="/api/auth/signout" className="appearance-none">
-                <LogOut className="mb-1 h-5 w-5" />
-                <span className="text-xs">Sign Out</span>
-              </Link>
-            </Button>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Center Content Column */}
+      <div
+        className={cn(
+          "flex flex-1 flex-col overflow-hidden",
+          // Apply margin only if not small screen and corresponding sidebar is visible/expanded
+          !isSmallScreen && !isLeftSidebarManuallyCollapsed && "ml-[20dvw]",
+          !isSmallScreen && isLeftSidebarManuallyCollapsed && `ml-16`,
+          !isSmallScreen && `mr-20` // Right sidebar margin for desktop
+        )}>
+        {/* Header for mobile */}
+        {isSmallScreen && (
+          <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 items-center justify-between border-b p-3">
+            <div className="flex-1">
+              {/* Empty div to push title to center if needed or for menu button */}{" "}
+            </div>
+            <h1 className="text-brand-text-emphasis flex-1 text-center text-lg font-semibold">
+              {activeSectionTitle}
+            </h1>
+            <div className="flex flex-1 justify-end">
+              <ThemeToggle />
+            </div>
+          </header>
+        )}
+
+        <main
+          ref={scrollContainerRef}
+          className="relative flex-1 space-y-8 overflow-y-auto p-4 sm:space-y-10 sm:p-6 md:p-8">
+          {settingsSectionsConfig.map(section => {
+            const SectionComponent = section.component;
+            return (
+              <div
+                key={section.id}
+                id={section.id}
+                ref={createSectionRef(section.id)}
+                // Conditional padding/margin for sections
+                className="min-h-[80vh] scroll-mt-8 pt-8 pb-12">
+                <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
+                  {section.title}
+                </h2>
+                <SectionComponent user={user} />
+              </div>
+            );
+          })}
+        </main>
       </div>
-    </>
+
+      {/* Right Sidebar - hidden on small screens */}
+      {!isSmallScreen && (
+        <motion.div
+          key="right-sidebar"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className={cn(
+            "bg-brand-sidebar border-brand-border z-20 hidden h-full shrink-0 flex-col items-center border-l p-4 sm:flex",
+            RIGHT_COLUMN_WIDTH_DESKTOP
+          )}>
+          <div className="mb-6">
+            <Avatar className="size-10">
+              <AvatarImage
+                src={user?.image ?? "/user.svg"}
+                alt={user?.name ?? "username"}
+                className="text-brand-text-muted h-8 w-8"
+              />
+            </Avatar>
+          </div>
+          <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mb-auto" />
+          <Button
+            asChild
+            variant="ghost"
+            className="flex h-auto w-full flex-col items-center py-2 text-red-400 hover:bg-red-400/10 hover:text-red-300">
+            <Link href="/api/auth/signout" className="appearance-none">
+              <LogOut className="mb-1 h-5 w-5" />
+              <span className="text-xs">Sign Out</span>
+            </Link>
+          </Button>
+        </motion.div>
+      )}
+    </div>
   );
 }

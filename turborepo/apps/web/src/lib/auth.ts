@@ -1,5 +1,6 @@
-import {nanoid} from "nanoid"
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
+import type { DefaultSession } from "next-auth";
+import { nanoid } from "nanoid";
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import { prismaClient } from "@/lib/prisma";
@@ -51,17 +52,17 @@ export const {
       }
     },
     async jwt({ token, account, user, trigger, profile: _profile }) {
-      if (trigger === "signIn" && user && account) {
+      if ((trigger === "signIn" || trigger === "signUp") && user && account) {
         const sessionToken = nanoid();
+
         token.sessionToken = sessionToken;
         token.userId = user.id;
-
         const expires = account.expires_at
           ? new Date(account.expires_at * 1000)
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // fallback 30d
         await prismaClient.user.update({
           where: { email: token.email ?? "", id: user.id ?? "" },
-          data: { emailVerified: new Date(Date.now()) }
+          data: { emailVerified: new Date(Date.now()), updatedAt: new Date(Date.now()) }
         });
         await prismaClient.session.create({
           data: {
@@ -170,6 +171,12 @@ declare module "next-auth" {
     updatedAt?: string;
   }
   interface Session {
+    user: {
+
+      createdAt?: string;
+      updatedAt?: string;
+    } & DefaultSession['user'];
+    expires: DefaultSession['expires']
     sessionToken?: string;
     error?: "RefreshTokenError";
     accessToken?: string;
