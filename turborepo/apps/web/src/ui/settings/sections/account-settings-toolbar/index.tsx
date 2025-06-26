@@ -18,9 +18,7 @@ export function AccountSettingsSection({ user }: { user?: User }) {
     <div className="space-y-6">
       <UserProfileCard
         className="bg-brand-component border-brand-border"
-        user={{
-          ...user
-        }}
+        user={user}
       />
       <Card className="bg-brand-component border-brand-border text-brand-text">
         <CardHeader>

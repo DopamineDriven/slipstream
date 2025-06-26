@@ -4,12 +4,6 @@ import type { DefaultSession, DefaultUser } from "next-auth";
 declare module "next-auth" {
   interface Session extends DefaultSession {
     expires: DefaultSession["expires"];
-    user?: {
-      id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
     accessToken?: string;
     sessionToken?: string;
     error?: "RefreshTokenError";

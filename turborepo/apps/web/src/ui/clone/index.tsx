@@ -271,9 +271,7 @@ export function ChatPage({ user }: { user?: User }) {
         className="relative flex flex-grow flex-col overflow-y-auto">
         {isChatEmpty ? (
           <EmptyStateChat
-            userName={
-              user?.name?.split(" ")[0] ?? mockUserProfile.name.split(" ")[0]
-            }
+            user={user}
             onPromptSelect={handlePromptSelect}
           />
         ) : (
@@ -321,9 +319,7 @@ export function ChatPage({ user }: { user?: User }) {
                 onCollapse={() => setIsSidebarOpen(false)}
                 onExpand={() => setIsSidebarOpen(true)}>
                 <Sidebar
-                  user={{
-                    ...user
-                  }}
+                  user={user}
                   onNewChat={handleNewChat}
                   onOpenSettings={() => setIsSettingsDrawerOpen(true)}
                   className="h-full"
@@ -355,9 +351,7 @@ export function ChatPage({ user }: { user?: User }) {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="fixed top-0 left-0 z-50 h-full">
                     <Sidebar
-                      user={{
-                        ...user
-                      }}
+                      user={user}
                       onNewChat={handleNewChat}
                       onOpenSettings={() => setIsSettingsDrawerOpen(true)}
                       className="h-full w-[280px] sm:w-[300px]"
