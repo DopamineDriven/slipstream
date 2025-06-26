@@ -1,13 +1,12 @@
 import { jwtVerify } from "jose";
-
+import { Credentials } from "@t3-chat-clone/credentials";
 // hardcoded-string for local dev fallback only as it's truly useless -- generated with openssl rand -base64 32
 // the production secret is generated with openssl rand -base64 64 (64 bit random secret as opposed to the 32 bit secret shown below)
-const JWT_SECRET =
-  process.env.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
 
 export async function verifyJWT(
   token: string
 ): Promise<null | { sub: string }> {
+  const JWT_SECRET = await new Credentials().get("JWT_SECRET");
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);

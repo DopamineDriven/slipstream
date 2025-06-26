@@ -1,7 +1,7 @@
 {
-  "name": "@t3-chat-clone/redis-service",
+  "name": "@t3-chat-clone/credentials",
   "version": "1.0.0",
-  "description": "convenient redis util",
+  "description": "convenient credentials util",
   "publishConfig": {
     "access": "public",
     "typesVersions": {
@@ -10,10 +10,10 @@
           "dist/*.d.ts",
           "dist/*/index.d.ts"
         ],
-        "redis": [
-          "dist/service/index.d.ts"
+        "creds": [
+          "dist/creds/index.d.ts"
         ],
-        "types": ["dist/service/types.d.ts"]
+        "types": ["dist/types/index.d.ts"]
       }
     }
   },
@@ -25,10 +25,10 @@
         "dist/*.d.ts",
         "dist/*/index.d.ts"
       ],
-      "redis": [
-        "dist/service/index.d.ts"
-      ],
-      "types": ["dist/service/types.d.ts"]
+        "creds": [
+          "dist/creds/index.d.ts"
+        ],
+        "types": ["dist/types/index.d.ts"]
     }
   },
   "type": "module",
@@ -41,8 +41,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./*": "./dist/*.js",
-    "./redis": "./dist/service/index.js",
-    "./types": "./dist/service/types.js"
+    "./creds": "./dist/creds/index.js",
+    "./types": "./dist/types/index.js"
   },
   "scripts": {
     "build": "tsup",
@@ -52,9 +52,9 @@
     "fix": "npm pkg fix"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.835.0",
     "dotenv": "^16.5.0",
-    "dotenv-expand": "^12.0.2",
-    "redis": "^5.5.6"
+    "dotenv-expand": "^12.0.2"
   },
   "devDependencies": {
     "@t3-chat-clone/eslint-config": "workspace:*",

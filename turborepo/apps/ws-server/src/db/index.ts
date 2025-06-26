@@ -1,7 +1,4 @@
 import { Pool } from "@neondatabase/serverless";
-import * as dotenv from "dotenv";
-
-dotenv.config();
 
 export type UserQuery = {
   id: string;
@@ -11,7 +8,7 @@ export type UserQuery = {
   imaeg: string;
   createdAt?: Date;
   updatedAt?: Date;
-}
+};
 
 export class DbService {
   constructor(public pool: Pool) {}
@@ -37,7 +34,7 @@ export class DbService {
       `SELECT * FROM "public"."User" WHERE "public"."User"."email" = $1`,
       [userEmail]
     );
-    if (!rowCount || rowCount ===0) return false;
+    if (!rowCount || rowCount === 0) return false;
     const ourUser = rows[0];
     if (!ourUser?.id) return false;
     const { rows: sessionRows } = await this.pool.query(
@@ -45,16 +42,6 @@ export class DbService {
       [ourUser.id]
     );
     console.log(sessionRows);
-    return {valid: sessionRows.length > 0, id: ourUser.id};
+    return { valid: sessionRows.length > 0, id: ourUser.id };
   }
 }
-
-// export const db = new DbService(pool);
-
-// const _test = db.isValidUserAndSession("9f51e5e2-e89c-40a9-825e-2b9b4f9bbfd5");
-// const test2 = db.isValidUserAndSessionByEmail("andrew@windycitydevs.io")
-// test2.then(t => {
-//   console.log(t);
-//   return t;
-// });
-
