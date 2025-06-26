@@ -2,7 +2,6 @@ import type { ChatCompletionChunk } from "openai/resources/index.mjs";
 import type { RawData } from "ws";
 import { RedisInstance } from "@t3-chat-clone/redis-service";
 import { GenerateContentResponse, GoogleGenAI } from "@google/genai";
-import * as dotenv from "dotenv";
 import OpenAI from "openai";
 import { WebSocket } from "ws";
 import type {
@@ -13,11 +12,8 @@ import type {
 } from "@/types/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
+import { Credentials } from "@t3-chat-clone/credentials";
 
-dotenv.config();
-
-const FASTAPI_URL =
-  process.env.FASTAPI_URL ?? "http://localhost:8000/generate-image";
 
 export class Resolver {
   constructor(
@@ -25,7 +21,8 @@ export class Resolver {
     private openai: OpenAI,
     private gemini: GoogleGenAI,
     private redis: RedisInstance,
-    private r2: R2Instance
+    private r2: R2Instance,
+    private cred: Credentials
   ) {}
 
   /** Register all event handlers here */
@@ -143,17 +140,21 @@ export class Resolver {
           }
         }
       } else {
-        const model = (event.model ?? "gpt-4o-mini") as SelectedProvider<
+        const model = (event.model ?? "gpt-4o-nano") as SelectedProvider<
           typeof provider
         >;
-        const stream = (await client.chat.completions.create({
-          model,
-          // supports audio response conditionally with certain models
-          // modalities: ["text", "audio"],
-          // reasoning_effort: "high" | "medium" | "low",
-          messages: [{ role: "user", content: event.prompt }],
-          stream: true
-        })) satisfies AsyncIterable<ChatCompletionChunk>;
+        const stream = (await client.chat.completions.create(
+          {
+            user: userId,
+            model,
+            // supports audio response conditionally with certain models
+            // modalities: ["text", "audio"],
+            // reasoning_effort: "high" | "medium" | "low",
+            messages: [{ role: "user", content: event.prompt }],
+            stream: true
+          },
+          { stream: true }
+        )) satisfies AsyncIterable<ChatCompletionChunk>;
 
         await this.redis.expire(streamKey, 3600);
 
@@ -325,6 +326,7 @@ export class Resolver {
     ws: WebSocket,
     userId: string
   ): Promise<void> {
+    const FASTAPI_URL = await this.cred.get("FASTAPI_URL");
     try {
       const res = await fetch(FASTAPI_URL, {
         method: "POST",
@@ -376,10 +378,10 @@ export class Resolver {
     ws: WebSocket,
     userId: string
   ): Promise<void> {
+    const bucket = await this.cred.get("R2_BUCKET");
     try {
       const data = Buffer.from(event.base64, "base64");
       const key = `user-assets/${userId}/${Date.now()}_${event.filename}`;
-      const bucket = process.env.R2_BUCKET ?? "t3-chat-clone-pg";
       const url = await this.r2.uploadToR2({
         Key: key,
         Body: data,

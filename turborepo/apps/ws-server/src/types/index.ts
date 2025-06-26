@@ -1,5 +1,55 @@
 import { WebSocket } from "ws";
 
+type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[] ? U : T;
+
+export const providerModelObj = {
+  openai: [
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "gpt-4.5-preview",
+    "o4-mini",
+    "o1",
+    "o1-mini",
+    "o3-mini",
+    "gpt-4o",
+    "gpt-4o-audio-preview",
+    "gpt-4o-mini",
+    "gpt-4o-search-preview",
+    "gpt-4o-mini-search-preview",
+    "gpt-4o-mini-audio-preview",
+    "gpt-4",
+    "gpt-4-turbo",
+    "gpt-3.5-turbo"
+  ] as const,
+  gemini: [
+    "gemini-2.5-flash",
+    "gemini-2.5",
+    "gemini-2.5-flash-lite-preview-06-17",
+    "gemini-2.5-flash-preview-native-audio-dialog",
+    "gemini-2.5-flash-exp-native-audio-thinking-dialog",
+    "gemini-2.5-flash-preview-tts",
+    "gemini-2.5-pro-preview-tts",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-preview-image-generation",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-embedding-exp",
+    "imagen-4.0-generate-preview-06-06",
+    "imagen-4.0-ultra-generate-preview-06-06",
+    "imagen-3.0-generate-002",
+    "veo-2.0-generate-001",
+    "gemini-live-2.5-flash-preview",
+    "gemini-2.0-flash-live-001"
+  ] as const
+} as const;
+
+export type Providers = keyof typeof providerModelObj;
+export type Models<T extends keyof typeof providerModelObj> = {
+  readonly [P in T]: Unenumerate<(typeof providerModelObj)[P]>;
+}[T];
+
 export type ModelProvider = "openai" | "gemini";
 export type GeminiModels = "gemini-2.5-flash" | "gemini-2.5-pro";
 export type OpenAIModels =

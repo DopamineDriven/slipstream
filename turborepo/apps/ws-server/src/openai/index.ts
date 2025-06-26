@@ -1,11 +1,17 @@
 import type { ClientOptions } from "openai";
+import { Credentials } from "@t3-chat-clone/credentials";
 import { OpenAI } from "openai";
-import * as dotenv from "dotenv";
 
-dotenv.config();
+let openai: OpenAI;
 
-const defaultConfig = {
-  apiKey: process.env.OPENAI_API_KEY
-} satisfies ClientOptions;
+export async function getOpenAI(cred: Credentials) {
+  if (openai) return openai;
 
-export const openai = new OpenAI(defaultConfig);
+  const apiKey = await cred.get("OPENAI_API_KEY");
+
+  if (!apiKey) throw new Error("Missing OPENAI_API_KEY!");
+
+  openai = new OpenAI({ apiKey } satisfies ClientOptions);
+
+  return openai;
+}

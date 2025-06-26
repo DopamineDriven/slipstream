@@ -1,57 +1,77 @@
 import type { Socket } from "net";
-import { RedisInstance } from "@t3-chat-clone/redis-service";
-import { Pool } from "@neondatabase/serverless";
+import { Credentials } from "@t3-chat-clone/credentials";
 import * as dotenv from "dotenv";
-import { DbService } from "@/db/index.ts";
-import { gemini } from "@/gemini/index.ts";
-import { openai } from "@/openai/index.ts";
-import { R2Instance } from "@/r2-helper/index.ts";
-import { Resolver } from "@/resolver/index.ts";
-import { WSServer } from "@/ws-server/index.ts";
 
 dotenv.config();
 
-// r2
-const accountId = process.env.R2_ACCOUNT_ID ?? "";
-const accessKeyId = process.env.R2_ACCESS_KEY_ID ?? "";
-const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY ?? "";
-const r2PublicUrl = process.env.R2_PUBLIC_URL ?? "";
+async function exe() {
+  const cred = new Credentials();
 
-const r2 = new R2Instance({
-  accountId,
-  accessKeyId,
-  secretAccessKey,
-  r2PublicUrl
-});
+  const cfg = await cred.getAll();
+  {
+    // r2
+    const accountId = cfg.R2_ACCOUNT_ID;
+    const accessKeyId = cfg.R2_ACCESS_KEY_ID;
+    const secretAccessKey = cfg.R2_SECRET_ACCESS_KEY;
+    const r2PublicUrl = cfg.R2_PUBLIC_URL;
+    const { R2Instance } = await import("@/r2-helper/index.ts");
 
-// redis
-const redisUrl = process.env.REDIS_URL ?? "redis://redis:6379";
+    const r2 = new R2Instance({
+      accountId,
+      accessKeyId,
+      secretAccessKey,
+      r2PublicUrl
+    });
 
-const redisInstance = new RedisInstance(redisUrl);
+    // redis
+    const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379";
 
-// pg
-const dbConnectionString = process.env.DATABASE_URL;
+    const { RedisInstance } = await import("@t3-chat-clone/redis-service");
 
-const pool = new Pool({
-  connectionString: dbConnectionString
-});
+    const redisInstance = new RedisInstance(redisUrl);
 
-const db = new DbService(pool);
+    // pg
 
-const jwtSecret =
-  process.env.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
+    const { Pool } = await import("@neondatabase/serverless");
 
-const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 4000;
+    const pool = new Pool({
+      connectionString: cfg.DATABASE_URL
+    });
+    const { DbService } = await import("@/db/index.ts");
 
-const wsServer = new WSServer({ port, redisUrl, jwtSecret }, db, redisInstance);
-const resolver = new Resolver(wsServer, openai, gemini, wsServer.redis, r2);
-resolver.registerAll();
-wsServer.setResolver(resolver);
+    const db = new DbService(pool);
 
-wsServer.start();
+    const jwtSecret =
+      cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
 
-export {};
+    const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
+    const { WSServer } = await import("@/ws-server/index.ts");
+    const wsServer = new WSServer(
+      { port, redisUrl, jwtSecret },
+      db,
+      redisInstance
+    );
+    const { Resolver } = await import("@/resolver/index.ts");
+    const { getOpenAI } = await import("@/openai/index.ts");
+    const openai = await getOpenAI(cred);
+    const { getGemini } = await import("@/gemini/index.ts");
+    const gemini = await getGemini(cred);
+    const resolver = new Resolver(
+      wsServer,
+      openai,
+      gemini,
+      wsServer.redis,
+      r2,
+      cred
+    );
+    resolver.registerAll();
+    wsServer.setResolver(resolver);
 
+    wsServer.start();
+  }
+}
+
+exe();
 declare module "ws" {
   interface WebSocket {
     _socket: Socket;
