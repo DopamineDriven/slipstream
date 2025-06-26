@@ -1,5 +1,4 @@
 import type { JWT as NextAuthJWT } from "next-auth/jwt";
-import type { DefaultSession } from "next-auth";
 import { nanoid } from "nanoid";
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
@@ -23,7 +22,6 @@ export interface AccessTokenError {
  * see https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
  */
 export type AccessTokenResUnion = AccessTokenError | AccessTokenSuccess;
-
 export const {
   signIn,
   signOut,
@@ -44,7 +42,8 @@ export const {
   secret: process.env.AUTH_SECRET,
   callbacks: {
     async authorized(params) {
-      const _nextUrl = params.request.nextUrl;
+      const s = JSON.stringify(params, null, 2);
+      console.info(`[authorizedCallback]: ` + s);
       if (!params.auth?.user) {
         return false;
       } else {
@@ -62,7 +61,10 @@ export const {
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // fallback 30d
         await prismaClient.user.update({
           where: { email: token.email ?? "", id: user.id ?? "" },
-          data: { emailVerified: new Date(Date.now()), updatedAt: new Date(Date.now()) }
+          data: {
+            emailVerified: new Date(Date.now()),
+            updatedAt: new Date(Date.now())
+          }
         });
         await prismaClient.session.create({
           data: {
@@ -128,57 +130,14 @@ export const {
       // Expose any error and fresh access token in session
       session.error = token.error;
       session.accessToken = token.access_token;
+      if (session.user && token.userId) {
+        session.user.id = token.userId;
+        session.userId = session.user.id;
+      } // next auth has a gross Date & string cast for the expires field...impossible for that to ever happen, so we have to cast
+      session.expires = new Date(
+        token.expires_at * 1000
+      ).toISOString() as unknown as Date & string;
       return session;
     }
   }
 });
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    provider?: string;
-    access_token: string;
-    expires_at: number; // seconds
-    refresh_token?: string;
-    sessionToken?: string;
-    error?: "RefreshTokenError";
-  }
-}
-
-declare module "@auth/core/types" {
-  interface DefaultUser {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-  }
-
-  interface Session {
-    sessionToken?: string;
-    error?: "RefreshTokenError";
-    accessToken?: string;
-  }
-}
-
-declare module "next-auth" {
-  interface User {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-  }
-  interface Session {
-    user: {
-
-      createdAt?: string;
-      updatedAt?: string;
-    } & DefaultSession['user'];
-    expires: DefaultSession['expires']
-    sessionToken?: string;
-    error?: "RefreshTokenError";
-    accessToken?: string;
-  }
-}

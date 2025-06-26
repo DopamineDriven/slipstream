@@ -3,7 +3,6 @@ import type { GoogleProfile } from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth from "next-auth";
 import { prismaClient } from "@/lib/prisma";
 
 export const authConfig = <NextAuthConfig>{

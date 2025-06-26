@@ -84,7 +84,7 @@ model Session {
 model UserKey {
   id        String   @id @default(cuid(2))
   userId    String
-  provider  String
+  provider  Provider
   apiKey    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -109,7 +109,8 @@ model AiAgent {
 
 model Conversation {
   id          String       @id @default(cuid(2))
-  userId      String
+  userId      String       // always defined
+  userKeyId   String
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String?
   createdAt   DateTime     @default(now())
@@ -117,8 +118,8 @@ model Conversation {
   messages    Message[]
   aiAgentId   String?
   aiAgent     AiAgent?     @relation("AgentConversations", fields: [aiAgentId], references: [id], onDelete: Cascade)
-  branchId    String? // For branching conversations
-  parentId    String? // For chat branching
+  branchId    String?       // For branching conversations
+  parentId    String?       // For chat branching
   attachments Attachment[]
   isShared    Boolean      @default(false)
   shareToken  String?      @unique
@@ -129,6 +130,9 @@ model Message {
   conversationId String
   userId         String?
   senderType     SenderType @default(USER)
+  provider       Provider
+  model          String?
+  apiKey         String
   content        String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt

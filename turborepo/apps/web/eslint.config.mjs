@@ -14,7 +14,8 @@ export default [
       "@typescript-eslint/require-await": "off",
       "import/consistent-type-specifier-style": "off",
       "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/no-empty-object-type": "off"
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/prefer-regexp-exec": "off"
     }
   }
 ];
