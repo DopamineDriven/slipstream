@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 
-const obj = {
+const aiChatResponse = {
   type: "ai_chat_response",
   conversationId: "abc123",
   userId: "x1sa9esbc7nb1bbhnn5uy9ct",
@@ -12,4 +12,4 @@ const obj = {
 };
 const fs = new Fs(process.cwd());
 
-fs.withWs("src/__out__/openai/request-ai-chat-writeup.md", obj.chunk);
+fs.withWs("src/__out__/openai/request-ai-chat-writeup.md", aiChatResponse.chunk);
