@@ -22,7 +22,6 @@ export interface AccessTokenError {
  * see https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
  */
 export type AccessTokenResUnion = AccessTokenError | AccessTokenSuccess;
-const userIdMap = new Map<string, string>();
 export const {
   signIn,
   signOut,
@@ -48,7 +47,6 @@ export const {
       if (!params.auth?.user) {
         return false;
       } else {
-        if (params.auth.user.id) userIdMap.set("userId", params.auth.user.id);
         return true;
       }
     },
@@ -133,7 +131,7 @@ export const {
       session.error = token.error;
       session.accessToken = token.access_token;
       if (session.user && token.userId) {
-        session.user.id = userIdMap.get("userId") ?? token.userId;
+        session.user.id = token.userId;
         session.userId = session.user.id;
       } // next auth has a gross Date & string cast for the expires field...impossible for that to ever happen, so we have to cast
       session.expires = new Date(
