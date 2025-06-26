@@ -861,6 +861,23 @@
             "relationOnDelete": "Cascade",
             "isGenerated": false,
             "isUpdatedAt": false
+          },
+          {
+            "name": "messages",
+            "kind": "object",
+            "isList": true,
+            "isRequired": true,
+            "isUnique": false,
+            "isId": false,
+            "isReadOnly": false,
+            "hasDefaultValue": false,
+            "type": "Message",
+            "nativeType": null,
+            "relationName": "MessageToUserKey",
+            "relationFromFields": [],
+            "relationToFields": [],
+            "isGenerated": false,
+            "isUpdatedAt": false
           }
         ],
         "primaryKey": null,
@@ -1405,6 +1422,20 @@
             "isUpdatedAt": false
           },
           {
+            "name": "userKeyId",
+            "kind": "scalar",
+            "isList": false,
+            "isRequired": false,
+            "isUnique": false,
+            "isId": false,
+            "isReadOnly": true,
+            "hasDefaultValue": false,
+            "type": "String",
+            "nativeType": null,
+            "isGenerated": false,
+            "isUpdatedAt": false
+          },
+          {
             "name": "apiKey",
             "kind": "scalar",
             "isList": false,
@@ -1475,6 +1506,27 @@
             "hasDefaultValue": false,
             "type": "String",
             "nativeType": null,
+            "isGenerated": false,
+            "isUpdatedAt": false
+          },
+          {
+            "name": "userKey",
+            "kind": "object",
+            "isList": false,
+            "isRequired": false,
+            "isUnique": false,
+            "isId": false,
+            "isReadOnly": false,
+            "hasDefaultValue": false,
+            "type": "UserKey",
+            "nativeType": null,
+            "relationName": "MessageToUserKey",
+            "relationFromFields": [
+              "userKeyId"
+            ],
+            "relationToFields": [
+              "id"
+            ],
             "isGenerated": false,
             "isUpdatedAt": false
           },

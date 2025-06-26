@@ -118,6 +118,7 @@ META META
     SenderType senderType 
     Provider provider 
     String model "❓"
+    String userKeyId "❓"
     String apiKey 
     String content 
     DateTime createdAt 
@@ -153,6 +154,7 @@ META META
     "Session" o|--|| "User" : "user"
     "UserKey" o|--|| "Provider" : "enum:provider"
     "UserKey" o|--|| "User" : "user"
+    "UserKey" o{--}o "Message" : "messages"
     "Settings" o|--|| "User" : "user"
     "Settings" o|--|o "ThemePreference" : "enum:theme"
     "AiAgent" o|--|| "Provider" : "enum:provider"
@@ -163,6 +165,7 @@ META META
     "Conversation" o{--}o "Attachment" : "attachments"
     "Message" o|--|| "SenderType" : "enum:senderType"
     "Message" o|--|| "Provider" : "enum:provider"
+    "Message" o|--|o "UserKey" : "userKey"
     "Message" o{--}o "Attachment" : "attachments"
     "Message" o|--|| "Conversation" : "conversation"
     "Attachment" o|--|o "Conversation" : "conversation"
