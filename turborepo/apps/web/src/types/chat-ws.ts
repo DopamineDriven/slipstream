@@ -16,7 +16,6 @@ export type SelectedProvider<T extends ModelProvider | undefined> =
 export type ChatMessage = {
   type: "message";
   conversationId: string;
-  userId: string;
   content: string;
   timestamp: number;
   attachments?: string[];
@@ -26,7 +25,6 @@ export type AIChatRequest = {
   type: "ai_chat_request";
   conversationId: string;
   prompt: string;
-  userId: string;
   apiKey?: string;
   provider?: ModelProvider;
   model?: SelectedProvider<ModelProvider>;
@@ -73,7 +71,6 @@ export type AIChatError = {
 
 export type TypingIndicator = {
   type: "typing";
-  userId: string;
   conversationId: string;
 };
 
@@ -83,7 +80,6 @@ export type PingMessage = {
 
 export type ImageGenRequest = {
   type: "image_gen_request";
-  userId: string;
   conversationId: string;
   prompt: string;
   seed?: number;
@@ -100,7 +96,6 @@ export type ImageGenResponse = {
 
 export type AssetUploadRequest = {
   type: "asset_upload_request";
-  userId: string;
   conversationId: string;
   filename: string;
   contentType: string;
@@ -212,9 +207,7 @@ export type RawData = WithImplicitCoercion<string | ArrayLike<number>>;
 
 export type MessageHandler<T extends keyof EventTypeMap> = (
   event: EventTypeMap[T],
-  ws: WebSocket,
-  userId: string,
-  userData?: UserData
+  ws: WebSocket
 ) => Promise<void> | void;
 
 export type HandlerMap = {

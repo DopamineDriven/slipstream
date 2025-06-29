@@ -25,7 +25,7 @@ export class DbService {
       `SELECT * FROM "public"."Session" WHERE "public"."Session"."userId" = $1 AND "public"."Session"."expires" > NOW()`,
       [userId]
     );
-    console.log(sessionRows);
+
     return sessionRows.length > 0;
   }
 
@@ -41,7 +41,6 @@ export class DbService {
       `SELECT * FROM "public"."Session" WHERE "public"."Session"."userId" = $1 AND "public"."Session"."expires" > NOW()`,
       [ourUser.id]
     );
-    console.log(sessionRows);
     return { valid: sessionRows.length > 0, id: ourUser.id };
   }
 }

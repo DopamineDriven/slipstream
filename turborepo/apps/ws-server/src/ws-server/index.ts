@@ -149,25 +149,38 @@ export class WSServer {
     ws: WebSocket,
     req: IncomingMessage
   ): Promise<string | null> {
+
     const userEmail = this.extractUserEmailFromUrl(req);
+
     if (!userEmail) {
       ws.close(4001, "no user email, connection closed");
       return null;
     }
+
     if (userEmail === "no-user-email") {
       ws.close(4001, "no user email, connection closed");
       return null;
     }
+
     try {
       const decodedEmail = decodeURIComponent(userEmail);
+
       const userIsValid =
         await this.db.isValidUserAndSessionByEmail(decodedEmail);
+
       if (userIsValid === false) throw new Error("Invalid Session");
+
       if (userIsValid.valid === false) throw new Error("Invalid Session");
+
       return userIsValid.id;
-    } catch {
-      ws.close(4001, "Auth failed");
-      return null;
+    } catch (err) {
+      if (err instanceof Error) {
+        ws.close(4001, `Auth failed: ${err.message}`);
+        return null;
+      } else {
+        ws.close(4001, "Auth failed");
+        return null;
+      }
     }
   }
 

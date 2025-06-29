@@ -3,40 +3,24 @@ import type {
   EventTypeMap,
   HandlerMap,
   MessageHandler,
-  RawData,
-  UserData
+  RawData
 } from "@/types/chat-ws";
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 
 export class ChatWebSocketClient {
   private socket: WebSocket | null = null;
-
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private messageQueue = Array.of<string>();
   private listeners = Array.of<ChatEventListener>();
   private _isConnected = false;
-  private userId = "";
-  private userData?: UserData;
   public readonly handlers: HandlerMap = {};
   private resolver?: {
-    handleRawMessage: (
-      ws: WebSocket,
-      userId: string,
-      raw: RawData,
-      userData?: UserData
-    ) => void | Promise<void>;
+    handleRawMessage: (socket: WebSocket, raw: RawData) => void | Promise<void>;
   };
-  constructor(
-    private url: string,
-    id?: string,
-    userData?: UserData
-  ) {
-    this.userId = id ?? "";
-    this.userData = userData;
-  }
+  constructor(private readonly url: string) {}
 
   public connect() {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
@@ -55,8 +39,78 @@ export class ChatWebSocketClient {
     };
 
     this.socket.onmessage = (event: MessageEvent<string>) => {
-      const data = JSON.parse(event.data) as ChatWsEvent;
-      this.listeners.forEach(listener => listener(data));
+      const raw = event.data satisfies RawData;
+      if (!this.socket) return;
+      if (this.resolver) {
+        this.resolver.handleRawMessage(this.socket, raw);
+      } else {
+        const data = JSON.parse(raw) as ChatWsEvent;
+        this.listeners.forEach(listener => listener(data));
+        switch (data.type) {
+          case "ai_chat_chunk": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "ai_chat_error": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "ai_chat_inline_data": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "ai_chat_request": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "ai_chat_response": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "asset_upload_request": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "asset_upload_response": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "image_gen_request": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "image_gen_response": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "message": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "ping": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          case "typing": {
+            const handler = this.handlers[data.type];
+            if (handler) handler(data, this.socket);
+            break;
+          }
+          default:
+            console.warn(`Unhandled event type in ${raw}`);
+        }
+      }
     };
 
     this.socket.onerror = error => {
@@ -77,12 +131,7 @@ export class ChatWebSocketClient {
     };
   }
   public setResolver(resolver: {
-    handleRawMessage: (
-      ws: WebSocket,
-      userId: string,
-      raw: RawData,
-      userData?: UserData
-    ) => void | Promise<void>;
+    handleRawMessage: (ws: WebSocket, raw: RawData) => void
   }) {
     this.resolver = resolver;
   }
@@ -90,17 +139,10 @@ export class ChatWebSocketClient {
     event: T,
     data: EventTypeMap[T]
   ) {
-    const payload = {
-      ...data,
-      type: event,
-      userId: this.userId,
-      userData: { ...(this.userData ?? {}) }
-    } satisfies EventTypeMap[T] & {
+    const payload = { ...data, type: event } satisfies EventTypeMap[T] & {
       type: T;
-      userId: string;
-      userData?: UserData;
     };
-    const msg = JSON.stringify({ ...data, type: event });
+    const msg = JSON.stringify(payload);
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(msg);
     } else {
@@ -126,11 +168,59 @@ export class ChatWebSocketClient {
     }
   }
 
-  public on<const T extends keyof EventTypeMap>(
-    event: T,
-    handler: MessageHandler<T>
-  ): void {
-    this.handlers[event] = handler as HandlerMap[T];
+  public on(event: keyof EventTypeMap, handler: MessageHandler<typeof event>) {
+    switch (event) {
+      case "ai_chat_chunk": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "ai_chat_error": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "ai_chat_inline_data": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "ai_chat_response": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "ai_chat_request": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "asset_upload_response": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "asset_upload_request": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "image_gen_request": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "image_gen_response": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "message": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "ping": {
+        this.handlers[event] = handler;
+        break;
+      }
+      case "typing": {
+        this.handlers[event] = handler;
+        break;
+      }
+      default:
+        console.warn(`unhandled event in 'on' method in ws-client`);
+    }
   }
 
   public get isConnected() {

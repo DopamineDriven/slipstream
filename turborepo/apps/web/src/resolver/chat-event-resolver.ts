@@ -1,6 +1,4 @@
 // src/context/ChatEventResolver.ts
-import type { Dispatch } from "react";
-import { Session } from "next-auth";
 import type {
   ChatWsEvent,
   ChatWsEventTypeUnion,
@@ -11,65 +9,70 @@ import type {
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 
 // The same actions your reducer expects:
-type ChatAction =
+type _ChatAction =
   | {
-      type: "add_message";
+      type: "message";
       conversationId: string;
       message: EventMap<"message">;
     }
   | {
-      type: "add_chunk";
+      type: "ai_chat_chunk";
       conversationId: string;
       chunk: EventMap<"ai_chat_chunk">;
     }
   | {
-      type: "finish_stream";
+      type: "ai_chat_response";
       conversationId: string;
       response: EventMap<"ai_chat_response">;
     }
-  | { type: "error"; conversationId: string; error: EventMap<"ai_chat_error"> };
+  | {
+      type: "ai_chat_error";
+      conversationId: string;
+      error: EventMap<"ai_chat_error">;
+    };
 
 export class ChatEventResolver {
   // Build a HandlerMap<ChatAction> keyed by event type
-  private handlers: {
-    [K in keyof EventTypeMap]?: (evt: EventMap<K>) => void;
-  } = {};
 
-  constructor(
-    private dispatch: Dispatch<ChatAction>,
-    public wsClient: ChatWebSocketClient,
-    public session: Session | null
-  ) {
-    this.handlers.message = evt =>
-      this.dispatch({
-        type: "add_message",
-        conversationId: evt.conversationId,
-        message: evt
-      });
-    this.handlers.ai_chat_chunk = evt =>
-      this.dispatch({
-        type: "add_chunk",
-        conversationId: evt.conversationId,
-        chunk: evt
-      });
-    this.handlers.ai_chat_response = evt =>
-      this.dispatch({
-        type: "finish_stream",
-        conversationId: evt.conversationId,
-        response: evt
-      });
-    this.handlers.ai_chat_error = evt =>
-      this.dispatch({
-        type: "error",
-        conversationId: evt.conversationId,
-        error: evt
-      });
-    // if you want inline_data, typing, etc—just add more here
-  }
-  /** Register all event handlers here */
+  constructor(public wsClient: ChatWebSocketClient) {}
+
   public registerAll() {
-    this.wsClient.on("typing", this.handleTyping.bind(this));
-    // You can also register response handlers if needed (for internal use)
+    this.wsClient.setResolver(this);
+  }
+  public handleRawMessage(socket: WebSocket, raw: RawData) {
+    const data = this.parseEvent(raw);
+    if (!data) return;
+    switch (data.type) {
+      case "typing":
+        return this.handleTyping(data, socket);
+
+      case "message":
+        return this.handleMessage(data, socket);
+
+      case "ping":
+        return this.handlePing(data, socket);
+
+      case "ai_chat_chunk":
+        return this.handleAIChatChunk(data, socket);
+
+      case "ai_chat_response":
+        return this.handleAIChatResponse(data, socket);
+
+      case "ai_chat_error":
+        return this.handleAIChatError(data, socket);
+
+      case "image_gen_response":
+        return this.handleImageGenResponse(data, socket);
+
+      case "asset_upload_response":
+        return this.handleAssetUploadResponse(data, socket);
+
+      case "ai_chat_inline_data":
+        return this.handleAIChatInlineData(data, socket);
+
+      default:
+        console.warn(`No handler for event type ${data.type}`);
+    }
   }
   public EVENT_TYPES = [
     "message",
@@ -124,64 +127,63 @@ export class ChatEventResolver {
       return `${err}`;
     } else return String(err);
   }
-  public async handleTyping(
-    event: EventTypeMap["typing"],
-    ws: ChatWebSocketClient
-  ): Promise<void> {
-    ws.send("typing", { ...event });
+
+  private handleTyping(evt: EventTypeMap["typing"], _ws: WebSocket): void {
+    console.debug("typing:", evt);
   }
 
-  /**
-   *
-   * This is akin to
-   *
-   *
+  private handleMessage(evt: EventTypeMap["message"], _ws: WebSocket): void {
+    console.debug("new chat message:", evt);
+  }
 
-  ```ts
-      public async handleRawMessage(
-        ws: WebSocket,
-        userId: string,
-        raw: RawData
-      ): Promise<void> {
-        const event = this.parseEvent(raw);
-        if (!event) {
-          ws.send(JSON.stringify({ error: "Invalid message" }));
-          return;
-        }
-        switch (event.type) {
-          case "message":
-            await this.handleMessage(event, ws, userId);
-            break;
-          case "typing":
-            await this.handleTyping(event, ws, userId);
-            break;
-          case "ping":
-            await this.handlePing(event, ws, userId);
-            break;
-          case "asset_upload_request":
-            await this.handleAssetUploadRequest(event, ws, userId);
-            break;
-          case "image_gen_request":
-            await this.handleImageGenRequest(event, ws, userId);
-            break;
-          case "ai_chat_request":
-            await this.handleAIChat(event, ws, userId);
-            break;
-          default:
-            await this.wsServer.redis.publish(
-              this.wsServer.channel,
-              JSON.stringify({ event: "never", userId, timestamp: Date.now() })
-            );
-        }
-      }
-    ```
-   **/
+  private handlePing(evt: EventTypeMap["ping"], ws: WebSocket): void {
+    console.log(evt.type);
+    ws.send(JSON.stringify(evt));
+  }
 
-  public processEvent(wsClient: ChatWebSocketClient, raw: RawData) {
-    const event = this.parseEvent(raw);
-    // Narrow it to the exact shape
+  private handleAIChatChunk(
+    evt: EventTypeMap["ai_chat_chunk"],
+    _ws: WebSocket
+  ) {
+    console.log("stream chunk:", evt);
+    // stream token into the UI
+  }
 
-    if (!event) return;
-    return wsClient.send(event.type, event);
+  private handleAIChatInlineData(
+    event: EventTypeMap["ai_chat_inline_data"],
+    _ws: WebSocket
+  ) {
+    console.log("ai_chat_inline_data", event.type);
+  }
+
+  private handleAIChatResponse(
+    evt: EventTypeMap["ai_chat_response"],
+    _ws: WebSocket
+  ): void {
+    console.debug("chat complete", evt);
+    // finished streaming (token output complete)
+  }
+
+  private handleAIChatError(
+    evt: EventTypeMap["ai_chat_error"],
+    _ws: WebSocket
+  ): void {
+    console.error("chat error", evt);
+  }
+
+  private handleImageGenResponse(
+    evt: EventTypeMap["image_gen_response"],
+    _ws: WebSocket
+  ): void {
+    console.debug("image URL", evt);
+    // display the generated image
+  }
+
+  private handleAssetUploadResponse(
+    evt: EventTypeMap["asset_upload_response"],
+    _ws: WebSocket
+  ): void {
+    console.debug("uploaded asset:", evt);
+    // update the UI with the new asset
   }
 }

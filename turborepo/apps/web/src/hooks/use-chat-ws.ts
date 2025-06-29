@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChatWsEvent, EventTypeMap } from "@/types/chat-ws";
+import type { ChatWsEvent } from "@/types/chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 
 export function useChatWebSocket(wsUrl: string) {
@@ -28,16 +28,13 @@ export function useChatWebSocket(wsUrl: string) {
       client.close();
     };
   }, [wsUrl]);
-  const sendEvent = useCallback(
-    <const T extends keyof EventTypeMap>(event: T, data: EventTypeMap[T]) => {
-      clientRef.current?.send(event, data);
-    },
-    []
-  );
+  const sendEvent = useCallback((event: ChatWsEvent) => {
+    clientRef.current?.send(event.type, event);
+  }, []);
   // once we're connected, send our auth
   useEffect(() => {
     if (isConnected) {
-      sendEvent("ping", { type: "ping" } satisfies EventTypeMap["ping"]);
+      sendEvent({ type: "ping" });
     }
     return () => {};
   }, [isConnected, sendEvent]);
