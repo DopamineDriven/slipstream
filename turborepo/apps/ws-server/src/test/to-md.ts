@@ -14,7 +14,8 @@ type Targets =
   | "src/pubsub"
   | "src/index"
   | "src/types"
-  | "src/ws-server";
+  | "src/ws-server"
+  | "public/inspect";
 
 class OutputMd extends Fs {
   constructor(public override cwd: string) {
@@ -39,14 +40,14 @@ class OutputMd extends Fs {
                 file
               ) === false
           )
-          .filter(file => /(?:(src\/test))/g.test(file) === false)
+          .filter(file => /(?:(src\/(test|__out__)))/g.test(file) === false)
           // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
           .filter(file => /\./g.test(file) && !/\.md$/g.test(file))
       );
     } else if (target === "src/index") {
       const { recursive: re = false, ...opts } = options;
       return this.readDir("src", { recursive: re, ...opts })
-        .filter(file => /(?:(test))/g.test(file) === false)
+        .filter(file => /(?:(test|__out__))/g.test(file) === false)
         .filter(v => /\./g.test(v))
         .map(v => {
           return v;
@@ -106,7 +107,7 @@ class OutputMd extends Fs {
             : target === "src/index"
               ? `src/${file}`
               : `${target}/${file}`;
-        const fileExtension = this.fileExt(file);
+        const fileExtension = this.fileExt(file) === "rels" ? "xml" : this.fileExt(file);
         const fileContent =
           this.fileToBuffer(handleInjectedTarget).toString("utf-8");
 
@@ -163,6 +164,11 @@ ${this.handleComments(target, fileContent, removeComments)}
         this.withWs(
           "src/test/__out__/index.md",
           this.getRawFiles("src/index", omitComments).join("\n")
+        );
+      } else if (argv[3]?.includes("inspect")) {
+        this.withWs(
+          "public/inspect/__out__/public/inspect.md",
+          this.getRawFiles("public/inspect", false).join("\n")
         );
       } else if (argv[3]?.includes("pubsub")) {
         this.withWs(

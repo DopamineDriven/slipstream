@@ -59,5 +59,3 @@ export class Credentials {
     return (await this.getAll())[target];
   }
 }
-
-

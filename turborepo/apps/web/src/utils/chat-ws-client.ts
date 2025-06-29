@@ -1,19 +1,41 @@
-import { ChatWsEvent } from "@/types/chat-ws";
+import type {
+  ChatWsEvent,
+  EventTypeMap,
+  HandlerMap,
+  MessageHandler,
+  RawData,
+  UserData
+} from "@/types/chat-ws";
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 
 export class ChatWebSocketClient {
   private socket: WebSocket | null = null;
-  private readonly url: string;
+
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
   private reconnectTimeout: NodeJS.Timeout | null = null;
-  private messageQueue=Array.of<string>();
-  private listeners=Array.of<ChatEventListener>();
+  private messageQueue = Array.of<string>();
+  private listeners = Array.of<ChatEventListener>();
   private _isConnected = false;
-
-  constructor(url: string) {
-    this.url = url;
+  private userId = "";
+  private userData?: UserData;
+  public readonly handlers: HandlerMap = {};
+  private resolver?: {
+    handleRawMessage: (
+      ws: WebSocket,
+      userId: string,
+      raw: RawData,
+      userData?: UserData
+    ) => void | Promise<void>;
+  };
+  constructor(
+    private url: string,
+    id?: string,
+    userData?: UserData
+  ) {
+    this.userId = id ?? "";
+    this.userData = userData;
   }
 
   public connect() {
@@ -54,9 +76,31 @@ export class ChatWebSocketClient {
       }
     };
   }
-
-  public send(event: ChatWsEvent) {
-    const msg = JSON.stringify(event);
+  public setResolver(resolver: {
+    handleRawMessage: (
+      ws: WebSocket,
+      userId: string,
+      raw: RawData,
+      userData?: UserData
+    ) => void | Promise<void>;
+  }) {
+    this.resolver = resolver;
+  }
+  public send<const T extends keyof EventTypeMap>(
+    event: T,
+    data: EventTypeMap[T]
+  ) {
+    const payload = {
+      ...data,
+      type: event,
+      userId: this.userId,
+      userData: { ...(this.userData ?? {}) }
+    } satisfies EventTypeMap[T] & {
+      type: T;
+      userId: string;
+      userData?: UserData;
+    };
+    const msg = JSON.stringify({ ...data, type: event });
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(msg);
     } else {
@@ -80,6 +124,13 @@ export class ChatWebSocketClient {
       this.socket = null;
       this._isConnected = false;
     }
+  }
+
+  public on<const T extends keyof EventTypeMap>(
+    event: T,
+    handler: MessageHandler<T>
+  ): void {
+    this.handlers[event] = handler as HandlerMap[T];
   }
 
   public get isConnected() {

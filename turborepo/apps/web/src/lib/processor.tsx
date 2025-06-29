@@ -211,7 +211,7 @@ export async function processMarkdownToReact(content: string) {
   const file = new VFile({ value: content });
   const result = await processor.process(file);
 
-  return result.result as React.ReactElement;
+  return result.result as React.ReactElement satisfies ReactNode;
 }
 
 declare module "vfile" {

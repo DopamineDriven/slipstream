@@ -64,7 +64,7 @@ async function exe() {
       r2,
       cred
     );
-    
+
     resolver.registerAll();
     wsServer.setResolver(resolver);
     wsServer.start();

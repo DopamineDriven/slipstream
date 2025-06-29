@@ -345,7 +345,7 @@ export class Resolver {
             conversationId: event.conversationId,
             success: false,
             error: `Image gen failed: ${errorText}`
-          } as EventTypeMap["image_gen_response"])
+          } satisfies EventTypeMap["image_gen_response"])
         );
         return;
       }
@@ -357,7 +357,7 @@ export class Resolver {
           conversationId: event.conversationId,
           imageUrl: url,
           success: true
-        } as EventTypeMap["image_gen_response"])
+        } satisfies EventTypeMap["image_gen_response"])
       );
     } catch (error) {
       ws.send(
@@ -367,7 +367,7 @@ export class Resolver {
           conversationId: event.conversationId,
           success: false,
           error: error instanceof Error ? error.message : String(error)
-        } as EventTypeMap["image_gen_response"])
+        } satisfies EventTypeMap["image_gen_response"])
       );
     }
   }

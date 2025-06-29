@@ -52,20 +52,21 @@
     "fix": "npm pkg fix"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.835.0",
-    "dotenv": "^16.5.0",
+    "@aws-sdk/client-secrets-manager": "^3.839.0",
+    "dotenv": "^17.0.0",
     "dotenv-expand": "^12.0.2"
   },
   "devDependencies": {
+    "@d0paminedriven/fs": "^6.1.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.4",
+    "@types/node": "^24.0.6",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.0",
     "jiti": "^2.4.2",
-    "prettier": "^3.6.1",
+    "prettier": "^3.6.2",
     "terser": "^5.43.1",
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",

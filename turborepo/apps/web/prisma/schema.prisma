@@ -7,14 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator erd {
-  provider                  = "prisma-erd-generator"
-  disable                   = true
-  theme                     = "dark"
-  mmdcPath                  = "../../node_modules/.bin"
-  includeRelationFromFields = true
-  erdDebug                  = true
-}
+
 
 enum SenderType {
   USER

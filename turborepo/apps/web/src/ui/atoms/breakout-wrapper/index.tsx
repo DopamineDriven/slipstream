@@ -1,3 +1,6 @@
+
+
+import {renderToString as _ren } from "react-dom/server";
 import type { FC, ReactNode } from "react";
 
 export const BreakoutWrapper: FC<{ children: ReactNode }> = ({ children }) => {

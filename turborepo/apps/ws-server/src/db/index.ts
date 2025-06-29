@@ -5,7 +5,7 @@ export type UserQuery = {
   name: string;
   email: string;
   emailVerified?: Date;
-  imaeg: string;
+  image: string;
   createdAt?: Date;
   updatedAt?: Date;
 };

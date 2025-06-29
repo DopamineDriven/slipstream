@@ -1,0 +1,78 @@
+{
+  "name": "@t3-chat-clone/types",
+  "version": "1.0.0",
+  "description": "convenient shared types util",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/*.d.ts",
+          "dist/*/index.d.ts"
+        ],
+        "creds": [
+          "dist/creds/index.d.ts"
+        ],
+        "types": ["dist/types/index.d.ts"]
+      }
+    }
+  },
+  "license": "MIT",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/*/index.d.ts"
+      ],
+        "creds": [
+          "dist/creds/index.d.ts"
+        ],
+        "types": ["dist/types/index.d.ts"]
+    }
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,d.ts,d.cts,css}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js",
+    "./creds": "./dist/creds/index.js",
+    "./types": "./dist/types/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "fix": "npm pkg fix"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@t3-chat-clone/eslint-config": "workspace:*",
+    "@t3-chat-clone/prettier-config": "workspace:*",
+    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@types/node": "^24.0.6",
+    "chokidar": "^4.0.3",
+    "dotenv": "^17.0.0",
+    "dotenv-cli": "^8.0.0",
+    "dotenv-expand": "^12.0.2",
+    "eslint": "^9.30.0",
+    "jiti": "^2.4.2",
+    "prettier": "^3.6.2",
+    "terser": "^5.43.1",
+    "tslib": "^2.8.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "ws": "^8.18.2"
+  },
+  "prettier": "@t3-chat-clone/prettier-config"
+}

@@ -8,7 +8,8 @@ const tsupConfig = (options: Options) =>
       "src/index.ts",
       "src/creds/index.ts",
       "src/types/index.ts",
-      "!src/test/**"
+      "!src/test/**",
+      "!src/service/**"
     ],
     target: ["node24"],
     dts: true,

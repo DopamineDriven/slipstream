@@ -28,4 +28,5 @@ if (
   const getSchema = fs.fileToBuffer("prisma/schema.prisma").toString("utf-8");
   const regex = /generator\s+erd\s*\{[\s\S]*?\}/g;
   fs.withWs("prisma/schema.prisma", getSchema.replace(regex, ""));
+  console.info("> generator axed ✔")
 }
