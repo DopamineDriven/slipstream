@@ -25,7 +25,6 @@ export class ChatWebSocketClient {
   public connect() {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
     this.socket = new WebSocket(this.url);
-
     this.socket.onopen = () => {
       this._isConnected = true;
       this.reconnectAttempts = 0;
