@@ -354,3 +354,9 @@ export type BufferLike =
   | { valueOf(): readonly number[] }
   | { valueOf(): string }
   | { [Symbol.toPrimitive](hint: string): string };
+
+/**
+ * @url https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/handle-streaming-refusals#implementation-guide
+ */
+export const triggerAnthropicRefusalForPromptTesting =
+  "ANTHROPIC_MAGIC_STRING_TRIGGER_REFUSAL_1FAEFB6177B4672DEE07F9D3AFC62588CCD2631EDCF22E8CCC1FB35B501C9C86" as const;
