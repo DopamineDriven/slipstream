@@ -1,12 +1,12 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
 
 
 enum SenderType {
@@ -23,10 +23,8 @@ enum ThemePreference {
 
 enum Provider {
   OPENAI
-  ANTHROPIC
-  X_AI
+  GROK
   GEMINI
-  META
 }
 
 model User {
@@ -46,13 +44,15 @@ model User {
 }
 
 model Profile {
-  id      String  @id @default(cuid(2))
-  bio     String?
-  city    String?
-  country String?
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  id       String  @id @default(cuid(2))
+  bio      String?
+  city     String?
+  country  String?
+  lat      Float?
+  lng      Float?
+  timezone String?
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String  @unique
 }
 
 model Account {
@@ -87,45 +87,52 @@ model UserKey {
   id        String    @id @default(cuid(2))
   userId    String
   provider  Provider
-  apiKey    String
+  apiKey    String    @db.VarChar(255)
+  label     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Message[] @relation("MessageToUserKey")
+
+  @@unique([userId, provider])
+  @@map("UserApiKey")
 }
 
 model Settings {
-  id     String           @id @default(cuid(2))
-  userId String           @unique
-  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme  ThemePreference? @default(SYSTEM)
-}
-
-model AiAgent {
-  id            String         @id @default(cuid(2))
-  provider      Provider
-  model         String
-  displayName   String?
-  description   String?
-  conversations Conversation[] @relation("AgentConversations")
+  id              String           @id @default(cuid(2))
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme           ThemePreference? @default(SYSTEM)
+  defaultProvider Provider?
+  defaultModel    String?
 }
 
 model Conversation {
-  id          String       @id @default(cuid(2))
-  userId      String // always defined
-  userKeyId   String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title       String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  messages    Message[]
-  aiAgentId   String?
-  aiAgent     AiAgent?     @relation("AgentConversations", fields: [aiAgentId], references: [id], onDelete: Cascade)
-  branchId    String? // For branching conversations
-  parentId    String? // For chat branching
-  attachments Attachment[]
-  isShared    Boolean      @default(false)
-  shareToken  String?      @unique
+  id                   String                @id @default(cuid(2))
+  userId               String
+  userKeyId            String?
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  messages             Message[]
+  branchId             String? // For branching conversations
+  parentId             String? // For chat branching
+  attachments          Attachment[]
+  isShared             Boolean               @default(false)
+  shareToken           String?               @unique
+  conversationSettings ConversationSettings?
+}
+
+model ConversationSettings {
+  id             String       @id @default(cuid(2))
+  conversationId String       @unique
+  systemPrompt   String?
+  temperature    Float?       @default(1.0)
+  topP           Float?       @default(1.0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model Message {
@@ -136,11 +143,9 @@ model Message {
   provider       Provider
   model          String?
   userKeyId      String?
-  apiKey         String
   content        String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  aiAgentId      String?
   userKey        UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])
   attachments    Attachment[]
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)

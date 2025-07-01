@@ -24,6 +24,8 @@ import { MessageInputBar } from "@/ui/message-input-bar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { Sidebar } from "@/ui/sidebar";
+// import { useAiChat } from "@/hooks/use-ai-chat";
+
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),

@@ -27,32 +27,6 @@ export const openAiChatModelsObj = {
   "gpt_3.5_turbo_16k": "gpt-3.5-turbo-16k"
 } as const;
 
-export const geminiChatModelsObj = {
-  gemini_2_point_5_flash: "gemini-2.5-flash",
-  gemini_2_point_5: "gemini-2.5",
-  gemini_2_point_5_flash_lite_preview_06_17:
-    "gemini-2.5-flash-lite-preview-06-17",
-  gemini_2_point_5_flash_preview_native_audio_dialog:
-    "gemini-2.5-flash-preview-native-audio-dialog",
-  gemini_2_point_5_flash_exp_native_audio_thinking_dialog:
-    "gemini-2.5-flash-exp-native-audio-thinking-dialog",
-  gemini_2_point_5_flash_preview_tts: "gemini-2.5-flash-preview-tts",
-  gemini_2_point_5_pro_preview_tts: "gemini-2.5-pro-preview-tts",
-  gemini_2_point_0_flash: "gemini-2.0-flash",
-  gemini_2_point_0_flash_preview_image_generation:
-    "gemini-2.0-flash-preview-image-generation",
-  gemini_2_point_0_flash_lite: "gemini-2.0-flash-lite",
-  gemini_1_point_5_flash: "gemini-1.5-flash",
-  gemini_1_point_5_pro: "gemini-1.5-pro",
-  gemini_embedding_exp: "gemini-embedding-exp",
-  imagen_4_point_0_generate_preview_06_06: "imagen-4.0-generate-preview-06-06",
-  imagen_4_point_0_ultra_generate_preview_06_06:
-    "imagen-4.0-ultra-generate-preview-06-06",
-  imagen_3_point_0_generate_002: "imagen-3.0-generate-002",
-  veo_2_point_0_generate_001: "veo-2.0-generate-001",
-  gemini_live_2_point_5_flash_preview: "gemini-live-2.5-flash-preview",
-  gemini_2_point_0_flash_live_001: "gemini-2.0-flash-live-001"
-} as const;
 export const providerModelChatApi = {
   openai: [
     "gpt-4.1",
@@ -152,7 +126,11 @@ export type Models = {
   >;
 };
 export type OpenAiChatModels = Models["openai"];
-export type OpenAiCompletionModels = [];
+
+export type GeminiChatModels = Models["gemini"];
+
+export type GrokChatModels = Models["grok"];
+export type OpenAiCompletionModels = Unenumerate<typeof providerModelResponsesApi["openai"]>;
 export type AllModelsUnion = Models[Provider];
 
 export type GetModelUtilRT<T = Provider> = T extends "openai"

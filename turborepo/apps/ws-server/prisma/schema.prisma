@@ -1,0 +1,171 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+enum SenderType {
+  USER
+  AI
+  SYSTEM
+}
+
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum Provider {
+  OPENAI
+  GROK
+  GEMINI
+}
+
+model User {
+  id            String         @id @default(cuid(2))
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  profile       Profile?
+  accounts      Account[]
+  sessions      Session[]
+  keys          UserKey[]
+  conversations Conversation[]
+  settings      Settings?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Profile {
+  id       String  @id @default(cuid(2))
+  bio      String?
+  city     String?
+  country  String?
+  lat      Float?
+  lng      Float?
+  timezone String?
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String  @unique
+}
+
+model Account {
+  id                String  @id @default(cuid(2))
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid(2))
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model UserKey {
+  id        String    @id @default(cuid(2))
+  userId    String
+  provider  Provider
+  apiKey    String    @db.VarChar(255)
+  label     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[] @relation("MessageToUserKey")
+
+  @@unique([userId, provider])
+  @@map("UserApiKey")
+}
+
+model Settings {
+  id              String           @id @default(cuid(2))
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme           ThemePreference? @default(SYSTEM)
+  defaultProvider Provider?
+  defaultModel    String?
+}
+
+model Conversation {
+  id                   String                @id @default(cuid(2))
+  userId               String
+  userKeyId            String?
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  messages             Message[]
+  branchId             String? // For branching conversations
+  parentId             String? // For chat branching
+  attachments          Attachment[]
+  isShared             Boolean               @default(false)
+  shareToken           String?               @unique
+  conversationSettings ConversationSettings?
+}
+
+model ConversationSettings {
+  id             String       @id @default(cuid(2))
+  conversationId String       @unique
+  systemPrompt   String?
+  temperature    Float?       @default(1.0)
+  topP           Float?       @default(1.0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id             String       @id @default(cuid(2))
+  conversationId String
+  userId         String?
+  senderType     SenderType   @default(USER)
+  provider       Provider
+  model          String?
+  userKeyId      String?
+  content        String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userKey        UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])
+  attachments    Attachment[]
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Attachment {
+  id             String        @id @default(cuid(2))
+  messageId      String
+  url            String
+  type           String
+  createdAt      DateTime      @default(now())
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message        Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}

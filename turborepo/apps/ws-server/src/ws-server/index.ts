@@ -13,7 +13,7 @@ import type {
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
-import { DbService } from "@/db/index.ts";
+import { PrismaService } from "@/prisma/index.ts";
 
 dotenv.config();
 
@@ -38,8 +38,8 @@ export class WSServer {
 
   constructor(
     private opts: WSServerOptions,
-    private db: DbService,
-    public redis: RedisInstance
+    public redis: RedisInstance,
+    public prisma: PrismaService
   ) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
@@ -97,12 +97,13 @@ export class WSServer {
     );
   }
 
-  private stashUserData(
+  private async stashUserData(
     userId: string,
     cookieObj: Record<keyof UserData, string> | null
   ) {
     if (!cookieObj) return;
     const { city, country, latlng, tz } = cookieObj;
+    void this.prisma.updateProfile({ city, country, latlng, tz, userId });
     return this.userDataMap.set(userId, { city, country, latlng, tz });
   }
 
@@ -115,7 +116,7 @@ export class WSServer {
 
     const userId = await this.authenticateConnection(ws, req);
     if (!userId) return;
-    this.stashUserData(userId, cookieObj);
+    await this.stashUserData(userId, cookieObj);
     const { city, country, latlng, tz } = this.userDataMap.get(userId) ?? {
       city: "unknown city",
       country: "unknown country",
@@ -149,7 +150,6 @@ export class WSServer {
     ws: WebSocket,
     req: IncomingMessage
   ): Promise<string | null> {
-
     const userEmail = this.extractUserEmailFromUrl(req);
 
     if (!userEmail) {
@@ -165,14 +165,12 @@ export class WSServer {
     try {
       const decodedEmail = decodeURIComponent(userEmail);
 
-      const userIsValid =
-        await this.db.isValidUserAndSessionByEmail(decodedEmail);
+      const { isValid: userIsValid, userId } =
+        await this.prisma.getAndValidateUserSessionByEmail(decodedEmail);
 
       if (userIsValid === false) throw new Error("Invalid Session");
 
-      if (userIsValid.valid === false) throw new Error("Invalid Session");
-
-      return userIsValid.id;
+      return userId;
     } catch (err) {
       if (err instanceof Error) {
         ws.close(4001, `Auth failed: ${err.message}`);

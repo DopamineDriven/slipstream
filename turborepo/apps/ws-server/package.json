@@ -23,8 +23,14 @@
       "gemini": [
         "dist/gemini/index.d.ts"
       ],
+      "generated": [
+        "dist/generated/*.d.ts"
+      ],
       "openai": [
         "dist/openai/index.d.ts"
+      ],
+      "prisma": [
+        "dist/prisma/index.d.ts"
       ],
       "r2-helper": [
         "dist/r2-helper/index.d.ts"
@@ -42,6 +48,12 @@
   },
   "scripts": {
     "build": "tsup",
+    "prebuild":"pnpm db:generate",
+    "postinstall": "pnpm db:generate",
+    "db:generate": "prisma generate --no-engine",
+    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio --browser none --port 7777",
     "clean": "git clean -xdf .turbo dist node_modules",
     "devv": "tsup --config tsup.config.dev.ts",
     "dev": "nodemon --watch src --ext ts --exec \"tsx src/index.ts\"",
@@ -54,9 +66,11 @@
     "@aws-sdk/client-secrets-manager": "^3.839.0",
     "@google/genai": "^1.7.0",
     "@neondatabase/serverless": "^1.0.1",
+    "@prisma/client": "^6.10.1",
+    "@prisma/extension-accelerate": "^2.0.1",
     "@t3-chat-clone/credentials": "workspace:*",
     "@t3-chat-clone/redis-service": "workspace:*",
-    "@types/node": "^24.0.6",
+    "@types/node": "^24.0.7",
     "@types/ws": "^8.18.1",
     "dotenv": "^17.0.0",
     "dotenv-cli": "^8.0.0",
@@ -66,7 +80,7 @@
     "redis": "^5.5.6",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
-    "ws": "^8.18.2"
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^6.1.0",
@@ -80,9 +94,10 @@
     "jiti": "^2.4.2",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
+    "prisma": "^6.10.1",
     "terser": "^5.43.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
-    "typescript-eslint": "^8.35.0"
+    "typescript-eslint": "^8.35.1"
   }
 }

@@ -30,16 +30,10 @@ async function exe() {
 
     const redisInstance = new RedisInstance(redisUrl);
 
+    const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
+
+    const prisma = new PrismaService(prismaClient);
     // pg
-
-    const { Pool } = await import("@neondatabase/serverless");
-
-    const pool = new Pool({
-      connectionString: cfg.DATABASE_URL
-    });
-    const { DbService } = await import("@/db/index.ts");
-
-    const db = new DbService(pool);
 
     const jwtSecret =
       cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
@@ -48,14 +42,19 @@ async function exe() {
     const { WSServer } = await import("@/ws-server/index.ts");
     const wsServer = new WSServer(
       { port, redisUrl, jwtSecret },
-      db,
-      redisInstance
+      redisInstance,
+      prisma
     );
     const { Resolver } = await import("@/resolver/index.ts");
+
     const { getOpenAI } = await import("@/openai/index.ts");
+
     const openai = await getOpenAI(cred);
-    const { getGemini } = await import("@/gemini/index.ts");
-    const gemini = await getGemini(cred);
+
+    const { GeminiService } = await import("@/gemini/index.ts");
+
+    const gemini = new GeminiService(cred);
+
     const resolver = new Resolver(
       wsServer,
       openai,

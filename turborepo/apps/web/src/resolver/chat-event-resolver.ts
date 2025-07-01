@@ -1,39 +1,12 @@
-// src/context/ChatEventResolver.ts
 import type {
   ChatWsEvent,
   ChatWsEventTypeUnion,
-  EventMap,
   EventTypeMap,
   RawData
 } from "@/types/chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 
-// The same actions your reducer expects:
-type _ChatAction =
-  | {
-      type: "message";
-      conversationId: string;
-      message: EventMap<"message">;
-    }
-  | {
-      type: "ai_chat_chunk";
-      conversationId: string;
-      chunk: EventMap<"ai_chat_chunk">;
-    }
-  | {
-      type: "ai_chat_response";
-      conversationId: string;
-      response: EventMap<"ai_chat_response">;
-    }
-  | {
-      type: "ai_chat_error";
-      conversationId: string;
-      error: EventMap<"ai_chat_error">;
-    };
-
 export class ChatEventResolver {
-  // Build a HandlerMap<ChatAction> keyed by event type
-
   constructor(public wsClient: ChatWebSocketClient) {}
 
   public registerAll() {
@@ -146,7 +119,7 @@ export class ChatEventResolver {
     _ws: WebSocket
   ) {
     console.log("stream chunk:", evt);
-    // stream token into the UI
+    // stream token into UI
   }
 
   private handleAIChatInlineData(
@@ -161,7 +134,7 @@ export class ChatEventResolver {
     _ws: WebSocket
   ): void {
     console.debug("chat complete", evt);
-    // finished streaming (token output complete)
+    // finished streaming (token generation complete)
   }
 
   private handleAIChatError(
@@ -176,7 +149,7 @@ export class ChatEventResolver {
     _ws: WebSocket
   ): void {
     console.debug("image URL", evt);
-    // display the generated image
+    // display generated image
   }
 
   private handleAssetUploadResponse(
@@ -184,6 +157,30 @@ export class ChatEventResolver {
     _ws: WebSocket
   ): void {
     console.debug("uploaded asset:", evt);
-    // update the UI with the new asset
+    // update UI with new asset
   }
 }
+
+/**
+ type _ChatAction =
+  | {
+      type: "message";
+      conversationId: string;
+      message: EventMap<"message">;
+    }
+  | {
+      type: "ai_chat_chunk";
+      conversationId: string;
+      chunk: EventMap<"ai_chat_chunk">;
+    }
+  | {
+      type: "ai_chat_response";
+      conversationId: string;
+      response: EventMap<"ai_chat_response">;
+    }
+  | {
+      type: "ai_chat_error";
+      conversationId: string;
+      error: EventMap<"ai_chat_error">;
+    };
+ */

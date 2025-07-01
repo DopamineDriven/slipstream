@@ -2,7 +2,6 @@ import type {
   ChatWsEvent,
   EventTypeMap,
   HandlerMap,
-  MessageHandler,
   RawData
 } from "@/types/chat-ws";
 
@@ -129,8 +128,12 @@ export class ChatWebSocketClient {
       }
     };
   }
+
+  public off<const K extends keyof HandlerMap>(event: K) {
+    delete this.handlers[event];
+  }
   public setResolver(resolver: {
-    handleRawMessage: (ws: WebSocket, raw: RawData) => void
+    handleRawMessage: (ws: WebSocket, raw: RawData) => void;
   }) {
     this.resolver = resolver;
   }
@@ -167,7 +170,10 @@ export class ChatWebSocketClient {
     }
   }
 
-  public on(event: keyof EventTypeMap, handler: MessageHandler<typeof event>) {
+  public on<const K extends keyof HandlerMap>(
+    event: K,
+    handler: HandlerMap[typeof event]
+  ) {
     switch (event) {
       case "ai_chat_chunk": {
         this.handlers[event] = handler;
