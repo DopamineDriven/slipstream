@@ -27,6 +27,7 @@
   },
   "ui": "stream",
   "globalEnv": [
+    "ANTHROPIC_API_KEY",
     "AUTH_GITHUB_ID",
     "AUTH_GITHUB_SECRET",
     "AUTH_GOOGLE_ID",

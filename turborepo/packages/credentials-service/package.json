@@ -52,7 +52,7 @@
     "fix": "npm pkg fix"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.839.0",
+    "@aws-sdk/client-secrets-manager": "^3.840.0",
     "dotenv": "^17.0.0",
     "dotenv-expand": "^12.0.2"
   },
@@ -61,7 +61,7 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.7",
+    "@types/node": "^24.0.8",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.0",
