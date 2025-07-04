@@ -8,8 +8,7 @@ async function exe() {
   const cred = new Credentials();
 
   const cfg = await cred.getAll();
-  {
-    // r2
+  try {
     const accountId = cfg.R2_ACCOUNT_ID;
     const accessKeyId = cfg.R2_ACCESS_KEY_ID;
     const secretAccessKey = cfg.R2_SECRET_ACCESS_KEY;
@@ -23,7 +22,6 @@ async function exe() {
       r2PublicUrl
     });
 
-    // redis
     const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379";
 
     const { RedisInstance } = await import("@t3-chat-clone/redis-service");
@@ -33,21 +31,27 @@ async function exe() {
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
 
     const prisma = new PrismaService(prismaClient);
-    // pg
 
     const jwtSecret =
       cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
+
     const { WSServer } = await import("@/ws-server/index.ts");
+
     const wsServer = new WSServer(
       { port, redisUrl, jwtSecret },
       redisInstance,
       prisma
     );
+
     const { Resolver } = await import("@/resolver/index.ts");
 
     const { getOpenAI } = await import("@/openai/index.ts");
+
+    const { AnthropicService } = await import("@/anthropic/index.ts");
+
+    const anthropic = new AnthropicService(cred);
 
     const openai = await getOpenAI(cred);
 
@@ -59,6 +63,7 @@ async function exe() {
       wsServer,
       openai,
       gemini,
+      anthropic,
       wsServer.redis,
       r2,
       cred
@@ -67,6 +72,9 @@ async function exe() {
     resolver.registerAll();
     wsServer.setResolver(resolver);
     wsServer.start();
+  } catch (err) {
+    if (err instanceof Error) throw new Error(err.message);
+    else throw new Error(`something went wrong...`);
   }
 }
 

@@ -1,10 +1,10 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function ArrowRight({ ...svg }: BaseSVGProps) {
+export function ArrowRight({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      role="img"
+      role={role}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

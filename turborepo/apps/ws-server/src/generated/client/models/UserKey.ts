@@ -28,9 +28,12 @@ export type UserKeyMinAggregateOutputType = {
   userId: string | null
   provider: $Enums.Provider | null
   apiKey: string | null
+  iv: string | null
+  authTag: string | null
   label: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDefault: boolean | null
 }
 
 export type UserKeyMaxAggregateOutputType = {
@@ -38,9 +41,12 @@ export type UserKeyMaxAggregateOutputType = {
   userId: string | null
   provider: $Enums.Provider | null
   apiKey: string | null
+  iv: string | null
+  authTag: string | null
   label: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDefault: boolean | null
 }
 
 export type UserKeyCountAggregateOutputType = {
@@ -48,9 +54,12 @@ export type UserKeyCountAggregateOutputType = {
   userId: number
   provider: number
   apiKey: number
+  iv: number
+  authTag: number
   label: number
   createdAt: number
   updatedAt: number
+  isDefault: number
   _all: number
 }
 
@@ -60,9 +69,12 @@ export type UserKeyMinAggregateInputType = {
   userId?: true
   provider?: true
   apiKey?: true
+  iv?: true
+  authTag?: true
   label?: true
   createdAt?: true
   updatedAt?: true
+  isDefault?: true
 }
 
 export type UserKeyMaxAggregateInputType = {
@@ -70,9 +82,12 @@ export type UserKeyMaxAggregateInputType = {
   userId?: true
   provider?: true
   apiKey?: true
+  iv?: true
+  authTag?: true
   label?: true
   createdAt?: true
   updatedAt?: true
+  isDefault?: true
 }
 
 export type UserKeyCountAggregateInputType = {
@@ -80,9 +95,12 @@ export type UserKeyCountAggregateInputType = {
   userId?: true
   provider?: true
   apiKey?: true
+  iv?: true
+  authTag?: true
   label?: true
   createdAt?: true
   updatedAt?: true
+  isDefault?: true
   _all?: true
 }
 
@@ -163,9 +181,12 @@ export type UserKeyGroupByOutputType = {
   userId: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label: string | null
   createdAt: Date
   updatedAt: Date
+  isDefault: boolean
   _count: UserKeyCountAggregateOutputType | null
   _min: UserKeyMinAggregateOutputType | null
   _max: UserKeyMaxAggregateOutputType | null
@@ -194,9 +215,12 @@ export type UserKeyWhereInput = {
   userId?: Prisma.StringFilter<"UserKey"> | string
   provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
   apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
   label?: Prisma.StringNullableFilter<"UserKey"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
 }
@@ -206,25 +230,31 @@ export type UserKeyOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
   label?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
 }
 
 export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_provider?: Prisma.UserKeyUserIdProviderCompoundUniqueInput
+  userId_provider?: Prisma.UserKeyUserId_providerCompoundUniqueInput
   AND?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
   OR?: Prisma.UserKeyWhereInput[]
   NOT?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
   userId?: Prisma.StringFilter<"UserKey"> | string
   provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
   apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
   label?: Prisma.StringNullableFilter<"UserKey"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
 }, "id" | "userId_provider">
@@ -234,9 +264,12 @@ export type UserKeyOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
   label?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   _count?: Prisma.UserKeyCountOrderByAggregateInput
   _max?: Prisma.UserKeyMaxOrderByAggregateInput
   _min?: Prisma.UserKeyMinOrderByAggregateInput
@@ -250,18 +283,24 @@ export type UserKeyScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
   provider?: Prisma.EnumProviderWithAggregatesFilter<"UserKey"> | $Enums.Provider
   apiKey?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  iv?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  authTag?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
   label?: Prisma.StringNullableWithAggregatesFilter<"UserKey"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolWithAggregatesFilter<"UserKey"> | boolean
 }
 
 export type UserKeyCreateInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
 }
@@ -271,9 +310,12 @@ export type UserKeyUncheckedCreateInput = {
   userId: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -281,9 +323,12 @@ export type UserKeyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
 }
@@ -293,9 +338,12 @@ export type UserKeyUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -304,18 +352,24 @@ export type UserKeyCreateManyInput = {
   userId: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
 }
 
 export type UserKeyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserKeyUncheckedUpdateManyInput = {
@@ -323,9 +377,12 @@ export type UserKeyUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserKeyListRelationFilter = {
@@ -338,7 +395,7 @@ export type UserKeyOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type UserKeyUserIdProviderCompoundUniqueInput = {
+export type UserKeyUserId_providerCompoundUniqueInput = {
   userId: string
   provider: $Enums.Provider
 }
@@ -348,9 +405,12 @@ export type UserKeyCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyMaxOrderByAggregateInput = {
@@ -358,9 +418,12 @@ export type UserKeyMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyMinOrderByAggregateInput = {
@@ -368,9 +431,12 @@ export type UserKeyMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyNullableScalarRelationFilter = {
@@ -424,6 +490,10 @@ export type EnumProviderFieldUpdateOperationsInput = {
   set?: $Enums.Provider
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type UserKeyCreateNestedOneWithoutMessagesInput = {
   create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
   connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
@@ -444,9 +514,12 @@ export type UserKeyCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
 }
 
@@ -454,9 +527,12 @@ export type UserKeyUncheckedCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -494,18 +570,24 @@ export type UserKeyScalarWhereInput = {
   userId?: Prisma.StringFilter<"UserKey"> | string
   provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
   apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
   label?: Prisma.StringNullableFilter<"UserKey"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
 }
 
 export type UserKeyCreateWithoutMessagesInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
 }
 
@@ -514,9 +596,12 @@ export type UserKeyUncheckedCreateWithoutMessagesInput = {
   userId: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
 }
 
 export type UserKeyCreateOrConnectWithoutMessagesInput = {
@@ -539,9 +624,12 @@ export type UserKeyUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
 }
 
@@ -550,27 +638,36 @@ export type UserKeyUncheckedUpdateWithoutMessagesInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserKeyCreateManyUserInput = {
   id?: string
   provider: $Enums.Provider
   apiKey: string
+  iv: string
+  authTag: string
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDefault?: boolean
 }
 
 export type UserKeyUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -578,9 +675,12 @@ export type UserKeyUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -588,9 +688,12 @@ export type UserKeyUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -629,9 +732,12 @@ export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   userId?: boolean
   provider?: boolean
   apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
@@ -642,9 +748,12 @@ export type UserKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   userId?: boolean
   provider?: boolean
   apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
@@ -653,9 +762,12 @@ export type UserKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   userId?: boolean
   provider?: boolean
   apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
@@ -664,12 +776,15 @@ export type UserKeySelectScalar = {
   userId?: boolean
   provider?: boolean
   apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDefault?: boolean
 }
 
-export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "apiKey" | "label" | "createdAt" | "updatedAt", ExtArgs["result"]["userKey"]>
+export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "apiKey" | "iv" | "authTag" | "label" | "createdAt" | "updatedAt" | "isDefault", ExtArgs["result"]["userKey"]>
 export type UserKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
@@ -693,9 +808,12 @@ export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     userId: string
     provider: $Enums.Provider
     apiKey: string
+    iv: string
+    authTag: string
     label: string | null
     createdAt: Date
     updatedAt: Date
+    isDefault: boolean
   }, ExtArgs["result"]["userKey"]>
   composites: {}
 }
@@ -1125,9 +1243,12 @@ export interface UserKeyFieldRefs {
   readonly userId: Prisma.FieldRef<"UserKey", 'String'>
   readonly provider: Prisma.FieldRef<"UserKey", 'Provider'>
   readonly apiKey: Prisma.FieldRef<"UserKey", 'String'>
+  readonly iv: Prisma.FieldRef<"UserKey", 'String'>
+  readonly authTag: Prisma.FieldRef<"UserKey", 'String'>
   readonly label: Prisma.FieldRef<"UserKey", 'String'>
   readonly createdAt: Prisma.FieldRef<"UserKey", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserKey", 'DateTime'>
+  readonly isDefault: Prisma.FieldRef<"UserKey", 'Boolean'>
 }
     
 

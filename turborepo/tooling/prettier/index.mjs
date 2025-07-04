@@ -10,13 +10,14 @@ const config = {
   ],
   importOrder: [
     "<TYPES>",
-    "<TYPES>^@t3-chat-clone",
-    "^@t3-chat-clone/(.*)$",
+    "^(openai(.*)$)|^(openai$)",
     "^(react/(.*)$)|^(react$)",
     "^(next/(.*)$)|^(next$)",
+    "^(expo(.*)$)|^(expo$)",
     "<THIRD_PARTY_MODULES>",
-    "<TYPES>^[.|..|@]",
-    "^@/",
+    "<TYPES>^@t3-chat-clone",
+    "^@t3-chat-clone/(.*)$",
+    "<TYPES>^[.|..|~]",
     "^~/",
     "^[../]",
     "^[./]"

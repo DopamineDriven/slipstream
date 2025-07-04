@@ -1,17 +1,12 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "@/lib/utils";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 
 type ProgressProps = ComponentPropsWithRef<typeof ProgressPrimitive.Root>;
 
-const Progress = ({
-  className,
-  value,
-  ref,
-  ...props
-}: ProgressProps) => (
+const Progress = ({ className, value, ref, ...props }: ProgressProps) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(

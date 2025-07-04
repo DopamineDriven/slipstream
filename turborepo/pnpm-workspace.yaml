@@ -11,5 +11,6 @@ onlyBuiltDependencies:
   - cbor-extract
   - esbuild
   - prisma
+  - puppeteer
   - sharp
   - unrs-resolver

@@ -1,10 +1,10 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function MessageSquareText({ ...svg }: BaseSVGProps) {
+export function MessageSquareText({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      role="img"
+      role={role}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

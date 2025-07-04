@@ -28,7 +28,8 @@ export type ThemePreference = (typeof ThemePreference)[keyof typeof ThemePrefere
 export const Provider = {
   OPENAI: 'OPENAI',
   GROK: 'GROK',
-  GEMINI: 'GEMINI'
+  GEMINI: 'GEMINI',
+  ANTHROPIC: 'ANTHROPIC'
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]

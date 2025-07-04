@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function Bot({ ...svg }: BaseSVGProps) {
+export function Bot({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +10,7 @@ export function Bot({ ...svg }: BaseSVGProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
+      role={role}
       {...svg}>
       <path d="M12 8V4H8" />
       <rect width="16" height="12" x="4" y="8" rx="2" />

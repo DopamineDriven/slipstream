@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function ArrowLeft({ ...svg }: BaseSVGProps) {
+export function ArrowLeft({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +10,7 @@ export function ArrowLeft({ ...svg }: BaseSVGProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
+      role={role}
       {...svg}>
       <path d="m12 19-7-7 7-7" />
       <path d="M19 12H5" />

@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function CirclePlus({ ...svg }: BaseSVGProps) {
+export function CirclePlus({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -9,7 +9,7 @@ export function CirclePlus({ ...svg }: BaseSVGProps) {
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
-      role="img"
+      role={role}
       strokeLinejoin="round"
       {...svg}>
       <circle cx="12" cy="12" r="10" />

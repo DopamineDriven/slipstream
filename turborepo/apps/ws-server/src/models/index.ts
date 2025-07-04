@@ -33,6 +33,11 @@ export class ModelService {
           return model;
         } else return "grok-3" as const as NonNullable<K>;
       }
+      case "anthropic": {
+        if (model && providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"anthropic">)) {
+          return model;
+        } else return "claude-3-haiku-20240307" as const as NonNullable<K>
+      }
       default: {
         if (
           model &&

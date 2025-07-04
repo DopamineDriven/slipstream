@@ -1,4 +1,5 @@
 import { WebSocket } from "ws";
+import { UserKey } from "@/generated/client/client.ts";
 
 export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
@@ -8,36 +9,29 @@ export type RemoveFields<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };
 
+/**
+ * helper workup for use in XOR type below
+ * makes properties from U optional and undefined in T, and vice versa
+ */
+export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+/**
+ * enforces mutual exclusivity of T | U
+ */
+// prettier-ignore
+export type XOR<T, U> =
+  [T, U] extends [object, object]
+    ? (Without<T, U> & U) | (Without<U, T> & T)
+    : T | U
+
 export type ConditionalToRequired<
   T,
   Z extends keyof T = keyof T
 > = RemoveFields<T, Z> & { [Q in Z]-?: T[Q] };
 
-export type StripHyphen<T extends string> = T extends `${infer X}-${infer Y}`
-  ? `${X}_${StripHyphen<Y>}`
+export type KebabToSnake<T extends string> = T extends `${infer X}-${infer Y}`
+  ? `${X}_${KebabToSnake<Y>}`
   : T;
-
-export const openAiChatModelsObj = {
-  "gpt_4.1": "gpt-4.1",
-  "gpt_4.1_mini": "gpt-4.1-mini",
-  "gpt_4.1_nano": "gpt-4.1-nano",
-  "gpt_4.5_preview": "gpt-4.5-preview",
-  o4_mini: "o4-mini",
-  o1: "o1",
-  o3: "o3",
-  o1_mini: "o1-mini",
-  o3_mini: "o3-mini",
-  gpt_4o: "gpt-4o",
-  gpt_4o_audio_preview: "gpt-4o-audio-preview",
-  gpt_4o_mini: "gpt-4o-mini",
-  gpt_4o_search_preview: "gpt-4o-search-preview",
-  gpt_4o_mini_search_preview: "gpt-4o-mini-search-preview",
-  gpt_4o_mini_audio_preview: "gpt-4o-mini-audio-preview",
-  gpt_4: "gpt-4",
-  gpt_4_turbo: "gpt-4-turbo",
-  "gpt_3.5_turbo": "gpt-3.5-turbo",
-  "gpt_3.5_turbo_16k": "gpt-3.5-turbo-16k"
-} as const;
 
 export const providerModelChatApi = {
   openai: [
@@ -82,7 +76,27 @@ export const providerModelChatApi = {
     "gemini-live-2.5-flash-preview",
     "gemini-2.0-flash-live-001"
   ],
-  grok: ["grok-3", "grok-3.1", "grok-3.2"]
+  grok: ["grok-3", "grok-3.1", "grok-3.2"],
+  /**
+   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
+   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
+   */
+  anthropic: [
+    "claude-opus-4-20250514",
+    "claude-opus-4-0",
+    "claude-sonnet-4-20250514",
+    "claude-sonnet-4-0",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-7-sonnet-latest",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-haiku-latest",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-5-sonnet-latest",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-haiku-20240307",
+    "claude-3-opus-20240229",
+    "claude-3-opus-latest"
+  ]
 } as const;
 
 export const providerModelResponsesApi = {
@@ -128,7 +142,27 @@ export const providerModelResponsesApi = {
     "gemini-live-2.5-flash-preview",
     "gemini-2.0-flash-live-001"
   ],
-  grok: ["grok-3", "grok-3.1", "grok-3.2"]
+  grok: ["grok-3", "grok-3.1", "grok-3.2"],
+  /**
+   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
+   * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
+   */
+  anthropic: [
+    "claude-opus-4-20250514",
+    "claude-opus-4-0",
+    "claude-sonnet-4-20250514",
+    "claude-sonnet-4-0",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-7-sonnet-latest",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-haiku-latest",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-5-sonnet-latest",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-haiku-20240307",
+    "claude-3-opus-20240229",
+    "claude-3-opus-latest"
+  ]
 } as const;
 
 export type Provider = keyof typeof providerModelChatApi;
@@ -145,6 +179,8 @@ export type GeminiChatModels = ModelMap["gemini"];
 
 export type GrokChatModels = ModelMap["grok"];
 
+export type AnthropicChatModels = ModelMap["anthropic"];
+
 export type AllModelsUnion = ModelMap[Provider];
 
 export type GetModelUtilRT<T = Provider> = T extends "openai"
@@ -153,7 +189,9 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
     ? GeminiChatModels
     : T extends "grok"
       ? GrokChatModels
-      : never;
+      : T extends "anthropic"
+        ? AnthropicChatModels
+        : never;
 
 export type ChatMessage = {
   type: "message";
@@ -162,6 +200,115 @@ export type ChatMessage = {
   content: string;
   timestamp: number;
   attachments?: string[];
+};
+
+export type ApiKeySetDefaultRequest = {
+  type: "api_key_set_default_request";
+  provider: Provider;
+};
+export type ApiKeySetDefaultResponse = {
+  type: "api_key_set_default_response";
+  provider: Provider;
+  keyId: string;
+  userId: string;
+  message?: string;
+};
+export type ApiKeySetDefaultError = {
+  type: "api_key_set_default_error";
+  provider: Provider;
+  userId: string;
+  keyId?: string;
+  message: string;
+};
+
+export type ApiKeyCreateRequest = {
+  type: "api_key_create_request";
+  provider: Provider;
+  apiKey: string;
+  label?: string;
+  asDefault?: boolean;
+};
+
+export type ApiKeyCreateResponse = {
+  type: "api_key_create_response";
+  provider: Provider;
+  label?: string;
+  asDefault?: boolean;
+  userId: string;
+  keyId: string;
+};
+
+export type ApiKeyCreateError = {
+  type: "api_key_create_error";
+  provider: Provider;
+  userId: string;
+  message: string;
+};
+
+export type ApiKeyUpdateRequest = {
+  type: "api_key_update_request";
+  provider: Provider;
+  apiKey?: string;
+  label?: string;
+  asDefault?: boolean;
+};
+
+export type ApiKeyUpdateResponse = {
+  type: "api_key_update_response";
+  provider: Provider;
+  label?: string;
+  asDefault?: boolean;
+  userId: string;
+  keyId: string;
+};
+
+export type ApiKeyUpdateError = {
+  type: "api_key_update_error";
+  provider: Provider;
+  message: string;
+  label?: string;
+  asDefault?: boolean;
+  userId: string;
+  keyId: string;
+};
+
+export type ApiKeyDeleteRequest = {
+  type: "api_key_delete_request";
+  provider: Provider;
+  asDefault?: boolean;
+};
+
+export type ApiKeyDeleteResponse = {
+  type: "api_key_delete_response";
+  provider: Provider;
+  userId: string;
+  message?: string;
+};
+
+export type ApiKeyDeleteError = {
+  type: "api_key_delete_error";
+  keyId: string;
+  provider: Provider;
+  label?: string;
+  asDefault?: boolean;
+  userId: string;
+  message: string;
+};
+
+export type ApiKeyListRequest = {
+  type: "api_key_list_request";
+};
+
+export type ApiKeyListResponse = {
+  type: "api_key_list_response";
+  apiKeys: UserKey[];
+  userId: string;
+};
+
+export type ApiKeyListError = {
+  type: "api_key_list_error";
+  message?: string;
+  userId: string;
 };
 
 export type AIChatRequest = {
@@ -174,6 +321,7 @@ export type AIChatRequest = {
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
+  maxTokens?: number;
 };
 
 export type AIChatResponse = {
@@ -183,7 +331,11 @@ export type AIChatResponse = {
   chunk: string;
   done: boolean;
   provider?: Provider;
+  title?: string;
   model?: string;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
 };
 
 export type AIChatInlineData = {
@@ -193,6 +345,9 @@ export type AIChatInlineData = {
   data: string;
   provider?: Provider;
   model?: string;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
 };
 
 export type AIChatChunk = {
@@ -202,7 +357,11 @@ export type AIChatChunk = {
   chunk: string;
   done: boolean;
   provider?: Provider;
+  title?: string;
   model?: string;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
 };
 
 export type AIChatError = {
@@ -213,6 +372,9 @@ export type AIChatError = {
   done: true;
   provider?: Provider;
   model?: string;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
 };
 
 export type TypingIndicator = {
@@ -261,6 +423,21 @@ export type AssetUploadResponse = {
 };
 
 export type AnyEvent =
+  | ApiKeyCreateError
+  | ApiKeyCreateRequest
+  | ApiKeyCreateResponse
+  | ApiKeyDeleteError
+  | ApiKeyDeleteRequest
+  | ApiKeyDeleteResponse
+  | ApiKeyListError
+  | ApiKeyListRequest
+  | ApiKeyListResponse
+  | ApiKeySetDefaultError
+  | ApiKeySetDefaultRequest
+  | ApiKeySetDefaultResponse
+  | ApiKeyUpdateError
+  | ApiKeyUpdateRequest
+  | ApiKeyUpdateResponse
   | AssetUploadRequest
   | AssetUploadResponse
   | AIChatChunk
@@ -276,24 +453,24 @@ export type AnyEvent =
 
 export type AnyEventTypeUnion = AnyEvent["type"];
 
-/**
- * helper workup for use in XOR type below
- * makes properties from U optional and undefined in T, and vice versa
- */
-export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-
-/**
- * enforces mutual exclusivity of T | U
- */
-// prettier-ignore
-export type XOR<T, U> =
-  [T, U] extends [object, object]
-    ? (Without<T, U> & U) | (Without<U, T> & T)
-    : T | U
-
 export type EventUnion = XOR<ChatMessage, TypingIndicator>;
 
 export type EventTypeMap = {
+  api_key_create_error: ApiKeyCreateError;
+  api_key_create_request: ApiKeyCreateRequest;
+  api_key_create_response: ApiKeyCreateResponse;
+  api_key_delete_error: ApiKeyDeleteError;
+  api_key_delete_request: ApiKeyDeleteRequest;
+  api_key_delete_response: ApiKeyDeleteResponse;
+  api_key_list_error: ApiKeyListError;
+  api_key_list_request: ApiKeyListRequest;
+  api_key_list_response: ApiKeyListResponse;
+  api_key_set_default_error: ApiKeySetDefaultError;
+  api_key_set_default_request: ApiKeySetDefaultRequest;
+  api_key_set_default_response: ApiKeySetDefaultResponse;
+  api_key_update_error: ApiKeyUpdateError;
+  api_key_update_request: ApiKeyUpdateRequest;
+  api_key_update_response: ApiKeyUpdateResponse;
   ai_chat_chunk: AIChatChunk;
   ai_chat_error: AIChatError;
   ai_chat_inline_data: AIChatInlineData;

@@ -1,6 +1,3 @@
-import { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
-import { withAccelerate } from "@prisma/extension-accelerate";
-import * as dotenv from "dotenv";
 import type {
   AIChatError,
   AIChatRequest,
@@ -10,6 +7,11 @@ import type {
 import { PrismaClient } from "@/generated/client/client.ts";
 import { Provider, SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
+import { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
+import { withAccelerate } from "@prisma/extension-accelerate";
+import * as dotenv from "dotenv";
+import type { EncryptedPayload } from "@t3-chat-clone/encryption";
+import { EncryptionService } from "@t3-chat-clone/encryption";
 
 dotenv.config();
 
@@ -18,19 +20,27 @@ export const prismaClient = new PrismaClient().$extends(withAccelerate());
 export type PrismaClientWithAccelerate = typeof prismaClient;
 
 export interface HandleAiChatRequestProps
-  extends RemoveFields<ConditionalToRequired<AIChatRequest, "provider">, "type"> {
+  extends RemoveFields<
+    ConditionalToRequired<AIChatRequest, "provider">,
+    "type"
+  > {
   userId: string;
 }
 
 export interface HandleAiChatResponseProps
-  extends RemoveFields<ConditionalToRequired<AIChatResponse, "provider">, "type"> {}
+  extends RemoveFields<
+    ConditionalToRequired<AIChatResponse, "provider">,
+    "type"
+  > {}
 
 export interface HandleAiChatErrorResponseProps
   extends ConditionalToRequired<AIChatError, "provider"> {}
 
 export class PrismaService extends ModelService {
+  private encryption: EncryptionService;
   constructor(public prismaClient: PrismaClientWithAccelerate) {
     super();
+    this.encryption = new EncryptionService();
   }
 
   public async getAndValidateUserSessionByEmail(email: string) {
@@ -52,23 +62,6 @@ export class PrismaService extends ModelService {
     };
   }
 
-  private async handleApiKey(
-    data: RemoveFields<AIChatRequest, "type">,
-    userId: string,
-    provider: keyof typeof Provider
-  ) {
-    let keyRecordId: string | null = null;
-    if (data.apiKey) {
-      const keyRecord = await this.prismaClient.userKey.upsert({
-        where: { userId_provider: { provider, userId } },
-        create: { userId, provider, apiKey: data.apiKey },
-        update: {}
-      });
-      keyRecordId = keyRecord.id;
-    }
-    return keyRecordId;
-  }
-
   public async updateProfile({
     city,
     country,
@@ -77,7 +70,7 @@ export class PrismaService extends ModelService {
     userId
   }: { [P in keyof UserData]-?: UserData[P] } & { userId: string }) {
     const [latStr, lngStr] = latlng.split(",") as [string, string]; // formatted `${lat},${lng}` in the cookie value for the key latlng
-     await this.prismaClient.profile.upsert({
+    await this.prismaClient.profile.upsert({
       where: { userId },
       create: {
         city,
@@ -98,17 +91,44 @@ export class PrismaService extends ModelService {
     });
   }
 
+  private async handleApiKey(
+    data: RemoveFields<AIChatRequest, "type">,
+    userId: string
+  ) {
+    let encryptedApiKey: string | null = null;
+    let encryptedPayload: EncryptedPayload | null = null;
+    try {
+      if (data.provider) {
+
+        const prismaProvider = this.providerToPrismaFormat(
+          data.provider
+        ) satisfies keyof typeof Provider;
+
+        const rec = await this.prismaClient.userKey.findUnique({
+          where: { userId_provider: { userId, provider: prismaProvider } }
+        });
+        if (!rec) return null;
+        const { apiKey, authTag, iv } = rec;
+        encryptedPayload = { authTag, data: apiKey, iv };
+        encryptedApiKey = rec?.apiKey ?? null;
+      }
+    } catch (err) {
+      console.warn(err);
+    } finally {
+      if (encryptedPayload) {
+        const apiKey = await this.encryption.decryptText(encryptedPayload);
+        return apiKey;
+      }
+    }
+    return encryptedApiKey;
+  }
+
   public async handleAiChatRequest({
     userId,
     provider,
     ...data
   }: HandleAiChatRequestProps) {
-    const userKeyId = await this.handleApiKey(
-      data,
-      userId,
-      this.providerToPrismaFormat(provider)
-    );
-
+    const userKeyId = await this.handleApiKey(data, userId);
     if (data.conversationId === "new-chat") {
       return this.prismaClient.conversation.create({
         include: { messages: true, conversationSettings: true },
@@ -181,7 +201,8 @@ export class PrismaService extends ModelService {
             userId
           }
         },
-        userId
+        userId,
+        title: data.title
       }
     });
   }

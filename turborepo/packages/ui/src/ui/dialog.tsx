@@ -1,9 +1,9 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "@/icons/x";
 import { cn } from "@/lib/utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 const Dialog = DialogPrimitive.Root;
 

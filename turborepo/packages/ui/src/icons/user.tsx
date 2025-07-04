@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function User({ ...svg }: BaseSVGProps) {
+export function User({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -8,7 +8,7 @@ export function User({ ...svg }: BaseSVGProps) {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      role="img"
+      role={role}
       strokeLinecap="round"
       strokeLinejoin="round"
       {...svg}>

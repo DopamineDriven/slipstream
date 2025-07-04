@@ -499,10 +499,6 @@ export type ConversationUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type ConversationCreateNestedOneWithoutConversationSettingsInput = {
   create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput>
   connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationSettingsInput
