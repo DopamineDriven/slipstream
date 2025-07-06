@@ -7,15 +7,18 @@ const tsupConfig = (options: Options) =>
   ({
     entry: [
       "src/index.ts",
+      "src/anthropic/index.ts",
       "src/auth/index.ts",
-      "src/db/index.ts",
       "src/gemini/index.ts",
+      "src/generated/**/*.ts",
+      "src/models/index.ts",
       "src/openai/index.ts",
       "src/r2-helper/index.ts",
+      "src/prisma/index.ts",
       "src/resolver/index.ts",
       "src/types/index.ts",
       "src/ws-server/index.ts",
-      "!src/__generated__/**/*",
+      "!src/__out__/**/*",
       "!src/test/**/*",
       "!public/**/*"
     ],

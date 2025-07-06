@@ -1,31 +1,48 @@
-import type { ChatCompletionChunk } from "openai/resources/index.mjs";
+import type {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam
+} from "openai/resources/index.mjs";
 import type { RawData } from "ws";
+import { Credentials } from "@t3-chat-clone/credentials";
 import { RedisInstance } from "@t3-chat-clone/redis-service";
-import { GenerateContentResponse, GoogleGenAI } from "@google/genai";
+import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import { GenerateContentResponse } from "@google/genai";
 import OpenAI from "openai";
 import { WebSocket } from "ws";
 import type {
+  AnthropicChatModels,
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  SelectedProvider
+  GeminiChatModels,
+  GrokChatModels,
+  OpenAIChatModels,
+  Provider
 } from "@/types/index.ts";
+import type {
+  RawMessageStreamEvent,
+  StopReason
+} from "@anthropic-ai/sdk/resources/messages.mjs";
+import type { ContentUnion } from "@google/genai";
+import { AnthropicService } from "@/anthropic/index.ts";
+import { GeminiService } from "@/gemini/index.ts";
+import { ModelService } from "@/models/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import { Credentials } from "@t3-chat-clone/credentials";
 
-
-export class Resolver {
+export class Resolver extends ModelService {
   constructor(
     public wsServer: WSServer,
     private openai: OpenAI,
-    private gemini: GoogleGenAI,
+    private geminiService: GeminiService,
+    private anthropicService: AnthropicService,
     private redis: RedisInstance,
     private r2: R2Instance,
     private cred: Credentials
-  ) {}
+  ) {
+    super();
+  }
 
-  /** Register all event handlers here */
   public registerAll() {
     this.wsServer.on("typing", this.handleTyping.bind(this));
     this.wsServer.on("message", this.handleMessage.bind(this));
@@ -39,7 +56,6 @@ export class Resolver {
       this.handleAssetUploadRequest.bind(this)
     );
     this.wsServer.on("ai_chat_request", this.handleAIChat.bind(this));
-    // You can also register response handlers if needed (for internal use)
   }
 
   public safeErrMsg(err: unknown) {
@@ -56,45 +72,118 @@ export class Resolver {
     } else return String(err);
   }
 
-  // can inject with userData (handled on the server now)
-  // userData?: UserData
+  private cleanTitle(outputTitle: string, maxWords = 10) {
+    if (!outputTitle) return "New Chat";
+    return outputTitle
+      .replace(/^["']|["']$/g, "")
+      .replace(/\.$/, "")
+      .split(/\s+/)
+      .slice(0, maxWords)
+      .join(" ")
+      .trim();
+  }
+
+  private formatProvider(provider?: Provider) {
+    switch (provider) {
+      case "anthropic":
+        return "Anthropic";
+      case "gemini":
+        return "Gemini";
+      case "openai":
+        return "OpenAI";
+      case "grok":
+        return "Grok";
+      default:
+        return "OpenAI";
+    }
+  }
+
+  private async titleGenUtil({
+    prompt,
+    provider
+  }: EventTypeMap["ai_chat_request"]) {
+    const apiKey = await new Credentials().get("OPENAI_API_KEY");
+    const openai = new OpenAI({ apiKey });
+    try {
+      const turbo = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        store: false,
+        messages: [
+          {
+            role: "developer",
+            content: `Generate a concise, descriptive title (max 10 words) for this user-submitted-prompt: "${prompt}"`
+          }
+        ]
+      });
+      const title =
+        turbo.choices?.[0]?.message?.content ?? this.formatProvider(provider);
+
+      return title;
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
     userId: string
   ) {
-    // 1) pick the right client (BYOK or default)
-
     const provider = event?.provider ?? "openai";
+    const model = this.getModel(
+      provider,
+      event?.model as
+        | GeminiChatModels
+        | OpenAIChatModels
+        | GrokChatModels
+        | undefined
+    );
+    const res = await this.wsServer.prisma.handleAiChatRequest({
+      userId,
+      conversationId: event.conversationId,
+      prompt: event.prompt,
+      provider: provider,
+      apiKey: event.apiKey,
+      model: model
+    });
 
-    const client = event.apiKey
-      ? this.openai.withOptions({ apiKey: event.apiKey })
-      : this.openai;
+    const topP = event.topP;
+    const temperature = event.temperature;
+    const systemPrompt = event.systemPrompt;
+    const max_tokens = event.maxTokens;
+
+    const conversationId =
+      res.id === event.conversationId ? event.conversationId : res.id;
 
     const streamKey = `stream:${event.conversationId}`;
+
     let agg = "";
+
+    const title = res?.title ?? await this.titleGenUtil(event);
 
     try {
       if (provider === "gemini") {
-        const model = (event.model ?? "gemini-2.5-flash") as SelectedProvider<
-          typeof provider
-        >;
+        const gemini = await this.geminiService.getClient(event.apiKey);
 
-        const chat = this.gemini.chats.create({ model });
+        const chat = gemini.chats.create({ model: model });
 
         const stream = (await chat.sendMessageStream({
           message: event.prompt,
-
-          config: { thinkingConfig: { thinkingBudget: 0 } } // disables thinking
+          config: {
+            temperature,
+            maxOutputTokens: max_tokens,
+            topP,
+            systemInstruction: systemPrompt satisfies ContentUnion | undefined,
+            thinkingConfig: { thinkingBudget: 0 }
+          } // disables thinking
         })) satisfies AsyncGenerator<GenerateContentResponse>;
 
         await this.redis.expire(streamKey, 3600);
-        // 3) walk the stream
+
         for await (const chunk of stream) {
           const textPart = chunk.text;
           const dataPart = chunk.data;
           const done = chunk.candidates?.[0]?.finishReason;
-          const returnedModel = chunk.modelVersion ?? model;
 
           if (textPart) {
             await this.redis.rPush(streamKey, textPart);
@@ -102,9 +191,13 @@ export class Resolver {
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
-                conversationId: event.conversationId,
+                conversationId,
                 userId,
-                model: model,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
                 provider,
                 chunk: textPart,
                 done: false
@@ -116,21 +209,38 @@ export class Resolver {
             ws.send(
               JSON.stringify({
                 type: "ai_chat_inline_data",
-                conversationId: event.conversationId,
+                conversationId,
                 data: dataPart,
-                provider,
+                userId,
                 model,
-                userId
+                systemPrompt,
+                temperature,
+                topP,
+                provider
               } satisfies EventTypeMap["ai_chat_inline_data"])
             );
           }
           if (done) {
+
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              title,
+              provider,
+              userId,
+              model
+            });
             ws.send(
               JSON.stringify({
                 type: "ai_chat_response",
-                conversationId: event.conversationId,
+                conversationId,
                 userId,
-                model: returnedModel,
+                model,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
                 provider,
                 chunk: agg,
                 done: true
@@ -139,31 +249,40 @@ export class Resolver {
             break;
           }
         }
-      } else {
-        const model = (event.model ?? "gpt-4o-nano") as SelectedProvider<
-          typeof provider
-        >;
-        const stream = (await client.chat.completions.create(
-          {
-            user: userId,
-            model,
-            // supports audio response conditionally with certain models
-            // modalities: ["text", "audio"],
-            // reasoning_effort: "high" | "medium" | "low",
-            messages: [{ role: "user", content: event.prompt }],
-            stream: true
-          },
-          { stream: true }
-        )) satisfies AsyncIterable<ChatCompletionChunk>;
+      } else if (provider === "anthropic") {
+        const anthropic = await this.anthropicService.getClient(event.apiKey);
+
+        const max_tokens =
+          event.maxTokens ??
+          this.anthropicService.maxOutputTokens(model as AnthropicChatModels);
+
+        const stream = (await anthropic.messages.create({
+          max_tokens,
+          stream: true,
+          thinking: { type: "disabled" },
+          top_p: topP,
+          temperature,
+          system: systemPrompt,
+          model,
+          messages: [{ role: "user", content: event.prompt }]
+        })) satisfies Stream<RawMessageStreamEvent> & {
+          _request_id?: string | null;
+        };
 
         await this.redis.expire(streamKey, 3600);
 
-        // 3) walk the stream
         for await (const chunk of stream) {
-          const choice = chunk.choices[0];
-          const text = choice?.delta.content;
-          const done = choice?.finish_reason != null;
-          const returnedModel = chunk.model;
+          let text: string | undefined = undefined;
+          let done: StopReason | null = null;
+          if (chunk.type === "content_block_delta") {
+            if (chunk.delta.type === "text_delta") {
+              text = chunk.delta.text;
+            } else if (chunk.delta.type === "citations_delta") {
+              text = chunk.delta.citation.cited_text;
+            }
+          } else if (chunk.type === "message_delta") {
+            done = chunk.delta.stop_reason;
+          }
 
           if (text) {
             await this.redis.rPush(streamKey, text);
@@ -171,10 +290,14 @@ export class Resolver {
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
-                conversationId: event.conversationId,
+                conversationId,
                 userId,
                 provider,
-                model: returnedModel,
+                title,
+                model,
+                systemPrompt,
+                temperature,
+                topP,
                 chunk: text,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
@@ -182,13 +305,196 @@ export class Resolver {
           }
 
           if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              title,
+              provider,
+              userId,
+              model
+            });
             ws.send(
               JSON.stringify({
                 type: "ai_chat_response",
-                conversationId: event.conversationId,
+                conversationId,
                 userId,
                 provider,
-                model: returnedModel,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                chunk: agg,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            break;
+          }
+        }
+      } else if (provider === "grok") {
+        const xAi = await this.cred.get("X_AI_KEY");
+
+        const fallbackApiKey = xAi;
+
+        const client = event.apiKey
+          ? this.openai.withOptions({
+              apiKey: event.apiKey,
+              baseURL: "https://api.x.ai/v1"
+            })
+          : this.openai.withOptions({
+              apiKey: fallbackApiKey,
+              baseURL: "https://api.x.ai/v1"
+            });
+        const messages = (
+          systemPrompt
+            ? ([
+                { role: "system", content: systemPrompt },
+                { role: "user", content: event.prompt }
+              ] as const)
+            : ([{ role: "user", content: event.prompt }] as const)
+        ) satisfies ChatCompletionMessageParam[];
+        const stream = (await client.chat.completions.create(
+          {
+            user: userId,
+            top_p: topP,
+            temperature,
+            max_completion_tokens: max_tokens,
+            model,
+            messages,
+            stream: true
+          },
+          { stream: true }
+        )) satisfies AsyncIterable<ChatCompletionChunk>;
+
+        await this.redis.expire(streamKey, 3600);
+
+        for await (const chunk of stream) {
+          const choice = chunk.choices[0];
+          const text = choice?.delta.content;
+          const done = choice?.finish_reason != null;
+
+          if (text) {
+            await this.redis.rPush(streamKey, text);
+            agg += text;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                title,
+                provider,
+                systemPrompt,
+                temperature,
+                topP,
+                model,
+                chunk: text,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+          }
+
+          if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              provider,
+              title,
+              userId,
+              model
+            });
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            break;
+          }
+        }
+      } else {
+        const messages = (
+          systemPrompt
+            ? ([
+                { role: "system", content: systemPrompt },
+                { role: "user", content: event.prompt }
+              ] as const)
+            : ([{ role: "user", content: event.prompt }] as const)
+        ) satisfies ChatCompletionMessageParam[];
+        const client = event.apiKey
+          ? this.openai.withOptions({ apiKey: event.apiKey })
+          : this.openai;
+        const stream = (await client.chat.completions.create(
+          {
+            user: userId,
+            top_p: topP,
+            temperature,
+            model,
+            max_completion_tokens: max_tokens,
+            messages,
+            stream: true
+          },
+          { stream: true }
+        )) satisfies AsyncIterable<ChatCompletionChunk>;
+
+        await this.redis.expire(streamKey, 3600);
+
+        for await (const chunk of stream) {
+          const choice = chunk.choices[0];
+          const text = choice?.delta.content;
+          const done = choice?.finish_reason != null;
+
+          if (text) {
+            await this.redis.rPush(streamKey, text);
+            agg += text;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                title,
+                provider,
+                systemPrompt,
+                temperature,
+                topP,
+                model,
+                chunk: text,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+          }
+
+          if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              provider,
+              title,
+              userId,
+              model
+            });
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                provider,
+                systemPrompt,
+                title,
+                temperature,
+                topP,
+                model,
                 chunk: agg,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
@@ -203,10 +509,12 @@ export class Resolver {
         JSON.stringify({
           type: "ai_chat_error",
           provider: provider,
-          conversationId: event.conversationId,
+          conversationId,
+          model,
+          systemPrompt,
           userId,
           done: true,
-          message: err instanceof Error ? err.message : String(err)
+          message: this.safeErrMsg(err)
         } satisfies EventTypeMap["ai_chat_error"])
       );
     }
@@ -250,6 +558,21 @@ export class Resolver {
   }
 
   public EVENT_TYPES = [
+    "api_key_create_error",
+    "api_key_create_request",
+    "api_key_create_response",
+    "api_key_delete_error",
+    "api_key_delete_request",
+    "api_key_delete_response",
+    "api_key_list_error",
+    "api_key_list_request",
+    "api_key_list_response",
+    "api_key_set_default_error",
+    "api_key_set_default_request",
+    "api_key_set_default_response",
+    "api_key_update_error",
+    "api_key_update_request",
+    "api_key_update_response",
     "message",
     "typing",
     "ping",
@@ -291,7 +614,6 @@ export class Resolver {
     }
   }
 
-  /** Handler for typing indicator */
   public async handleTyping(
     event: EventTypeMap["typing"],
     ws: WebSocket,
@@ -300,17 +622,14 @@ export class Resolver {
     this.wsServer.broadcast("typing", { ...event, userId });
   }
 
-  /** Handler for chat messages */
   public async handleMessage(
     event: EventTypeMap["message"],
     ws: WebSocket,
     userId: string
   ): Promise<void> {
-    // Demo: Just echo message to everyone
     this.wsServer.broadcast("message", { ...event, userId });
   }
 
-  /** Handler for ping */
   public async handlePing(
     event: EventTypeMap["ping"],
     ws: WebSocket,
@@ -320,7 +639,6 @@ export class Resolver {
     ws.send(JSON.stringify({ type: "pong", userId }));
   }
 
-  /** Handler for image gen requests */
   public async handleImageGenRequest(
     event: EventTypeMap["image_gen_request"],
     ws: WebSocket,
@@ -345,7 +663,7 @@ export class Resolver {
             conversationId: event.conversationId,
             success: false,
             error: `Image gen failed: ${errorText}`
-          } as EventTypeMap["image_gen_response"])
+          } satisfies EventTypeMap["image_gen_response"])
         );
         return;
       }
@@ -357,7 +675,7 @@ export class Resolver {
           conversationId: event.conversationId,
           imageUrl: url,
           success: true
-        } as EventTypeMap["image_gen_response"])
+        } satisfies EventTypeMap["image_gen_response"])
       );
     } catch (error) {
       ws.send(
@@ -367,12 +685,11 @@ export class Resolver {
           conversationId: event.conversationId,
           success: false,
           error: error instanceof Error ? error.message : String(error)
-        } as EventTypeMap["image_gen_response"])
+        } satisfies EventTypeMap["image_gen_response"])
       );
     }
   }
 
-  /** Handler for asset upload requests */
   public async handleAssetUploadRequest(
     event: EventTypeMap["asset_upload_request"],
     ws: WebSocket,

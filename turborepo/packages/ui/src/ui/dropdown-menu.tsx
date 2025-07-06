@@ -1,11 +1,11 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check } from "@/icons/check";
 import { ChevronRight } from "@/icons/chevron-right";
 import { Circle } from "@/icons/circle";
 import { cn } from "@/lib/utils";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

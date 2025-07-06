@@ -21,7 +21,8 @@
   "css.format.enable": true,
   "css.format.newlineBetweenSelectors": true,
   "files.associations": {
-    "*.css": "tailwindcss"
+    "*.css": "tailwindcss",
+    "*.svg": "svg"
   },
   "css.hover.documentation": true,
   "css.hover.references": true,

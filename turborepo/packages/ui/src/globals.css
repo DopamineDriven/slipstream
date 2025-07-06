@@ -27,7 +27,6 @@
   font-display: swap;
 }
 
-
 @theme {
   --font-cal-sans: CalSans, sans-serif;
   --color-background: oklch(100% 0 0);
@@ -56,7 +55,7 @@
   --color-chart-5: oklch(78.34% 0.1261 58.75);
   --color-hue-0: oklch(0.9434 0.199 105.96);
   --color-hue-1: oklch(0.6477 0.263 359.98);
-  --color-hue-2: oklch(0.6404 0.300 324.36);
+  --color-hue-2: oklch(0.6404 0.3 324.36);
   --color-hue-3: oklch(0.5636 0.292 301.63);
   --color-hue-4: oklch(0.5898 0.211 259.36);
   --color-hue-5: oklch(0.8203 0.141 210.49);
@@ -111,7 +110,6 @@
       opacity: 0.2;
     }
   }
-
 }
 
 @layer theme {
@@ -142,7 +140,7 @@
     --color-chart-5: oklch(61.23% 0.2093 6.386);
     --color-hue-0: oklch(0.9434 0.199 105.96);
     --color-hue-1: oklch(0.6477 0.263 359.98);
-    --color-hue-2: oklch(0.6404 0.300 324.36);
+    --color-hue-2: oklch(0.6404 0.3 324.36);
     --color-hue-3: oklch(0.5636 0.292 301.63);
     --color-hue-4: oklch(0.5898 0.211 259.36);
     --color-hue-5: oklch(0.8203 0.141 210.49);

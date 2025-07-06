@@ -73,7 +73,7 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
-            <ChatWebSocketProvider email={session?.user?.email ?? undefined}>
+            <ChatWebSocketProvider>
               {children}
             </ChatWebSocketProvider>
           </SessionProvider>

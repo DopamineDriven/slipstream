@@ -3,7 +3,7 @@
 import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
 
- interface TextareaProps extends ComponentPropsWithRef<"textarea"> {}
+interface TextareaProps extends ComponentPropsWithRef<"textarea"> {}
 
 const Textarea = ({ ref, className, ...rest }: TextareaProps) => {
   return (

@@ -4,6 +4,8 @@ export type Unenumerate<T> = T extends readonly (infer U)[] | (infer U)[]
   ? U
   : T;
 
+export type Include<T, U> = T extends U ? U : never;
+
 export type UnwrapPromise<T> = T extends Promise<infer U> | PromiseLike<infer U>
   ? U
   : T;
@@ -54,13 +56,9 @@ export type FilterOptionalOrRequired<
   T extends "conditional" | "required"
 > = T extends "conditional" ? OnlyOptional<V> : OnlyRequired<V>;
 
-
-
 /* General Helper Types END */
 
-
 /* Case helper types BEGIN  */
-
 
 /** Convert literal string types like 'foo-bar' to 'FooBar' */
 export type ToPascalCase<S extends string> = string extends S
@@ -76,9 +74,7 @@ export type ToCamelCase<S extends string> = string extends S
     ? `${T}${ToPascalCase<U>}`
     : S;
 
-
 /* Case helper types END  */
-
 
 /* Helper functions BEGIN */
 

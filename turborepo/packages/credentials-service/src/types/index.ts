@@ -35,12 +35,15 @@ export interface CredentialEntity {
   AWS_SECRET_ACCESS_KEY?: string;
   GEMINI_API_KEY?: string;
   GOOGLE_API_KEY?: string;
+  X_AI_KEY?: string;
+  AWS_REGION?: string;
+  AWS_SECRETS_ID?: string;
+  ENCRYPTION_KEY?: string;
+  ANTHROPIC_API_KEY?: string;
 }
-
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"
     ? {
         [P in keyof CredentialEntity]-?: CredentialEntity[P];
       }
     : undefined;
-

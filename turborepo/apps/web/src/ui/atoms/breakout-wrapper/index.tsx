@@ -1,9 +1,9 @@
-import type { FC, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-export const BreakoutWrapper: FC<{ children: ReactNode }> = ({ children }) => {
+export const BreakoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="w-full sm:container sm:mx-auto">
-      <div className="relative right-1/2 left-1/2 -mx-[50vw] w-screen sm:static sm:mx-0 sm:w-full">
+    <div className="w-full">
+      <div className="relative right-1/2 left-1/2 -mx-[50dvw] w-screen sm:static sm:mx-0 sm:w-full sm:max-w-full">
         {children}
       </div>
     </div>

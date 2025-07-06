@@ -1,11 +1,12 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import { cn } from "@/lib/utils";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
-type AvatarProps<T extends "Root" | "Image" | "Fallback"> =
-  ComponentPropsWithRef<(typeof AvatarPrimitive)[T]>;
+type AvatarProps<T extends "Root" | "Image" | "Fallback"> = {
+  [P in T]: ComponentPropsWithRef<(typeof AvatarPrimitive)[P]>;
+}[T];
 
 function Avatar({ className, ref, ...props }: AvatarProps<"Root">) {
   return (

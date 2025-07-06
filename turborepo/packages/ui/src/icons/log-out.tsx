@@ -1,8 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function LogOut({
-  ...svg
-}: BaseSVGProps) {
+export function LogOut({ role="role",...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +10,7 @@ export function LogOut({
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
+      role={role}
       {...svg}>
       <path d="m16 17 5-5-5-5" />
       <path d="M21 12H9" />

@@ -1,13 +1,44 @@
-export function isDecimal<const T extends number | `${number}`>(s: T) {
+
+        export type StripUnderscore<T extends string> =
+  T extends `${infer X}_${infer Y}` ? `${X}${StripUnderscore<Y>}` : T;
+
+export type StripCommas<T extends string> =
+  T extends `${infer X},${infer Y}` ? `${X}${StripCommas<Y>}` : T;
+
+// union of reverse-ordered recursive character stripping
+
+
+export type InferStrip<T> = T extends StripSeparators<infer U> ? U : T;
+export type StripSeparators<T extends string> = StripCommas<StripUnderscore<T>>;
+export const stripSeparators = <const T extends string>(
+  s: T
+): InferStrip<StripSeparators<T>> =>
+  s.replace(/(_|,)/g, "") as InferStrip<StripSeparators<T>>;
+
+
+export function isDecimal<const T extends number | string>(s: T) {
+  const v = typeof s === "string" ? Number.parseInt(s) : s;
+  if (Number.isNaN(v)) throw new Error(`${s} isNaN`);
   if (typeof s === "number") {
-    return /./.test(s.toString(10));
-  } else return /./.test(s);
+    return /\./g.test(s.toPrecision(10));
+  } else {
+    return /\./g.test(s);
+  }
 }
 
-export function toN<const V extends number | `${number}`>(s: V) {
-  return typeof s === "string"
-    ? isDecimal(s) === true
-      ? Number.parseFloat(s)
-      : Number.parseInt(s, 10)
-    : s;
+
+
+export function toN<const V extends (number | string)>(s: V): number {
+  if (typeof s === "string") {
+    const normalize = stripSeparators(s).valueOf();
+    return isDecimal(normalize) ? Number.parseFloat(normalize) : Number.parseInt(normalize);
+  }
+  return s;
 }
+
+export function n<const V extends number | string>(s: V) {
+  const toP = (typeof s === "number" ? s.toPrecision(10) as `${typeof s}` : s) as `${V}` | Exclude<V, number>;
+  return stripSeparators<typeof toP>(toN(toP.valueOf()).toPrecision(10) as `${V}` | Exclude<V, number>)
+}
+
+console.log(n("100_000,025_309.24"))

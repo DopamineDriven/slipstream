@@ -1,0 +1,4 @@
+.env
+src/service/__out__/*
+notes.md
+src/test/__out__/**/*

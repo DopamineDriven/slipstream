@@ -1,16 +1,34 @@
 import { Credentials } from "@t3-chat-clone/credentials";
 import { GoogleGenAI } from "@google/genai";
 
-let gemini: GoogleGenAI;
-export async function getGemini(cred: Credentials) {
-  if (gemini) return gemini;
+/**
+ * Singleton service to manage Gemini (Google GenAI) clients.
+ * Supports a default API key from credentials or per-request overrides.
+ */
+export class GeminiService {
+  private defaultClient: GoogleGenAI | null = null;
+  private defaultApiKey: string | null = null;
 
-  const apiKey = await cred.get("GOOGLE_API_KEY");
+  constructor(private cred: Credentials) {}
 
-  if (!apiKey) throw new Error("Missing GOOGLE_API_KEY!");
+  private async initDefault(): Promise<GoogleGenAI> {
+    if (this.defaultClient && this.defaultApiKey) {
+      return this.defaultClient;
+    }
 
-  gemini = new GoogleGenAI({ apiKey, apiVersion: "v1alpha" });
+    const apiKey = await this.cred.get("GOOGLE_API_KEY");
+    if (!apiKey) {
+      throw new Error("Missing GOOGLE_API_KEY in credentials");
+    }
+    this.defaultApiKey = apiKey;
+    this.defaultClient = new GoogleGenAI({ apiKey, apiVersion: "v1alpha" });
+    return this.defaultClient;
+  }
 
-  return gemini;
+  public async getClient(overrideKey?: string) {
+    if (overrideKey) {
+      return new GoogleGenAI({ apiKey: overrideKey, apiVersion: "v1alpha" });
+    }
+    return await this.initDefault();
+  }
 }
-

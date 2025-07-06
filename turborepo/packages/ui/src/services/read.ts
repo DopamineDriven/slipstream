@@ -68,20 +68,21 @@ class GenConfig extends Fs {
   }
 
   public async writeTypes() {
-   return this.withWs("src/services/__out__/types.json", this.typesWorkup());
+    return this.withWs("src/services/__out__/types.json", this.typesWorkup());
   }
 
   public async writeTsup() {
-   return this.withWs("src/services/__out__/tsup.json", this.tsupWorkup());
+    return this.withWs("src/services/__out__/tsup.json", this.tsupWorkup());
   }
 
   public async writeExports() {
-   return this.withWs("src/services/__out__/exports.json", this.exportsWorkup());
+    return this.withWs(
+      "src/services/__out__/exports.json",
+      this.exportsWorkup()
+    );
   }
 
-  public exe<const T extends "types" | "exports" | "tsup" | "all">(
-    target: T
-  ) {
+  public exe<const T extends "types" | "exports" | "tsup" | "all">(target: T) {
     switch (target) {
       case "exports":
         this.writeExports();
@@ -104,14 +105,11 @@ const gen = new GenConfig(process.cwd());
 if (process.argv[3]) {
   if (process.argv[3] === "exports") {
     gen.exe("exports");
-  }
-   else if (process.argv[3] === "types") {
+  } else if (process.argv[3] === "types") {
     gen.exe("types");
-  }
-   else if (process.argv[3] === "tsup") {
+  } else if (process.argv[3] === "tsup") {
     gen.exe("tsup");
-  }
-  else {
+  } else {
     gen.exe("all");
   }
 }

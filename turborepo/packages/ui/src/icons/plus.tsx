@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function Plus({ ...svg }: BaseSVGProps) {
+export function Plus({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +10,7 @@ export function Plus({ ...svg }: BaseSVGProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
+      role={role}
       {...svg}>
       <path d="M5 12h14" />
       <path d="M12 5v14" />

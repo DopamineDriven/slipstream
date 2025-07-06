@@ -11,7 +11,8 @@ export default [
       "@typescript-eslint/no-misused-promises": "off",
       "prefer-const": "off",
       "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/prefer-regexp-exec": "off"
+      "@typescript-eslint/prefer-regexp-exec": "off",
+      "@typescript-eslint/no-empty-object-type": "off"
     },
     ignores: ["dist/**"]
   }

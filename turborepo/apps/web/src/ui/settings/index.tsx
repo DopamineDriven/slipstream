@@ -29,7 +29,8 @@ import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have th
 import { cn } from "@/lib/utils";
 import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
-import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
+// import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
+import {ApiKeysTab} from "@/ui/api-key-settings";
 import { AttachmentsSettingsSection } from "@/ui/settings/sections/attachment-settings-section";
 import { ContactUsSettingsSection } from "@/ui/settings/sections/contact-us-settings-section";
 import { CustomizationSettingsSection } from "@/ui/settings/sections/customization-settings-section";
@@ -53,7 +54,7 @@ const settingsSectionsConfig = [
     id: "apiKeys",
     title: "API Keys",
     icon: KeyRound,
-    component: ApiKeysSettingsSection,
+    component: ApiKeysTab,
     type: "section"
   },
   {
@@ -479,6 +480,8 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
             <Avatar className="size-10">
               <AvatarImage
                 src={user?.image ?? "/user.svg"}
+                width={24}
+                height={24}
                 alt={user?.name ?? "username"}
                 className="text-brand-text-muted h-8 w-8"
               />

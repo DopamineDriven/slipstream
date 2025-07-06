@@ -1,6 +1,6 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function ShareIcon({ ...svg }: BaseSVGProps) {
+export function ShareIcon({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +10,7 @@ export function ShareIcon({ ...svg }: BaseSVGProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="img"
+      role={role}
       {...svg}>
       <circle cx="18" cy="5" r="3" />
       <circle cx="6" cy="12" r="3" />
