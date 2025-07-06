@@ -95,7 +95,7 @@ const settingsSectionsConfig = [
 ] as const;
 
 const LEFT_COLUMN_WIDTH_DESKTOP = "20dvw";
-const LEFT_COLUMN_WIDTH_COLLAPSED = "w-16"; // approx <5dvw on mobile, e.g. 64px
+const LEFT_COLUMN_WIDTH_COLLAPSED = "5dvw"; // approx <5dvw on mobile, e.g. 64px
 const RIGHT_COLUMN_WIDTH_DESKTOP = "w-20"; // approx 80px
 const TOTAL_SECTIONS = settingsSectionsConfig.length; // 7
 const PERIPHERAL_TRANSITION_PERCENT = 0.05; // 5% buffer zones
@@ -343,7 +343,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
             key="left-sidebar"
             initial={{
               width: styleMemo.widthInitial,
-              "--left-sidebar-width": LEFT_COLUMN_WIDTH_DESKTOP
+              "--left-sidebar-width": LEFT_COLUMN_WIDTH_COLLAPSED
             }}
             animate={{
               width: styleMemo.widthAnimation,
@@ -352,10 +352,10 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 sm:p-4",
+              "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 sm:p-4 transition-all ease-in-out",
               isSmallScreen ? "fixed" : "relative", // Fixed on small screens to overlay
               isLeftSidebarEffectivelyCollapsed
-                ? LEFT_COLUMN_WIDTH_COLLAPSED
+                ? "w-[5dvw]"
                 : "w-[20dvw]"
             )}>
             <div
@@ -397,7 +397,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
                 "border-brand-border mt-auto border-t pt-4",
                 isLeftSidebarEffectivelyCollapsed ? "flex justify-center" : ""
               )}>
-              <Avatar className="h-10 w-10">
+              <Avatar className="size-10">
                 <AvatarImage
                   src={user?.image ?? "/user.svg?width=40&height=40&query=AR"}
                   alt={user?.name ?? "username"}
@@ -422,18 +422,11 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
       {/* Center Content Column */}
       <div
         className={cn(
-          "flex flex-1 flex-col overflow-hidden",
-          // Apply margin only if not small screen and corresponding sidebar is visible/expanded
-          !isSmallScreen && !isLeftSidebarManuallyCollapsed && "ml-[20dvw]",
-          !isSmallScreen && isLeftSidebarManuallyCollapsed && `ml-16`,
-          !isSmallScreen && `mr-20` // Right sidebar margin for desktop
+          "flex flex-1 flex-col overflow-hidden sm:mx-[5dvw] sm:max-w-[60dvw]"
         )}>
         {/* Header for mobile */}
         {isSmallScreen && (
           <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 items-center justify-between border-b p-3">
-            <div className="flex-1">
-              {/* Empty div to push title to center if needed or for menu button */}{" "}
-            </div>
             <h1 className="text-brand-text-emphasis flex-1 text-center text-lg font-semibold">
               {activeSectionTitle}
             </h1>
@@ -445,7 +438,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
 
         <main
           ref={scrollContainerRef}
-          className="relative flex-1 space-y-8 overflow-y-auto p-4 sm:space-y-10 sm:p-6 md:p-8">
+          className="relative flex-1 space-y-8 overflow-y-auto p-2 sm:space-y-10 sm:p-6 md:p-8">
           {settingsSectionsConfig.map(section => {
             const SectionComponent = section.component;
             return (
@@ -454,7 +447,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
                 id={section.id}
                 ref={createSectionRef(section.id)}
                 // Conditional padding/margin for sections
-                className="min-h-[80vh] scroll-mt-8 pt-8 pb-12">
+                className="min-h-fit py-8">
                 <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
                   {section.title}
                 </h2>
