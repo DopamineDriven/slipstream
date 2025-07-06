@@ -1,11 +1,19 @@
 "use client";
 
-import type { FormEvent as ReactFormEvent } from "react";
+import type { Providers as Provider } from "@/types/chat-ws";
+import type {
+  ComponentPropsWithRef,
+  JSX,
+  FormEvent as ReactFormEvent
+} from "react";
 import { useState } from "react";
-import Image from "next/image";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
 import { cn } from "@/lib/utils";
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
+import { AnthropicIcon } from "@/ui/icons/anthropic";
+import { GeminiIcon } from "@/ui/icons/gemini";
+import { OpenAiIcon } from "@/ui/icons/openai";
+import { XAiIcon } from "@/ui/icons/x-ai";
 import { AnimatePresence, motion } from "motion/react";
 import {
   AlertDialog,
@@ -41,12 +49,15 @@ interface ApiKeysTabProps {
   className?: string;
 }
 
-type Provider = "anthropic" | "gemini" | "grok" | "openai";
-
 interface ApiKeyData {
   provider: Provider;
   text: string;
-  icon: string;
+  icon: ({
+    ...svg
+  }: Omit<
+    ComponentPropsWithRef<"svg">,
+    "viewBox" | "fill" | "xmlns" | "role"
+  >) => JSX.Element;
   value?: string;
   isSet?: boolean;
   isDefault?: boolean;
@@ -55,37 +66,42 @@ interface ApiKeyData {
 const providerObj = [
   {
     provider: "anthropic",
-    text: "Anthropic API Key",
-    icon: "/claude-ai-icon.svg",
+    text: "Anthropic",
+    icon: AnthropicIcon,
     value: "sk-ant-*******************************************",
     isSet: true,
     isDefault: false
   },
   {
     provider: "gemini",
-    text: "Gemini API Key",
-    icon: "/google-gemini-icon.svg",
+    text: "Gemini",
+    icon: GeminiIcon,
     value: "AIza********************",
     isSet: false,
     isDefault: false
   },
   {
     provider: "grok",
-    text: "Grok API Key",
-    icon: "/grok-icon.svg",
+    text: "Grok",
+    icon: XAiIcon,
     value: "xai-*******************************************",
     isSet: true,
     isDefault: false
   },
   {
     provider: "openai",
-    text: "OpenAI API Key",
-    icon: "/chatgpt-icon.svg",
+    text: "OpenAI",
+    icon: OpenAiIcon,
     value: "sk-************************************************",
     isSet: true,
     isDefault: true
   }
 ] satisfies ApiKeyData[];
+
+const CARD_HEADER_TEXT =
+  "Bring your own API keys for expanded model support. This allows for substantially higher usage limits and access to premium models.";
+const CARD_FOOTER_TEXT =
+  "API keys are encrypted at rest and are only used to communicate with respective model providers in secure server contexts.";
 
 export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
   // State for managing API keys
@@ -365,17 +381,16 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={cn("mx-auto max-w-4xl", className)}>
-        <Card className="bg-brand-component border-brand-border text-brand-text mx-4 sm:mx-0">
-          <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-brand-text-emphasis">API Keys</CardTitle>
-            <CardDescription className="text-brand-text-muted">
-              Bring your own API keys for select models. This allows for higher
-              usage limits and access to specific model versions.
+        className={cn("w-full", className)}>
+        <Card className="bg-brand-component border-brand-border text-brand-text mx-auto w-full max-w-full overflow-hidden sm:mx-0">
+          <CardHeader>
+            <CardTitle className="text-brand-text-emphasis">BYOK</CardTitle>
+            <CardDescription className="text-brand-text-muted text-xs tracking-tight sm:text-sm">
+              {CARD_HEADER_TEXT}
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-6 px-4 sm:px-6">
+          <CardContent className="space-y-6">
             <AnimatePresence mode="popLayout">
               {apiKeys.map(keyData => (
                 <motion.div
@@ -386,12 +401,9 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
                   transition={{ duration: 0.3 }}
                   className="space-y-3">
                   <div className="flex items-center space-x-2">
-                    <Image
-                      src={keyData.icon ?? "/placeholder.svg"}
-                      alt={`${keyData.provider} icon`}
-                      width={24}
-                      height={24}
-                      className="h-5 w-5 flex-shrink-0"
+                    <keyData.icon
+                      aria-description={keyData.provider + ` icon`}
+                      className="mr-3 size-6 flex-shrink-0"
                     />
                     <label
                       htmlFor={`${keyData.provider}-key`}
@@ -630,16 +642,13 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
                       key={provider.provider}
                       variant="outline"
                       onClick={() => addProvider(provider.provider)}
-                      className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-[56px] justify-start px-4 py-4">
-                      <Image
-                        src={provider.icon || "/placeholder.svg"}
-                        alt={`${provider.provider} icon`}
-                        width={24}
-                        height={24}
-                        className="mr-3 h-5 w-5 flex-shrink-0"
+                      className="bg-brand-sidebar space-x-1.5 border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-[56px] justify-start">
+                      <provider.icon
+                        aria-description={provider.provider + ` icon`}
+                        className="size-6 flex-shrink-0"
                       />
                       <span className="text-left text-sm">
-                        Add {provider.text}
+                        {provider.text}
                       </span>
                     </Button>
                   ))}
@@ -656,9 +665,8 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
             )}
           </CardContent>
 
-          <CardFooter className="text-brand-text-muted px-4 text-xs sm:px-6">
-            Your API keys are stored securely and only used to communicate with
-            the respective model providers.
+          <CardFooter className="text-brand-text-muted text-xs tracking-tight">
+            {CARD_FOOTER_TEXT}
           </CardFooter>
         </Card>
       </motion.div>

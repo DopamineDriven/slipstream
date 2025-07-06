@@ -4,3 +4,5 @@ ws-server-taskdef.json
 python-service-taskdef.json
 remote/**/*.json
 inspect/**/*
+schema-taskdef.json
+notes.md

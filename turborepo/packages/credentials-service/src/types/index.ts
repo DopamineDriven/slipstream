@@ -40,7 +40,7 @@ export interface CredentialEntity {
   AWS_SECRETS_ID?: string;
   ENCRYPTION_KEY?: string;
   ANTHROPIC_API_KEY?: string;
-} 
+}
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"
     ? {
