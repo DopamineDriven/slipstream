@@ -422,7 +422,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
       {/* Center Content Column */}
       <div
         className={cn(
-          "flex flex-1 flex-col overflow-hidden sm:mx-[5dvw] sm:max-w-[60dvw]"
+          "flex flex-1 flex-col overflow-hidden sm:mx-[5dvw] sm:max-w-full"
         )}>
         {/* Header for mobile */}
         {isSmallScreen && (
@@ -438,7 +438,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
 
         <main
           ref={scrollContainerRef}
-          className="relative flex-1 space-y-8 overflow-y-auto p-2 sm:space-y-10 sm:p-6 md:p-8">
+          className="relative flex-1 space-y-8 overflow-y-auto p-2 sm:space-y-10 sm:p-6 mx-auto sm:max-w-8xl">
           {settingsSectionsConfig.map(section => {
             const SectionComponent = section.component;
             return (
