@@ -47,6 +47,7 @@ export { PanelRightClose } from "@/icons/panel-right-close";
 export { Paperclip } from "@/icons/paperclip";
 export { PenLine } from "@/icons/pen-line";
 export { Plus } from "@/icons/plus";
+export { QuestionMark } from "@/icons/question-mark";
 export { Save } from "@/icons/save";
 export { Search } from "@/icons/search";
 export { Send } from "@/icons/send";

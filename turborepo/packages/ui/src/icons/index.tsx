@@ -45,6 +45,7 @@ import { PanelRightClose } from "@/icons/panel-right-close";
 import { Paperclip } from "@/icons/paperclip";
 import { PenLine } from "@/icons/pen-line";
 import { Plus } from "@/icons/plus";
+import { QuestionMark } from "@/icons/question-mark";
 import { Save } from "@/icons/save";
 import { Search } from "@/icons/search";
 import { Send } from "@/icons/send";
@@ -105,6 +106,7 @@ const IconComponents = {
   Paperclip,
   PenLine,
   Plus,
+  QuestionMark,
   Save,
   Search,
   Send,
@@ -199,6 +201,7 @@ export {
   Paperclip,
   PenLine,
   Plus,
+  QuestionMark,
   Save,
   Search,
   Send,

@@ -457,6 +457,7 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
                             <Button
                               type="button"
                               variant="ghost"
+                              asChild
                               size="sm"
                               onClick={() => toggleVisibility(keyData.provider)}
                               className="hover:bg-brand-primary/20 h-8 w-8 p-0">
