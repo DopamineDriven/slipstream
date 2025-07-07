@@ -1,15 +1,21 @@
 "use client";
 
-import type React from "react";
-import { Button, Icon, Textarea } from "@t3-chat-clone/ui";
-import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
-import { User } from "next-auth";
 import type { Message } from "@/types/ui";
+import type { User } from "next-auth";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { processMarkdownToReact } from "@/lib/processor";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/ui/atoms/avatar";
+import { motion } from "motion/react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Icon,
+  Textarea
+} from "@t3-chat-clone/ui";
 
 interface ChatMessageProps {
   message: Message;
@@ -25,20 +31,25 @@ export function ChatMessage({
   user
 }: ChatMessageProps) {
   const isUser = message.sender === "user";
-  const [renderedContent, setRenderedContent] = useState<React.ReactNode>(
+  const [renderedContent, setRenderedContent] = useState<ReactNode>(
     typeof message.text === "string"
       ? message.text.substring(0, 50) + "..."
       : "Loading content..."
   );
   const [isEditing, setIsEditing] = useState(message.isEditing ?? false);
-  const [editText, setEditText] = useState(
-    typeof message.originalText === "string"
-      ? message.originalText
-      : typeof message.text === "string"
-        ? message.text
-        : ""
-  );
-  // Removed showUserActions and showAiCopyButton states, will rely on group-hover
+
+  const messageMemo = useMemo(() => {
+    const ogText = message.originalText;
+    const textRevision = message.text;
+
+    return typeof ogText === "string"
+      ? ogText
+      : typeof textRevision === "string"
+        ? textRevision
+        : "";
+  }, [message.originalText, message.text]);
+
+  const [editText, setEditText] = useState(messageMemo);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -104,15 +115,13 @@ export function ChatMessage({
         `group relative flex items-start space-x-2 py-3 sm:space-x-3`, // Ensure group class is here
         isUser ? "justify-end" : "",
         className
-      )}
-      // Removed onMouseEnter and onMouseLeave handlers
-    >
+      )}>
       {!isUser && (
         <>
           <Avatar className="h-7 w-7 shrink-0 sm:h-8 sm:w-8">
             {message.avatar ? (
               <AvatarImage
-                src={message.avatar || "/placeholder.svg"}
+                src={message.avatar ?? "/placeholder.svg"}
                 alt="AI Avatar"
               />
             ) : (
@@ -127,7 +136,6 @@ export function ChatMessage({
             <div className="text-brand-text-muted/80 mt-1.5 flex items-center justify-between text-xs">
               <span className="flex-grow">
                 {" "}
-                {/* Allow timestamp to take available space */}
                 {message.timestamp} {message.model && `· ${message.model}`}
               </span>
               <AnimatedCopyButton
@@ -151,7 +159,7 @@ export function ChatMessage({
       {isUser && (
         <>
           <div className="relative flex items-center">
-            {!isEditing && ( // Actions only visible when not editing
+            {!isEditing && (
               <div className="absolute top-1/2 right-full z-10 mr-2 flex -translate-y-1/2 items-center space-x-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
                 <Button
                   variant="ghost"

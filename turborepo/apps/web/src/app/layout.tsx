@@ -68,7 +68,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-cal-sans min-h-screen antialiased",
+          "bg-background font-basis min-h-screen antialiased",
           inter.variable
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>

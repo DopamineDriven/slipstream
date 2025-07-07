@@ -1,10 +1,14 @@
 "use client";
 
+import type { ChatThread } from "@/types/ui";
 import type { User } from "next-auth";
+import Image from "next/image";
+import Link from "next/link";
+import { mockChatThreads } from "@/lib/mock";
+import { shimmer } from "@/lib/shimmer";
+import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   ChevronDown,
   CirclePlus,
@@ -21,11 +25,6 @@ import {
   Search,
   Settings
 } from "@t3-chat-clone/ui";
-import Link from "next/link";
-import { motion } from "motion/react";
-import type { ChatThread } from "@/types/ui";
-import { mockChatThreads } from "@/lib/mock";
-import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   chatThreads?: ChatThread[];
@@ -118,25 +117,29 @@ export function Sidebar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="hover:bg-brand-component w-full items-center justify-between p-2">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
+              className="hover:bg-brand-component w-full items-center justify-between">
+              <div className="group block shrink-0 p-2">
+                <div className="flex items-center select-none">
+                  <Image
+                    className="inline-block size-10 rounded-full"
                     src={userProfile?.image ?? "/placeholder.svg"}
                     alt={userProfile?.name ?? "user image"}
+                    width={36}
+                    height={36}
+                    placeholder="blur"
+                    blurDataURL={shimmer([36, 36])}
                   />
-                  <AvatarFallback>
-                    {userProfile?.name?.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-left">
-                  <p className="text-brand-text text-sm font-medium">
-                    {userProfile?.name}
-                  </p>
-                  <p className="text-brand-text-muted text-xs">{"Free"} Plan</p>
+                  <div className="ml-2.5 inline-block align-middle">
+                    <p className="text-foreground text-sm leading-snug font-normal">
+                      {userProfile?.name ?? "Username"}
+                    </p>
+                    <p className="text-secondary-foreground text-xs leading-snug">
+                      {userProfile?.email ?? "user@email.com"}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <ChevronDown className="text-brand-text-muted h-4 w-4" />
+              <ChevronDown className="text-secondary-foreground size-4 sm:size-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
