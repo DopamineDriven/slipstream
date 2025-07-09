@@ -1,16 +1,16 @@
 "use client";
 
-import { Button, Icon } from "@t3-chat-clone/ui";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/atoms/popover";
+import { Button, Camera, FileText, ImageIcon, Plus } from "@t3-chat-clone/ui";
 
 interface AttachmentPopoverProps {
   onSelectAttachment: (type: "file" | "camera" | "photo") => void;
 }
 
 const attachmentOptions = [
-  { id: "file", label: "Files", icon: Icon.FileText },
-  { id: "camera", label: "Camera", icon: Icon.Camera },
-  { id: "photo", label: "Photos", icon: Icon.ImageIcon }
+  { id: "file", label: "Files", icon: FileText },
+  { id: "camera", label: "Camera", icon: Camera },
+  { id: "photo", label: "Photos", icon: ImageIcon }
 ];
 
 export function AttachmentPopover({
@@ -23,7 +23,7 @@ export function AttachmentPopover({
           variant="ghost"
           size="icon"
           className="text-brand-text-muted hover:text-brand-text hover:bg-brand-sidebar h-8 w-8 sm:h-auto sm:w-auto">
-          <Icon.Plus className="h-5 w-5" />
+          <Plus className="size-5" />
           <span className="sr-only">Attach</span>
         </Button>
       </PopoverTrigger>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Icon } from "@t3-chat-clone/ui";
+import { Button, Sun, Moon } from "@t3-chat-clone/ui";
 import { useEffect, useState } from "react";
 import type { ComponentPropsWithRef } from "react";
 import { useTheme } from "next-themes";
@@ -43,9 +43,9 @@ export function ThemeToggle({
           borderRadius: "0.375rem"
         }}>
         {prefersDark ? (
-          <Icon.Moon className="size-5" />
+          <Moon className="size-5" />
         ) : (
-          <Icon.Sun className="size-5" />
+          <Sun className="size-5" />
         )}
         <span
           style={{
@@ -84,9 +84,9 @@ export function ThemeToggle({
         borderRadius: "0.375rem"
       }}>
       {resolvedTheme === "dark" ? (
-        <Icon.Moon className="size-5" />
+        <Moon className="size-5" />
       ) : (
-        <Icon.Sun className="size-5" />
+        <Sun className="size-5" />
       )}
       <span
         style={{

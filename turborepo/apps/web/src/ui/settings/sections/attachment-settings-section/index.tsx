@@ -8,10 +8,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Input
+  Input,
+  Label,
+  Switch
 } from "@t3-chat-clone/ui";
-import { Label } from "@/ui/atoms/label";
-import { Switch } from "@/ui/atoms/switch";
 
 export function AttachmentsSettingsSection({ user }: { user?: User }) {
   return (

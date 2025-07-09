@@ -4,12 +4,13 @@ import {
   Card,
   CardContent,
   CardDescription,
+  Label,
+  Switch,
   CardHeader,
   CardTitle
 } from "@t3-chat-clone/ui";
 import dynamic from "next/dynamic";
-import { Label } from "@/ui/atoms/label";
-import { Switch } from "@/ui/atoms/switch";
+
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),

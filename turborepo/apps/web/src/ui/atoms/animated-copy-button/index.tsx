@@ -1,7 +1,7 @@
 "use client";
 
 import type { ButtonProps } from "@t3-chat-clone/ui";
-import { Button, Icon } from "@t3-chat-clone/ui";
+import { Button, Copy } from "@t3-chat-clone/ui";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,7 @@ export function AnimatedCopyButton({
             : { opacity: 0, scale: 0.8, y: -5, pointerEvents: "none" }
         }
         transition={{ duration: 0.2, ease: "easeOut" }}>
-        <Icon.Copy className="size-3.5" />
+        <Copy className="size-3.5" />
       </motion.div>
       <motion.div
         className={iconContainerClasses}
