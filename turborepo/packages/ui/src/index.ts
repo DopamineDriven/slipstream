@@ -1,8 +1,8 @@
 import "./globals.css";
 
 // icons
-export { Icon } from "@/icons";
-export type { BaseSVGProps, IconName } from "@/icons";
+export { Icon } from "@/icons/index";
+export type { BaseSVGProps, IconName } from "@/icons/index";
 export { ArrowDownCircle } from "@/icons/arrow-down-circle";
 export { ArrowLeft } from "@/icons/arrow-left";
 export { ArrowRight } from "@/icons/arrow-right";
@@ -25,6 +25,7 @@ export { EyeOff } from "@/icons/eye-off";
 export { Eye } from "@/icons/eye";
 export { FileText } from "@/icons/file-text";
 export { Github } from "@/icons/github";
+export { GripVertical } from "@/icons/grip-vertical";
 export { History } from "@/icons/history";
 export { ImageIcon } from "@/icons/image-icon";
 export { KeyRound } from "@/icons/key-round";

@@ -1,7 +1,7 @@
 {
-  "name": "@t3-chat-clone/redis-service",
+  "name": "@t3-chat-clone/key-validator",
   "version": "1.0.0",
-  "description": "convenient redis util",
+  "description": "convenient key-validator util",
   "publishConfig": {
     "access": "public",
     "typesVersions": {
@@ -10,10 +10,12 @@
           "dist/*.d.ts",
           "dist/*/index.d.ts"
         ],
-        "redis": [
-          "dist/service/index.d.ts"
+        "http": [
+          "dist/http/index.d.ts"
         ],
-        "types": ["dist/service/types.d.ts"]
+        "types": [
+          "dist/types/index.d.ts"
+        ]
       }
     }
   },
@@ -25,10 +27,12 @@
         "dist/*.d.ts",
         "dist/*/index.d.ts"
       ],
-      "redis": [
-        "dist/service/index.d.ts"
+      "http": [
+        "dist/http/index.d.ts"
       ],
-      "types": ["dist/service/types.d.ts"]
+      "types": [
+        "dist/types/index.d.ts"
+      ]
     }
   },
   "type": "module",
@@ -41,8 +45,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./*": "./dist/*.js",
-    "./redis": "./dist/service/index.js",
-    "./types": "./dist/service/types.js"
+    "./http": "./dist/http/index.js",
+    "./types": "./dist/types/index.js"
   },
   "scripts": {
     "build": "tsup",
@@ -52,18 +56,13 @@
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache",
     "fix": "npm pkg fix"
   },
-  "dependencies": {
-    "dotenv": "^17.1.0",
-    "dotenv-expand": "^12.0.2",
-    "redis": "^5.6.0"
-  },
   "devDependencies": {
+    "@d0paminedriven/fs": "^6.1.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
     "@types/node": "^24.0.11",
     "chokidar": "^4.0.3",
-    "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.1",
     "jiti": "^2.4.2",
     "prettier": "^3.6.2",

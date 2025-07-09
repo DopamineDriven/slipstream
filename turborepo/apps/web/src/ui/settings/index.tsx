@@ -37,6 +37,7 @@ import { CustomizationSettingsSection } from "@/ui/settings/sections/customizati
 import { HistorySettingsSection } from "@/ui/settings/sections/history-settings-section";
 import { ModelsSettingsSection } from "@/ui/settings/sections/models-settings-section";
 import { SettingsNavigation } from "@/ui/settings/settings-navigation";
+import { ClientWorkupProps } from "@/types/shared";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -113,7 +114,7 @@ const SECTION_TITLES = {
 
 type SectionId = keyof typeof SECTION_TITLES;
 
-export default function SettingsScaffold({ user }: { user?: UserProps }) {
+export default function SettingsScaffold({ user, initialData }: { user?: UserProps;   initialData?: ClientWorkupProps }) {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
@@ -451,7 +452,7 @@ export default function SettingsScaffold({ user }: { user?: UserProps }) {
                 <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
                   {section.title}
                 </h2>
-                <SectionComponent user={user} />
+                {section.title === "API Keys" ? <SectionComponent user={user} initialData={initialData} />  : <SectionComponent user={user} />}
               </div>
             );
           })}
