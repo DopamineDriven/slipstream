@@ -5,7 +5,7 @@ import type {
   UserData
 } from "@/types/index.ts";
 import type { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
-import { PrismaClient } from "@/generated/client/client.ts";
+import { PrismaClient, UserKey } from "@/generated/client/client.ts";
 import { Provider, SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -14,6 +14,23 @@ import type { EncryptedPayload } from "@t3-chat-clone/encryption";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 
 dotenv.config();
+
+export type ProviderCountsProps = {
+  openai: number;
+  grok: number;
+  gemini: number;
+  anthropic: number;
+};
+
+export type RecordCountsProps = {
+  isSet: ProviderCountsProps;
+  isDefault: ProviderCountsProps;
+};
+
+export type ClientWorkupProps = {
+  isSet: Record<Lowercase<keyof typeof Provider>, boolean>;
+  isDefault: Record<Lowercase<keyof typeof Provider>, boolean>;
+};
 
 export const prismaClient = new PrismaClient().$extends(withAccelerate());
 
@@ -204,5 +221,52 @@ export class PrismaService extends ModelService {
         title: data.title
       }
     });
+  }
+  public formatProps(props: RecordCountsProps) {
+    const isDefault = Object.fromEntries(
+      Object.entries(props.isDefault).map(([t, o]) => {
+        return [
+          t as Lowercase<keyof typeof Provider>,
+          o === 0 ? false : true
+        ] as const;
+      })
+    );
+    const isSet = Object.fromEntries(
+      Object.entries(props.isSet).map(([t, o]) => {
+        return [
+          t as Lowercase<keyof typeof Provider>,
+          o === 0 ? false : true
+        ] as const;
+      })
+    );
+    return { isSet, isDefault } as ClientWorkupProps;
+  }
+  public handleExistingKeysForClient(props: UserKey[]) {
+    const initialProps = {
+      isSet: {
+        openai: 0,
+        grok: 0,
+        gemini: 0,
+        anthropic: 0
+      },
+      isDefault: { openai: 0, grok: 0, gemini: 0, anthropic: 0 }
+    };
+    props.forEach(function (res) {
+      const provider = res.provider.toLowerCase() as Lowercase<
+        keyof typeof Provider
+      >;
+      const isDefault = res.isDefault;
+      initialProps.isSet[provider] += 1;
+      initialProps.isDefault[provider] += isDefault ? 1 : 0;
+    });
+    return this.formatProps(initialProps);
+  }
+
+  public async getClientApiKeys(userId: string) {
+    const data = await this.prismaClient.userKey.findMany({
+      where: { userId }
+    });
+    console.log(data);
+    return this.handleExistingKeysForClient(data);
   }
 }
