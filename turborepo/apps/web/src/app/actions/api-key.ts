@@ -31,7 +31,7 @@ export async function upsertApiKey(formdata: FormData) {
   const validator = new KeyValidator(getKey, getProvider as Providers);
   const { isValid, message } = await validator.validateProvider();
   if (getProvider && typeof getProvider === "string" && userId && isValid) {
-    const cryptService = new EncryptionService();
+    const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
     const { authTag, data, iv } = await cryptService.encryptText(getKey);
     const createUserKey = await prismaClient.userKey.upsert({
       create: {

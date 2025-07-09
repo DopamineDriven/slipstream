@@ -10,14 +10,15 @@ export class EncryptionService {
   #IV_LENGTH = 16;
   #creds: Credentials;
   #masterKey?: Buffer;
-  constructor() {
+  constructor(private encryptionKey = process.env.ENCRYPTION_KEY) {
     this.#creds = new Credentials();
   }
 
   private async getMasterKey() {
     // look in memory before fetching ENCRYPTION_KEY from aws secrets manager
     if (!this.#masterKey) {
-      const encryptionKey = await this.#creds.get("ENCRYPTION_KEY");
+      const encryptionKey =
+        this.encryptionKey ?? (await this.#creds.get("ENCRYPTION_KEY"));
 
       if (encryptionKey.length < 64) throw new Error("Invalid ENCRYPTION_KEY");
 

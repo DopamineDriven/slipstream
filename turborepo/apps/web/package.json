@@ -23,6 +23,7 @@
     "output:md": "tsx src/utils/to-md.ts --target root false"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.840.0",
     "@auth/core": "^0.40.0",
     "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.11.1",
