@@ -13,3 +13,5 @@ declare global {
 export const prismaClient = globalThis.prisma ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== "production") globalThis.prisma = prismaClient;
+
+export type PrismaClientWithAccelerate = typeof prismaClient;

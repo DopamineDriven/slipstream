@@ -133,7 +133,7 @@ export const {
       if (session.user && token.userId) {
         session.user.id = token.userId;
         session.userId = session.user.id;
-      } // next auth has a gross Date & string cast for the expires field...impossible for that to ever happen, so we have to cast
+      }
       session.expires = new Date(
         token.expires_at * 1000
       ).toISOString() as unknown as Date & string;

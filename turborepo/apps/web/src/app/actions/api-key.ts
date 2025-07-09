@@ -70,13 +70,18 @@ export async function upsertApiKey(formdata: FormData) {
  * they verify what they wanted to verify, they'll just click cancel or done (depending on available ui options).
  * THIS action handles those scenarios if an actual edit does happen, the `upsertApiKey` action will be triggered
  */
+
+const decryptMapper = new Map<Providers, string | undefined>();
 export async function getDecryptedApiKeyOnEdit(
   provider: Providers
 ): Promise<string> {
-  const cryptService = new EncryptionService();
+  const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
   const authData = await auth();
   const userId = authData?.user?.id;
-  if (!userId) throw new Error("unauthorized");
+  if (!userId) {
+    decryptMapper.clear();
+    throw new Error("unauthorized");
+  }
   const rec = await prismaClient.userKey.findUnique({
     where: { userId_provider: { userId, provider: toPrismaFormat(provider) } }
   });
@@ -84,12 +89,20 @@ export async function getDecryptedApiKeyOnEdit(
     throw new Error(`No API key configured for ${provider}!`);
   }
   try {
-    revalidatePath("/settings");
-    return await cryptService.decryptText({
+    const hasKey = decryptMapper.get(provider);
+    if (typeof hasKey !== "undefined") {
+      revalidatePath("/settings");
+      return hasKey;
+    }
+
+    const decrypted = await cryptService.decryptText({
       authTag: rec.authTag,
       data: rec.apiKey,
       iv: rec.iv
     });
+    decryptMapper.set(provider, decrypted);
+    revalidatePath("/settings");
+    return decrypted;
   } catch (err) {
     if (err instanceof Error) {
       console.error(`Decryption failed for: ${provider}, ` + err.message);
