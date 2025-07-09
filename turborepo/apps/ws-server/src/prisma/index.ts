@@ -4,10 +4,10 @@ import type {
   AIChatResponse,
   UserData
 } from "@/types/index.ts";
+import type { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
 import { PrismaClient } from "@/generated/client/client.ts";
 import { Provider, SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
-import { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import * as dotenv from "dotenv";
 import type { EncryptedPayload } from "@t3-chat-clone/encryption";
@@ -99,7 +99,6 @@ export class PrismaService extends ModelService {
     let encryptedPayload: EncryptedPayload | null = null;
     try {
       if (data.provider) {
-
         const prismaProvider = this.providerToPrismaFormat(
           data.provider
         ) satisfies keyof typeof Provider;
@@ -207,22 +206,3 @@ export class PrismaService extends ModelService {
     });
   }
 }
-
-// const p = new PrismaService(prismaClient);
-
-// p.handleAiChatRequest({
-//   conversationId: "new-chat",
-//   prompt: "why is the sky blue?",
-//   type: "ai_chat_request",
-//   provider: "openai",
-//   model: "gpt-4.1-nano",
-//   userId: "x1sa9esbc7nb1bbhnn5uy9ct"
-// }).then(data => {
-//   // conversationId that we can inject into the chunk event immediately for client context
-//   data.id;
-// });
-
-// p.getAndValidateUserSessionByEmail("andrew@windycitydevs.io").then(res => {
-//   console.log(res);
-//   return res;
-// });

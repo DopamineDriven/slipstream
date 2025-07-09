@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
-import { default as SettingsPage } from "@/ui/settings";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { getClientApiKeys } from "@/orm/handle-keys";
+import { default as SettingsPage } from "@/ui/settings";
 
 export const metadata = {
   title: "settings"
@@ -9,10 +10,11 @@ export const metadata = {
 
 export default async function Settings() {
   const session = await auth();
-  if (!session) return redirect("/api/auth/signin");
+  if (!session?.user) return redirect("/api/auth/signin");
+  const keyData = await getClientApiKeys(session.user.id);
   return (
     <Suspense fallback={"Loading..."}>
-      <SettingsPage user={session?.user} />
+      <SettingsPage user={session?.user} initialData={keyData} />
     </Suspense>
   );
 }

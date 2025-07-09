@@ -15,7 +15,8 @@ export default [
       "import/consistent-type-specifier-style": "off",
       "@typescript-eslint/no-floating-promises": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/prefer-regexp-exec": "off"
+      "@typescript-eslint/prefer-regexp-exec": "off",
+      "@typescript-eslint/no-unused-vars": "warn"
     }
   }
 ];

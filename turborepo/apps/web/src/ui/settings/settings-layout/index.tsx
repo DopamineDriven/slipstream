@@ -1,18 +1,27 @@
 "use client";
 
-import { Card, Icon } from "@t3-chat-clone/ui";
-import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
+import { motion } from "motion/react";
+import {
+  Bot,
+  Card,
+  History,
+  KeyRound,
+  MessageCircleQuestion,
+  Palette,
+  Paperclip,
+  User as UserIcon
+} from "@t3-chat-clone/ui";
 
 const settingsTabs = [
-  { value: "account", label: "Account", icon: Icon.User },
-  { value: "customization", label: "Customization", icon: Icon.Palette },
-  { value: "history", label: "History & Sync", icon: Icon.History },
-  { value: "models", label: "Models", icon: Icon.KeyRound },
-  { value: "apiKeys", label: "API Keys", icon: Icon.KeyRound },
-  { value: "attachments", label: "Attachments", icon: Icon.Paperclip },
-  { value: "contactUs", label: "Contact Us", icon: Icon.MessageCircleQuestion }
+  { value: "account", label: "Account", icon: UserIcon },
+  { value: "customization", label: "Customization", icon: Palette },
+  { value: "history", label: "History & Sync", icon: History },
+  { value: "models", label: "Models", icon: Bot },
+  { value: "apiKeys", label: "API Keys", icon: KeyRound },
+  { value: "attachments", label: "Attachments", icon: Paperclip },
+  { value: "contactUs", label: "Contact Us", icon: MessageCircleQuestion }
 ];
 
 interface SettingsLayoutProps {

@@ -1,16 +1,12 @@
 "use client";
 
+import type { Message, Model } from "@/types/ui";
 import type { User } from "next-auth";
-import { Button, Icon } from "@t3-chat-clone/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-// import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
-import { useTheme } from "next-themes";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import type { Message, Model } from "@/types/ui";
+// import { useAiChat } from "@/hooks/use-ai-chat";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   availableModels,
@@ -24,8 +20,18 @@ import { MessageInputBar } from "@/ui/message-input-bar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { Sidebar } from "@/ui/sidebar";
-// import { useAiChat } from "@/hooks/use-ai-chat";
-
+import { AnimatePresence, motion } from "motion/react";
+import { useTheme } from "next-themes";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import {
+  ArrowDownCircle,
+  Button,
+  ChevronDown,
+  PanelLeftClose,
+  PanelRightClose,
+  Settings,
+  ShareIcon
+} from "@t3-chat-clone/ui";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -35,6 +41,14 @@ const ThemeToggle = dynamic(
 const SCROLL_THRESHOLD = 100;
 
 export function ChatPage({ user }: { user?: User }) {
+  // const {
+  //   isConnected,
+  //   streamedText,
+  //   messages: aiMessages,
+  //   error,
+  //   isComplete,
+  //   sendChat
+  // } = useAiChat();
   const [messages, setMessages] = useState<Message[]>(
     initialMessages.map(msg => ({
       ...msg,
@@ -42,7 +56,7 @@ export function ChatPage({ user }: { user?: User }) {
     }))
   );
 
-  // const {} = useChatWebSocketContext()
+
   const [isChatEmpty, setIsChatEmpty] = useState(messages.length === 0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedModel, setSelectedModel] = useState<Model>(
@@ -208,7 +222,7 @@ export function ChatPage({ user }: { user?: User }) {
         size="icon"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-        {isSidebarOpen ? <Icon.PanelLeftClose /> : <Icon.PanelRightClose />}
+        {isSidebarOpen ? <PanelLeftClose /> : <PanelRightClose />}
         <span className="sr-only">
           {isSidebarOpen ? "Close sidebar" : "Open sidebar"}
         </span>
@@ -227,7 +241,7 @@ export function ChatPage({ user }: { user?: User }) {
           />
         )}
         {selectedModel.name}
-        <Icon.ChevronDown className="ml-1 h-4 w-4" />
+        <ChevronDown className="ml-1 h-4 w-4" />
       </Button>
       <div className="flex items-center space-x-1 sm:space-x-2">
         <Button
@@ -235,7 +249,7 @@ export function ChatPage({ user }: { user?: User }) {
           size="icon"
           onClick={handleShareChat}
           className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-          <Icon.ShareIcon className="size-[1.125rem]" />
+          <ShareIcon className="size-[1.125rem]" />
           <span className="sr-only">Share chat</span>
         </Button>
         {isDesktop && (
@@ -245,7 +259,7 @@ export function ChatPage({ user }: { user?: User }) {
             asChild
             className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
             <Link href="/settings">
-              <Icon.Settings className="size-[1.125rem]" />
+              <Settings className="size-[1.125rem]" />
               <span className="sr-only">Settings</span>
             </Link>
           </Button>
@@ -257,7 +271,7 @@ export function ChatPage({ user }: { user?: User }) {
             size="icon"
             onClick={() => setIsSettingsDrawerOpen(true)}
             className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-            <Icon.Settings />
+            <Settings />
             <span className="sr-only">Settings</span>
           </Button>
         )}
@@ -272,10 +286,7 @@ export function ChatPage({ user }: { user?: User }) {
         ref={chatAreaContainerRef}
         className="relative flex flex-grow flex-col overflow-y-auto">
         {isChatEmpty ? (
-          <EmptyStateChat
-            user={user}
-            onPromptSelect={handlePromptSelect}
-          />
+          <EmptyStateChat user={user} onPromptSelect={handlePromptSelect} />
         ) : (
           <ChatArea
             messages={messages}
@@ -293,7 +304,7 @@ export function ChatPage({ user }: { user?: User }) {
             )}
             onClick={() => scrollToBottom()}
             aria-label="Scroll to bottom">
-            <Icon.ArrowDownCircle className="size-5" />
+            <ArrowDownCircle className="size-5" />
           </Button>
         )}
       </main>

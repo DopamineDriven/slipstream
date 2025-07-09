@@ -1,12 +1,12 @@
 "use client";
 
+import type { User } from "next-auth";
 import type React from "react";
-import { Icon } from "@t3-chat-clone/ui";
 import { useState } from "react";
-import { motion } from "motion/react";
 import { mockEmptyStatePrompts } from "@/lib/mock";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
-import type { User } from "next-auth";
+import { motion } from "motion/react";
+import { BookOpen, Code, Compass, PenLine, Sparkles } from "@t3-chat-clone/ui";
 
 interface EmptyStateChatProps {
   user?: User;
@@ -15,10 +15,10 @@ interface EmptyStateChatProps {
 }
 
 const iconMap: Record<string, React.ElementType> = {
-  Create: Icon.PenLine,
-  Explore: Icon.Compass,
-  Code: Icon.Code,
-  Learn: Icon.BookOpen
+  Create: PenLine,
+  Explore: Compass,
+  Code: Code,
+  Learn: BookOpen
 };
 
 export function EmptyStateChat({
@@ -29,7 +29,6 @@ export function EmptyStateChat({
   const [activeTab, setActiveTab] = useState(
     Object.keys(mockEmptyStatePrompts)[0]
   );
-  
 
   return (
     <motion.div
@@ -37,7 +36,7 @@ export function EmptyStateChat({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
       className={`text-brand-text flex h-full flex-col items-center justify-center p-4 sm:p-8 ${className}`}>
-      <Icon.Sparkles className="text-brand-primary mb-4 h-12 w-12 sm:mb-6 sm:h-16 sm:w-16" />
+      <Sparkles className="text-brand-primary mb-4 h-12 w-12 sm:mb-6 sm:h-16 sm:w-16" />
       <h1 className="text-brand-text-emphasis mb-3 text-center text-2xl font-semibold sm:mb-4 sm:text-3xl md:text-4xl">
         How can I help you, {user?.name ?? "username"}?
       </h1>

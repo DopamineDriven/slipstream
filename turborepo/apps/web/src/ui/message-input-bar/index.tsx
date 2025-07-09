@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Icon, Textarea } from "@t3-chat-clone/ui";
+import { Button, Expand, Send, Textarea, Search } from "@t3-chat-clone/ui";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { AttachmentPopover } from "@/ui/attachment-popover";
@@ -92,7 +92,7 @@ export function MessageInputBar({
                 size="icon"
                 className="text-brand-text-muted hover:text-brand-text absolute top-0 right-0 h-7 w-7 sm:hidden"
                 onClick={() => setIsFullScreenInputOpen(true)}>
-                <Icon.Expand className="h-4 w-4" />
+                <Expand className="h-4 w-4" />
                 <span className="sr-only">Expand input</span>
               </Button>
             )}
@@ -103,7 +103,7 @@ export function MessageInputBar({
               variant="ghost"
               size="icon"
               className="text-brand-text-muted hover:text-brand-text hover:bg-brand-sidebar hidden h-8 w-8 sm:inline-flex sm:h-auto sm:w-auto">
-              <Icon.Search className="h-5 w-5" />
+              <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
             </Button>
             <Button
@@ -111,7 +111,7 @@ export function MessageInputBar({
               onClick={handleSend}
               className="bg-brand-primary text-brand-primaryForeground hover:bg-brand-primary/90 h-8 w-8 sm:h-auto sm:w-auto"
               disabled={!message.trim()}>
-              <Icon.Send className="h-5 w-5" />
+              <Send className="h-5 w-5" />
               <span className="sr-only">Send message</span>
             </Button>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Icon, ScrollArea } from "@t3-chat-clone/ui";
+import { Button, ScrollArea, Check } from "@t3-chat-clone/ui";
 import Image from "next/image";
 import type { Model } from "@/types/ui"; // Assuming Model type is in lib/types.ts
 import { availableModels } from "@/lib/mock";
@@ -68,7 +68,7 @@ export function MobileModelSelectorDrawer({
                     )}
                     <span className="flex-grow">{model.name}</span>
                     {selectedModel.id === model.id && (
-                      <Icon.Check className="ml-auto h-5 w-5" />
+                      <Check className="ml-auto h-5 w-5" />
                     )}
                   </div>
                 </Button>

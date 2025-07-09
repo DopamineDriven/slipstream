@@ -48,12 +48,13 @@
     "build": "tsup",
     "dev": "pnpm build",
     "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache",
     "clean": "git clean -xdf .turbo dist node_modules",
     "fix": "npm pkg fix"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.840.0",
-    "dotenv": "^17.0.1",
+    "dotenv": "^17.1.0",
     "dotenv-expand": "^12.0.2"
   },
   "devDependencies": {
@@ -61,7 +62,7 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.0.11",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.1",
@@ -72,7 +73,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.1"
+    "typescript-eslint": "^8.36.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

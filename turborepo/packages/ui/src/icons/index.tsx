@@ -23,6 +23,7 @@ import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
 import { FileText } from "@/icons/file-text";
 import { Github } from "@/icons/github";
+import { GripVertical } from "@/icons/grip-vertical";
 import { History } from "@/icons/history";
 import { ImageIcon } from "@/icons/image-icon";
 import { Key } from "@/icons/key";
@@ -84,6 +85,7 @@ const IconComponents = {
   EyeOff,
   FileText,
   Github,
+  GripVertical,
   History,
   ImageIcon,
   Key,
@@ -179,6 +181,7 @@ export {
   EyeOff,
   FileText,
   Github,
+  GripVertical,
   History,
   ImageIcon,
   Key,

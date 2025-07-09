@@ -10,11 +10,11 @@ import {
   CardTitle,
   Input,
   Mail,
+  Label,
   MessageSquare as MessageSquareQuestion,
   Send,
   Textarea
 } from "@t3-chat-clone/ui";
-import { Label } from "@/ui/atoms/label";
 
 export function ContactUsSettingsSection({ user }: { user?: User }) {
   return (

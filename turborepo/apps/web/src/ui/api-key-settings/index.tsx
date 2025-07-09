@@ -1,20 +1,15 @@
 "use client";
 
 import type { Providers as Provider } from "@/types/chat-ws";
-import type {
-  ComponentPropsWithRef,
-  JSX,
-  FormEvent as ReactFormEvent
-} from "react";
+import type { ClientWorkupProps } from "@/types/shared";
+import type { ApiKeyData } from "@/ui/api-key-settings/types";
+import type { FormEvent as ReactFormEvent } from "react";
 import { useState } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
 import { cn } from "@/lib/utils";
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
-import { AnthropicIcon } from "@/ui/icons/anthropic";
-import { GeminiIcon } from "@/ui/icons/gemini";
-import { OpenAiIcon } from "@/ui/icons/openai";
-import { XAiIcon } from "@/ui/icons/x-ai";
 import { AnimatePresence, motion } from "motion/react";
+import { User } from "next-auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,66 +39,21 @@ import {
   Trash,
   X
 } from "@t3-chat-clone/ui";
+import { API_KEY_SETTINGS_TEXT_CONSTS, providerObj } from "./constants";
 
 interface ApiKeysTabProps {
   className?: string;
+  initialData?: ClientWorkupProps;
+  user?: User;
 }
 
-interface ApiKeyData {
-  provider: Provider;
-  text: string;
-  icon: ({
-    ...svg
-  }: Omit<
-    ComponentPropsWithRef<"svg">,
-    "viewBox" | "fill" | "xmlns" | "role"
-  >) => JSX.Element;
-  value?: string;
-  isSet?: boolean;
-  isDefault?: boolean;
-}
+const { CARD_HEADER_TEXT, CARD_FOOTER_TEXT } = API_KEY_SETTINGS_TEXT_CONSTS;
 
-const providerObj = [
-  {
-    provider: "anthropic",
-    text: "Anthropic",
-    icon: AnthropicIcon,
-    value: "sk-ant-*******************************************",
-    isSet: true,
-    isDefault: false
-  },
-  {
-    provider: "gemini",
-    text: "Gemini",
-    icon: GeminiIcon,
-    value: "AIza********************",
-    isSet: false,
-    isDefault: false
-  },
-  {
-    provider: "grok",
-    text: "Grok",
-    icon: XAiIcon,
-    value: "xai-*******************************************",
-    isSet: true,
-    isDefault: false
-  },
-  {
-    provider: "openai",
-    text: "OpenAI",
-    icon: OpenAiIcon,
-    value: "sk-************************************************",
-    isSet: true,
-    isDefault: true
-  }
-] satisfies ApiKeyData[];
-
-const CARD_HEADER_TEXT =
-  "Bring your own API keys for expanded model support. This allows for substantially higher usage limits and access to premium models.";
-const CARD_FOOTER_TEXT =
-  "API keys are encrypted at rest and are only used to communicate with respective model providers in secure server contexts.";
-
-export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
+export function ApiKeysTab({
+  className = "",
+  initialData,
+  user: _user
+}: ApiKeysTabProps) {
   // State for managing API keys
   const [apiKeys, setApiKeys] = useState<ApiKeyData[]>([]);
   const [editingKey, setEditingKey] = useState<Provider | null>(null);
@@ -114,12 +64,14 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
     grok: "",
     openai: ""
   });
-  const [tempDefaults, setTempDefaults] = useState<Record<Provider, boolean>>({
-    anthropic: false,
-    gemini: false,
-    grok: false,
-    openai: false
-  });
+  const [tempDefaults, setTempDefaults] = useState<Record<Provider, boolean>>(
+    initialData?.isSet ?? {
+      anthropic: false,
+      gemini: false,
+      grok: false,
+      openai: false
+    }
+  );
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [keyToDelete, setKeyToDelete] = useState<Provider | null>(null);
@@ -457,7 +409,6 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
                             <Button
                               type="button"
                               variant="ghost"
-                              asChild
                               size="sm"
                               onClick={() => toggleVisibility(keyData.provider)}
                               className="hover:bg-brand-primary/20 h-8 w-8 p-0">
@@ -643,14 +594,12 @@ export function ApiKeysTab({ className = "" }: ApiKeysTabProps) {
                       key={provider.provider}
                       variant="outline"
                       onClick={() => addProvider(provider.provider)}
-                      className="bg-brand-sidebar space-x-1.5 border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-[56px] justify-start">
+                      className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text h-auto min-h-[56px] justify-start space-x-1.5">
                       <provider.icon
                         aria-description={provider.provider + ` icon`}
                         className="size-6 flex-shrink-0"
                       />
-                      <span className="text-left text-sm">
-                        {provider.text}
-                      </span>
+                      <span className="text-left text-sm">{provider.text}</span>
                     </Button>
                   ))}
                 </div>

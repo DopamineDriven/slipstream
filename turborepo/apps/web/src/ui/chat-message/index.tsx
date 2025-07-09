@@ -12,9 +12,13 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Bot,
   Button,
-  Icon,
-  Textarea
+  Check,
+  PenLine,
+  Textarea,
+  User as UserIcon,
+  X
 } from "@t3-chat-clone/ui";
 
 interface ChatMessageProps {
@@ -126,7 +130,7 @@ export function ChatMessage({
               />
             ) : (
               <AvatarFallback>
-                <Icon.Bot className="size-4" />
+                <Bot className="size-4" />
               </AvatarFallback>
             )}
           </Avatar>
@@ -167,7 +171,7 @@ export function ChatMessage({
                   onClick={handleEdit}
                   className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component h-7 w-7"
                   aria-label="Edit message">
-                  <Icon.PenLine className="size-3.5" />
+                  <PenLine className="size-3.5" />
                 </Button>
                 <AnimatedCopyButton
                   textToCopy={
@@ -209,14 +213,14 @@ export function ChatMessage({
                       size="sm"
                       onClick={handleCancelEdit}
                       className="text-brand-text-muted">
-                      <Icon.X className="mr-1 h-4 w-4" /> Cancel
+                      <X className="mr-1 h-4 w-4" /> Cancel
                     </Button>
                     <Button
                       variant="default"
                       size="sm"
                       onClick={handleSaveEdit}
                       className="bg-brand-primary hover:bg-brand-primary/90 text-brand-primaryForeground">
-                      <Icon.Check className="mr-1 h-4 w-4" /> Save & Submit
+                      <Check className="mr-1 h-4 w-4" /> Save & Submit
                     </Button>
                   </div>
                 </div>
@@ -239,7 +243,7 @@ export function ChatMessage({
               />
             ) : (
               <AvatarFallback>
-                <Icon.User className="size-4" />
+                <UserIcon className="size-4" />
               </AvatarFallback>
             )}
           </Avatar>

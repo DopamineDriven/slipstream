@@ -7,11 +7,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Input
+  Input,
+  Label
 } from "@t3-chat-clone/ui";
 import Image from "next/image";
 import { availableModels } from "@/lib/mock"; // Assuming models data is here
-import { Label } from "@/ui/atoms/label";
 
 // TODO revisit with database-synced model offerings (exact specifity)
 export function ModelsSettingsSection() {

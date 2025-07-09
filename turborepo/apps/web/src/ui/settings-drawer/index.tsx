@@ -1,7 +1,6 @@
 "use client";
 
 import type { User } from "next-auth";
-import { Button, Icon } from "@t3-chat-clone/ui";
 import {
   Drawer,
   DrawerClose,
@@ -13,6 +12,14 @@ import {
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab"; // Example tab
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
+import {
+  Button,
+  History,
+  KeyRound,
+  Palette,
+  User as UserIcon,
+  X
+} from "@t3-chat-clone/ui";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -24,26 +31,26 @@ const _settingsOptions = [
   {
     id: "profile",
     label: "Profile",
-    icon: Icon.User,
+    icon: UserIcon,
     component: UserProfileCard
   },
   {
     id: "apiKeys",
     label: "API Keys",
-    icon: Icon.KeyRound,
+    icon: KeyRound,
     component: ApiKeysTab
   },
   // Add more settings options here
   {
     id: "customization",
     label: "Customization",
-    icon: Icon.Palette,
+    icon: Palette,
     component: () => <p>Customization (TODO)</p>
   },
   {
     id: "history",
     label: "History & Sync",
-    icon: Icon.History,
+    icon: History,
     component: () => <p>History & Sync (TODO)</p>
   }
 ];
@@ -73,7 +80,7 @@ export function SettingsDrawer({
                 variant="ghost"
                 size="icon"
                 className="text-brand-text-muted hover:text-brand-text">
-                <Icon.X className="h-5 w-5" />
+                <X className="h-5 w-5" />
               </Button>
             </DrawerClose>
           </DrawerHeader>

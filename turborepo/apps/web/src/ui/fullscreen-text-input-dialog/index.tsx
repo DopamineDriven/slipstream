@@ -1,14 +1,16 @@
 "use client";
 
-import { Button, Icon, Textarea } from "@t3-chat-clone/ui";
 import { useEffect, useState } from "react";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle
-} from "@/ui/atoms/dialog";
+  DialogTitle,
+  Textarea,
+  X
+} from "@t3-chat-clone/ui";
 
 interface FullscreenTextInputDialogProps {
   isOpen: boolean;
@@ -48,7 +50,7 @@ export function FullscreenTextInputDialog({
             size="icon"
             onClick={() => onOpenChange(false)}
             className="text-brand-text-muted hover:text-brand-text">
-            <Icon.X className="h-5 w-5" />
+            <X className="h-5 w-5" />
           </Button>
         </DialogHeader>
         <div className="flex-grow overflow-hidden p-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { Button, Icon } from "@t3-chat-clone/ui";
+import { Button, Sun, Moon } from "@t3-chat-clone/ui";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
@@ -21,11 +21,11 @@ export function ThemeToggle({
   };
 
   // Determine the icon to show before mount, based on system preference or stored theme (via script)
-  let initialIcon = <Icon.Sun className="size-5" />; // Default to Sun
+  let initialIcon = <Sun className="size-5" />; // Default to Sun
   if (typeof window !== "undefined") {
     const scriptSetDark = document.documentElement.classList.contains("dark");
     if (scriptSetDark) {
-      initialIcon = <Icon.Moon className="size-5" />;
+      initialIcon = <Moon className="size-5" />;
     }
   }
 
@@ -53,9 +53,9 @@ export function ThemeToggle({
       aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
       {...props}>
       {resolvedTheme === "dark" ? (
-        <Icon.Moon className="size-5" />
+        <Moon className="size-5" />
       ) : (
-        <Icon.Sun className="size-5" />
+        <Sun className="size-5" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
