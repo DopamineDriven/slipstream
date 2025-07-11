@@ -1,5 +1,9 @@
 import type { UserData } from "@/types/index.ts";
-import { PrismaClient } from "@/generated/client/client.ts";
+import {
+  Conversation,
+  Message,
+  PrismaClient
+} from "@/generated/client/client.ts";
 import { SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -219,4 +223,57 @@ export class PrismaService extends ModelService {
       }
     });
   }
+
+  public async getRecentConversationsByUserId(
+    userId: string
+  ): Promise<Conversation[]> {
+    return await this.prismaClient.conversation.findMany({
+      where: { userId },
+      take: 10,
+      orderBy: [{ updatedAt: "asc" }]
+    });
+  }
+
+  public async getMessagesByConversationId(
+    conversationId: string
+  ): Promise<null | (Conversation & { messages: Message[] })> {
+    return await this.prismaClient.conversation.findUnique({
+      where: { id: conversationId },
+      include: { messages: true }
+    });
+  }
 }
+
+// const p = new PrismaService(prismaClient);
+
+// const fs = new Fs(process.cwd());
+// const myIFFEs = () =>
+//   (() =>
+//     p.getRecentConversationsByUserId("x1sa9esbc7nb1bbhnn5uy9ct").then(v => {
+//       return v;
+//     }))()
+//     .then(convos => {
+//       const helper = Array.of<null | (Conversation & { messages: Message[] })>();
+//       try {
+//         convos.forEach(async function (convo) {
+//           const messages = await p.getMessagesByConversationId(convo.id);
+//           if (!messages)
+//             console.log(`no messages for ${convo.title ?? convo.id}`);
+//           fs.withWs(
+//             `src/__out__/prisma/conversations/${convo.id}.json`,
+//             JSON.stringify({ data: messages }, null, 2)
+//           );
+//           helper.push(messages);
+//         });
+//       } catch (err) {
+//         console.error(err);
+//       } finally {
+//         return helper;
+//       }
+//     })
+//     .then(v => {
+//       return v;
+//     });
+// myIFFEs().then((o) => {
+//   console.log(o);
+// });

@@ -11,18 +11,25 @@ export const metadata = {
   title: "t3 clone home"
 } satisfies Metadata;
 
-const { prismaApiKeyService } = ormHandler(prismaClient);
+const { prismaApiKeyService, prismaConversationService } =
+  ormHandler(prismaClient);
 
 export default async function HomePage() {
   const session = (await auth()) satisfies Session | null;
 
   if (!session?.user) return redirect("/api/auth/signin");
+
   const providerConfig = await prismaApiKeyService.getClientApiKeys(
     session.user.id
   );
+  const recentConvos =
+    await prismaConversationService.getRecentConversationsByUserId(
+      session.user.id
+    );
+
   return (
     <Suspense fallback={"Loading..."}>
-      <ChatPage user={session?.user} providerConfig={providerConfig} />
+      <ChatPage user={session.user} providerConfig={providerConfig} recentConvos={recentConvos} />
     </Suspense>
   );
 }

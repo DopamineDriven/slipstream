@@ -1,10 +1,9 @@
 "use client";
 
-import type { ChatThread } from "@/types/ui";
+import type { Conversation } from "@prisma/client";
 import type { User } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { mockChatThreads } from "@/lib/mock";
 import { shimmer } from "@/lib/shimmer";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
@@ -26,17 +25,36 @@ import {
   Settings
 } from "@t3-chat-clone/ui";
 
+/**
+ * Conversation has the following shape
+ *
+ *```ts
+ * type Conversation =  {
+    id: string;
+    userId: string;
+    userKeyId: string | null;
+    title: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    branchId: string | null;
+    parentId: string | null;
+    isShared: boolean;
+    shareToken: string | null;
+}
+    ```
+ */
+
 interface SidebarProps {
-  chatThreads?: ChatThread[];
+  chatThreads?: Conversation[];
   onNewChat?: () => void;
   onSelectChat?: (id: string) => void;
-  onOpenSettings?: () => void; // Kept for potential future use, but we'll link directly
+  onOpenSettings?: () => void;
   className?: string;
   user?: User;
 }
 
 export function Sidebar({
-  chatThreads = mockChatThreads,
+  chatThreads,
   user: userProfile,
   onNewChat = () => console.log("New Chat"),
   onSelectChat = id => console.log("Select Chat:", id),
@@ -94,24 +112,51 @@ export function Sidebar({
 
       <ScrollArea className="flex-grow">
         <div className="space-y-2">
-          {chatThreads.map(thread => (
-            <Button
-              key={thread.id}
-              variant="ghost"
-              className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text h-auto w-full justify-start py-2"
-              onClick={() => onSelectChat(thread.id)}>
-              <MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
-              <span className="flex-1 text-left break-words whitespace-normal">
-                {thread.title}
-              </span>
-              <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
-                {thread.lastMessageAt}
-              </span>
-            </Button>
-          ))}
+          {chatThreads ? (
+            chatThreads.map(thread => (
+              <Link href={`/#${thread.id}`} passHref>
+              <Button
+                key={thread.id}
+                variant="ghost"
+                className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text h-auto w-full justify-start py-1"
+                onClick={() => onSelectChat(thread.id)}>
+                <MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
+                <span className="flex-1 text-left break-words whitespace-normal">
+                  {thread.title ?? "No title set"}
+                </span>
+                <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
+                  {new Date(thread.updatedAt).toISOString()}
+                </span>
+              </Button>
+              </Link>
+            ))
+          ) : (
+            <div className="text-center align-middle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-brand-text-muted mx-auto size-12">
+                <path d="M12 6V2H8" />
+                <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z" />
+                <path d="M2 12h2" />
+                <path d="M9 11v2" />
+                <path d="M15 11v2" />
+                <path d="M20 12h2" />
+              </svg>
+              <h3 className="text-accent-foreground mt-1 text-sm font-semibold">
+                Empty Chat History
+              </h3>
+              <p className="text-brand-text-muted mt-1 text-sm">
+                Get started by creating a new chat.
+              </p>
+            </div>
+          )}
         </div>
       </ScrollArea>
-
       <div className="border-brand-border mt-auto border-t pt-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -129,7 +174,7 @@ export function Sidebar({
                     placeholder="blur"
                     blurDataURL={shimmer([36, 36])}
                   />
-                  <div className="ml-2.5 inline-block align-middle">
+                  <div className="ml-2.5 inline-block text-left align-middle">
                     <p className="text-foreground text-sm leading-snug font-normal">
                       {userProfile?.name ?? "Username"}
                     </p>
