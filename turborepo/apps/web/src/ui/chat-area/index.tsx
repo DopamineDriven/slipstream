@@ -29,10 +29,13 @@ export function ChatArea({
   streamedText = "",
   isStreaming = false
 }: ChatAreaProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for the ScrollArea's viewport
-  const messagesEndRef = useRef<HTMLDivElement>(null); // Ref for the end of messages list
+  /**
+   * silence warning of unused var -- let's do something with `isStreaming` or omit it
+   */
+  const _s = isStreaming;
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Scroll to bottom when new messages are added (unless a specific message is targeted)
   useEffect(() => {
     if (!scrollToMessageId && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ClientWorkupProps } from "@/types/shared";
 import type { Message, Model } from "@/types/ui";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -23,6 +24,7 @@ import { Sidebar } from "@/ui/sidebar";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import type { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 import {
   ArrowDownCircle,
   Button,
@@ -32,7 +34,7 @@ import {
   Settings,
   ShareIcon
 } from "@t3-chat-clone/ui";
-import type { ClientWorkupProps } from "@/types/shared";
+import type { Conversation } from "@prisma/client";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -41,14 +43,24 @@ const ThemeToggle = dynamic(
 
 const SCROLL_THRESHOLD = 100;
 
-export function ChatPage({ user, providerConfig }: { user?: User; providerConfig: ClientWorkupProps }) {
-
+export function ChatPage({
+  user,
+  providerConfig,
+  recentConvos
+}: {
+  user?: User;
+  providerConfig: ClientWorkupProps;
+  recentConvos?: Conversation[]
+}) {
   const _implementProviderWorkup = providerConfig;
   const {
-    isConnected,
+    // should definitely be double or triple checking this in a lifecycle hook before allowing prompts to be sent -- if not connected that means their session is invalid and they need to sign in again (shouldn't happen but just in case)
+    isConnected: _isConnected,
     streamedText,
-    messages: aiMessages,
-    error,
+    // need to keep state current as more than one message is sent
+    messages: _aiMessages,
+    // we should have this at least listen for any subtle errors that may be occurring otherwise we're flying blind in that regard
+    error: _error,
     isComplete,
     sendChat
   } = useAiChat();
@@ -152,15 +164,35 @@ export function ChatPage({ user, providerConfig }: { user?: User; providerConfig
     }
     setIsChatEmpty(false);
 
-    // Use real streaming via sendChat
-    const provider = selectedModel.id.includes("gpt") ? "openai" : 
-                    selectedModel.id.includes("gemini") ? "gemini" :
-                    selectedModel.id.includes("claude") ? "anthropic" : "openai";
-    
-    const hasConfigured = _implementProviderWorkup.isSet[provider as keyof typeof _implementProviderWorkup.isSet];
-    const isDefault = _implementProviderWorkup.isDefault[provider as keyof typeof _implementProviderWorkup.isDefault];
-    
-    sendChat(text, provider as any, modelId as any, hasConfigured, isDefault);
+    // Use real streaming via sendChat (SHOULD THIS BE MEMOIZED OR HANDLED IN A MORE PERFORMANT MANNER?)
+    const provider = (selectedModel.id.includes("gpt")
+      ? "openai"
+      : selectedModel.id.includes("gemini")
+        ? "gemini"
+        : selectedModel.id.includes("claude")
+          ? "anthropic"
+          : selectedModel.id.includes("grok")
+            ? "grok"
+            : selectedModel.id.includes("xai")
+              ? "grok"
+              : "openai") satisfies Provider;
+
+    const hasConfigured =
+      _implementProviderWorkup.isSet[
+        provider as keyof typeof _implementProviderWorkup.isSet
+      ];
+    const isDefault =
+      _implementProviderWorkup.isDefault[
+        provider as keyof typeof _implementProviderWorkup.isDefault
+      ];
+    // please NEVER use as any....ever. just ask if you aren't sure what type to assign something that requires an explicit annotation please
+    sendChat(
+      text,
+      provider as Provider,
+      modelId as AllModelsUnion,
+      hasConfigured,
+      isDefault
+    );
   };
 
   const handleUpdateMessage = (messageId: string, newText: string) => {
@@ -308,6 +340,7 @@ export function ChatPage({ user, providerConfig }: { user?: User; providerConfig
                 onCollapse={() => setIsSidebarOpen(false)}
                 onExpand={() => setIsSidebarOpen(true)}>
                 <Sidebar
+                  chatThreads={recentConvos}
                   user={user}
                   onNewChat={handleNewChat}
                   onOpenSettings={() => setIsSettingsDrawerOpen(true)}
@@ -340,6 +373,7 @@ export function ChatPage({ user, providerConfig }: { user?: User; providerConfig
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="fixed top-0 left-0 z-50 h-full">
                     <Sidebar
+                      chatThreads={recentConvos}
                       user={user}
                       onNewChat={handleNewChat}
                       onOpenSettings={() => setIsSettingsDrawerOpen(true)}
