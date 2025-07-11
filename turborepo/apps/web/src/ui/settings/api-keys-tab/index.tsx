@@ -1,7 +1,7 @@
 "use client";
 
 // import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
-import type { Providers } from "@/types/chat-ws";
+import type { Providers } from "@t3-chat-clone/types";
 import { motion } from "motion/react";
 // import { useSession } from "next-auth/react";
 import {

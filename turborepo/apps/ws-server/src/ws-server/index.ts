@@ -7,12 +7,12 @@ import * as dotenv from "dotenv";
 import { WebSocket, WebSocketServer } from "ws";
 import type {
   BufferLike,
-  EventTypeMap,
   HandlerMap,
   MessageHandler,
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
+import type { EventTypeMap } from "@t3-chat-clone/types";
 import { PrismaService } from "@/prisma/index.ts";
 
 dotenv.config();

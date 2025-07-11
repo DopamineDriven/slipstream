@@ -1,10 +1,10 @@
+import type { RawData } from "@/types/chat-ws";
+import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type {
   ChatWsEvent,
   ChatWsEventTypeUnion,
-  EventTypeMap,
-  RawData
-} from "@/types/chat-ws";
-import { ChatWebSocketClient } from "@/utils/chat-ws-client";
+  EventTypeMap
+} from "@t3-chat-clone/types";
 
 export class ChatEventResolver {
   constructor(public wsClient: ChatWebSocketClient) {}
@@ -18,9 +18,6 @@ export class ChatEventResolver {
     switch (data.type) {
       case "typing":
         return this.handleTyping(data, socket);
-
-      case "message":
-        return this.handleMessage(data, socket);
 
       case "ping":
         return this.handlePing(data, socket);
@@ -48,7 +45,6 @@ export class ChatEventResolver {
     }
   }
   public EVENT_TYPES = [
-    "message",
     "typing",
     "ping",
     "image_gen_request",
@@ -105,10 +101,6 @@ export class ChatEventResolver {
     console.debug("typing:", evt);
   }
 
-  private handleMessage(evt: EventTypeMap["message"], _ws: WebSocket): void {
-    console.debug("new chat message:", evt);
-  }
-
   private handlePing(evt: EventTypeMap["ping"], ws: WebSocket): void {
     console.log(evt.type);
     ws.send(JSON.stringify(evt));
@@ -119,7 +111,9 @@ export class ChatEventResolver {
     _ws: WebSocket
   ) {
     console.log("stream chunk:", evt);
-    // stream token into UI
+    // Forward to registered handler in WebSocket client
+    const handler = this.wsClient.handlers["ai_chat_chunk"];
+    if (handler) handler(evt, _ws);
   }
 
   private handleAIChatInlineData(
@@ -127,6 +121,9 @@ export class ChatEventResolver {
     _ws: WebSocket
   ) {
     console.log("ai_chat_inline_data", event.type);
+    // Forward to registered handler in WebSocket client
+    const handler = this.wsClient.handlers["ai_chat_inline_data"];
+    if (handler) handler(event, _ws);
   }
 
   private handleAIChatResponse(
@@ -134,7 +131,9 @@ export class ChatEventResolver {
     _ws: WebSocket
   ): void {
     console.debug("chat complete", evt);
-    // finished streaming (token generation complete)
+    // Forward to registered handler in WebSocket client
+    const handler = this.wsClient.handlers["ai_chat_response"];
+    if (handler) handler(evt, _ws);
   }
 
   private handleAIChatError(
@@ -142,6 +141,9 @@ export class ChatEventResolver {
     _ws: WebSocket
   ): void {
     console.error("chat error", evt);
+    // Forward to registered handler in WebSocket client
+    const handler = this.wsClient.handlers["ai_chat_error"];
+    if (handler) handler(evt, _ws);
   }
 
   private handleImageGenResponse(

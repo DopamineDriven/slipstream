@@ -1,19 +1,19 @@
 {
   "name": "@t3-chat-clone/types",
   "version": "1.0.0",
-  "description": "convenient shared types util",
+  "description": "convenient type definitions",
   "publishConfig": {
     "access": "public",
     "typesVersions": {
       "*": {
-        "*": [
-          "dist/*.d.ts",
-          "dist/*/index.d.ts"
+      "*": [
+        "dist/index.d.ts"
+      ],
+        "events": [
+          "dist/events.d.ts"
         ],
-        "creds": [
-          "dist/creds/index.d.ts"
-        ],
-        "types": ["dist/types/index.d.ts"]
+        "models": ["dist/models.d.ts"],
+        "utils": ["dist/utils.d.ts"]
       }
     }
   },
@@ -22,13 +22,13 @@
   "typesVersions": {
     "*": {
       "*": [
-        "dist/*.d.ts",
-        "dist/*/index.d.ts"
+        "dist/index.d.ts"
       ],
-        "creds": [
-          "dist/creds/index.d.ts"
+        "events": [
+          "dist/events.d.ts"
         ],
-        "types": ["dist/types/index.d.ts"]
+        "models": ["dist/models.d.ts"],
+        "utils": ["dist/utils.d.ts"]
     }
   },
   "type": "module",
@@ -36,33 +36,28 @@
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
-    "dist/**/*.{js,cjs,d.ts,d.cts,css}"
+    "dist/**/*.{js,cjs,mjs,d.ts,d.cts,d.mts}"
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./*": "./dist/*.js",
-    "./creds": "./dist/creds/index.js",
-    "./types": "./dist/types/index.js"
+    "./events": "./dist/events.js",
+    "./models": "./dist/models.js",
+    "./utils": "./dist/utils.js"
   },
   "scripts": {
     "build": "tsup",
     "dev": "pnpm build",
     "lint": "eslint",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
     "clean": "git clean -xdf .turbo dist node_modules",
     "fix": "npm pkg fix"
-  },
-  "dependencies": {
-    "@types/ws": "^8.18.1"
   },
   "devDependencies": {
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.11",
+    "@types/node": "^24.0.12",
     "chokidar": "^4.0.3",
-    "dotenv": "^17.1.0",
-    "dotenv-cli": "^8.0.0",
-    "dotenv-expand": "^12.0.2",
     "eslint": "^9.30.1",
     "jiti": "^2.4.2",
     "prettier": "^3.6.2",
@@ -71,8 +66,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
-    "ws": "^8.18.3"
+    "typescript-eslint": "^8.36.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

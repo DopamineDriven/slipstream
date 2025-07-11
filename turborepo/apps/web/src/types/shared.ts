@@ -1,4 +1,4 @@
-import { Providers } from "@/types/chat-ws";
+import { Providers } from "@t3-chat-clone/types";
 
 export type ProviderCountsProps = {
   openai: number;

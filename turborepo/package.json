@@ -2,13 +2,13 @@
   "name": "@t3-chat-clone/root",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
   "scripts": {
     "build:credentials": "turbo build --filter=@t3-chat-clone/credentials",
     "build:encryption": "turbo build --filter=@t3-chat-clone/encryption",
     "build:key-validator": "turbo build --filter=@t3-chat-clone/key-validator",
     "build:redis-service": "turbo build --filter=@t3-chat-clone/redis-service",
-    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && pnpm build:ws-server",
+    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && build:types",
     "build:types": "turbo build --filter=@t3-chat-clone/types",
     "build:ui": "turbo build --filter=@t3-chat-clone/ui",
     "build:web": "turbo build --filter=@t3-chat-clone/web",
@@ -27,8 +27,7 @@
     "npm:registry": "npm set registry https://registry.npmjs.org",
     "run:web": "turbo dev --filter=@t3-chat-clone/web",
     "run:ws-server": "turbo dev --filter=@t3-chat-clone/ws-server",
-    "latest:pnpm": "corepack use pnpm@latest",
-    "update:pnpm": "curl -fsSL https://get.pnpm.io/install.sh | sh -"
+    "latest:pnpm": "corepack use pnpm@latest"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
@@ -36,15 +35,15 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.11",
-    "dotenv": "^17.1.0",
+    "@types/node": "^24.0.12",
+    "dotenv": "^17.2.0",
     "eslint": "^9.30.1",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "vercel": "^44.2.13"
+    "vercel": "^44.4.0"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {

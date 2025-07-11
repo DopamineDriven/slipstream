@@ -15,6 +15,8 @@ interface ChatAreaProps {
   scrollToMessageId?: string | null; // To trigger scroll to a specific message
   onScrollToMessageHandled?: () => void; // Callback after scroll is handled
   user?: User;
+  streamedText?: string;
+  isStreaming?: boolean;
 }
 
 export function ChatArea({
@@ -23,7 +25,9 @@ export function ChatArea({
   onUpdateMessage,
   scrollToMessageId,
   onScrollToMessageHandled: _onScrollToMessageHandled,
-  user
+  user,
+  streamedText = "",
+  isStreaming = false
 }: ChatAreaProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for the ScrollArea's viewport
   const messagesEndRef = useRef<HTMLDivElement>(null); // Ref for the end of messages list
@@ -56,6 +60,23 @@ export function ChatArea({
             onUpdateMessage={onUpdateMessage}
           />
         ))}
+        {streamedText && (
+          <ChatMessage
+            key="streaming"
+            message={{
+              id: "streaming",
+              sender: "ai",
+              text: streamedText,
+              originalText: streamedText,
+              timestamp: new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+              }),
+              avatar: "/placeholder.svg?width=32&height=32"
+            }}
+            user={user}
+          />
+        )}
         <div ref={messagesEndRef} />
         {/* Invisible element at the end for auto-scrolling */}
       </motion.div>

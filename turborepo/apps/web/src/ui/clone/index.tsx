@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-// import { useAiChat } from "@/hooks/use-ai-chat";
+import { useAiChat } from "@/hooks/use-ai-chat";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   availableModels,
@@ -32,6 +32,7 @@ import {
   Settings,
   ShareIcon
 } from "@t3-chat-clone/ui";
+import type { ClientWorkupProps } from "@/types/shared";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -40,22 +41,23 @@ const ThemeToggle = dynamic(
 
 const SCROLL_THRESHOLD = 100;
 
-export function ChatPage({ user }: { user?: User }) {
-  // const {
-  //   isConnected,
-  //   streamedText,
-  //   messages: aiMessages,
-  //   error,
-  //   isComplete,
-  //   sendChat
-  // } = useAiChat();
+export function ChatPage({ user, providerConfig }: { user?: User; providerConfig: ClientWorkupProps }) {
+
+  const _implementProviderWorkup = providerConfig;
+  const {
+    isConnected,
+    streamedText,
+    messages: aiMessages,
+    error,
+    isComplete,
+    sendChat
+  } = useAiChat();
   const [messages, setMessages] = useState<Message[]>(
     initialMessages.map(msg => ({
       ...msg,
       originalText: typeof msg.text === "string" ? msg.text : ""
     }))
   );
-
 
   const [isChatEmpty, setIsChatEmpty] = useState(messages.length === 0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -149,44 +151,16 @@ export function ChatPage({ user }: { user?: User }) {
       setMessages(prev => [...prev, newMessage]);
     }
     setIsChatEmpty(false);
-    // ... (rest of the function)
 
-    const thinkingMessageId = `thinking-${Date.now()}`;
-    const thinkingMessage: Message = {
-      id: thinkingMessageId,
-      sender: "ai",
-      text: "Thinking...",
-      originalText: "Thinking...",
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      }),
-      model: modelId,
-      avatar: "/globe.svg?width=32&height=32"
-    };
-    setMessages(prev => [...prev, thinkingMessage]);
-
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: String(Date.now() + 1),
-        sender: "ai",
-        text: `This is a simulated AI response to "${text}" using model ${modelId}. The previous message was ${
-          isEditSubmit ? "an edit." : "new."
-        }`,
-        originalText: `This is a simulated AI response to "${text}" using model ${modelId}. The previous message was ${
-          isEditSubmit ? "an edit." : "new."
-        }`,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit"
-        }),
-        model: modelId,
-        avatar: "/placeholder.svg?width=32&height=32"
-      };
-      setMessages(prev =>
-        prev.map(m => (m.id === thinkingMessageId ? aiResponse : m))
-      );
-    }, 2000);
+    // Use real streaming via sendChat
+    const provider = selectedModel.id.includes("gpt") ? "openai" : 
+                    selectedModel.id.includes("gemini") ? "gemini" :
+                    selectedModel.id.includes("claude") ? "anthropic" : "openai";
+    
+    const hasConfigured = _implementProviderWorkup.isSet[provider as keyof typeof _implementProviderWorkup.isSet];
+    const isDefault = _implementProviderWorkup.isDefault[provider as keyof typeof _implementProviderWorkup.isDefault];
+    
+    sendChat(text, provider as any, modelId as any, hasConfigured, isDefault);
   };
 
   const handleUpdateMessage = (messageId: string, newText: string) => {
@@ -292,6 +266,8 @@ export function ChatPage({ user }: { user?: User }) {
             messages={messages}
             onUpdateMessage={handleUpdateMessage}
             user={user}
+            streamedText={streamedText}
+            isStreaming={!isComplete && !!streamedText}
           />
         )}
         {showScrollToBottomButton && (

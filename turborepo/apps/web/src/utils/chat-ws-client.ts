@@ -1,9 +1,5 @@
-import type {
-  ChatWsEvent,
-  EventTypeMap,
-  HandlerMap,
-  RawData
-} from "@/types/chat-ws";
+import type { HandlerMap, RawData } from "@/types/chat-ws";
+import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 
@@ -90,11 +86,7 @@ export class ChatWebSocketClient {
             if (handler) handler(data, this.socket);
             break;
           }
-          case "message": {
-            const handler = this.handlers[data.type];
-            if (handler) handler(data, this.socket);
-            break;
-          }
+
           case "ping": {
             const handler = this.handlers[data.type];
             if (handler) handler(data, this.socket);
@@ -208,10 +200,6 @@ export class ChatWebSocketClient {
         break;
       }
       case "image_gen_response": {
-        this.handlers[event] = handler;
-        break;
-      }
-      case "message": {
         this.handlers[event] = handler;
         break;
       }

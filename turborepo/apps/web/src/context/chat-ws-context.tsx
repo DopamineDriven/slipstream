@@ -2,9 +2,9 @@
 
 import type { Context, ReactNode } from "react";
 import { createContext, useContext } from "react";
-import type { ChatWsEvent, EventTypeMap } from "@/types/chat-ws";
 import { useChatWebSocket } from "@/hooks/use-chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
+import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 
 export interface ChatWsContextProps {
   lastEvent: ChatWsEvent | null;

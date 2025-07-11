@@ -1,6 +1,6 @@
 "use client";
 
-import type { Providers as Provider } from "@/types/chat-ws";
+import type { Providers as Provider } from "@t3-chat-clone/types";
 import type { ClientWorkupProps } from "@/types/shared";
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
@@ -14,7 +14,7 @@ import {
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
-import { User } from "next-auth";
+import type { User } from "next-auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -135,14 +135,11 @@ export function ApiKeysTab({
     const keyData = apiKeys.find(key => key.provider === provider);
 
     if (newVisible.has(provider)) {
-      // Hide the key - but DON'T clear from secure map
       newVisible.delete(provider);
     } else {
-      // Show the key - decrypt if it's an existing key
       if (keyData?.isSet && editingKey !== provider) {
         setDecryptingKey(provider);
         try {
-          // Only decrypt if we don't already have it cached
           if (!tempValuesRef.current.has(provider)) {
             const decryptedValue = await getDecryptedApiKeyOnEdit(provider);
             tempValuesRef.current.set(provider, decryptedValue);
@@ -165,7 +162,7 @@ export function ApiKeysTab({
     const currentKey = apiKeys.find(key => key.provider === provider);
 
     if (currentKey?.isSet) {
-      // Existing key - decrypt and hide by default
+
       setDecryptingKey(provider);
 
       try {
@@ -188,7 +185,6 @@ export function ApiKeysTab({
         }));
         setEditingKey(provider);
 
-        // Hide the key by default when editing existing keys
         setVisibleKeys(prev => {
           const newVisible = new Set(prev);
           newVisible.delete(provider);
@@ -200,21 +196,19 @@ export function ApiKeysTab({
         setDecryptingKey(null);
       }
     } else {
-      // New key - show immediately and auto-focus
+
       setEditingKey(provider);
       setTempDefaults(prev => ({
         ...prev,
         [provider]: false
       }));
 
-      // For new keys, make them visible immediately (no security concern)
       setVisibleKeys(prev => {
         const newVisible = new Set(prev);
         newVisible.add(provider);
         return newVisible;
       });
 
-      // Auto-focus the input after a brief delay to ensure it's rendered
       setTimeout(() => {
         const input = getInputRef(provider);
         if (input) {
@@ -232,7 +226,7 @@ export function ApiKeysTab({
         isDefault: getTempDefault(provider)
       };
 
-      if (!original) return true; // New key, always has changes
+      if (!original) return true;
 
       return (
         original.value !== current.value ||
@@ -459,7 +453,6 @@ export function ApiKeysTab({
         ...prev,
         { ...providerData, isSet: false, value: "", isDefault: false }
       ]);
-      // Immediately start editing for seamless UX
       startEditing(provider);
     }
   };
@@ -736,7 +729,7 @@ export function ApiKeysTab({
                 </div>
               )}
 
-            {/* Available Providers Section - providers that are added but not configured */}
+            {/* Available Providers Section - providers that are available but not yet configured */}
             {apiKeys.filter(key => !key.isSet).length > 0 && (
               <div className="space-y-4">
                 <div className="text-brand-text-muted text-sm font-medium">
@@ -841,8 +834,6 @@ export function ApiKeysTab({
                               Set as default provider
                             </Label>
                           </div>
-
-                          {/* Error display */}
                           {submitError && editingKey === keyData.provider && (
                             <div className="text-sm text-red-500">
                               {submitError}
@@ -876,7 +867,7 @@ export function ApiKeysTab({
               </div>
             )}
 
-            {/* Show message when all providers are configured */}
+            {/* Shown only when all offered providers are configured */}
             {getAvailableProviders().length === 0 &&
               apiKeys.filter(key => !key.isSet).length === 0 &&
               apiKeys.filter(key => key.isSet).length ===
