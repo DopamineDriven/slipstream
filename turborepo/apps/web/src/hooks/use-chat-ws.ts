@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import type { ChatWsEvent, EventTypeMap } from "@/types/chat-ws";
 import { ChatEventResolver } from "@/resolver/chat-event-resolver";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
+import { useSession } from "next-auth/react";
+import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
@@ -47,7 +47,10 @@ export function useChatWebSocket() {
 
   const sendEvent = useMemo(
     () =>
-      <const T extends keyof EventTypeMap>(event: T, data: EventTypeMap[typeof event]) =>
+      <const T extends keyof EventTypeMap>(
+        event: T,
+        data: EventTypeMap[typeof event]
+      ) =>
         client.send(event, data),
     [client]
   );

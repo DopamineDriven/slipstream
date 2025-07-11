@@ -1,63 +1,41 @@
+import type { UserData } from "@/types/index.ts";
+import { PrismaClient } from "@/generated/client/client.ts";
+import { SenderType } from "@/generated/client/enums.ts";
+import { ModelService } from "@/models/index.ts";
+import { withAccelerate } from "@prisma/extension-accelerate";
+import * as dotenv from "dotenv";
 import type {
   AIChatError,
   AIChatRequest,
   AIChatResponse,
-  UserData
-} from "@/types/index.ts";
-import type { ConditionalToRequired, RemoveFields } from "@d0paminedriven/fs";
-import { PrismaClient, UserKey } from "@/generated/client/client.ts";
-import { Provider, SenderType } from "@/generated/client/enums.ts";
-import { ModelService } from "@/models/index.ts";
-import { withAccelerate } from "@prisma/extension-accelerate";
-import * as dotenv from "dotenv";
-import type { EncryptedPayload } from "@t3-chat-clone/encryption";
+  CTR,
+  Providers,
+  RemoveFields
+} from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 
 dotenv.config();
-
-export type ProviderCountsProps = {
-  openai: number;
-  grok: number;
-  gemini: number;
-  anthropic: number;
-};
-
-export type RecordCountsProps = {
-  isSet: ProviderCountsProps;
-  isDefault: ProviderCountsProps;
-};
-
-export type ClientWorkupProps = {
-  isSet: Record<Lowercase<keyof typeof Provider>, boolean>;
-  isDefault: Record<Lowercase<keyof typeof Provider>, boolean>;
-};
 
 export const prismaClient = new PrismaClient().$extends(withAccelerate());
 
 export type PrismaClientWithAccelerate = typeof prismaClient;
 
 export interface HandleAiChatRequestProps
-  extends RemoveFields<
-    ConditionalToRequired<AIChatRequest, "provider">,
-    "type"
-  > {
+  extends RemoveFields<CTR<AIChatRequest, "provider">, "type"> {
   userId: string;
 }
 
 export interface HandleAiChatResponseProps
-  extends RemoveFields<
-    ConditionalToRequired<AIChatResponse, "provider">,
-    "type"
-  > {}
+  extends RemoveFields<CTR<AIChatResponse, "provider">, "type"> {}
 
 export interface HandleAiChatErrorResponseProps
-  extends ConditionalToRequired<AIChatError, "provider"> {}
+  extends CTR<AIChatError, "provider"> {}
 
 export class PrismaService extends ModelService {
   private encryption: EncryptionService;
   constructor(public prismaClient: PrismaClientWithAccelerate) {
     super();
-    this.encryption = new EncryptionService();
+    this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 
   public async getAndValidateUserSessionByEmail(email: string) {
@@ -108,35 +86,51 @@ export class PrismaService extends ModelService {
     });
   }
 
-  private async handleApiKey(
-    data: RemoveFields<AIChatRequest, "type">,
-    userId: string
-  ) {
-    let encryptedApiKey: string | null = null;
-    let encryptedPayload: EncryptedPayload | null = null;
-    try {
-      if (data.provider) {
-        const prismaProvider = this.providerToPrismaFormat(
-          data.provider
-        ) satisfies keyof typeof Provider;
+  /**
+   * ```ts
+   * (property) userProviderKeyMap: Map<`${string}_openai` | `${string}_grok` | `${string}_gemini` | `${string}_anthropic`, string | undefined>
+   * ```
+   */
+  private userProviderKeyMap = new Map<Providers, string | undefined>();
 
-        const rec = await this.prismaClient.userKey.findUnique({
-          where: { userId_provider: { userId, provider: prismaProvider } }
-        });
-        if (!rec) return null;
-        const { apiKey, authTag, iv } = rec;
-        encryptedPayload = { authTag, data: apiKey, iv };
-        encryptedApiKey = rec?.apiKey ?? null;
-      }
-    } catch (err) {
-      console.warn(err);
-    } finally {
-      if (encryptedPayload) {
-        const apiKey = await this.encryption.decryptText(encryptedPayload);
-        return apiKey;
-      }
+  public async handleApiKeyLookup(provider: Providers, userId?: string) {
+    if (!userId) {
+      this.userProviderKeyMap.clear();
+      throw new Error("unauthorized");
     }
-    return encryptedApiKey;
+    const rec = await this.prismaClient.userKey.findUnique({
+      where: {
+        userId_provider: {
+          userId,
+          provider: this.providerToPrismaFormat(provider)
+        }
+      }
+    });
+    if (!rec) {
+      console.error(`No API key configured for ${provider}!`);
+      return { apiKey: null, keyId: null };
+    }
+    try {
+      const hasKey = this.userProviderKeyMap.get(provider);
+      if (typeof hasKey !== "undefined") {
+        return { apiKey: hasKey, keyId: rec.id };
+      }
+
+      const decrypted = await this.encryption.decryptText({
+        authTag: rec.authTag,
+        data: rec.apiKey,
+        iv: rec.iv
+      });
+
+      this.userProviderKeyMap.set(provider, decrypted);
+
+      return { apiKey: decrypted, keyId: rec.id };
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(`Decryption failed for: ${provider}, ` + err.message);
+        return { apiKey: null, keyId: null };
+      } else return { apiKey: null, keyId: null };
+    }
   }
 
   public async handleAiChatRequest({
@@ -144,7 +138,7 @@ export class PrismaService extends ModelService {
     provider,
     ...data
   }: HandleAiChatRequestProps) {
-    const userKeyId = await this.handleApiKey(data, userId);
+    const { keyId } = await this.handleApiKeyLookup(provider, userId);
     if (data.conversationId === "new-chat") {
       return this.prismaClient.conversation.create({
         include: { messages: true, conversationSettings: true },
@@ -156,7 +150,7 @@ export class PrismaService extends ModelService {
               senderType: SenderType.USER,
               model: data.model,
               userId,
-              userKeyId
+              userKeyId: keyId
             }
           },
           conversationSettings: {
@@ -166,7 +160,7 @@ export class PrismaService extends ModelService {
               temperature: data.temperature
             }
           },
-          userKeyId,
+          userKeyId: keyId,
           userId
         }
       });
@@ -182,7 +176,7 @@ export class PrismaService extends ModelService {
               provider: this.providerToPrismaFormat(provider),
               model: data.model,
               userId,
-              userKeyId
+              userKeyId: keyId
             }
           },
           conversationSettings: {
@@ -193,7 +187,7 @@ export class PrismaService extends ModelService {
             }
           },
           userId,
-          userKeyId
+          userKeyId: keyId
         }
       });
     }
@@ -204,6 +198,7 @@ export class PrismaService extends ModelService {
     provider,
     ...data
   }: HandleAiChatResponseProps) {
+    const { keyId } = await this.handleApiKeyLookup(provider, userId);
     return this.prismaClient.conversation.update({
       include: { messages: true, conversationSettings: true },
       where: { id: data.conversationId },
@@ -214,59 +209,14 @@ export class PrismaService extends ModelService {
             senderType: SenderType.AI,
             provider: this.providerToPrismaFormat(provider),
             model: data.model,
-            userId
+            userId,
+            userKeyId: keyId
           }
         },
         userId,
-        title: data.title
+        title: data.title,
+        userKeyId: keyId
       }
     });
-  }
-  public formatProps(props: RecordCountsProps) {
-    const isDefault = Object.fromEntries(
-      Object.entries(props.isDefault).map(([t, o]) => {
-        return [
-          t as Lowercase<keyof typeof Provider>,
-          o === 0 ? false : true
-        ] as const;
-      })
-    );
-    const isSet = Object.fromEntries(
-      Object.entries(props.isSet).map(([t, o]) => {
-        return [
-          t as Lowercase<keyof typeof Provider>,
-          o === 0 ? false : true
-        ] as const;
-      })
-    );
-    return { isSet, isDefault } as ClientWorkupProps;
-  }
-  public handleExistingKeysForClient(props: UserKey[]) {
-    const initialProps = {
-      isSet: {
-        openai: 0,
-        grok: 0,
-        gemini: 0,
-        anthropic: 0
-      },
-      isDefault: { openai: 0, grok: 0, gemini: 0, anthropic: 0 }
-    };
-    props.forEach(function (res) {
-      const provider = res.provider.toLowerCase() as Lowercase<
-        keyof typeof Provider
-      >;
-      const isDefault = res.isDefault;
-      initialProps.isSet[provider] += 1;
-      initialProps.isDefault[provider] += isDefault ? 1 : 0;
-    });
-    return this.formatProps(initialProps);
-  }
-
-  public async getClientApiKeys(userId: string) {
-    const data = await this.prismaClient.userKey.findMany({
-      where: { userId }
-    });
-    console.log(data);
-    return this.handleExistingKeysForClient(data);
   }
 }

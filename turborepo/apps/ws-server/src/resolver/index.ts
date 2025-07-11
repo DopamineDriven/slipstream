@@ -1,13 +1,21 @@
 import type {
+  RawMessageStreamEvent,
+  StopReason
+} from "@anthropic-ai/sdk/resources/messages.mjs";
+import type { ContentUnion } from "@google/genai";
+import type {
   ChatCompletionChunk,
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs";
 import type { RawData } from "ws";
-import { Credentials } from "@t3-chat-clone/credentials";
-import { RedisInstance } from "@t3-chat-clone/redis-service";
+import OpenAI from "openai";
+import { AnthropicService } from "@/anthropic/index.ts";
+import { GeminiService } from "@/gemini/index.ts";
+import { ModelService } from "@/models/index.ts";
+import { R2Instance } from "@/r2-helper/index.ts";
+import { WSServer } from "@/ws-server/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import { GenerateContentResponse } from "@google/genai";
-import OpenAI from "openai";
 import { WebSocket } from "ws";
 import type {
   AnthropicChatModels,
@@ -18,17 +26,9 @@ import type {
   GrokChatModels,
   OpenAIChatModels,
   Provider
-} from "@/types/index.ts";
-import type {
-  RawMessageStreamEvent,
-  StopReason
-} from "@anthropic-ai/sdk/resources/messages.mjs";
-import type { ContentUnion } from "@google/genai";
-import { AnthropicService } from "@/anthropic/index.ts";
-import { GeminiService } from "@/gemini/index.ts";
-import { ModelService } from "@/models/index.ts";
-import { R2Instance } from "@/r2-helper/index.ts";
-import { WSServer } from "@/ws-server/index.ts";
+} from "@t3-chat-clone/types";
+import { Credentials } from "@t3-chat-clone/credentials";
+import { RedisInstance } from "@t3-chat-clone/redis-service";
 
 export class Resolver extends ModelService {
   constructor(
@@ -45,7 +45,6 @@ export class Resolver extends ModelService {
 
   public registerAll() {
     this.wsServer.on("typing", this.handleTyping.bind(this));
-    this.wsServer.on("message", this.handleMessage.bind(this));
     this.wsServer.on("ping", this.handlePing.bind(this));
     this.wsServer.on(
       "image_gen_request",
@@ -102,8 +101,8 @@ export class Resolver extends ModelService {
     prompt,
     provider
   }: EventTypeMap["ai_chat_request"]) {
-    const apiKey = await new Credentials().get("OPENAI_API_KEY");
-    const openai = new OpenAI({ apiKey });
+    const apiKey = await this.cred.get("OPENAI_API_KEY");
+    const openai = this.openai.withOptions({ apiKey });
     try {
       const turbo = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -138,12 +137,18 @@ export class Resolver extends ModelService {
         | GrokChatModels
         | undefined
     );
+
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
       conversationId: event.conversationId,
       prompt: event.prompt,
-      provider: provider,
-      apiKey: event.apiKey,
+      provider,
+      hasProviderConfigured: event.hasProviderConfigured,
+      maxTokens: event.maxTokens,
+      isDefaultProvider: event.isDefaultProvider,
+      systemPrompt: event.systemPrompt,
+      temperature: event.temperature,
+      topP: event.topP,
       model: model
     });
 
@@ -159,11 +164,23 @@ export class Resolver extends ModelService {
 
     let agg = "";
 
-    const title = res?.title ?? await this.titleGenUtil(event);
+    const title = res?.title ?? (await this.titleGenUtil(event));
 
     try {
       if (provider === "gemini") {
-        const gemini = await this.geminiService.getClient(event.apiKey);
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (event.hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
+        const gemini = await this.geminiService.getClient(
+          key.apiKey ?? undefined
+        );
 
         const chat = gemini.chats.create({ model: model });
 
@@ -221,7 +238,6 @@ export class Resolver extends ModelService {
             );
           }
           if (done) {
-
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
               conversationId,
@@ -250,7 +266,20 @@ export class Resolver extends ModelService {
           }
         }
       } else if (provider === "anthropic") {
-        const anthropic = await this.anthropicService.getClient(event.apiKey);
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (event.hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
+        const anthropicFallback = await this.cred.get("ANTHROPIC_API_KEY");
+        const anthropic = await this.anthropicService.getClient(
+          key.apiKey ?? anthropicFallback
+        );
 
         const max_tokens =
           event.maxTokens ??
@@ -334,12 +363,21 @@ export class Resolver extends ModelService {
         }
       } else if (provider === "grok") {
         const xAi = await this.cred.get("X_AI_KEY");
-
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (event.hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
         const fallbackApiKey = xAi;
 
-        const client = event.apiKey
+        const client = key.apiKey
           ? this.openai.withOptions({
-              apiKey: event.apiKey,
+              apiKey: key.apiKey,
               baseURL: "https://api.x.ai/v1"
             })
           : this.openai.withOptions({
@@ -431,8 +469,18 @@ export class Resolver extends ModelService {
               ] as const)
             : ([{ role: "user", content: event.prompt }] as const)
         ) satisfies ChatCompletionMessageParam[];
-        const client = event.apiKey
-          ? this.openai.withOptions({ apiKey: event.apiKey })
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (event.hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
+        const client = key.apiKey
+          ? this.openai.withOptions({ apiKey: key.apiKey })
           : this.openai;
         const stream = (await client.chat.completions.create(
           {
@@ -531,9 +579,6 @@ export class Resolver extends ModelService {
       return;
     }
     switch (event.type) {
-      case "message":
-        await this.handleMessage(event, ws, userId);
-        break;
       case "typing":
         await this.handleTyping(event, ws, userId);
         break;
@@ -558,22 +603,6 @@ export class Resolver extends ModelService {
   }
 
   public EVENT_TYPES = [
-    "api_key_create_error",
-    "api_key_create_request",
-    "api_key_create_response",
-    "api_key_delete_error",
-    "api_key_delete_request",
-    "api_key_delete_response",
-    "api_key_list_error",
-    "api_key_list_request",
-    "api_key_list_response",
-    "api_key_set_default_error",
-    "api_key_set_default_request",
-    "api_key_set_default_response",
-    "api_key_update_error",
-    "api_key_update_request",
-    "api_key_update_response",
-    "message",
     "typing",
     "ping",
     "image_gen_request",
@@ -620,14 +649,6 @@ export class Resolver extends ModelService {
     userId: string
   ): Promise<void> {
     this.wsServer.broadcast("typing", { ...event, userId });
-  }
-
-  public async handleMessage(
-    event: EventTypeMap["message"],
-    ws: WebSocket,
-    userId: string
-  ): Promise<void> {
-    this.wsServer.broadcast("message", { ...event, userId });
   }
 
   public async handlePing(

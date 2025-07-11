@@ -1,12 +1,12 @@
 "use server";
 
-import type { Providers } from "@/types/chat-ws";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
-import { toPrismaFormat } from "@/types/chat-ws";
+import type { Providers } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 import { KeyValidator } from "@t3-chat-clone/key-validator";
+import { toPrismaFormat } from "@t3-chat-clone/types";
 
 function handleAsDefault(asDefault: FormDataEntryValue | null) {
   if (asDefault && typeof asDefault === "string") {

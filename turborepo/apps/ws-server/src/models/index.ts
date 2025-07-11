@@ -1,5 +1,5 @@
-import type { GetModelUtilRT, Provider } from "@/types/index.ts";
-import { providerModelChatApi } from "@/types/index.ts";
+import type { GetModelUtilRT, Provider } from "@t3-chat-clone/types";
+import { providerModelChatApi } from "@t3-chat-clone/types";
 
 export class ModelService {
   constructor() {}
@@ -34,9 +34,14 @@ export class ModelService {
         } else return "grok-3" as const as NonNullable<K>;
       }
       case "anthropic": {
-        if (model && providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"anthropic">)) {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"anthropic">
+          )
+        ) {
           return model;
-        } else return "claude-3-haiku-20240307" as const as NonNullable<K>
+        } else return "claude-3-haiku-20240307" as const as NonNullable<K>;
       }
       default: {
         if (
@@ -51,6 +56,6 @@ export class ModelService {
     }
   };
   public providerToPrismaFormat<const T extends Provider>(provider: T) {
-    return provider.toUpperCase() as  Uppercase<T>;
+    return provider.toUpperCase() as Uppercase<T>;
   }
 }

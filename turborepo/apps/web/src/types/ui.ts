@@ -29,15 +29,7 @@ export interface Message {
 
   avatar?: string
 
-  isEditing?: boolean // For user messages
-
-  // For branching, we might add:
-
-  // parentId?: string;
-
-  // version?: number;
-
-  // activeVersion?: number;
+  isEditing?: boolean
 
 }
 

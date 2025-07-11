@@ -109,7 +109,7 @@
     "@d0paminedriven/fs": "^6.1.0",
     "@microsoft/api-extractor": "^7.52.8",
     "@tailwindcss/postcss": "^4.1.11",
-    "@types/node": "^24.0.11",
+    "@types/node": "^24.0.12",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",

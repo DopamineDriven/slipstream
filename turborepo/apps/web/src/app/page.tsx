@@ -3,20 +3,26 @@ import type { Session } from "next-auth";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { prismaClient } from "@/lib/prisma";
+import { ormHandler } from "@/orm";
 import { ChatPage } from "@/ui/clone";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "t3 clone home"
-};
+} satisfies Metadata;
+
+const { prismaApiKeyService } = ormHandler(prismaClient);
 
 export default async function HomePage() {
-  
   const session = (await auth()) satisfies Session | null;
 
-  if (!session) return redirect("/api/auth/signin");
+  if (!session?.user) return redirect("/api/auth/signin");
+  const providerConfig = await prismaApiKeyService.getClientApiKeys(
+    session.user.id
+  );
   return (
     <Suspense fallback={"Loading..."}>
-      <ChatPage user={session?.user} />
+      <ChatPage user={session?.user} providerConfig={providerConfig} />
     </Suspense>
   );
 }

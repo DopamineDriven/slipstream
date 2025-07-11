@@ -1,7 +1,7 @@
 "use client";
 
 import "node:crypto";
-import type { Providers } from "@/types/chat-ws";
+import type { Providers } from "@t3-chat-clone/types";
 import { useState, useTransition } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
 import { Switch } from "@/ui/atoms/switch";

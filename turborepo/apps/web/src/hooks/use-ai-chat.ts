@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type {
-  MessageHandler,
-  ModelProvider,
-  SelectedProvider
+  MessageHandler
 } from "@/types/chat-ws";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import { getModel } from "@/lib/get-model";
+import { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 
 export function useAiChat() {
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
@@ -57,9 +57,10 @@ export function useAiChat() {
   const sendChat = useCallback(
     (
       prompt: string,
-      provider?: ModelProvider,
-      model?: SelectedProvider<typeof provider>,
-      apiKey?: string
+      provider?: Provider,
+      model?: AllModelsUnion,
+      hasProviderConfigured?: boolean,
+      isDefaultProvider?: boolean
     ) => {
       try {
         setStreamedText("");
@@ -72,9 +73,14 @@ export function useAiChat() {
           type: "ai_chat_request",
           conversationId: conversationId ?? "new-chat",
           prompt,
-          provider,
-          model,
-          apiKey
+          provider: provider ?? "openai",
+          model: getModel(provider ?? "openai", model as AllModelsUnion | undefined),
+          hasProviderConfigured: hasProviderConfigured ?? false,
+          isDefaultProvider: isDefaultProvider ?? false,
+          maxTokens: undefined,
+          systemPrompt: undefined,
+          temperature: undefined,
+          topP: undefined
         });
       }
     },

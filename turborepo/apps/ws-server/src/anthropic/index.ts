@@ -1,6 +1,6 @@
-import { Credentials } from "@t3-chat-clone/credentials";
 import { Anthropic } from "@anthropic-ai/sdk";
-import type { AnthropicChatModels } from "@/types/index.ts";
+import type { AnthropicChatModels } from "@t3-chat-clone/types";
+import { Credentials } from "@t3-chat-clone/credentials";
 
 export class AnthropicService {
   private defaultClient: Anthropic | null = null;

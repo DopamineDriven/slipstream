@@ -6,8 +6,9 @@ const tsupConfig = (options: Options) =>
   ({
     entry: [
       "src/index.ts",
-      "src/creds/index.ts",
-      "src/types/index.ts",
+      "src/events.ts",
+      "src/utils.ts",
+      "src/models.ts",
       "!src/test/**"
     ],
     target: ["node24"],

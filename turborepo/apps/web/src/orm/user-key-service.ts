@@ -1,7 +1,7 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
 import type { ClientWorkupProps, RecordCountsProps } from "@/types/shared";
 import type { UserKey } from "@prisma/client";
-import { Providers } from "@/types/chat-ws";
+import type { Providers } from "@t3-chat-clone/types";
 
 export class PrismaUserKeyService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {}
