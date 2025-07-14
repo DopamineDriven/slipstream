@@ -67,10 +67,10 @@ export function MessageInputBar({
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
         className={`bg-brand-component border-brand-border border-t p-2 sm:p-4 ${className}`}>
-        <div className="bg-brand-background border-brand-border relative flex items-end space-x-1 rounded-lg border p-2">
+        <div className="bg-brand-background border-brand-border relative flex items-center space-x-1 rounded-lg border p-2">
           <AttachmentPopover onSelectAttachment={handleAttachmentSelect} />
 
-          <div className="relative flex-grow">
+          <div className="relative flex-grow flex items-center">
             <Textarea
               ref={textareaRef}
               value={message}

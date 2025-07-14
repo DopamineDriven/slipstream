@@ -9,14 +9,12 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
-  History,
   KeyRound,
   LogOut,
   MessageCircleQuestion,
   Palette,
   PanelLeftClose,
   PanelRightClose,
-  Paperclip,
   User
 } from "@t3-chat-clone/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -31,11 +29,8 @@ import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
 // import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
 import {ApiKeysTab} from "@/ui/api-key-settings";
-import { AttachmentsSettingsSection } from "@/ui/settings/sections/attachment-settings-section";
 import { ContactUsSettingsSection } from "@/ui/settings/sections/contact-us-settings-section";
 import { CustomizationSettingsSection } from "@/ui/settings/sections/customization-settings-section";
-import { HistorySettingsSection } from "@/ui/settings/sections/history-settings-section";
-import { ModelsSettingsSection } from "@/ui/settings/sections/models-settings-section";
 import { SettingsNavigation } from "@/ui/settings/settings-navigation";
 import { ClientWorkupProps } from "@/types/shared";
 
@@ -66,27 +61,6 @@ const settingsSectionsConfig = [
     type: "section"
   },
   {
-    id: "history",
-    title: "History & Sync",
-    icon: History,
-    component: HistorySettingsSection,
-    type: "section"
-  },
-  {
-    id: "models",
-    title: "Models",
-    icon: KeyRound,
-    component: ModelsSettingsSection,
-    type: "section"
-  },
-  {
-    id: "attachments",
-    title: "Attachments",
-    icon: Paperclip,
-    component: AttachmentsSettingsSection,
-    type: "section"
-  },
-  {
     id: "contactUs",
     title: "Contact Us",
     icon: MessageCircleQuestion,
@@ -106,9 +80,6 @@ const SECTION_TITLES = {
   account: "Account",
   apiKeys: "API Keys",
   customization: "Customization",
-  history: "History & Sync",
-  models: "Models",
-  attachments: "Attachments",
   contactUs: "Contact Us"
 } as const;
 
@@ -145,9 +116,6 @@ export default function SettingsScaffold({ user, initialData }: { user?: UserPro
     account: null,
     apiKeys: null,
     customization: null,
-    history: null,
-    models: null,
-    attachments: null,
     contactUs: null
   });
   const scrollContainerRef = useRef<HTMLDivElement>(null);

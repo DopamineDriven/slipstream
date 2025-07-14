@@ -1,15 +1,11 @@
-import type React from "react"
-import type { User } from "next-auth"
-export interface ChatThread {
-  id: string
-  title: string
-  lastMessageAt: string
-}
+import React from "react"
+import type { ComponentPropsWithRef, JSX } from "react";
+
 
 export interface Model {
   id: string
   name: string
-  icon?: string
+  icon?: ({ ...svg }: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns" | "role">) => JSX.Element;
 }
 
 
@@ -19,9 +15,9 @@ export interface Message {
 
   sender: "user" | "ai"
 
-  text: string | React.ReactNode // Can be string for initial, ReactNode after processing
+  text: string | React.ReactNode
 
-  originalText?: string // To store the raw markdown string for editing
+  originalText?: string
 
   timestamp: string
 
@@ -33,13 +29,6 @@ export interface Message {
 
 }
 
-export interface UserProfile extends User {
-  plan: "Free" | "Pro"
-  messageUsage: {
-    current: number
-    limit: number
-  }
-}
 
 export interface KeyboardShortcut {
   action: string

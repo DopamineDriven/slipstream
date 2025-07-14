@@ -35,21 +35,14 @@ export class AnthropicService {
   public maxOutputTokens = (model: AnthropicChatModels) => {
     switch (model) {
       case "claude-3-haiku-20240307":
-      case "claude-3-opus-20240229":
-      case "claude-3-opus-latest":
         return 4096;
       case "claude-3-5-haiku-20241022":
-      case "claude-3-5-haiku-latest":
       case "claude-3-5-sonnet-20240620":
-      case "claude-3-5-sonnet-latest":
       case "claude-3-5-sonnet-20241022":
         return 8192;
       case "claude-opus-4-20250514":
-      case "claude-opus-4-0":
         return 32000;
       case "claude-sonnet-4-20250514":
-      case "claude-sonnet-4-0":
-      case "claude-3-7-sonnet-latest":
       case "claude-3-7-sonnet-20250219":
         return 64000;
       default:

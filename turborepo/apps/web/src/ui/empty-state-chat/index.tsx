@@ -4,9 +4,18 @@ import type { User } from "next-auth";
 import type React from "react";
 import { useState } from "react";
 import { mockEmptyStatePrompts } from "@/lib/mock";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
 import { motion } from "motion/react";
-import { BookOpen, Code, Compass, PenLine, Sparkles } from "@t3-chat-clone/ui";
+import {
+  BookOpen,
+  Code,
+  Compass,
+  PenLine,
+  Sparkles,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@t3-chat-clone/ui";
 
 interface EmptyStateChatProps {
   user?: User;

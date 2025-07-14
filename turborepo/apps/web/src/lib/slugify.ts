@@ -1,4 +1,4 @@
-import type { LowerAlphabet } from "@/types/union";
+import type { Unenumerate } from "@/types/helpers";
 
 export type CollapseSpaces<S extends string> =
   S extends `${infer T}  ${infer U}` ? CollapseSpaces<`${T} ${U}`> : S;
@@ -75,6 +75,23 @@ export function slugify<const T extends string>(title: T) {
     .replace(/^-+/, "")
     .replace(/-+$/, "") as ToSlug<T>;
 }
+
+/**
+ * 
+ * miscellaneous
+ * ===============
+ */
+export type Split<S extends string> = S extends `${infer First}${infer Rest}`
+  ? [First, ...Split<Rest>]
+  : [];
+
+export type SplitR<S extends string> = S extends `${infer First}${infer Rest}`
+  ? readonly [First, ...Split<Rest>]
+  : [];
+
+export type AtoZ = `abcdefghijklmnopqrstuvwxyz`;
+
+export type LowerAlphabet = Unenumerate<Split<AtoZ>>;
 
 export type AllowedSlugChars =
   | LowerAlphabet

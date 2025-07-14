@@ -17,6 +17,7 @@
     "next-env.d.ts",
     "next.config.ts",
     "global.d.ts",
+    "index.d.ts",
     "src/types/next-auth.d.ts",
     "postcss.config.mjs",
     "tailwind.config.ts",

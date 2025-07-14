@@ -56,43 +56,6 @@ export function AccountSettingsSection({ user }: { user?: User }) {
           </Button>
         </CardContent>
       </Card>
-      <Card className="bg-brand-component border-brand-border text-brand-text">
-        <CardHeader>
-          <CardTitle className="text-brand-text-emphasis">Password</CardTitle>
-          <CardDescription className="text-brand-text-muted">
-            Change your password.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Label htmlFor="current-password">Current Password</Label>
-            <Input
-              id="current-password"
-              type="password"
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="new-password">New Password</Label>
-            <Input
-              id="new-password"
-              type="password"
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="confirm-password">Confirm New Password</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-            />
-          </div>
-          <Button className="bg-brand-primary text-brand-primaryForeground hover:bg-brand-primary/90">
-            Update Password
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }

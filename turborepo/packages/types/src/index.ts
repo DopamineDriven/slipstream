@@ -22,7 +22,7 @@ export type {
 } from "@/events.ts";
 
 /**
- * providers & models
+ * model/provider types
  */
 export type {
   AllModelsUnion,
@@ -34,15 +34,32 @@ export type {
   Models,
   OpenAIChatModels,
   Provider,
-  Providers
+  Providers,
+  AnthropicDisplayNameUnion,
+  AnthropicModelIdUnion,
+  GeminiDisplayNameUnion,
+  GeminiModelIdUnion,
+  GrokDisplayNameUnion,
+  GrokModelIdUnion,
+  ModelDisplayNameToModelId,
+  ModelIdToModelDisplayName,
+  OpenAiDisplayNameUnion,
+  OpenAiModelIdUnion
 } from "@/models.ts";
 
 export {
   toPrismaFormat,
+  allProviders,
+  getModelsForProvider,
   providerModelResponsesApi,
-  providerModelChatApi
+  providerModelChatApi,
+  displayNameToModelId,
+  getDisplayNameByModelId,
+  getModelIdByDisplayName,
+  defaultModelDisplayNameByProvider,
+  defaultModelIdByProvider,
+  modelIdToDisplayName
 } from "@/models.ts";
-
 
 /**
  * convenient utility types
@@ -65,3 +82,24 @@ export type {
   Without,
   XOR
 } from "@/utils.ts";
+
+/**
+ * api-handling types for codegen
+ */
+
+export type {
+  AnthropicError,
+  AnthropicModel,
+  AnthropicResponse,
+  AnthropicSuccess,
+  FlexiProvider,
+  GeminiError,
+  GeminiModel,
+  GeminiResponse,
+  GeminiSuccess,
+  GrokModelsResponse,
+  ListModelsSingleton,
+  OpenAiError,
+  OpenAiResponse,
+  SuccessResponse
+} from "@/types.ts";

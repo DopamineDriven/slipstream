@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
   Input,
   LogOut,
-  MessageSquareText,
   ScrollArea,
   Search,
   Settings
@@ -61,6 +60,7 @@ export function Sidebar({
   onOpenSettings: _openSettings,
   className = ""
 }: SidebarProps) {
+  const _x = onSelectChat;
   const dropDownMap = [
     {
       name: "settings-sidebar",
@@ -114,20 +114,17 @@ export function Sidebar({
         <div className="space-y-2">
           {chatThreads ? (
             chatThreads.map(thread => (
-              <Link href={`/#${thread.id}`} passHref>
-              <Button
-                key={thread.id}
-                variant="ghost"
-                className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text h-auto w-full justify-start py-1"
-                onClick={() => onSelectChat(thread.id)}>
-                <MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
-                <span className="flex-1 text-left break-words whitespace-normal">
-                  {thread.title ?? "No title set"}
-                </span>
-                <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
+              <Link key={thread.id} href={`/chat/${thread.id}`} passHref>
+                <div
+                  role="button"
+                  className="text-foreground hover:bg-background/30 hover:text-foreground/90 flex min-w-0 grow items-center">
+                  <div className="truncate">
+                    <span className="">{thread.title ?? "No title set"}</span>
+                  </div>
+                  {/* <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
                   {new Date(thread.updatedAt).toISOString()}
-                </span>
-              </Button>
+                </span> */}
+                </div>
               </Link>
             ))
           ) : (

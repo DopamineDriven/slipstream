@@ -1,21 +1,23 @@
+import { prismaClient } from "@/prisma/index.ts";
+import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import { Credentials } from "@t3-chat-clone/credentials";
-import { EncryptionService } from "@t3-chat-clone/encryption";
 
 dotenv.config();
 
-async function testingEncryption() {
-  const cred = new Credentials();
-  const myPersonalKey = await cred.get("OPENAI_API_KEY");
 
-  const encryptionHandler = new EncryptionService();
 
-  if (myPersonalKey) {
-    return encryptionHandler.encryptText(myPersonalKey);
-  } else return "no dice";
-}
+const data = async () =>
+  await prismaClient.conversation.findMany({ include: { messages: true } });
 
-testingEncryption().then(res => {
-  console.log(res);
-  return res;
+const fs = new Fs(process.cwd());
+data().then(v => {
+  try {
+    v.forEach(function (s) {
+      fs.withWs(`src/__out__/bulk/md/${s.title?.concat("-"+s.id) ?? s.id}.md`, s.messages.find((t) => t.senderType === "AI")?.content ?? "");
+    });
+  } catch (err) {
+    console.error(err);
+  } finally {
+    return v;
+  }
 });

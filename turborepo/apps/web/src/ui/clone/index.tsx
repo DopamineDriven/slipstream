@@ -1,19 +1,15 @@
 "use client";
 
 import type { ClientWorkupProps } from "@/types/shared";
-import type { Message, Model } from "@/types/ui";
+import type { Message } from "@/types/ui";
+import type { Conversation } from "@prisma/client";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import {
-  availableModels,
-  mockMessages as initialMessages,
-  mockUserProfile
-} from "@/lib/mock";
+import { defaultModelSelection, ModelSelection } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { ChatArea } from "@/ui/chat-area";
 import { EmptyStateChat } from "@/ui/empty-state-chat";
@@ -28,13 +24,10 @@ import type { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 import {
   ArrowDownCircle,
   Button,
-  ChevronDown,
-  PanelLeftClose,
-  PanelRightClose,
   Settings,
   ShareIcon
 } from "@t3-chat-clone/ui";
-import type { Conversation } from "@prisma/client";
+import { ProviderModelSelector } from "../model-selector-drawer";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -43,38 +36,34 @@ const ThemeToggle = dynamic(
 
 const SCROLL_THRESHOLD = 100;
 
+interface ChatPageProps {
+  user?: User;
+  providerConfig: ClientWorkupProps;
+  recentConvos?: Conversation[];
+}
+
 export function ChatPage({
   user,
   providerConfig,
   recentConvos
-}: {
-  user?: User;
-  providerConfig: ClientWorkupProps;
-  recentConvos?: Conversation[]
-}) {
-  const _implementProviderWorkup = providerConfig;
+}: ChatPageProps) {
   const {
     // should definitely be double or triple checking this in a lifecycle hook before allowing prompts to be sent -- if not connected that means their session is invalid and they need to sign in again (shouldn't happen but just in case)
-    isConnected: _isConnected,
+    isConnected,
     streamedText,
     // need to keep state current as more than one message is sent
     messages: _aiMessages,
     // we should have this at least listen for any subtle errors that may be occurring otherwise we're flying blind in that regard
-    error: _error,
+    error,
     isComplete,
     sendChat
   } = useAiChat();
-  const [messages, setMessages] = useState<Message[]>(
-    initialMessages.map(msg => ({
-      ...msg,
-      originalText: typeof msg.text === "string" ? msg.text : ""
-    }))
-  );
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [isChatEmpty, setIsChatEmpty] = useState(messages.length === 0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [selectedModel, setSelectedModel] = useState<Model>(
-    availableModels[0] as Model
+  const [selectedModel, setSelectedModel] = useState<ModelSelection>(
+    defaultModelSelection
   );
   const [isModelDrawerOpen, setIsModelDrawerOpen] = useState(false);
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
@@ -82,6 +71,7 @@ export function ChatPage({
   const chatAreaContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollToBottomButton, setShowScrollToBottomButton] =
     useState(false);
+  const [_isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
 
   const { resolvedTheme } = useTheme();
 
@@ -111,6 +101,22 @@ export function ChatPage({
   useEffect(() => {
     setIsSidebarOpen(isDesktop);
   }, [isDesktop]);
+
+  // Connection check as requested in comments
+  useEffect(() => {
+    if (!isConnected) {
+      console.warn("WebSocket not connected - user may need to sign in again");
+      // TODO: Redirect to sign in or show connection error
+    }
+  }, [isConnected]);
+
+  // Error handling as requested in comments
+  useEffect(() => {
+    if (error) {
+      console.error("AI Chat Error:", error);
+      // TODO: Show user-facing error message
+    }
+  }, [error]);
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (chatAreaContainerRef.current) {
@@ -148,43 +154,46 @@ export function ChatPage({
     modelId: string,
     isEditSubmit = false
   ) => {
-    const newMessage: Message = {
-      id: crypto.randomUUID(),
-      sender: "user",
-      text,
-      originalText: text,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      }),
-      avatar: user?.image ?? mockUserProfile.image
-    };
+    // Connection check before sending as requested in comments
+    if (!isConnected) {
+      console.error("Cannot send message: WebSocket not connected");
+      // TODO: Show user error message about connection
+      return;
+    }
+    // Optimistic UI update - ID will be resolved when server persists to database
     if (!isEditSubmit) {
-      setMessages(prev => [...prev, newMessage]);
+      const optimisticMessage: Message = {
+        id: "temp-user-message", // Static temp ID - easy to find and replace with real DB ID
+        sender: "user",
+        text,
+        originalText: text,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        avatar: user?.image ?? "/svgs/user.svg"
+      };
+      setMessages(prev => [...prev, optimisticMessage]);
     }
     setIsChatEmpty(false);
 
     // Use real streaming via sendChat (SHOULD THIS BE MEMOIZED OR HANDLED IN A MORE PERFORMANT MANNER?)
-    const provider = (selectedModel.id.includes("gpt")
-      ? "openai"
-      : selectedModel.id.includes("gemini")
-        ? "gemini"
-        : selectedModel.id.includes("claude")
-          ? "anthropic"
-          : selectedModel.id.includes("grok")
-            ? "grok"
-            : selectedModel.id.includes("xai")
+    const provider = (
+      selectedModel.provider.includes("gpt")
+        ? "openai"
+        : selectedModel.provider.includes("gemini")
+          ? "gemini"
+          : selectedModel.provider.includes("claude")
+            ? "anthropic"
+            : selectedModel.provider.includes("grok")
               ? "grok"
-              : "openai") satisfies Provider;
+              : selectedModel.provider.includes("xai")
+                ? "grok"
+                : "openai"
+    ) satisfies Provider;
 
-    const hasConfigured =
-      _implementProviderWorkup.isSet[
-        provider as keyof typeof _implementProviderWorkup.isSet
-      ];
-    const isDefault =
-      _implementProviderWorkup.isDefault[
-        provider as keyof typeof _implementProviderWorkup.isDefault
-      ];
+    const hasConfigured = providerConfig.isSet[provider];
+    const isDefault = providerConfig.isDefault[provider];
     // please NEVER use as any....ever. just ask if you aren't sure what type to assign something that requires an explicit annotation please
     sendChat(
       text,
@@ -203,7 +212,7 @@ export function ChatPage({
           : msg
       )
     );
-    handleSendMessage(newText, selectedModel.id, true);
+    handleSendMessage(newText, selectedModel.modelId, true);
   };
 
   const handleNewChat = () => {
@@ -213,7 +222,7 @@ export function ChatPage({
   };
 
   const handlePromptSelect = (prompt: string) => {
-    handleSendMessage(prompt, selectedModel.id);
+    handleSendMessage(prompt, selectedModel.modelId);
   };
 
   const handleShareChat = () => {
@@ -221,73 +230,105 @@ export function ChatPage({
     alert("Share functionality to be implemented!");
   };
 
-  const header = (
-    <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-        {isSidebarOpen ? <PanelLeftClose /> : <PanelRightClose />}
-        <span className="sr-only">
-          {isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-        </span>
-      </Button>
-      <Button
-        variant="ghost"
-        onClick={() => setIsModelDrawerOpen(true)}
-        className="text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base">
-        {selectedModel.icon && (
-          <Image
-            src={selectedModel.icon || "/placeholder.svg"}
-            alt=""
-            width={16}
-            height={16}
-            className="mr-2 rounded-sm"
-          />
-        )}
-        {selectedModel.name}
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
-      <div className="flex items-center space-x-1 sm:space-x-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleShareChat}
-          className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-          <ShareIcon className="size-[1.125rem]" />
-          <span className="sr-only">Share chat</span>
-        </Button>
-        {isDesktop && (
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-            className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-            <Link href="/settings">
-              <Settings className="size-[1.125rem]" />
-              <span className="sr-only">Settings</span>
-            </Link>
-          </Button>
-        )}
-        <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
-        {!isDesktop && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSettingsDrawerOpen(true)}
-            className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
-            <Settings />
-            <span className="sr-only">Settings</span>
-          </Button>
-        )}
-      </div>
-    </header>
-  );
+  // const header = (
+  //   <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
+  //     <Button
+  //       variant="ghost"
+  //       size="icon"
+  //       onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+  //       className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+  //       {isSidebarOpen ? <PanelLeftClose /> : <PanelRightClose />}
+  //       <span className="sr-only">
+  //         {isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+  //       </span>
+  //     </Button>
+  //     <Button
+  //       variant="ghost"
+  //       onClick={() => setIsModelDrawerOpen(true)}
+  //       className="text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base">
+  //       {selectedModel.provider &&
+  //         (selectedModel.provider === "gemini" ? (
+  //           <GeminiIcon />
+  //         ) : selectedModel.provider === "grok" ? (
+  //           <XAiIcon />
+  //         ) : selectedModel.provider === "anthropic" ? (
+  //           <AnthropicIcon />
+  //         ) : (
+  //           <OpenAiIcon />
+  //         ))}
+  //       {selectedModel.displayName}
+  //       <ChevronDown className="ml-1 h-4 w-4" />
+  //     </Button>
+  //     <div className="flex items-center space-x-1 sm:space-x-2">
+  //       <Button
+  //         variant="ghost"
+  //         size="icon"
+  //         onClick={handleShareChat}
+  //         className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+  //         <ShareIcon className="size-[1.125rem]" />
+  //         <span className="sr-only">Share chat</span>
+  //       </Button>
+  //       {isDesktop && (
+  //         <Button
+  //           variant="ghost"
+  //           size="icon"
+  //           asChild
+  //           className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+  //           <Link href="/settings">
+  //             <Settings className="size-[1.125rem]" />
+  //             <span className="sr-only">Settings</span>
+  //           </Link>
+  //         </Button>
+  //       )}
+  //       <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
+  //       {!isDesktop && (
+  //         <Button
+  //           variant="ghost"
+  //           size="icon"
+  //           onClick={() => setIsSettingsDrawerOpen(true)}
+  //           className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+  //           <Settings />
+  //           <span className="sr-only">Settings</span>
+  //         </Button>
+  //       )}
+  //     </div>
+  //   </header>
+  // );
 
   const chatContent = (
     <div className="relative flex h-full flex-grow flex-col overflow-hidden">
-      {header}
+      <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
+        <div className="w-10" />{" "}
+        {/* Spacer for mobile since sidebar toggle is in layout */}
+        <ProviderModelSelector
+          selectedModel={selectedModel}
+          onModelChangeAction={model => setSelectedModel(model)}
+          onClick={() => setIsModelSelectorOpen(true)}
+        />
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleShareChat}
+            className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+            <ShareIcon className="size-5" />
+            <span className="sr-only">Share chat</span>
+          </Button>
+          {isDesktop && (
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
+              <Link href="/settings">
+                <Settings className="size-5" />
+                <span className="sr-only">Settings</span>
+              </Link>
+            </Button>
+          )}
+          <ThemeToggle className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component" />
+        </div>
+      </header>
       <main
         ref={chatAreaContainerRef}
         className="relative flex flex-grow flex-col overflow-y-auto">
@@ -320,7 +361,7 @@ export function ChatPage({
         onSendMessage={(text, modelId) =>
           handleSendMessage(text, modelId, false)
         }
-        currentModelId={selectedModel.id}
+        currentModelId={selectedModel.modelId}
         className="shrink-0"
       />
     </div>
@@ -390,10 +431,11 @@ export function ChatPage({
         )}
       </div>
       <MobileModelSelectorDrawer
+
         isOpen={isModelDrawerOpen}
-        onOpenChange={setIsModelDrawerOpen}
+        onOpenChangeAction={setIsModelDrawerOpen}
         selectedModel={selectedModel}
-        onSelectModel={setSelectedModel}
+        onSelectModelAction={setSelectedModel}
       />
       <SettingsDrawer
         user={user}

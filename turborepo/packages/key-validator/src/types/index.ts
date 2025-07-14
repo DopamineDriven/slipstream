@@ -29,7 +29,7 @@ export type XOR<T, U> =
 
 export interface ListModelsSingleton {
   id: string;
-  objet: string;
+  object: string;
   created: number;
   owned_by: string;
 }
@@ -38,6 +38,8 @@ export type SuccessResponse = {
   object: "list";
   data: ListModelsSingleton[];
 };
+
+export type GrokModelsResponse = SuccessResponse;
 
 export type OpenAiError = {
   error: {

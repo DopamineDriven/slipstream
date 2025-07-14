@@ -81,11 +81,7 @@ export {
   AlertDialogAction,
   AlertDialogCancel
 } from "@/ui/alert-dialog";
-export type {
-  AlertDialogProps,
-  AlertDialogActionProps,
-  AlertDialogCancelProps
-} from "@/ui/alert-dialog";
+export type { AlertDialogProps } from "@/ui/alert-dialog";
 export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
@@ -132,9 +128,7 @@ export {
 } from "@/ui/dropdown-menu";
 export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
-export type { InputProps } from "@/ui/input";
 export { Label } from "@/ui/label";
-export type { LabelProps } from "@/ui/label";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";
 export { ScrollArea, ScrollBar } from "@/ui/scroll-area";
@@ -156,5 +150,7 @@ export { Separator } from "@/ui/separator";
 export type { SeparatorProps } from "@/ui/separator";
 export { Switch } from "@/ui/switch";
 export type { SwitchProps } from "@/ui/switch";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+export type { TabsProps } from "@/ui/tabs";
 export { Textarea } from "@/ui/textarea";
 export type { TextareaProps } from "@/ui/textarea";
