@@ -2,27 +2,23 @@
 
 import type { Conversation } from "@prisma/client";
 import type { User } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
-import { shimmer } from "@/lib/shimmer";
 import { cn } from "@/lib/utils";
+import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { motion } from "motion/react";
 import {
   Button,
-  ChevronDown,
   CirclePlus,
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   Input,
   LogOut,
   ScrollArea,
   Search,
-  Settings
+  Settings,
+  SquarePen,
+  Trash
 } from "@t3-chat-clone/ui";
+import { Logo } from "../logo";
 
 /**
  * Conversation has the following shape
@@ -47,6 +43,8 @@ interface SidebarProps {
   chatThreads?: Conversation[];
   onNewChat?: () => void;
   onSelectChat?: (id: string) => void;
+  onUpdateChatTitleAction?: (conversationId: string, newTitle: string) => void;
+  onDeleteChatAction?: (threadId: string) => void;
   onOpenSettings?: () => void;
   className?: string;
   user?: User;
@@ -55,36 +53,17 @@ interface SidebarProps {
 export function Sidebar({
   chatThreads,
   user: userProfile,
+  // TODO implement route handling logic
   onNewChat = () => console.log("New Chat"),
+  // TODO implement route handling logic
   onSelectChat = id => console.log("Select Chat:", id),
+  // TODO IMPLEMENT DYNAMIC HANDLING OF TITLE RETURNED BY FIRST CHUNK OF WEBSOCKET RESPONSE (listen using websocket context provider and parse out title during ai_chat_chunk event if a placeholder title -- "new chat" is temprarily set)
+  onUpdateChatTitleAction: _onUpdateChatTitleAction,
   onOpenSettings: _openSettings,
   className = ""
 }: SidebarProps) {
   const _x = onSelectChat;
-  const dropDownMap = [
-    {
-      name: "settings-sidebar",
-      Component: () => (
-        <Link href="/settings" passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        </Link>
-      )
-    },
-    {
-      name: "signout-sidebar",
-      Component: () => (
-        <Link href="/api/auth/signout" passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Sign Out</span>
-          </DropdownMenuItem>
-        </Link>
-      )
-    }
-  ];
+
   return (
     <motion.div
       initial={{ x: -300 }}
@@ -94,6 +73,11 @@ export function Sidebar({
         `bg-brand-sidebar text-brand-text border-brand-border flex h-full flex-col space-y-4 border-r p-4`,
         className
       )}>
+      <div className="flex items-center justify-between px-1 py-0.5">
+        <div className="flex items-center">
+          <Logo className="text-foreground size-12" />
+        </div>
+      </div>
       <Button
         variant="outline"
         className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start"
@@ -114,16 +98,13 @@ export function Sidebar({
         <div className="space-y-2">
           {chatThreads ? (
             chatThreads.map(thread => (
-              <Link key={thread.id} href={`/chat/${thread.id}`} passHref>
+              <Link key={thread.id} href={`/chat/${thread.id}`} passHref scroll={false}>
                 <div
                   role="button"
                   className="text-foreground hover:bg-background/30 hover:text-foreground/90 flex min-w-0 grow items-center">
                   <div className="truncate">
-                    <span className="">{thread.title ?? "No title set"}</span>
+                    <span className="">{thread.title ?? "Untitled"}</span>
                   </div>
-                  {/* <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
-                  {new Date(thread.updatedAt).toISOString()}
-                </span> */}
                 </div>
               </Link>
             ))
@@ -154,50 +135,7 @@ export function Sidebar({
           )}
         </div>
       </ScrollArea>
-      <div className="border-brand-border mt-auto border-t pt-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="hover:bg-brand-component w-full items-center justify-between">
-              <div className="group block shrink-0 p-2">
-                <div className="flex items-center select-none">
-                  <Image
-                    className="inline-block size-10 rounded-full"
-                    src={userProfile?.image ?? "/placeholder.svg"}
-                    alt={userProfile?.name ?? "user image"}
-                    width={36}
-                    height={36}
-                    placeholder="blur"
-                    blurDataURL={shimmer([36, 36])}
-                  />
-                  <div className="ml-2.5 inline-block text-left align-middle">
-                    <p className="text-foreground text-sm leading-snug font-normal">
-                      {userProfile?.name ?? "Username"}
-                    </p>
-                    <p className="text-secondary-foreground text-xs leading-snug">
-                      {userProfile?.email ?? "user@email.com"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <ChevronDown className="text-secondary-foreground size-4 sm:size-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="bg-brand-component border-brand-border text-brand-text w-56"
-            side="top"
-            align="start">
-            <DropdownMenuLabel className="text-brand-text-muted">
-              My Account
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-brand-border" />
-            {dropDownMap.map(({ Component, name }) => (
-              <Component key={name} />
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <SidebarDropdownMenu user={userProfile} />
     </motion.div>
   );
 }

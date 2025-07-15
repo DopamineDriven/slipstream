@@ -2,7 +2,7 @@
 
 import type { ClientWorkupProps } from "@/types/shared";
 import type { Message } from "@/types/ui";
-import type { Conversation } from "@prisma/client";
+import type { Conversation, Message as PrismaMessage } from "@prisma/client";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
@@ -40,6 +40,7 @@ interface ChatPageProps {
   user?: User;
   providerConfig: ClientWorkupProps;
   recentConvos?: Conversation[];
+  conversationDetails?:null | (Conversation & { messages: PrismaMessage[] })
 }
 
 export function ChatPage({

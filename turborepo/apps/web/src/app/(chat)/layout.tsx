@@ -1,6 +1,6 @@
 import type { Viewport } from "next";
 import type { ReactNode } from "react";
-// import { ScaffoldChatLayout } from "@/ui/chat-layout";
+import { ScaffoldChatLayout } from "@/ui/chat-layout";
 export const viewport = {
   colorScheme: "normal",
   userScalable: true,
@@ -16,5 +16,5 @@ export default function ChatLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  return <section>{children}</section>;
+  return <ScaffoldChatLayout>{children}</ScaffoldChatLayout>;
 }

@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
-import { ChatPage } from "@/ui/clone";
+// import { ChatPage } from "@/ui/clone";
+import {ChatHome} from "@/ui/chat-page";
 
 export const metadata = {
   title: "chat"
@@ -29,7 +30,7 @@ export default async function HomePage() {
 
   return (
     <Suspense fallback={"Loading..."}>
-      <ChatPage user={session.user} providerConfig={providerConfig} recentConvos={recentConvos} />
+      <ChatHome user={session.user} providerConfig={providerConfig} recentConvos={recentConvos} />
     </Suspense>
   );
 }

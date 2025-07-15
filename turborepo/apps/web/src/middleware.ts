@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse, userAgent } from "next/server";
+
 export { authConfig } from "@/lib/auth.config";
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
@@ -13,8 +14,8 @@ function detectDeviceAndSetCookies(
   const lng = request.headers.get("x-vercel-ip-longitude") ?? "-87.8966849";
   const lat = request.headers.get("x-vercel-ip-latitude") ?? "41.8338486";
   const tz = request.headers.get("x-vercel-ip-timezone") ?? "america/chicago";
-  const { device, ua } = userAgent(request);
-
+  const { os, device, ua } = userAgent(request);
+  const isMac = /(mac)/gim.test(os?.name ?? "") ?? false;
   const latlng = `${lat},${lng}` as const;
 
   const { hostname } = request.nextUrl;
@@ -47,6 +48,10 @@ function detectDeviceAndSetCookies(
     response.cookies.delete("tz");
   }
 
+  if (request.cookies.has("isMac")) {
+    response.cookies.delete("isMac");
+  }
+
   const isIOS = /(ios|iphone|ipad|iwatch)/i.test(ua);
 
   const ios = `${isIOS}` as const;
@@ -62,6 +67,7 @@ function detectDeviceAndSetCookies(
   response.cookies.set("tz", tz);
   response.cookies.set("country", country);
   response.cookies.set("city", city);
+  response.cookies.set("isMac", `${isMac}`);
   response.headers.set("Access-Control-Allow-Origin", "*");
 
   return response;
