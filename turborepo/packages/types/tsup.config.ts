@@ -9,7 +9,8 @@ const tsupConfig = (options: Options) =>
       "src/events.ts",
       "src/utils.ts",
       "src/models.ts",
-      "!src/test/**"
+      "src/types.ts",
+      "src/codegen/**/*.ts"
     ],
     target: ["node24"],
     dts: true,

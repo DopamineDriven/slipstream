@@ -2,52 +2,24 @@
 
 import type { Conversation } from "@prisma/client";
 import type { User } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
-import { shimmer } from "@/lib/shimmer";
 import { cn } from "@/lib/utils";
+import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
+import { Logo } from "@/ui/logo";
+import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { motion } from "motion/react";
 import {
   Button,
-  ChevronDown,
   CirclePlus,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   Input,
-  LogOut,
-  MessageSquareText,
   ScrollArea,
-  Search,
-  Settings
+  Search
 } from "@t3-chat-clone/ui";
-
-/**
- * Conversation has the following shape
- *
- *```ts
- * type Conversation =  {
-    id: string;
-    userId: string;
-    userKeyId: string | null;
-    title: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    branchId: string | null;
-    parentId: string | null;
-    isShared: boolean;
-    shareToken: string | null;
-}
-    ```
- */
 
 interface SidebarProps {
   chatThreads?: Conversation[];
-  onNewChat?: () => void;
-  onSelectChat?: (id: string) => void;
+  onUpdateChatTitleAction?: (conversationId: string, newTitle: string) => void;
+  onDeleteChatAction?: (threadId: string) => void;
   onOpenSettings?: () => void;
   className?: string;
   user?: User;
@@ -56,35 +28,11 @@ interface SidebarProps {
 export function Sidebar({
   chatThreads,
   user: userProfile,
-  onNewChat = () => console.log("New Chat"),
-  onSelectChat = id => console.log("Select Chat:", id),
-  onOpenSettings: _openSettings,
+  // TODO implement route handling logi
+  // TODO IMPLEMENT DYNAMIC HANDLING OF TITLE RETURNED BY FIRST CHUNK OF WEBSOCKET RESPONSE (listen using websocket context provider and parse out title during ai_chat_chunk event if a placeholder title -- "new chat" is temprarily set)
+  onUpdateChatTitleAction: _onUpdateChatTitleAction,
   className = ""
 }: SidebarProps) {
-  const dropDownMap = [
-    {
-      name: "settings-sidebar",
-      Component: () => (
-        <Link href="/settings" passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        </Link>
-      )
-    },
-    {
-      name: "signout-sidebar",
-      Component: () => (
-        <Link href="/api/auth/signout" passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Sign Out</span>
-          </DropdownMenuItem>
-        </Link>
-      )
-    }
-  ];
   return (
     <motion.div
       initial={{ x: -300 }}
@@ -94,13 +42,18 @@ export function Sidebar({
         `bg-brand-sidebar text-brand-text border-brand-border flex h-full flex-col space-y-4 border-r p-4`,
         className
       )}>
-      <Button
-        variant="outline"
-        className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start"
-        onClick={onNewChat}>
-        <CirclePlus className="mr-2 h-5 w-5" /> New Chat
-      </Button>
-
+      <div className="flex items-center justify-between px-1 py-0.5">
+        <div className="flex items-center">
+          <Logo className="text-foreground size-12" />
+        </div>
+      </div>
+      <Link href="/">
+        <Button
+          variant="outline"
+          className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start">
+          <CirclePlus className="mr-2 h-5 w-5" /> New Chat
+        </Button>
+      </Link>
       <div className="relative">
         <Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
@@ -112,26 +65,37 @@ export function Sidebar({
 
       <ScrollArea className="flex-grow">
         <div className="space-y-2">
-          {chatThreads ? (
-            chatThreads.map(thread => (
-              <Link href={`/#${thread.id}`} passHref>
-              <Button
-                key={thread.id}
-                variant="ghost"
-                className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text h-auto w-full justify-start py-1"
-                onClick={() => onSelectChat(thread.id)}>
-                <MessageSquareText className="mr-2 h-4 w-4 shrink-0" />
-                <span className="flex-1 text-left break-words whitespace-normal">
-                  {thread.title ?? "No title set"}
-                </span>
-                <span className="text-brand-text-muted ml-auto shrink-0 self-start text-xs">
-                  {new Date(thread.updatedAt).toISOString()}
-                </span>
-              </Button>
-              </Link>
-            ))
+          {chatThreads && chatThreads.length > 0 ? (
+            <>
+              <div className="px-2 py-1">
+                <h3 className="text-brand-text-muted text-xs font-medium tracking-wider uppercase">
+                  Recent
+                </h3>
+              </div>
+              {chatThreads.map(thread => (
+                <div key={thread.id} className="group relative">
+                  <Link href={`/chat/${thread.id}`} passHref>
+                    <div
+                      role="button"
+                      className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text flex h-auto min-h-[44px] w-full items-center justify-start rounded-md px-3 py-2 pr-10 transition-colors">
+                      <div className="flex w-full min-w-0 flex-col items-start text-left">
+                        <NativeTruncatedText
+                          text={thread?.title ?? "Untitled"}
+                          className="w-full text-left text-sm leading-tight font-medium"
+                          baseChars={20}
+                          maxExtraChars={4}
+                        />
+                        <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
+                          {new Date(thread.updatedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </>
           ) : (
-            <div className="text-center align-middle">
+            <div className="text-center align-middle py-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -157,50 +121,7 @@ export function Sidebar({
           )}
         </div>
       </ScrollArea>
-      <div className="border-brand-border mt-auto border-t pt-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="hover:bg-brand-component w-full items-center justify-between">
-              <div className="group block shrink-0 p-2">
-                <div className="flex items-center select-none">
-                  <Image
-                    className="inline-block size-10 rounded-full"
-                    src={userProfile?.image ?? "/placeholder.svg"}
-                    alt={userProfile?.name ?? "user image"}
-                    width={36}
-                    height={36}
-                    placeholder="blur"
-                    blurDataURL={shimmer([36, 36])}
-                  />
-                  <div className="ml-2.5 inline-block text-left align-middle">
-                    <p className="text-foreground text-sm leading-snug font-normal">
-                      {userProfile?.name ?? "Username"}
-                    </p>
-                    <p className="text-secondary-foreground text-xs leading-snug">
-                      {userProfile?.email ?? "user@email.com"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <ChevronDown className="text-secondary-foreground size-4 sm:size-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="bg-brand-component border-brand-border text-brand-text w-56"
-            side="top"
-            align="start">
-            <DropdownMenuLabel className="text-brand-text-muted">
-              My Account
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-brand-border" />
-            {dropDownMap.map(({ Component, name }) => (
-              <Component key={name} />
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <SidebarDropdownMenu user={userProfile} />
     </motion.div>
   );
 }

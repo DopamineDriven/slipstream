@@ -1,0 +1,63 @@
+export const displayNameModelsByProvider = {
+  openai: [
+    "GPT 4.1",
+    "GPT 4.1 Mini",
+    "GPT 4.1 Nano",
+    "GPT 4.5 Preview",
+    "o4 Mini",
+    "o1",
+    "o3",
+    "o1 Mini",
+    "o3 Mini",
+    "GPT 4o",
+    "GPT 4o Audio Preview",
+    "GPT 4o Mini",
+    "GPT 4o Search Preview",
+    "GPT 4o Mini Search Preview",
+    "GPT 4o Mini Audio Preview",
+    "GPT 4",
+    "GPT 4 Turbo",
+    "GPT 3.5 Turbo",
+    "GPT 3.5 Turbo 16k"
+  ],
+  gemini: [
+    "Gemini 2.5 Flash",
+    "Gemini 2.5 Pro",
+    "Gemini 2.5 Flash-Lite Preview 06-17",
+    "Gemini 2.5 Flash Preview Native Audio Dialog",
+    "Gemini 2.5 Flash Exp Native Audio Thinking Dialog",
+    "Gemini 2.5 Flash Preview TTS",
+    "Gemini 2.5 Pro Preview TTS",
+    "Gemini 2.0 Flash",
+    "Gemini 2.0 Flash Preview Image Generation",
+    "Gemini 2.0 Flash-Lite",
+    "Gemini 1.5 Flash",
+    "Gemini 1.5 Pro",
+    "Gemini Embedding Experimental",
+    "Imagen 4 (Preview)",
+    "Imagen 4 Ultra (Preview)",
+    "Imagen 3.0 002 model",
+    "Veo 2",
+    "Gemini Live 2.5 Flash Preview",
+    "Gemini 2.0 Flash 001"
+  ],
+  grok: [
+    "Grok 3",
+    "Grok 2",
+    "Grok 2 Vision",
+    "Grok 3 Fast",
+    "Grok 3 Mini",
+    "Grok 3 Mini Fast",
+    "Grok 4",
+    "Grok 2 Image"
+  ],
+  anthropic: [
+    "Claude Opus 4",
+    "Claude Sonnet 4",
+    "Claude Sonnet 3.7",
+    "Claude Haiku 3.5",
+    "Claude Sonnet 3.5 (New)",
+    "Claude Sonnet 3.5 (Old)",
+    "Claude Haiku 3"
+  ]
+} as const;

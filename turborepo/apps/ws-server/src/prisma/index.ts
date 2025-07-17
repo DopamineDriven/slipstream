@@ -243,7 +243,12 @@ export class PrismaService extends ModelService {
     });
   }
 }
+// const p = new PrismaService(prismaClient);
 
+// p.getMessagesByConversationId("iy7x2xz720owhf5wfbtazany").then((v) => {
+//   console.log(v);
+//   return v;
+// })
 // const p = new PrismaService(prismaClient);
 
 // const fs = new Fs(process.cwd());

@@ -8,7 +8,7 @@
     "build:encryption": "turbo build --filter=@t3-chat-clone/encryption",
     "build:key-validator": "turbo build --filter=@t3-chat-clone/key-validator",
     "build:redis-service": "turbo build --filter=@t3-chat-clone/redis-service",
-    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && build:types",
+    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && pnpm build:types && pnpm build:ws-server",
     "build:types": "turbo build --filter=@t3-chat-clone/types",
     "build:ui": "turbo build --filter=@t3-chat-clone/ui",
     "build:web": "turbo build --filter=@t3-chat-clone/web",
@@ -35,15 +35,15 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.14",
     "dotenv": "^17.2.0",
-    "eslint": "^9.30.1",
+    "eslint": "^9.31.0",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "vercel": "^44.4.0"
+    "vercel": "^44.4.1"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {

@@ -26,7 +26,7 @@ async function exe() {
 
     const { RedisInstance } = await import("@t3-chat-clone/redis-service");
 
-    const redisInstance = new RedisInstance(redisUrl);
+    const redisInstance = RedisInstance.getInstance(redisUrl);
 
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
 
@@ -40,7 +40,7 @@ async function exe() {
     const { WSServer } = await import("@/ws-server/index.ts");
 
     const wsServer = new WSServer(
-      { port, redisUrl, jwtSecret },
+      { port, jwtSecret },
       redisInstance,
       prisma
     );
@@ -71,7 +71,14 @@ async function exe() {
 
     resolver.registerAll();
     wsServer.setResolver(resolver);
-    wsServer.start();
+        setInterval(async () => {
+      try {
+        await redisInstance.ping();
+      } catch (err) {
+        console.error('Redis health check failed: ', err instanceof Error ? err.message : "");
+      }
+    }, 30000);
+    await wsServer.start();
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message);
     else throw new Error(`something went wrong...`);

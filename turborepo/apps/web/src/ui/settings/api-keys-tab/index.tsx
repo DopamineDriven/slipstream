@@ -1,7 +1,6 @@
 "use client";
 
 // import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
-import type { Providers } from "@t3-chat-clone/types";
 import { motion } from "motion/react";
 // import { useSession } from "next-auth/react";
 import {
@@ -21,28 +20,7 @@ interface ApiKeysTabPropss {
   className?: string;
 }
 
-const _providerObj = [
-  {
-    provider: "anthropic",
-    text: "Anthropic Api Key",
-    icon: "https://raw.githubusercontent.com/DopamineDriven/t3-chat-clone/refs/heads/main/turborepo/apps/web/public/claude-ai-icon.svg"
-  },
-  {
-    provider: "gemini",
-    text: "Gemini Api Key",
-    icon: "https://raw.githubusercontent.com/DopamineDriven/t3-chat-clone/refs/heads/main/turborepo/apps/web/public/google-gemini-icon.svg"
-  },
-  {
-    provider: "grok",
-    text: "Grok Api Key",
-    icon: "https://raw.githubusercontent.com/DopamineDriven/t3-chat-clone/refs/heads/main/turborepo/apps/web/public/grok-icon.svg"
-  },
-  {
-    provider: "openai",
-    text: "OpenAI Api Key",
-    icon: "https://raw.githubusercontent.com/DopamineDriven/t3-chat-clone/refs/heads/main/turborepo/apps/web/public/chatgpt-icon.svg"
-  }
-] as const satisfies readonly ({provider: Providers; text: string; icon: string;})[];
+
 export function ApiKeysTab({
   className = ""
 }: ApiKeysTabPropss) {

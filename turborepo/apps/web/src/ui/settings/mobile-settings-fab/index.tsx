@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/ui/atoms/tooltip";
 
 const ThemeToggle = dynamic(
-  () => import("@/ui/theme").then(d => d.ThemeToggle),
+  () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
   { ssr: false }
 );
 
@@ -33,9 +33,6 @@ type SectionIds =
   | "account"
   | "apiKeys"
   | "customization"
-  | "history"
-  | "models"
-  | "attachments"
   | "contactUs";
 interface SettingsSectionConfigForFAB {
   id: SectionIds;

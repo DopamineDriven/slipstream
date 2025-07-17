@@ -1,6 +1,6 @@
-export const getProductionUrl = "https://prod-placeholder.com" as const;
+export const getProductionUrl = "https://chat.d0paminedriven.com" as const;
 
-export const getPreviewUrl = "https://preview-placeholder.vercel.app" as const;
+export const getPreviewUrl = "https://dev.chat.d0paminedriven.com" as const;
 
 export const getLocalUrl = "http://localhost:3030" as const;
 

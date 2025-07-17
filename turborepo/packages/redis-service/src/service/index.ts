@@ -1,37 +1,125 @@
 import type {
-  RedisClientType,
-  RedisDefaultModules,
-  RedisFunctions,
-  RedisModules,
-  RedisScripts,
-  RespVersions,
-  TypeMapping
-} from "redis";
+  RedisArg,
+  RedisClientEntity,
+  RedisVariadicArg
+} from "@/service/types.ts";
 import * as dotenv from "dotenv";
 import { createClient } from "redis";
-import type { RedisArg, RedisVariadicArg } from "@/service/types.ts";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export class RedisInstance {
-  #client: RedisClientType<
-    RedisDefaultModules & RedisModules,
-    RedisFunctions,
-    RedisScripts,
-    RespVersions,
-    TypeMapping
-  >;
-  constructor(public url: string) {
-    this.#client = createClient({ url });
+  #isConnecting = false;
+  #connectionPromise: Promise<void> | null = null;
+  #client: RedisClientEntity;
+  // Singleton instance storage
+  private static instance: RedisInstance | null = null;
+  private constructor(public url: string) {
+    this.#client = createClient({
+      url,
+      pingInterval: 30000,
+      socket: {
+        keepAlive: true,
+        keepAliveInitialDelay: 10000,
+        noDelay: true,
+        connectTimeout: 10000,
+        reconnectStrategy: (retries, cause) => {
+          if (retries > 20) {
+            console.error("Max reconnection attempts reached");
+            return new Error(
+              "Max reconnection attempts reached " + cause.message
+            );
+          }
+
+          console.log(
+            `Reconnecting attempt ${retries}, cause: `,
+            cause?.message
+          );
+
+          const backoff = Math.min(Math.pow(2, retries) * 100, 5000);
+          const jitter = Math.random() * 100;
+          return backoff + jitter;
+        }
+      },
+      disableOfflineQueue: false
+    });
+    this.setupEventHandlers();
+  }
+
+  private setupEventHandlers() {
+    this.#client.on("error", err => {
+      console.error("Redis error:", err);
+    });
+
+    this.#client.on("connect", () => {
+      console.log("Redis connected");
+    });
+
+    this.#client.on("ready", () => {
+      console.log("Redis ready to accept commands");
+    });
+
+    this.#client.on("reconnecting", () => {
+      console.log("Redis reconnecting…");
+    });
+
+    this.#client.on("end", () => {
+      console.log("Redis connection closed");
+    });
+  }
+
+  /**
+   * Get the singleton instance of RedisInstance
+   * @param url Optional Redis URL - only used on first call
+   * @returns The singleton RedisInstance
+   */
+  public static getInstance(url?: string): RedisInstance {
+    if (!RedisInstance.instance) {
+      const redisUrl = url ?? process.env.REDIS_URL ?? "redis://redis:6379";
+      RedisInstance.instance = new RedisInstance(redisUrl);
+    }
+    return RedisInstance.instance;
+  }
+
+  public static async resetInstance(): Promise<void> {
+    if (RedisInstance.instance) {
+      await RedisInstance.instance.close();
+      RedisInstance.instance = null;
+    }
   }
 
   /** Connect the *main* client */
   public async connect() {
-    await this.#client.connect();
+    // Prevent multiple simultaneous connection attempts
+    if (this.#isConnecting && this.#connectionPromise) {
+      return this.#connectionPromise;
+    }
+
+    if (this.isReady()) {
+      return;
+    }
+
+    this.#isConnecting = true;
+    this.#connectionPromise = this.#client
+      .connect()
+      .then(() => {
+        this.#isConnecting = false;
+        this.#connectionPromise = null;
+      })
+      .catch(err => {
+        this.#isConnecting = false;
+        this.#connectionPromise = null;
+        throw new Error(
+          "error connecting in connection promise" +
+            (err instanceof Error ? err.message : "")
+        );
+      });
+
+    return this.#connectionPromise;
   }
 
   public isOpen() {
-     return this.#client.isOpen;
+    return this.#client.isOpen;
   }
 
   public isPubSubActive() {
@@ -44,27 +132,67 @@ export class RedisInstance {
 
   /** Disconnect the *main* client */
   public async quit(): Promise<void> {
-    await this.#client.quit();
+    await this.#client.close();
   }
   public async subscribeToMessages(
     channel: string | string[],
-    cb: (message: string) => void
+    cb: (message: string, channel: string) => void
   ) {
     const sub = this.#client.duplicate();
+    sub.on("error", err => {
+      console.error("Redis subscriber error:", err);
+    });
     await sub.connect();
     await sub.subscribe(channel, cb);
     return async () => {
-      await sub.unsubscribe(channel);
-      await sub.quit();
+      try {
+        await sub.unsubscribe(channel);
+        await sub.quit();
+      } catch (err) {
+        if (err instanceof Error)
+          console.error("error cleaning up subscriber", err.message);
+        sub.destroy();
+      }
     };
   }
 
+  public destroy() {
+    this.#client.destroy();
+  }
+  public async close(): Promise<void> {
+    try {
+      await this.#client.close();
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error during Redis close: ", err.message);
+      }
+      console.error("Error during Redis close:");
+      // Force destroy if graceful close fails
+      this.#client.destroy();
+    }
+  }
   public publish(channel: RedisArg, message: RedisArg) {
     return this.#client.publish(channel, message);
   }
 
   public rPush(key: RedisArg, value: RedisVariadicArg) {
     return this.#client.rPush(key, value);
+  }
+
+  public async ping(): Promise<string> {
+    try {
+      return await this.#client.ping();
+    } catch (err) {
+      if (err instanceof Error) console.error("Redis ping failed: ", err);
+
+      throw new Error("Redis ping failed");
+    }
+  }
+
+  private async ensureConnection() {
+    if (!this.isReady()) {
+      await this.connect();
+    }
   }
 
   /**
@@ -97,6 +225,3 @@ export class RedisInstance {
   }
 }
 
-export const redisService = new RedisInstance(
-  process.env.REDIS_URL ?? "redis://redis:6379"
-);

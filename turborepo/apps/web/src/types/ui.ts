@@ -1,31 +1,25 @@
-import type React from "react"
-import type { User } from "next-auth"
-export interface ChatThread {
-  id: string
-  title: string
-  lastMessageAt: string
-}
+import React from "react"
+import type { ComponentPropsWithRef, JSX } from "react";
+import type { Message as MessagePrisma } from "@prisma/client";
+
 
 export interface Model {
   id: string
   name: string
-  icon?: string
+  icon?: ({ ...svg }: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns" | "role">) => JSX.Element;
 }
 
 
-export interface Message {
+export interface Message  extends Omit<MessagePrisma, "createdAt"|"updatedAt"|"provider">{
+provider: "grok" | "openai" | "gemini" | "anthropic";
+createdAt: string;
+updatedAt: string;
+  text: string | React.ReactNode
 
-  id: string
-
-  sender: "user" | "ai"
-
-  text: string | React.ReactNode // Can be string for initial, ReactNode after processing
-
-  originalText?: string // To store the raw markdown string for editing
+  originalText?: string
 
   timestamp: string
 
-  model?: string
 
   avatar?: string
 
@@ -33,13 +27,6 @@ export interface Message {
 
 }
 
-export interface UserProfile extends User {
-  plan: "Free" | "Pro"
-  messageUsage: {
-    current: number
-    limit: number
-  }
-}
 
 export interface KeyboardShortcut {
   action: string

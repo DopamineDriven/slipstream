@@ -2,9 +2,12 @@ import type { PrismaClientWithAccelerate } from "@/lib/prisma";
 import type { ClientWorkupProps, RecordCountsProps } from "@/types/shared";
 import type { UserKey } from "@prisma/client";
 import type { Providers } from "@t3-chat-clone/types";
+import { ErrorHelperService } from "@/orm/err-helper";
 
-export class PrismaUserKeyService {
-  constructor(public prismaClient: PrismaClientWithAccelerate) {}
+export class PrismaUserKeyService  extends ErrorHelperService {
+  constructor(public prismaClient: PrismaClientWithAccelerate) {
+    super();
+  }
   public formatProps(props: RecordCountsProps) {
     const isDefault = Object.fromEntries(
       Object.entries(props.isDefault).map(([t, o]) => {

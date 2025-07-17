@@ -17,6 +17,7 @@ import { Code } from "@/icons/code";
 import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
 import { Edit } from "@/icons/edit";
+import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 import { Expand } from "@/icons/expand";
 import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
@@ -79,6 +80,7 @@ const IconComponents = {
   Compass,
   Copy,
   Edit,
+  EllipsisHorizontal,
   Expand,
   Eye,
   EyeClosed,
@@ -175,6 +177,7 @@ export {
   Compass,
   Copy,
   Edit,
+  EllipsisHorizontal,
   Expand,
   Eye,
   EyeClosed,

@@ -154,3 +154,20 @@ export type EventTypeMap = {
 export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
+
+export type ProviderCountsProps = {
+  openai: number;
+  grok: number;
+  gemini: number;
+  anthropic: number;
+};
+
+export type RecordCountsProps = {
+  isSet: ProviderCountsProps;
+  isDefault: ProviderCountsProps;
+};
+
+export type ClientContextWorkupProps = {
+  isSet: Record<Provider, boolean>;
+  isDefault: Record<Provider, boolean>;
+};

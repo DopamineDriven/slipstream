@@ -67,10 +67,10 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.14",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.30.1",
+    "eslint": "^9.31.0",
     "jiti": "^2.4.2",
     "prettier": "^3.6.2",
     "terser": "^5.43.1",
@@ -78,7 +78,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0"
+    "typescript-eslint": "^8.37.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

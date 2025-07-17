@@ -56,7 +56,7 @@ export async function upsertApiKey(formdata: FormData) {
       }
     });
 
-    revalidatePath("/settings");
+    revalidatePath("/(settings)/settings");
     return { success: true, id: createUserKey.id } as const;
   } else return { success: false, id: message } as const;
 }
@@ -91,7 +91,7 @@ export async function getDecryptedApiKeyOnEdit(
   try {
     const hasKey = decryptMapper.get(provider);
     if (typeof hasKey !== "undefined") {
-      revalidatePath("/settings");
+      revalidatePath("/(settings)/settings");
       return hasKey;
     }
 
@@ -101,7 +101,7 @@ export async function getDecryptedApiKeyOnEdit(
       iv: rec.iv
     });
     decryptMapper.set(provider, decrypted);
-    revalidatePath("/settings");
+    revalidatePath("/(settings)/settings");
     return decrypted;
   } catch (err) {
     if (err instanceof Error) {

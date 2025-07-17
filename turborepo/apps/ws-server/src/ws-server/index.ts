@@ -42,8 +42,7 @@ export class WSServer {
     public prisma: PrismaService
   ) {
     this.channel = opts.channel ?? "chat-global";
-    this.jwtSecret = opts.jwtSecret;
-    redis.url = opts.redisUrl;
+    this.jwtSecret = opts.jwtSecret;;
     this.httpServer = http.createServer((req, res) => {
       const startTime = performance.now();
 
@@ -78,7 +77,6 @@ export class WSServer {
 
   public async start(): Promise<void> {
     await this.redis.connect();
-    console.info(`Connected to Redis at ${this.opts.redisUrl}`);
     // now we listen on our HTTP server (which also speaks WS)
     this.httpServer.listen(this.opts.port, () => {
       console.info(`HTTP+WebSocket server listening on port ${this.opts.port}`);

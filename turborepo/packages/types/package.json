@@ -13,7 +13,9 @@
           "dist/events.d.ts"
         ],
         "models": ["dist/models.d.ts"],
-        "utils": ["dist/utils.d.ts"]
+        "utils": ["dist/utils.d.ts"],
+        "types": ["dist/types.d.ts"],
+        "codegen": ["dist/codegen/*.d.ts"]
       }
     }
   },
@@ -28,7 +30,9 @@
           "dist/events.d.ts"
         ],
         "models": ["dist/models.d.ts"],
-        "utils": ["dist/utils.d.ts"]
+        "utils": ["dist/utils.d.ts"],
+        "types": ["dist/types.d.ts"],
+        "codegen": ["dist/codegen/*.d.ts"]
     }
   },
   "type": "module",
@@ -40,9 +44,11 @@
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./events": "./dist/events.js",
+    "./utils": "./dist/utils.js",
+    "./types": "./dist/types.js",
     "./models": "./dist/models.js",
-    "./utils": "./dist/utils.js"
+    "./events": "./dist/events.js",
+    "./codegen/*": "./dist/codegen/*.js"
   },
   "scripts": {
     "build": "tsup",
@@ -50,15 +56,21 @@
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml}\" --ignore-unknown --cache",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "fix": "npm pkg fix"
+    "fix": "npm pkg fix",
+    "generate-models": "pnpm tsx src/codegen/index.ts"
+  },
+  "dependencies": {
+    "@d0paminedriven/fs": "^6.1.0"
   },
   "devDependencies": {
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.14",
     "chokidar": "^4.0.3",
-    "eslint": "^9.30.1",
+    "dotenv": "^17.2.0",
+    "dotenv-expand": "^12.0.2",
+    "eslint": "^9.31.0",
     "jiti": "^2.4.2",
     "prettier": "^3.6.2",
     "terser": "^5.43.1",
@@ -66,7 +78,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0"
+    "typescript-eslint": "^8.37.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

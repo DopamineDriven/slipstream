@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d0paminedriven Brand Specification</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "SF Pro Display",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, oklch(14.479% 0.00002 271.152) 0%, oklch(21.779% 0.00002 271.152) 100%);
+        color: oklch(100% 0.00011 271.152);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, oklch(21.779% 0.00002 271.152) 0%, oklch(14.479% 0.00002 271.152) 100%);
+        border-radius: 25px;
+        margin-bottom: 3rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, oklch(100% 0.00011 271.152), transparent);
+        opacity: 0.2;
+      }
+
+      .hero-logo {
+        width: 120px;
+        height: 190px;
+        margin: 0 auto 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-logo svg {
+        width: 100%;
+        height: 100%;
+        fill: oklch(100% 0.00011 271.152);
+        filter: drop-shadow(0 0 20px oklch(100% 0.00011 271.152 / 0.3));
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, oklch(100% 0.00011 271.152) 0%, oklch(62.675% 0.00007 271.152) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        color: oklch(73.802% 0.00008 271.152);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .section {
+        background: linear-gradient(135deg, oklch(28.502% 0.00003 271.152) 0%, oklch(21.779% 0.00002 271.152) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+      }
+
+      .section h2 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: oklch(100% 0.00011 271.152);
+        font-weight: 400;
+      }
+
+      .logo-variations {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .logo-variant {
+        background: linear-gradient(135deg, oklch(21.779% 0.00002 271.152) 0%, oklch(16.842% 0.00002 271.152) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .logo-variant:hover {
+        transform: translateY(-3px);
+        border-color: oklch(44.953% 0.00005 271.152);
+      }
+
+      .logo-variant h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: oklch(100% 0.00011 271.152);
+      }
+
+      .logo-variant p {
+        font-size: 0.9rem;
+        color: oklch(62.675% 0.00007 271.152);
+        margin-bottom: 1.5rem;
+      }
+
+      .logo-display {
+        width: 80px;
+        height: 126px;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-display svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .color-palette {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .color-card {
+        background: linear-gradient(135deg, oklch(21.779% 0.00002 271.152) 0%, oklch(16.842% 0.00002 271.152) 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+        text-align: center;
+      }
+
+      .color-swatch {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        border: 2px solid oklch(32.109% 0.00004 271.152);
+        position: relative;
+      }
+
+      .color-card h4 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: oklch(100% 0.00011 271.152);
+      }
+
+      .color-card p {
+        font-size: 0.8rem;
+        color: oklch(62.675% 0.00007 271.152);
+      }
+
+      .usage-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .usage-example {
+        background: linear-gradient(135deg, oklch(21.779% 0.00002 271.152) 0%, oklch(16.842% 0.00002 271.152) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+      }
+
+      .usage-example h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: oklch(100% 0.00011 271.152);
+      }
+
+      .mockup {
+        background: oklch(0% 0 0);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152)96.81);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .mockup-logo {
+        width: 32px;
+        height: 50px;
+        flex-shrink: 0;
+      }
+
+      .mockup-logo svg {
+        width: 100%;
+        height: 100%;
+        fill: oklch(100% 0.00011 271.152);
+      }
+
+      .mockup-text {
+        color: oklch(100% 0.00011 271.152);
+        font-size: 0.9rem;
+      }
+
+      .specifications {
+        background: linear-gradient(135deg, oklch(21.779% 0.00002 271.152) 0%, oklch(16.842% 0.00002 271.152) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+        margin-top: 2rem;
+      }
+
+      .spec-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+      }
+
+      .spec-item {
+        background: linear-gradient(135deg, oklch(28.502% 0.00003 271.152) 0%, oklch(21.779% 0.00002 271.152) 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid oklch(38.666% 0.00004 271.152);
+      }
+
+      .spec-item h4 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: oklch(100% 0.00011 271.152);
+      }
+
+      .spec-item p {
+        font-size: 0.9rem;
+        color: oklch(73.802% 0.00008 271.152);
+      }
+
+      .code-block {
+        background: oklch(14.479% 0.00002 271.152);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border: 1px solid oklch(32.109% 0.00004 271.152);
+        font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 0.9rem;
+        color: oklch(100% 0.00011 271.152);
+        overflow-x: auto;
+      }
+
+      .highlight {
+        color: oklch(77.621% 0.11162 188.581);
+      }
+
+      .comment {
+        color: oklab(51.028% 0 -0.00006);
+      }
+      .s {
+        color: oklch(0% 0 0);
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 20px oklch(100% 0.00011 271.152 / 0.3));
+        }
+        50% {
+          filter: drop-shadow(0 0 30px oklch(100% 0.00011 271.152 / 0.5));
+        }
+      }
+
+      .glow {
+        animation: glow 3s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="hero">
+        <div class="hero-logo glow">
+          <svg viewBox="0 0 59.749 95.436">
+            <path
+              d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+            <path
+              d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+          </svg>
+        </div>
+        <h1>d0paminedriven</h1>
+        <p>
+          Multi-provider, multi-model LLM platform brand identity & design
+          system
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>Logo Variations</h2>
+        <p>
+          Your interlocked "dd" logo works beautifully across all contexts. Here
+          are the key variations for different use cases:
+        </p>
+
+        <div class="logo-variations">
+          <div class="logo-variant">
+            <h3>Primary Logo</h3>
+            <p>Main brand mark using Basis Grotesque Pro</p>
+            <div class="logo-display">
+              <svg viewBox="0 0 59.749 95.436" fill="#fff">
+                <path
+                  d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                <path
+                  d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="logo-variant">
+            <h3>Dopamine Gradient</h3>
+            <p>Energetic dual-color version</p>
+            <div class="logo-display">
+              <svg viewBox="0 0 59.749 95.436">
+                <defs>
+                  <linearGradient
+                    id="grad1"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%">
+                    <stop
+                      offset="0%"
+                      style="stop-color: oklch(71.159% 0.18121 22.817); stop-opacity: 1" />
+                    <stop
+                      offset="100%"
+                      style="stop-color: oklch(77.621% 0.11162 188.581)-5.91); stop-opacity: 1" />
+                  </linearGradient>
+                </defs>
+                <path
+                  fill="url(#grad1)"
+                  d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                <path
+                  fill="url(#grad1)"
+                  d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="logo-variant">
+            <h3>High Contrast</h3>
+            <p>Bold version for small sizes & favicons</p>
+            <div class="logo-display">
+              <svg
+                viewBox="0 0 59.749 95.436"
+                fill="oklch(100% 0.00011 271.152)"
+                stroke="oklch(0% 0 0)"
+                stroke-width="0.5">
+                <path
+                  d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                <path
+                  d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="logo-variant">
+            <h3>Monochrome</h3>
+            <p>Single color for versatile applications</p>
+            <div class="logo-display">
+              <svg viewBox="0 0 59.749 95.436" fill="oklch(62.675% 0.00007 271.152)">
+                <path
+                  d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                <path
+                  d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Color Palette</h2>
+        <p>
+          A sophisticated palette that reflects the technical nature of your
+          platform while maintaining approachability.
+        </p>
+
+        <div class="color-palette">
+          <div class="color-card">
+            <div class="color-swatch" style="background: oklch(100% 0.00011 271.152)"></div>
+            <h4>Primary White</h4>
+            <p>#FFFFFF<br />Main logo color</p>
+          </div>
+          <div class="color-card">
+            <div
+              class="color-swatch"
+              style="
+                background: linear-gradient(135deg, oklch(71.159% 0.18121 22.817), oklch(77.621% 0.11162 188.581));
+              "></div>
+            <h4>Dopamine Gradient</h4>
+            <p>#FF6B6B → #4ECDC4<br />Energy & innovation</p>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: oklch(0% 0 0)"></div>
+            <h4>Deep Black</h4>
+            <p>#000000<br />High contrast backgrounds</p>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: oklch(21.779% 0.00002 271.152)"></div>
+            <h4>Charcoal</h4>
+            <p>#1A1A1A<br />Interface backgrounds</p>
+          </div>
+          <div class="color-card">
+            <div class="color-swatch" style="background: oklch(62.675% 0.00007 271.152)"></div>
+            <h4>Medium Grey</h4>
+            <p>#888888<br />Secondary elements</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Usage Examples</h2>
+        <p>How your logo appears across different contexts and platforms:</p>
+
+        <div class="usage-grid">
+          <div class="usage-example">
+            <h3>chat.d0paminedriven.com</h3>
+            <div class="mockup">
+              <div class="mockup-logo">
+                <svg viewBox="0 0 59.749 95.436" fill="#fff">
+                  <path
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176Z" />
+                  <path
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">d0paminedriven</div>
+            </div>
+            <p>Header logo with brand name in navigation</p>
+          </div>
+
+          <div class="usage-example">
+            <h3>Browser Tab Favicon</h3>
+            <div class="mockup">
+              <div class="mockup-logo" style="width: 16px; height: 25px">
+                <svg viewBox="0 0 59.749 95.436" fill="#fff">
+                  <path
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                  <path
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">AI Chat | d0paminedriven</div>
+            </div>
+            <p>16x16px favicon - remains crisp at tiny sizes</p>
+          </div>
+
+          <div class="usage-example">
+            <h3>WebSocket Status</h3>
+            <div class="mockup">
+              <div class="mockup-logo" style="width: 24px; height: 38px">
+                <svg viewBox="0 0 59.749 95.436">
+                  <defs>
+                    <linearGradient
+                      id="ws-grad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%">
+                      <stop
+                        offset="0%"
+                        style="stop-color: #4ecdc4; stop-opacity: 1" />
+                      <stop
+                        offset="100%"
+                        style="stop-color: #45b7aa; stop-opacity: 1" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#ws-grad)"
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                  <path
+                    fill="url(#ws-grad)"
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">
+                Connected to wss://ws.d0paminedriven.com
+              </div>
+            </div>
+            <p>Green tint indicates active WebSocket connection</p>
+          </div>
+
+          <div class="usage-example">
+            <h3>Python API Service</h3>
+            <div class="mockup">
+              <div class="mockup-logo" style="width: 28px; height: 44px">
+                <svg viewBox="0 0 59.749 95.436">
+                  <defs>
+                    <linearGradient
+                      id="py-grad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%">
+                      <stop
+                        offset="0%"
+                        style="stop-color: #ff6b6b; stop-opacity: 1" />
+                      <stop
+                        offset="100%"
+                        style="stop-color: #ee5a5a; stop-opacity: 1" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#py-grad)"
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                  <path
+                    fill="url(#py-grad)"
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">
+                Image Generation • py.d0paminedriven.com
+              </div>
+            </div>
+            <p>Red variant for Python FastAPI microservice</p>
+          </div>
+
+          <div class="usage-example">
+            <h3>Mobile App Icon</h3>
+            <div
+              class="mockup"
+              style="
+                background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+                border-radius: 20px;
+              ">
+              <div class="mockup-logo" style="width: 48px; height: 76px">
+                <svg
+                  viewBox="0 0 59.749 95.436"
+                  fill="#fff"
+                  style="filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5))">
+                  <path
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                  <path
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">d0paminedriven</div>
+            </div>
+            <p>iOS/Android app icon with rounded corners</p>
+          </div>
+
+          <div class="usage-example">
+            <h3>Loading State</h3>
+            <div class="mockup">
+              <div class="mockup-logo pulse" style="width: 32px; height: 50px">
+                <svg viewBox="0 0 59.749 95.436">
+                  <defs>
+                    <linearGradient
+                      id="loading-grad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%">
+                      <stop
+                        offset="0%"
+                        style="stop-color: #fff; stop-opacity: 0.8" />
+                      <stop
+                        offset="100%"
+                        style="stop-color: #888; stop-opacity: 0.4" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#loading-grad)"
+                    d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                  <path
+                    fill="url(#loading-grad)"
+                    d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+                </svg>
+              </div>
+              <div class="mockup-text">Processing request...</div>
+            </div>
+            <p>Animated version for loading states</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="specifications">
+        <h2>Technical Specifications</h2>
+        <div class="spec-grid">
+          <div class="spec-item">
+            <h4>Minimum Size</h4>
+            <p>16px width (favicon)<br />Maintains legibility at all sizes</p>
+          </div>
+          <div class="spec-item">
+            <h4>Aspect Ratio</h4>
+            <p>0.626:1 (W:H)<br />Based on your SVG viewBox</p>
+          </div>
+          <div class="spec-item">
+            <h4>Clear Space</h4>
+            <p>
+              Minimum 0.5x logo width<br />on all sides for proper breathing
+              room
+            </p>
+          </div>
+          <div class="spec-item">
+            <h4>Font Reference</h4>
+            <p>Basis Grotesque Pro<br />Maintains brand consistency</p>
+          </div>
+          <div class="spec-item">
+            <h4>File Formats</h4>
+            <p>SVG (primary), PNG, ICO<br />Vector-first approach</p>
+          </div>
+          <div class="spec-item">
+            <h4>Color Modes</h4>
+            <p>RGB for digital<br />Single color for print</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Implementation Code</h2>
+        <p>Ready-to-use code snippets for your platform:</p>
+
+        <h3>Favicon Implementation</h3>
+        <div class="code-block">
+          <span class="comment"><!-- HTML head section --></span>
+          &lt;<span class="highlight">link</span> rel=<span class="highlight"
+            >"icon"</span
+          >
+          type=<span class="highlight">"image/svg+xml"</span> href=<span
+            class="highlight"
+            >"/favicon.svg"</span
+          >&gt; &lt;<span class="highlight">link</span> rel=<span
+            class="highlight"
+            >"icon"</span
+          >
+          type=<span class="highlight">"image/png"</span> sizes=<span
+            class="highlight"
+            >"32x32"</span
+          >
+          href=<span class="highlight">"/favicon-32x32.png"</span>&gt; &lt;<span
+            class="highlight"
+            >link</span
+          >
+          rel=<span class="highlight">"icon"</span> type=<span class="highlight"
+            >"image/png"</span
+          >
+          sizes=<span class="highlight">"16x16"</span> href=<span
+            class="highlight"
+            >"/favicon-16x16.png"</span
+          >&gt; &lt;<span class="highlight">link</span> rel=<span
+            class="highlight"
+            >"apple-touch-icon"</span
+          >
+          sizes=<span class="highlight">"180x180"</span> href=<span
+            class="highlight"
+            >"/apple-touch-icon.png"</span
+          >&gt;
+        </div>
+
+        <h3>React Component</h3>
+        <div class="code-block">
+          <span class="highlight">const</span> DDLogo = ({
+          <span class="highlight">size</span> =
+          <span class="highlight">40</span>,
+          <span class="highlight">color</span> =
+          <span class="highlight">"#fff"</span>,
+          <span class="highlight">className</span> =
+          <span class="highlight">""</span> }) => ( &lt;<span class="highlight"
+            >svg</span
+          >
+          <span class="highlight">className</span>={className}
+          <span class="highlight">width</span>={size * 0.626}
+          <span class="highlight">height</span>={size}
+          <span class="highlight">viewBox</span>=<span class="highlight"
+            >"0 0 59.749 95.436"</span
+          >
+          <span class="highlight">fill</span>={color} &gt; &lt;<span
+            class="highlight"
+            >path</span
+          >
+          <span class="highlight">d</span>=<span class="highlight"
+            >"M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z"</span
+          >
+          /&gt; &lt;<span class="highlight">path</span>
+          <span class="highlight">d</span>=<span class="highlight"
+            >"M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z"</span
+          >
+          /&gt; &lt;/<span class="highlight">svg</span>&gt; );
+        </div>
+
+        <h3>CSS Animations</h3>
+        <div class="code-block">
+          <span class="comment">/* Loading pulse animation */</span>
+          <span class="highlight">.dd-logo-pulse</span> {
+          <span class="highlight">animation</span>: ddPulse
+          <span class="highlight">2s</span> ease-in-out infinite; }
+
+          <span class="highlight">@keyframes</span> ddPulse {
+          <span class="highlight">0%</span>,
+          <span class="highlight">100%</span> {
+          <span class="highlight">opacity</span>:
+          <span class="highlight">0.8</span>; }
+          <span class="highlight">50%</span> {
+          <span class="highlight">opacity</span>:
+          <span class="highlight">1</span>; } }
+
+          <span class="comment">/* Hover glow effect */</span>
+          <span class="highlight">.dd-logo-glow</span>:<span class="highlight"
+            >hover</span
+          >
+          { <span class="highlight">filter</span>: drop-shadow(<span
+            class="highlight"
+            >0</span
+          >
+          <span class="highlight">0</span>
+          <span class="highlight">20px</span> rgba(<span class="highlight"
+            >255</span
+          >, <span class="highlight">255</span>,
+          <span class="highlight">255</span>,
+          <span class="highlight">0.5</span>));
+          <span class="highlight">transition</span>: filter
+          <span class="highlight">0.3s</span> ease; }
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Brand Philosophy</h2>
+        <p>
+          Your logo embodies the core principles of consilience - the unity of
+          knowledge across disciplines. The interlocking "dd" represents the
+          intersection of your biochemistry background with cutting-edge AI
+          technology, creating something greater than the sum of its parts.
+        </p>
+
+        <p>
+          The overlapping circles suggest neural networks, molecular bonds, and
+          impossible geometry - all unified in a clean, scalable mark that works
+          across your entire platform ecosystem.
+        </p>
+
+        <blockquote
+          style="
+            border-left: 3px solid #555;
+            padding-left: 1rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: #ccc;
+          ">
+          "The greatest challenge today, not just in cell biology and ecology
+          but in all of science, is the accurate and complete description of
+          complex systems."
+          <br /><em>— Edward O. Wilson</em>
+        </blockquote>
+
+        <p>
+          Your multi-model LLM platform is exactly this kind of complex system -
+          bringing together diverse AI providers and models into a coherent,
+          unified interface. The logo reflects this synthesis beautifully.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>Next Steps</h2>
+        <p>
+          Your logo is production-ready! Here's what you can implement
+          immediately:
+        </p>
+
+        <div class="spec-grid">
+          <div class="spec-item">
+            <h4>1. Generate Assets</h4>
+            <p>
+              Export your SVG to PNG at 16px, 32px, 64px, 180px, and 512px for
+              various use cases
+            </p>
+          </div>
+          <div class="spec-item">
+            <h4>2. Update Favicons</h4>
+            <p>
+              Replace existing favicons across chat.d0paminedriven.com with your
+              new logo
+            </p>
+          </div>
+          <div class="spec-item">
+            <h4>3. Header Integration</h4>
+            <p>Add the logo to your Next.js chat interface navigation</p>
+          </div>
+          <div class="spec-item">
+            <h4>4. Service Variants</h4>
+            <p>
+              Create colored versions for WebSocket status and Python API
+              service indicators
+            </p>
+          </div>
+          <div class="spec-item">
+            <h4>5. Metadata Enhancement</h4>
+            <p>
+              Update Open Graph images and social media previews with your new
+              brand mark
+            </p>
+          </div>
+          <div class="spec-item">
+            <h4>6. Mobile Optimization</h4>
+            <p>Generate app icons and progressive web app manifests</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          text-align: center;
+          margin-top: 3rem;
+          padding: 2rem;
+          background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+          border-radius: 15px;
+          border: 1px solid #333;
+        ">
+        <div style="width: 60px; height: 95px; margin: 0 auto 1rem">
+          <svg
+            viewBox="0 0 59.749 95.436"
+            fill="#fff"
+            style="
+              width: 100%;
+              height: 100%;
+              filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            ">
+            <path
+              d="M54.277,26.604v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796v-21.528h4.176ZM37.429,74.412c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+            <path
+              d="M37.296,10.799v50.4h-4.176v-6.984c-1.105,2.304-2.808,4.212-5.112,5.724-2.304,1.512-4.92,2.268-7.848,2.268-4.993,0-9.097-1.8-12.312-5.4-3.216-3.6-4.824-8.087-4.824-13.464,0-5.328,1.608-9.803,4.824-13.428,3.215-3.624,7.224-5.436,12.024-5.436,2.927,0,5.555.684,7.884,2.052,2.328,1.368,4.115,3.301,5.364,5.796V10.799h4.176ZM20.448,58.607c3.839,0,6.984-1.44,9.432-4.32,2.448-2.88,3.672-6.527,3.672-10.944s-1.224-8.064-3.672-10.944c-2.448-2.88-5.592-4.32-9.432-4.32-3.888,0-7.045,1.417-9.468,4.248-2.424,2.833-3.636,6.505-3.636,11.016s1.211,8.185,3.636,11.016c2.423,2.833,5.58,4.248,9.468,4.248Z" />
+          </svg>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.5rem">Perfect Consilience</h3>
+        <p style="color: #888">
+          Your logo beautifully bridges biochemistry and AI, impossible geometry
+          and clean minimalism, personal branding and technical sophistication.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

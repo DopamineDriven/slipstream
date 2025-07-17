@@ -13,36 +13,64 @@ export type {
   AssetUploadResponse,
   ChatWsEvent,
   ChatWsEventTypeUnion,
+  ClientContextWorkupProps,
   EventMap,
   EventTypeMap,
   ImageGenRequest,
   ImageGenResponse,
   PingMessage,
+  ProviderCountsProps,
+  RecordCountsProps,
   TypingIndicator
 } from "@/events.ts";
 
 /**
- * providers & models
+ * model/provider types
  */
 export type {
+  AllDisplayNamesUnion,
   AllModelsUnion,
   AnthropicChatModels,
+  AnthropicDisplayNameUnion,
+  AnthropicModelIdUnion,
+  DisplayNameModelMap,
   GeminiChatModels,
+  GeminiDisplayNameUnion,
+  GeminiModelIdUnion,
+  GetDisplayNamesForProviderRT,
+  GetModelsForProviderRT,
   GetModelUtilRT,
   GrokChatModels,
+  GrokDisplayNameUnion,
+  GrokModelIdUnion,
+  ModelDisplayNameToModelId,
+  ModelIdToModelDisplayName,
   ModelMap,
   Models,
   OpenAIChatModels,
+  OpenAiDisplayNameUnion,
+  OpenAiModelIdUnion,
   Provider,
   Providers
 } from "@/models.ts";
 
 export {
-  toPrismaFormat,
+  allProviders,
+  defaultModelDisplayNameByProvider,
+  defaultModelIdByProvider,
+  displayNameModelsByProvider,
+  displayNameToModelId,
+  getAllProviders,
+  getDisplayNameByModelId,
+  getDisplayNamesForProvider,
+  getModelIdByDisplayName,
+  getModelsForProvider,
+  modelIdsByProvider,
+  modelIdToDisplayName,
+  providerModelChatApi,
   providerModelResponsesApi,
-  providerModelChatApi
+  toPrismaFormat
 } from "@/models.ts";
-
 
 /**
  * convenient utility types
@@ -65,3 +93,24 @@ export type {
   Without,
   XOR
 } from "@/utils.ts";
+
+/**
+ * api-handling types for codegen
+ */
+
+export type {
+  AnthropicError,
+  AnthropicModel,
+  AnthropicResponse,
+  AnthropicSuccess,
+  FlexiProvider,
+  GeminiError,
+  GeminiModel,
+  GeminiResponse,
+  GeminiSuccess,
+  GrokModelsResponse,
+  ListModelsSingleton,
+  OpenAiError,
+  OpenAiResponse,
+  SuccessResponse
+} from "@/types.ts";
