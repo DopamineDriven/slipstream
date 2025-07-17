@@ -367,7 +367,12 @@
     white-space:nowrap
   }
 }
-
+@layer utilities {
+  .prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    color: var(--color-brand-text);
+    font-weight: 600;
+  }
+}
 *,
 *::before,
 *::after {
