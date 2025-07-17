@@ -1,6 +1,5 @@
 "use client";
 
-import type { Message } from "@prisma/client";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -22,9 +21,10 @@ import {
   X
 } from "@t3-chat-clone/ui";
 import type { Provider } from "@t3-chat-clone/types";
+import { UIMessage } from "@/types/shared";
 
 interface ChatMessageProps {
-  message: Message;
+  message: UIMessage;
   onUpdateMessage?: (messageId: string, newText: string) => void;
   className?: string;
   user?: User;

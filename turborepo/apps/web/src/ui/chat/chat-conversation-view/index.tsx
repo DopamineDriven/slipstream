@@ -16,10 +16,11 @@ import type {
   Provider
 } from "@t3-chat-clone/types";
 import { toPrismaFormat } from "@t3-chat-clone/types";
+import { UIMessage } from "@/types/shared";
 
 interface ChatConversationViewProps {
   conversationId: string;
-  initialMessages?: Message[];
+  initialMessages?: UIMessage[];
   user?: User;
   conversationTitle?: string;
   apiKeys: ClientContextWorkupProps;
@@ -43,7 +44,7 @@ export function ChatConversationView({
   } = useAiChat();
   console.log(title);
   const searchParams = useSearchParams();
-  const [messages, setMessages] = useState<Message[]>(initialMessages ?? []);
+  const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
     null
@@ -63,9 +64,8 @@ export function ChatConversationView({
     if (conversationId === "new-chat") {
       const initial = searchParams.get("message");
       if (initial && messages.length === 0) {
-        const userMsg: Message = {
+        const userMsg: UIMessage = {
           id: `temp-user-${Date.now()}`,
-          conversationId: "new-chat",
           senderType: "USER",
           provider: toPrismaFormat(selectedModel.provider),
           model: selectedModel.modelId,
@@ -99,9 +99,8 @@ export function ChatConversationView({
         const id = `streaming-${conversationId}-${Date.now()}`;
         setStreamingMessageId(id);
 
-        const aiMsg: Message = {
+        const aiMsg: UIMessage = {
           id,
-          conversationId: conversationId ?? "new-chat",
           senderType: "AI",
           provider: selectedModel.provider.toUpperCase() as Message["provider"],
           model: selectedModel.modelId,
@@ -146,9 +145,8 @@ export function ChatConversationView({
     }
 
     if (!isEditSubmit) {
-      const optimistic: Message = {
+      const optimistic: UIMessage = {
         id: `temp-user-${Date.now()}`,
-        conversationId: conversationId ?? "new-chat",
         senderType: "USER",
         provider: selectedModel.provider.toUpperCase() as Message["provider"],
         model: selectedModel.modelId,
