@@ -1,9 +1,8 @@
+import type { Unenumerate } from "@/utils.ts";
 import { displayNameToModelId } from "@/codegen/__gen__/display-name-to-model-id.ts";
+import { displayNameModelsByProvider } from "@/codegen/__gen__/display-names-by-provider.ts";
 import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name.ts";
-
-export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
-  ? U
-  : T;
+import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
 
 export const providerModelChatApi = {
   openai: [
@@ -158,6 +157,12 @@ export type ModelMap = {
   >;
 };
 
+export type DisplayNameModelMap = {
+  readonly [P in keyof typeof displayNameModelsByProvider]: Unenumerate<
+    (typeof displayNameModelsByProvider)[P]
+  >;
+};
+
 export type OpenAIChatModels = ModelMap["openai"];
 
 export type GeminiChatModels = ModelMap["gemini"];
@@ -167,6 +172,8 @@ export type GrokChatModels = ModelMap["grok"];
 export type AnthropicChatModels = ModelMap["anthropic"];
 
 export type AllModelsUnion = ModelMap[Provider];
+
+export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
 
 export type GetModelUtilRT<T = Provider> = T extends "openai"
   ? OpenAIChatModels
@@ -330,16 +337,56 @@ export type GeminiModelIdUnion = ModelIdToModelDisplayName<"gemini">;
 export type AnthropicModelIdUnion = ModelIdToModelDisplayName<"anthropic">;
 
 // re-export for consumer apps
-export { modelIdToDisplayName, displayNameToModelId };
+export {
+  modelIdToDisplayName,
+  displayNameToModelId,
+  displayNameModelsByProvider,
+  modelIdsByProvider
+};
+
+export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
+  ? AnthropicModelIdUnion
+  : T extends "gemini"
+    ? GeminiModelIdUnion
+    : T extends "grok"
+      ? GrokModelIdUnion
+      : T extends "openai"
+        ? OpenAiModelIdUnion
+        : never;
+
+export type GetDisplayNamesForProviderRT<T extends Provider> =
+  T extends "anthropic"
+    ? AnthropicDisplayNameUnion
+    : T extends "gemini"
+      ? GeminiDisplayNameUnion
+      : T extends "grok"
+        ? GrokDisplayNameUnion
+        : T extends "openai"
+          ? OpenAiDisplayNameUnion
+          : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
     .map(([t, v]) => {
-      return [t as T, v as ModelDisplayNameToModelId<T>] as const;
+      return [t as T, v as GetModelsForProviderRT<T>] as const;
     })
     .map(([_tt, vv]) => vv);
 }
 
+export function getDisplayNamesForProvider<const T extends Provider>(
+  provider: T
+) {
+  return Object.entries(modelIdToDisplayName[provider])
+    .map(([k, v]) => {
+      return [k as T, v as GetDisplayNamesForProviderRT<T>] as const;
+    })
+    .map(([_kk, vv]) => vv);
+}
+
 export function allProviders() {
   return ["anthropic", "gemini", "grok", "openai"] as const;
+}
+
+export function getAllProviders() {
+  return allProviders();
 }

@@ -1,117 +1,150 @@
+// src/ui/provider-model-selector.tsx
 "use client";
 
 import React from "react";
-import {
-  defaultModelByProvider,
-  getModelsForProvider,
-  providerMetadata
-} from "@/lib/models";
+import { useModelSelection } from "@/context/model-selection-context";
+import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
+import { User } from "next-auth";
 import {
-  ModelIdToModelDisplayName as AvailableModelsByProvider,
-  getDisplayNameByModelId,
-  getModelIdByDisplayName,
+  AnthropicDisplayNameUnion,
+  GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
   OpenAiDisplayNameUnion,
-  Provider
+  getAllProviders,
+  getModelsForProvider,
+  getModelIdByDisplayName,
 } from "@t3-chat-clone/types";
+import type { Provider } from "@t3-chat-clone/types";
 import {
   Button,
   ChevronDown,
   Select,
+  SelectTrigger,
+  SelectValue,
   SelectContent,
   SelectItem,
-  SelectTrigger,
-  SelectValue
 } from "@t3-chat-clone/ui";
 
-import type { AnthropicModelDisplayNames, GeminiModelDispayNames } from "@/ui/mobile-model-select";
-import { User } from "next-auth";
-
-interface ModelSelection {
-  provider: Provider
-  displayName: string
-  modelId: string
-}
 interface ProviderModelSelectorProps {
-  selectedModel: ModelSelection
-  onModelChangeAction: (model: ModelSelection) => void
-  onClick?: () => void
-  className?: string
+  onClick?: () => void;
+  className?: string;
   variant?: "button" | "compact";
-  user?: User
+  user?: User;
 }
 
 export function ProviderModelSelector({
-  selectedModel,
-  onModelChangeAction,
   onClick,
   className,
   variant = "button",
-  user: _user
 }: ProviderModelSelectorProps) {
+  const { selectedModel, updateProvider, updateModel } = useModelSelection();
 
+  const allProviders = React.useMemo(() => getAllProviders(), []);
+  const availableModels = getModelsForProvider(selectedModel.provider);
+  const currentMeta = providerMetadata[selectedModel.provider];
 
-  const handleProviderChange = (newProvider: Provider) => {
-    const defaultModel = defaultModelByProvider[newProvider];
-    const newModelSelection = {
-      provider: newProvider,
-      displayName: defaultModel,
-      modelId:
-        newProvider === "anthropic"
-          ? getModelIdByDisplayName(newProvider, (defaultModel as AnthropicModelDisplayNames) ?? undefined)
-          : newProvider === "gemini"
-            ? getModelIdByDisplayName(newProvider, (defaultModel as GeminiModelDispayNames) ?? undefined)
-            : newProvider === "grok"
-              ? getModelIdByDisplayName(newProvider, (defaultModel as GrokDisplayNameUnion) ?? undefined)
-              : getModelIdByDisplayName(newProvider, (defaultModel as OpenAiDisplayNameUnion) ?? undefined),
+  const handleProviderChange = (prov: Provider) => {
+    switch (prov) {
+      case "anthropic": {
+        const displayName = defaultModelByProvider.anthropic;
+        updateProvider("anthropic");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("anthropic", displayName)
+        );
+        break;
+      }
+      case "gemini": {
+        const displayName = defaultModelByProvider.gemini;
+        updateProvider("gemini");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("gemini", displayName)
+        );
+        break;
+      }
+      case "grok": {
+        const displayName = defaultModelByProvider.grok;
+        updateProvider("grok");
+        updateModel(displayName, getModelIdByDisplayName("grok", displayName));
+        break;
+      }
+      case "openai":
+      default: {
+        const displayName = defaultModelByProvider.openai;
+        updateProvider("openai");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("openai", displayName)
+        );
+        break;
+      }
     }
-    onModelChangeAction(newModelSelection)
-  }
+  };
 
-  const handleModelChange = (displayName: string) => {
-    const newModelSelection: ModelSelection = {
-      provider: selectedModel.provider,
-      displayName,
-      modelId: getDisplayNameByModelId(
-        selectedModel.provider,
-        displayName as AvailableModelsByProvider<typeof selectedModel.provider>,
-      ),
+  const handleModelChange = (name: string) => {
+    const prov = selectedModel.provider;
+    switch (prov) {
+      case "anthropic": {
+        const dn = name as AnthropicDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("anthropic", dn));
+        break;
+      }
+      case "gemini": {
+        const dn = name as GeminiDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("gemini", dn));
+        break;
+      }
+      case "grok": {
+        const dn = name as GrokDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("grok", dn));
+        break;
+      }
+      case "openai":
+      default: {
+        const dn = name as OpenAiDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("openai", dn));
+        break;
+      }
     }
-    onModelChangeAction(newModelSelection)
-  }
-
-  const availableModels = getModelsForProvider(selectedModel.provider)
-  const currentProviderMeta = providerMetadata[selectedModel.provider]
+  };
 
   if (variant === "compact") {
     return (
       <div className={cn("flex items-center space-x-2", className)}>
-        <Select value={selectedModel.provider} onValueChange={handleProviderChange}>
-          <SelectTrigger className="w-[140px] bg-brand-component border-brand-border">
+        <Select
+          value={selectedModel.provider}
+          onValueChange={(v) => handleProviderChange(v as Provider)}
+        >
+          <SelectTrigger className="bg-brand-component border-brand-border w-[140px]">
             <div className="flex items-center">
-              {React.createElement(currentProviderMeta.icon, {
+              {React.createElement(currentMeta.icon, {
                 className: "mr-2 w-4 h-4",
               })}
               <SelectValue />
             </div>
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
-            {(["grok", "openai", "gemini", "anthropic"] as const).map((provider) => {
-              const Icon = providerMetadata[provider].icon;
-              return(
-              <SelectItem key={provider} value={provider}>
-                <div className="flex items-center">
-                  <Icon className="mr-2 w-4 h-4" />
-                  {providerMetadata[provider].name}
-                </div>
-              </SelectItem>
-            )})}
+            {allProviders.map((prov) => {
+              const Icon = providerMetadata[prov].icon;
+              return (
+                <SelectItem key={prov} value={prov}>
+                  <div className="flex items-center">
+                    <Icon className="mr-2 h-4 w-4" />
+                    {providerMetadata[prov].name}
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
 
-        <Select value={selectedModel.displayName} onValueChange={handleModelChange}>
-          <SelectTrigger className="w-[180px] bg-brand-component border-brand-border">
+        <Select
+          value={selectedModel.displayName}
+          onValueChange={handleModelChange}
+        >
+          <SelectTrigger className="bg-brand-component border-brand-border w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
@@ -123,18 +156,21 @@ export function ProviderModelSelector({
           </SelectContent>
         </Select>
       </div>
-    )
+    );
   }
 
   return (
     <Button
       variant="ghost"
       onClick={onClick}
-      className={cn("text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base", className)}
+      className={cn(
+        "text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base",
+        className
+      )}
     >
-     <currentProviderMeta.icon className="mr-2 w-4 h-4 flex-shrink-0" />
+      <currentMeta.icon className="mr-2 h-4 w-4 flex-shrink-0" />
       {selectedModel.displayName}
       <ChevronDown className="ml-1 h-4 w-4" />
     </Button>
-  )
+  );
 }

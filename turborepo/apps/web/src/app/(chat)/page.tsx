@@ -6,11 +6,12 @@ import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 // import { ChatPage } from "@/ui/clone";
-import {ChatHome} from "@/ui/chat-page";
+import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
+import { ChatEmptyState } from "@/ui/chat/empty-chat-shell";
 
-export const metadata = {
-  title: "chat"
-} satisfies Metadata;
+export const metadata:Metadata = {
+  title: "Chat Home"
+};
 
 const { prismaApiKeyService, prismaConversationService } =
   ormHandler(prismaClient);
@@ -27,10 +28,11 @@ export default async function HomePage() {
     await prismaConversationService.getRecentConversationsByUserId(
       session.user.id
     );
-
   return (
     <Suspense fallback={"Loading..."}>
-      <ChatHome user={session.user} providerConfig={providerConfig} recentConvos={recentConvos} />
+      <ChatLayoutShell user={session.user} recentConvos={recentConvos}>
+        <ChatEmptyState  apiKeys={providerConfig} user={session.user} />
+      </ChatLayoutShell>
     </Suspense>
   );
 }

@@ -35,7 +35,7 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.13",
+    "@types/node": "^24.0.14",
     "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
     "husky": "^9.1.7",

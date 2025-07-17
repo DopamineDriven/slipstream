@@ -4,7 +4,6 @@ import type { EventTypeMap } from "@t3-chat-clone/types";
 
 export interface WSServerOptions {
   port: number;
-  redisUrl: string;
   jwtSecret: string;
   channel?: string;
 }

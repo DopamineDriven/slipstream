@@ -4,45 +4,20 @@ import type { Conversation } from "@prisma/client";
 import type { User } from "next-auth";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
+import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { motion } from "motion/react";
 import {
   Button,
   CirclePlus,
-  DropdownMenuItem,
   Input,
-  LogOut,
   ScrollArea,
-  Search,
-  Settings,
-  SquarePen,
-  Trash
+  Search
 } from "@t3-chat-clone/ui";
-import { Logo } from "../logo";
-
-/**
- * Conversation has the following shape
- *
- *```ts
- * type Conversation =  {
-    id: string;
-    userId: string;
-    userKeyId: string | null;
-    title: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    branchId: string | null;
-    parentId: string | null;
-    isShared: boolean;
-    shareToken: string | null;
-}
-    ```
- */
 
 interface SidebarProps {
   chatThreads?: Conversation[];
-  onNewChat?: () => void;
-  onSelectChat?: (id: string) => void;
   onUpdateChatTitleAction?: (conversationId: string, newTitle: string) => void;
   onDeleteChatAction?: (threadId: string) => void;
   onOpenSettings?: () => void;
@@ -53,17 +28,11 @@ interface SidebarProps {
 export function Sidebar({
   chatThreads,
   user: userProfile,
-  // TODO implement route handling logic
-  onNewChat = () => console.log("New Chat"),
-  // TODO implement route handling logic
-  onSelectChat = id => console.log("Select Chat:", id),
+  // TODO implement route handling logi
   // TODO IMPLEMENT DYNAMIC HANDLING OF TITLE RETURNED BY FIRST CHUNK OF WEBSOCKET RESPONSE (listen using websocket context provider and parse out title during ai_chat_chunk event if a placeholder title -- "new chat" is temprarily set)
   onUpdateChatTitleAction: _onUpdateChatTitleAction,
-  onOpenSettings: _openSettings,
   className = ""
 }: SidebarProps) {
-  const _x = onSelectChat;
-
   return (
     <motion.div
       initial={{ x: -300 }}
@@ -78,13 +47,13 @@ export function Sidebar({
           <Logo className="text-foreground size-12" />
         </div>
       </div>
-      <Button
-        variant="outline"
-        className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start"
-        onClick={onNewChat}>
-        <CirclePlus className="mr-2 h-5 w-5" /> New Chat
-      </Button>
-
+      <Link href="/">
+        <Button
+          variant="outline"
+          className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start">
+          <CirclePlus className="mr-2 h-5 w-5" /> New Chat
+        </Button>
+      </Link>
       <div className="relative">
         <Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
@@ -96,20 +65,37 @@ export function Sidebar({
 
       <ScrollArea className="flex-grow">
         <div className="space-y-2">
-          {chatThreads ? (
-            chatThreads.map(thread => (
-              <Link key={thread.id} href={`/chat/${thread.id}`} passHref scroll={false}>
-                <div
-                  role="button"
-                  className="text-foreground hover:bg-background/30 hover:text-foreground/90 flex min-w-0 grow items-center">
-                  <div className="truncate">
-                    <span className="">{thread.title ?? "Untitled"}</span>
-                  </div>
+          {chatThreads && chatThreads.length > 0 ? (
+            <>
+              <div className="px-2 py-1">
+                <h3 className="text-brand-text-muted text-xs font-medium tracking-wider uppercase">
+                  Recent
+                </h3>
+              </div>
+              {chatThreads.map(thread => (
+                <div key={thread.id} className="group relative">
+                  <Link href={`/chat/${thread.id}`} passHref>
+                    <div
+                      role="button"
+                      className="text-brand-text-muted hover:bg-brand-component hover:text-brand-text flex h-auto min-h-[44px] w-full items-center justify-start rounded-md px-3 py-2 pr-10 transition-colors">
+                      <div className="flex w-full min-w-0 flex-col items-start text-left">
+                        <NativeTruncatedText
+                          text={thread?.title ?? "Untitled"}
+                          className="w-full text-left text-sm leading-tight font-medium"
+                          baseChars={20}
+                          maxExtraChars={4}
+                        />
+                        <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
+                          {new Date(thread.updatedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
-            ))
+              ))}
+            </>
           ) : (
-            <div className="text-center align-middle">
+            <div className="text-center align-middle py-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

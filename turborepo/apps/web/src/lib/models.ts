@@ -82,31 +82,21 @@ export type ModelSelectionAlt<T extends Provider> = {
   displayName: DisplayNameWorkup<T>;
   modelId: ModelIdWorkup<T>;
 };
-export function getModelsForProvider<const T extends Provider>(provider: T) {
-  if (provider === "grok") {
-    return Object.entries(displayNameToModelId["grok"]).map(([_t, o]) =>
-      getDisplayNameByModelId("grok", o)
-    );
-  } else if (provider === "openai") {
-    return Object.entries(displayNameToModelId["openai"]).map(([_t, o]) =>
-      getDisplayNameByModelId("openai", o)
-    );
-  } else if (provider === "gemini") {
-    return Object.entries(displayNameToModelId["gemini"]).map(([_t, o]) =>
-      getDisplayNameByModelId("gemini", o)
-    );
-  } else {
-    return Object.entries(displayNameToModelId["anthropic"]).map(([_t, o]) =>
-      getDisplayNameByModelId("anthropic", o)
-    );
-  }
-}
+
 export const defaultModelByProvider = {
   openai: "GPT 4o Mini" as OpenAiDisplayNameUnion,
-  gemini: "Gemini 2.5 Flash" as GeminiDisplayNameUnion,
+  gemini: "Gemini 2.5 Flash-Lite Preview 06-17" as GeminiDisplayNameUnion,
   grok: "Grok 3" as GrokDisplayNameUnion,
   anthropic: "Claude Sonnet 3.5 (New)" as AnthropicDisplayNameUnion
 } as const;
+
+export const defaultModelIdByProvider = {
+  openai: "gpt-4o-mini" as OpenAiModelIdUnion,
+  gemini: "gemini-2.5-flash-lite-preview-06-17" as GeminiModelIdUnion,
+  grok: "grok-3" as GrokModelIdUnion,
+  anthropic: "claude-3-5-sonnet-20241022" as AnthropicModelIdUnion
+};
+
 export let defaultProvider: "openai" | "gemini" | "grok" | "anthropic";
 export const defaultModelSelection: ModelSelection = {
   provider: (defaultProvider = "anthropic"),
@@ -114,21 +104,21 @@ export const defaultModelSelection: ModelSelection = {
   modelId:
     defaultProvider === "anthropic"
       ? getModelIdByDisplayName(
-          defaultProvider="anthropic",
+          (defaultProvider = "anthropic"),
           defaultModelByProvider[defaultProvider]
         )
       : defaultProvider === "gemini"
         ? getModelIdByDisplayName(
-            defaultProvider="gemini",
+            (defaultProvider = "gemini"),
             defaultModelByProvider[defaultProvider]
           )
         : defaultProvider === "grok"
           ? getModelIdByDisplayName(
-              defaultProvider="grok",
+              (defaultProvider = "grok"),
               defaultModelByProvider[defaultProvider]
             )
           : getModelIdByDisplayName(
-              defaultProvider="openai",
+              (defaultProvider = "openai"),
               defaultModelByProvider[defaultProvider]
             )
 };

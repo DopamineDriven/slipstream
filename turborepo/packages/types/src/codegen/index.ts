@@ -185,8 +185,9 @@ const modelMapper = async (modelKeys = true) => {
 };
 
 async function displayNameModelIdGen<
-  const T extends "keys=model-id" | "keys=display-name"
->(target: T) {
+  const T extends "keys=model-id" | "keys=display-name",
+  const V extends "model-id-only" | "display-name-only"
+>(target: T, arrayOnly?: V) {
   const mapper = await modelMapper(
     target === "keys=display-name" ? false : true
   );
@@ -197,6 +198,42 @@ async function displayNameModelIdGen<
 
   if (!openai || !gemini || !grok || !anthropic)
     throw new Error("empty data in displayNameModelIdGen");
+
+  if (typeof arrayOnly !== "undefined") {
+    if (arrayOnly === "display-name-only") {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _]) => keys),
+          anthropic: anthropic.map(([keys, _]) => keys)
+        };
+      } else {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals),
+          anthropic: anthropic.map(([_, vals]) => vals)
+        };
+      }
+    } else {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals),
+          anthropic: anthropic.map(([_, vals]) => vals)
+        };
+      } else {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _]) => keys),
+          anthropic: anthropic.map(([keys, _]) => keys)
+        };
+      }
+    }
+  }
   return {
     openai: Object.fromEntries(openai),
     gemini: Object.fromEntries(gemini),
@@ -207,10 +244,22 @@ async function displayNameModelIdGen<
 
 (async () => {
   const displayNameToModelId = await displayNameModelIdGen("keys=display-name");
+
+  const displayNameOnly = await displayNameModelIdGen("keys=display-name", "display-name-only");
+
   // prettier-ignore
   const displayNameToModelIdTemplate = `export const displayNameToModelId = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`
 
+// prettier-ignore
+const displayNameOnlyTemplate = `export const displayNameModelsByProvider = ${JSON.stringify(displayNameOnly, null, 2)} as const;`
+
   const modelIdToDisplayName = await displayNameModelIdGen("keys=model-id");
+
+  const modelIdsOnly = await displayNameModelIdGen("keys=model-id", "model-id-only");
+
+  // prettier-ignore
+  const modelIdsOnlyTemplate = `export const modelIdsByProvider = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`
+
   // prettier-ignore
   const modelIdToDisplayNameTemplate = `export const modelIdToDisplayName = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`
 
@@ -218,8 +267,16 @@ async function displayNameModelIdGen<
     "src/codegen/__gen__/display-name-to-model-id.ts",
     displayNameToModelIdTemplate
   );
+    fs.withWs(
+    "src/codegen/__gen__/display-names-by-provider.ts",
+    displayNameOnlyTemplate
+  );
   fs.withWs(
     "src/codegen/__gen__/model-id-to-display-name.ts",
     modelIdToDisplayNameTemplate
+  );
+      fs.withWs(
+    "src/codegen/__gen__/model-ids-by-provider.ts",
+    modelIdsOnlyTemplate
   );
 })();

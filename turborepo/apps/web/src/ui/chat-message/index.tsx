@@ -1,12 +1,13 @@
 "use client";
 
-import type { Message } from "@/types/ui";
+import type { Message } from "@prisma/client";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { processMarkdownToReact } from "@/lib/processor";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
+import { providerMetadata } from "@/lib/models";
 import { motion } from "motion/react";
 import {
   Avatar,
@@ -20,6 +21,7 @@ import {
   User as UserIcon,
   X
 } from "@t3-chat-clone/ui";
+import type { Provider } from "@t3-chat-clone/types";
 
 interface ChatMessageProps {
   message: Message;
@@ -34,24 +36,15 @@ export function ChatMessage({
   className,
   user
 }: ChatMessageProps) {
-  const isUser = message.sender === "user";
+  const isUser = message.senderType === "USER";
   const [renderedContent, setRenderedContent] = useState<ReactNode>(
-    typeof message.text === "string"
-      ? message.text.substring(0, 50) + "..."
-      : "Loading content..."
+    message.content.substring(0, 50) + "..."
   );
-  const [isEditing, setIsEditing] = useState(message.isEditing ?? false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const messageMemo = useMemo(() => {
-    const ogText = message.originalText;
-    const textRevision = message.text;
-
-    return typeof ogText === "string"
-      ? ogText
-      : typeof textRevision === "string"
-        ? textRevision
-        : "";
-  }, [message.originalText, message.text]);
+    return message.content;
+  }, [message.content]);
 
   const [editText, setEditText] = useState(messageMemo);
 
@@ -59,23 +52,19 @@ export function ChatMessage({
   const messageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof message.text === "string") {
-      let isMounted = true;
-      processMarkdownToReact(message.text)
-        .then(content => {
-          if (isMounted) setRenderedContent(content);
-        })
-        .catch(error => {
-          console.error("Error processing markdown:", error);
-          if (isMounted) setRenderedContent("Error displaying content.");
-        });
-      return () => {
-        isMounted = false;
-      };
-    } else {
-      setRenderedContent(message.text);
-    }
-  }, [message.text]);
+    let isMounted = true;
+    processMarkdownToReact(message.content)
+      .then(content => {
+        if (isMounted) setRenderedContent(content);
+      })
+      .catch(error => {
+        console.error("Error processing markdown:", error);
+        if (isMounted) setRenderedContent("Error displaying content.");
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [message.content]);
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
@@ -90,20 +79,14 @@ export function ChatMessage({
   }, [isEditing]);
 
   const handleEdit = () => {
-    setEditText(
-      message.originalText ??
-        (typeof message.text === "string" ? message.text : "")
-    );
+    setEditText(message.content);
     setIsEditing(true);
   };
 
   const handleCancelEdit = () => setIsEditing(false);
 
   const handleSaveEdit = () => {
-    if (
-      onUpdateMessage &&
-      editText.trim() !== (message.originalText ?? message.text)
-    ) {
+    if (onUpdateMessage && editText.trim() !== message.content) {
       onUpdateMessage(message.id, editText.trim());
     }
     setIsEditing(false);
@@ -122,35 +105,31 @@ export function ChatMessage({
       )}>
       {!isUser && (
         <>
-          <Avatar className="h-7 w-7 shrink-0 sm:h-8 sm:w-8">
-            {message.avatar ? (
-              <AvatarImage
-                src={message.avatar ?? "/placeholder.svg"}
-                alt="AI Avatar"
-              />
-            ) : (
-              <AvatarFallback>
-                <Bot className="size-4" />
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <div className="h-7 w-7 shrink-0 sm:h-8 sm:w-8 flex items-center justify-center">
+            {(() => {
+              const provider = message.provider.toLowerCase() as Provider;
+              const ProviderIcon = providerMetadata[provider]?.icon || Bot;
+              return <ProviderIcon className="size-4" />;
+            })()}
+          </div>
           <div
             className={`bg-brand-component text-brand-text prose dark:prose-invert prose-sm max-w-[85%] rounded-lg p-2 shadow-sm sm:max-w-[75%] sm:p-3`}>
             {renderedContent}
             <div className="text-brand-text-muted/80 mt-1.5 flex items-center justify-between text-xs">
               <span className="flex-grow">
                 {" "}
-                {message.timestamp} {message.model && `· ${message.model}`}
+                {new Date(message.createdAt).toLocaleTimeString([], {
+                  hour12: false,
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })} {message.model && `· ${message.model}`}
               </span>
               <AnimatedCopyButton
-                textToCopy={
-                  message.originalText ??
-                  (typeof message.text === "string" ? message.text : "")
-                }
+                textToCopy={message.content}
                 className={cn(
-                  "text-brand-text-muted hover:text-brand-text h-6 w-6 flex-shrink-0", // Added flex-shrink-0
+                  "text-brand-text-muted hover:text-brand-text h-6 w-6 flex-shrink-0",
                   "opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                  "pointer-events-none group-hover:pointer-events-auto" // Control interactivity
+                  "pointer-events-none group-hover:pointer-events-auto"
                 )}
                 initialIconSize={12}
                 aria-label="Copy AI response"
@@ -174,10 +153,7 @@ export function ChatMessage({
                   <PenLine className="size-3.5" />
                 </Button>
                 <AnimatedCopyButton
-                  textToCopy={
-                    message.originalText ??
-                    (typeof message.text === "string" ? message.text : "")
-                  }
+                  textToCopy={message.content}
                   className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component h-7 w-7"
                   initialIconSize={14}
                   aria-label="Copy message"
@@ -230,15 +206,20 @@ export function ChatMessage({
               {!isEditing && (
                 <div
                   className={`text-brand-primaryForeground/80 mt-1.5 text-xs`}>
-                  {message.timestamp}
+                  {new Date(message.createdAt).toLocaleTimeString([], {
+                    hour12: false,
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  })}
                 </div>
               )}
             </div>
           </div>
           <Avatar className="h-7 w-7 shrink-0 sm:h-8 sm:w-8">
-            {message.avatar ? (
+            {user?.image ? (
               <AvatarImage
-                src={user?.image ?? message.avatar ?? "/placeholder.svg"}
+
+                src={user?.image}
                 alt="User Avatar"
               />
             ) : (

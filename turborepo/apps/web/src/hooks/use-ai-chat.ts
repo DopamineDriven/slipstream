@@ -12,6 +12,9 @@ export function useAiChat() {
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [streamedText, setStreamedText] = useState<string>("");
+  const [title, setTitle] = useState<string | null>(null);
+  const [done, setDone] = useState<boolean>(false);
+  const [chunk, setChunk] = useState<string>("");
 
   const [messages, setMessages] = useState<string[]>([]);
 
@@ -22,6 +25,9 @@ export function useAiChat() {
   useEffect(() => {
     const onChunk: MessageHandler<"ai_chat_chunk"> = evt => {
       setConversationId(id => id ?? evt.conversationId);
+      setTitle(prev => prev ?? evt.title ?? null);
+      setDone(evt.done);
+      setChunk(evt.chunk);
       setIsComplete(false);
       setStreamedText(txt => txt + evt.chunk);
     };
@@ -35,7 +41,8 @@ export function useAiChat() {
       setIsComplete(true);
     };
 
-    const onResponse: MessageHandler<"ai_chat_response"> = _evt => {
+    const onResponse: MessageHandler<"ai_chat_response"> = evt => {
+      setDone(evt.done);
       // you might push the fully-streamedText into history…
       setMessages(ms => [...ms, streamedText]);
       setIsComplete(true);
@@ -89,6 +96,10 @@ export function useAiChat() {
 
   return {
     isConnected,
+    conversationId,
+    title,
+    done,
+    chunk,
     streamedText,
     messages,
     error,

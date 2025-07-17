@@ -1,87 +1,95 @@
+// src/ui/atoms/chat-area.tsx
 "use client";
 
-import { useEffect, useRef } from "react"; // Import useRef and useEffect
-import { motion } from "motion/react";
-import { User } from "next-auth";
-import type { Message } from "@/types/ui";
-import { mockMessages } from "@/lib/mock"; // Assuming mockMessages is still used for default
+import type { Message as PrismaMessage } from "@prisma/client";
+import type { User } from "next-auth";
+import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ChatMessage } from "@/ui/chat-message";
+import { motion } from "motion/react";
+import { Provider, toPrismaFormat } from "@t3-chat-clone/types";
 
 interface ChatAreaProps {
-  messages?: Message[];
-  className?: string;
-  onUpdateMessage?: (messageId: string, newText: string) => void;
-  scrollToMessageId?: string | null; // To trigger scroll to a specific message
-  onScrollToMessageHandled?: () => void; // Callback after scroll is handled
-  user?: User;
+  messages?: PrismaMessage[];
   streamedText?: string;
   isStreaming?: boolean;
+  model: string | null;
+  provider: Provider;
+  conversationId: string |null;
+  onUpdateMessage?: (messageId: string, newText: string) => void;
+  user?: User;
+  className?: string;
 }
 
 export function ChatArea({
-  messages = mockMessages,
-  className = "",
-  onUpdateMessage,
-  scrollToMessageId,
-  onScrollToMessageHandled: _onScrollToMessageHandled,
-  user,
+  messages = [],
   streamedText = "",
-  isStreaming = false
+  isStreaming = false,
+  onUpdateMessage,
+  model,
+  user,
+  conversationId,
+  provider,
+  className = ""
 }: ChatAreaProps) {
-  /**
-   * silence warning of unused var -- let's do something with `isStreaming` or omit it
-   */
-  const _s = isStreaming;
-  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
 
+  // scroll to bottom whenever messages or streamingText change
   useEffect(() => {
-    if (!scrollToMessageId && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, scrollToMessageId]);
-
-  // Scroll to a specific message if scrollToMessageId is set
-  // This is a simplified version; direct child refs in ChatMessage are more robust for this.
-  // For now, we'll rely on the ChatMessage's internal scrollIntoView when editing.
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, streamedText]);
 
   return (
-    <ScrollArea
-      ref={scrollAreaRef}
-      className={`flex-grow p-2 sm:p-4 md:p-6 ${className}`}>
+    <ScrollArea className={`flex-grow p-2 sm:p-4 md:p-6 ${className}`}>
       <motion.div
-        className="space-y-1" // Reduced space-y for tighter message packing
+        className="space-y-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.1 }}>
+        {/* Render all persisted messages */}
         {messages.map(msg => (
           <ChatMessage
             key={msg.id}
-            message={msg}
+            message={{
+              id: msg.id,
+              senderType: msg.senderType,
+              content: msg.content,
+              createdAt: msg.createdAt,
+              conversationId: msg.conversationId,
+              model: msg.model,
+              provider: msg.provider,
+              updatedAt: msg.updatedAt,
+              userId: msg.userId,
+              userKeyId: msg.userKeyId
+              // include any other fields your ChatMessage expects
+            }}
             user={user}
             onUpdateMessage={onUpdateMessage}
           />
         ))}
-        {streamedText && (
+
+        {/* If streaming is active, render one in-flight AI bubble */}
+        {isStreaming && streamedText && (
           <ChatMessage
             key="streaming"
             message={{
               id: "streaming",
-              sender: "ai",
-              text: streamedText,
-              originalText: streamedText,
-              timestamp: new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-              }),
-              avatar: "/placeholder.svg?width=32&height=32"
+              senderType: "AI",
+              content: streamedText,
+              createdAt: new Date(),
+              conversationId: conversationId ?? "new-chat",
+              model,
+              provider: toPrismaFormat(provider),
+              updatedAt: new Date(),
+              userId: user?.id ?? null,
+              userKeyId: null
             }}
             user={user}
           />
         )}
-        <div ref={messagesEndRef} />
-        {/* Invisible element at the end for auto-scrolling */}
+
+        {/* anchor for auto-scroll */}
+        <div ref={endRef} />
       </motion.div>
     </ScrollArea>
   );

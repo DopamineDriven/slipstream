@@ -1,5 +1,6 @@
 import React from "react"
 import type { ComponentPropsWithRef, JSX } from "react";
+import type { Message as MessagePrisma } from "@prisma/client";
 
 
 export interface Model {
@@ -9,19 +10,16 @@ export interface Model {
 }
 
 
-export interface Message {
-
-  id: string
-
-  sender: "user" | "ai"
-
+export interface Message  extends Omit<MessagePrisma, "createdAt"|"updatedAt"|"provider">{
+provider: "grok" | "openai" | "gemini" | "anthropic";
+createdAt: string;
+updatedAt: string;
   text: string | React.ReactNode
 
   originalText?: string
 
   timestamp: string
 
-  model?: string
 
   avatar?: string
 

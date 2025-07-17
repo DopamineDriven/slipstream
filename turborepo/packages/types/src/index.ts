@@ -13,11 +13,14 @@ export type {
   AssetUploadResponse,
   ChatWsEvent,
   ChatWsEventTypeUnion,
+  ClientContextWorkupProps,
   EventMap,
   EventTypeMap,
   ImageGenRequest,
   ImageGenResponse,
   PingMessage,
+  ProviderCountsProps,
+  RecordCountsProps,
   TypingIndicator
 } from "@/events.ts";
 
@@ -25,40 +28,48 @@ export type {
  * model/provider types
  */
 export type {
+  AllDisplayNamesUnion,
   AllModelsUnion,
   AnthropicChatModels,
-  GeminiChatModels,
-  GetModelUtilRT,
-  GrokChatModels,
-  ModelMap,
-  Models,
-  OpenAIChatModels,
-  Provider,
-  Providers,
   AnthropicDisplayNameUnion,
   AnthropicModelIdUnion,
+  DisplayNameModelMap,
+  GeminiChatModels,
   GeminiDisplayNameUnion,
   GeminiModelIdUnion,
+  GetDisplayNamesForProviderRT,
+  GetModelsForProviderRT,
+  GetModelUtilRT,
+  GrokChatModels,
   GrokDisplayNameUnion,
   GrokModelIdUnion,
   ModelDisplayNameToModelId,
   ModelIdToModelDisplayName,
+  ModelMap,
+  Models,
+  OpenAIChatModels,
   OpenAiDisplayNameUnion,
-  OpenAiModelIdUnion
+  OpenAiModelIdUnion,
+  Provider,
+  Providers
 } from "@/models.ts";
 
 export {
-  toPrismaFormat,
   allProviders,
-  getModelsForProvider,
-  providerModelResponsesApi,
-  providerModelChatApi,
-  displayNameToModelId,
-  getDisplayNameByModelId,
-  getModelIdByDisplayName,
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
-  modelIdToDisplayName
+  displayNameModelsByProvider,
+  displayNameToModelId,
+  getAllProviders,
+  getDisplayNameByModelId,
+  getDisplayNamesForProvider,
+  getModelIdByDisplayName,
+  getModelsForProvider,
+  modelIdsByProvider,
+  modelIdToDisplayName,
+  providerModelChatApi,
+  providerModelResponsesApi,
+  toPrismaFormat
 } from "@/models.ts";
 
 /**

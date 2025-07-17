@@ -1,11 +1,9 @@
 "use client";
 
-
-import {
-  getModelsForProvider,
-  ModelSelection,
-  providerMetadata
-} from "@/lib/models";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useModelSelection } from "@/context/model-selection-context";
+import { providerMetadata } from "@/lib/models";
+import { cn } from "@/lib/utils";
 import {
   Drawer,
   DrawerClose,
@@ -15,59 +13,65 @@ import {
   DrawerHeader,
   DrawerTitle
 } from "@/ui/atoms/drawer";
+import type { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 import {
   displayNameToModelId,
-  getModelIdByDisplayName,
-  Provider
-} from "@t3-chat-clone/types/models";
+  getAllProviders,
+  getDisplayNamesForProvider,
+  getModelIdByDisplayName
+} from "@t3-chat-clone/types";
 import {
-  Badge,
   Button,
-  Check,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger
 } from "@t3-chat-clone/ui";
-
-type AvailableModelsByProvider<
-  T extends "grok" | "openai" | "gemini" | "anthropic"
-> = keyof (typeof displayNameToModelId)[T];
-
-export type GrokModels = AvailableModelsByProvider<"grok">;
-
-export type OpenAiModels = AvailableModelsByProvider<"openai">;
-
-export type GeminiModelDispayNames = AvailableModelsByProvider<"gemini">;
-
-export type AnthropicModelDisplayNames = AvailableModelsByProvider<"anthropic">;
+import { ModelUI } from "./model-badges";
 
 interface MobileModelSelectorDrawerProps {
   isOpen: boolean;
   onOpenChangeAction: (isOpen: boolean) => void;
-  selectedModel: ModelSelection;
-  onSelectModelAction: (model: ModelSelection) => void;
 }
-
 
 export function MobileModelSelectorDrawer({
   isOpen,
-  onOpenChangeAction,
-  selectedModel,
-  onSelectModelAction
+  onOpenChangeAction
 }: MobileModelSelectorDrawerProps) {
-  const handleModelSelect = <const V extends Provider>(
-    provider: V,
-    displayName: keyof (typeof displayNameToModelId)[V]
-  ) => {
-    const newModelSelection = {
-      provider,
-      displayName,
-      modelId: getModelIdByDisplayName(provider, displayName)
+  const { selectedModel, updateModel, updateProvider } = useModelSelection();
+  // 1) local “draft” state so we don’t overwrite context until commit
+  const [draftProvider, setDraftProvider] = useState<Provider>(
+    selectedModel.provider
+  );
+
+  useEffect(() => {
+    setDraftProvider(selectedModel.provider);
+  }, [selectedModel.provider]);
+
+  const handleModelSelect = useCallback(
+    <const V extends Provider>(
+      provider: V,
+      displayName: keyof (typeof displayNameToModelId)[V]
+    ) => {
+      const modelId = getModelIdByDisplayName(provider, displayName);
+      updateProvider(provider);
+      updateModel(displayName as string, modelId as AllModelsUnion);
+      onOpenChangeAction(false);
+    },
+    [onOpenChangeAction, updateModel, updateProvider]
+  );
+
+  const styleMemo = useMemo(() => {
+    const mobileModelSelectStyles = {
+      default: `focus:ring-brand-primary/50 h-auto w-full justify-between px-4 py-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98]`,
+      isSelected: "bg-brand-primary text-brand-primaryForeground shadow-md",
+      isNotSelected:
+        "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
     };
-    onSelectModelAction(newModelSelection as ModelSelection);
-    onOpenChangeAction(false);
-  };
+    return mobileModelSelectStyles;
+  }, []);
+
+  const providers = useMemo(() => getAllProviders(), []);
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChangeAction}>
@@ -84,7 +88,8 @@ export function MobileModelSelectorDrawer({
 
           <div className="flex-1 overflow-hidden px-4">
             <Tabs
-              defaultValue={selectedModel.provider}
+              value={draftProvider}
+              onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
               {/* Provider Tabs - More spacious */}
               <TabsList className="bg-brand-sidebar border-brand-border mb-6 grid h-12 w-full flex-shrink-0 grid-cols-2 border sm:grid-cols-4">
@@ -106,259 +111,141 @@ export function MobileModelSelectorDrawer({
                 )}
               </TabsList>
 
-              {(["anthropic", "gemini", "grok", "openai"] as const).map(
-                provider => {
-                  const Icon = providerMetadata[provider].icon;
-                  return (
-                    <TabsContent
-                      key={provider}
-                      value={provider}
-                      className="flex-1 overflow-x-hidden">
-                      {/* Provider Info - Cleaner layout */}
-                      <div className="bg-brand-sidebar/50 border-brand-border/50 mb-6 rounded-lg border p-4">
-                        <div className="mb-2 flex items-center gap-3">
-                          <Icon className="size-6 shrink-0" />
-                          <h3 className="text-brand-text-emphasis text-lg font-semibold">
-                            {providerMetadata[provider].name}
-                          </h3>
-                        </div>
-                        <p className="text-brand-text-muted text-sm leading-relaxed">
-                          {providerMetadata[provider].description}
-                        </p>
+              {providers.map(provider => {
+                const Icon = providerMetadata[provider].icon;
+                return (
+                  <TabsContent
+                    key={provider}
+                    value={provider}
+                    className="flex-1 overflow-x-hidden">
+                    {/* Provider Info - Cleaner layout */}
+                    <div className="bg-brand-sidebar/50 border-brand-border/50 mb-6 rounded-lg border p-4">
+                      <div className="mb-2 flex items-center gap-3">
+                        <Icon className="size-6 shrink-0" />
+                        <h3 className="text-brand-text-emphasis text-lg font-semibold">
+                          {providerMetadata[provider].name}
+                        </h3>
                       </div>
+                      <p className="text-brand-text-muted text-sm leading-relaxed">
+                        {providerMetadata[provider].description}
+                      </p>
+                    </div>
 
-                      {/* Models List - Full height scrolling */}
-                      <div className="-mr-2 flex-1 overflow-y-auto pr-2">
-                        <div className="space-y-3 pb-6">
-                          {provider === "anthropic" ? (
-                            getModelsForProvider(provider).map(model => {
-                              const isSelected =
-                                selectedModel.provider === provider &&
-                                selectedModel.displayName === model;
-                              return (
-                                <Button
-                                  key={model}
-                                  variant={isSelected ? "default" : "outline"}
-                                  className={`focus:ring-brand-primary/50 h-auto w-full justify-between px-4 py-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98] ${
-                                    isSelected
-                                      ? "bg-brand-primary text-brand-primaryForeground shadow-md"
-                                      : "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
-                                  }`}
-                                  onClick={() =>
-                                    handleModelSelect(
-                                      provider,
-                                      model as AnthropicModelDisplayNames
-                                    )
-                                  }>
-                                  <div className="flex w-full items-center justify-between">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className="text-base font-medium">
-                                        {model}
-                                      </span>
-                                      {/* Inline badges */}
-                                      {model.includes("Preview") && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Preview
-                                        </Badge>
-                                      )}
-                                      {model.includes("Mini") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Compact
-                                        </Badge>
-                                      )}
-                                      {model.includes("Vision") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Vision
-                                        </Badge>
-                                      )}
-                                    </div>
-                                    {isSelected && (
-                                      <Check className="text-brand-primaryForeground ml-3 h-5 w-5 flex-shrink-0" />
-                                    )}
-                                  </div>
-                                </Button>
-                              );
-                            })
-                          ) : provider === "gemini" ? (
-                            getModelsForProvider(provider).map(model => {
-                              const isSelected =
-                                selectedModel.provider === provider &&
-                                selectedModel.displayName === model;
-                              return (
-                                <Button
-                                  key={model}
-                                  variant={isSelected ? "default" : "outline"}
-                                  className={`focus:ring-brand-primary/50 h-auto w-full justify-between px-4 py-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98] ${
-                                    isSelected
-                                      ? "bg-brand-primary text-brand-primaryForeground shadow-md"
-                                      : "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
-                                  }`}
-                                  onClick={() =>
-                                    handleModelSelect(
-                                      provider,
-                                      model as GeminiModelDispayNames
-                                    )
-                                  }>
-                                  <div className="flex w-full items-center justify-between">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className="text-base font-medium">
-                                        {model}
-                                      </span>
-                                      {/* Inline badges */}
-                                      {model.includes("Preview") && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Preview
-                                        </Badge>
-                                      )}
-                                      {model.includes("Mini") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Compact
-                                        </Badge>
-                                      )}
-                                      {model.includes("Vision") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Vision
-                                        </Badge>
-                                      )}
-                                    </div>
-                                    {isSelected && (
-                                      <Check className="text-brand-primaryForeground ml-3 h-5 w-5 flex-shrink-0" />
-                                    )}
-                                  </div>
-                                </Button>
-                              );
-                            })
-                          ) : provider === "grok" ? (
-                            getModelsForProvider(provider).map(model => {
-                              const isSelected =
-                                selectedModel.provider === provider &&
-                                selectedModel.displayName === model;
-                              return (
-                                <Button
-                                  key={model}
-                                  variant={isSelected ? "default" : "outline"}
-                                  className={`focus:ring-brand-primary/50 h-auto w-full justify-between px-4 py-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98] ${
-                                    isSelected
-                                      ? "bg-brand-primary text-brand-primaryForeground shadow-md"
-                                      : "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
-                                  }`}
-                                  onClick={() =>
-                                    handleModelSelect(
-                                      provider,
-                                      model as GrokModels
-                                    )
-                                  }>
-                                  <div className="flex w-full items-center justify-between">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className="text-base font-medium">
-                                        {model}
-                                      </span>
-                                      {/* Inline badges */}
-                                      {model.includes("Preview") && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Preview
-                                        </Badge>
-                                      )}
-                                      {model.includes("Mini") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Compact
-                                        </Badge>
-                                      )}
-                                      {model.includes("Vision") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Vision
-                                        </Badge>
-                                      )}
-                                    </div>
-                                    {isSelected && (
-                                      <Check className="text-brand-primaryForeground ml-3 h-5 w-5 flex-shrink-0" />
-                                    )}
-                                  </div>
-                                </Button>
-                              );
-                            })
-                          ) : provider === "openai" ? (
-                            getModelsForProvider(provider).map(model => {
-                              const isSelected =
-                                selectedModel.provider === provider &&
-                                selectedModel.displayName === model;
-                              return (
-                                <Button
-                                  key={model}
-                                  variant={isSelected ? "default" : "outline"}
-                                  className={`focus:ring-brand-primary/50 h-auto w-full justify-between px-4 py-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98] ${
-                                    isSelected
-                                      ? "bg-brand-primary text-brand-primaryForeground shadow-md"
-                                      : "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
-                                  }`}
-                                  onClick={() =>
-                                    handleModelSelect(
-                                      provider,
-                                      model as OpenAiModels
-                                    )
-                                  }>
-                                  <div className="flex w-full items-center justify-between">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className="text-base font-medium">
-                                        {model}
-                                      </span>
-                                      {/* Inline badges */}
-                                      {model.includes("Preview") && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Preview
-                                        </Badge>
-                                      )}
-                                      {model.includes("Mini") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Compact
-                                        </Badge>
-                                      )}
-                                      {model.includes("Vision") && (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-5 px-1.5 py-0.5 text-xs">
-                                          Vision
-                                        </Badge>
-                                      )}
-                                    </div>
-                                    {isSelected && (
-                                      <Check className="text-brand-primaryForeground ml-3 h-5 w-5 flex-shrink-0" />
-                                    )}
-                                  </div>
-                                </Button>
-                              );
-                            })
-                          ) : (
-                            <></>
-                          )}
-                        </div>
+                    {/* Models List - Full height scrolling */}
+                    <div className="-mr-2 flex-1 overflow-y-auto pr-2">
+                      <div className="space-y-3 pb-6">
+                        {provider === "anthropic" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "gemini" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "grok" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "openai" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : (
+                          <></>
+                        )}
                       </div>
-                    </TabsContent>
-                  );
-                }
-              )}
+                    </div>
+                  </TabsContent>
+                );
+              })}
             </Tabs>
           </div>
           <DrawerFooter className="flex-shrink-0 pt-4">

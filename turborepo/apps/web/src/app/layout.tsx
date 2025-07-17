@@ -7,6 +7,7 @@ import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
 import Script from "next/script";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
+import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { auth } from "@/lib/auth";
 import { getSiteUrl } from "@/lib/site-url";
 import * as ga from "@/utils/google-analytics";
@@ -27,7 +28,7 @@ export const viewport = {
   width: "device-width"
 } satisfies Viewport;
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl(process.env.NODE_ENV)),
   title: {
     default: "AI Chat",
@@ -89,7 +90,7 @@ export const metadata = {
     "max-image-preview": "large",
     "max-snippet": -1
   }
-} satisfies Metadata;
+};
 
 export default async function RootLayout({
   children
@@ -130,7 +131,9 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
-            <ChatWebSocketProvider>{children}</ChatWebSocketProvider>
+            <ChatWebSocketProvider>
+              <ModelSelectionProvider>{children}</ModelSelectionProvider>
+            </ChatWebSocketProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>
