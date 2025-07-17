@@ -208,8 +208,8 @@ export async function processMarkdownToReact(content: string) {
     },
     passNode: true
   });
-  const file = new VFile({ value: content });
-  const result = await processor.process(file);
+  const _file = new VFile({ value: content });
+  const result = await processor.process(content);
 
   return result.result as React.ReactElement satisfies ReactNode;
 }
