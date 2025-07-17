@@ -1,15 +1,15 @@
 "use client";
 
-import type { Message as PrismaMessage } from "@prisma/client";
 import type { User } from "next-auth";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ChatMessage } from "@/ui/chat-message";
 import { motion } from "motion/react";
 import { Provider } from "@t3-chat-clone/types";
+import { UIMessage } from "@/types/shared";
 
 interface ChatAreaProps {
-  messages?: PrismaMessage[];
+  messages?: UIMessage[];
   streamedText?: string;
   isStreaming?: boolean;
   model: string | null;
@@ -50,14 +50,17 @@ export function ChatArea({
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.1 }}>
         {/* Render all persisted messages */}
-        {messages.map(msg => (
+        {messages.map(msg => {
+
+          return(
+
           <ChatMessage
             key={msg.id}
             message={msg}
             user={user}
             onUpdateMessage={onUpdateMessage}
           />
-        ))}
+        )})}
         {/* anchor for auto-scroll */}
         <div ref={endRef} />
       </motion.div>

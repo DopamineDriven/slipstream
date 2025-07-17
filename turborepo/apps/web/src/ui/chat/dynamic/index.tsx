@@ -1,7 +1,6 @@
 // app/chat/[conversationId]/ChatInterface.tsx
 "use client";
 
-import type { Message } from "@prisma/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAiChat } from "@/hooks/use-ai-chat";
@@ -14,6 +13,7 @@ import {
   ClientContextWorkupProps,
   toPrismaFormat
 } from "@t3-chat-clone/types";
+import { UIMessage } from "@/types/shared";
 
 interface ChatInterfaceProps {
   conversationId: string;
@@ -21,7 +21,7 @@ interface ChatInterfaceProps {
   isNewChat: boolean;
   user?: User;
   conversationTitle?: string;
-  initialMessages?: Message[];
+  initialMessages?: UIMessage[];
   apiKeys: ClientContextWorkupProps;
 }
 
@@ -43,7 +43,8 @@ export function ChatInterface({
   } = useAiChat();
 
   const [convId, setConvId] = useState(initialConvId);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const streamingIdRef = useRef<string|null>(null);
+  const [messages, setMessages] = useState<UIMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const streamingRef = useRef<string | null>(null);
   const processedRef = useRef(false);
@@ -60,9 +61,8 @@ export function ChatInterface({
       processedRef.current = true;
 
       // 1a) Optimistic user message
-      const userMsg: Message = {
-        id: `msg_user_${Date.now()}`,
-        conversationId: "new-chat",
+      const userMsg: UIMessage = {
+        id: `new-chat`,
         senderType: "USER",
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
@@ -98,16 +98,16 @@ export function ChatInterface({
   useEffect(() => {
     if (!streamedText) return;
     setIsStreaming(true);
+    if (streamingIdRef.current === null) {
 
     setMessages(prev => {
       if (!streamingRef.current) {
-        const id = `streaming-${convId}-${Date.now()}`;
+        const id = `streaming`;
         streamingRef.current = id;
         return [
           ...prev,
           {
             id,
-            conversationId: convId,
             senderType: "AI",
             provider: toPrismaFormat(selectedModel.provider),
             model: selectedModel.modelId,
@@ -124,7 +124,7 @@ export function ChatInterface({
           ? { ...m, content: streamedText, updatedAt: new Date() }
           : m
       );
-    });
+    });}
   }, [streamedText, convId, selectedModel, user]);
 
   useEffect(() => {
@@ -139,9 +139,8 @@ export function ChatInterface({
     (text: string) => {
       if (!isConnected) return;
       // optimistic user bubble
-      const um: Message = {
-        id: `msg_user_${Date.now()}`,
-        conversationId: convId,
+      const um: UIMessage = {
+        id: `new-chat`,
         senderType: "USER",
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
@@ -169,7 +168,6 @@ export function ChatInterface({
       selectedModel.modelId,
       selectedModel.provider,
       isConnected,
-      convId,
       sendChat
     ]
   );
