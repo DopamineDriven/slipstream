@@ -12,6 +12,7 @@ import { auth } from "@/lib/auth";
 import { getSiteUrl } from "@/lib/site-url";
 import * as ga from "@/utils/google-analytics";
 import { SessionProvider } from "next-auth/react";
+import { User } from "next-auth";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -91,13 +92,14 @@ export const metadata: Metadata = {
     "max-snippet": -1
   }
 };
-
+const userMap = new Map<"user", User>();
 export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  if (session?.user) userMap.set("user", session.user);
   return (
     <html suppressHydrationWarning lang="en">
       <head>
@@ -131,7 +133,7 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
-            <ChatWebSocketProvider>
+            <ChatWebSocketProvider user={userMap.get("user")} >
               <ModelSelectionProvider>{children}</ModelSelectionProvider>
             </ChatWebSocketProvider>
           </SessionProvider>

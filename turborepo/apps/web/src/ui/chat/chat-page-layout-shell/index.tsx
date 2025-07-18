@@ -19,6 +19,7 @@ import { Sidebar } from "@/ui/sidebar";
 import { SidebarToggleButton } from "@/ui/sidebar-toggle-button";
 import { Conversation } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { Button, Settings, ShareIcon as Share2 } from "@t3-chat-clone/ui";
 
 const ThemeToggle = dynamic(
@@ -33,17 +34,41 @@ interface ChatLayoutShellProps {
 }
 
 export function ChatLayoutShell({
-  user,
   recentConvos,
+  user,
   children
 }: ChatLayoutShellProps) {
+  // const {data} = useSession();
+  // const user = data?.user
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
   const [isMobileModelSelectorOpen, setIsMobileModelSelectorOpen] =
     useState(false);
   const { isMac } = usePlatformDetection();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    // Check if user prefers dark mode
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
 
+    // Apply theme based on system preference during initial load
+    if (!resolvedTheme) {
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      // Apply theme based on resolvedTheme once it's available
+      if (resolvedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [resolvedTheme]);
 
   const keyboardShortcutsMemo = useMemo(
     () => [
@@ -81,7 +106,7 @@ export function ChatLayoutShell({
   const handleShareChat = useCallback(() => {
     console.log("Share chat clicked. Implement sharing logic.");
     alert("Share functionality to be implemented!");
-  },[]);
+  }, []);
 
   const handleOpenMobileModelSelector = useCallback(() => {
     setIsMobileModelSelectorOpen(true);
@@ -246,7 +271,6 @@ export function ChatLayoutShell({
         </>
       )}
       <SettingsDrawer
-    
         user={user}
         isOpen={isSettingsDrawerOpen}
         onOpenChange={setIsSettingsDrawerOpen}

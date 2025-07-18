@@ -1,11 +1,11 @@
 "use client";
 
 import type { User } from "next-auth";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ChatMessage } from "@/ui/chat-message";
 import { motion } from "motion/react";
-import { Provider } from "@t3-chat-clone/types";
+import { Provider, toPrismaFormat } from "@t3-chat-clone/types";
 import { UIMessage } from "@/types/shared";
 
 interface ChatAreaProps {
@@ -18,6 +18,7 @@ interface ChatAreaProps {
   onUpdateMessage?: (messageId: string, newText: string) => void;
   user?: User;
   className?: string;
+  isAwaitingFirstChunk: boolean
 }
 
 export function ChatArea({
@@ -41,7 +42,16 @@ export function ChatArea({
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, streamedText]);
+  // 2) accumulate all chunks into one displayText
+  const accRef = useRef("");
+  const [displayText, setDisplayText] = useState("");
 
+  useEffect(() => {
+    if (streamedText) {
+      accRef.current = streamedText;
+      setDisplayText(accRef.current);
+    }
+  }, [streamedText]);
   return (
     <ScrollArea className={`flex-grow p-2 sm:p-4 md:p-6 ${className}`}>
       <motion.div
@@ -61,6 +71,24 @@ export function ChatArea({
             onUpdateMessage={onUpdateMessage}
           />
         )})}
+        {displayText && (
+          <ChatMessage
+            key="streaming"
+            message={{
+              id: "streaming",
+              senderType: "AI",
+              content: displayText,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              conversationId: conversationId ?? "new-chat",
+              model: model ?? "unknown-model",
+              provider: toPrismaFormat(provider),
+              userId: user?.id ?? null,
+              userKeyId: null
+            }}
+            user={user}
+          />
+        )}
         {/* anchor for auto-scroll */}
         <div ref={endRef} />
       </motion.div>

@@ -5,6 +5,7 @@ import { createContext, useContext } from "react";
 import { useChatWebSocket } from "@/hooks/use-chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
+import { User } from "next-auth";
 
 export interface ChatWsContextProps {
   lastEvent: ChatWsEvent | null;
@@ -21,11 +22,13 @@ const ChatWebSocketContext = createContext<ChatWsContextProps | null>(
 ) satisfies Context<ChatWsContextProps | null>;
 
 export function ChatWebSocketProvider({
-  children
+  children,
+  user
 }: Readonly<{
   children: ReactNode;
+  user?: undefined | null | User;
 }>) {
-  const { lastEvent, isConnected, sendEvent, client } = useChatWebSocket();
+  const { lastEvent, isConnected, sendEvent, client } = useChatWebSocket(user?.email);
 
   return (
     <ChatWebSocketContext.Provider
