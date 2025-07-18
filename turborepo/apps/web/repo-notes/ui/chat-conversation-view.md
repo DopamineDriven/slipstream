@@ -1,3 +1,6 @@
+### Removed 2025-07-18T05:22:00.000Z
+
+```tsx
 // src/components/ChatConversationView.tsx
 "use client";
 
@@ -41,7 +44,7 @@ export function ChatConversationView({
     conversationId = convoId,
     isComplete,
     sendChat
-  } = useAiChat();
+  } = useAiChat(user?.id);
   console.log(title);
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
@@ -112,7 +115,6 @@ export function ChatConversationView({
         };
         return [...prev, aiMsg];
       }
-
       // subsequent tokens: patch that same message
       return prev.map(msg =>
         msg.id === streamingMessageId
@@ -212,3 +214,5 @@ export function ChatConversationView({
     </div>
   );
 }
+
+```
