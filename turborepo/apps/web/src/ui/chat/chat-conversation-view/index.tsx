@@ -184,6 +184,7 @@ export function ChatConversationView({
   return (
     <div className="flex min-h-full flex-col overflow-y-auto">
       <ChatArea
+      isAwaitingFirstChunk
         messages={messages}
         streamedText={streamedText}
         isStreaming={isStreaming}
