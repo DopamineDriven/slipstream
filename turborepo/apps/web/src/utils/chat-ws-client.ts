@@ -212,7 +212,7 @@ export class ChatWebSocketClient {
         break;
       }
       default:
-        console.warn(`unhandled event in 'on' method in ws-client`);
+        console.warn(`unhandled event ${event} in 'on' method in ws-client`);
     }
   }
 
