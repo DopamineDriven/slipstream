@@ -1,53 +1,61 @@
+// src/hooks/use-ai-chat.ts
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type {
-  MessageHandler
-} from "@/types/chat-ws";
+import type { MessageHandler } from "@/types/chat-ws";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { getModel } from "@/lib/get-model";
 import { AllModelsUnion, Provider } from "@t3-chat-clone/types";
+
 const activeUserStreams = new Set<string>();
+
 export function useAiChat(userId?: string) {
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const [streamedText, setStreamedText] = useState<string>("");
   const [title, setTitle] = useState<string | null>(null);
-
   const [messages, setMessages] = useState<string[]>([]);
-
   const [error, setError] = useState<string | null>(null);
-
   const [isComplete, setIsComplete] = useState<boolean>(false);
-  const [liveConversationId, setLiveConversationId] = useState<string | null>(null);
+  const [liveConversationId, setLiveConversationId] = useState<string | null>(
+    null
+  );
+
+  // Keep the “current” conversationId in a ref so we don’t force
+  // sendChat to depend on it
   const conversationIdRef = useRef<string | null>(null);
+
+  // When the stream ends, allow a new sendChat for this user
   useEffect(() => {
     if (isComplete && userId) {
       activeUserStreams.delete(userId);
     }
   }, [isComplete, userId]);
+
+  // 1️⃣ Subscribe with **named** handlers, so we can clean them up by reference
   useEffect(() => {
-    const onChunk: MessageHandler<"ai_chat_chunk"> = evt => {
-          if (evt.conversationId && conversationIdRef.current !== evt.conversationId) {
+    const onChunk: MessageHandler<"ai_chat_chunk"> = (evt) => {
+      // capture the real ID once it arrives
+      if (evt.conversationId && conversationIdRef.current !== evt.conversationId) {
         conversationIdRef.current = evt.conversationId;
         setLiveConversationId(evt.conversationId);
       }
-      setTitle(prev => prev ?? evt.title ?? null);
+      setTitle((t) => t ?? evt.title ?? null);
       setIsComplete(false);
-      setStreamedText(txt => txt + evt.chunk);
+      setStreamedText((txt) => txt + evt.chunk);
     };
 
-    const onInline: MessageHandler<"ai_chat_inline_data"> = evt => {
+    const onInline: MessageHandler<"ai_chat_inline_data"> = (evt) => {
       console.info("inline data:", evt.data);
     };
 
-    const onError: MessageHandler<"ai_chat_error"> = evt => {
+    const onError: MessageHandler<"ai_chat_error"> = (evt) => {
       setError(evt.message);
       setIsComplete(true);
     };
 
-    const onResponse: MessageHandler<"ai_chat_response"> = evt => {
-      // you might push the fully-streamedText into history…
-      setMessages(ms => [...ms, evt.chunk]);
+    const onResponse: MessageHandler<"ai_chat_response"> = (evt) => {
+      // you might prefer evt.chunk or streamedText here
+      setMessages((ms) => [...ms, evt.chunk]);
       setIsComplete(evt.done);
     };
 
@@ -64,6 +72,7 @@ export function useAiChat(userId?: string) {
     };
   }, [client]);
 
+  // 2️⃣ sendChat no longer re-creates when the conversationId changes
   const sendChat = useCallback(
     (
       prompt: string,
@@ -72,41 +81,45 @@ export function useAiChat(userId?: string) {
       hasProviderConfigured?: boolean,
       isDefaultProvider?: boolean
     ) => {
-            if (!userId) {
+      if (!userId) {
         console.warn("sendChat called without a userId.");
         return;
       }
       if (activeUserStreams.has(userId)) {
-        console.warn(`Request ignored: User ${userId} already has an active stream.`);
-        return; // Omit the request entirely
+        console.warn(
+          `Request ignored: User ${userId} already has an active stream.`
+        );
+        return;
       }
 
-      try {
-        activeUserStreams.add(userId);
-        setStreamedText("");
-        setError(null);
-        setIsComplete(false);
-      } catch (err) {
-        console.warn(`error in the sendChat useCallback`, err);
-      } finally {
-        if (conversationIdRef.current ==null || conversationIdRef.current === "new-chat") {
-          conversationIdRef.current = "new-chat";
-        }
-        conversationIdRef.current;
-        sendEvent("ai_chat_request", {
-          type: "ai_chat_request",
-          conversationId: conversationIdRef.current,
-          prompt,
-          provider: provider ?? "openai",
-          model: getModel(provider ?? "openai", model as AllModelsUnion | undefined),
-          hasProviderConfigured: hasProviderConfigured ?? false,
-          isDefaultProvider: isDefaultProvider ?? false,
-          maxTokens: undefined,
-          systemPrompt: undefined,
-          temperature: undefined,
-          topP: undefined
-        });
+      activeUserStreams.add(userId);
+      setStreamedText("");
+      setError(null);
+      setIsComplete(false);
+
+      if (
+        !conversationIdRef.current ||
+        conversationIdRef.current === "new-chat"
+      ) {
+        conversationIdRef.current = "new-chat";
       }
+
+      sendEvent("ai_chat_request", {
+        type: "ai_chat_request",
+        conversationId: conversationIdRef.current,
+        prompt,
+        provider: provider ?? "openai",
+        model: getModel(
+          provider ?? "openai",
+          model as AllModelsUnion | undefined
+        ),
+        hasProviderConfigured: hasProviderConfigured ?? false,
+        isDefaultProvider: isDefaultProvider ?? false,
+        maxTokens: undefined,
+        systemPrompt: undefined,
+        temperature: undefined,
+        topP: undefined
+      });
     },
     [sendEvent, userId]
   );
