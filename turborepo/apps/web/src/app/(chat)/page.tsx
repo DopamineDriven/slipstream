@@ -13,7 +13,7 @@ export const metadata:Metadata = {
   title: "Chat Home"
 };
 
-const { prismaApiKeyService, prismaConversationService } =
+const { prismaConversationService } =
   ormHandler(prismaClient);
 
 export default async function HomePage() {
@@ -21,9 +21,7 @@ export default async function HomePage() {
 
   if (!session?.user) return redirect("/api/auth/signin");
 
-  const providerConfig = await prismaApiKeyService.getClientApiKeys(
-    session.user.id
-  );
+
   const recentConvos =
     await prismaConversationService.getRecentConversationsByUserId(
       session.user.id
@@ -31,7 +29,7 @@ export default async function HomePage() {
   return (
     <Suspense fallback={"Loading..."}>
       <ChatLayoutShell user={session.user} recentConvos={recentConvos}>
-        <ChatEmptyState  apiKeys={providerConfig} user={session.user} />
+        <ChatEmptyState   user={session.user} />
       </ChatLayoutShell>
     </Suspense>
   );

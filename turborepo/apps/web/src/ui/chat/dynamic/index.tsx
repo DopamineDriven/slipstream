@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAiChat } from "@/hooks/use-ai-chat";
+import { UIMessage } from "@/types/shared";
 import { ChatArea } from "@/ui/chat-area";
 import { MessageInputBar } from "@/ui/chat/message-input-bar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
@@ -13,7 +14,6 @@ import {
   ClientContextWorkupProps,
   toPrismaFormat
 } from "@t3-chat-clone/types";
-import { UIMessage } from "@/types/shared";
 
 interface ChatInterfaceProps {
   conversationId: string;
@@ -40,15 +40,15 @@ export function ChatInterface({
     sendChat,
     isConnected,
     conversationId: liveConvId
-  } = useAiChat();
+  } = useAiChat(user?.id);
 
   const [convId, setConvId] = useState(initialConvId);
-  const streamingIdRef = useRef<string|null>(null);
+  const streamingIdRef = useRef<string | null>(null);
   const [messages, setMessages] = useState<UIMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const streamingRef = useRef<string | null>(null);
   const processedRef = useRef(false);
-
+  const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
   useEffect(() => {
     if (!initialMessages) return;
     setMessages(initialMessages);
@@ -59,7 +59,7 @@ export function ChatInterface({
   useEffect(() => {
     if (isNewChat && initialPrompt && !processedRef.current) {
       processedRef.current = true;
-
+      setIsAwaitingFirstChunk(true);
       // 1a) Optimistic user message
       const userMsg: UIMessage = {
         id: `new-chat`,
@@ -91,41 +91,42 @@ export function ChatInterface({
   useEffect(() => {
     if (liveConvId && liveConvId !== convId) {
       setConvId(liveConvId);
+      setIsAwaitingFirstChunk(false);
       window.history.replaceState(null, "", `/chat/${liveConvId}`);
     }
   }, [liveConvId, convId]);
 
   useEffect(() => {
-    if (!streamedText) return;
+    if (!streamedText || isAwaitingFirstChunk) return;
     setIsStreaming(true);
     if (streamingIdRef.current === null) {
-
-    setMessages(prev => {
-      if (!streamingRef.current) {
-        const id = `streaming`;
-        streamingRef.current = id;
-        return [
-          ...prev,
-          {
-            id,
-            senderType: "AI",
-            provider: toPrismaFormat(selectedModel.provider),
-            model: selectedModel.modelId,
-            content: streamedText,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            userId: user?.id ?? null,
-            userKeyId: null
-          }
-        ];
-      }
-      return prev.map(m =>
-        m.id === streamingRef.current
-          ? { ...m, content: streamedText, updatedAt: new Date() }
-          : m
-      );
-    });}
-  }, [streamedText, convId, selectedModel, user]);
+      setMessages(prev => {
+        if (!streamingRef.current) {
+          const id = `streaming-${convId}`;
+          streamingRef.current = id;
+          return [
+            ...prev,
+            {
+              id,
+              senderType: "AI",
+              provider: toPrismaFormat(selectedModel.provider),
+              model: selectedModel.modelId,
+              content: streamedText,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              userId: user?.id ?? null,
+              userKeyId: null
+            }
+          ];
+        }
+        return prev.map(m =>
+          m.id === streamingRef.current
+            ? { ...m, content: streamedText, updatedAt: new Date() }
+            : m
+        );
+      });
+    }
+  }, [streamedText, convId, selectedModel, user, isAwaitingFirstChunk]);
 
   useEffect(() => {
     if (isComplete) {
@@ -179,6 +180,7 @@ export function ChatInterface({
       <ChatArea
         messages={sorted}
         streamedText={streamedText}
+        isAwaitingFirstChunk={isAwaitingFirstChunk}
         isStreaming={isStreaming}
         model={selectedModel.modelId}
         provider={selectedModel.provider}
@@ -189,7 +191,7 @@ export function ChatInterface({
         onSendMessageAction={handleSend}
         disabled={isStreaming}
         placeholder={
-          isStreaming
+          isStreaming || isAwaitingFirstChunk
             ? "AI is responding…"
             : `Message ${selectedModel.displayName}…`
         }

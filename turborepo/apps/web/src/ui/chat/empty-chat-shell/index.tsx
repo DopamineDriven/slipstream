@@ -12,10 +12,7 @@ import { Logo } from "@/ui/logo";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { motion } from "motion/react";
 import { User } from "next-auth";
-import type {
-  AllModelsUnion,
-  ClientContextWorkupProps
-} from "@t3-chat-clone/types";
+
 import {
   Button,
   Card,
@@ -57,13 +54,12 @@ const suggestedPrompts = [
 
 interface ChatEmptyStateProps {
   user?: User;
-  apiKeys: ClientContextWorkupProps;
 }
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 
-export function ChatEmptyState({ user, apiKeys }: ChatEmptyStateProps) {
+export function ChatEmptyState({ user }: ChatEmptyStateProps) {
   const router = useRouter();
-  const { isConnected, sendChat,  } = useAiChat();
+  const { isConnected } = useAiChat();
   const { selectedModel } = useModelSelection();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   // Local state for the input
@@ -85,21 +81,12 @@ export function ChatEmptyState({ user, apiKeys }: ChatEmptyStateProps) {
 
   const handleSendMessage = useCallback(
     async (messageText: string) => {
-      if (!messageText.trim() || !isConnected || isSubmitting) return;
+      if (!messageText.trim() ||  isSubmitting) return;
 
       setIsSubmitting(true);
 
       try {
-        const hasConfigured = apiKeys.isSet[selectedModel.provider];
-        const isDefault = apiKeys.isDefault[selectedModel.provider];
 
-        sendChat(
-          messageText.trim(),
-          selectedModel.provider,
-          selectedModel.modelId as AllModelsUnion,
-          hasConfigured,
-          isDefault
-        );
 
         const params = new URLSearchParams({ prompt: messageText.trim() });
         router.push(`/chat/new-chat?${params.toString()}`);
@@ -108,7 +95,7 @@ export function ChatEmptyState({ user, apiKeys }: ChatEmptyStateProps) {
         setIsSubmitting(false);
       }
     },
-    [isConnected, isSubmitting, apiKeys, selectedModel, sendChat, router]
+    [isSubmitting, router]
   );
 
   const handleSubmit = useCallback(

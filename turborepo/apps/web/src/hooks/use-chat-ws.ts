@@ -3,26 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChatEventResolver } from "@/resolver/chat-event-resolver";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
-import { useSession } from "next-auth/react";
 import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
-export function useChatWebSocket() {
-  const { status, data: session } = useSession();
+export function useChatWebSocket(email?: string | null) {
   const [lastEvent, setLastEvent] = useState<ChatWsEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
-  const wsUrl = useMemo(() => {
-    const email =
-      status === "authenticated" && session?.user?.email
-        ? encodeURIComponent(session.user.email)
-        : "no-user-email";
-
-    return `${WS_BASE}?email=${email}`;
-  }, [status, session?.user?.email]);
-
-  const client = useMemo(() => new ChatWebSocketClient(wsUrl), [wsUrl]);
+  const client = useMemo(() => new ChatWebSocketClient(`${WS_BASE}?email=${email}`), [email]);
 
   useEffect(() => {
     const resolver = new ChatEventResolver(client);

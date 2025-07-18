@@ -117,7 +117,6 @@ export function ChatMessage({
             {renderedContent}
             <div className="text-brand-text-muted/80 mt-1.5 flex items-center justify-between text-xs">
               <span className="flex-grow">
-                {" "}
                 {new Date(message.createdAt).toLocaleTimeString([], {
                   hour12: false,
                   hour: "2-digit",

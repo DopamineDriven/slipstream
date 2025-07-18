@@ -1,34 +1,35 @@
-import React from "react"
-import type { ComponentPropsWithRef, JSX } from "react";
 import type { Message as MessagePrisma } from "@prisma/client";
-
+import type { ComponentPropsWithRef, JSX } from "react";
+import React from "react";
 
 export interface Model {
-  id: string
-  name: string
-  icon?: ({ ...svg }: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns" | "role">) => JSX.Element;
+  id: string;
+  name: string;
+  icon?: ({
+    ...svg
+  }: Omit<
+    ComponentPropsWithRef<"svg">,
+    "viewBox" | "fill" | "xmlns" | "role"
+  >) => JSX.Element;
 }
 
+export interface MessageUI
+  extends Omit<MessagePrisma, "createdAt" | "updatedAt" | "provider"> {
+  provider: "grok" | "openai" | "gemini" | "anthropic";
+  createdAt: string;
+  updatedAt: string;
+  text: string | React.ReactNode;
 
-export interface Message  extends Omit<MessagePrisma, "createdAt"|"updatedAt"|"provider">{
-provider: "grok" | "openai" | "gemini" | "anthropic";
-createdAt: string;
-updatedAt: string;
-  text: string | React.ReactNode
+  originalText?: string;
 
-  originalText?: string
+  timestamp: string;
 
-  timestamp: string
+  avatar?: string;
 
-
-  avatar?: string
-
-  isEditing?: boolean
-
+  isEditing?: boolean;
 }
-
 
 export interface KeyboardShortcut {
-  action: string
-  keys: string[]
+  action: string;
+  keys: string[];
 }
