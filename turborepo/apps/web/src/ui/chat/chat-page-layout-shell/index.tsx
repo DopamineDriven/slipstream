@@ -214,7 +214,7 @@ export function ChatLayoutShell({
               </>
             )}
           </AnimatePresence>
-          <div className="flex flex-grow flex-col">
+          <div className="flex flex-grow flex-col h-screen">
             {/* Header */}
             <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
               <div className="flex items-center">

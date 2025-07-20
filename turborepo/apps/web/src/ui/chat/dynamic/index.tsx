@@ -62,7 +62,7 @@ export function ChatInterface({
       setIsAwaitingFirstChunk(true);
       // 1a) Optimistic user message
       const userMsg: UIMessage = {
-        id: `new-chat`,
+        id: `new-chat-${Date.now()}`,
         senderType: "USER",
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
@@ -141,7 +141,7 @@ export function ChatInterface({
       if (!isConnected) return;
       // optimistic user bubble
       const um: UIMessage = {
-        id: `new-chat`,
+        id: `new-chat-${Date.now()}`,
         senderType: "USER",
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,

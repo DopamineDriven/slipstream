@@ -8,28 +8,28 @@ type GenericHandler = (event: ChatWsEvent, socket: WebSocket) => void;
 
 export class ChatWebSocketClient {
   private socket: WebSocket | null = null;
-  private queue: string[] = [];
+  private queue: string[] = Array.of<string>();
   private reconnectAttempts = 0;
   private maxReconnect = 5;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   private handlers: Record<EventType, GenericHandler[]> = {
-    ai_chat_chunk: [],
-    ai_chat_error: [],
-    ai_chat_inline_data: [],
-    ai_chat_request: [],
-    ai_chat_response: [],
-    asset_upload_request: [],
-    asset_upload_response: [],
-    image_gen_request: [],
-    image_gen_response: [],
-    ping: [],
-    typing: [],
+    ai_chat_chunk: Array.of<GenericHandler>(),
+    ai_chat_error: Array.of<GenericHandler>(),
+    ai_chat_inline_data: Array.of<GenericHandler>(),
+    ai_chat_request: Array.of<GenericHandler>(),
+    ai_chat_response: Array.of<GenericHandler>(),
+    asset_upload_request: Array.of<GenericHandler>(),
+    asset_upload_response: Array.of<GenericHandler>(),
+    image_gen_request: Array.of<GenericHandler>(),
+    image_gen_response: Array.of<GenericHandler>(),
+    ping: Array.of<GenericHandler>(),
+    typing: Array.of<GenericHandler>()
   };
 
   constructor(private url: string) {}
 
-  connect() {
+  public connect() {
     if (this.socket?.readyState === WebSocket.OPEN) return;
     this.socket = new WebSocket(this.url);
 
@@ -42,8 +42,11 @@ export class ChatWebSocketClient {
 
     this.socket.onmessage = (ev: MessageEvent<string>) => {
       let data: ChatWsEvent;
-      try { data = JSON.parse(ev.data) as ChatWsEvent; }
-      catch { return; }
+      try {
+        data = JSON.parse(ev.data) as ChatWsEvent;
+      } catch {
+        return;
+      }
 
       if (!this.socket) return; // in case we got closed
       this.handlers[data.type].forEach(fn => fn(data, this.socket!));
@@ -64,16 +67,19 @@ export class ChatWebSocketClient {
     };
   }
 
-  on(event: EventType, handler: GenericHandler) {
+  public on(event: EventType, handler: GenericHandler) {
     this.handlers[event].push(handler);
     if (!this.socket) this.connect();
   }
 
-  off(event: EventType, handler: GenericHandler) {
+  public off(event: EventType, handler: GenericHandler) {
     this.handlers[event] = this.handlers[event].filter(h => h !== handler);
   }
 
-  send<T extends EventType>(event: T, payload: Omit<ChatWsEvent, "type">) {
+  public send<const T extends EventType>(
+    event: T,
+    payload: Omit<ChatWsEvent, "type">
+  ) {
     const msg = JSON.stringify({ ...payload, type: event });
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(msg);
@@ -83,13 +89,13 @@ export class ChatWebSocketClient {
     }
   }
 
-  close() {
+  public close() {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.socket?.close();
     this.socket = null;
   }
 
-  get isConnected() {
+  public get isConnected() {
     return this.socket?.readyState === WebSocket.OPEN;
   }
 }

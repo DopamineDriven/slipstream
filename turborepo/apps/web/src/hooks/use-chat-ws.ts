@@ -1,47 +1,118 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ChatEventResolver } from "@/resolver/chat-event-resolver";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
+import type { MessageHandler } from "@/types/chat-ws";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
 export function useChatWebSocket(email?: string | null) {
   const [lastEvent, setLastEvent] = useState<ChatWsEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const client = useMemo(() => new ChatWebSocketClient(`${WS_BASE}?email=${email}`), [email]);
+
+  // Use ref to maintain stable client reference
+  const clientRef = useRef<ChatWebSocketClient | null>(null);
+  const emailRef = useRef(email);
+
+  // Track if we need to recreate the client due to email change
+  const shouldRecreateClient = emailRef.current !== email;
+
+  // Initialize or recreate client when needed
+  if (!clientRef.current || shouldRecreateClient) {
+    // Clean up existing client before creating new one
+    if (clientRef.current) {
+      clientRef.current.close();
+    }
+
+    // Create new client with current email
+    const wsUrl = email ? `${WS_BASE}?email=${encodeURIComponent(email)}` : WS_BASE;
+    clientRef.current = new ChatWebSocketClient(wsUrl);
+    emailRef.current = email;
+  }
+
+  const client = clientRef.current;
 
   useEffect(() => {
-    const resolver = new ChatEventResolver(client);
-    resolver.registerAll();
-  }, [client]);
+    // Event listener for all events
+    const handleEvent = (event: ChatWsEvent) => {
+      setLastEvent(event);
+    };
 
-  useEffect(() => {
+    // Connection status listener
+    const handleConnectionChange = (event: ChatWsEvent) => {
+      // Update connection status based on events
+      if (event.type === "ping") {
+        setIsConnected(true);
+      }
+    };
+
+    // Add listeners
+    client.addListener(handleEvent);
+    client.addListener(handleConnectionChange);
+
+    // Connect
     client.connect();
 
-    const onEvent = (ev: ChatWsEvent) => setLastEvent(ev);
-    client.addListener(onEvent);
+    // More efficient connection status monitoring
+    // Check immediately and after potential state changes
+    const checkConnection = () => {
+      setIsConnected(client.isConnected);
+    };
 
-    // polling -> connection status update
-    const tid = setInterval(() => setIsConnected(client.isConnected), 200);
+    // Initial check
+    checkConnection();
 
+    const intervalId = setInterval(checkConnection, 1000);
+
+    // Cleanup
     return () => {
-      clearInterval(tid);
-      client.removeListener(onEvent);
-      client.close();
+      clearInterval(intervalId);
+      client.removeListener(handleEvent);
+      client.removeListener(handleConnectionChange);
     };
   }, [client]);
 
-  const sendEvent = useMemo(
-    () =>
-      <const T extends keyof EventTypeMap>(
-        event: T,
-        data: EventTypeMap[typeof event]
-      ) =>
-        client.send(event, data),
+  // Stable send function
+  const sendEvent = useCallback(
+    <T extends keyof EventTypeMap>(
+      event: T,
+      data: EventTypeMap[T]
+    ) => {
+      client.send(event, data);
+    },
     [client]
   );
 
-  return { lastEvent, isConnected, sendEvent, client };
+  // Register handlers for specific events
+  const on = useCallback((
+      event: keyof EventTypeMap,
+      handler: MessageHandler<typeof event>
+    ) => {
+      client.on(event, handler);
+
+      // Return cleanup function
+      return () => {
+        client.off(event);
+      };
+    },
+    [client]
+  );
+
+  // Manual cleanup function
+  const disconnect = useCallback(() => {
+    if (clientRef.current) {
+      clientRef.current.close();
+      clientRef.current = null;
+    }
+  }, []);
+
+  return {
+    lastEvent,
+    isConnected,
+    sendEvent,
+    client,
+    on,
+    disconnect
+  };
 }

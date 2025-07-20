@@ -4,7 +4,7 @@ import type { UserKey } from "@prisma/client";
 import type { Providers } from "@t3-chat-clone/types";
 import { ErrorHelperService } from "@/orm/err-helper";
 
-export class PrismaUserKeyService  extends ErrorHelperService {
+export class PrismaUserKeyService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
     super();
   }
