@@ -18,6 +18,7 @@ import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
 import { Edit } from "@/icons/edit";
 import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
+import { EmptyChatHistory } from "@/icons/empty-chat-history";
 import { Expand } from "@/icons/expand";
 import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
@@ -81,6 +82,7 @@ const IconComponents = {
   Copy,
   Edit,
   EllipsisHorizontal,
+  EmptyChatHistory,
   Expand,
   Eye,
   EyeClosed,
@@ -178,6 +180,7 @@ export {
   Copy,
   Edit,
   EllipsisHorizontal,
+  EmptyChatHistory,
   Expand,
   Eye,
   EyeClosed,

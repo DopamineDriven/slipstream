@@ -17,4 +17,6 @@ export type RedisClientEntity = RedisClientType<
   >;
 export type RedisArg = string | Buffer<ArrayBufferLike>;
 
+export type RedisHashType = number | RedisArg;
+
 export type RedisVariadicArg = RedisArg | RedisArg[];

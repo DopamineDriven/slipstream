@@ -190,7 +190,6 @@ export class WSServer {
           if (parts) {
             const k = (parts?.[1]?.trim() ?? "").trimStart();
             const v = parts?.[2]?.trim() ?? "";
-            console.log([k, v]);
             if (cookieKeys.includes(k)) {
               arr.push([k as keyof UserData, decodeURIComponent(v)] as const);
             }

@@ -20,6 +20,7 @@ export { Compass } from "@/icons/compass";
 export { Copy } from "@/icons/copy";
 export { Edit } from "@/icons/edit";
 export { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
+export { EmptyChatHistory } from "@/icons/empty-chat-history";
 export { Expand } from "@/icons/expand";
 export { EyeClosed } from "@/icons/eye-closed";
 export { EyeOff } from "@/icons/eye-off";

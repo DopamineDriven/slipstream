@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "next-auth";
 import {
   Drawer,
   DrawerClose,
@@ -12,6 +11,7 @@ import {
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab"; // Example tab
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
+import { useSession } from "next-auth/react";
 import {
   Button,
   History,
@@ -24,7 +24,6 @@ import {
 interface SettingsDrawerProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  user?: User;
 }
 
 const _settingsOptions = [
@@ -55,13 +54,8 @@ const _settingsOptions = [
   }
 ];
 
-export function SettingsDrawer({
-  isOpen,
-  onOpenChange,
-  user
-}: SettingsDrawerProps) {
-  // For simplicity, we'll just show a list of buttons that could lead to sections
-  // A more complex drawer might use an Accordion or nested views
+export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
+  const { data: session, status } = useSession();
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[90vh] flex-col">
@@ -84,18 +78,24 @@ export function SettingsDrawer({
               </Button>
             </DrawerClose>
           </DrawerHeader>
-          <ScrollArea className="flex-grow p-4">
-            <div className="space-y-3">
-              <UserProfileCard
-                user={user}
-                className="bg-brand-background border-brand-border"
-              />
-              <ApiKeysTab
-                isProUser={false}
-                className="bg-brand-background border-brand-border rounded-lg p-4"
-              />
+          {status === "loading" ? (
+            <div className="p-4">
+              <div className="h-12 w-full">Loading...</div>
             </div>
-          </ScrollArea>
+          ) : (
+            <ScrollArea className="flex-grow p-4">
+              <div className="space-y-3">
+                <UserProfileCard
+                  user={session?.user}
+                  className="bg-brand-background border-brand-border"
+                />
+                <ApiKeysTab
+                  isProUser={false}
+                  className="bg-brand-background border-brand-border rounded-lg p-4"
+                />
+              </div>
+            </ScrollArea>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

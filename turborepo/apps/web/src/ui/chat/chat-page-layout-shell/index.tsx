@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -15,9 +14,8 @@ import {
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { ProviderModelSelector } from "@/ui/model-selector-drawer";
 import { SettingsDrawer } from "@/ui/settings-drawer";
-import { Sidebar } from "@/ui/sidebar";
 import { SidebarToggleButton } from "@/ui/sidebar-toggle-button";
-import { Conversation } from "@prisma/client";
+import { EnhancedSidebar } from "@/ui/sidebar/enhanced";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Button, Settings, ShareIcon as Share2 } from "@t3-chat-clone/ui";
@@ -28,14 +26,10 @@ const ThemeToggle = dynamic(
 );
 
 interface ChatLayoutShellProps {
-  user?: User;
-  recentConvos?: Conversation[];
   children: React.ReactNode;
 }
 
 export function ChatLayoutShell({
-  recentConvos,
-  user,
   children
 }: ChatLayoutShellProps) {
   // const {data} = useSession();
@@ -90,19 +84,6 @@ export function ChatLayoutShell({
     setIsSidebarOpen(isDesktop);
   }, [isDesktop]);
 
-  const handleUpdateChatTitle = useCallback(
-    async (threadId: string, newTitle: string) => {
-      console.log("Update chat title:", threadId, newTitle);
-      // In a real app, this would update the database
-    },
-    []
-  );
-
-  const handleDeleteChat = useCallback(async (threadId: string) => {
-    console.log("Delete chat:", threadId);
-    // In a real app, this would delete from database
-  }, []);
-
   const handleShareChat = useCallback(() => {
     console.log("Share chat clicked. Implement sharing logic.");
     alert("Share functionality to be implemented!");
@@ -129,14 +110,7 @@ export function ChatLayoutShell({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}>
-                <Sidebar
-                  chatThreads={recentConvos}
-                  user={user}
-                  onUpdateChatTitleAction={handleUpdateChatTitle}
-                  onDeleteChatAction={handleDeleteChat}
-                  onOpenSettings={() => setIsSettingsDrawerOpen(true)}
-                  className="h-full"
-                />
+                <EnhancedSidebar className="h-full" />
               </motion.div>
             </ResizablePanel>
           )}
@@ -202,19 +176,12 @@ export function ChatLayoutShell({
                   exit={{ x: "-100%" }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="fixed top-0 left-0 z-50 h-full">
-                  <Sidebar
-                    chatThreads={recentConvos}
-                    user={user}
-                    onUpdateChatTitleAction={handleUpdateChatTitle}
-                    onDeleteChatAction={handleDeleteChat}
-                    onOpenSettings={() => setIsSettingsDrawerOpen(true)}
-                    className="h-full w-[280px] sm:w-[300px]"
-                  />
+                  <EnhancedSidebar className="h-full w-[280px] sm:w-[300px]" />
                 </motion.div>
               </>
             )}
           </AnimatePresence>
-          <div className="flex flex-grow flex-col h-screen">
+          <div className="flex h-screen flex-grow flex-col">
             {/* Header */}
             <header className="border-brand-border bg-brand-background sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
               <div className="flex items-center">
@@ -238,7 +205,6 @@ export function ChatLayoutShell({
                   <span className="sr-only">Open sidebar</span>
                 </Button>
                 <ProviderModelSelector
-                  user={user}
                   onClick={handleOpenMobileModelSelector}
                 />
               </div>
@@ -271,7 +237,6 @@ export function ChatLayoutShell({
         </>
       )}
       <SettingsDrawer
-        user={user}
         isOpen={isSettingsDrawerOpen}
         onOpenChange={setIsSettingsDrawerOpen}
       />

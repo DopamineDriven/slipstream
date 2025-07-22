@@ -8,13 +8,7 @@ import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { motion } from "motion/react";
-import {
-  Button,
-  CirclePlus,
-  Input,
-  ScrollArea,
-  Search
-} from "@t3-chat-clone/ui";
+import { Button, CirclePlus, ScrollArea } from "@t3-chat-clone/ui";
 
 interface SidebarProps {
   chatThreads?: Conversation[];
@@ -27,14 +21,13 @@ interface SidebarProps {
 
 export function Sidebar({
   chatThreads,
-  user: userProfile,
-  // TODO implement route handling logi
-  // TODO IMPLEMENT DYNAMIC HANDLING OF TITLE RETURNED BY FIRST CHUNK OF WEBSOCKET RESPONSE (listen using websocket context provider and parse out title during ai_chat_chunk event if a placeholder title -- "new chat" is temprarily set)
+  user: userProfile, // this can be simplified to useSession via next-auth/react
   onUpdateChatTitleAction: _onUpdateChatTitleAction,
   className = ""
 }: SidebarProps) {
   return (
     <motion.div
+      onLoadStart={e => e}
       initial={{ x: -300 }}
       animate={{ x: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
@@ -54,14 +47,6 @@ export function Sidebar({
           <CirclePlus className="mr-2 h-5 w-5" /> New Chat
         </Button>
       </Link>
-      <div className="relative">
-        <Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <Input
-          type="search"
-          placeholder="Search your threads..."
-          className="bg-brand-component border-brand-border focus:ring-brand-ring text-brand-text placeholder:text-brand-text-muted pl-10"
-        />
-      </div>
 
       <ScrollArea className="flex-grow">
         <div className="space-y-2">
@@ -95,7 +80,7 @@ export function Sidebar({
               ))}
             </>
           ) : (
-            <div className="text-center align-middle py-8">
+            <div className="py-8 text-center align-middle">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

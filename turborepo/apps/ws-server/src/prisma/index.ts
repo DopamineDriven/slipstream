@@ -224,13 +224,17 @@ export class PrismaService extends ModelService {
     });
   }
 
-  public async getRecentConversationsByUserId(
-    userId: string
-  ): Promise<Conversation[]> {
+  public async getRecentConversationsByUserId(userId: string) {
     return await this.prismaClient.conversation.findMany({
       where: { userId },
       take: 10,
       orderBy: [{ updatedAt: "asc" }]
+    });
+  }
+
+  public async convoCounts(userId: string) {
+    return await this.prismaClient.conversation.count({
+      where: { userId: userId }
     });
   }
 
@@ -245,10 +249,10 @@ export class PrismaService extends ModelService {
 }
 // const p = new PrismaService(prismaClient);
 
-// p.getMessagesByConversationId("iy7x2xz720owhf5wfbtazany").then((v) => {
+// p.convoCounts("x1sa9esbc7nb1bbhnn5uy9ct").then(v => {
 //   console.log(v);
 //   return v;
-// })
+// });
 // const p = new PrismaService(prismaClient);
 
 // const fs = new Fs(process.cwd());
