@@ -160,7 +160,7 @@ export class Resolver extends ModelService {
     const conversationId =
       res.id === event.conversationId ? event.conversationId : res.id;
 
-    const streamKey = `stream:${event.conversationId}`;
+    const streamKey = `stream:${conversationId}`;
 
     let agg = "";
 

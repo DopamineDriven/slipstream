@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { InferGSPRT } from "@/types/next";
-import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
 import { ChatInterface } from "@/ui/chat/dynamic";
 import { Conversation, Message } from "@prisma/client";
 
@@ -51,14 +50,8 @@ export default async function ChatPage({
       );
   }
 
-  const recentConvos =
-    await prismaConversationService.getRecentConversationsByUserId(
-      session.user.id
-    );
-
   return (
     <Suspense fallback={"Loading..."}>
-      <ChatLayoutShell user={session.user} recentConvos={recentConvos}>
         <ChatInterface
           user={session.user}
           apiKeys={providerConfig}
@@ -68,7 +61,6 @@ export default async function ChatPage({
           conversationId={conversationId}
           initialPrompt={prompt}
         />
-      </ChatLayoutShell>
     </Suspense>
   );
 }

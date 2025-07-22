@@ -5,7 +5,6 @@ import React from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { User } from "next-auth";
 import {
   AnthropicDisplayNameUnion,
   GeminiDisplayNameUnion,
@@ -30,7 +29,6 @@ interface ProviderModelSelectorProps {
   onClick?: () => void;
   className?: string;
   variant?: "button" | "compact";
-  user?: User;
 }
 
 export function ProviderModelSelector({

@@ -1,6 +1,7 @@
 import type {
   RedisArg,
   RedisClientEntity,
+  RedisHashType,
   RedisVariadicArg
 } from "@/service/types.ts";
 import * as dotenv from "dotenv";
@@ -223,5 +224,59 @@ export class RedisInstance {
   ) {
     return this.#client.expire(key, seconds, mode);
   }
-}
+  // method for Redis DEL command (for cleanup)
+  public del(key: RedisArg | RedisArg[]) {
+    return this.#client.del(key);
+  }
 
+  // method for Redis KEYS command (for stream analysis)
+  public keys(pattern: RedisArg) {
+    return this.#client.keys(pattern);
+  }
+
+  // method for Redis TTL command (for stream analysis)
+  public ttl(key: RedisArg) {
+    return this.#client.ttl(key);
+  }
+  public hSet(key: RedisArg, field: RedisHashType, value: RedisHashType) {
+    return this.#client.hSet(key, field, value);
+  }
+
+  public hGetAll(key: RedisArg) {
+    return this.#client.hGetAll(key);
+  }
+  // Enhanced publish method with error handling
+  public async publishEvent<const T>(channel: RedisArg, message: T) {
+    try {
+      await this.ensureConnection();
+      return await this.#client.publish(channel, JSON.stringify(message));
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error publishing event:", error);
+        throw new Error(error.message);
+      } else {
+        console.error(`error publishing event on channel `, channel);
+      }
+    }
+  }
+
+  /** method to get stream data (if needed for analysis) */
+  public lRange(key: RedisArg, start: number, stop: number) {
+    return this.#client.lRange(key, start, stop);
+  }
+
+  /** method to get stream length */
+  public lLen(key: RedisArg) {
+    return this.#client.lLen(key);
+  }
+
+  // Enhanced subscription method that returns the subscriber instance
+  public async createSubscriber() {
+    const subscriber = this.#client.duplicate();
+    subscriber.on("error", err => {
+      console.error("Redis subscriber error:", err);
+    });
+    await subscriber.connect();
+    return subscriber;
+  }
+}

@@ -12,7 +12,10 @@ export class PrismaUserMessageService extends ErrorHelperService {
       orderBy: { createdAt: "asc" }
     });
   }
-  public async getRecentConversationsByUserId(userId: string): Promise<
+  public async getRecentConversationsByUserId(
+    userId: string,
+    options?: { skip?: number; take?: number }
+  ): Promise<
     {
       id: string;
       userId: string;
@@ -28,7 +31,8 @@ export class PrismaUserMessageService extends ErrorHelperService {
   > {
     return await this.prismaClient.conversation.findMany({
       where: { userId },
-      take: 15,
+      take: options?.take ?? 20,
+      skip: options?.skip ?? 0,
       orderBy: [{ updatedAt: "desc" }]
     });
   }
@@ -40,5 +44,26 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: { messages: true }
     });
   }
-}
 
+  public async updateConversationTitle(
+    conversationId: string,
+    updatedTitle: string
+  ) {
+    return await this.prismaClient.conversation.update({
+      where: { id: conversationId },
+      data: { title: updatedTitle }
+    });
+  }
+  
+  public async convoCounts(userId: string) {
+    return await this.prismaClient.conversation.count({
+      where: { userId: userId }
+    });
+  }
+
+  public async deleteConversation(conversationId: string) {
+    return await this.prismaClient.conversation.delete({
+      where: { id: conversationId }
+    });
+  }
+}
