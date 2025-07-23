@@ -28,7 +28,7 @@ import type {
   Provider
 } from "@t3-chat-clone/types";
 import { Credentials } from "@t3-chat-clone/credentials";
-import { RedisInstance } from "@t3-chat-clone/redis-service";
+import { RedisChannels } from "@t3-chat-clone/redis-service";
 
 export class Resolver extends ModelService {
   constructor(
@@ -36,7 +36,6 @@ export class Resolver extends ModelService {
     private openai: OpenAI,
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
-    private redis: RedisInstance,
     private r2: R2Instance,
     private cred: Credentials
   ) {
@@ -135,6 +134,7 @@ export class Resolver extends ModelService {
         | GeminiChatModels
         | OpenAIChatModels
         | GrokChatModels
+        | AnthropicChatModels
         | undefined
     );
 
@@ -157,15 +157,67 @@ export class Resolver extends ModelService {
     const systemPrompt = event.systemPrompt;
     const max_tokens = event.maxTokens;
 
-    const conversationId =
-      res.id === event.conversationId ? event.conversationId : res.id;
-
-    const streamKey = `stream:${conversationId}`;
-
+    const conversationId = res.id;
+    const streamChannel = RedisChannels.conversationStream(conversationId);
+    const userChannel = RedisChannels.user(userId);
+    const existingState =
+      await this.wsServer.redis.getStreamState(conversationId);
+    let chunks = Array.of<string>();
+    let resumedFromChunk = 0;
     let agg = "";
 
     const title = res?.title ?? (await this.titleGenUtil(event));
+    if (existingState && !existingState.metadata.completed) {
+      chunks = existingState.chunks;
+      resumedFromChunk = chunks.length;
 
+      // Send resume event
+      await this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "stream:resumed",
+        {
+          type: "stream:resumed",
+          conversationId,
+          resumedAt: resumedFromChunk,
+          chunks,
+          title: existingState.metadata.title,
+          model: existingState.metadata.model,
+          provider: existingState.metadata.provider
+        }
+      );
+
+      // Send the accumulated chunks as a single ai_chat_chunk to catch up
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          chunk: chunks.join(""),
+          done: false,
+          model: existingState.metadata.model,
+          provider: existingState.metadata.provider as Provider,
+          title: existingState.metadata.title,
+
+          systemPrompt: event.systemPrompt,
+          temperature: event.temperature,
+          topP: event.topP
+        } satisfies EventTypeMap["ai_chat_chunk"])
+      );
+    }
+
+    if (event.conversationId === "new-chat") {
+      void this.wsServer.redis.publishTypedEvent(
+        userChannel,
+        "conversation:created",
+        {
+          type: "conversation:created",
+          conversationId,
+          userId,
+          title: title ?? "New Chat",
+          timestamp: res.createdAt.getTime() ?? Date.now()
+        }
+      );
+    }
     try {
       if (provider === "gemini") {
         let key: { apiKey: string | null; keyId: string | null } = {
@@ -190,12 +242,9 @@ export class Resolver extends ModelService {
             temperature,
             maxOutputTokens: max_tokens,
             topP,
-            systemInstruction: systemPrompt satisfies ContentUnion | undefined,
-            thinkingConfig: { thinkingBudget: 0 }
-          } // disables thinking
+            systemInstruction: systemPrompt satisfies ContentUnion | undefined
+          }
         })) satisfies AsyncGenerator<GenerateContentResponse>;
-
-        await this.redis.expire(streamKey, 3600);
 
         for await (const chunk of stream) {
           const textPart = chunk.text;
@@ -203,8 +252,9 @@ export class Resolver extends ModelService {
           const done = chunk.candidates?.[0]?.finishReason;
 
           if (textPart) {
-            await this.redis.rPush(streamKey, textPart);
+            chunks.push(textPart);
             agg += textPart;
+
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
@@ -220,6 +270,36 @@ export class Resolver extends ModelService {
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                chunk: textPart,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
           }
           if (dataPart) {
             const _dataUrl = `data:image/png;base64,${dataPart}` as const;
@@ -262,6 +342,25 @@ export class Resolver extends ModelService {
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
             break;
           }
         }
@@ -298,8 +397,6 @@ export class Resolver extends ModelService {
           _request_id?: string | null;
         };
 
-        await this.redis.expire(streamKey, 3600);
-
         for await (const chunk of stream) {
           let text: string | undefined = undefined;
           let done: StopReason | null = null;
@@ -314,8 +411,8 @@ export class Resolver extends ModelService {
           }
 
           if (text) {
-            await this.redis.rPush(streamKey, text);
             agg += text;
+            chunks.push(text);
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
@@ -331,6 +428,35 @@ export class Resolver extends ModelService {
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
           }
 
           if (done) {
@@ -358,6 +484,25 @@ export class Resolver extends ModelService {
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
             break;
           }
         }
@@ -405,15 +550,13 @@ export class Resolver extends ModelService {
           { stream: true }
         )) satisfies AsyncIterable<ChatCompletionChunk>;
 
-        await this.redis.expire(streamKey, 3600);
-
         for await (const chunk of stream) {
           const choice = chunk.choices[0];
           const text = choice?.delta.content;
           const done = choice?.finish_reason != null;
 
           if (text) {
-            await this.redis.rPush(streamKey, text);
+            chunks.push(text);
             agg += text;
             ws.send(
               JSON.stringify({
@@ -430,6 +573,35 @@ export class Resolver extends ModelService {
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
           }
 
           if (done) {
@@ -457,6 +629,25 @@ export class Resolver extends ModelService {
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
             break;
           }
         }
@@ -495,15 +686,13 @@ export class Resolver extends ModelService {
           { stream: true }
         )) satisfies AsyncIterable<ChatCompletionChunk>;
 
-        await this.redis.expire(streamKey, 3600);
-
         for await (const chunk of stream) {
           const choice = chunk.choices[0];
           const text = choice?.delta.content;
           const done = choice?.finish_reason != null;
 
           if (text) {
-            await this.redis.rPush(streamKey, text);
+            chunks.push(text);
             agg += text;
             ws.send(
               JSON.stringify({
@@ -520,6 +709,35 @@ export class Resolver extends ModelService {
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
           }
 
           if (done) {
@@ -547,6 +765,25 @@ export class Resolver extends ModelService {
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
             break;
           }
         }
@@ -565,6 +802,34 @@ export class Resolver extends ModelService {
           message: this.safeErrMsg(err)
         } satisfies EventTypeMap["ai_chat_error"])
       );
+      void this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "ai_chat_error",
+        {
+          type: "ai_chat_error",
+          provider,
+          conversationId,
+          model,
+          systemPrompt,
+          temperature,
+          topP,
+          userId,
+          done: true,
+          message: this.safeErrMsg(err)
+        }
+      );
+
+      // Save state for potential resume after error
+      void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+        model,
+        provider,
+        title,
+        totalChunks: chunks.length,
+        completed: false,
+        systemPrompt,
+        temperature,
+        topP
+      });
     }
   }
   /** Dispatches incoming events to handlers */

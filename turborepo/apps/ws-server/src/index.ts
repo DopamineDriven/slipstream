@@ -1,8 +1,8 @@
 import type { Socket } from "net";
-import { Credentials } from "@t3-chat-clone/credentials";
 import * as dotenv from "dotenv";
+import { Credentials } from "@t3-chat-clone/credentials";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 async function exe() {
   const cred = new Credentials();
@@ -24,9 +24,11 @@ async function exe() {
 
     const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379";
 
-    const { RedisInstance } = await import("@t3-chat-clone/redis-service");
+    const { EnhancedRedisPubSub } = await import(
+      "@t3-chat-clone/redis-service"
+    );
 
-    const redisInstance = RedisInstance.getInstance(redisUrl);
+    const redisInstance = new EnhancedRedisPubSub(redisUrl);
 
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
 
@@ -39,11 +41,7 @@ async function exe() {
 
     const { WSServer } = await import("@/ws-server/index.ts");
 
-    const wsServer = new WSServer(
-      { port, jwtSecret },
-      redisInstance,
-      prisma
-    );
+    const wsServer = new WSServer({ port, jwtSecret }, redisInstance, prisma);
 
     const { Resolver } = await import("@/resolver/index.ts");
 
@@ -64,18 +62,20 @@ async function exe() {
       openai,
       gemini,
       anthropic,
-      wsServer.redis,
       r2,
       cred
     );
 
     resolver.registerAll();
     wsServer.setResolver(resolver);
-        setInterval(async () => {
+    setInterval(async () => {
       try {
         await redisInstance.ping();
       } catch (err) {
-        console.error('Redis health check failed: ', err instanceof Error ? err.message : "");
+        console.error(
+          "Redis health check failed: ",
+          err instanceof Error ? err.message : ""
+        );
       }
     }, 30000);
     await wsServer.start();

@@ -1,10 +1,10 @@
 services:
   ws-server:
     build:
-      context: ./turborepo
+      context: ./
       dockerfile: Dockerfile
     env_file:
-      - ./turborepo/apps/ws-server/.env
+      - ./apps/ws-server/.env
     ports:
       - "4000:4000"
     depends_on:
@@ -14,26 +14,6 @@ services:
     environment:
       # Make sure your ws-server env points to the local Postgres
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/t3chatdb
-
-  python-image-service:
-    build:
-      context: ./python
-      dockerfile: Dockerfile
-    env_file:
-      - ./python/.env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      # Example for FastAPI if it connects to Postgres too
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/t3chatdb
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 2s
-      retries: 5
 
   redis:
     image: redis:8

@@ -15,7 +15,7 @@ export class RedisInstance {
   #client: RedisClientEntity;
   // Singleton instance storage
   private static instance: RedisInstance | null = null;
-  private constructor(public url: string) {
+   constructor(public url: string) {
     this.#client = createClient({
       url,
       pingInterval: 30000,
@@ -46,7 +46,9 @@ export class RedisInstance {
     });
     this.setupEventHandlers();
   }
-
+  protected get client(): RedisClientEntity {
+    return this.#client;
+  }
   private setupEventHandlers() {
     this.#client.on("error", err => {
       console.error("Redis error:", err);

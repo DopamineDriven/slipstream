@@ -13,7 +13,8 @@
         "redis": [
           "dist/service/index.d.ts"
         ],
-        "types": ["dist/service/types.d.ts"]
+        "types": ["dist/service/types.d.ts"],
+              "pubsub": ["dist/pubsub/channels.d.ts", "dist/pubsub/enhanced-client.d.ts", "dist/pubsub/extended-events.d.ts"]
       }
     }
   },
@@ -28,7 +29,8 @@
       "redis": [
         "dist/service/index.d.ts"
       ],
-      "types": ["dist/service/types.d.ts"]
+      "types": ["dist/service/types.d.ts"],
+      "pubsub": ["dist/pubsub/channels.d.ts", "dist/pubsub/enhanced-client.d.ts", "dist/pubsub/extended-events.d.ts"]
     }
   },
   "type": "module",
@@ -42,7 +44,10 @@
     ".": "./dist/index.js",
     "./*": "./dist/*.js",
     "./redis": "./dist/service/index.js",
-    "./types": "./dist/service/types.js"
+    "./types": "./dist/service/types.js",
+    "./pubsub/channels": "./dist/pubsub/channels.js",
+    "./pubsub/enhanced-client": "./dist/pubsub/enhanced-client.js",
+    "./pubsub/extended-events": "./dist/pubsub/extended-events.js"
   },
   "scripts": {
     "build": "tsup",
@@ -53,6 +58,7 @@
     "fix": "npm pkg fix"
   },
   "dependencies": {
+    "@t3-chat-clone/types": "workspace:*",
     "dotenv": "^17.2.0",
     "dotenv-expand": "^12.0.2",
     "redis": "^5.6.0"
@@ -61,9 +67,9 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.0.14",
+    "@types/node": "^24.1.0",
     "chokidar": "^4.0.3",
-    "dotenv-cli": "^8.0.0",
+    "dotenv-cli": "^9.0.0",
     "eslint": "^9.31.0",
     "jiti": "^2.4.2",
     "prettier": "^3.6.2",
@@ -72,7 +78,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.37.0"
+    "typescript-eslint": "^8.38.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

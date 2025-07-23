@@ -2,7 +2,7 @@ import http from "http";
 import { TLSSocket } from "tls";
 import type { IncomingMessage } from "http";
 import type { RawData } from "ws";
-import { RedisInstance } from "@t3-chat-clone/redis-service";
+import {  EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 import * as dotenv from "dotenv";
 import { WebSocket, WebSocketServer } from "ws";
 import type {
@@ -38,7 +38,7 @@ export class WSServer {
 
   constructor(
     private opts: WSServerOptions,
-    public redis: RedisInstance,
+    public redis: EnhancedRedisPubSub,
     public prisma: PrismaService
   ) {
     this.channel = opts.channel ?? "chat-global";

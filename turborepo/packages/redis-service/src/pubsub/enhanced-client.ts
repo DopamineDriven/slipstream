@@ -1,0 +1,153 @@
+import type {
+  AllEvents,
+  ExtendedEventMap,
+  StreamStateProps
+} from "@/pubsub/extended-events.ts";
+import type { RedisArg, RedisClientEntity } from "@/service/types.ts";
+import { RedisInstance } from "@/service/index.ts";
+import type { EventTypeMap } from "@t3-chat-clone/types";
+
+export class EnhancedRedisPubSub extends RedisInstance {
+  private subscribers = new Map<
+    string,
+    Set<<const T extends keyof AllEvents>(data: AllEvents[T]) => void>
+  >();
+  private subscriptionClients = new Map<string, RedisClientEntity>();
+
+  /**
+   * Type-safe event publishing for both original and extended events
+   */
+  public async publishTypedEvent<const T extends keyof AllEvents>(
+    channel: RedisArg,
+    event: T,
+    data: AllEvents[T]
+  ) {
+    if ("type" in data && data.type !== event) {
+      console.warn(`Event type mismatch: expected ${event}, got ${data.type}`);
+    }
+    if (event !== data.type) throw new Error("event type mismatch");
+    const payload = {
+      ...data,
+      timestamp: "timestamp" in data ? data.timestamp : Date.now()
+    };
+
+    await this.publish(channel, JSON.stringify(payload));
+  }
+
+  /**
+   * Type-safe event subscription with automatic cleanup
+   */
+  public async subscribe<const T extends keyof AllEvents>(
+    channel: string,
+    event: T,
+    handler: <const V extends keyof AllEvents>(data: AllEvents[V]) => void
+  ): Promise<() => Promise<void>> {
+    // Create dedicated client for this subscription
+    if (!this.subscriptionClients.has(channel)) {
+      const subClient = this.client.duplicate();
+      await subClient.connect();
+      this.subscriptionClients.set(channel, subClient);
+
+      // Set up the base subscription
+      await subClient.subscribe(channel, message => {
+        try {
+          const parsed = JSON.parse(message) as AllEvents[T];
+          const handlers = this.subscribers.get(`${channel}:${parsed.type}`);
+          if (handlers) {
+            handlers.forEach(h => h(parsed));
+          }
+        } catch (err) {
+          console.error(`Error parsing message on ${channel}: `, err);
+        }
+      });
+    }
+
+    // Register the specific event handler
+    const key = `${channel}:${event}`;
+    if (!this.subscribers.has(key)) {
+      this.subscribers.set(key, new Set());
+    }
+    const getKey = this.subscribers.get(key);
+    if (!getKey)
+      throw new Error(`${key} not able to be retrieved in subscribe workup`);
+    getKey.add(handler);
+
+    // Return cleanup function
+    return async () => {
+      const handlers = this.subscribers.get(key);
+      if (handlers) {
+        handlers.delete(handler);
+        if (handlers.size === 0) {
+          this.subscribers.delete(key);
+        }
+      }
+
+      // Clean up client if no more handlers for this channel
+      const hasMoreHandlers = Array.from(this.subscribers.keys()).some(k =>
+        k.startsWith(`${channel}:`)
+      );
+
+      if (!hasMoreHandlers) {
+        const client = this.subscriptionClients.get(channel);
+        if (client) {
+          await client.unsubscribe(channel);
+          await client.quit();
+          this.subscriptionClients.delete(channel);
+        }
+      }
+    };
+  }
+
+  /**
+   * Stream state management for resumable streams
+   * Stores the chunks from ai_chat_chunk events for resume capability
+   */
+public async saveStreamState(
+    conversationId: string,
+    chunks: string[],
+    metadata: {
+      model?: string;
+      provider?: string;
+      title?: string;
+      totalChunks: number;
+      completed: boolean;
+      systemPrompt?: string;
+      temperature?: number;
+      topP?: number;
+    }
+  ): Promise<void> {
+    const key = `stream:state:${conversationId}`;
+
+    await this.hSet(key, "chunks", JSON.stringify(chunks));
+    await this.hSet(key, "metadata", JSON.stringify(metadata));
+    await this.expire(key, 3600); // 1 hour TTL
+  }
+
+  public async getStreamState(
+    conversationId: string
+  ): Promise<StreamStateProps | null> {
+    const key = `stream:state:${conversationId}`;
+    const data = await this.hGetAll(key);
+
+    if (!data.chunks || !data.metadata) return null;
+
+    return {
+      chunks: JSON.parse(data.chunks) as StreamStateProps["chunks"],
+      metadata: JSON.parse(data.metadata) as StreamStateProps["metadata"]
+    };
+  }
+
+  /**
+   * Helper to broadcast existing EventTypeMap events to pub/sub channels
+   * This allows WebSocket events to also be available via pub/sub
+   */
+ public async bridgeWebSocketEvent<const T extends keyof EventTypeMap>(
+    event: T,
+    data: ExtendedEventMap[T],
+    channels: string[]
+  ): Promise<void> {
+    await Promise.all(
+      channels.map(channel => this.publishTypedEvent(channel, event, data))
+    );
+  }
+}

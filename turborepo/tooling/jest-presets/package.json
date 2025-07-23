@@ -21,8 +21,8 @@
   "devDependencies": {
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "jest": "^30.0.4",
-    "jest-environment-jsdom": "^30.0.4",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3"
   },
