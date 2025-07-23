@@ -135,6 +135,7 @@ export class Resolver extends ModelService {
         | GeminiChatModels
         | OpenAIChatModels
         | GrokChatModels
+        | AnthropicChatModels
         | undefined
     );
 

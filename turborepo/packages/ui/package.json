@@ -80,7 +80,7 @@
     "types": "tsc --emitDeclarationOnly"
   },
   "peerDependencies": {
-    "next": ">=15.3.5",
+    "next": ">=15.4.3",
     "react": ">=19.1.0",
     "react-dom": ">=19.1.0",
     "tailwindcss": ">=4.1.11"
@@ -101,7 +101,8 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@t3-chat-clone/eslint-config": "workspace:*",
@@ -110,14 +111,14 @@
     "@d0paminedriven/fs": "^6.1.0",
     "@microsoft/api-extractor": "^7.52.8",
     "@tailwindcss/postcss": "^4.1.11",
-    "@types/node": "^24.0.13",
+    "@types/node": "^24.1.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",
     "chokidar": "^4.0.3",
     "eslint": "^9.31.0",
     "jiti": "^2.4.2",
-    "next": "^15.3.5",
+    "next": "^15.4.3",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "react": "^19.1.0",
