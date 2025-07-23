@@ -8,6 +8,9 @@ const tsupConfig = (options: Options) =>
       "src/index.ts",
       "src/service/index.ts",
       "src/service/types.ts",
+      "src/pubsub/channels.ts",
+      "src/pubsub/enhanced-client.ts",
+      "src/pubsub/extended-events.ts",
       "!src/test/**"
     ],
     target: ["node24"],

@@ -627,6 +627,9 @@ importers:
 
   packages/redis-service:
     dependencies:
+      '@t3-chat-clone/types':
+        specifier: workspace:*
+        version: link:../types
       dotenv:
         specifier: ^17.2.0
         version: 17.2.0
