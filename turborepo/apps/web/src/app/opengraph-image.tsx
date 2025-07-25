@@ -28,42 +28,6 @@ export default async function Image(request: NextRequest) {
     const model = searchParams.get("model") ?? "gpt-4.1";
     const provider = searchParams.get("provider") ?? "openai";
 
-    // Load your dd logo SVG and convert to base64
-    // const logoUrl = new URL("../../../public/favicon.svg", import.meta.url);
-    // const fontRegularUrl = new URL(
-    //   "../../../public/BasisGrotesquePro-Regular.ttf",
-    //   import.meta.url
-    // );
-    // const fontLightUrl = new URL(
-    //   "../../../public/BasisGrotesquePro-Light.ttf",
-    //   import.meta.url
-    // );
-
-    // const [logoResponse, fontRegularResponse, fontLightResponse] =
-    //   await Promise.all([
-    //     fetch(logoUrl),
-    //     fetch(fontRegularUrl),
-    //     fetch(fontLightUrl)
-    //   ]);
-
-    // if (!logoResponse.ok || !fontRegularResponse.ok || !fontLightResponse.ok) {
-    //   throw new Error("Failed to fetch assets");
-    // }
-
-    // const logoSvg = await logoResponse.text();
-    // const fontRegularData = await fontRegularResponse.arrayBuffer();
-    // const fontLightData = await fontLightResponse.arrayBuffer();
-
-    // Convert SVG to data URL (with theme-appropriate color)
-    // const logoColor = theme === "dark" ? "#ffffff" : "#000000";
-    // const styledLogoSvg = logoSvg.replace(
-    //   /fill="[^"]*"/g,
-    //   `fill="${logoColor}"`
-    // );
-    // const logoDataUrl = `data:image/svg+xml;base64,${Buffer.from(styledLogoSvg).toString("base64")}`;
-
-    // Theme colors
-
     return new ImageResponse(
       (
         <div

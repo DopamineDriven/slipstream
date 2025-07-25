@@ -1,7 +1,6 @@
-import * as dotenv from "dotenv";
 import { prismaClient as prisma } from "@/lib/prisma";
 
-dotenv.config();
+
 
 if (process.argv[3] === "users") {
   (async () => {

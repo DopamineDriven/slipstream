@@ -18,7 +18,7 @@ export const viewport = {
   width: "device-width"
 } satisfies Viewport;
 
-export async function generteMetadata({
+export async function generateMetadata({
   params
 }: {
   params: Promise<{ conversationId: string }>;
