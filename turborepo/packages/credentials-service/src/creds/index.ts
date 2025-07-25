@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-secrets-manager";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export class Credentials {
   #client: SecretsManagerClient;
@@ -26,6 +26,10 @@ export class Credentials {
       }
     ]);
     this.#secretId = process.env.AWS_CREDENTIAL_SECRET_ID;
+  }
+
+  public unflattenNewlines(s: string) {
+    return s.replace(/\\n/g, "\n");
   }
 
   public async getAll(): Promise<CredentialsResult<"success">> {

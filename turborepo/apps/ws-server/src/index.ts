@@ -13,6 +13,7 @@ async function exe() {
     const accessKeyId = cfg.R2_ACCESS_KEY_ID;
     const secretAccessKey = cfg.R2_SECRET_ACCESS_KEY;
     const r2PublicUrl = cfg.R2_PUBLIC_URL;
+
     const { R2Instance } = await import("@/r2-helper/index.ts");
 
     const r2 = new R2Instance({
@@ -23,12 +24,21 @@ async function exe() {
     });
 
     const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379";
-
+    const ca = cred.unflattenNewlines(cfg.REDIS_CA_PEM);
+    const cert = cred.unflattenNewlines(cfg.REDIS_CLIENT_CERT);
+    const key = cred.unflattenNewlines(cfg.REDIS_CLIENT_KEY);
+    const host = cfg.REDIS_HOST;
     const { EnhancedRedisPubSub } = await import(
       "@t3-chat-clone/redis-service"
     );
 
-    const redisInstance = new EnhancedRedisPubSub(redisUrl);
+    const redisInstance = new EnhancedRedisPubSub(
+      redisUrl,
+      ca,
+      key,
+      cert,
+      host
+    );
 
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
 

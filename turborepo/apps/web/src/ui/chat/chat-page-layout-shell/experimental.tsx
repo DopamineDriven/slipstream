@@ -190,7 +190,7 @@ export function ChatLayoutShell({
         {/* Desktop Layout with ResizablePanelGroup */}
         <ResizablePanelGroup
           direction="horizontal"
-          className="hidden md:flex md:h-full"
+          className="hidden! md:flex! md:h-full"
           style={{ overflowY: "scroll" }}>
           {/* Desktop Sidebar Panel */}
           <ResizablePanel

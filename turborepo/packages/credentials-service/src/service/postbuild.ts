@@ -1,9 +1,9 @@
+import { Credentials } from "@/creds/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 import expand from "dotenv-expand";
-import { Credentials } from "@/creds/index.ts";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 class Postbuild {
   constructor(
     private additions: string,
@@ -21,7 +21,7 @@ class Postbuild {
     return this.fs.fileToBuffer("src/types/index.ts").toString("utf-8");
   }
   private myEnv() {
-    return dotenv.config({ processEnv: {} });
+    return dotenv.config({ processEnv: {}, quiet: true });
   }
 
   public parseDotEnv() {

@@ -1,12 +1,13 @@
 "use client";
 
+import type { SidebarProps } from "@/types/ui";
+import type { User } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { usePlatformDetection } from "@/hooks/use-platform-detection";
 import { cn } from "@/lib/utils";
-import { SidebarProps } from "@/types/ui";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -20,7 +21,6 @@ import { EnhancedSidebar } from "@/ui/sidebar/enhanced";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { Button, Settings, ShareIcon as Share2 } from "@t3-chat-clone/ui";
-import type {User} from "next-auth";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -49,7 +49,6 @@ export function ChatLayoutShell({
     const prefersDark =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
-
     if (!resolvedTheme) {
       if (prefersDark) {
         document.documentElement.classList.add("dark");
@@ -85,11 +84,9 @@ export function ChatLayoutShell({
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
     setIsSidebarOpen(mediaQuery.matches);
-
     const handleChange = (e: MediaQueryListEvent) => {
       setIsSidebarOpen(e.matches);
     };
-
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
@@ -126,130 +123,132 @@ export function ChatLayoutShell({
     </div>
   );
 
-  return (
-    <motion.div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
-      {/* Mobile Sidebar Overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className={cn(
-          "fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden",
-          isSidebarOpen ? "opacity-100" : "pointer-events-none hidden"
-        )}
-        onClick={() => setIsSidebarOpen(false)}
+  // Replace the current mobile/desktop layout section with this:
+return (
+  <motion.div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
+    {/* Mobile Sidebar Overlay */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className={cn(
+        "fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden",
+        isSidebarOpen ? "opacity-100" : "pointer-events-none hidden"
+      )}
+      onClick={() => setIsSidebarOpen(false)}
+    />
+
+    {/* Mobile Sidebar */}
+    <div
+      className={cn(
+        "fixed top-0 left-0 z-50 h-full transition-transform md:hidden",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+      <EnhancedSidebar
+        className="h-full w-[280px] sm:w-[300px]"
+        user={user}
+        sidebarData={sidebarData}
       />
+    </div>
 
-      {/* Mobile Sidebar */}
-      <div
-        className={cn(
-          "fixed top-0 left-0 z-50 h-full transition-transform md:hidden",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}>
-        <EnhancedSidebar
-          className="h-full w-[280px] sm:w-[300px]"
-          user={user}
-          sidebarData={sidebarData}
-        />
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex h-full w-full">
-        {/* Mobile Layout */}
-        <div className="flex h-full w-full flex-col md:hidden">
-          <header className="border-brand-border bg-brand-background flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSidebarOpen(true)}
-                className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mr-2">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-                <span className="sr-only">Open sidebar</span>
-              </Button>
-              <ProviderModelSelector
-                onClick={handleOpenMobileModelSelector}
+    {/* Mobile Layout - visible only on mobile */}
+    <div className="flex h-full w-full flex-col md:hidden">
+      <header className="border-brand-border bg-brand-background flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarOpen(true)}
+            className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component mr-2">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
               />
-            </div>
-            <HeaderActions />
-          </header>
-          <main className="flex-1 overflow-y-auto">{children}</main>
+            </svg>
+            <span className="sr-only">Open sidebar</span>
+          </Button>
+          <ProviderModelSelector
+            onClick={handleOpenMobileModelSelector}
+          />
         </div>
+        <HeaderActions />
+      </header>
+      <main className="flex-1 overflow-y-auto">{children}</main>
+    </div>
 
-        {/* Desktop Layout with ResizablePanelGroup */}
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="hidden md:flex md:h-full"
-          style={{ overflowY: "scroll" }}>
-          {/* Desktop Sidebar Panel */}
-          <ResizablePanel
-            defaultSize={isSidebarOpen ? 20 : 0}
-            minSize={0}
-            style={{ overflowY: "scroll" }}
-            maxSize={25}
-            collapsible
-            collapsedSize={0}
-            onCollapse={() => setIsSidebarOpen(false)}
-            onExpand={() => setIsSidebarOpen(true)}
-            className={cn(
-              "transition-all duration-300",
-              !isSidebarOpen && "!w-0 !min-w-0"
-            )}>
-            <div className={cn("h-full", !isSidebarOpen && "hidden")}>
-              <EnhancedSidebar
-                className="h-full"
-                user={user}
-                sidebarData={sidebarData}
-              />
-            </div>
-          </ResizablePanel>
+    {/* Desktop Layout wrapper - hidden on mobile, flex on desktop */}
+    <div className="hidden md:flex! md:isolate! md:h-full md:w-full">
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="md:h-full md:w-full"
+        style={{ overflowY: "scroll" }}>
+        {/* Desktop Sidebar Panel */}
+        <ResizablePanel
+          defaultSize={isSidebarOpen ? 20 : 0}
+          minSize={0}
+          maxSize={25}
+          collapsible
+          collapsedSize={0}
+          onCollapse={() => setIsSidebarOpen(false)}
+          onExpand={() => setIsSidebarOpen(true)}
+          style={{ overflowY: "scroll" }}
+          className={cn(
+            "md:transition-all md:duration-300",
+            !isSidebarOpen && "md:!w-0 md:!min-w-0"
+          )}>
+          <div className={cn("md:h-full", !isSidebarOpen && "md:hidden")}>
+            <EnhancedSidebar
+              className="md:h-full"
+              user={user}
+              sidebarData={sidebarData}
+            />
+          </div>
+        </ResizablePanel>
 
-          {/* Resizable Handle */}
+        {/* Resizable Handle */}
+        {isSidebarOpen && (
           <ResizableHandle
             withHandle
-            className={cn(
-              "bg-brand-border/50 hover:bg-brand-border data-[panel-group-direction=horizontal]:w-1",
-              !isSidebarOpen && "hidden"
-            )}
+            className="md:bg-brand-border/50 md:hover:bg-brand-border md:data-[panel-group-direction=horizontal]:w-1"
           />
+        )}
 
-          {/* Main Content Panel */}
-          <ResizablePanel style={{overflowY: "scroll"}}>
-            <div className="flex h-full flex-col">
-              <header className="border-brand-border bg-brand-background flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
-                <div className="flex items-center">
-                  <SidebarToggleButton
-                    isOpen={isSidebarOpen}
-                    onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="mr-2"
-                  />
-                </div>
-                <HeaderActions />
-              </header>
-              <main className="flex-1 overflow-y-auto">{children}</main>
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-      <SettingsDrawer
-        isOpen={isSettingsDrawerOpen}
-        onOpenChange={setIsSettingsDrawerOpen}
-      />
-      <MobileModelSelectorDrawer
-        isOpen={isMobileModelSelectorOpen}
-        onOpenChangeAction={setIsMobileModelSelectorOpen}
-      />
-    </motion.div>
-  );
+        {/* Main Content Panel */}
+        <ResizablePanel
+          className="md:min-w-fit"
+          style={{ overflowY: "scroll" }}>
+          <div className="md:flex md:h-full md:flex-col">
+            <header className="border-brand-border bg-brand-background flex h-14 shrink-0 items-center justify-between border-b p-2 sm:p-4">
+              <div className="flex items-center">
+                <SidebarToggleButton
+                  isOpen={isSidebarOpen}
+                  onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="mr-2"
+                />
+              </div>
+              <HeaderActions />
+            </header>
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
+
+    <SettingsDrawer
+      isOpen={isSettingsDrawerOpen}
+      onOpenChange={setIsSettingsDrawerOpen}
+    />
+    <MobileModelSelectorDrawer
+      isOpen={isMobileModelSelectorOpen}
+      onOpenChangeAction={setIsMobileModelSelectorOpen}
+    />
+  </motion.div>
+);
 }

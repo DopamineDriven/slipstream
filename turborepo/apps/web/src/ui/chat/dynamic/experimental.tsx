@@ -1,37 +1,35 @@
-// src/ui/chat/dynamic/ChatInterface.tsx
 "use client";
 
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import { ChatArea } from "@/ui/chat/chat-area";
-import type {
-  AllModelsUnion
-} from "@t3-chat-clone/types";
+import type { AllModelsUnion } from "@t3-chat-clone/types";
 import { toPrismaFormat } from "@t3-chat-clone/types";
 import { useApiKeys } from "@/context/api-keys-context";
+
 interface ChatInterfaceProps {
-  conversationId: string;
-  isNewChat: boolean;
-  user?: User;
-  conversationTitle?: string;
-  initialMessages?: UIMessage[];
   children: ReactNode;
+  initialMessages?: UIMessage[] | null;
+  conversationTitle?: string | null;
+  conversationId: string;
+  user: User;
 }
 
 export function ChatInterface({
-  conversationId: initialConvId,
-  isNewChat,
-  user,
+  children,
   initialMessages,
-  children
+  conversationTitle: _conversationTitle,
+  conversationId: initialConversationId,
+  user
 }: ChatInterfaceProps) {
-  const router = useRouter();
-    const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const initialPrompt = searchParams.get("prompt");
   const { selectedModel } = useModelSelection();
   const {
@@ -40,25 +38,28 @@ export function ChatInterface({
     sendChat,
     isConnected,
     conversationId: liveConvId
-  } = useAiChat(user?.id);
-const {apiKeys}= useApiKeys();
-  const [convId, setConvId] = useState(initialConvId);
+  } = useAiChat(user.id);
+  const { apiKeys } = useApiKeys();
+
+  const [convId, setConvId] = useState(initialConversationId);
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
   const [isStreaming, setIsStreaming] = useState(false);
   const streamingRef = useRef<string | null>(null);
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
 
-  // Initialize with server messages
+  // Update messages when navigating between conversations
   useEffect(() => {
-    if (initialMessages && initialMessages.length > 0) {
-      setMessages(initialMessages);
+    const currentConvId = pathname.replace('/chat/', '') || 'new-chat';
+    if (currentConvId !== convId) {
+      setConvId(currentConvId);
+      // Messages will be updated by the server on navigation
     }
-  }, [initialMessages]);
+  }, [pathname, convId]);
 
   // Handle initial prompt for new chats
   useEffect(() => {
-    if (isNewChat && initialPrompt && !processedRef.current && isConnected) {
+    if (initialConversationId === 'new-chat' && initialPrompt && !processedRef.current && isConnected) {
       processedRef.current = true;
       setIsAwaitingFirstChunk(true);
 
@@ -71,10 +72,11 @@ const {apiKeys}= useApiKeys();
         content: initialPrompt,
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: user?.id ?? null,
+        userId: user.id,
         userKeyId: null,
-        conversationId: initialConvId
+        conversationId: 'new-chat'
       };
+
       setMessages([userMsg]);
       setIsStreaming(true);
 
@@ -90,24 +92,28 @@ const {apiKeys}= useApiKeys();
       );
     }
   }, [
-    isNewChat,
+    initialConversationId,
     initialPrompt,
     selectedModel,
     sendChat,
     apiKeys,
     user,
-    isConnected,
-    initialConvId
+    isConnected
   ]);
 
-  // Update URL when we get real conversation ID
+  // Update URL using native history API when we get real conversation ID
   useEffect(() => {
-    if (liveConvId && liveConvId !== convId) {
+    if (liveConvId && liveConvId !== 'new-chat' && liveConvId !== convId) {
+      // Use native history API to avoid navigation
+      window.history.replaceState(
+        null,
+        '',
+        `/chat/${liveConvId}`
+      );
       setConvId(liveConvId);
       setIsAwaitingFirstChunk(false);
-      router.replace(`/chat/${liveConvId}`, { scroll: false });
     }
-  }, [liveConvId, convId, router]);
+  }, [liveConvId, convId]);
 
   // Handle streaming text
   useEffect(() => {
@@ -128,7 +134,7 @@ const {apiKeys}= useApiKeys();
             content: streamedText,
             createdAt: new Date(),
             updatedAt: new Date(),
-            userId: user?.id ?? null,
+            userId: user.id,
             userKeyId: null,
             conversationId: convId
           }

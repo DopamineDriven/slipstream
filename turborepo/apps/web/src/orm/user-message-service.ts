@@ -24,30 +24,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       cacheStrategy: { swr: 3600, ttl: 60 }
     });
   }
-  public async getRecentConversationsByUserId(
-    userId: string,
-    options?: { skip?: number; take?: number }
-  ): Promise<
-    {
-      id: string;
-      userId: string;
-      userKeyId: string | null;
-      title: string | null;
-      createdAt: Date;
-      updatedAt: Date;
-      branchId: string | null;
-      parentId: string | null;
-      isShared: boolean;
-      shareToken: string | null;
-    }[]
-  > {
-    return await this.prismaClient.conversation.findMany({
-      where: { userId },
-      take: options?.take ?? 20,
-      skip: options?.skip ?? 0,
-      orderBy: [{ updatedAt: "desc" }]
-    });
-  }
+  
   public sanitizeTitle(generatedTitle: string) {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   }
@@ -56,8 +33,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return await this.prismaClient.conversation
       .findMany({
         where: { userId },
-        orderBy: [{ updatedAt: "desc" }],
-        cacheStrategy: { swr: 3600, ttl: 60 }
+        orderBy: [{ updatedAt: "desc" }]
       })
       .then(t => {
         return t.map(v => ({
@@ -73,12 +49,23 @@ export class PrismaUserMessageService extends ErrorHelperService {
   ): Promise<GetMessagesByConversationIdRT> {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
-      cacheStrategy: { swr: 3600, ttl: 60 },
       include: {
         messages: { orderBy: { createdAt: "asc" } },
         conversationSettings: true
       }
     });
+  }
+
+  public async getTitleByConversationId(conversationId: string) {
+    return await this.prismaClient.conversation
+      .findUnique({
+        where: { id: conversationId },
+        select: { title: true },
+        cacheStrategy: { swr: 3600, ttl: 60 }
+      })
+      .then(t => {
+        return t?.title ?? "Untitled";
+      });
   }
 
   public async updateConversationTitle(
@@ -91,11 +78,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
     });
   }
 
-  public async convoCounts(userId: string) {
-    return await this.prismaClient.conversation.count({
-      where: { userId: userId }
-    });
-  }
 
   public async deleteConversation(conversationId: string) {
     return await this.prismaClient.conversation.delete({
