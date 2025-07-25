@@ -41,6 +41,14 @@ export interface CredentialEntity {
   ENCRYPTION_KEY?: string;
   ANTHROPIC_API_KEY?: string;
   DATABASE_API_KEY?: string;
+  REDIS_PASSWORD?: string;
+  REDIS_USER?: string;
+  REDIS_ID?: string;
+  REDIS_NAME?: string;
+  REDIS_HOST?: string;
+  REDIS_CA_PEM?: string;
+  REDIS_CLIENT_CERT?: string;
+  REDIS_CLIENT_KEY?: string;
 } 
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

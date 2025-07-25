@@ -1,54 +1,77 @@
-// src/app/(chat)/chat/[conversationId]/page.tsx
-"use client";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { prismaClient } from "@/lib/prisma";
+import { ormHandler } from "@/orm";
+import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
+import { ChatContent } from "@/ui/chat/chat-input";
+import { ChatInterface } from "@/ui/chat/dynamic/experimental";
+import { InferGSPRT } from "@t3-chat-clone/types";
 
-import { useCallback, useMemo } from "react";
-import { MessageInputBar } from "@/ui/chat/message-input-bar";
-import { useModelSelection } from "@/context/model-selection-context";
-import { useApiKeys } from "@/context/api-keys-context";
-import { useAiChat } from "@/hooks/use-ai-chat";
-import { useSession } from "next-auth/react";
-import type { AllModelsUnion } from "@t3-chat-clone/types";
+// Create once at module level
+const { prismaConversationService } = ormHandler(prismaClient);
 
-export default function ChatPage() {
-  const { data: session } = useSession();
-  const { selectedModel } = useModelSelection();
-  const { apiKeys } = useApiKeys();
-  const {
-    sendChat,
-    isConnected,
-    isComplete
-  } = useAiChat(session?.user?.id);
+export const dynamicParams = true;
 
-  // Memoize streaming state
-  const isStreaming = useMemo(() => !isComplete, [isComplete]);
+export async function generateStaticParams() {
+  return [{ conversationId: "new-chat" }];
+}
 
-  const handleSend = useCallback(
-    (text: string) => {
-      if (!isConnected || !text.trim()) return;
+export async function generateMetadata({
+  params
+}: InferGSPRT<typeof generateStaticParams>): Promise<Metadata> {
+  const { conversationId } = await params;
+  if (conversationId !== "new-chat") {
+    const title =
+      await prismaConversationService.getTitleByConversationId(conversationId);
+    return {
+      title
+    };
+  }
+  return {
+    title: "New Chat"
+  };
+}
 
-      const hasConfigured = apiKeys.isSet[selectedModel.provider];
-      const isDefault = apiKeys.isDefault[selectedModel.provider];
+export default async function ChatPage({
+  params
+}: InferGSPRT<typeof generateStaticParams>) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/api/auth/signin");
 
-      sendChat(
-        text,
-        selectedModel.provider,
-        selectedModel.modelId as AllModelsUnion,
-        hasConfigured,
-        isDefault
+  const { conversationId } = await params;
+
+  // Fetch data directly on the server
+  let messages = null;
+  let conversationTitle = null;
+
+  if (conversationId !== "new-chat") {
+    const data =
+      await prismaConversationService.getMessagesByConversationId(
+        conversationId
       );
-    },
-    [apiKeys, selectedModel, isConnected, sendChat]
-  );
 
+    if (data) {
+      messages = data.messages;
+      conversationTitle = data.title;
+    }
+  }
   return (
-    <MessageInputBar
-      onSendMessageAction={handleSend}
-      disabled={isStreaming}
-      placeholder={
-        isStreaming
-          ? "AI is responding…"
-          : `Message ${selectedModel.displayName}…`
-      }
-    />
+    <Suspense
+      fallback={
+        <div className="flex h-full flex-col">
+          <ChatAreaSkeleton />
+          <ChatContent user={session.user} />
+        </div>
+      }>
+      <ChatInterface
+        initialMessages={messages}
+        conversationTitle={conversationTitle}
+        conversationId={conversationId}
+        user={session.user}>
+        <ChatContent user={session.user} />
+      </ChatInterface>
+    </Suspense>
   );
 }

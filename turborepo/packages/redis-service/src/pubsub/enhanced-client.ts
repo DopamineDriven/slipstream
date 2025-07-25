@@ -3,7 +3,11 @@ import type {
   ExtendedEventMap,
   StreamStateProps
 } from "@/pubsub/extended-events.ts";
-import type { RedisArg, RedisClientEntity } from "@/service/types.ts";
+import type {
+  EnhancedRedisPubSubOptions,
+  RedisArg,
+  RedisClientEntity
+} from "@/service/types.ts";
 import { RedisInstance } from "@/service/index.ts";
 import type { EventTypeMap } from "@t3-chat-clone/types";
 
@@ -13,6 +17,23 @@ export class EnhancedRedisPubSub extends RedisInstance {
     Set<<const T extends keyof AllEvents>(data: AllEvents[T]) => void>
   >();
   private subscriptionClients = new Map<string, RedisClientEntity>();
+  private subHeartbeats = new Map<string, NodeJS.Timeout>();
+  private options: Required<EnhancedRedisPubSubOptions>;
+
+  constructor(
+    url: string,
+    ca: string,
+    key: string,
+    cert: string,
+    host: string,
+    options: EnhancedRedisPubSubOptions = {}
+  ) {
+    super(url, ca, key, cert, host);
+    this.options = {
+      heartbeatInterval: options.heartbeatInterval ?? 20000,
+      enableHeartbeat: options.enableHeartbeat ?? true
+    };
+  }
 
   /**
    * Type-safe event publishing for both original and extended events
@@ -35,7 +56,22 @@ export class EnhancedRedisPubSub extends RedisInstance {
   }
 
   /**
-   * Type-safe event subscription with automatic cleanup
+   * Creates a heartbeat function for a Redis client
+   */
+  private createHeartbeat(
+    subClient: RedisClientEntity,
+    channel: string
+  ): () => void {
+    return () => {
+      subClient.ping().catch(err => {
+        console.error(`Heartbeat failed for channel ${channel}:`, err);
+        // Optional: Implement reconnection logic here
+      });
+    };
+  }
+
+  /**
+   * Type-safe event subscription with automatic cleanup and heartbeat
    */
   public async subscribe<const T extends keyof AllEvents>(
     channel: string,
@@ -47,6 +83,16 @@ export class EnhancedRedisPubSub extends RedisInstance {
       const subClient = this.client.duplicate();
       await subClient.connect();
       this.subscriptionClients.set(channel, subClient);
+
+      // Set up heartbeat to keep connection alive
+      if (this.options.enableHeartbeat) {
+        const heartbeat = setInterval(
+          this.createHeartbeat(subClient, channel),
+          this.options.heartbeatInterval
+        );
+
+        this.subHeartbeats.set(channel, heartbeat);
+      }
 
       // Set up the base subscription
       await subClient.subscribe(channel, message => {
@@ -94,6 +140,13 @@ export class EnhancedRedisPubSub extends RedisInstance {
           await client.quit();
           this.subscriptionClients.delete(channel);
         }
+
+        // Clean up heartbeat
+        const heartbeat = this.subHeartbeats.get(channel);
+        if (heartbeat) {
+          clearInterval(heartbeat);
+          this.subHeartbeats.delete(channel);
+        }
       }
     };
   }
@@ -102,7 +155,7 @@ export class EnhancedRedisPubSub extends RedisInstance {
    * Stream state management for resumable streams
    * Stores the chunks from ai_chat_chunk events for resume capability
    */
-public async saveStreamState(
+  public async saveStreamState(
     conversationId: string,
     chunks: string[],
     metadata: {
@@ -141,7 +194,7 @@ public async saveStreamState(
    * Helper to broadcast existing EventTypeMap events to pub/sub channels
    * This allows WebSocket events to also be available via pub/sub
    */
- public async bridgeWebSocketEvent<const T extends keyof EventTypeMap>(
+  public async bridgeWebSocketEvent<const T extends keyof EventTypeMap>(
     event: T,
     data: ExtendedEventMap[T],
     channels: string[]
@@ -149,5 +202,28 @@ public async saveStreamState(
     await Promise.all(
       channels.map(channel => this.publishTypedEvent(channel, event, data))
     );
+  }
+
+  /**
+   * Cleanup method to disconnect all clients and clear heartbeats
+   */
+  public async cleanup(): Promise<void> {
+    // Clear all heartbeats
+    for (const heartbeat of this.subHeartbeats.values()) {
+      clearInterval(heartbeat);
+    }
+    this.subHeartbeats.clear();
+
+    // Disconnect all subscription clients
+    for (const [channel, client] of this.subscriptionClients) {
+      try {
+        await client.unsubscribe(channel);
+        await client.quit();
+      } catch (err) {
+        console.error(`Error cleaning up client for ${channel}:`, err);
+      }
+    }
+    this.subscriptionClients.clear();
+    this.subscribers.clear();
   }
 }
