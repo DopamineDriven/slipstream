@@ -1,8 +1,7 @@
-import { relative } from "path";
 import { prismaClient } from "@/lib/prisma";
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 
-dotenv.config({ path: relative(process.cwd(), ".env") });
+// dotenv.config({ path: relative(process.cwd(), ".env") });
 
 export async function getExisting(userId: string) {
   const start = performance.now();

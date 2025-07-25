@@ -1,7 +1,4 @@
 import { Fs } from "@d0paminedriven/fs";
-import * as dotenv from "dotenv";
-
-dotenv.config();
 
 if (
   process.env.NODE_ENV !== "development" ||
