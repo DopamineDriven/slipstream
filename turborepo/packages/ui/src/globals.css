@@ -1,5 +1,3 @@
-@layer theme;
-
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
@@ -7,7 +5,7 @@
 
 @config "../tailwind.config.ts";
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant dark (&:where([data-theme=dark], .dark, [data-theme=dark] *));
 
 @font-face {
   font-family: "CalSans";
@@ -113,6 +111,9 @@
 }
 
 @layer theme {
+  :host {
+    --color-background: var(--color-background);
+  }
   .dark {
     --color-background: oklch(14.45% 0 0);
     --color-foreground: oklch(98.48% 0 0);

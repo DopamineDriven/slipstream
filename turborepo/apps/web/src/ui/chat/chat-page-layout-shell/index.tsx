@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePlatformDetection } from "@/hooks/use-platform-detection";
+import { SidebarProps } from "@/types/ui";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -16,9 +17,10 @@ import { ProviderModelSelector } from "@/ui/model-selector-drawer";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { SidebarToggleButton } from "@/ui/sidebar-toggle-button";
 import { EnhancedSidebar } from "@/ui/sidebar/enhanced";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { Button, Settings, ShareIcon as Share2 } from "@t3-chat-clone/ui";
+import { User } from "next-auth";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -27,10 +29,13 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
+  sidebarData: SidebarProps[];
+  user:User;
 }
 
 export function ChatLayoutShell({
-  children
+  children,
+  sidebarData, user
 }: ChatLayoutShellProps) {
   // const {data} = useSession();
   // const user = data?.user
@@ -110,7 +115,7 @@ export function ChatLayoutShell({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}>
-                <EnhancedSidebar className="h-full" />
+                <EnhancedSidebar user={user} sidebarData={sidebarData} className="h-full" />
               </motion.div>
             </ResizablePanel>
           )}
@@ -176,7 +181,11 @@ export function ChatLayoutShell({
                   exit={{ x: "-100%" }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="fixed top-0 left-0 z-50 h-full">
-                  <EnhancedSidebar className="h-full w-[280px] sm:w-[300px]" />
+                  <EnhancedSidebar
+                    user={user}
+                    sidebarData={sidebarData}
+                    className="h-full w-[280px] sm:w-[300px]"
+                  />
                 </motion.div>
               </>
             )}

@@ -9,10 +9,8 @@ import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/attachment-popover";
 import { FullscreenTextInputDialog } from "@/ui/fullscreen-text-input-dialog";
 import { Logo } from "@/ui/logo";
-import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { motion } from "motion/react";
-import { User } from "next-auth";
-
+import { useSession } from "next-auth/react";
 import {
   Button,
   Card,
@@ -52,16 +50,14 @@ const suggestedPrompts = [
   }
 ];
 
-interface ChatEmptyStateProps {
-  user?: User;
-}
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 
-export function ChatEmptyState({ user }: ChatEmptyStateProps) {
+export function ChatEmptyState() {
   const router = useRouter();
-  const { isConnected } = useAiChat();
+  const { data: session } = useSession();
+  const { isConnected } = useAiChat(session?.user?.id);
   const { selectedModel } = useModelSelection();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [_isDrawerOpen, setIsDrawerOpen] = useState(false);
   // Local state for the input
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,15 +77,13 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
 
   const handleSendMessage = useCallback(
     async (messageText: string) => {
-      if (!messageText.trim() ||  isSubmitting) return;
+      if (!messageText.trim() || isSubmitting) return;
 
       setIsSubmitting(true);
 
       try {
-
-
         const params = new URLSearchParams({ prompt: messageText.trim() });
-        router.push(`/chat/new-chat?${params.toString()}`);
+        router.push(`/chat/new-chat?${params.toString()}`, { scroll: false });
       } catch (error) {
         console.error("Failed to send message:", error);
         setIsSubmitting(false);
@@ -141,7 +135,7 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
         className="mb-8 text-center">
         <Logo className="mx-auto mb-4 size-12 stroke-current text-current [&_path]:stroke-current" />
         <h1 className="text-brand-text mb-2 text-3xl font-bold">
-          {`How can I help you today, ${user?.name?.split(" ")[0] ?? "User"}?`}
+          {`How may I help you today, ${session?.user?.name?.split(" ")[0] ?? "User"}?`}
         </h1>
         <p className="text-brand-text-muted text-lg">
           Start a conversation with {selectedModel.displayName}
@@ -153,7 +147,7 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="mb-8 grid w-full max-w-2xl grid-cols-1 gap-4 md:grid-cols-2">
+        className="hidden md:mb-8 md:grid md:w-full md:max-w-2xl md:gap-4 md:grid-cols-2">
         {suggestedPrompts.map((item, idx) => (
           <Card
             key={idx}
@@ -184,9 +178,7 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
           onSubmit={handleSubmit}
           className="bg-brand-component border-brand-border rounded-lg border-t p-2 sm:p-4">
           <div className="bg-brand-background border-brand-border relative flex min-h-[40px] items-center space-x-1 rounded-lg border p-2">
-            {/* Your AttachmentPopover if needed */}
             <AttachmentPopover onSelectAttachment={handleAttachmentSelect} />
-
             <div className="relative flex min-h-[24px] flex-grow items-center">
               <Textarea
                 ref={textareaRef}
@@ -218,11 +210,19 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsFullScreenInputOpen(true)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-brand-text-muted hover:text-brand-text"
-                  disabled={isSubmitting}
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  className="text-brand-text-muted hover:text-brand-text absolute top-1/2 right-2 -translate-y-1/2"
+                  disabled={isSubmitting}>
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
                   </svg>
                   <span className="sr-only">Expand to fullscreen</span>
                 </Button>
@@ -266,10 +266,6 @@ export function ChatEmptyState({ user }: ChatEmptyStateProps) {
         onOpenChange={setIsFullScreenInputOpen}
         initialValue={message}
         onSubmit={handleFullScreenSubmit}
-      />
-      <MobileModelSelectorDrawer
-        isOpen={isDrawerOpen}
-        onOpenChangeAction={setIsDrawerOpen}
       />
     </div>
   );

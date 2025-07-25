@@ -1,9 +1,20 @@
+import { relative } from "path";
 import { prismaClient } from "@/lib/prisma";
 import * as dotenv from "dotenv";
-dotenv.config();
+
+dotenv.config({ path: relative(process.cwd(), ".env") });
 
 export async function getExisting(userId: string) {
-  return await prismaClient.userKey.findMany({ where: { userId } });
-}
+  const start = performance.now();
 
-getExisting("x1sa9esbc7nb1bbhnn5uy9ct");
+  return await prismaClient.conversation
+    .findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      cacheStrategy: {swr: 3600, ttl:60}
+    })
+    .then(t => {
+      console.log(performance.now()-start);
+      return t.map(v => ({ id: v.id, title: v.title, updatedAt: v.updatedAt }));
+    });
+}

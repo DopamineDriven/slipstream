@@ -96,6 +96,10 @@ export class Resolver extends ModelService {
     }
   }
 
+  public sanitizeTitle = (generatedTitle: string) => {
+    return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
+  };
+
   private async titleGenUtil({
     prompt,
     provider
@@ -108,15 +112,15 @@ export class Resolver extends ModelService {
         store: false,
         messages: [
           {
-            role: "developer",
-            content: `Generate a concise, descriptive title (max 10 words) for this user-submitted-prompt: "${prompt}"`
+            role: "system",
+            content: `Generate a concise, descriptive title (max 10 words) for this user-submitted-prompt: "${prompt}". Do **not** wrap the generated title in quotes.`
           }
         ]
       });
       const title =
         turbo.choices?.[0]?.message?.content ?? this.formatProvider(provider);
 
-      return title;
+      return this.sanitizeTitle(title);
     } catch (err) {
       console.warn(err);
     }
