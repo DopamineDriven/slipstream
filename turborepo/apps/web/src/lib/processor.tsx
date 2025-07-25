@@ -9,6 +9,11 @@ import React, { createElement, Fragment } from "react";
 import * as jsxRuntime from "react/jsx-runtime";
 import Image from "next/image";
 import Link from "next/link";
+import { mathmlTags } from "@/lib/mathml-tags";
+import { shimmer } from "@/lib/shimmer";
+import { slugify } from "@/lib/slugify";
+import { CodeBlock } from "@/ui/atoms/code-block";
+import { transformerMetaWordHighlight } from "@shikijs/transformers";
 import rehypeKatex from "rehype-katex";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeReact from "rehype-react";
@@ -19,9 +24,6 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { VFile } from "vfile";
-import { shimmer } from "@/lib/shimmer";
-import { slugify } from "@/lib/slugify";
-import { CodeBlock } from "@/ui/atoms/code-block";
 
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
@@ -94,7 +96,8 @@ const prettyCodeOptions = {
   },
   onVisitHighlightedChars(node: CharsElement) {
     node.properties.className = ["word"];
-  }
+  },
+  transformers: [transformerMetaWordHighlight()]
 } satisfies RehypePrettyCodeOptions;
 
 function CustomImage({
@@ -135,25 +138,9 @@ const components = {
 };
 
 /**
- * Need to pinpoint how each ai-model returns markdown -- is it always a string
- * Or is it sometimes a buffer? Would using vfile and handling all cases be best here?
+ * Need to pinpoint how each ai-model returns markdown -- are there special niche formats I'm unaware of?
  */
-const commonMathMLTags = [
-  "math",
-  "mtable",
-  "mtd",
-  "mtr",
-  "mo",
-  "mi",
-  "mn",
-  "mtext",
-  "mspace",
-  "ms",
-  "semantics",
-  "annotation",
-  "mrow"
-];
-
+const commonMathMLTags = mathmlTags;
 export async function processMarkdownToReact(content: string) {
   const processor = unified();
   processor.use(remarkParse);
@@ -208,8 +195,8 @@ export async function processMarkdownToReact(content: string) {
     },
     passNode: true
   });
-  const _file = new VFile({ value: content });
-  const result = await processor.process(content);
+  const file = new VFile({ value: content });
+  const result = await processor.process(file);
 
   return result.result as React.ReactElement satisfies ReactNode;
 }

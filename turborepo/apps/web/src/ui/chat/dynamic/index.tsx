@@ -1,19 +1,18 @@
 // app/chat/[conversationId]/ChatInterface.tsx
 "use client";
 
+import type { UIMessage } from "@/types/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAiChat } from "@/hooks/use-ai-chat";
-import { UIMessage } from "@/types/shared";
-import { ChatArea } from "@/ui/chat-area";
+import { ChatArea } from "@/ui/chat/chat-area";
 import { MessageInputBar } from "@/ui/chat/message-input-bar";
-import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { User } from "next-auth";
-import {
+import type {
   AllModelsUnion,
-  ClientContextWorkupProps,
-  toPrismaFormat
+  ClientContextWorkupProps
 } from "@t3-chat-clone/types";
+import { toPrismaFormat } from "@t3-chat-clone/types";
 
 interface ChatInterfaceProps {
   conversationId: string;
@@ -196,8 +195,6 @@ export function ChatInterface({
             : `Message ${selectedModel.displayName}…`
         }
       />
-
-      <MobileModelSelectorDrawer isOpen={false} onOpenChangeAction={() => {}} />
     </div>
   );
 }

@@ -1,20 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   deleteConversationAction,
-  getSideBarDataAction,
   updateConversationTitleAction
 } from "@/app/actions/sidebar-actions";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import { cn } from "@/lib/utils";
+import { SidebarProps } from "@/types/ui";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
-import { motion, useInView } from "motion/react";
-import { useSession } from "next-auth/react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { motion } from "motion/react";
+import { User } from "next-auth";
 import {
   Button,
   Check,
@@ -22,51 +23,35 @@ import {
   SquarePen as Edit3,
   EmptyChatHistory,
   Input,
-  ScrollArea,
   Search,
   Trash as Trash2,
   X
 } from "@t3-chat-clone/ui";
 
-// Simplified conversation type - just what we need
-interface SimplifiedConversation {
-  id: string;
-  title: string;
-  updatedAt: Date;
-}
-
 interface EnhancedSidebarProps {
   className?: string;
+  sidebarData: SidebarProps[];
+  user: User;
 }
 
-export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
-  const { data: session } = useSession();
-  const [conversations, setConversations] = useState<SimplifiedConversation[]>(
-    []
-  );
-  const [_isLoading, _setIsLoading] = useState(true);
+export function EnhancedSidebar({
+  className = "",
+  sidebarData,
+  user
+}: EnhancedSidebarProps) {
+  const [conversations, setConversations] =
+    useState<SidebarProps[]>(sidebarData);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
 
-  // Track conversations we've seen to avoid duplicates
-  const seenConversationsRef = useRef(new Set<string>());
-
-  // Ref for infinite scroll trigger
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(loadMoreRef, {
-    once: false,
-    amount: "some"
-  });
+  // Ref for virtual scrolling
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Debounce search query
   useEffect(() => {
@@ -77,82 +62,32 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const hydrateSidebar = useCallback(async () => {
-    try {
-      const data = await getSideBarDataAction(0, 20);
-      setConversations(data.conversations);
-      setTotalCount(data.totalCount);
-      setHasMore(data.hasMore);
-      // Update our seen set
-      seenConversationsRef.current = new Set(data.conversations.map(c => c.id));
-    } catch (error) {
-      console.error("Failed to fetch sidebar data:", error);
-    }
-  }, []);
-
-  // Load more conversations
-  const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
-
-    setIsLoadingMore(true);
-    try {
-      const currentLength = conversations.length;
-      const data = await getSideBarDataAction(currentLength, 20);
-
-      // Append new conversations
-      setConversations(prev => [...prev, ...data.conversations]);
-      setHasMore(data.hasMore);
-
-      // Update seen set
-      data.conversations.forEach(c => seenConversationsRef.current.add(c.id));
-    } catch (error) {
-      console.error("Failed to load more conversations:", error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [conversations.length, hasMore, isLoadingMore]);
-
-  // Trigger load more when sentinel is in view
-  useEffect(() => {
-    console.log(isInView);
-    if (isInView && hasMore && !isLoadingMore) {
-      loadMore();
-    }
-  }, [isInView, hasMore, isLoadingMore, loadMore]);
-
-  // Initial fetch
-  useEffect(() => {
-    hydrateSidebar();
-  }, [hydrateSidebar]);
-
+  // Listen for new conversations from the active chat
   const { conversationId: activeConversationId, title: activeTitle } =
-    useAiChat(session?.user?.id);
+    useAiChat(user.id);
 
   useEffect(() => {
     if (!activeConversationId || activeConversationId === "new-chat") return;
     if (!activeTitle) return;
 
-    // Check if this is a new conversation we haven't seen
-    if (!seenConversationsRef.current.has(activeConversationId)) {
-      // Add to seen set
-      seenConversationsRef.current.add(activeConversationId);
+    // Check if this conversation already exists
+    const exists = conversations.some(conv => conv.id === activeConversationId);
 
-      // Add to conversations list
+    if (!exists) {
+      // Add new conversation to the top of the list
       setConversations(prev => [
         {
           id: activeConversationId,
-          updatedAt: new Date(Date.now()),
+          updatedAt: new Date(),
           title: activeTitle
         },
         ...prev
       ]);
-
-      // Increment total count
-      setTotalCount(prev => prev + 1);
     }
-  }, [activeConversationId, activeTitle]);
+  }, [activeConversationId, activeTitle, conversations]);
+
   // Handle title editing
-  const handleEditStart = (conv: SimplifiedConversation) => {
+  const handleEditStart = (conv: SidebarProps) => {
     setEditingId(conv.id);
     setEditingTitle(conv.title);
   };
@@ -191,10 +126,6 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
 
       // Remove from local state
       setConversations(prev => prev.filter(conv => conv.id !== convId));
-      seenConversationsRef.current.delete(convId);
-
-      // Decrement total count
-      setTotalCount(prev => Math.max(0, prev - 1));
 
       // If we're currently viewing this conversation, redirect to home
       if (pathname === `/chat/${convId}`) {
@@ -207,7 +138,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     }
   };
 
-  // Filter conversations based on search - now using memoized filtering
+  // Filter conversations based on search
   const filteredConversations = useMemo(() => {
     if (!debouncedSearchQuery) return conversations;
 
@@ -222,9 +153,13 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     return pathname === `/chat/${convId}`;
   };
 
-  // if (isLoading) {
-  //   return <SidebarSkeleton />;
-  // }
+  // Setup virtualizer
+  const virtualizer = useVirtualizer({
+    count: filteredConversations.length,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 68, // Estimated height of each conversation item
+    overscan: 5
+  });
 
   return (
     <motion.div
@@ -258,140 +193,148 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
           placeholder="Search your threads..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="bg-brand-component border-brand-border focus:ring-brand-border text-brand-text placeholder:text-brand-text-muted pl-10"
+          className="bg-brand-component border-brand-border focus:ring-brand-border text-brand-text placeholder:text-brand-text-muted pr-3 pl-10 text-sm"
         />
       </div>
-      <ScrollArea className="flex-grow" ref={containerRef}>
-        <div className="space-y-2">
+
+      <div className="flex-1 overflow-hidden">
+        {filteredConversations.length > 0 && (
+          <div className="mb-2 flex items-center justify-between px-2 py-1">
+            <h3 className="text-brand-text-muted text-xs font-medium tracking-wider uppercase">
+              Recent
+            </h3>
+            <span className="text-brand-text-muted text-xs">
+              {filteredConversations.length} conversations
+            </span>
+          </div>
+        )}
+
+        <div
+          ref={scrollContainerRef}
+          className="h-full overflow-auto"
+          style={{
+            contain: "strict"
+          }}>
           {filteredConversations.length > 0 ? (
-            <>
-              <div className="flex items-center justify-between px-2 py-1">
-                <h3 className="text-brand-text-muted text-xs font-medium tracking-wider uppercase">
-                  Recent
-                </h3>
-                {totalCount > 0 && (
-                  <span className="text-brand-text-muted text-xs">
-                    {conversations.length} of {totalCount}
-                  </span>
-                )}
-              </div>
-              {filteredConversations.map((thread, idx) => (
-                <motion.div
-                  key={thread.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="group relative">
-                  {editingId === thread.id ? (
-                    <div className="flex items-center gap-2 px-3 py-2">
-                      <Input
-                        value={editingTitle}
-                        onChange={e => setEditingTitle(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === "Enter") handleEditSave();
-                          if (e.key === "Escape") handleEditCancel();
-                        }}
-                        className="h-8 flex-1 text-sm"
-                        autoFocus
-                      />
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8"
-                        onClick={handleEditSave}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8"
-                        onClick={handleEditCancel}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="group relative">
-                      <Link href={`/chat/${thread.id}`} passHref>
-                        <div
-                          role="button"
-                          className={cn(
-                            `flex h-auto min-h-[44px] w-full items-center justify-start rounded-md px-3 py-2 pr-20 transition-colors`,
-                            isActiveConversation(thread.id)
-                              ? "bg-brand-primary/20 text-brand-text"
-                              : "text-brand-text-muted hover:bg-brand-component hover:text-brand-text"
-                          )}>
-                          <div
-                            className="flex w-full min-w-0 flex-col items-start text-left"
-                            ref={
-                              idx === filteredConversations.length - 1
-                                ? loadMoreRef
-                                : undefined
-                            }>
-                            <NativeTruncatedText
-                              text={thread?.title ?? "Untitled"}
-                              className="w-full text-left text-sm leading-tight font-medium"
-                              baseChars={20}
-                              maxExtraChars={4}
-                            />
-                            <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
-                              {new Date(thread.updatedAt).toLocaleDateString()}
-                            </span>
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: "100%",
+                position: "relative"
+              }}>
+              {virtualizer.getVirtualItems().map(virtualItem => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const thread = filteredConversations[virtualItem.index]!;
+                return (
+                  <div
+                    key={thread.id}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: `${virtualItem.size}px`,
+                      transform: `translateY(${virtualItem.start}px)`
+                    }}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="group relative pb-2">
+                      {editingId === thread.id ? (
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          <Input
+                            value={editingTitle}
+                            onChange={e => setEditingTitle(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === "Enter") handleEditSave();
+                              if (e.key === "Escape") handleEditCancel();
+                            }}
+                            className="h-8 flex-1 text-sm"
+                            autoFocus
+                          />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={handleEditSave}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={handleEditCancel}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="group relative">
+                          <Link href={`/chat/${thread.id}`} passHref>
+                            <div
+                              role="button"
+                              className={cn(
+                                `flex h-auto min-h-[44px] w-full items-center justify-start rounded-md px-3 py-2 pr-20 transition-colors`,
+                                isActiveConversation(thread.id)
+                                  ? "bg-brand-primary/20 text-brand-text"
+                                  : "text-brand-text-muted hover:bg-brand-component hover:text-brand-text"
+                              )}>
+                              <div className="flex w-full min-w-0 flex-col items-start text-left">
+                                <NativeTruncatedText
+                                  text={thread?.title ?? "Untitled"}
+                                  className="w-full text-left text-sm leading-tight font-medium"
+                                  baseChars={20}
+                                  maxExtraChars={4}
+                                />
+                                <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
+                                  {new Date(
+                                    thread.updatedAt
+                                  ).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="absolute top-1/2 right-2 flex -translate-y-1/2 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="hover:bg-brand-primary/20 h-8 w-8"
+                              onClick={() => handleEditStart(thread)}>
+                              <Edit3 className="size-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="hover:bg-destructive/20 hover:text-destructive h-8 w-8"
+                              onClick={() => handleDelete(thread.id)}
+                              disabled={deletingId === thread.id}>
+                              <Trash2 className="size-4" />
+                            </Button>
                           </div>
                         </div>
-                      </Link>
-                      <div className="absolute top-1/2 right-2 flex -translate-y-1/2 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="hover:bg-brand-primary/20 h-8 w-8"
-                          onClick={() => handleEditStart(thread)}>
-                          <Edit3 className="size-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="hover:bg-destructive/20 hover:text-destructive h-8 w-8"
-                          onClick={() => handleDelete(thread.id)}
-                          disabled={deletingId === thread.id}>
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </>
+                      )}
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
-            <div className="py-8 text-center align-middle">
-              <EmptyChatHistory className="text-brand-text-muted mx-auto size-12" />
-              <h3 className="text-accent-foreground mt-1 text-sm font-semibold">
-                {searchQuery ? "No matching chats" : "Empty Chat History"}
-              </h3>
-              <p className="text-brand-text-muted mt-1 text-sm">
-                {searchQuery
-                  ? "Try a different search term"
-                  : "Get started by creating a new chat."}
-              </p>
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <EmptyChatHistory className="text-brand-text-muted mx-auto size-12" />
+                <h3 className="text-accent-foreground mt-1 text-sm font-semibold">
+                  {searchQuery ? "No matching chats" : "Empty Chat History"}
+                </h3>
+                <p className="text-brand-text-muted mt-1 text-sm">
+                  {searchQuery
+                    ? "Try a different search term"
+                    : "Get started by creating a new chat."}
+                </p>
+              </div>
             </div>
           )}
-
-          {isLoadingMore && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center justify-center py-4">
-              <div className="text-brand-text-muted flex items-center gap-2">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="h-4 w-4 rounded-full border-2 border-current border-t-transparent"
-                />
-                <span className="text-sm">Loading more...</span>
-              </div>
-            </motion.div>
-          )}
         </div>
-      </ScrollArea>
-      <SidebarDropdownMenu user={session?.user ?? undefined} />
+      </div>
+      <SidebarDropdownMenu user={user} />
     </motion.div>
   );
 }

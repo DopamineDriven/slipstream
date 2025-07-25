@@ -1,6 +1,17 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
-import type { Conversation, Message } from "@prisma/client";
+import type {
+  Conversation,
+  ConversationSettings,
+  Message
+} from "@prisma/client";
 import { ErrorHelperService } from "@/orm/err-helper";
+
+export type GetMessagesByConversationIdRT =
+  | null
+  | (Conversation & {
+      messages: Message[];
+      conversationSettings: ConversationSettings | null;
+    });
 
 export class PrismaUserMessageService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
@@ -9,7 +20,8 @@ export class PrismaUserMessageService extends ErrorHelperService {
   public async getMessages(conversationId: string): Promise<Message[]> {
     return await this.prismaClient.message.findMany({
       where: { conversationId },
-      orderBy: { createdAt: "asc" }
+      orderBy: { createdAt: "asc" },
+      cacheStrategy: { swr: 3600, ttl: 60 }
     });
   }
   public async getRecentConversationsByUserId(
@@ -36,12 +48,36 @@ export class PrismaUserMessageService extends ErrorHelperService {
       orderBy: [{ updatedAt: "desc" }]
     });
   }
+  public sanitizeTitle(generatedTitle: string) {
+    return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
+  }
+
+  public async getSidebarData(userId: string) {
+    return await this.prismaClient.conversation
+      .findMany({
+        where: { userId },
+        orderBy: [{ updatedAt: "desc" }],
+        cacheStrategy: { swr: 3600, ttl: 60 }
+      })
+      .then(t => {
+        return t.map(v => ({
+          id: v.id,
+          title: this.sanitizeTitle(v.title ?? "Untitled"),
+          updatedAt: v.updatedAt
+        }));
+      });
+  }
+
   public async getMessagesByConversationId(
     conversationId: string
-  ): Promise<null | (Conversation & { messages: Message[] })> {
+  ): Promise<GetMessagesByConversationIdRT> {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
-      include: { messages: true }
+      cacheStrategy: { swr: 3600, ttl: 60 },
+      include: {
+        messages: { orderBy: { createdAt: "asc" } },
+        conversationSettings: true
+      }
     });
   }
 
@@ -54,7 +90,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       data: { title: updatedTitle }
     });
   }
-  
+
   public async convoCounts(userId: string) {
     return await this.prismaClient.conversation.count({
       where: { userId: userId }

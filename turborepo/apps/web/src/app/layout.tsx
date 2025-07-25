@@ -5,11 +5,15 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
+import { redirect } from "next/navigation";
 import Script from "next/script";
+import { ApiKeysProvider } from "@/context/api-keys-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { auth } from "@/lib/auth";
+import { prismaClient } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/site-url";
+import { ormHandler } from "@/orm";
 import * as ga from "@/utils/google-analytics";
 import { SessionProvider } from "next-auth/react";
 
@@ -92,12 +96,19 @@ export const metadata: Metadata = {
   }
 };
 
+const { prismaApiKeyService } = ormHandler(prismaClient);
+
 export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  if (!session?.user?.id) redirect("/api/auth/signin");
+
+  const apiKeysData = await prismaApiKeyService.getClientApiKeys(
+    session.user.id
+  );
   return (
     <html suppressHydrationWarning lang="en">
       <head>
@@ -131,8 +142,12 @@ export default async function RootLayout({
         )}>
         <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
           <SessionProvider session={session}>
-            <ChatWebSocketProvider user={session?.user} >
-              <ModelSelectionProvider>{children}</ModelSelectionProvider>
+            <ChatWebSocketProvider user={session?.user}>
+              <ModelSelectionProvider>
+                <ApiKeysProvider initialApiKeys={apiKeysData}>
+                  {children}
+                </ApiKeysProvider>
+              </ModelSelectionProvider>
             </ChatWebSocketProvider>
           </SessionProvider>
         </ThemeProvider>
