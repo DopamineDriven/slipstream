@@ -95,6 +95,7 @@ export {
   CardHeader,
   CardFooter,
   CardTitle,
+  CardAction,
   CardDescription,
   CardContent
 } from "@/ui/card";
