@@ -9,15 +9,16 @@ const { prismaConversationService } = ormHandler(prismaClient);
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { userId: string; conversationId: string } }
+  { params }: { params: Promise<{ userId: string; conversationId: string }> }
 ) {
+  const { userId, conversationId } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
       redirect("/api/auth/signin");
     }
 
-    if (session.user.id !== params.userId) {
+    if (session.user.id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -30,7 +31,7 @@ export async function PATCH(
 
     const updatedConversation =
       await prismaConversationService.updateConversationTitle(
-        params.conversationId,
+        conversationId,
         title
       );
 
@@ -49,20 +50,21 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { userId: string; conversationId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ userId: string; conversationId: string }> }
 ) {
+  const { userId, conversationId } = await params;
   try {
     const session = await auth();
     if (!session?.user?.id) {
       redirect("/api/auth/signin");
     }
 
-    if (session.user.id !== params.userId) {
+    if (session.user.id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    await prismaConversationService.deleteConversation(params.conversationId);
+    await prismaConversationService.deleteConversation(conversationId);
 
     return NextResponse.json({ success: true });
   } catch (error) {
