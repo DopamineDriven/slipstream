@@ -2,7 +2,7 @@
 
 import { MessageInputBar } from "@/ui/chat/message-input-bar";
 import { useAiChat } from "@/hooks/use-ai-chat";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import type { AllModelsUnion } from "@t3-chat-clone/types";
 import type { User } from "next-auth";
 import { useModelSelection } from "@/context/model-selection-context";
@@ -17,12 +17,11 @@ interface ChatContentProps {
 export function ChatContent({user}: ChatContentProps) {
   const {
     sendChat,
-    isConnected,
-    isComplete
+    isConnected
   } = useAiChat(user?.id);
   const { selectedModel } = useModelSelection();
   const {apiKeys} = useApiKeys()
-  const isStreaming = useMemo(() => !isComplete, [isComplete]);
+
 
   const handleSend = useCallback(
     (text: string) => {
@@ -45,12 +44,7 @@ export function ChatContent({user}: ChatContentProps) {
   return (
     <MessageInputBar
       onSendMessageAction={handleSend}
-      disabled={isStreaming}
-      placeholder={
-        isStreaming
-          ? "AI is responding…"
-          : `Message ${selectedModel.displayName}…`
-      }
+      placeholder={ `Message ${selectedModel.displayName}…`}
     />
   );
 }
