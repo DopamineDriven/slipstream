@@ -1,5 +1,7 @@
 "use client";
 
+import type { SidebarProps } from "@/types/ui";
+import type { User } from "next-auth";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,20 +11,24 @@ import {
 } from "@/app/actions/sidebar-actions";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import { cn } from "@/lib/utils";
-import { SidebarProps } from "@/types/ui";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
+import { useSidebar } from "@/ui/atoms/sidebar";
 import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
-import { User } from "next-auth";
 import {
   Button,
   Check,
   CirclePlus,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   SquarePen as Edit3,
   EmptyChatHistory,
   Input,
+  EllipsisHorizontal as MoreHorizontal,
   Search,
   Trash as Trash2,
   X
@@ -49,7 +55,8 @@ export function EnhancedSidebar({
 
   const pathname = usePathname();
   const router = useRouter();
-
+  const { state: sidebarState, isMobile } = useSidebar();
+  const effectiveState = isMobile ? "expanded" : sidebarState;
   // Ref for virtual scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -167,43 +174,77 @@ export function EnhancedSidebar({
       animate={{ x: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
       className={cn(
-        `bg-brand-sidebar text-brand-text border-brand-border flex h-full flex-col space-y-4 border-r p-4`,
+        `bg-sidebar text-sidebar-foreground border-sidebar-border flex h-full flex-col border-r transition-all`,
+        effectiveState === "collapsed"
+          ? "w-14 items-center space-y-2 p-2"
+          : "w-80 space-y-4 p-4",
         className
       )}>
       <Link href="/" className="appearance-none">
-        <div className="flex items-center justify-between px-1 py-0.5">
+        <div
+          className={cn(
+            "flex items-center py-0.5",
+            effectiveState === "collapsed"
+              ? "justify-center px-0"
+              : "justify-between px-1"
+          )}>
           <div className="flex items-center">
-            <Logo className="text-foreground size-12" />
+            <Logo
+              className={cn(
+                "text-sidebar-foreground",
+                effectiveState === "collapsed" ? "size-10" : "size-12"
+              )}
+            />{" "}
+            <span
+              className={cn(
+                "ml-2 font-semibold",
+                effectiveState === "collapsed" && "sr-only"
+              )}>
+              Chat
+            </span>
           </div>
         </div>
       </Link>
 
-      <Link href="/" className="appearance-none">
+      <Link href="/" className="w-full appearance-none">
         <Button
           variant="outline"
-          className="bg-brand-component hover:bg-brand-primary/20 border-brand-border text-brand-text w-full justify-start">
-          <CirclePlus className="mr-2 h-5 w-5" /> New Chat
+          className={cn(
+            "transition-all",
+            effectiveState === "collapsed"
+              ? "size-10 justify-center p-0"
+              : "w-full justify-start"
+          )}>
+          <CirclePlus
+            className={cn(
+              effectiveState === "collapsed" ? "m-0 size-4" : "mr-2 size-5"
+            )}
+          />
+          <span className={cn(effectiveState === "collapsed" && "sr-only")}>
+            New Chat
+          </span>
         </Button>
       </Link>
 
-      <div className="relative">
-        <Search className="text-brand-text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+      <div
+        className={cn("relative", effectiveState === "collapsed" && "hidden")}>
+        <Search className="text-sidebar-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <Input
           type="search"
-          placeholder="Search your threads..."
+          placeholder="Search..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="bg-brand-component border-brand-border focus:ring-brand-border text-brand-text placeholder:text-brand-text-muted pr-3 pl-10 text-sm"
+          className="bg-sidebar border-sidebar-border focus:ring-sidebar-ring text-sidebar-foreground placeholder:text-sidebar-accent-foreground pr-3 pl-10 text-sm"
         />
       </div>
 
       <div className="flex-1 overflow-hidden">
         {filteredConversations.length > 0 && (
           <div className="mb-2 flex items-center justify-between px-2 py-1">
-            <h3 className="text-brand-text-muted text-xs font-medium tracking-wider uppercase">
+            <h3 className="text-sidebar-accent-foreground text-xs font-medium tracking-wider uppercase">
               Recent
             </h3>
-            <span className="text-brand-text-muted text-xs">
+            <span className="text-sidebar-accent-foreground text-xs">
               {filteredConversations.length} conversations
             </span>
           </div>
@@ -293,22 +334,45 @@ export function EnhancedSidebar({
                               </div>
                             </div>
                           </Link>
-                          <div className="absolute top-1/2 right-2 flex -translate-y-1/2 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="hover:bg-brand-primary/20 h-8 w-8"
-                              onClick={() => handleEditStart(thread)}>
-                              <Edit3 className="size-4" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="hover:bg-destructive/20 hover:text-destructive h-8 w-8"
-                              onClick={() => handleDelete(thread.id)}
-                              disabled={deletingId === thread.id}>
-                              <Trash2 className="size-4" />
-                            </Button>
+                          <div
+                            className={cn(
+                              "absolute top-1/2 right-2 flex -translate-y-1/2 transition-opacity",
+                              isMobile
+                                ? "opacity-100"
+                                : "opacity-0 group-hover:opacity-100"
+                            )}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="hover:bg-primary/10 h-8 w-8"
+                                  onClick={e => e.stopPropagation()}>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">More options</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    handleEditStart(thread);
+                                  }}>
+                                  <Edit3 className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    handleDelete(thread.id);
+                                  }}
+                                  className="text-destructive focus:text-destructive"
+                                  disabled={deletingId === thread.id}>
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       )}
@@ -320,11 +384,11 @@ export function EnhancedSidebar({
           ) : (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <EmptyChatHistory className="text-brand-text-muted mx-auto size-12" />
-                <h3 className="text-accent-foreground mt-1 text-sm font-semibold">
+                <EmptyChatHistory className="text-sidebar-accent-foreground mx-auto size-12" />
+                <h3 className="text-sidebar-accent-foreground mt-1 text-sm font-semibold">
                   {searchQuery ? "No matching chats" : "Empty Chat History"}
                 </h3>
-                <p className="text-brand-text-muted mt-1 text-sm">
+                <p className="text-sidebar-accent-foreground/80 mt-1 text-sm">
                   {searchQuery
                     ? "Try a different search term"
                     : "Get started by creating a new chat."}

@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import Script from "next/script";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
+import { CookieProvider } from "@/context/cookie-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
@@ -140,17 +141,19 @@ export default async function RootLayout({
           "bg-background font-basis min-h-screen antialiased",
           inter.variable
         )}>
-        <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
-          <SessionProvider session={session}>
-            <ChatWebSocketProvider user={session?.user}>
-              <ModelSelectionProvider>
-                <ApiKeysProvider initialApiKeys={apiKeysData}>
-                  {children}
-                </ApiKeysProvider>
-              </ModelSelectionProvider>
-            </ChatWebSocketProvider>
-          </SessionProvider>
-        </ThemeProvider>
+        <CookieProvider>
+          <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
+            <SessionProvider session={session}>
+              <ChatWebSocketProvider user={session?.user}>
+                <ModelSelectionProvider>
+                  <ApiKeysProvider initialApiKeys={apiKeysData}>
+                    {children}
+                  </ApiKeysProvider>
+                </ModelSelectionProvider>
+              </ChatWebSocketProvider>
+            </SessionProvider>
+          </ThemeProvider>
+        </CookieProvider>
       </body>
       <Script
         async

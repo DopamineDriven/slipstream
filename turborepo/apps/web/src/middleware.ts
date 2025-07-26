@@ -9,7 +9,7 @@ function detectDeviceAndSetCookies(
   request: NextRequest,
   response: NextResponse
 ) {
-  const country = request.headers.get("x-vercel-ip-country") ?? "US";
+  const country = request.headers.get("X-Vercel-IP-Country") ?? "US";
   const city = request.headers.get("x-vercel-ip-city") ?? "Chicago";
   const lng = request.headers.get("x-vercel-ip-longitude") ?? "-87.8966849";
   const lat = request.headers.get("x-vercel-ip-latitude") ?? "41.8338486";
