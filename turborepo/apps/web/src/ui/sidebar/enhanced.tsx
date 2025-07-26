@@ -1,15 +1,11 @@
 "use client";
 
 import type { SidebarProps } from "@/types/ui";
-import type { User } from "next-auth";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  deleteConversationAction,
-  updateConversationTitleAction
-} from "@/app/actions/sidebar-actions";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useAiChat } from "@/hooks/use-ai-chat";
+import { useConversations } from "@/hooks/use-conversations";
 import { cn } from "@/lib/utils";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { useSidebar } from "@/ui/atoms/sidebar";
@@ -17,6 +13,7 @@ import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/sidebar/drop-menu";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 import {
   Button,
   Check,
@@ -33,20 +30,22 @@ import {
   Trash as Trash2,
   X
 } from "@t3-chat-clone/ui";
+import { SidebarSkeleton } from "./skeleton";
 
 interface EnhancedSidebarProps {
   className?: string;
-  sidebarData: SidebarProps[];
-  user: User;
 }
 
-export function EnhancedSidebar({
-  className = "",
-  sidebarData,
-  user
-}: EnhancedSidebarProps) {
-  const [conversations, setConversations] =
-    useState<SidebarProps[]>(sidebarData);
+export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
+  const {
+    conversations,
+    updateCache,
+    deleteConversation,
+    updateTitle
+  } = useConversations(userId);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -71,27 +70,28 @@ export function EnhancedSidebar({
 
   // Listen for new conversations from the active chat
   const { conversationId: activeConversationId, title: activeTitle } =
-    useAiChat(user.id);
+    useAiChat(userId);
 
   useEffect(() => {
     if (!activeConversationId || activeConversationId === "new-chat") return;
-    if (!activeTitle) return;
+    if (!activeTitle || !conversations) return;
 
     // Check if this conversation already exists
     const exists = conversations.some(conv => conv.id === activeConversationId);
 
     if (!exists) {
-      // Add new conversation to the top of the list
-      setConversations(prev => [
-        {
-          id: activeConversationId,
-          updatedAt: new Date(),
-          title: activeTitle
-        },
-        ...prev
-      ]);
+      // ✅ Use SWR mutate instead of setConversations
+      const newConversation = {
+        id: activeConversationId,
+        updatedAt: new Date(),
+        title: activeTitle
+      };
+
+      updateCache(current =>
+        current ? [newConversation, ...current] : [newConversation]
+      );
     }
-  }, [activeConversationId, activeTitle, conversations]);
+  }, [activeConversationId, activeTitle, conversations, updateCache]);
 
   // Handle title editing
   const handleEditStart = (conv: SidebarProps) => {
@@ -108,14 +108,7 @@ export function EnhancedSidebar({
     if (!editingId || !editingTitle.trim()) return;
 
     try {
-      await updateConversationTitleAction(editingId, editingTitle.trim());
-
-      // Update local state
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === editingId ? { ...conv, title: editingTitle.trim() } : conv
-        )
-      );
+      await updateTitle(editingId, editingTitle.trim());
 
       setEditingId(null);
       setEditingTitle("");
@@ -129,10 +122,9 @@ export function EnhancedSidebar({
     setDeletingId(convId);
 
     try {
-      await deleteConversationAction(convId);
+      await deleteConversation(convId);
 
       // Remove from local state
-      setConversations(prev => prev.filter(conv => conv.id !== convId));
 
       // If we're currently viewing this conversation, redirect to home
       if (pathname === `/chat/${convId}`) {
@@ -150,7 +142,7 @@ export function EnhancedSidebar({
     if (!debouncedSearchQuery) return conversations;
 
     const lowerQuery = debouncedSearchQuery.toLowerCase();
-    return conversations.filter(conv =>
+    return conversations?.filter(conv =>
       conv.title.toLowerCase().includes(lowerQuery)
     );
   }, [conversations, debouncedSearchQuery]);
@@ -162,12 +154,15 @@ export function EnhancedSidebar({
 
   // Setup virtualizer
   const virtualizer = useVirtualizer({
-    count: filteredConversations.length,
+    count: filteredConversations?.length ?? 0,
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 68, // Estimated height of each conversation item
     overscan: 5
   });
-
+  if (status === "loading") return <SidebarSkeleton />;
+  if (status === "unauthenticated" || !session?.user?.id) {
+    redirect("/api/auth/signin");
+  }
   return (
     <motion.div
       initial={{ x: -300 }}
@@ -239,7 +234,7 @@ export function EnhancedSidebar({
       </div>
 
       <div className="flex-1 overflow-hidden">
-        {filteredConversations.length > 0 && (
+        {filteredConversations && filteredConversations.length > 0 && (
           <div className="mb-2 flex items-center justify-between px-2 py-1">
             <h3 className="text-sidebar-accent-foreground text-xs font-medium tracking-wider uppercase">
               Recent
@@ -256,7 +251,7 @@ export function EnhancedSidebar({
           style={{
             contain: "strict"
           }}>
-          {filteredConversations.length > 0 ? (
+          {filteredConversations && filteredConversations.length > 0 ? (
             <div
               style={{
                 height: `${virtualizer.getTotalSize()}px`,
@@ -398,7 +393,7 @@ export function EnhancedSidebar({
           )}
         </div>
       </div>
-      <SidebarDropdownMenu user={user} />
+      <SidebarDropdownMenu user={session?.user} />
     </motion.div>
   );
 }

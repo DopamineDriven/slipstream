@@ -1,7 +1,5 @@
 "use client";
 
-import type { SidebarProps } from "@/types/ui";
-import type { User } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -29,14 +27,10 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
-  sidebarData: SidebarProps[];
-  user: User;
 }
 
 export function ChatLayoutShell({
-  children,
-  sidebarData,
-  user
+  children
 }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
@@ -146,8 +140,6 @@ return (
       )}>
       <EnhancedSidebar
         className="h-full w-[280px] sm:w-[300px]"
-        user={user}
-        sidebarData={sidebarData}
       />
     </div>
 
@@ -206,8 +198,6 @@ return (
           <div className={cn("md:h-full", !isSidebarOpen && "md:hidden")}>
             <EnhancedSidebar
               className="md:h-full"
-              user={user}
-              sidebarData={sidebarData}
             />
           </div>
         </ResizablePanel>

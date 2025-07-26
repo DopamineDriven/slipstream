@@ -1,12 +1,10 @@
 "use client";
 
-import type { User } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { usePlatformDetection } from "@/hooks/use-platform-detection";
-import { SidebarProps } from "@/types/ui";
 import {
   Sidebar,
   SidebarInset,
@@ -14,9 +12,9 @@ import {
   SidebarTrigger
 } from "@/ui/atoms/sidebar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
+import { ProviderModelSelector } from "@/ui/model-selector-drawer";
 import { SettingsDrawer } from "@/ui/settings-drawer";
 import { EnhancedSidebar } from "@/ui/sidebar/enhanced";
-import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import {
   Button,
@@ -33,8 +31,6 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
-  sidebarData: SidebarProps[];
-  user: User;
 }
 
 function HeaderActions({
@@ -88,15 +84,15 @@ function HeaderActions({
   );
 }
 
-export function ChatLayoutShell({
-  children,
-  sidebarData,
-  user
-}: ChatLayoutShellProps) {
+export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
+
   const [isMobileModelSelectorOpen, setIsMobileModelSelectorOpen] =
     useState(false);
+  const handleOpenMobileModelSelector = useCallback(() => {
+    if (isMobileModelSelectorOpen === false) setIsMobileModelSelectorOpen(true);
+  }, [isMobileModelSelectorOpen]);
   const { isMac } = usePlatformDetection();
 
   const keyboardShortcutsMemo = useMemo(
@@ -136,11 +132,11 @@ export function ChatLayoutShell({
   // Shared header actions component
 
   return (
-    <motion.div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
+    <>
       <SidebarProvider>
         <div className="flex h-screen w-screen overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
-            <EnhancedSidebar user={user} sidebarData={sidebarData} />
+            <EnhancedSidebar />
           </Sidebar>
           <SidebarInset className="flex-1">
             <div className="flex h-full flex-col">
@@ -152,6 +148,16 @@ export function ChatLayoutShell({
                   </SidebarTrigger>
                   <Separator orientation="vertical" className="mx-2 h-6" />
                   <h1 className="text-lg font-semibold">Chat</h1>
+                </div>
+                <div className="flex items-center">
+                  <SidebarTrigger className="-ml-2">
+                    <PanelLeft className="size-5" />
+                    <span className="sr-only">Toggle Sidebar</span>
+                  </SidebarTrigger>
+                  <Separator orientation="vertical" className="mx-2 h-6" />
+                  <ProviderModelSelector
+                    onClick={handleOpenMobileModelSelector}
+                  />
                 </div>
                 <HeaderActions
                   handleShareChat={handleShareChat}
@@ -171,6 +177,6 @@ export function ChatLayoutShell({
         isOpen={isMobileModelSelectorOpen}
         onOpenChangeAction={setIsMobileModelSelectorOpen}
       />
-    </motion.div>
+    </>
   );
 }

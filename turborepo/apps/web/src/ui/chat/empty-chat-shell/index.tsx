@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/attachment-popover";
 import { FullscreenTextInputDialog } from "@/ui/fullscreen-text-input-dialog";
 import { Logo } from "@/ui/logo";
+import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import {
@@ -147,7 +148,7 @@ export function ChatEmptyState() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="hidden md:mb-8 md:grid md:w-full md:max-w-2xl md:gap-4 md:grid-cols-2">
+        className="hidden md:mb-8 md:grid md:w-full md:max-w-2xl md:grid-cols-2 md:gap-4">
         {suggestedPrompts.map((item, idx) => (
           <Card
             key={idx}
@@ -266,6 +267,10 @@ export function ChatEmptyState() {
         onOpenChange={setIsFullScreenInputOpen}
         initialValue={message}
         onSubmit={handleFullScreenSubmit}
+      />
+      <MobileModelSelectorDrawer
+        isOpen={_isDrawerOpen}
+        onOpenChangeAction={setIsDrawerOpen}
       />
     </div>
   );
