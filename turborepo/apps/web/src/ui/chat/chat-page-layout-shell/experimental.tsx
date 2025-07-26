@@ -21,6 +21,7 @@ import { useTheme } from "next-themes";
 import {
   Button,
   PanelLeftClose as PanelLeft,
+  Separator,
   Settings,
   ShareIcon as Share2
 } from "@t3-chat-clone/ui";
@@ -41,7 +42,7 @@ function HeaderActions({
   setIsSettingsDrawerOpen
 }: {
   handleShareChat: () => void;
-  setIsSettingsDrawerOpen: () => React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSettingsDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { resolvedTheme } = useTheme();
 
@@ -132,35 +133,36 @@ export function ChatLayoutShell({
     alert("Share functionality to be implemented!");
   }, []);
 
-
-
   // Shared header actions component
 
   return (
     <motion.div className="bg-brand-background text-brand-text flex h-screen overflow-hidden">
       <SidebarProvider>
-      <div className="flex h-screen w-screen overflow-hidden">
-        <Sidebar collapsible="icon" className="border-r bg-muted/20">
-          <EnhancedSidebar user={user} sidebarData={sidebarData} />
-        </Sidebar>
-        <SidebarInset className="flex-1">
-          <div className="flex h-full flex-col">
-            <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
-              <div className="flex items-center">
-                <SidebarTrigger className="-ml-2">
-                  <PanelLeft className="size-5" />
-                  <span className="sr-only">Toggle Sidebar</span>
-                </SidebarTrigger>
-                <Separator orientation="vertical" className="mx-2 h-6" />
-                <h1 className="text-lg font-semibold">Chat</h1>
-              </div>
-              <HeaderActions handleShareChat={handleShareChat} setIsSettingsDrawerOpen={setIsSettingsDrawerOpen} />
-            </header>
-            <main className="flex-1 overflow-y-auto">{children}</main>
-          </div>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+        <div className="flex h-screen w-screen overflow-hidden">
+          <Sidebar collapsible="icon" className="bg-muted/20 border-r">
+            <EnhancedSidebar user={user} sidebarData={sidebarData} />
+          </Sidebar>
+          <SidebarInset className="flex-1">
+            <div className="flex h-full flex-col">
+              <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
+                <div className="flex items-center">
+                  <SidebarTrigger className="-ml-2">
+                    <PanelLeft className="size-5" />
+                    <span className="sr-only">Toggle Sidebar</span>
+                  </SidebarTrigger>
+                  <Separator orientation="vertical" className="mx-2 h-6" />
+                  <h1 className="text-lg font-semibold">Chat</h1>
+                </div>
+                <HeaderActions
+                  handleShareChat={handleShareChat}
+                  setIsSettingsDrawerOpen={setIsSettingsDrawerOpen}
+                />
+              </header>
+              <main className="flex-1 overflow-y-auto">{children}</main>
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
       <SettingsDrawer
         isOpen={isSettingsDrawerOpen}
         onOpenChange={setIsSettingsDrawerOpen}
