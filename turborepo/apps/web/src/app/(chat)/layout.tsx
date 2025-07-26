@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatLayoutClient } from "@/ui/chat/chat-layout";
-import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
+import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell/experimental";
 
 export const metadata: Metadata = {
   title: "Chat Home"

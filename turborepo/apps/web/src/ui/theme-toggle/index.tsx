@@ -1,14 +1,14 @@
 "use client";
 
-import type React from "react";
-import { Button, Sun, Moon } from "@t3-chat-clone/ui";
+import type { ComponentPropsWithRef } from "react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { Button, Moon, Sun } from "@t3-chat-clone/ui";
 
 export function ThemeToggle({
   className,
   ...props
-}: React.ComponentPropsWithRef<typeof Button>) {
+}: ComponentPropsWithRef<typeof Button>) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

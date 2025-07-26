@@ -5,6 +5,8 @@ import type { JSX } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { shimmer } from "@/lib/shimmer";
+import { cn } from "@/lib/utils";
+import { useSidebar } from "@/ui/atoms/sidebar";
 import {
   Button,
   ChevronDown,
@@ -24,7 +26,7 @@ const dropDownMap = [
     Component: () => (
       <Link href="/settings" passHref>
         <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
-          <Settings className="mr-2 h-4 w-4" />
+          <Settings className="mr-2 size-4" />
           <span>Settings</span>
         </DropdownMenuItem>
       </Link>
@@ -35,7 +37,7 @@ const dropDownMap = [
     Component: () => (
       <Link href="/api/auth/signout" passHref>
         <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="mr-2 size-4" />
           <span>Sign Out</span>
         </DropdownMenuItem>
       </Link>
@@ -47,6 +49,17 @@ const dropDownMap = [
 }[];
 
 export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
+  const { state: sidebarState, isMobile } = useSidebar();
+  // On mobile, always use expanded state
+  const effectiveState = isMobile ? "expanded" : sidebarState;
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map(n => n.substring(0,1))
+      .join("");
+  };
   return (
     <div className="border-brand-border mt-auto border-t pt-4">
       <DropdownMenu>
@@ -59,13 +72,17 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
                 <Image
                   className="inline-block size-10 rounded-full"
                   src={userProfile?.image ?? "/placeholder.svg"}
-                  alt={userProfile?.name ?? "user image"}
+                  alt={getInitials(userProfile?.name)}
                   width={36}
                   height={36}
                   placeholder="blur"
                   blurDataURL={shimmer([36, 36])}
                 />
-                <div className="ml-2.5 inline-block text-left align-middle">
+                <div
+                  className={cn(
+                    "ml-2.5 text-left align-middle",
+                    effectiveState === "collapsed" ? "hidden" : "inline-block"
+                  )}>
                   <p className="text-foreground text-sm leading-snug font-normal">
                     {userProfile?.name ?? "Username"}
                   </p>

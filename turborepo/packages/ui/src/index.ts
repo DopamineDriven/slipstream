@@ -151,9 +151,26 @@ export {
 export type { SelectProps } from "@/ui/select";
 export { Separator } from "@/ui/separator";
 export type { SeparatorProps } from "@/ui/separator";
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/ui/sheet";
+export { Skeleton } from "@/ui/skeleton";
 export { Switch } from "@/ui/switch";
 export type { SwitchProps } from "@/ui/switch";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 export type { TabsProps } from "@/ui/tabs";
 export { Textarea } from "@/ui/textarea";
 export type { TextareaProps } from "@/ui/textarea";
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/ui/tooltip";

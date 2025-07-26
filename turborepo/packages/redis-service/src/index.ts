@@ -1,5 +1,6 @@
 export { RedisInstance } from "@/service/index.ts";
 export type {
+  EnhancedRedisPubSubOptions,
   RedisArg,
   RedisHashType,
   RedisVariadicArg,
