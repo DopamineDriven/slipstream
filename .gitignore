@@ -6,3 +6,4 @@ remote/**/*.json
 inspect/**/*
 schema-taskdef.json
 notes.md
+.certs
