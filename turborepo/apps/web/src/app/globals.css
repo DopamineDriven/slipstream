@@ -356,6 +356,12 @@
   }
 }
 
+@media (width < 768px) {
+  html {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
 @supports not (backdrop-filter: blur(4px)) {
   .backdrop-blur-sm {
     background-color: color-mix(
@@ -397,13 +403,14 @@
   }
 
   .truncate {
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 @layer utilities {
-  .prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  .prose
+    :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: var(--color-brand-text);
     font-weight: 600;
   }
