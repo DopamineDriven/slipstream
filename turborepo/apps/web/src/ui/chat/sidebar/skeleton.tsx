@@ -1,7 +1,7 @@
 "use client";
 
 import type { Variants } from "motion/react";
-import { ComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 

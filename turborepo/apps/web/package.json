@@ -12,6 +12,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx,graphql,gql}\" --ignore-unknown --cache",
     "start": "next start",
     "lint": "eslint",
+    "typecheck":"tsc --noEmit",
     "postinstall": "pnpm db:generate",
     "db:generate": "prisma generate --no-engine",
     "db:migrate": "prisma migrate dev --skip-generate",

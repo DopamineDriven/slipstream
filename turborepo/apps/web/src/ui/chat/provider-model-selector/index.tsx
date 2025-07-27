@@ -5,23 +5,25 @@ import React from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { defaultModelByProvider, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import {
+import type {
   AnthropicDisplayNameUnion,
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
-  OpenAiDisplayNameUnion,
-  getModelsForProvider,
-  getModelIdByDisplayName,
+  OpenAiDisplayNameUnion
 } from "@t3-chat-clone/types";
 import type { Provider } from "@t3-chat-clone/types";
+import {
+  getModelIdByDisplayName,
+  getModelsForProvider
+} from "@t3-chat-clone/types";
 import {
   Button,
   ChevronDown,
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@t3-chat-clone/ui";
 
 interface ProviderModelSelectorProps {
@@ -31,9 +33,10 @@ interface ProviderModelSelectorProps {
 
 export function ProviderModelSelector({
   className,
-  variant = "button",
+  variant = "button"
 }: ProviderModelSelectorProps) {
-  const { selectedModel, updateProvider, updateModel, providers, openDrawer } = useModelSelection();
+  const { selectedModel, updateProvider, updateModel, providers, openDrawer } =
+    useModelSelection();
 
   const availableModels = getModelsForProvider(selectedModel.provider);
   const currentMeta = providerMetadata[selectedModel.provider];
@@ -109,18 +112,17 @@ export function ProviderModelSelector({
       <div className={cn("flex items-center space-x-2", className)}>
         <Select
           value={selectedModel.provider}
-          onValueChange={(v) => handleProviderChange(v as Provider)}
-        >
+          onValueChange={v => handleProviderChange(v as Provider)}>
           <SelectTrigger className="bg-brand-component border-brand-border w-[140px]">
             <div className="flex items-center">
               {React.createElement(currentMeta.icon, {
-                className: "mr-2 w-4 h-4",
+                className: "mr-2 w-4 h-4"
               })}
               <SelectValue />
             </div>
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
-            {providers.map((prov) => {
+            {providers.map(prov => {
               const Icon = providerMetadata[prov].icon;
               return (
                 <SelectItem key={prov} value={prov}>
@@ -136,13 +138,12 @@ export function ProviderModelSelector({
 
         <Select
           value={selectedModel.displayName}
-          onValueChange={handleModelChange}
-        >
+          onValueChange={handleModelChange}>
           <SelectTrigger className="bg-brand-component border-brand-border w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
-            {availableModels.map((model) => (
+            {availableModels.map(model => (
               <SelectItem key={model} value={model}>
                 {model}
               </SelectItem>
@@ -160,8 +161,7 @@ export function ProviderModelSelector({
       className={cn(
         "text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base",
         className
-      )}
-    >
+      )}>
       <currentMeta.icon className="mr-2 h-4 w-4 flex-shrink-0" />
       {selectedModel.displayName}
       <ChevronDown className="ml-1 h-4 w-4" />

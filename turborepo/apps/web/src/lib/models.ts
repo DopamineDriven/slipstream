@@ -1,7 +1,4 @@
-import { AnthropicIcon } from "@/ui/icons/anthropic";
-import { GeminiIcon } from "@/ui/icons/gemini";
-import { OpenAiIcon } from "@/ui/icons/openai";
-import { XAiIcon } from "@/ui/icons/x-ai";
+import { AnthropicIcon, GeminiIcon, OpenAiIcon, XAiIcon } from "@/ui/icons";
 import type {
   AnthropicDisplayNameUnion,
   AnthropicModelIdUnion,

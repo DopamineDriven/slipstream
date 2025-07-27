@@ -7,10 +7,10 @@ import { useModelSelection } from "@/context/model-selection-context";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { AttachmentPopover } from "@/ui/attachment-popover";
-import { FullscreenTextInputDialog } from "@/ui/fullscreen-text-input-dialog";
+import { AttachmentPopover } from "@/ui/chat/attachment-popover";
+import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { Logo } from "@/ui/logo";
-import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
+import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import {
@@ -68,6 +68,7 @@ export function ChatEmptyState() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
+  const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const ta = textareaRef.current;
@@ -78,22 +79,36 @@ export function ChatEmptyState() {
     setShowExpandButton(ta.scrollHeight > 48);
   }, [message]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) {
+        clearTimeout(submitTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSendMessage = useCallback(
     (messageText: string) => {
-      if (!messageText.trim() || isSubmitting) return;
+      if (!messageText.trim() || isSubmitting || !isConnected) return;
 
       setIsSubmitting(true);
 
       try {
+        // Navigate to new chat with prompt as search param
         const params = new URLSearchParams({ prompt: messageText.trim() });
-        // Navigate to new chat with prompt
         router.push(`/chat/new-chat?${params.toString()}`);
+
+        // Reset submitting state after a short delay
+        submitTimeoutRef.current = setTimeout(() => {
+          setIsSubmitting(false);
+        }, 500);
       } catch (error) {
-        console.error("Failed to send message:", error);
+        console.error("Failed to navigate:", error);
         setIsSubmitting(false);
       }
     },
-    [isSubmitting, router]
+    [isSubmitting, router, isConnected]
   );
 
   const handleSubmit = useCallback(

@@ -4,7 +4,7 @@
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
@@ -43,6 +43,7 @@ export function ChatInterface({
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
+  const lastUserMessageRef = useRef<string>("");
 
   // Handle initial prompt for new chats
   useEffect(() => {
@@ -65,6 +66,7 @@ export function ChatInterface({
       });
 
       setMessages([userMsg]);
+      lastUserMessageRef.current = initialPrompt;
 
       // Send to AI
       sendChat(initialPrompt);
@@ -140,6 +142,38 @@ export function ChatInterface({
     }
   }, [activeConversationId]);
 
+  // Callback to handle new user messages from the input component
+  const handleUserMessage = useCallback((content: string) => {
+    if (!activeConversationId || !content.trim()) return;
+
+    // Add optimistic user message immediately
+    const userMsg = createUserMessage({
+      id: `user-${Date.now()}-${Math.random()}`,
+      content: content.trim(),
+      userId: user.id,
+      provider: selectedModel.provider,
+      model: selectedModel.modelId,
+      conversationId: activeConversationId
+    });
+
+    setMessages(prev => [...prev, userMsg]);
+    lastUserMessageRef.current = content.trim();
+    setIsAwaitingFirstChunk(true);
+
+    // Send to AI
+    sendChat(content);
+  }, [activeConversationId, selectedModel, sendChat, user]);
+
+  // Clone children and pass the message handler
+  const childrenWithProps = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child as React.ReactElement<any>, {
+        onUserMessage: handleUserMessage
+      });
+    }
+    return child;
+  });
+
   return (
     <div className="flex h-full flex-col">
       <ChatArea
@@ -152,7 +186,7 @@ export function ChatInterface({
         conversationId={activeConversationId ?? 'new-chat'}
         user={user}
       />
-      {children}
+      {childrenWithProps}
     </div>
   );
 }

@@ -43,6 +43,7 @@ import { MessageSquareText } from "@/icons/message-square-text";
 import { Moon } from "@/icons/moon";
 import { Package } from "@/icons/package";
 import { Palette } from "@/icons/palette";
+import { PanelLeft } from "@/icons/panel-left";
 import { PanelLeftClose } from "@/icons/panel-left-close";
 import { PanelRightClose } from "@/icons/panel-right-close";
 import { Paperclip } from "@/icons/paperclip";
@@ -107,6 +108,7 @@ const IconComponents = {
   Moon,
   Package,
   Palette,
+  PanelLeft,
   PanelLeftClose,
   PanelRightClose,
   Paperclip,
@@ -205,6 +207,7 @@ export {
   Moon,
   Package,
   Palette,
+  PanelLeft,
   PanelLeftClose,
   PanelRightClose,
   Paperclip,
