@@ -1,9 +1,10 @@
+// src/ui/chat/empty-chat-shell/index.tsx
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useModelSelection } from "@/context/model-selection-context";
-import { useAiChat } from "@/hooks/use-ai-chat";
+import { useAIChatContext } from "@/context/ai-chat-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/attachment-popover";
@@ -56,21 +57,16 @@ const MAX_TEXTAREA_HEIGHT_PX = 120;
 
 export function ChatEmptyState() {
   const router = useRouter();
-
   const { data: session } = useSession();
 
-  const { isConnected } = useAiChat(session?.user?.id);
-
+  const { isConnected } = useAIChatContext();
   const { selectedModel, openDrawer } = useModelSelection();
+
   // Local state for the input
   const [message, setMessage] = useState("");
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
-
   const [showExpandButton, setShowExpandButton] = useState(false);
 
   useEffect(() => {
@@ -90,7 +86,7 @@ export function ChatEmptyState() {
 
       try {
         const params = new URLSearchParams({ prompt: messageText.trim() });
-        // Use push instead of replace to ensure proper navigation
+        // Navigate to new chat with prompt
         router.push(`/chat/new-chat?${params.toString()}`);
       } catch (error) {
         console.error("Failed to send message:", error);
@@ -129,7 +125,7 @@ export function ChatEmptyState() {
   const handleAttachmentSelect = useCallback(
     (type: "file" | "camera" | "photo") => {
       console.log("Selected attachment type:", type);
-      // TODO Implement attachment logic here
+      // TODO: Implement attachment logic here
     },
     []
   );
