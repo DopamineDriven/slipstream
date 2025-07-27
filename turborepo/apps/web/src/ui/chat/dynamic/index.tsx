@@ -5,7 +5,7 @@ import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
 import { useEffect, useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { createUserMessage, createAIMessage, finalizeStreamingMessage } from "@/lib/ui-message-helpers";
@@ -15,17 +15,16 @@ interface ChatInterfaceProps {
   children: ReactNode;
   initialMessages?: UIMessage[] | null;
   conversationTitle?: string | null;
-  conversationId: string; // From the dynamic route param
+  conversationId: string; // From the dynamic route param - not used, context drives everything
   user: User;
 }
 
 export function ChatInterface({
   children,
   initialMessages,
-  conversationId: routeConversationId, // This comes from the [conversationId] param
+  conversationId: _conversationId, // From route - not used, we rely on context
   user
 }: ChatInterfaceProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get("prompt");
 
@@ -35,7 +34,6 @@ export function ChatInterface({
     isStreaming,
     isComplete,
     sendChat,
-    setActiveConversation,
     isWaitingForRealId,
     resetStreamingState
   } = useAIChatContext();
@@ -46,27 +44,9 @@ export function ChatInterface({
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
 
-  // CRITICAL: Set the active conversation when component mounts or route changes
-  useEffect(() => {
-    console.log(`[ChatInterface] Route conversation ID: ${routeConversationId}`);
-    setActiveConversation(routeConversationId);
-  }, [routeConversationId, setActiveConversation]);
-
-  // Handle URL updates ONLY for new-chat → real ID transition
-  useEffect(() => {
-    // Only update URL when we receive a real ID for a new-chat
-    if (routeConversationId === 'new-chat' &&
-        activeConversationId &&
-        activeConversationId !== 'new-chat') {
-      console.log(`[ChatInterface] Updating URL from new-chat to real ID: ${activeConversationId}`);
-      // router.replace(`/chat/${activeConversationId}`);
-      window.history.replaceState(null, "", `/chat/${activeConversationId}`);
-    }
-  }, [activeConversationId, routeConversationId, router]);
-
   // Handle initial prompt for new chats
   useEffect(() => {
-    if (routeConversationId === 'new-chat' &&
+    if (activeConversationId === 'new-chat' &&
         initialPrompt &&
         !processedRef.current &&
         !isWaitingForRealId) {
@@ -81,7 +61,7 @@ export function ChatInterface({
         userId: user.id,
         provider: selectedModel.provider,
         model: selectedModel.modelId,
-        conversationId: 'new-chat'
+        conversationId: activeConversationId
       });
 
       setMessages([userMsg]);
@@ -90,7 +70,7 @@ export function ChatInterface({
       sendChat(initialPrompt);
     }
   }, [
-    routeConversationId,
+    activeConversationId,
     initialPrompt,
     selectedModel,
     sendChat,
@@ -155,10 +135,10 @@ export function ChatInterface({
 
   // Reset processed flag when navigating away from new-chat
   useEffect(() => {
-    if (routeConversationId !== 'new-chat') {
+    if (activeConversationId !== 'new-chat') {
       processedRef.current = false;
     }
-  }, [routeConversationId]);
+  }, [activeConversationId]);
 
   return (
     <div className="flex h-full flex-col">
@@ -169,7 +149,7 @@ export function ChatInterface({
         isStreaming={isStreaming}
         model={selectedModel.modelId}
         provider={selectedModel.provider}
-        conversationId={activeConversationId ?? routeConversationId}
+        conversationId={activeConversationId ?? 'new-chat'}
         user={user}
       />
       {children}
