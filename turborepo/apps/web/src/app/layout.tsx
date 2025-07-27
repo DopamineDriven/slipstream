@@ -138,7 +138,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-basis min-h-screen antialiased",
+          "bg-background font-basis min-h-screen antialiased m-0 p-0 overflow-hidden",
           inter.variable
         )}>
         <CookieProvider>

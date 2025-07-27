@@ -6,8 +6,8 @@ import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatContent } from "@/ui/chat/chat-input";
-import { ChatInterface } from "@/ui/chat/dynamic/experimental";
-import { InferGSPRT } from "@t3-chat-clone/types";
+import { ChatInterface } from "@/ui/chat/dynamic";
+import type { InferGSPRT } from "@t3-chat-clone/types";
 
 // Create once at module level
 const { prismaConversationService } = ormHandler(prismaClient);
@@ -62,7 +62,7 @@ export default async function ChatPage({
       fallback={
         <div className="flex h-full flex-col">
           <ChatAreaSkeleton />
-          <ChatContent user={session.user} />
+          <ChatContent user={session.user} conversationId={conversationId} />
         </div>
       }>
       <ChatInterface
@@ -70,7 +70,7 @@ export default async function ChatPage({
         conversationTitle={conversationTitle}
         conversationId={conversationId}
         user={session.user}>
-        <ChatContent user={session.user} />
+        <ChatContent user={session.user} conversationId={conversationId} />
       </ChatInterface>
     </Suspense>
   );

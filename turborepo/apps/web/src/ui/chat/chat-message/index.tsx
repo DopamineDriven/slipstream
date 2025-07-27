@@ -534,7 +534,7 @@ export const ChatMessage = memo(function ChatMessage({
                         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
                       }
                     }}
-                    className="bg-brand-background text-brand-text-default border-brand-border focus:ring-brand-ring min-h-[60px] w-full text-sm"
+                    className="bg-brand-background text-brand-text border-brand-border focus:ring-brand-ring min-h-[60px] w-full text-sm"
                     rows={3}
                   />
                   <div className="flex justify-end space-x-2">
@@ -556,7 +556,7 @@ export const ChatMessage = memo(function ChatMessage({
                 </div>
               ) : (
                 <>
-                  <div className="prose dark:prose-invert prose-sm max-w-none">
+                  <div className="prose dark:prose-invert max-w-[85%]  text-brand-text prose-sm">
                     {renderedContent}
                   </div>
                   <div className="text-brand-primaryForeground/80 mt-1.5 text-xs">

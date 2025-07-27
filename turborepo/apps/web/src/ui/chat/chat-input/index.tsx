@@ -1,3 +1,4 @@
+// src/ui/chat/chat-input/index.tsx
 "use client";
 
 import { MessageInputBar } from "@/ui/chat/message-input-bar";
@@ -8,20 +9,18 @@ import type { User } from "next-auth";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useApiKeys } from "@/context/api-keys-context";
 
-
 interface ChatContentProps {
-  user?: User;
+  user: User;
+  conversationId?: string; // Add this prop
 }
 
-
-export function ChatContent({user}: ChatContentProps) {
-  const {
-    sendChat,
-    isConnected
-  } = useAiChat(user?.id);
+export function ChatContent({ user, conversationId }: ChatContentProps) {
+  const { sendChat, isConnected } = useAiChat(
+    user.id,
+    conversationId
+  );
   const { selectedModel } = useModelSelection();
-  const {apiKeys} = useApiKeys()
-
+  const { apiKeys } = useApiKeys();
 
   const handleSend = useCallback(
     (text: string) => {
@@ -35,16 +34,17 @@ export function ChatContent({user}: ChatContentProps) {
         selectedModel.provider,
         selectedModel.modelId as AllModelsUnion,
         hasConfigured,
-        isDefault
+        isDefault,
+        conversationId // Pass the conversation ID
       );
     },
-    [apiKeys, selectedModel, isConnected, sendChat]
+    [apiKeys, selectedModel, isConnected, sendChat, conversationId]
   );
 
   return (
     <MessageInputBar
       onSendMessageAction={handleSend}
-      placeholder={ `Message ${selectedModel.displayName}…`}
+      placeholder={`Message ${selectedModel.displayName}…`}
     />
   );
 }

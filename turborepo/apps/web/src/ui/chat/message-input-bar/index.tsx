@@ -25,14 +25,14 @@ export function MessageInputBar({
   placeholder?: string;
   className?: string;
 }) {
-  const { selectedModel } = useModelSelection();
+  const { selectedModel, openDrawer } = useModelSelection();
   const { data: session } = useSession();
   const { isConnected } = useAiChat(session?.user?.id);
   // Local state for the input
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showExpandButton, setShowExpandButton] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -145,7 +145,7 @@ export function MessageInputBar({
                    variant="ghost"
                    size="icon"
                    disabled={isSubmitting}
-                   onClick={() => setIsDrawerOpen(true)}
+                   onClick={openDrawer}
                    title={`Current model: ${selectedModel.displayName}`}
                    className="text-brand-text-muted hover:text-brand-text hover:bg-brand-sidebar h-8 w-8">
                    <CurrentIcon />
@@ -177,10 +177,7 @@ export function MessageInputBar({
         initialValue={message}
         onSubmit={handleFullscreenSubmit}
       />
-      <MobileModelSelectorDrawer
-        isOpen={isDrawerOpen}
-        onOpenChangeAction={setIsDrawerOpen}
-      />
+      <MobileModelSelectorDrawer />
     </>
   );
 }

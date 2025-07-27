@@ -9,7 +9,7 @@ import { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 
 const activeUserStreams = new Set<string>();
 
-export function useAiChat(userId?: string) {
+export function useAiChat(userId?: string, initialConversationId?: string) {
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const [streamedText, setStreamedText] = useState<string>("");
   const [title, setTitle] = useState<string | null>(null);
@@ -17,17 +17,27 @@ export function useAiChat(userId?: string) {
   const [error, setError] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [liveConversationId, setLiveConversationId] = useState<string | null>(
-    null
+    initialConversationId ?? null
   );
+  const [isWaitingForRealId, setIsWaitingForRealId] = useState<boolean>(false);
 
-  // Keep the “current” conversationId in a ref so we don’t force
+  // Keep the "current" conversationId in a ref so we don't force
   // sendChat to depend on it
-  const conversationIdRef = useRef<string | null>(null);
+  const conversationIdRef = useRef<string | null>(initialConversationId ?? null);
+
+  // Update the ref when initialConversationId changes (e.g., navigation)
+  useEffect(() => {
+    if (initialConversationId) {
+      conversationIdRef.current = initialConversationId;
+      setLiveConversationId(initialConversationId);
+    }
+  }, [initialConversationId]);
 
   // When the stream ends, allow a new sendChat for this user
   useEffect(() => {
     if (isComplete && userId) {
       activeUserStreams.delete(userId);
+      setIsWaitingForRealId(false); // Ensure flag is cleared
     }
   }, [isComplete, userId]);
 
@@ -36,8 +46,10 @@ export function useAiChat(userId?: string) {
     const onChunk: MessageHandler<"ai_chat_chunk"> = (evt) => {
       // capture the real ID once it arrives
       if (evt.conversationId && conversationIdRef.current !== evt.conversationId) {
+        console.log(`[useAiChat] Received real conversation ID: ${evt.conversationId} (was: ${conversationIdRef.current})`);
         conversationIdRef.current = evt.conversationId;
         setLiveConversationId(evt.conversationId);
+        setIsWaitingForRealId(false); // Clear the waiting flag
       }
       setTitle((t) => t ?? evt.title ?? null);
       setIsComplete(false);
@@ -51,12 +63,16 @@ export function useAiChat(userId?: string) {
     const onError: MessageHandler<"ai_chat_error"> = (evt) => {
       setError(evt.message);
       setIsComplete(true);
+      setIsWaitingForRealId(false); // Clear waiting flag on error
     };
 
     const onResponse: MessageHandler<"ai_chat_response"> = (evt) => {
       // you might prefer evt.chunk or streamedText here
       setMessages((ms) => [...ms, evt.chunk]);
       setIsComplete(evt.done);
+      if (evt.done) {
+        setIsWaitingForRealId(false); // Clear waiting flag when complete
+      }
     };
 
     client.on("ai_chat_chunk", onChunk);
@@ -72,14 +88,15 @@ export function useAiChat(userId?: string) {
     };
   }, [client]);
 
-  // 2️⃣ sendChat no longer re-creates when the conversationId changes
+  // 2️⃣ sendChat now accepts an optional conversationId parameter
   const sendChat = useCallback(
     (
       prompt: string,
       provider?: Provider,
       model?: AllModelsUnion,
       hasProviderConfigured?: boolean,
-      isDefaultProvider?: boolean
+      isDefaultProvider?: boolean,
+      conversationId?: string // Optional parameter to override the current conversation
     ) => {
       if (!userId) {
         console.warn("sendChat called without a userId.");
@@ -97,16 +114,33 @@ export function useAiChat(userId?: string) {
       setError(null);
       setIsComplete(false);
 
-      if (
-        !conversationIdRef.current ||
-        conversationIdRef.current === "new-chat"
-      ) {
-        conversationIdRef.current = "new-chat";
+      // Use the provided conversationId, or fall back to the ref, or default to "new-chat"
+      const effectiveConversationId = conversationId ?? conversationIdRef.current ?? "new-chat";
+
+      // CRITICAL: If we're already streaming a new-chat and receive another send with the same prompt,
+      // ignore it to prevent duplicates
+      if (effectiveConversationId === "new-chat" && (streamedText || isWaitingForRealId)) {
+        console.warn("Ignoring duplicate new-chat send while streaming is active or waiting for real ID");
+        activeUserStreams.delete(userId);
+        return;
       }
+
+      // Set waiting flag if this is a new-chat request
+      if (effectiveConversationId === "new-chat") {
+        setIsWaitingForRealId(true);
+      }
+
+      // Update the ref if a new conversationId was provided
+      if (conversationId && conversationId !== conversationIdRef.current) {
+        conversationIdRef.current = conversationId;
+        setLiveConversationId(conversationId);
+      }
+
+      console.log(`[useAiChat] Sending chat request with conversationId: ${effectiveConversationId}`);
 
       sendEvent("ai_chat_request", {
         type: "ai_chat_request",
-        conversationId: conversationIdRef.current,
+        conversationId: effectiveConversationId,
         prompt,
         provider: provider ?? "openai",
         model: getModel(
@@ -121,8 +155,14 @@ export function useAiChat(userId?: string) {
         topP: undefined
       });
     },
-    [sendEvent, userId]
+    [sendEvent, userId, streamedText, isWaitingForRealId]
   );
+
+  // 3️⃣ Add a method to manually update the conversation ID (useful for navigation)
+  const updateConversationId = useCallback((newConversationId: string) => {
+    conversationIdRef.current = newConversationId;
+    setLiveConversationId(newConversationId);
+  }, []);
 
   return {
     isConnected,
@@ -132,6 +172,8 @@ export function useAiChat(userId?: string) {
     messages,
     error,
     isComplete,
-    sendChat
+    sendChat,
+    updateConversationId,
+    isWaitingForRealId
   };
 }

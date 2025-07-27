@@ -1,65 +1,83 @@
-// app/chat/[conversationId]/ChatInterface.tsx
+// src/ui/chat/dynamic/experimental.tsx
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { User } from "next-auth";
+import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAiChat } from "@/hooks/use-ai-chat";
 import { ChatArea } from "@/ui/chat/chat-area";
-import { MessageInputBar } from "@/ui/chat/message-input-bar";
-import { User } from "next-auth";
-import type {
-  AllModelsUnion,
-  ClientContextWorkupProps
-} from "@t3-chat-clone/types";
+import type { AllModelsUnion } from "@t3-chat-clone/types";
 import { toPrismaFormat } from "@t3-chat-clone/types";
+import { useApiKeys } from "@/context/api-keys-context";
 
 interface ChatInterfaceProps {
-  conversationId: string;
-  initialPrompt?: string;
-  isNewChat: boolean;
-  user?: User;
-  conversationTitle?: string;
-  initialMessages?: UIMessage[];
-  apiKeys: ClientContextWorkupProps;
+  children: ReactNode;
+  initialMessages?: UIMessage[] | null;
+  conversationTitle?: string | null;
+  conversationId: string; // Make this required
+  user: User;
 }
 
 export function ChatInterface({
-  conversationId: initialConvId,
-  initialPrompt,
-  isNewChat,
-  apiKeys,
-  user,
-  initialMessages
+  children,
+  initialMessages,
+  conversationTitle: _conversationTitle,
+  conversationId: initialConversationId,
+  user
 }: ChatInterfaceProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const initialPrompt = searchParams.get("prompt");
   const { selectedModel } = useModelSelection();
   const {
     streamedText,
     isComplete,
     sendChat,
     isConnected,
-    conversationId: liveConvId
-  } = useAiChat(user?.id);
+    conversationId: liveConvId,
+    updateConversationId,
+    isWaitingForRealId
+  } = useAiChat(user.id, initialConversationId);
+  const { apiKeys } = useApiKeys();
 
-  const [convId, setConvId] = useState(initialConvId);
-  const streamingIdRef = useRef<string | null>(null);
-  const [messages, setMessages] = useState<UIMessage[]>([]);
+  const [convId, setConvId] = useState(initialConversationId);
+  const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
   const [isStreaming, setIsStreaming] = useState(false);
   const streamingRef = useRef<string | null>(null);
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
-  useEffect(() => {
-    if (!initialMessages) return;
-    setMessages(initialMessages);
-  }, [initialMessages]);
 
-  // 1️⃣ On first mount, if new‐chat + prompt, enqueue it exactly once
-
+  // Update messages when navigating between conversations
   useEffect(() => {
-    if (isNewChat && initialPrompt && !processedRef.current) {
+    const currentConvId = pathname.replace('/chat/', '') || 'new-chat';
+
+    // CRITICAL: Don't update if we're in the middle of transitioning from new-chat to real ID
+    if (currentConvId === 'new-chat' && (liveConvId && liveConvId !== 'new-chat' || isWaitingForRealId)) {
+      console.log('[ChatInterface] Ignoring navigation update during new-chat transition');
+      return;
+    }
+
+    if (currentConvId !== convId) {
+      setConvId(currentConvId);
+      updateConversationId(currentConvId); // Update the hook's conversation ID
+      // Messages will be updated by the server on navigation
+    }
+  }, [pathname, convId, updateConversationId, liveConvId, isWaitingForRealId]);
+
+  // Handle initial prompt for new chats
+  useEffect(() => {
+    if (initialConversationId === 'new-chat' && initialPrompt && !processedRef.current && isConnected) {
+      // Mark as processed IMMEDIATELY to prevent any duplicate sends
       processedRef.current = true;
+
+      // Set a flag to prevent any other sends until we get the real ID
       setIsAwaitingFirstChunk(true);
-      // 1a) Optimistic user message
+
+      // Add optimistic user message
       const userMsg: UIMessage = {
         id: `new-chat-${Date.now()}`,
         senderType: "USER",
@@ -68,65 +86,103 @@ export function ChatInterface({
         content: initialPrompt,
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: user?.id ?? null,
-        userKeyId: null
+        userId: user.id,
+        userKeyId: null,
+        conversationId: 'new-chat'
       };
+
       setMessages([userMsg]);
       setIsStreaming(true);
 
-      // 1d) Fire off to your AI
+      // Send to AI with the conversation ID - THIS ONLY HAPPENS ONCE
       const hasConfigured = apiKeys.isSet[selectedModel.provider];
       const isDefault = apiKeys.isDefault[selectedModel.provider];
+
+      console.log('[ChatInterface] Sending initial prompt with new-chat ID');
       sendChat(
         initialPrompt,
         selectedModel.provider,
         selectedModel.modelId as AllModelsUnion,
         hasConfigured,
-        isDefault
+        isDefault,
+        'new-chat' // Explicitly pass the conversation ID
       );
     }
-  }, [isNewChat, initialPrompt, selectedModel, sendChat, apiKeys, user]);
+  }, [
+    initialConversationId,
+    initialPrompt,
+    selectedModel,
+    sendChat,
+    apiKeys,
+    user,
+    isConnected
+  ]);
 
+  // Update URL using native history API when we get real conversation ID
   useEffect(() => {
-    if (liveConvId && liveConvId !== convId) {
+    if (liveConvId && liveConvId !== 'new-chat' && liveConvId !== convId) {
+      console.log('[ChatInterface] Received real conversation ID:', liveConvId);
+
+      // Use native history API to avoid navigation and React Router re-renders
+      // This is critical to prevent the stream from being interrupted
+      window.history.replaceState(
+        null,
+        '',
+        `/chat/${liveConvId}`
+      );
+
+      // Update local state to match
       setConvId(liveConvId);
-      setIsAwaitingFirstChunk(false);
-      window.history.replaceState(null, "", `/chat/${liveConvId}`);
-    }
-  }, [liveConvId, convId]);
+      updateConversationId(liveConvId); // Keep the hook in sync
 
-  useEffect(() => {
-    if (!streamedText || isAwaitingFirstChunk) return;
-    setIsStreaming(true);
-    if (streamingIdRef.current === null) {
-      setMessages(prev => {
-        if (!streamingRef.current) {
-          const id = `streaming-${convId}`;
-          streamingRef.current = id;
-          return [
-            ...prev,
-            {
-              id,
-              senderType: "AI",
-              provider: toPrismaFormat(selectedModel.provider),
-              model: selectedModel.modelId,
-              content: streamedText,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              userId: user?.id ?? null,
-              userKeyId: null
-            }
-          ];
-        }
-        return prev.map(m =>
-          m.id === streamingRef.current
-            ? { ...m, content: streamedText, updatedAt: new Date() }
-            : m
-        );
-      });
+      // Clear the awaiting flag since we now have the real ID
+      setIsAwaitingFirstChunk(false);
+
+      // Clear the processed ref to allow future new chats
+      // But NOT immediately - wait a bit to ensure no race conditions
+      setTimeout(() => {
+        processedRef.current = false;
+      }, 1000);
     }
+  }, [liveConvId, convId, updateConversationId]);
+
+  // Handle streaming text
+  useEffect(() => {
+    // Don't process streaming text until we have chunks coming in (not just waiting)
+    if (!streamedText || isAwaitingFirstChunk) return;
+
+    setIsStreaming(true);
+    setIsAwaitingFirstChunk(false); // Clear this flag once streaming starts
+
+    setMessages(prev => {
+      if (!streamingRef.current) {
+        const id = `streaming-${convId}`;
+        streamingRef.current = id;
+        return [
+          ...prev,
+          {
+            id,
+            senderType: "AI",
+            provider: toPrismaFormat(selectedModel.provider),
+            model: selectedModel.modelId,
+            content: streamedText,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userId: user.id,
+            userKeyId: null,
+            conversationId: convId
+          }
+        ];
+      }
+      return prev.map(m =>
+        m.id === streamingRef.current
+          ? { ...m, content: streamedText, updatedAt: new Date() }
+          : m
+      );
+    });
   }, [streamedText, convId, selectedModel, user, isAwaitingFirstChunk]);
 
+  // Handle completion
   useEffect(() => {
     if (isComplete) {
       setIsStreaming(false);
@@ -134,48 +190,12 @@ export function ChatInterface({
     }
   }, [isComplete]);
 
-  // regular message handler
-  const handleSend = useCallback(
-    (text: string) => {
-      if (!isConnected) return;
-      // optimistic user bubble
-      const um: UIMessage = {
-        id: `new-chat-${Date.now()}`,
-        senderType: "USER",
-        provider: toPrismaFormat(selectedModel.provider),
-        model: selectedModel.modelId,
-        content: text,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        userId: user?.id ?? "",
-        userKeyId: null
-      };
-      setMessages(p => [...p, um]);
-      setIsStreaming(true);
-      const hasConfigured = apiKeys.isSet[selectedModel.provider];
-      const isDefault = apiKeys.isDefault[selectedModel.provider];
-      sendChat(
-        text,
-        selectedModel.provider,
-        selectedModel.modelId as AllModelsUnion,
-        hasConfigured,
-        isDefault
-      );
-    },
-    [
-      apiKeys,
-      user,
-      selectedModel.modelId,
-      selectedModel.provider,
-      isConnected,
-      sendChat
-    ]
-  );
   const sorted = [...messages].sort(
     (a, b) => new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf()
   );
+
   return (
-    <div className="flex h-full flex-col">
+    <div className="mx-auto flex h-full max-w-4xl flex-col items-center justify-center">
       <ChatArea
         messages={sorted}
         streamedText={streamedText}
@@ -186,15 +206,7 @@ export function ChatInterface({
         conversationId={convId}
         user={user}
       />
-      <MessageInputBar
-        onSendMessageAction={handleSend}
-        disabled={isStreaming}
-        placeholder={
-          isStreaming || isAwaitingFirstChunk
-            ? "AI is responding…"
-            : `Message ${selectedModel.displayName}…`
-        }
-      />
+      {children}
     </div>
   );
 }

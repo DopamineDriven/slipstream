@@ -28,7 +28,7 @@ export function MessageInputBarHome({
 }) {
   const { selectedModel } = useModelSelection();
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [_isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [message, setMessage] = useState("");
   const [_showExpandButton, setShowExpandButton] = useState(false);
@@ -142,10 +142,7 @@ export function MessageInputBarHome({
         initialValue={message}
         onSubmit={handleFullscreenSubmit}
       />
-      <MobileModelSelectorDrawer
-        isOpen={isDrawerOpen}
-        onOpenChangeAction={setIsDrawerOpen}
-      />
+      <MobileModelSelectorDrawer/>
     </>
   );
 }
