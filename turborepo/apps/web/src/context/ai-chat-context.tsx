@@ -160,14 +160,14 @@ export function AIChatProvider({
     };
 
     // Subscribe to events with properly typed handlers
-    const unsubChunk = client.on("ai_chat_chunk", handleChunk);
-    const unsubError = client.on("ai_chat_error", handleError);
-    const unsubResponse = client.on("ai_chat_response", handleResponse);
+    client.on("ai_chat_chunk", handleChunk);
+    client.on("ai_chat_error", handleError);
+    client.on("ai_chat_response", handleResponse);
 
     return () => {
-      unsubChunk();
-      unsubError();
-      unsubResponse();
+      client.off("ai_chat_chunk")
+      client.off("ai_chat_error");
+      client.off("ai_chat_response");
     };
   }, [client, streamedText, userId, isWaitingForRealId, selectedModel]);
 
