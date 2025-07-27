@@ -36,9 +36,8 @@ export function ProviderModelSelector({
   className,
   variant = "button",
 }: ProviderModelSelectorProps) {
-  const { selectedModel, updateProvider, updateModel } = useModelSelection();
-
-  const allProviders = React.useMemo(() => getAllProviders(), []);
+  const { selectedModel, updateProvider, updateModel, providers, openDrawer } = useModelSelection();
+  
   const availableModels = getModelsForProvider(selectedModel.provider);
   const currentMeta = providerMetadata[selectedModel.provider];
 
@@ -124,7 +123,7 @@ export function ProviderModelSelector({
             </div>
           </SelectTrigger>
           <SelectContent className="bg-brand-component border-brand-border">
-            {allProviders.map((prov) => {
+            {providers.map((prov) => {
               const Icon = providerMetadata[prov].icon;
               return (
                 <SelectItem key={prov} value={prov}>

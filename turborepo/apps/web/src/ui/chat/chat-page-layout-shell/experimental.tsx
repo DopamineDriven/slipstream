@@ -3,13 +3,14 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { usePlatformDetection } from "@/hooks/use-platform-detection";
 import {
   Sidebar,
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "@/ui/atoms/sidebar";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { ProviderModelSelector } from "@/ui/model-selector-drawer";
@@ -34,10 +35,8 @@ interface ChatLayoutShellProps {
 }
 
 function HeaderActions({
-  handleShareChat,
   setIsSettingsDrawerOpen
 }: {
-  handleShareChat: () => void;
   setIsSettingsDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { resolvedTheme } = useTheme();
@@ -61,6 +60,12 @@ function HeaderActions({
       }
     }
   }, [resolvedTheme]);
+
+  const handleShareChat = useCallback(() => {
+    console.log("Share chat clicked. Implement sharing logic.");
+    alert("Share functionality to be implemented!");
+  }, []);
+
   return (
     <div className="flex items-center space-x-1 sm:space-x-2">
       <Button
@@ -86,17 +91,14 @@ function HeaderActions({
 
 export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
 
-  const [isMobileModelSelectorOpen, setIsMobileModelSelectorOpen] =
-    useState(false);
-  const handleOpenMobileModelSelector = useCallback(() => {
-    if (isMobileModelSelectorOpen === false) setIsMobileModelSelectorOpen(true);
-  }, [isMobileModelSelectorOpen]);
-  const { isMac } = usePlatformDetection();
+  const { get } = useCookiesCtx();
 
-  const keyboardShortcutsMemo = useMemo(
-    () => [
+  const keyboardShortcutsMemo = useMemo(() => {
+    const isMac = get("isMac") === "true";
+    return [
       {
         key: "s",
         ctrlKey: !isMac,
@@ -105,32 +107,11 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
         callback: () => setIsSidebarOpen(!isSidebarOpen),
         description: "Toggle sidebar"
       }
-    ],
-    [isMac, isSidebarOpen]
-  );
+    ];
+  }, [get, isSidebarOpen]);
 
   useKeyboardShortcuts(keyboardShortcutsMemo);
-
-  // Auto-open sidebar on desktop mount
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
-    setIsSidebarOpen(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsSidebarOpen(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  const handleShareChat = useCallback(() => {
-    console.log("Share chat clicked. Implement sharing logic.");
-    alert("Share functionality to be implemented!");
-  }, []);
-
-  // Shared header actions component
-
+  const { isMobile } = useSidebar();
   return (
     <>
       <SidebarProvider>
@@ -147,20 +128,13 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>
                   <Separator orientation="vertical" className="mx-2 h-6" />
-                  <h1 className="text-lg font-semibold">Chat</h1>
-                </div>
-                <div className="flex items-center">
-                  <SidebarTrigger className="-ml-2">
-                    <PanelLeft className="size-5" />
-                    <span className="sr-only">Toggle Sidebar</span>
-                  </SidebarTrigger>
-                  <Separator orientation="vertical" className="mx-2 h-6" />
-                  <ProviderModelSelector
-                    onClick={handleOpenMobileModelSelector}
-                  />
+                  {isMobile ? (
+                    <ProviderModelSelector />
+                  ) : (
+                    <h2 className="text-lg font-semibold">Chat</h2>
+                  )}
                 </div>
                 <HeaderActions
-                  handleShareChat={handleShareChat}
                   setIsSettingsDrawerOpen={setIsSettingsDrawerOpen}
                 />
               </header>
@@ -169,13 +143,10 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
           </SidebarInset>
         </div>
       </SidebarProvider>
+      <MobileModelSelectorDrawer />
       <SettingsDrawer
         isOpen={isSettingsDrawerOpen}
         onOpenChange={setIsSettingsDrawerOpen}
-      />
-      <MobileModelSelectorDrawer
-        isOpen={isMobileModelSelectorOpen}
-        onOpenChangeAction={setIsMobileModelSelectorOpen}
       />
     </>
   );

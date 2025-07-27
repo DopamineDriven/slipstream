@@ -268,10 +268,7 @@ export function ChatEmptyState() {
         initialValue={message}
         onSubmit={handleFullScreenSubmit}
       />
-      <MobileModelSelectorDrawer
-        isOpen={_isDrawerOpen}
-        onOpenChangeAction={setIsDrawerOpen}
-      />
+      <MobileModelSelectorDrawer />
     </div>
   );
 }

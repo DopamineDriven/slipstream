@@ -2,35 +2,55 @@
 
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
   ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
 } from "react";
-import { ModelSelection, defaultModelSelection } from "@/lib/models";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
-import type { Provider, AllModelsUnion } from "@t3-chat-clone/types";
+import { defaultModelSelection, ModelSelection } from "@/lib/models";
+import type { AllModelsUnion, Provider } from "@t3-chat-clone/types";
+import {
+  displayNameToModelId,
+  getModelIdByDisplayName,
+  getAllProviders
+} from "@t3-chat-clone/types";
 
-interface Context {
+interface ModelSelectionContextType {
   selectedModel: ModelSelection;
+  isDrawerOpen: boolean;
+  providers: readonly ["anthropic", "gemini", "grok", "openai"]
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;
   updateModel: (name: string, id: AllModelsUnion) => void;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  handleModelSelect: <const V extends Provider>(
+    provider: V,
+    displayName: keyof (typeof displayNameToModelId)[V]
+  ) => void;
 }
 
 const STORAGE_KEY = "selected-ai-model";
-const ModelSelectionContext = createContext<Context | undefined>(undefined);
+
+const ModelSelectionContext = createContext<
+  | { [P in keyof ModelSelectionContextType]: ModelSelectionContextType[P] }
+  | undefined
+>(undefined);
 
 export function ModelSelectionProvider({ children }: { children: ReactNode }) {
   const { lastEvent } = useChatWebSocketContext();
 
-  // 1. Safe default so SSR/client hydration always matches
+  // Safe default so SSR/client hydration always matches
   const [selectedModel, setSelectedModel] = useState<ModelSelection>(
     defaultModelSelection
   );
+  // Add drawer state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // 2. Load from localStorage exactly once, after mount
+  // Load from localStorage exactly once, after mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -42,7 +62,7 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // 3. Persist whenever it changes
+  // Persist whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedModel));
@@ -51,32 +71,61 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedModel]);
 
-  // 4. Keep your WebSocket-based reactions separate
+  // Keep WebSocket-based reactions separate
   useEffect(() => {
     if (!lastEvent) return;
     if (lastEvent.type === "ai_chat_error") {
-      // maybe reset model?
+      // reset model on error
       setSelectedModel(defaultModelSelection);
     }
-    // …etc.
+    // etc.
   }, [lastEvent]);
 
-  // 5. Simple updater callbacks
+  // Simple updater callbacks
   const updateProvider = useCallback((provider: Provider) => {
-    setSelectedModel((m) => ({ ...m, provider }));
+    setSelectedModel(m => ({ ...m, provider }));
   }, []);
 
   const updateModel = useCallback(
     (displayName: string, modelId: AllModelsUnion) => {
-      setSelectedModel((m) => ({ ...m, displayName, modelId }));
+      setSelectedModel(m => ({ ...m, displayName, modelId }));
     },
     []
   );
 
+  // Drawer control methods
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+
+  // combined model selection handler
+  const handleModelSelect = useCallback(
+    <const V extends Provider>(
+      provider: V,
+      displayName: keyof (typeof displayNameToModelId)[V]
+    ) => {
+      const modelId = getModelIdByDisplayName(provider, displayName);
+      updateProvider(provider);
+      updateModel(displayName as string, modelId as AllModelsUnion);
+      closeDrawer();
+    },
+    [closeDrawer, updateModel, updateProvider]
+  );
+
+  const providers = useMemo(() => getAllProviders(),[]);
+
   return (
     <ModelSelectionContext.Provider
-      value={{ selectedModel, setSelectedModel, updateProvider, updateModel }}
-    >
+      value={{
+        selectedModel,
+        isDrawerOpen,
+        providers,
+        setSelectedModel,
+        updateProvider,
+        updateModel,
+        openDrawer,
+        closeDrawer,
+        handleModelSelect
+      }}>
       {children}
     </ModelSelectionContext.Provider>
   );
