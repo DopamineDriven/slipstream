@@ -28,7 +28,7 @@ export function NativeTruncatedText({ text, className, baseChars = 20, maxExtraC
   return (
     <span
       ref={ref}
-      className={cn("block w-full font-mono truncate", className)}
+      className={cn("block w-full truncate", className)}
       style={{ maxWidth: `${chars}ch` }}
       title={isTruncated ? text : undefined} // Native browser tooltip
     >

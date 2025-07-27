@@ -84,6 +84,7 @@ export {
   AlertDialogCancel
 } from "@/ui/alert-dialog";
 export type { AlertDialogProps } from "@/ui/alert-dialog";
+export { AspectRatio } from "@/ui/aspect-ratio";
 export { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 export type { AvatarProps } from "@/ui/avatar";
 export { Badge, badgeVariants } from "@/ui/badge";
@@ -99,6 +100,7 @@ export {
   CardDescription,
   CardContent
 } from "@/ui/card";
+export { Checkbox } from "@/ui/checkbox";
 export {
   Dialog,
   DialogPortal,
@@ -162,12 +164,15 @@ export {
   SheetTrigger
 } from "@/ui/sheet";
 export { Skeleton } from "@/ui/skeleton";
+export { Slider } from "@/ui/slider";
 export { Switch } from "@/ui/switch";
 export type { SwitchProps } from "@/ui/switch";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 export type { TabsProps } from "@/ui/tabs";
 export { Textarea } from "@/ui/textarea";
 export type { TextareaProps } from "@/ui/textarea";
+export { Toggle, toggleVariants } from "@/ui/toggle";
+export type { ToggleProps } from "@/ui/toggle";
 export {
   Tooltip,
   TooltipContent,

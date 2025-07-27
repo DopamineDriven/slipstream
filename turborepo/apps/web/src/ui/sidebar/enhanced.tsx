@@ -39,12 +39,8 @@ interface EnhancedSidebarProps {
 export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
-  const {
-    conversations,
-    updateCache,
-    deleteConversation,
-    updateTitle
-  } = useConversations(userId);
+  const { conversations, updateCache, deleteConversation, updateTitle } =
+    useConversations(userId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -54,11 +50,13 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
 
   const pathname = usePathname();
   const router = useRouter();
-  const { state: sidebarState, isMobile } = useSidebar();
+  const { state: sidebarState, isMobile, setOpen } = useSidebar();
   const effectiveState = isMobile ? "expanded" : sidebarState;
   // Ref for virtual scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -159,23 +157,43 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     estimateSize: () => 68, // Estimated height of each conversation item
     overscan: 5
   });
+  const handleSearchClick = () => {
+    if (effectiveState === "collapsed") {
+      // Clear any existing timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      setOpen(true);
+      // Focus the input after sidebar opens
+      searchTimeoutRef.current = setTimeout(() => {
+        searchInputRef.current?.focus();
+        searchTimeoutRef.current = null;
+      }, 200); // Small delay to allow sidebar animation
+    }
+  };
+
+  useEffect(() => {
+    const searchTimeoutRefInner = searchTimeoutRef.current;
+    return () => {
+      if (searchTimeoutRefInner) {
+        clearTimeout(searchTimeoutRefInner);
+      }
+    };
+  }, []);
+
   if (status === "loading") return <SidebarSkeleton />;
   if (status === "unauthenticated" || !session?.user?.id) {
     redirect("/api/auth/signin");
   }
   return (
-    <motion.div
-      initial={{ x: -300 }}
-      animate={{ x: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+    <div
       className={cn(
-        `bg-sidebar text-sidebar-foreground border-sidebar-border flex h-full flex-col border-r transition-all`,
-        effectiveState === "collapsed"
-          ? "w-14 items-center space-y-2 p-2"
-          : "w-80 space-y-4 p-4",
+        "bg-background flex h-full flex-col transition-all duration-200",
+        effectiveState === "collapsed" ? "w-14 items-center p-2" : "w-80 p-4",
         className
       )}>
-      <Link href="/" className="appearance-none">
+      <Link href="/" className="mb-4 appearance-none">
         <div
           className={cn(
             "flex items-center py-0.5",
@@ -186,10 +204,10 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
           <div className="flex items-center">
             <Logo
               className={cn(
-                "text-sidebar-foreground",
+                "text-foreground",
                 effectiveState === "collapsed" ? "size-10" : "size-12"
               )}
-            />{" "}
+            />
             <span
               className={cn(
                 "ml-2 font-semibold",
@@ -221,25 +239,41 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
         </Button>
       </Link>
 
-      <div
-        className={cn("relative", effectiveState === "collapsed" && "hidden")}>
-        <Search className="text-sidebar-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-        <Input
-          type="search"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="bg-sidebar border-sidebar-border focus:ring-sidebar-ring text-sidebar-foreground placeholder:text-sidebar-accent-foreground pr-3 pl-10 text-sm"
-        />
-      </div>
+      {effectiveState === "collapsed" ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-foreground mb-4 h-10 w-10"
+          onClick={handleSearchClick}
+          title="Search conversations">
+          <Search className="h-4 w-4" />
+          <span className="sr-only">Search conversations</span>
+        </Button>
+      ) : (
+        <div className="relative mb-4">
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Input
+            ref={searchInputRef}
+            type="search"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pr-3 pl-10 text-sm"
+          />
+        </div>
+      )}
 
-      <div className="flex-1 overflow-hidden">
+      <div
+        className={cn(
+          "flex-1 overflow-hidden",
+          effectiveState === "collapsed" && "hidden"
+        )}>
         {filteredConversations && filteredConversations.length > 0 && (
           <div className="mb-2 flex items-center justify-between px-2 py-1">
-            <h3 className="text-sidebar-accent-foreground text-xs font-medium tracking-wider uppercase">
+            <h3 className="text-accent-foreground text-xs font-medium tracking-wider uppercase">
               Recent
             </h3>
-            <span className="text-sidebar-accent-foreground text-xs">
+            <span className="text-accent-foreground text-xs">
               {filteredConversations.length} conversations
             </span>
           </div>
@@ -272,10 +306,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
                       height: `${virtualItem.size}px`,
                       transform: `translateY(${virtualItem.start}px)`
                     }}>
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="group relative pb-2">
+                    <motion.div className="group relative pb-2">
                       {editingId === thread.id ? (
                         <div className="flex items-center gap-2 px-3 py-2">
                           <Input
@@ -379,11 +410,11 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
           ) : (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <EmptyChatHistory className="text-sidebar-accent-foreground mx-auto size-12" />
-                <h3 className="text-sidebar-accent-foreground mt-1 text-sm font-semibold">
+                <EmptyChatHistory className="text-accent-foreground mx-auto size-12" />
+                <h3 className="text-accent-foreground mt-1 text-sm font-semibold">
                   {searchQuery ? "No matching chats" : "Empty Chat History"}
                 </h3>
-                <p className="text-sidebar-accent-foreground/80 mt-1 text-sm">
+                <p className="text-accent-foreground/80 mt-1 text-sm">
                   {searchQuery
                     ? "Try a different search term"
                     : "Get started by creating a new chat."}
@@ -394,6 +425,6 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
         </div>
       </div>
       <SidebarDropdownMenu user={session?.user} />
-    </motion.div>
+    </div>
   );
 }

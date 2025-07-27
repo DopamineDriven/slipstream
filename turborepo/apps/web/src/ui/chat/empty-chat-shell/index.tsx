@@ -57,8 +57,7 @@ export function ChatEmptyState() {
   const router = useRouter();
   const { data: session } = useSession();
   const { isConnected } = useAiChat(session?.user?.id);
-  const { selectedModel } = useModelSelection();
-  const [_isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { selectedModel, openDrawer } = useModelSelection();
   // Local state for the input
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -237,7 +236,7 @@ export function ChatEmptyState() {
                 variant="ghost"
                 size="icon"
                 disabled={isSubmitting}
-                onClick={() => setIsDrawerOpen(true)}
+                onClick={openDrawer}
                 title={`Current model: ${selectedModel.displayName}`}
                 className="text-brand-text-muted hover:text-brand-text hover:bg-brand-sidebar h-8 w-8">
                 <CurrentIcon />
@@ -268,10 +267,7 @@ export function ChatEmptyState() {
         initialValue={message}
         onSubmit={handleFullScreenSubmit}
       />
-      <MobileModelSelectorDrawer
-        isOpen={_isDrawerOpen}
-        onOpenChangeAction={setIsDrawerOpen}
-      />
+      <MobileModelSelectorDrawer />
     </div>
   );
 }

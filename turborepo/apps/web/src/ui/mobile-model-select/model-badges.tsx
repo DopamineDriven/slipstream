@@ -38,7 +38,7 @@ export function ModelUI<const T extends Provider>({
         )}
       </div>
       {isSelected && (
-        <Check className="text-brand-primaryForeground ml-3 h-5 w-5 flex-shrink-0" />
+        <Check className="text-brand-primary-foreground ml-3 h-5 w-5 flex-shrink-0" />
       )}
     </div>
   );
