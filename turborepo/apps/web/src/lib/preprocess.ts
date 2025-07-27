@@ -63,7 +63,7 @@ export function detectCodeLanguage(code: string) {
     }
   }
 
-  const trimmed = code.trim(""); // JSON
+  const trimmed = code.trim(); // JSON
   // eslint-disable-next-line no-useless-escape
   if (/^[{\[].*[}\]]$/s.test(trimmed)) {
     try {
