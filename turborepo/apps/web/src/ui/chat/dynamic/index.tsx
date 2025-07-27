@@ -53,24 +53,41 @@ export function ChatInterface({
 
   // Update messages when navigating between conversations
   useEffect(() => {
-    const currentConvId = pathname.replace('/chat/', '') || 'new-chat';
+     const workup = pathname.replace("/chat/", "");
+    const currentPathConvId = !workup.startsWith("new-chat") ? workup : 'new-chat';
 
-    // CRITICAL: Don't update if we're in the middle of transitioning from new-chat to real ID
-    if (currentConvId === 'new-chat' && (liveConvId && liveConvId !== 'new-chat' || isWaitingForRealId)) {
-      console.log('[ChatInterface] Ignoring navigation update during new-chat transition');
+    // If the conversation ID in the URL matches our current state, do nothing
+    if (currentPathConvId === convId) {
       return;
     }
 
-    if (currentConvId !== convId) {
-      setConvId(currentConvId);
-      updateConversationId(currentConvId); // Update the hook's conversation ID
-      // Messages will be updated by the server on navigation
+    // If we're waiting for a real ID and the path still shows new-chat, don't update
+    if (currentPathConvId === 'new-chat' && isWaitingForRealId) {
+      console.log('[ChatInterface] Skipping update while waiting for real conversation ID');
+      return;
     }
-  }, [pathname, convId, updateConversationId, liveConvId, isWaitingForRealId]);
+
+    // Only update if there's an actual mismatch that needs to be resolved
+    console.log(`[ChatInterface] Navigation detected: ${convId} -> ${currentPathConvId}`);
+    setConvId(currentPathConvId);
+    updateConversationId(currentPathConvId);
+
+    // Reset flags when navigating to a different conversation
+    setIsAwaitingFirstChunk(false);
+    setIsStreaming(false);
+    processedRef.current = false;
+  }, [pathname, convId, updateConversationId, isWaitingForRealId]);
 
   // Handle initial prompt for new chats
   useEffect(() => {
-    if (initialConversationId === 'new-chat' && initialPrompt && !processedRef.current && isConnected) {
+    // Only process if all conditions are met
+    if (
+      initialConversationId === 'new-chat' &&
+      initialPrompt &&
+      !processedRef.current &&
+      isConnected &&
+      !isWaitingForRealId // Add this check to prevent duplicate processing
+    ) {
       // Mark as processed IMMEDIATELY to prevent any duplicate sends
       processedRef.current = true;
 
@@ -115,48 +132,65 @@ export function ChatInterface({
     sendChat,
     apiKeys,
     user,
-    isConnected
+    isConnected,
+    isWaitingForRealId
   ]);
 
   // Update URL using native history API when we get real conversation ID
   useEffect(() => {
-    if (liveConvId && liveConvId !== 'new-chat' && liveConvId !== convId) {
-      console.log('[ChatInterface] Received real conversation ID:', liveConvId);
+    if (liveConvId && liveConvId !== 'new-chat') {
+      // Check if URL already has the correct conversation ID
+      const currentPathConvId = pathname.split('/chat/')[1];
 
-      // Use native history API to avoid navigation and React Router re-renders
-      // This is critical to prevent the stream from being interrupted
-      window.history.replaceState(
-        null,
-        '',
-        `/chat/${liveConvId}`
-      );
+      if (currentPathConvId === liveConvId) {
+        // URL is already correct, no need to update
+        console.log(`[ChatInterface] URL already has correct conversation ID: ${liveConvId}`);
+        return;
+      }
+
+      console.log(`[ChatInterface] Updating URL from ${currentPathConvId} to ${liveConvId}`);
+
+      // Use setTimeout to ensure we're not in a render cycle
+      setTimeout(() => {
+        window.history.replaceState(
+          null,
+          '',
+          `/chat/${liveConvId}`
+        );
+      }, 0);
 
       // Update local state to match
       setConvId(liveConvId);
-      updateConversationId(liveConvId); // Keep the hook in sync
+      updateConversationId(liveConvId);
 
       // Clear the awaiting flag since we now have the real ID
       setIsAwaitingFirstChunk(false);
 
       // Clear the processed ref to allow future new chats
-      // But NOT immediately - wait a bit to ensure no race conditions
       setTimeout(() => {
         processedRef.current = false;
       }, 1000);
     }
-  }, [liveConvId, convId, updateConversationId]);
+  }, [liveConvId, pathname, updateConversationId]);
 
   // Handle streaming text
   useEffect(() => {
-    // Don't process streaming text until we have chunks coming in (not just waiting)
-    if (!streamedText || isAwaitingFirstChunk) return;
+    // Don't process streaming text until we have chunks coming in
+    if (!streamedText) return;
+
+    // Once we have streaming text, we're no longer awaiting the first chunk
+    if (isAwaitingFirstChunk) {
+      setIsAwaitingFirstChunk(false);
+    }
 
     setIsStreaming(true);
-    setIsAwaitingFirstChunk(false); // Clear this flag once streaming starts
 
     setMessages(prev => {
+      // Ensure we have a valid conversation ID
+      const currentConvId = convId || 'new-chat';
+
       if (!streamingRef.current) {
-        const id = `streaming-${convId}`;
+        const id = `streaming-${currentConvId}`;
         streamingRef.current = id;
         return [
           ...prev,
@@ -170,7 +204,7 @@ export function ChatInterface({
             updatedAt: new Date(),
             userId: user.id,
             userKeyId: null,
-            conversationId: convId
+            conversationId: currentConvId
           }
         ];
       }
@@ -195,7 +229,7 @@ export function ChatInterface({
   );
 
   return (
-    <div className="mx-auto flex h-full max-w-4xl flex-col items-center justify-center">
+    <div className="flex h-full flex-col">
       <ChatArea
         messages={sorted}
         streamedText={streamedText}
@@ -210,3 +244,7 @@ export function ChatInterface({
     </div>
   );
 }
+/**
+     const workup = pathname.replace("/chat/", "");
+    const currentConvId = !workup.startsWith("new-chat") ? workup : 'new-chat';
+ */
