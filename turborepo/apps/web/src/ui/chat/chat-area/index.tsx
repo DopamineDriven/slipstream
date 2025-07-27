@@ -1,38 +1,34 @@
+// src/ui/chat/chat-area/index.tsx
 "use client";
 
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ChatMessage } from "@/ui/chat/chat-message";
 import { motion } from "motion/react";
-import type { Provider } from "@t3-chat-clone/types";
-import { toPrismaFormat } from "@t3-chat-clone/types";
 
 interface ChatAreaProps {
-  messages?: UIMessage[];
+  messages: UIMessage[];
   streamedText?: string;
   isStreaming?: boolean;
-  model: string | null;
-  provider: Provider;
-  conversationId: string;
-  onUpdateMessage?: (messageId: string, newText: string) => void;
-  user: User;
-  className?: string;
   isAwaitingFirstChunk?: boolean;
+  model: string;
+  provider: string;
+  conversationId: string;
+  user: User;
+  onUpdateMessage?: (messageId: string, newText: string) => void;
+  className?: string;
 }
 
 export const ChatArea = memo(function ChatArea({
   messages = [],
   streamedText = "",
   isStreaming = false,
+  isAwaitingFirstChunk = false,
   onUpdateMessage,
-  model,
   user,
-  conversationId,
-  provider,
-  className = "",
-  isAwaitingFirstChunk = false
+  className = ""
 }: ChatAreaProps) {
   const endRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
@@ -56,41 +52,14 @@ export const ChatArea = memo(function ChatArea({
 
   // Auto-scroll to bottom when new messages arrive or streaming updates
   useEffect(() => {
-    // Only auto-scroll if user is at bottom
     if (!shouldAutoScrollRef.current) return;
 
-    // Use smooth scrolling for new messages, instant for streaming
     const behavior =
       messages.length > lastMessageCountRef.current ? "smooth" : "auto";
     lastMessageCountRef.current = messages.length;
 
     endRef.current?.scrollIntoView({ behavior });
   }, [messages.length, streamedText]);
-
-  // Create streaming message only when we have streaming text
-  const streamingMessage = useMemo(() => {
-    if (!streamedText || isAwaitingFirstChunk) return null;
-
-    return {
-      id: `streaming-${conversationId}`,
-      senderType: "AI" as const,
-      content: streamedText,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      conversationId: conversationId ?? "new-chat",
-      model: model ?? "unknown",
-      provider: toPrismaFormat(provider),
-      userId: user?.id ?? null,
-      userKeyId: null
-    } satisfies UIMessage;
-  }, [
-    streamedText,
-    isAwaitingFirstChunk,
-    conversationId,
-    model,
-    provider,
-    user?.id
-  ]);
 
   return (
     <ScrollArea
@@ -101,25 +70,17 @@ export const ChatArea = memo(function ChatArea({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.1 }}>
-        {/* Render all persisted messages */}
+
+        {/* Render all messages */}
         {messages.map(msg => (
           <ChatMessage
             key={msg.id}
             message={msg}
             user={user}
             onUpdateMessage={onUpdateMessage}
+            isStreaming={isStreaming && msg.id.startsWith('streaming-')}
           />
         ))}
-
-        {/* Render streaming message if exists */}
-        {streamingMessage && (
-          <ChatMessage
-            key="streaming"
-            message={streamingMessage}
-            user={user}
-            isStreaming={isStreaming}
-          />
-        )}
 
         {/* Loading indicator when awaiting first chunk */}
         {isAwaitingFirstChunk && !streamedText && (

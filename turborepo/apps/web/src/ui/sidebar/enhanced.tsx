@@ -4,7 +4,6 @@ import type { SidebarProps } from "@/types/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
-import { useAiChat } from "@/hooks/use-ai-chat";
 import { useConversations } from "@/hooks/use-conversations";
 import { cn } from "@/lib/utils";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
@@ -31,6 +30,7 @@ import {
   X
 } from "@t3-chat-clone/ui";
 import { SidebarSkeleton } from "./skeleton";
+import { useAIChatContext } from "@/context/ai-chat-context";
 
 interface EnhancedSidebarProps {
   className?: string;
@@ -67,8 +67,8 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
   }, [searchQuery]);
 
   // Listen for new conversations from the active chat
-  const { conversationId: activeConversationId, title: activeTitle } =
-    useAiChat(userId);
+  const { activeConversationId, title: activeTitle } =
+    useAIChatContext()
 
   useEffect(() => {
     if (!activeConversationId || activeConversationId === "new-chat") return;

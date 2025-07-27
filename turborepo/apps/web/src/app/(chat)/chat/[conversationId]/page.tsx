@@ -7,6 +7,7 @@ import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatContent } from "@/ui/chat/chat-input";
 import { ChatInterface } from "@/ui/chat/dynamic";
+import { after } from "next/server";
 import type { InferGSPRT } from "@t3-chat-clone/types";
 
 // Create once at module level
@@ -57,6 +58,11 @@ export default async function ChatPage({
       conversationTitle = data.title;
     }
   }
+
+  after(()=>{
+    console.log("[after]: "+conversationId);
+  })
+
   return (
     <Suspense
       fallback={

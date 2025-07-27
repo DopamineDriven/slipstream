@@ -1,250 +1,175 @@
-// src/ui/chat/dynamic/experimental.tsx
 "use client";
 
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import { useAiChat } from "@/hooks/use-ai-chat";
+import { createUserMessage, createAIMessage, finalizeStreamingMessage } from "@/lib/ui-message-helpers";
 import { ChatArea } from "@/ui/chat/chat-area";
-import type { AllModelsUnion } from "@t3-chat-clone/types";
-import { toPrismaFormat } from "@t3-chat-clone/types";
-import { useApiKeys } from "@/context/api-keys-context";
 
 interface ChatInterfaceProps {
   children: ReactNode;
   initialMessages?: UIMessage[] | null;
   conversationTitle?: string | null;
-  conversationId: string; // Make this required
+  conversationId: string;
   user: User;
 }
 
 export function ChatInterface({
   children,
   initialMessages,
-  conversationTitle: _conversationTitle,
-  conversationId: initialConversationId,
+  conversationId: routeConversationId,
   user
 }: ChatInterfaceProps) {
-  const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
-
   const initialPrompt = searchParams.get("prompt");
-  const { selectedModel } = useModelSelection();
+
   const {
+    activeConversationId,
     streamedText,
+    isStreaming,
     isComplete,
     sendChat,
-    isConnected,
-    conversationId: liveConvId,
-    updateConversationId,
-    isWaitingForRealId
-  } = useAiChat(user.id, initialConversationId);
-  const { apiKeys } = useApiKeys();
+    setActiveConversation,
+    isWaitingForRealId,
+    resetStreamingState
+  } = useAIChatContext();
 
-  const [convId, setConvId] = useState(initialConversationId);
+  const { selectedModel } = useModelSelection();
+
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const streamingRef = useRef<string | null>(null);
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
 
-  // Update messages when navigating between conversations
+  // CRITICAL: Set the active conversation when component mounts or route changes
   useEffect(() => {
-     const workup = pathname.replace("/chat/", "");
-    const currentPathConvId = !workup.startsWith("new-chat") ? workup : 'new-chat';
+    console.log(`[ChatInterface] Route conversation ID: ${routeConversationId}`);
+    setActiveConversation(routeConversationId);
+  }, [routeConversationId, setActiveConversation]);
 
-    // If the conversation ID in the URL matches our current state, do nothing
-    if (currentPathConvId === convId) {
-      return;
+  // Handle URL updates when getting real conversation ID
+  useEffect(() => {
+    if (activeConversationId &&
+        activeConversationId !== 'new-chat' &&
+        activeConversationId !== routeConversationId) {
+      console.log(`[ChatInterface] Updating URL to real conversation ID: ${activeConversationId}`);
+      router.replace(`/chat/${activeConversationId}`);
     }
-
-    // If we're waiting for a real ID and the path still shows new-chat, don't update
-    if (currentPathConvId === 'new-chat' && isWaitingForRealId) {
-      console.log('[ChatInterface] Skipping update while waiting for real conversation ID');
-      return;
-    }
-
-    // Only update if there's an actual mismatch that needs to be resolved
-    console.log(`[ChatInterface] Navigation detected: ${convId} -> ${currentPathConvId}`);
-    setConvId(currentPathConvId);
-    updateConversationId(currentPathConvId);
-
-    // Reset flags when navigating to a different conversation
-    setIsAwaitingFirstChunk(false);
-    setIsStreaming(false);
-    processedRef.current = false;
-  }, [pathname, convId, updateConversationId, isWaitingForRealId]);
+  }, [activeConversationId, routeConversationId, router]);
 
   // Handle initial prompt for new chats
   useEffect(() => {
-    // Only process if all conditions are met
-    if (
-      initialConversationId === 'new-chat' &&
-      initialPrompt &&
-      !processedRef.current &&
-      isConnected &&
-      !isWaitingForRealId // Add this check to prevent duplicate processing
-    ) {
-      // Mark as processed IMMEDIATELY to prevent any duplicate sends
-      processedRef.current = true;
+    if (routeConversationId === 'new-chat' &&
+        initialPrompt &&
+        !processedRef.current &&
+        !isWaitingForRealId) {
 
-      // Set a flag to prevent any other sends until we get the real ID
+      processedRef.current = true;
       setIsAwaitingFirstChunk(true);
 
       // Add optimistic user message
-      const userMsg: UIMessage = {
-        id: `new-chat-${Date.now()}`,
-        senderType: "USER",
-        provider: toPrismaFormat(selectedModel.provider),
-        model: selectedModel.modelId,
+      const userMsg = createUserMessage({
+        id: `new-chat-user-${Date.now()}`,
         content: initialPrompt,
-        createdAt: new Date(),
-        updatedAt: new Date(),
         userId: user.id,
-        userKeyId: null,
+        provider: selectedModel.provider,
+        model: selectedModel.modelId,
         conversationId: 'new-chat'
-      };
+      });
 
       setMessages([userMsg]);
-      setIsStreaming(true);
 
-      // Send to AI with the conversation ID - THIS ONLY HAPPENS ONCE
-      const hasConfigured = apiKeys.isSet[selectedModel.provider];
-      const isDefault = apiKeys.isDefault[selectedModel.provider];
-
-      console.log('[ChatInterface] Sending initial prompt with new-chat ID');
-      sendChat(
-        initialPrompt,
-        selectedModel.provider,
-        selectedModel.modelId as AllModelsUnion,
-        hasConfigured,
-        isDefault,
-        'new-chat' // Explicitly pass the conversation ID
-      );
+      // Send to AI
+      sendChat(initialPrompt);
     }
   }, [
-    initialConversationId,
+    routeConversationId,
     initialPrompt,
     selectedModel,
     sendChat,
-    apiKeys,
     user,
-    isConnected,
     isWaitingForRealId
   ]);
 
-  // Update URL using native history API when we get real conversation ID
+  // Update messages with streaming content
   useEffect(() => {
-    if (liveConvId && liveConvId !== 'new-chat') {
-      // Check if URL already has the correct conversation ID
-      const currentPathConvId = pathname.split('/chat/')[1];
+    if (!streamedText || !activeConversationId) return;
 
-      if (currentPathConvId === liveConvId) {
-        // URL is already correct, no need to update
-        console.log(`[ChatInterface] URL already has correct conversation ID: ${liveConvId}`);
-        return;
-      }
-
-      console.log(`[ChatInterface] Updating URL from ${currentPathConvId} to ${liveConvId}`);
-
-      // Use setTimeout to ensure we're not in a render cycle
-      setTimeout(() => {
-        window.history.replaceState(
-          null,
-          '',
-          `/chat/${liveConvId}`
-        );
-      }, 0);
-
-      // Update local state to match
-      setConvId(liveConvId);
-      updateConversationId(liveConvId);
-
-      // Clear the awaiting flag since we now have the real ID
-      setIsAwaitingFirstChunk(false);
-
-      // Clear the processed ref to allow future new chats
-      setTimeout(() => {
-        processedRef.current = false;
-      }, 1000);
-    }
-  }, [liveConvId, pathname, updateConversationId]);
-
-  // Handle streaming text
-  useEffect(() => {
-    // Don't process streaming text until we have chunks coming in
-    if (!streamedText) return;
-
-    // Once we have streaming text, we're no longer awaiting the first chunk
-    if (isAwaitingFirstChunk) {
-      setIsAwaitingFirstChunk(false);
-    }
-
-    setIsStreaming(true);
+    setIsAwaitingFirstChunk(false);
 
     setMessages(prev => {
-      // Ensure we have a valid conversation ID
-      const currentConvId = convId || 'new-chat';
+      // Check if we already have a streaming message
+      const existingStreamIndex = prev.findIndex(m => m.id.startsWith('streaming-'));
 
-      if (!streamingRef.current) {
-        const id = `streaming-${currentConvId}`;
-        streamingRef.current = id;
-        return [
-          ...prev,
-          {
-            id,
-            senderType: "AI",
-            provider: toPrismaFormat(selectedModel.provider),
-            model: selectedModel.modelId,
-            content: streamedText,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            userId: user.id,
-            userKeyId: null,
-            conversationId: currentConvId
-          }
-        ];
+      const streamingMsg = createAIMessage({
+        id: `streaming-${activeConversationId}`,
+        content: streamedText,
+        userId: user.id,
+        provider: selectedModel.provider,
+        model: selectedModel.modelId,
+        conversationId: activeConversationId
+      });
+
+      if (existingStreamIndex >= 0) {
+        // Update existing streaming message
+        const updated = [...prev];
+        updated[existingStreamIndex] = streamingMsg;
+        return updated;
+      } else {
+        // Add new streaming message
+        return [...prev, streamingMsg];
       }
-      return prev.map(m =>
-        m.id === streamingRef.current
-          ? { ...m, content: streamedText, updatedAt: new Date() }
-          : m
-      );
     });
-  }, [streamedText, convId, selectedModel, user, isAwaitingFirstChunk]);
+  }, [streamedText, activeConversationId, selectedModel, user]);
 
   // Handle completion
   useEffect(() => {
-    if (isComplete) {
-      setIsStreaming(false);
-      streamingRef.current = null;
-    }
-  }, [isComplete]);
+    if (isComplete && streamedText) {
+      // Convert streaming message to final message
+      setMessages(prev => {
+        const streamingIndex = prev.findIndex(m => m.id.startsWith('streaming-'));
+        if (streamingIndex >= 0) {
+          const updated = [...prev];
+          const streamingMsg = updated[streamingIndex];
+          if (streamingMsg) {
+            updated[streamingIndex] = finalizeStreamingMessage(streamingMsg, streamedText);
+          }
+          return updated;
+        }
+        return prev;
+      });
 
-  const sorted = [...messages].sort(
-    (a, b) => new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf()
-  );
+      // Reset streaming state after completion
+      setTimeout(() => {
+        resetStreamingState();
+      }, 100);
+    }
+  }, [isComplete, streamedText, resetStreamingState]);
+
+  // Reset processed flag when navigating away from new-chat
+  useEffect(() => {
+    if (routeConversationId !== 'new-chat') {
+      processedRef.current = false;
+    }
+  }, [routeConversationId]);
 
   return (
     <div className="flex h-full flex-col">
       <ChatArea
-        messages={sorted}
-        streamedText={streamedText}
+        messages={messages}
+        streamedText={isStreaming ? streamedText : ""}
         isAwaitingFirstChunk={isAwaitingFirstChunk}
         isStreaming={isStreaming}
         model={selectedModel.modelId}
         provider={selectedModel.provider}
-        conversationId={convId}
+        conversationId={activeConversationId ?? routeConversationId}
         user={user}
       />
       {children}
     </div>
   );
 }
-/**
-     const workup = pathname.replace("/chat/", "");
-    const currentConvId = !workup.startsWith("new-chat") ? workup : 'new-chat';
- */

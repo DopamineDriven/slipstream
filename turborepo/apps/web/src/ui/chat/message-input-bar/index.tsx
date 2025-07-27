@@ -2,15 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
-import { useAiChat } from "@/hooks/use-ai-chat";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/attachment-popover";
 import { FullscreenTextInputDialog } from "@/ui/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
 import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
 import { Button, Expand, Loader, Send, Textarea } from "@t3-chat-clone/ui";
+import { useAIChatContext } from "@/context/ai-chat-context";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 const INITIAL_TEXTAREA_HEIGHT_PX = 24;
@@ -26,8 +25,7 @@ export function MessageInputBar({
   className?: string;
 }) {
   const { selectedModel, openDrawer } = useModelSelection();
-  const { data: session } = useSession();
-  const { isConnected } = useAiChat(session?.user?.id);
+  const { isConnected } = useAIChatContext();
   // Local state for the input
   const [isSubmitting, setIsSubmitting] = useState(false);
 

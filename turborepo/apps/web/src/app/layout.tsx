@@ -7,6 +7,7 @@ import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
 import { redirect } from "next/navigation";
 import Script from "next/script";
+import { AIChatProvider } from "@/context/ai-chat-context";
 import { ApiKeysProvider } from "@/context/api-keys-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { CookieProvider } from "@/context/cookie-context";
@@ -138,7 +139,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-basis min-h-screen antialiased m-0 p-0 overflow-hidden",
+          "bg-background font-basis m-0 min-h-screen overflow-hidden p-0 antialiased",
           inter.variable
         )}>
         <CookieProvider>
@@ -147,7 +148,9 @@ export default async function RootLayout({
               <ChatWebSocketProvider user={session?.user}>
                 <ModelSelectionProvider>
                   <ApiKeysProvider initialApiKeys={apiKeysData}>
-                    {children}
+                    <AIChatProvider userId={session?.user?.id}>
+                      {children}
+                    </AIChatProvider>
                   </ApiKeysProvider>
                 </ModelSelectionProvider>
               </ChatWebSocketProvider>
