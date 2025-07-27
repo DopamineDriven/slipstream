@@ -18,6 +18,7 @@ import { getSiteUrl } from "@/lib/site-url";
 import { ormHandler } from "@/orm";
 import * as ga from "@/utils/google-analytics";
 import { SessionProvider } from "next-auth/react";
+import "./katex.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,7 +29,7 @@ export const viewport = {
   colorScheme: "normal",
   userScalable: true,
   themeColor: "#020817",
-  viewportFit: "auto",
+  viewportFit: "cover",
   initialScale: 1,
   maximumScale: 1,
   width: "device-width"
@@ -114,12 +115,6 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
-          crossOrigin="anonymous"
-        />
         <script
           async={true}
           id="prevent-flash-of-wrong-theme"
@@ -139,7 +134,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-basis m-0 min-h-screen overflow-hidden p-0 antialiased",
+          "bg-background font-basis m-0 min-h-[100dvh] overflow-hidden p-0 antialiased",
           inter.variable
         )}>
         <CookieProvider>

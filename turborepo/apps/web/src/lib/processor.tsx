@@ -1,3 +1,4 @@
+import type { Root } from "mdast";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import type {
   CharsElement,
@@ -5,11 +6,14 @@ import type {
   Options as RehypePrettyCodeOptions
 } from "rehype-pretty-code";
 import type { Options as RehypeSanitizeOptions } from "rehype-sanitize";
+import type { Options as RemarkParseOptions } from "remark-parse";
+import type { Options as RemarkRehypeOptions } from "remark-rehype";
 import React, { createElement, Fragment } from "react";
 import * as jsxRuntime from "react/jsx-runtime";
 import Image from "next/image";
 import Link from "next/link";
 import { mathmlTags } from "@/lib/mathml-tags";
+import { preprocessAIMarkdown } from "@/lib/preprocess";
 import { shimmer } from "@/lib/shimmer";
 import { slugify } from "@/lib/slugify";
 import { CodeBlock } from "@/ui/atoms/code-block";
@@ -23,8 +27,88 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { visit } from "unist-util-visit";
 import { VFile } from "vfile";
 
+function _remarkFixHeadings() {
+  return (tree: Root) => {
+    visit(tree, "paragraph", (node, index, parent) => {
+      if (!parent || !index) return;
+      const fullText = node.children
+        .map(child => {
+          if (child.type === "text") return child.value;
+          if (child.type === "inlineCode") return "`" + child.value + "`";
+          if (child.type === "inlineMath") return "\\(" + child.value + "\\)";
+          return "";
+        })
+        .join("");
+
+      // Check if paragraph starts with heading syntax
+      const headingMatch = fullText.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch?.[1] && headingMatch?.[2]) {
+        const depth = headingMatch[1].length as 1 | 2 | 3 | 4 | 5 | 6;
+        const headingText = headingMatch[2];
+
+        // Parse the heading content back into inline nodes
+        parent.children[index] = {
+          type: "heading",
+          depth,
+          children: [
+            {
+              type: "text",
+              value: headingText
+            }
+          ]
+        };
+      }
+
+      const midMatch = fullText.match(/(.+?)(#{1,6})\s+(.+)/);
+      if (
+        midMatch?.[1] &&
+        midMatch?.[2] &&
+        midMatch?.[3] &&
+        parent.type !== "root"
+      ) {
+        const [_, before, hashes, after] = midMatch;
+
+        const depth = hashes.length as 1 | 2 | 3 | 4 | 5 | 6;
+
+        // Split into: paragraph (before) + heading + paragraph (after)
+        const newNodes = Array.of<
+          | {
+              type: "paragraph";
+              children: {
+                type: "text";
+                value: string;
+              }[];
+            }
+          | {
+              type: "heading";
+              depth: 1 | 2 | 3 | 4 | 5 | 6;
+              children: {
+                type: "text";
+                value: string;
+              }[];
+            }
+        >();
+        if (before.trim()) {
+          newNodes.push({
+            type: "paragraph" as const,
+            children: [{ type: "text" as const, value: before.trim() }]
+          });
+        }
+
+        newNodes.push({
+          type: "heading" as const,
+          depth,
+          children: [{ type: "text" as const, value: after.trim() }]
+        });
+
+        parent.children.splice(index, 1, ...newNodes);
+      }
+    });
+  };
+}
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
   [key: string]: any;
@@ -86,6 +170,7 @@ const prettyCodeOptions = {
   grid: true,
   keepBackground: true,
   theme: "dark-plus",
+  bypassInlineCode: false,
   onVisitLine(node: LineElement) {
     if (node.children.length === 0) {
       node.children = [{ type: "text", value: " " }];
@@ -141,21 +226,20 @@ const components = {
  * Need to pinpoint how each ai-model returns markdown -- are there special niche formats I'm unaware of?
  */
 const commonMathMLTags = mathmlTags;
-export async function processMarkdownToReact(content: string) {
+export async function processMarkdownToReact(contentRaw: string) {
+  const content = preprocessAIMarkdown(contentRaw);
   const processor = unified();
-  processor.use(remarkParse);
+  processor.use(remarkParse, {} satisfies RemarkParseOptions);
   processor.use(remarkGfm);
   processor.use(remarkMath);
-  processor.use(remarkRehype, { allowDangerousHtml: true });
+  processor.use(remarkRehype, {
+    allowDangerousHtml: true
+  } satisfies RemarkRehypeOptions);
   processor.use(rehypePrettyCode, prettyCodeOptions);
   processor.use(rehypeKatex);
   processor.use(rehypeSanitize, {
     allowDoctypes: true,
-    ...(defaultSchema.tagNames
-      ? {
-          tagNames: [...defaultSchema.tagNames, ...commonMathMLTags]
-        }
-      : { tagNames: [...commonMathMLTags] }),
+    tagNames: [...(defaultSchema.tagNames ?? []), ...commonMathMLTags],
     attributes: {
       ...(defaultSchema.attributes ?? {}),
       "*": [

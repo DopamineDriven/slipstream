@@ -5,6 +5,7 @@ import type { User } from "next-auth";
 import type { JSX, ReactNode } from "react";
 import { memo, useEffect, useRef, useState } from "react";
 import { providerMetadata } from "@/lib/models";
+import { preprocessAIMarkdown } from "@/lib/preprocess";
 import { processMarkdownToReact } from "@/lib/processor";
 import { cn } from "@/lib/utils";
 import { UIMessage } from "@/types/shared";
@@ -76,7 +77,9 @@ function getModelDisplayName(toProvider: Provider, modelId: string | null) {
  * - Ordered lists (1., 2., etc.)
  */
 function processStreamingMarkdown(content: string): ReactNode {
-  const blocks = content.split("\n\n");
+  const preprocessed = preprocessAIMarkdown(content);
+
+  const blocks = preprocessed.split("\n\n");
 
   return (
     <>
@@ -373,7 +376,6 @@ export const ChatMessage = memo(function ChatMessage({
     // Prevent duplicate processing
     if (processingRef.current) return;
     processingRef.current = true;
-    
 
     // Process with full markdown processor
     processMarkdownToReact(message.content)
@@ -557,7 +559,7 @@ export const ChatMessage = memo(function ChatMessage({
                 </div>
               ) : (
                 <>
-                  <div className="prose dark:prose-invert max-w-[85%]  text-brand-text prose-sm">
+                  <div className="prose dark:prose-invert text-brand-text prose-sm max-w-[85%]">
                     {renderedContent}
                   </div>
                   <div className="text-brand-primary-foreground/80 mt-1.5 text-xs">

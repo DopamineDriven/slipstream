@@ -3,7 +3,19 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.css",
+        "tsconfig.json",
+        "package.json",
+        "postcss.config.mjs",
+        "eslint.config.mjs",
+        "tsup.config.ts",
+        "tailwind.config.ts"
+      ]
     }
   }
 }
