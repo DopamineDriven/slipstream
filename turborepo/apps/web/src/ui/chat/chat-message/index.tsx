@@ -38,7 +38,7 @@ interface ChatMessageProps {
   message: UIMessage;
   onUpdateMessage?: (messageId: string, newText: string) => void;
   className?: string;
-  user?: User;
+  user: User;
   isStreaming?: boolean;
 }
 
@@ -559,7 +559,7 @@ export const ChatMessage = memo(function ChatMessage({
                   <div className="prose dark:prose-invert max-w-[85%]  text-brand-text prose-sm">
                     {renderedContent}
                   </div>
-                  <div className="text-brand-primaryForeground/80 mt-1.5 text-xs">
+                  <div className="text-brand-primary-foreground/80 mt-1.5 text-xs">
                     {new Date(message.createdAt).toLocaleTimeString([], {
                       hour12: false,
                       hour: "2-digit",

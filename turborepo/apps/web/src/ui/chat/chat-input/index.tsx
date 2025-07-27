@@ -11,7 +11,7 @@ import { useApiKeys } from "@/context/api-keys-context";
 
 interface ChatContentProps {
   user: User;
-  conversationId?: string; // Add this prop
+  conversationId: string;
 }
 
 export function ChatContent({ user, conversationId }: ChatContentProps) {
@@ -23,11 +23,13 @@ export function ChatContent({ user, conversationId }: ChatContentProps) {
   const { apiKeys } = useApiKeys();
 
   const handleSend = useCallback(
-    (text: string) => {
+    (text: string, _isEditSubmit?: boolean) => {
       if (!isConnected || !text.trim()) return;
 
       const hasConfigured = apiKeys.isSet[selectedModel.provider];
       const isDefault = apiKeys.isDefault[selectedModel.provider];
+
+      console.log(`[ChatContent] Sending message in conversation: ${conversationId}`);
 
       sendChat(
         text,
@@ -35,7 +37,7 @@ export function ChatContent({ user, conversationId }: ChatContentProps) {
         selectedModel.modelId as AllModelsUnion,
         hasConfigured,
         isDefault,
-        conversationId // Pass the conversation ID
+        conversationId // Always explicitly pass the conversation ID
       );
     },
     [apiKeys, selectedModel, isConnected, sendChat, conversationId]

@@ -15,9 +15,9 @@ interface ChatAreaProps {
   isStreaming?: boolean;
   model: string | null;
   provider: Provider;
-  conversationId: string | null;
+  conversationId: string;
   onUpdateMessage?: (messageId: string, newText: string) => void;
-  user?: User;
+  user: User;
   className?: string;
   isAwaitingFirstChunk?: boolean;
 }
@@ -77,7 +77,7 @@ export const ChatArea = memo(function ChatArea({
       content: streamedText,
       createdAt: new Date(),
       updatedAt: new Date(),
-      conversationId: conversationId ?? "temp",
+      conversationId: conversationId ?? "new-chat",
       model: model ?? "unknown",
       provider: toPrismaFormat(provider),
       userId: user?.id ?? null,

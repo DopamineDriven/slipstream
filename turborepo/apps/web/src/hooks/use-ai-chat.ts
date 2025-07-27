@@ -117,11 +117,39 @@ export function useAiChat(userId?: string, initialConversationId?: string) {
       // Use the provided conversationId, or fall back to the ref, or default to "new-chat"
       const effectiveConversationId = conversationId ?? conversationIdRef.current ?? "new-chat";
 
+      // Log what's happening for debugging
+      console.log(`[useAiChat.sendChat] Current ref: ${conversationIdRef.current}, Provided: ${conversationId}, Using: ${effectiveConversationId}`);
+
       // CRITICAL: If we're already streaming a new-chat and receive another send with the same prompt,
       // ignore it to prevent duplicates
       if (effectiveConversationId === "new-chat" && (streamedText || isWaitingForRealId)) {
         console.warn("Ignoring duplicate new-chat send while streaming is active or waiting for real ID");
         activeUserStreams.delete(userId);
+        return;
+      }
+
+      // IMPORTANT: Don't allow sending to "new-chat" if we already have a real conversation ID
+      if (effectiveConversationId === "new-chat" && liveConversationId && liveConversationId !== "new-chat") {
+        console.warn(`[useAiChat.sendChat] Attempted to send to new-chat but already have real ID: ${liveConversationId}`);
+        conversationIdRef.current = liveConversationId;
+
+        // Retry with the real conversation ID
+        sendEvent("ai_chat_request", {
+          type: "ai_chat_request",
+          conversationId: liveConversationId,
+          prompt,
+          provider: provider ?? "openai",
+          model: getModel(
+            provider ?? "openai",
+            model as AllModelsUnion | undefined
+          ),
+          hasProviderConfigured: hasProviderConfigured ?? false,
+          isDefaultProvider: isDefaultProvider ?? false,
+          maxTokens: undefined,
+          systemPrompt: undefined,
+          temperature: undefined,
+          topP: undefined
+        });
         return;
       }
 
@@ -155,7 +183,7 @@ export function useAiChat(userId?: string, initialConversationId?: string) {
         topP: undefined
       });
     },
-    [sendEvent, userId, streamedText, isWaitingForRealId]
+    [sendEvent, userId, streamedText, isWaitingForRealId, liveConversationId]
   );
 
   // 3️⃣ Add a method to manually update the conversation ID (useful for navigation)

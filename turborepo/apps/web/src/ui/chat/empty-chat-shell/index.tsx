@@ -17,6 +17,7 @@ import {
   Card,
   CardContent,
   Code,
+  Expand,
   FileText,
   Loader,
   MessageSquare,
@@ -55,13 +56,19 @@ const MAX_TEXTAREA_HEIGHT_PX = 120;
 
 export function ChatEmptyState() {
   const router = useRouter();
+
   const { data: session } = useSession();
+
   const { isConnected } = useAiChat(session?.user?.id);
+
   const { selectedModel, openDrawer } = useModelSelection();
   // Local state for the input
   const [message, setMessage] = useState("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
 
   const [showExpandButton, setShowExpandButton] = useState(false);
@@ -76,14 +83,15 @@ export function ChatEmptyState() {
   }, [message]);
 
   const handleSendMessage = useCallback(
-    async (messageText: string) => {
+    (messageText: string) => {
       if (!messageText.trim() || isSubmitting) return;
 
       setIsSubmitting(true);
 
       try {
         const params = new URLSearchParams({ prompt: messageText.trim() });
-        router.push(`/chat/new-chat?${params.toString()}`, { scroll: false });
+        // Use push instead of replace to ensure proper navigation
+        router.push(`/chat/new-chat?${params.toString()}`);
       } catch (error) {
         console.error("Failed to send message:", error);
         setIsSubmitting(false);
@@ -125,7 +133,9 @@ export function ChatEmptyState() {
     },
     []
   );
+
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
+
   return (
     <div className="mx-auto flex h-full max-w-4xl flex-col items-center justify-center p-4">
       <motion.div
@@ -212,18 +222,7 @@ export function ChatEmptyState() {
                   onClick={() => setIsFullScreenInputOpen(true)}
                   className="text-brand-text-muted hover:text-brand-text absolute top-1/2 right-2 -translate-y-1/2"
                   disabled={isSubmitting}>
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                    />
-                  </svg>
+                  <Expand className="size-4" />
                   <span className="sr-only">Expand to fullscreen</span>
                 </Button>
               )}
