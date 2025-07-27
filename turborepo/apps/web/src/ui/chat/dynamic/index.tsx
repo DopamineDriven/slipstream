@@ -1,3 +1,4 @@
+// src/ui/chat/dynamic/index.tsx
 "use client";
 
 import type { UIMessage } from "@/types/shared";
@@ -14,14 +15,14 @@ interface ChatInterfaceProps {
   children: ReactNode;
   initialMessages?: UIMessage[] | null;
   conversationTitle?: string | null;
-  conversationId: string;
+  conversationId: string; // From the dynamic route param
   user: User;
 }
 
 export function ChatInterface({
   children,
   initialMessages,
-  conversationId: routeConversationId,
+  conversationId: routeConversationId, // This comes from the [conversationId] param
   user
 }: ChatInterfaceProps) {
   const router = useRouter();
@@ -51,13 +52,15 @@ export function ChatInterface({
     setActiveConversation(routeConversationId);
   }, [routeConversationId, setActiveConversation]);
 
-  // Handle URL updates when getting real conversation ID
+  // Handle URL updates ONLY for new-chat → real ID transition
   useEffect(() => {
-    if (activeConversationId &&
-        activeConversationId !== 'new-chat' &&
-        activeConversationId !== routeConversationId) {
-      console.log(`[ChatInterface] Updating URL to real conversation ID: ${activeConversationId}`);
-      router.replace(`/chat/${activeConversationId}`);
+    // Only update URL when we receive a real ID for a new-chat
+    if (routeConversationId === 'new-chat' &&
+        activeConversationId &&
+        activeConversationId !== 'new-chat') {
+      console.log(`[ChatInterface] Updating URL from new-chat to real ID: ${activeConversationId}`);
+      // router.replace(`/chat/${activeConversationId}`);
+      window.history.replaceState(null, "", `/chat/${activeConversationId}`);
     }
   }, [activeConversationId, routeConversationId, router]);
 
