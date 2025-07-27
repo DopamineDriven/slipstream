@@ -373,6 +373,7 @@ export const ChatMessage = memo(function ChatMessage({
     // Prevent duplicate processing
     if (processingRef.current) return;
     processingRef.current = true;
+    
 
     // Process with full markdown processor
     processMarkdownToReact(message.content)

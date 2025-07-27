@@ -45,6 +45,7 @@ export { MessageSquareText } from "@/icons/message-square-text";
 export { Moon } from "@/icons/moon";
 export { Package } from "@/icons/package";
 export { Palette } from "@/icons/palette";
+export { PanelLeft } from "@/icons/panel-left";
 export { PanelLeftClose } from "@/icons/panel-left-close";
 export { PanelRightClose } from "@/icons/panel-right-close";
 export { Paperclip } from "@/icons/paperclip";
@@ -133,6 +134,7 @@ export {
 } from "@/ui/dropdown-menu";
 export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
+export type { InputProps } from "@/ui/input";
 export { Label } from "@/ui/label";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";

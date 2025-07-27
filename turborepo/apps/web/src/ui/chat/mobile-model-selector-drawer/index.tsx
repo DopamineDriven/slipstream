@@ -13,7 +13,7 @@ import {
   DrawerHeader,
   DrawerTitle
 } from "@/ui/atoms/drawer";
-import { ModelUI } from "@/ui/mobile-model-select/model-badges";
+import { ModelUI } from "@/ui/chat/mobile-model-selector-drawer/model-badges";
 import type { Provider } from "@t3-chat-clone/types";
 import {
   displayNameToModelId,

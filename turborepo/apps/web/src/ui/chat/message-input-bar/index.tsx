@@ -1,15 +1,16 @@
+// src/ui/chat/message-input-bar/index.tsx
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { AttachmentPopover } from "@/ui/attachment-popover";
-import { FullscreenTextInputDialog } from "@/ui/fullscreen-text-input-dialog";
-import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
+import { AttachmentPopover } from "@/ui/chat/attachment-popover";
+import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
+import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
 import { Button, Expand, Loader, Send, Textarea } from "@t3-chat-clone/ui";
-import { useAIChatContext } from "@/context/ai-chat-context";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 const INITIAL_TEXTAREA_HEIGHT_PX = 24;
@@ -26,19 +27,29 @@ export function MessageInputBar({
 }) {
   const { selectedModel, openDrawer } = useModelSelection();
   const { isConnected } = useAIChatContext();
-  // Local state for the input
+
+  // Local state
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [showExpandButton, setShowExpandButton] = useState(false);
-
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
+  const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) {
+        clearTimeout(submitTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
+
     ta.style.height = "auto";
     const h = Math.min(ta.scrollHeight, MAX_TEXTAREA_HEIGHT_PX);
     ta.style.height = `${h}px`;
@@ -46,29 +57,44 @@ export function MessageInputBar({
   }, [message]);
 
   const handleSend = useCallback(
-    (e?: React.FormEvent) => {
+    async (e?: React.FormEvent) => {
       // Prevent default form submission if called from form submit
       if (e) {
         e.preventDefault();
       }
 
-      if (!message.trim() || disabled || isSubmitting) return;
+      const trimmedMessage = message.trim();
+      if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
 
       setIsSubmitting(true);
-      onSendMessage(message);
-      setMessage("");
-      setIsSubmitting(false);
 
-      if (textareaRef.current) {
-        textareaRef.current.style.height = `${INITIAL_TEXTAREA_HEIGHT_PX}px`;
+      try {
+        // Call parent's send handler
+        onSendMessage(trimmedMessage);
+
+        // Clear message immediately for better UX
+        setMessage("");
+
+        // Reset textarea height
+        if (textareaRef.current) {
+          textareaRef.current.style.height = `${INITIAL_TEXTAREA_HEIGHT_PX}px`;
+        }
+        setShowExpandButton(false);
+
+        // Reset submitting state after a short delay
+        submitTimeoutRef.current = setTimeout(() => {
+          setIsSubmitting(false);
+        }, 300);
+      } catch (error) {
+        console.error("Failed to send message:", error);
+        setIsSubmitting(false);
       }
-      setShowExpandButton(false);
     },
-    [message, onSendMessage, disabled, isSubmitting]
+    [message, onSendMessage, disabled, isSubmitting, isConnected]
   );
 
-  const handleFullscreenSubmit = useCallback((full: string) => {
-    setMessage(full);
+  const handleFullscreenSubmit = useCallback((fullText: string) => {
+    setMessage(fullText);
     setIsFullScreenInputOpen(false);
     // Don't auto-send, let user review and send manually
   }, []);
@@ -76,7 +102,7 @@ export function MessageInputBar({
   const handleAttachmentSelect = useCallback(
     (type: "file" | "camera" | "photo") => {
       console.log("Selected attachment type:", type);
-      // TODO Implement attachment logic here
+      // TODO: Implement attachment logic here
     },
     []
   );
@@ -85,6 +111,8 @@ export function MessageInputBar({
 
   const effectivePlaceholder =
     placeholder ?? `Message ${selectedModel.displayName}...`;
+
+  const isDisabled = !isConnected || isSubmitting || disabled;
 
   return (
     <>
@@ -110,12 +138,10 @@ export function MessageInputBar({
                   }
                 }}
                 placeholder={effectivePlaceholder}
-                disabled={!isConnected || isSubmitting}
+                disabled={isDisabled}
                 className={cn(
                   "text-brand-text placeholder:text-brand-text-muted min-h-[24px] w-full resize-none border-none bg-transparent px-0 py-2 leading-6 focus-visible:outline-none",
-                  !isConnected || isSubmitting
-                    ? "cursor-not-allowed opacity-50"
-                    : ""
+                  isDisabled ? "cursor-not-allowed opacity-50" : ""
                 )}
                 rows={1}
                 style={{
@@ -123,14 +149,14 @@ export function MessageInputBar({
                   lineHeight: 1.5
                 }}
               />
-              {showExpandButton && (
+              {showExpandButton && !isSubmitting && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsFullScreenInputOpen(true)}
                   className="text-brand-text-muted hover:text-brand-text absolute top-1/2 right-2 -translate-y-1/2"
-                  disabled={isSubmitting || disabled}>
+                  disabled={isDisabled}>
                   <Expand className="size-4" />
                   <span className="sr-only">Expand to fullscreen</span>
                 </Button>
@@ -154,9 +180,7 @@ export function MessageInputBar({
                 type="submit"
                 size="icon"
                 className="bg-brand-primary text-brand-primary-foreground hover:bg-brand-primary/90 h-8 w-8"
-                disabled={
-                  !message.trim() || !isConnected || isSubmitting || disabled
-                }>
+                disabled={!message.trim() || isDisabled}>
                 {isSubmitting ? (
                   <Loader className="h-5 w-5 animate-spin" />
                 ) : (

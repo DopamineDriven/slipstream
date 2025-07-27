@@ -34,6 +34,7 @@ export const ChatArea = memo(function ChatArea({
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const lastMessageCountRef = useRef(messages.length);
   const shouldAutoScrollRef = useRef(true);
+  const lastScrollTimeRef = useRef(0);
 
   // Track if user has scrolled away from bottom
   useEffect(() => {
@@ -46,20 +47,41 @@ export const ChatArea = memo(function ChatArea({
       shouldAutoScrollRef.current = isAtBottom;
     };
 
-    scrollArea.addEventListener("scroll", checkIfAtBottom);
-    return () => scrollArea.removeEventListener("scroll", checkIfAtBottom);
+    const throttledCheck = () => {
+      const now = Date.now();
+      if (now - lastScrollTimeRef.current > 50) {
+        lastScrollTimeRef.current = now;
+        checkIfAtBottom();
+      }
+    };
+
+    scrollArea.addEventListener("scroll", throttledCheck, { passive: true });
+    return () => scrollArea.removeEventListener("scroll", throttledCheck);
   }, []);
 
   // Auto-scroll to bottom when new messages arrive or streaming updates
   useEffect(() => {
     if (!shouldAutoScrollRef.current) return;
 
-    const behavior =
-      messages.length > lastMessageCountRef.current ? "smooth" : "auto";
+    // Determine scroll behavior based on whether we have new messages
+    const hasNewMessages = messages.length > lastMessageCountRef.current;
+    const behavior = hasNewMessages ? "smooth" : "auto";
     lastMessageCountRef.current = messages.length;
 
-    endRef.current?.scrollIntoView({ behavior });
+    // Small delay to ensure DOM is updated
+    requestAnimationFrame(() => {
+      endRef.current?.scrollIntoView({ behavior, block: "end" });
+    });
   }, [messages.length, streamedText]);
+
+  // Force scroll when awaiting first chunk changes
+  useEffect(() => {
+    if (isAwaitingFirstChunk) {
+      requestAnimationFrame(() => {
+        endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      });
+    }
+  }, [isAwaitingFirstChunk]);
 
   return (
     <ScrollArea
@@ -69,17 +91,25 @@ export const ChatArea = memo(function ChatArea({
         className="space-y-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ staggerChildren: 0.1 }}>
+        transition={{ duration: 0.3, staggerChildren: 0.05 }}>
 
         {/* Render all messages */}
-        {messages.map(msg => (
-          <ChatMessage
+        {messages.map((msg, index) => (
+          <motion.div
             key={msg.id}
-            message={msg}
-            user={user}
-            onUpdateMessage={onUpdateMessage}
-            isStreaming={isStreaming && msg.id.startsWith('streaming-')}
-          />
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.3,
+              delay: index === messages.length - 1 ? 0 : 0
+            }}>
+            <ChatMessage
+              message={msg}
+              user={user}
+              onUpdateMessage={onUpdateMessage}
+              isStreaming={isStreaming && msg.id.startsWith('streaming-')}
+            />
+          </motion.div>
         ))}
 
         {/* Loading indicator when awaiting first chunk */}
@@ -87,28 +117,32 @@ export const ChatArea = memo(function ChatArea({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
             className="flex items-center gap-3 py-3">
             <div className="bg-brand-component/10 flex size-8 items-center justify-center rounded-full">
               <div className="border-brand-component/20 border-t-brand-component/40 size-4 animate-spin rounded-full border-2" />
             </div>
             <div className="bg-brand-component rounded-lg px-4 py-2">
               <div className="flex gap-1">
-                <span className="bg-brand-component/70 size-2 animate-bounce rounded-full" />
+                <span
+                  className="bg-brand-component/70 size-2 animate-bounce rounded-full"
+                  style={{ animationDelay: "0ms" }}
+                />
                 <span
                   className="bg-brand-component/60 size-2 animate-bounce rounded-full"
-                  style={{ animationDelay: "0.1s" }}
+                  style={{ animationDelay: "150ms" }}
                 />
                 <span
                   className="bg-brand-component/50 size-2 animate-bounce rounded-full"
-                  style={{ animationDelay: "0.2s" }}
+                  style={{ animationDelay: "300ms" }}
                 />
               </div>
             </div>
           </motion.div>
         )}
-
         {/* Auto-scroll anchor */}
-        <div ref={endRef} />
+        <div ref={endRef} aria-hidden="true" />
       </motion.div>
     </ScrollArea>
   );

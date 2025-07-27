@@ -8,12 +8,12 @@ import { MessageInputBar } from "@/ui/chat/message-input-bar";
 
 interface ChatContentProps {
   user: User;
-  conversationId: string; // From route params
+  conversationId: string;
+  onUserMessage?: (content: string) => void; // New prop
 }
 
-export function ChatContent({ user: _user, conversationId }: ChatContentProps) {
+export function ChatContent({ user: _user, conversationId, onUserMessage }: ChatContentProps) {
   const {
-    sendChat,
     isConnected,
     activeConversationId
   } = useAIChatContext();
@@ -28,9 +28,12 @@ export function ChatContent({ user: _user, conversationId }: ChatContentProps) {
         `[ChatContent] Sending message in active conversation: ${activeConversationId ?? conversationId}`
       );
 
-      sendChat(text);
+      // Call the callback to add user message to UI
+      if (onUserMessage) {
+        onUserMessage(text);
+      }
     },
-    [isConnected, sendChat, activeConversationId, conversationId]
+    [isConnected, onUserMessage, activeConversationId, conversationId]
   );
 
   return (

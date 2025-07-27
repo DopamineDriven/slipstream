@@ -1,10 +1,13 @@
 // src/lib/models.ts
+import type { ProviderIconProps } from "@/ui/icons";
+import type { JSX } from "react";
+import { AnthropicIcon, GeminiIcon, OpenAiIcon, XAiIcon } from "@/ui/icons";
 import type {
-  Provider,
+  GetDisplayNamesForProviderRT,
+  GetModelsForProviderRT,
   ModelDisplayNameToModelId,
   ModelIdToModelDisplayName,
-  GetDisplayNamesForProviderRT,
-  GetModelsForProviderRT
+  Provider
 } from "@t3-chat-clone/types";
 import {
   defaultModelDisplayNameByProvider,
@@ -12,11 +15,6 @@ import {
   getDisplayNamesForProvider,
   getModelsForProvider
 } from "@t3-chat-clone/types";
-import { AnthropicIcon } from "@/ui/icons/anthropic";
-import { GeminiIcon } from "@/ui/icons/gemini";
-import { OpenAiIcon } from "@/ui/icons/openai";
-import { XAiIcon } from "@/ui/icons/x-ai";
-import type { ComponentPropsWithRef, JSX } from "react";
 
 // Re-export the strong typed ModelSelection interface
 export interface ModelSelection<T extends Provider = Provider> {
@@ -26,12 +24,15 @@ export interface ModelSelection<T extends Provider = Provider> {
 }
 
 // Provider metadata with icons
-export const providerMetadata: Record<Provider, {
-  name: string;
-  icon: ({ ...svg }: Omit<ComponentPropsWithRef<"svg">, "viewBox" | "fill" | "xmlns" | "role">)=> JSX.Element;
-  color: string;
-  description: string;
-}> = {
+export const providerMetadata: Record<
+  Provider,
+  {
+    name: string;
+    icon({ ...svg }: ProviderIconProps): JSX.Element;
+    color: string;
+    description: string;
+  }
+> = {
   openai: {
     name: "OpenAI",
     icon: OpenAiIcon,

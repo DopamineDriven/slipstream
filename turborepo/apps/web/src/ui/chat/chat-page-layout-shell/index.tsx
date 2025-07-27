@@ -4,6 +4,7 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useCookiesCtx } from "@/context/cookie-context";
+import { useModelSelection } from "@/context/model-selection-context";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import {
   Sidebar,
@@ -11,10 +12,10 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from "@/ui/atoms/sidebar";
-import { MobileModelSelectorDrawer } from "@/ui/mobile-model-select";
-import { ProviderModelSelector } from "@/ui/model-selector-drawer";
-import { SettingsDrawer } from "@/ui/settings-drawer";
-import { EnhancedSidebar } from "@/ui/sidebar/enhanced";
+import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
+import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
+import { SettingsDrawer } from "@/ui/chat/settings-drawer";
+import { EnhancedSidebar } from "@/ui/chat/sidebar";
 import { useTheme } from "next-themes";
 import {
   Button,
@@ -23,7 +24,7 @@ import {
   Settings,
   ShareIcon as Share2
 } from "@t3-chat-clone/ui";
-import { useModelSelection } from "@/context/model-selection-context";
+
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
   { ssr: false }
@@ -60,7 +61,7 @@ function HeaderActions() {
     console.log("Share chat clicked. Implement sharing logic.");
     alert("Share functionality to be implemented!");
   }, []);
-const {openDrawer}=useModelSelection()
+  const { openDrawer } = useModelSelection();
   return (
     <div className="flex items-center space-x-1 sm:space-x-2">
       <Button
@@ -123,7 +124,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>
                   <Separator orientation="vertical" className="mx-2 h-6" />
-                      <ProviderModelSelector />
+                  <ProviderModelSelector />
                 </div>
                 <HeaderActions />
               </header>
