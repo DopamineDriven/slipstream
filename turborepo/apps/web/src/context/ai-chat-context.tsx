@@ -126,7 +126,7 @@ export function AIChatProvider({
         content: streamedText + evt.chunk,
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
-        timestamp: new Date(Date.now()),
+        timestamp: new Date(),
         isUser: false
       });
     };
@@ -165,7 +165,7 @@ export function AIChatProvider({
     client.on("ai_chat_response", handleResponse);
 
     return () => {
-      client.off("ai_chat_chunk")
+      client.off("ai_chat_chunk");
       client.off("ai_chat_error");
       client.off("ai_chat_response");
     };
