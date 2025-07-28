@@ -13,7 +13,6 @@ import * as jsxRuntime from "react/jsx-runtime";
 import Image from "next/image";
 import Link from "next/link";
 import { mathmlTags } from "@/lib/mathml-tags";
-import { preprocessAIMarkdown } from "@/lib/preprocess";
 import { shimmer } from "@/lib/shimmer";
 import { slugify } from "@/lib/slugify";
 import { CodeBlock } from "@/ui/atoms/code-block";
@@ -226,8 +225,8 @@ const components = {
  * Need to pinpoint how each ai-model returns markdown -- are there special niche formats I'm unaware of?
  */
 const commonMathMLTags = mathmlTags;
-export async function processMarkdownToReact(contentRaw: string) {
-  const content = preprocessAIMarkdown(contentRaw);
+export async function processMarkdownToReact(content: string) {
+  // const content = preprocessAIMarkdown(contentRaw);
   const processor = unified();
   processor.use(remarkParse, {} satisfies RemarkParseOptions);
   processor.use(remarkGfm);
