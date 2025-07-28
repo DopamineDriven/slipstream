@@ -101,9 +101,9 @@ export function preprocessAIMarkdown(content: string) {
 
       // Clean up any triple+ newlines we created
       .replace(/\n{3,}/g, "\n\n")
-      .replace(/```\n([\s\S]*?)```/g, (match, code: string) => {
-        const lang = detectCodeLanguage(code);
-        return lang !== "text" ? `\`\`\`${lang}\n${code}\`\`\`` : match;
-      })
+      // .replace(/```\n([\s\S]*?)```/g, (match, code: string) => {
+      //   const lang = detectCodeLanguage(code);
+      //   return lang !== "text" ? `\`\`\`${lang}\n${code}\`\`\`` : match;
+      // })
   );
 }
