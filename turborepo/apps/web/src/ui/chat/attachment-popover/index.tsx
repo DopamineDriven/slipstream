@@ -1,7 +1,15 @@
 "use client";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/ui/atoms/popover";
-import { Button, Camera, FileText, ImageIcon, Plus } from "@t3-chat-clone/ui";
+import {
+  Button,
+  Camera,
+  FileText,
+  ImageIcon,
+  Plus,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@t3-chat-clone/ui";
 
 interface AttachmentPopoverProps {
   onSelectAttachment: (type: "file" | "camera" | "photo") => void;
@@ -22,15 +30,12 @@ export function AttachmentPopover({
         <Button
           variant="ghost"
           size="icon"
-          className="text-brand-text-muted hover:text-brand-text hover:bg-brand-sidebar h-8 w-8 sm:h-auto sm:w-auto">
+          className="text-muted-foreground hover:text-foreground hover:bg-accent size-8 sm:h-auto sm:w-auto">
           <Plus className="size-5" />
           <span className="sr-only">Attach</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="bg-brand-sidebar border-brand-border text-brand-text w-48 p-2"
-        side="top"
-        align="center">
+      <PopoverContent className="w-48 p-2" side="top" align="center">
         <div className="space-y-1">
           {attachmentOptions.map(opt => {
             const IconOpt = opt.icon;
@@ -38,11 +43,11 @@ export function AttachmentPopover({
               <Button
                 key={opt.id}
                 variant="ghost"
-                className="hover:bg-brand-component w-full justify-start"
+                className="hover:bg-accent w-full justify-start"
                 onClick={() =>
                   onSelectAttachment(opt.id as "file" | "camera" | "photo")
                 }>
-                <IconOpt className="mr-2 h-4 w-4" />
+                <IconOpt className="mr-2 size-4" />
                 {opt.label}
               </Button>
             );
