@@ -136,6 +136,13 @@ export type { DropdownMenuProps } from "@/ui/dropdown-menu";
 export { Input } from "@/ui/input";
 export type { InputProps } from "@/ui/input";
 export { Label } from "@/ui/label";
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor
+} from "@/ui/popover";
+export type { PopoverProps } from "@/ui/popover";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";
 export { ScrollArea, ScrollBar } from "@/ui/scroll-area";
