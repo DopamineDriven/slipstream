@@ -40,6 +40,7 @@ import { Menu } from "@/icons/menu";
 import { MessageCircleQuestion } from "@/icons/message-circle-question";
 import { MessageSquare } from "@/icons/message-square";
 import { MessageSquareText } from "@/icons/message-square-text";
+import { Mic } from "@/icons/mic";
 import { Moon } from "@/icons/moon";
 import { Package } from "@/icons/package";
 import { Palette } from "@/icons/palette";
@@ -53,12 +54,14 @@ import { QuestionMark } from "@/icons/question-mark";
 import { Save } from "@/icons/save";
 import { Search } from "@/icons/search";
 import { Send } from "@/icons/send";
+import { SendMessage } from "@/icons/send-message";
 import { Settings } from "@/icons/settings";
 import { ShareIcon } from "@/icons/share-icon";
 import { Sparkles } from "@/icons/sparkles";
 import { SquarePen } from "@/icons/square-pen";
 import { Sun } from "@/icons/sun";
 import { Terminal } from "@/icons/terminal";
+import { Tools } from "@/icons/tools";
 import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
 import { User } from "@/icons/user";
@@ -105,6 +108,7 @@ const IconComponents = {
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,
+  Mic,
   Moon,
   Package,
   Palette,
@@ -118,12 +122,14 @@ const IconComponents = {
   Save,
   Search,
   Send,
+  SendMessage,
   Settings,
   ShareIcon,
   Sparkles,
   SquarePen,
   Sun,
   Terminal,
+  Tools,
   Trash,
   TrashSimple,
   User,
@@ -204,6 +210,7 @@ export {
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,
+  Mic,
   Moon,
   Package,
   Palette,
@@ -217,12 +224,14 @@ export {
   Save,
   Search,
   Send,
+  SendMessage,
   Settings,
   ShareIcon,
   Sparkles,
   SquarePen,
   Sun,
   Terminal,
+  Tools,
   Trash,
   TrashSimple,
   User,

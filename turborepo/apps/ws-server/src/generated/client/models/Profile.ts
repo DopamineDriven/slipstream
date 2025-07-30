@@ -227,7 +227,7 @@ type GetProfileGroupByPayload<T extends ProfileGroupByArgs> = Prisma.PrismaPromi
           : Prisma.GetScalarType<T[P], ProfileGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

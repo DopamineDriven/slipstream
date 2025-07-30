@@ -1,17 +1,37 @@
-import type { ClientOptions } from "openai";
-import { Credentials } from "@t3-chat-clone/credentials";
 import { OpenAI } from "openai";
 
-let openai: OpenAI;
 
-export async function getOpenAI(cred: Credentials) {
-  if (openai) return openai;
+export class OpenAIService {
+  private defaultClient: OpenAI;
+  private defaultGrokClient: OpenAI;
 
-  const apiKey = await cred.get("OPENAI_API_KEY");
+  constructor(
+    private apiKey: string,
+    private grokApiKey: string
+  ) {
+    this.defaultClient = new OpenAI({ apiKey: this.apiKey });
+    this.defaultGrokClient = this.defaultClient.withOptions({
+      apiKey: this.grokApiKey,
+      baseURL: "https://api.x.ai/v1"
+    });
+  }
 
-  if (!apiKey) throw new Error("Missing OPENAI_API_KEY!");
+  public getClient(overrideKey?: string) {
+    const client = this.defaultClient;
+    if (overrideKey) {
+      return client.withOptions({ apiKey: overrideKey });
+    }
 
-  openai = new OpenAI({ apiKey } satisfies ClientOptions);
+    return client;
+  }
 
-  return openai;
+  public getGrokClient(overrideKey?: string) {
+    const client = this.defaultGrokClient;
+    if (overrideKey) {
+      return client.withOptions({
+        apiKey: overrideKey
+      });
+    }
+    return this.defaultGrokClient;
+  }
 }

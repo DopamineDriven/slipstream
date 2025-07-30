@@ -1,20 +1,20 @@
 import type { BaseSVGProps } from "@/icons/index";
 
-export function Send({ role = "img", ...svg }: BaseSVGProps) {
+export function Mic({ role = "img", ...svg }: BaseSVGProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      role={role}
       viewBox="0 0 24 24"
       fill="none"
+      role={role}
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...svg}>
-      <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
-      <path d="m21.854 2.147-10.94 10.939" />
+      <path d="M12 19v3" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+      <rect x="9" y="2" width="6" height="13" rx="3" />
     </svg>
   );
 }
-

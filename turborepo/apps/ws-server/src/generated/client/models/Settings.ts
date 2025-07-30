@@ -168,7 +168,7 @@ type GetSettingsGroupByPayload<T extends SettingsGroupByArgs> = Prisma.PrismaPro
           : Prisma.GetScalarType<T[P], SettingsGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

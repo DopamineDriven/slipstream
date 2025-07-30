@@ -203,7 +203,7 @@ type GetUserKeyGroupByPayload<T extends UserKeyGroupByArgs> = Prisma.PrismaPromi
           : Prisma.GetScalarType<T[P], UserKeyGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

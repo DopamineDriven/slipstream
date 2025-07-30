@@ -14,7 +14,7 @@ import type {
 } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const prismaClient = new PrismaClient().$extends(withAccelerate());
 

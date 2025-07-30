@@ -411,8 +411,12 @@
 @layer utilities {
   .prose
     :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    color: var(--color-brand-text);
+    color: var(--color-foreground);
     font-weight: 600;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 *,
@@ -473,6 +477,17 @@ code > [data-line]::before {
     color-mix(in oklab, var(--color-brand-primary) 50%, transparent);
 }
 
+/* Add styles for KaTeX rendered math */
+.katex-display {
+  @apply p-4 my-4 overflow-x-auto;
+  background-color: oklch(97.614% 0.00011 271.152);
+  border-radius: 0.375rem;
+}
+
+.dark .katex-display {
+  background-color: oklch(21.779% 0.00002 271.152);
+}
+
 .word {
   background-color: color-mix(
     in oklab,
@@ -488,21 +503,22 @@ code > [data-line]::before {
 }
 
 .prose pre {
-  background-color: var(--color-prose-pre-bg);
+  background-color: transparent;
   color: var(--color-prose-pre-text);
   position: relative;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
   border-radius: 0.5rem;
+  margin: 0;
   overflow-x: auto;
-  border: 1px solid var(--color-brand-border);
+  border: 1px solid var(--color-accent-foreground);
 }
 
 @media (max-width: 768px) {
   :root .prose pre {
-    padding: 0.5rem;
+    padding: 0;
     font-size: 0.875rem;
   }
 }
@@ -514,7 +530,7 @@ code > [data-line]::before {
 }
 @media (max-width: 768px) {
   .dark .prose pre {
-    padding: 0.5rem;
+    padding: 0;
     font-size: 0.875rem;
   }
 }

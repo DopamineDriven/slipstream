@@ -175,7 +175,7 @@ type GetAttachmentGroupByPayload<T extends AttachmentGroupByArgs> = Prisma.Prism
           : Prisma.GetScalarType<T[P], AttachmentGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

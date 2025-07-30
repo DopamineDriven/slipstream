@@ -64,7 +64,7 @@
     "@t3-chat-clone/tsconfig": "workspace:*",
     "@types/node": "^24.1.0",
     "chokidar": "^4.0.3",
-    "dotenv-cli": "^9.0.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.32.0",
     "jiti": "^2.5.1",
     "prettier": "^3.6.2",

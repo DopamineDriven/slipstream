@@ -6,7 +6,6 @@ import type {
   Options as RehypePrettyCodeOptions
 } from "rehype-pretty-code";
 import type { Options as RehypeSanitizeOptions } from "rehype-sanitize";
-import type { Options as RemarkParseOptions } from "remark-parse";
 import type { Options as RemarkRehypeOptions } from "remark-rehype";
 import React, { createElement, Fragment } from "react";
 import * as jsxRuntime from "react/jsx-runtime";
@@ -104,6 +103,28 @@ function _remarkFixHeadings() {
         });
 
         parent.children.splice(index, 1, ...newNodes);
+      }
+    });
+  };
+}
+
+function remarkNormalizeMath() {
+  return (tree: Root) => {
+    visit(tree, "text", (node, index, parent) => {
+      if (!parent || typeof index !== "number") return;
+
+      // Only normalize obvious math delimiter issues
+      let value = node.value;
+
+      // Fix escaped parentheses that should be math delimiters
+      value = value.replace(/\\$$/g, "$").replace(/\\$$/g, "$");
+
+      // Fix escaped brackets for display math
+      value = value.replace(/\\\[/g, "$$").replace(/\\\]/g, "$$");
+
+      // Only update if we actually changed something
+      if (value !== node.value) {
+        node.value = value;
       }
     });
   };
@@ -228,17 +249,88 @@ const commonMathMLTags = mathmlTags;
 export async function processMarkdownToReact(content: string) {
   // const content = preprocessAIMarkdown(contentRaw);
   const processor = unified();
-  processor.use(remarkParse, {} satisfies RemarkParseOptions);
+  processor.use(remarkParse);
+  processor.use(remarkNormalizeMath);
   processor.use(remarkGfm);
   processor.use(remarkMath);
   processor.use(remarkRehype, {
     allowDangerousHtml: true
   } satisfies RemarkRehypeOptions);
-  processor.use(rehypePrettyCode, prettyCodeOptions);
   processor.use(rehypeKatex);
+  processor.use(rehypePrettyCode, prettyCodeOptions);
   processor.use(rehypeSanitize, {
     allowDoctypes: true,
-    tagNames: [...(defaultSchema.tagNames ?? []), ...commonMathMLTags],
+    allowComments: true,
+    tagNames: [
+      "a",
+      "audio",
+      "aside",
+      "address",
+      "b",
+      "blockquote",
+      "br",
+      "code",
+      "cite",
+      "caption",
+      "canvas",
+      "data",
+      "dd",
+      "del",
+      "details",
+      "div",
+      "dl",
+      "dt",
+      "em",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "hr",
+      "g",
+      "i",
+      "label",
+      "iframe",
+      "img",
+      "image",
+      "input",
+      "ins",
+      "kbd",
+      "li",
+      "ol",
+      "p",
+      "picture",
+      "pre",
+      "q",
+      "rp",
+      "rt",
+      "ruby",
+      "s",
+      "samp",
+      "section",
+      "source",
+      "span",
+      "strike",
+      "strong",
+      "sub",
+      "summary",
+      "sup",
+      "svg",
+      "table",
+      "tbody",
+      "video",
+      "td",
+      "tfoot",
+      "th",
+      "thead",
+      "time",
+      "tr",
+      "tt",
+      "ul",
+      "var",
+      ...commonMathMLTags
+    ],
     attributes: {
       ...(defaultSchema.attributes ?? {}),
       "*": [
@@ -294,3 +386,4 @@ declare module "vfile" {
     data: TData;
   }
 }
+export default processMarkdownToReact;

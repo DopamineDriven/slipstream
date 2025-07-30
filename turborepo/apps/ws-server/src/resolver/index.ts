@@ -1,3 +1,4 @@
+import type { Message } from "@/generated/client/client.ts";
 import type {
   RawMessageStreamEvent,
   StopReason
@@ -8,10 +9,10 @@ import type {
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs";
 import type { RawData } from "ws";
-import OpenAI from "openai";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { ModelService } from "@/models/index.ts";
+import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
@@ -19,6 +20,7 @@ import { GenerateContentResponse } from "@google/genai";
 import { WebSocket } from "ws";
 import type {
   AnthropicChatModels,
+  AnthropicModelIdUnion,
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
@@ -27,17 +29,17 @@ import type {
   OpenAIChatModels,
   Provider
 } from "@t3-chat-clone/types";
-import { Credentials } from "@t3-chat-clone/credentials";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 
 export class Resolver extends ModelService {
   constructor(
     public wsServer: WSServer,
-    private openai: OpenAI,
+    private openai: OpenAIService,
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
     private r2: R2Instance,
-    private cred: Credentials
+    private fastApiUrl: string,
+    private Bucket: string
   ) {
     super();
   }
@@ -70,17 +72,6 @@ export class Resolver extends ModelService {
     } else return String(err);
   }
 
-  private cleanTitle(outputTitle: string, maxWords = 10) {
-    if (!outputTitle) return "New Chat";
-    return outputTitle
-      .replace(/^["']|["']$/g, "")
-      .replace(/\.$/, "")
-      .split(/\s+/)
-      .slice(0, maxWords)
-      .join(" ")
-      .trim();
-  }
-
   private formatProvider(provider?: Provider) {
     switch (provider) {
       case "anthropic":
@@ -104,8 +95,7 @@ export class Resolver extends ModelService {
     prompt,
     provider
   }: EventTypeMap["ai_chat_request"]) {
-    const apiKey = await this.cred.get("OPENAI_API_KEY");
-    const openai = this.openai.withOptions({ apiKey });
+    const openai = this.openai.getClient();
     try {
       const turbo = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -125,7 +115,6 @@ export class Resolver extends ModelService {
       console.warn(err);
     }
   }
-
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -141,42 +130,59 @@ export class Resolver extends ModelService {
         | AnthropicChatModels
         | undefined
     );
+    const topP = event.topP;
+
+    const temperature = event.temperature;
+
+    const systemPrompt = event.systemPrompt;
+
+    const max_tokens = event.maxTokens;
+
+    const hasProviderConfigured = event.hasProviderConfigured;
+
+    const isDefaultProvider = event.isDefaultProvider;
+
+    const prompt = event.prompt;
+
+    const conversationIdInitial = event.conversationId;
 
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
-      conversationId: event.conversationId,
-      prompt: event.prompt,
+      conversationId: conversationIdInitial,
+      prompt,
       provider,
-      hasProviderConfigured: event.hasProviderConfigured,
-      maxTokens: event.maxTokens,
-      isDefaultProvider: event.isDefaultProvider,
-      systemPrompt: event.systemPrompt,
-      temperature: event.temperature,
-      topP: event.topP,
-      model: model
+      hasProviderConfigured,
+      maxTokens: max_tokens,
+      isDefaultProvider,
+      systemPrompt,
+      temperature,
+      topP,
+      model
     });
-
-    const topP = event.topP;
-    const temperature = event.temperature;
-    const systemPrompt = event.systemPrompt;
-    const max_tokens = event.maxTokens;
-
+    // TODO set up passing recent messages into request for context -- configure token usage for a given conversation relative to model max context window limits
+    const _isNewChat = conversationIdInitial.startsWith("new-chat");
+    const _msgs = res.messages satisfies Message[];
     const conversationId = res.id;
+
     const streamChannel = RedisChannels.conversationStream(conversationId);
     const userChannel = RedisChannels.user(userId);
     const existingState =
       await this.wsServer.redis.getStreamState(conversationId);
+
     let chunks = Array.of<string>();
+
     let resumedFromChunk = 0;
+
     let agg = "";
 
     const title = res?.title ?? (await this.titleGenUtil(event));
+
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
       resumedFromChunk = chunks.length;
 
       // Send resume event
-      await this.wsServer.redis.publishTypedEvent(
+      void this.wsServer.redis.publishTypedEvent(
         streamChannel,
         "stream:resumed",
         {
@@ -201,10 +207,9 @@ export class Resolver extends ModelService {
           model: existingState.metadata.model,
           provider: existingState.metadata.provider as Provider,
           title: existingState.metadata.title,
-
-          systemPrompt: event.systemPrompt,
-          temperature: event.temperature,
-          topP: event.topP
+          systemPrompt,
+          temperature,
+          topP
         } satisfies EventTypeMap["ai_chat_chunk"])
       );
     }
@@ -228,24 +233,23 @@ export class Resolver extends ModelService {
           apiKey: null,
           keyId: null
         };
-        if (event.hasProviderConfigured) {
+        if (hasProviderConfigured) {
           key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
           console.log(
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const gemini = await this.geminiService.getClient(
-          key.apiKey ?? undefined
-        );
+        const gemini = this.geminiService.getClient(key.apiKey ?? undefined);
 
         const chat = gemini.chats.create({ model: model });
 
         const stream = (await chat.sendMessageStream({
-          message: event.prompt,
+          message: prompt,
           config: {
             temperature,
             maxOutputTokens: max_tokens,
             topP,
+            thinkingConfig: { thinkingBudget: -1 },
             systemInstruction: systemPrompt satisfies ContentUnion | undefined
           }
         })) satisfies AsyncGenerator<GenerateContentResponse>;
@@ -373,31 +377,53 @@ export class Resolver extends ModelService {
           apiKey: null,
           keyId: null
         };
-        if (event.hasProviderConfigured) {
+        if (hasProviderConfigured) {
           key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
           console.log(
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const anthropicFallback = await this.cred.get("ANTHROPIC_API_KEY");
-        const anthropic = await this.anthropicService.getClient(
-          key.apiKey ?? anthropicFallback
+
+        const anthropic = this.anthropicService.getClient(
+          key.apiKey ?? undefined
         );
 
-        const max_tokens =
-          event.maxTokens ??
-          this.anthropicService.maxOutputTokens(model as AnthropicChatModels);
+        const max =
+          max_tokens &&
+          max_tokens <=
+            this.anthropicService.getMaxTokens(model as AnthropicModelIdUnion)
+            ? max_tokens
+            : this.anthropicService.getMaxTokens(
+                model as AnthropicModelIdUnion
+              );
 
-        const stream = (await anthropic.messages.create({
-          max_tokens,
-          stream: true,
-          thinking: { type: "disabled" },
-          top_p: topP,
-          temperature,
-          system: systemPrompt,
-          model,
-          messages: [{ role: "user", content: event.prompt }]
-        })) satisfies Stream<RawMessageStreamEvent> & {
+        const stream = (await anthropic.messages.create(
+          {
+            max_tokens: max,
+            stream: true,
+            thinking:
+              max >= 1024
+                ? {
+                    type: "enabled",
+                    budget_tokens:
+                      this.anthropicService.getMaxTokens(
+                        model as AnthropicModelIdUnion
+                      ) - 1024
+                  }
+                : { type: "disabled" },
+            top_p: topP,
+            temperature,
+            system: [
+              {
+                type: "text",
+                text: systemPrompt ?? "You are an honest and helpful assistant."
+              }
+            ],
+            model,
+            messages: [{ role: "user", content: prompt }]
+          },
+          { stream: true }
+        )) satisfies Stream<RawMessageStreamEvent> & {
           _request_id?: string | null;
         };
 
@@ -405,9 +431,13 @@ export class Resolver extends ModelService {
           let text: string | undefined = undefined;
           let done: StopReason | null = null;
           if (chunk.type === "content_block_delta") {
+            if (chunk.delta.type === "thinking_delta") {
+              text = chunk.delta.thinking;
+            }
             if (chunk.delta.type === "text_delta") {
               text = chunk.delta.text;
-            } else if (chunk.delta.type === "citations_delta") {
+            }
+            if (chunk.delta.type === "citations_delta") {
               text = chunk.delta.citation.cited_text;
             }
           } else if (chunk.type === "message_delta") {
@@ -469,8 +499,11 @@ export class Resolver extends ModelService {
               conversationId,
               done: true,
               title,
+              temperature,
+              topP,
               provider,
               userId,
+              systemPrompt,
               model
             });
             ws.send(
@@ -511,28 +544,18 @@ export class Resolver extends ModelService {
           }
         }
       } else if (provider === "grok") {
-        const xAi = await this.cred.get("X_AI_KEY");
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
         };
-        if (event.hasProviderConfigured) {
+        if (hasProviderConfigured) {
           key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
           console.log(
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const fallbackApiKey = xAi;
 
-        const client = key.apiKey
-          ? this.openai.withOptions({
-              apiKey: key.apiKey,
-              baseURL: "https://api.x.ai/v1"
-            })
-          : this.openai.withOptions({
-              apiKey: fallbackApiKey,
-              baseURL: "https://api.x.ai/v1"
-            });
+        const client = this.openai.getGrokClient(key.apiKey ?? undefined);
         const messages = (
           systemPrompt
             ? ([
@@ -660,23 +683,21 @@ export class Resolver extends ModelService {
           systemPrompt
             ? ([
                 { role: "system", content: systemPrompt },
-                { role: "user", content: event.prompt }
+                { role: "user", content: prompt }
               ] as const)
-            : ([{ role: "user", content: event.prompt }] as const)
+            : ([{ role: "user", content: prompt }] as const)
         ) satisfies ChatCompletionMessageParam[];
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
         };
-        if (event.hasProviderConfigured) {
+        if (hasProviderConfigured) {
           key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
           console.log(
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const client = key.apiKey
-          ? this.openai.withOptions({ apiKey: key.apiKey })
-          : this.openai;
+        const client = this.openai.getClient(key.apiKey ?? undefined);
         const stream = (await client.chat.completions.create(
           {
             user: userId,
@@ -934,9 +955,8 @@ export class Resolver extends ModelService {
     ws: WebSocket,
     userId: string
   ): Promise<void> {
-    const FASTAPI_URL = await this.cred.get("FASTAPI_URL");
     try {
-      const res = await fetch(FASTAPI_URL, {
+      const res = await fetch(this.fastApiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -985,7 +1005,6 @@ export class Resolver extends ModelService {
     ws: WebSocket,
     userId: string
   ): Promise<void> {
-    const bucket = await this.cred.get("R2_BUCKET");
     try {
       const data = Buffer.from(event.base64, "base64");
       const key = `user-assets/${userId}/${Date.now()}_${event.filename}`;
@@ -993,7 +1012,7 @@ export class Resolver extends ModelService {
         Key: key,
         Body: data,
         ContentType: event.contentType,
-        Bucket: bucket
+        Bucket: this.Bucket
       });
       ws.send(
         JSON.stringify({

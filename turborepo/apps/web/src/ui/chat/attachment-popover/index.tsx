@@ -30,8 +30,9 @@ export function AttachmentPopover({
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground hover:text-foreground hover:bg-accent size-8 sm:h-auto sm:w-auto">
-          <Plus className="size-5" />
+          title="Attach"
+          className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 sm:h-auto sm:w-auto">
+          <Plus className="size-4" />
           <span className="sr-only">Attach</span>
         </Button>
       </PopoverTrigger>

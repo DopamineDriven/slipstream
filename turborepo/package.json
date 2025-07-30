@@ -43,7 +43,7 @@
     "tsx": "^4.20.3",
     "turbo": "^2.5.5",
     "typescript": "^5.8.3",
-    "vercel": "^44.6.3"
+    "vercel": "^44.6.4"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {

@@ -101,9 +101,72 @@ export function preprocessAIMarkdown(content: string) {
 
       // Clean up any triple+ newlines we created
       .replace(/\n{3,}/g, "\n\n")
-      // .replace(/```\n([\s\S]*?)```/g, (match, code: string) => {
-      //   const lang = detectCodeLanguage(code);
-      //   return lang !== "text" ? `\`\`\`${lang}\n${code}\`\`\`` : match;
-      // })
   );
+}
+
+/**
+ * Splits the markdown content into logical blocks.
+ * This is a key part of the memoization strategy. We split by code blocks
+ * and double newlines to create chunks that can be independently rendered.
+ * @param markdown - The full markdown string.
+ * @returns An array of markdown strings, each representing a block.
+ */
+export function splitIntoBlocks(markdown: string): string[] {
+  // First, convert literal \n to actual newlines
+  const withNewlines = markdown.replace(/\\n/g, "\n")
+
+  // The regex splits the string by code blocks (\`\`\`...\`\`\`) or by double newlines.
+  // The `s` flag allows `.` to match newlines, which is crucial for code blocks.
+  // The capturing group `(\`\`\`[\s\S]*?\`\`\`)` ensures that the code blocks themselves
+  // are included in the result array.
+  const blocks = withNewlines.split(/(```[\s\S]*?```|\n{2,})/s)
+
+  // The split can result in empty or undefined entries, so we filter them out.
+  // We also trim each block to remove leading/trailing whitespace.
+  return blocks.filter((block) => block && block.trim() !== "").map((block) => block.trim())
+}
+
+// TEMP
+
+/**
+ * Preprocesses LaTeX content within a markdown string to correct
+ * common issues from AI model outputs.
+ * @param content - The markdown string.
+ * @returns A string with corrected LaTeX.
+ */
+export function preprocessTex(content: string): string {
+  return (
+    content
+      // Normalize excessive backslashes from various AI models to a standard double backslash.
+      .replace(/\\\\+/g, "\\\\")
+      // Some models might escape single backslashes, turning \\ into \\\\. This reverts it.
+      .replace(/(\s)\\\\/g, "$1\\\\")
+  )
+}
+
+/**
+ * Normalizes a markdown string by attempting to fix common formatting
+ * issues, like missing newlines before headings or list items.
+ * This makes the parser more resilient to malformed input.
+ * @param markdown - The raw markdown string.
+ * @returns A normalized markdown string.
+ */
+export function normalizeMarkdown(markdown: string): string {
+  return (
+    markdown
+      // Convert literal \n to actual newlines first
+      .replace(/\\n/g, "\n")
+      // Add a newline before headings that are not at the start of the string.
+      .replace(/(\S)(#{1,6} )/g, "$1\n\n$2")
+      // Add a newline before list items that are not at the start of a line.
+      .replace(/(\S)(\n?[-*] )/g, "$1\n$2")
+      // Add a newline before numbered list items that are not at the start of a line.
+      .replace(/(\S)(\n?\d+\. )/g, "$1\n$2")
+      // Handle LaTeX delimiters more carefully - only convert if they're clearly block math
+      .replace(/\\\[\s*\n/g, "\n$$\n")
+      .replace(/\n\s*\\\]/g, "\n$$\n")
+      // Convert inline math delimiters
+      .replace(/\\\(/g, "$")
+      .replace(/\\\)/g, "$")
+  )
 }
