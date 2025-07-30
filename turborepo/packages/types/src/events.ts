@@ -1,5 +1,14 @@
 import type { GetModelUtilRT, Provider } from "@/models.ts";
 
+export type AIChatRequestUserMetadata = {
+  city?: string;
+  region?: string;
+  country?: string;
+  lat?: number;
+  lng?: number;
+  tz?: string;
+  postalCode?: string;
+};
 export type AIChatRequest = {
   type: "ai_chat_request";
   conversationId: string;
@@ -12,6 +21,7 @@ export type AIChatRequest = {
   maxTokens?: number;
   hasProviderConfigured?: boolean;
   isDefaultProvider?: boolean;
+  metadata?: AIChatRequestUserMetadata;
 };
 
 export type AIChatResponse = {
@@ -52,7 +62,7 @@ export type AIChatChunk = {
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
-  sub_type: "text" | "citation" | "thinking"
+  // sub_type: "text" | "citation" | "thinking"
 };
 
 export type AIChatError = {

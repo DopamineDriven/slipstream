@@ -6,7 +6,9 @@ export const COOKIES = {
   tz: "tz",
   country: "country",
   city: "city",
-  isMac: "isMac"
+  isMac: "isMac",
+  region: "region",
+  postalCode: "postalCode"
 } as const;
 
 export type CookieValue = {
@@ -20,6 +22,8 @@ export type CookieValue = {
    */
   latlng: string;
   tz: string;
+  region: string;
+  postalCode: string;
   country: string;
   city: string;
   isMac: "true" | "false";

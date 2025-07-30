@@ -2,7 +2,7 @@ import { prismaClient } from "@/prisma/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const data = async () =>
   await prismaClient.conversation.findMany({ include: { messages: true } });

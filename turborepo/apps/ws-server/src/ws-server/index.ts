@@ -1,10 +1,5 @@
 import http from "http";
 import { TLSSocket } from "tls";
-import type { IncomingMessage } from "http";
-import type { RawData } from "ws";
-import {  EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
-import * as dotenv from "dotenv";
-import { WebSocket, WebSocketServer } from "ws";
 import type {
   BufferLike,
   HandlerMap,
@@ -12,10 +7,12 @@ import type {
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
-import type { EventTypeMap } from "@t3-chat-clone/types";
+import type { IncomingMessage } from "http";
+import type { RawData } from "ws";
 import { PrismaService } from "@/prisma/index.ts";
-
-dotenv.config();
+import { WebSocket, WebSocketServer } from "ws";
+import type { EventTypeMap } from "@t3-chat-clone/types";
+import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
 export class WSServer {
   private wss: WebSocketServer;
@@ -42,7 +39,7 @@ export class WSServer {
     public prisma: PrismaService
   ) {
     this.channel = opts.channel ?? "chat-global";
-    this.jwtSecret = opts.jwtSecret;;
+    this.jwtSecret = opts.jwtSecret;
     this.httpServer = http.createServer((req, res) => {
       const startTime = performance.now();
 

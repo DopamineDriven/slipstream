@@ -3,11 +3,12 @@ import type {
   RawMessageStreamEvent,
   StopReason
 } from "@anthropic-ai/sdk/resources/messages.mjs";
-import type { ContentUnion } from "@google/genai";
 import type {
-  ChatCompletionChunk,
-  ChatCompletionMessageParam
-} from "openai/resources/index.mjs";
+  Blob,
+  FinishReason,
+  GenerateContentResponse
+} from "@google/genai";
+import type { ChatCompletionChunk } from "openai/resources/index.mjs";
 import type { RawData } from "ws";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
@@ -16,17 +17,12 @@ import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import { GenerateContentResponse } from "@google/genai";
 import { WebSocket } from "ws";
 import type {
-  AnthropicChatModels,
-  AnthropicModelIdUnion,
+  AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  GeminiChatModels,
-  GrokChatModels,
-  OpenAIChatModels,
   Provider
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
@@ -78,10 +74,9 @@ export class Resolver extends ModelService {
         return "Anthropic";
       case "gemini":
         return "Gemini";
-      case "openai":
-        return "OpenAI";
       case "grok":
         return "Grok";
+      case "openai":
       default:
         return "OpenAI";
     }
@@ -115,6 +110,7 @@ export class Resolver extends ModelService {
       console.warn(err);
     }
   }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -123,12 +119,7 @@ export class Resolver extends ModelService {
     const provider = event?.provider ?? "openai";
     const model = this.getModel(
       provider,
-      event?.model as
-        | GeminiChatModels
-        | OpenAIChatModels
-        | GrokChatModels
-        | AnthropicChatModels
-        | undefined
+      event?.model as AllModelsUnion | undefined
     );
     const topP = event.topP;
 
@@ -159,9 +150,9 @@ export class Resolver extends ModelService {
       topP,
       model
     });
-    // TODO set up passing recent messages into request for context -- configure token usage for a given conversation relative to model max context window limits
-    const _isNewChat = conversationIdInitial.startsWith("new-chat");
-    const _msgs = res.messages satisfies Message[];
+    //  configure token usage for a given conversation relative to model max context window limits
+    const isNewChat = conversationIdInitial.startsWith("new-chat");
+    const msgs = res.messages satisfies Message[];
     const conversationId = res.id;
 
     const streamChannel = RedisChannels.conversationStream(conversationId);
@@ -174,7 +165,8 @@ export class Resolver extends ModelService {
     let resumedFromChunk = 0;
 
     let agg = "";
-
+    // let thinking = "";
+    // let citations = "";
     const title = res?.title ?? (await this.titleGenUtil(event));
 
     if (existingState && !existingState.metadata.completed) {
@@ -239,9 +231,20 @@ export class Resolver extends ModelService {
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
+
+        const { history, systemInstruction } =
+          this.geminiService.getHistoryAndInstruction(
+            isNewChat,
+            msgs,
+            systemPrompt
+          );
+
         const gemini = this.geminiService.getClient(key.apiKey ?? undefined);
 
-        const chat = gemini.chats.create({ model: model });
+        const chat = gemini.chats.create({
+          model: model,
+          history
+        });
 
         const stream = (await chat.sendMessageStream({
           message: prompt,
@@ -249,16 +252,38 @@ export class Resolver extends ModelService {
             temperature,
             maxOutputTokens: max_tokens,
             topP,
-            thinkingConfig: { thinkingBudget: -1 },
-            systemInstruction: systemPrompt satisfies ContentUnion | undefined
+            thinkingConfig: { includeThoughts: true, thinkingBudget: -1 },
+            systemInstruction
           }
         })) satisfies AsyncGenerator<GenerateContentResponse>;
 
         for await (const chunk of stream) {
-          const textPart = chunk.text;
-          const dataPart = chunk.data;
-          const done = chunk.candidates?.[0]?.finishReason;
 
+          // Gemini thinking chunks _always_ start with **TEXT** -- use regex to detect when thinking starts/stops at the onset of streaming
+          // eg, const isThinkingRegex = /^\s*\*\*.+\*\*\s*$/;
+
+          let dataPart: Blob | undefined = undefined;
+          let textPart: string | undefined = undefined;
+          let done: keyof typeof FinishReason | undefined = undefined;
+
+          if (chunk.candidates) {
+            for (const candidate of chunk.candidates) {
+              if (candidate.content?.parts) {
+                for (const part of candidate.content.parts) {
+                  if (part.text) {
+                    textPart = part.text;
+                  }
+                  if (part.inlineData) {
+                    dataPart = part.inlineData;
+                  }
+                }
+              }
+
+              if (candidate.finishReason) {
+                done = candidate.finishReason;
+              }
+            }
+          }
           if (textPart) {
             chunks.push(textPart);
             agg += textPart;
@@ -309,13 +334,14 @@ export class Resolver extends ModelService {
               });
             }
           }
-          if (dataPart) {
-            const _dataUrl = `data:image/png;base64,${dataPart}` as const;
+          if (dataPart?.data && dataPart?.mimeType) {
+            const _dataUrl =
+              `data:${dataPart.mimeType};base64,${dataPart.data}` as const;
             ws.send(
               JSON.stringify({
                 type: "ai_chat_inline_data",
                 conversationId,
-                data: dataPart,
+                data: _dataUrl,
                 userId,
                 model,
                 systemPrompt,
@@ -388,39 +414,30 @@ export class Resolver extends ModelService {
           key.apiKey ?? undefined
         );
 
-        const max =
-          max_tokens &&
-          max_tokens <=
-            this.anthropicService.getMaxTokens(model as AnthropicModelIdUnion)
-            ? max_tokens
-            : this.anthropicService.getMaxTokens(
-                model as AnthropicModelIdUnion
-              );
+        const { messages, system } =
+          this.anthropicService.formatAnthropicHistory(
+            isNewChat,
+            msgs,
+            prompt,
+            systemPrompt
+          );
+
+        const { max_tokens, thinking } =
+          this.anthropicService.handleMaxTokensAndThinking(
+            model,
+            event.maxTokens
+          );
 
         const stream = (await anthropic.messages.create(
           {
-            max_tokens: max,
+            max_tokens,
             stream: true,
-            thinking:
-              max >= 1024
-                ? {
-                    type: "enabled",
-                    budget_tokens:
-                      this.anthropicService.getMaxTokens(
-                        model as AnthropicModelIdUnion
-                      ) - 1024
-                  }
-                : { type: "disabled" },
+            thinking,
             top_p: topP,
             temperature,
-            system: [
-              {
-                type: "text",
-                text: systemPrompt ?? "You are an honest and helpful assistant."
-              }
-            ],
+            system,
             model,
-            messages: [{ role: "user", content: prompt }]
+            messages
           },
           { stream: true }
         )) satisfies Stream<RawMessageStreamEvent> & {
@@ -438,7 +455,7 @@ export class Resolver extends ModelService {
               text = chunk.delta.text;
             }
             if (chunk.delta.type === "citations_delta") {
-              text = chunk.delta.citation.cited_text;
+              console.log(chunk.delta.citation);
             }
           } else if (chunk.type === "message_delta") {
             done = chunk.delta.stop_reason;
@@ -556,14 +573,7 @@ export class Resolver extends ModelService {
         }
 
         const client = this.openai.getGrokClient(key.apiKey ?? undefined);
-        const messages = (
-          systemPrompt
-            ? ([
-                { role: "system", content: systemPrompt },
-                { role: "user", content: event.prompt }
-              ] as const)
-            : ([{ role: "user", content: event.prompt }] as const)
-        ) satisfies ChatCompletionMessageParam[];
+
         const stream = (await client.chat.completions.create(
           {
             user: userId,
@@ -571,7 +581,12 @@ export class Resolver extends ModelService {
             temperature,
             max_completion_tokens: max_tokens,
             model,
-            messages,
+            messages: this.openai.formatOpenAi(
+              isNewChat,
+              msgs,
+              prompt,
+              systemPrompt
+            ),
             stream: true
           },
           { stream: true }
@@ -679,14 +694,6 @@ export class Resolver extends ModelService {
           }
         }
       } else {
-        const messages = (
-          systemPrompt
-            ? ([
-                { role: "system", content: systemPrompt },
-                { role: "user", content: prompt }
-              ] as const)
-            : ([{ role: "user", content: prompt }] as const)
-        ) satisfies ChatCompletionMessageParam[];
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
@@ -705,7 +712,12 @@ export class Resolver extends ModelService {
             temperature,
             model,
             max_completion_tokens: max_tokens,
-            messages,
+            messages: this.openai.formatOpenAi(
+              isNewChat,
+              msgs,
+              prompt,
+              systemPrompt
+            ),
             stream: true
           },
           { stream: true }

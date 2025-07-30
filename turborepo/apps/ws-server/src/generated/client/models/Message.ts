@@ -32,6 +32,11 @@ export type MessageMinAggregateOutputType = {
   model: string | null
   userKeyId: string | null
   content: string | null
+  thinkingText: string | null
+  citationsText: string | null
+  liked: boolean | null
+  disliked: boolean | null
+  tryAgain: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -45,6 +50,11 @@ export type MessageMaxAggregateOutputType = {
   model: string | null
   userKeyId: string | null
   content: string | null
+  thinkingText: string | null
+  citationsText: string | null
+  liked: boolean | null
+  disliked: boolean | null
+  tryAgain: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +68,12 @@ export type MessageCountAggregateOutputType = {
   model: number
   userKeyId: number
   content: number
+  thinkingText: number
+  citationsText: number
+  citations: number
+  liked: number
+  disliked: number
+  tryAgain: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -73,6 +89,11 @@ export type MessageMinAggregateInputType = {
   model?: true
   userKeyId?: true
   content?: true
+  thinkingText?: true
+  citationsText?: true
+  liked?: true
+  disliked?: true
+  tryAgain?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -86,6 +107,11 @@ export type MessageMaxAggregateInputType = {
   model?: true
   userKeyId?: true
   content?: true
+  thinkingText?: true
+  citationsText?: true
+  liked?: true
+  disliked?: true
+  tryAgain?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -99,6 +125,12 @@ export type MessageCountAggregateInputType = {
   model?: true
   userKeyId?: true
   content?: true
+  thinkingText?: true
+  citationsText?: true
+  citations?: true
+  liked?: true
+  disliked?: true
+  tryAgain?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -185,6 +217,12 @@ export type MessageGroupByOutputType = {
   model: string | null
   userKeyId: string | null
   content: string
+  thinkingText: string | null
+  citationsText: string | null
+  citations: runtime.JsonValue | null
+  liked: boolean | null
+  disliked: boolean | null
+  tryAgain: boolean | null
   createdAt: Date
   updatedAt: Date
   _count: MessageCountAggregateOutputType | null
@@ -219,6 +257,12 @@ export type MessageWhereInput = {
   model?: Prisma.StringNullableFilter<"Message"> | string | null
   userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
   content?: Prisma.StringFilter<"Message"> | string
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citationsText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citations?: Prisma.JsonNullableFilter<"Message">
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
@@ -235,6 +279,12 @@ export type MessageOrderByWithRelationInput = {
   model?: Prisma.SortOrderInput | Prisma.SortOrder
   userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
+  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
+  citationsText?: Prisma.SortOrderInput | Prisma.SortOrder
+  citations?: Prisma.SortOrderInput | Prisma.SortOrder
+  liked?: Prisma.SortOrderInput | Prisma.SortOrder
+  disliked?: Prisma.SortOrderInput | Prisma.SortOrder
+  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userKey?: Prisma.UserKeyOrderByWithRelationInput
@@ -254,6 +304,12 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   model?: Prisma.StringNullableFilter<"Message"> | string | null
   userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
   content?: Prisma.StringFilter<"Message"> | string
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citationsText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citations?: Prisma.JsonNullableFilter<"Message">
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
@@ -270,6 +326,12 @@ export type MessageOrderByWithAggregationInput = {
   model?: Prisma.SortOrderInput | Prisma.SortOrder
   userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
+  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
+  citationsText?: Prisma.SortOrderInput | Prisma.SortOrder
+  citations?: Prisma.SortOrderInput | Prisma.SortOrder
+  liked?: Prisma.SortOrderInput | Prisma.SortOrder
+  disliked?: Prisma.SortOrderInput | Prisma.SortOrder
+  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MessageCountOrderByAggregateInput
@@ -289,6 +351,12 @@ export type MessageScalarWhereWithAggregatesInput = {
   model?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   userKeyId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  thinkingText?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  citationsText?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  citations?: Prisma.JsonNullableWithAggregatesFilter<"Message">
+  liked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
+  disliked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
+  tryAgain?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
 }
@@ -300,6 +368,12 @@ export type MessageCreateInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
@@ -316,6 +390,12 @@ export type MessageUncheckedCreateInput = {
   model?: string | null
   userKeyId?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
@@ -328,6 +408,12 @@ export type MessageUpdateInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
@@ -344,6 +430,12 @@ export type MessageUncheckedUpdateInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
@@ -358,6 +450,12 @@ export type MessageCreateManyInput = {
   model?: string | null
   userKeyId?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -369,6 +467,12 @@ export type MessageUpdateManyMutationInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -382,6 +486,12 @@ export type MessageUncheckedUpdateManyInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -405,6 +515,12 @@ export type MessageCountOrderByAggregateInput = {
   model?: Prisma.SortOrder
   userKeyId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  thinkingText?: Prisma.SortOrder
+  citationsText?: Prisma.SortOrder
+  citations?: Prisma.SortOrder
+  liked?: Prisma.SortOrder
+  disliked?: Prisma.SortOrder
+  tryAgain?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -418,6 +534,11 @@ export type MessageMaxOrderByAggregateInput = {
   model?: Prisma.SortOrder
   userKeyId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  thinkingText?: Prisma.SortOrder
+  citationsText?: Prisma.SortOrder
+  liked?: Prisma.SortOrder
+  disliked?: Prisma.SortOrder
+  tryAgain?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -431,6 +552,11 @@ export type MessageMinOrderByAggregateInput = {
   model?: Prisma.SortOrder
   userKeyId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  thinkingText?: Prisma.SortOrder
+  citationsText?: Prisma.SortOrder
+  liked?: Prisma.SortOrder
+  disliked?: Prisma.SortOrder
+  tryAgain?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -549,6 +675,12 @@ export type MessageCreateWithoutUserKeyInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
@@ -563,6 +695,12 @@ export type MessageUncheckedCreateWithoutUserKeyInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
@@ -606,6 +744,12 @@ export type MessageScalarWhereInput = {
   model?: Prisma.StringNullableFilter<"Message"> | string | null
   userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
   content?: Prisma.StringFilter<"Message"> | string
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citationsText?: Prisma.StringNullableFilter<"Message"> | string | null
+  citations?: Prisma.JsonNullableFilter<"Message">
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
@@ -617,6 +761,12 @@ export type MessageCreateWithoutConversationInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
@@ -631,6 +781,12 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   model?: string | null
   userKeyId?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
@@ -669,6 +825,12 @@ export type MessageCreateWithoutAttachmentsInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
@@ -684,6 +846,12 @@ export type MessageUncheckedCreateWithoutAttachmentsInput = {
   model?: string | null
   userKeyId?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -711,6 +879,12 @@ export type MessageUpdateWithoutAttachmentsInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
@@ -726,6 +900,12 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -738,6 +918,12 @@ export type MessageCreateManyUserKeyInput = {
   provider: $Enums.Provider
   model?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -749,6 +935,12 @@ export type MessageUpdateWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
@@ -763,6 +955,12 @@ export type MessageUncheckedUpdateWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
@@ -776,6 +974,12 @@ export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -788,6 +992,12 @@ export type MessageCreateManyConversationInput = {
   model?: string | null
   userKeyId?: string | null
   content: string
+  thinkingText?: string | null
+  citationsText?: string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: boolean | null
+  disliked?: boolean | null
+  tryAgain?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -799,6 +1009,12 @@ export type MessageUpdateWithoutConversationInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
@@ -813,6 +1029,12 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
@@ -826,6 +1048,12 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citationsText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  citations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -870,6 +1098,12 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   model?: boolean
   userKeyId?: boolean
   content?: boolean
+  thinkingText?: boolean
+  citationsText?: boolean
+  citations?: boolean
+  liked?: boolean
+  disliked?: boolean
+  tryAgain?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
@@ -887,6 +1121,12 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   model?: boolean
   userKeyId?: boolean
   content?: boolean
+  thinkingText?: boolean
+  citationsText?: boolean
+  citations?: boolean
+  liked?: boolean
+  disliked?: boolean
+  tryAgain?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
@@ -902,6 +1142,12 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   model?: boolean
   userKeyId?: boolean
   content?: boolean
+  thinkingText?: boolean
+  citationsText?: boolean
+  citations?: boolean
+  liked?: boolean
+  disliked?: boolean
+  tryAgain?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
@@ -917,11 +1163,17 @@ export type MessageSelectScalar = {
   model?: boolean
   userKeyId?: boolean
   content?: boolean
+  thinkingText?: boolean
+  citationsText?: boolean
+  citations?: boolean
+  liked?: boolean
+  disliked?: boolean
+  tryAgain?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "thinkingText" | "citationsText" | "citations" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
@@ -953,6 +1205,12 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     model: string | null
     userKeyId: string | null
     content: string
+    thinkingText: string | null
+    citationsText: string | null
+    citations: runtime.JsonValue | null
+    liked: boolean | null
+    disliked: boolean | null
+    tryAgain: boolean | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["message"]>
@@ -1389,6 +1647,12 @@ export interface MessageFieldRefs {
   readonly model: Prisma.FieldRef<"Message", 'String'>
   readonly userKeyId: Prisma.FieldRef<"Message", 'String'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
+  readonly thinkingText: Prisma.FieldRef<"Message", 'String'>
+  readonly citationsText: Prisma.FieldRef<"Message", 'String'>
+  readonly citations: Prisma.FieldRef<"Message", 'Json'>
+  readonly liked: Prisma.FieldRef<"Message", 'Boolean'>
+  readonly disliked: Prisma.FieldRef<"Message", 'Boolean'>
+  readonly tryAgain: Prisma.FieldRef<"Message", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Message", 'DateTime'>
 }
