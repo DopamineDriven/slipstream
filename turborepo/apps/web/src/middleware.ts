@@ -9,10 +9,14 @@ function detectDeviceAndSetCookies(
   request: NextRequest,
   response: NextResponse
 ) {
-  const country = request.headers.get("X-Vercel-IP-Country") ?? "US";
+  const country = request.headers.get("x-vercel-ip-country") ?? "US";
+  const region =
+    request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
   const city = request.headers.get("x-vercel-ip-city") ?? "Chicago";
   const lng = request.headers.get("x-vercel-ip-longitude") ?? "-87.8966849";
   const lat = request.headers.get("x-vercel-ip-latitude") ?? "41.8338486";
+  const postalCode = request.headers.get("x-vercel-ip-postal-code") ?? "60010";
+
   const tz = request.headers.get("x-vercel-ip-timezone") ?? "america/chicago";
   const { os, device, ua } = userAgent(request);
   const isMac = /(mac)/gim.test(os?.name ?? "") ?? false;
@@ -38,6 +42,13 @@ function detectDeviceAndSetCookies(
 
   if (request.cookies.has("country")) {
     response.cookies.delete("country");
+  }
+
+  if (request.cookies.has("region")) {
+    response.cookies.delete("region");
+  }
+  if (request.cookies.has("postalCode")) {
+    response.cookies.delete("postalCode");
   }
 
   if (request.cookies.has("city")) {
@@ -68,6 +79,8 @@ function detectDeviceAndSetCookies(
   response.cookies.set("country", country);
   response.cookies.set("city", city);
   response.cookies.set("isMac", `${isMac}`);
+  response.cookies.set("region", region);
+  response.cookies.set("postalCode", postalCode);
   response.headers.set("Access-Control-Allow-Origin", "*");
 
   return response;

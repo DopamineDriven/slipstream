@@ -26,11 +26,13 @@ export type AggregateConversationSettings = {
 }
 
 export type ConversationSettingsAvgAggregateOutputType = {
+  maxTokens: number | null
   temperature: number | null
   topP: number | null
 }
 
 export type ConversationSettingsSumAggregateOutputType = {
+  maxTokens: number | null
   temperature: number | null
   topP: number | null
 }
@@ -39,6 +41,12 @@ export type ConversationSettingsMinAggregateOutputType = {
   id: string | null
   conversationId: string | null
   systemPrompt: string | null
+  enableThinking: boolean | null
+  trackUsage: boolean | null
+  enableWebSearch: boolean | null
+  enableAssetGen: boolean | null
+  maxTokens: number | null
+  usageAlerts: boolean | null
   temperature: number | null
   topP: number | null
   createdAt: Date | null
@@ -49,6 +57,12 @@ export type ConversationSettingsMaxAggregateOutputType = {
   id: string | null
   conversationId: string | null
   systemPrompt: string | null
+  enableThinking: boolean | null
+  trackUsage: boolean | null
+  enableWebSearch: boolean | null
+  enableAssetGen: boolean | null
+  maxTokens: number | null
+  usageAlerts: boolean | null
   temperature: number | null
   topP: number | null
   createdAt: Date | null
@@ -59,6 +73,12 @@ export type ConversationSettingsCountAggregateOutputType = {
   id: number
   conversationId: number
   systemPrompt: number
+  enableThinking: number
+  trackUsage: number
+  enableWebSearch: number
+  enableAssetGen: number
+  maxTokens: number
+  usageAlerts: number
   temperature: number
   topP: number
   createdAt: number
@@ -68,11 +88,13 @@ export type ConversationSettingsCountAggregateOutputType = {
 
 
 export type ConversationSettingsAvgAggregateInputType = {
+  maxTokens?: true
   temperature?: true
   topP?: true
 }
 
 export type ConversationSettingsSumAggregateInputType = {
+  maxTokens?: true
   temperature?: true
   topP?: true
 }
@@ -81,6 +103,12 @@ export type ConversationSettingsMinAggregateInputType = {
   id?: true
   conversationId?: true
   systemPrompt?: true
+  enableThinking?: true
+  trackUsage?: true
+  enableWebSearch?: true
+  enableAssetGen?: true
+  maxTokens?: true
+  usageAlerts?: true
   temperature?: true
   topP?: true
   createdAt?: true
@@ -91,6 +119,12 @@ export type ConversationSettingsMaxAggregateInputType = {
   id?: true
   conversationId?: true
   systemPrompt?: true
+  enableThinking?: true
+  trackUsage?: true
+  enableWebSearch?: true
+  enableAssetGen?: true
+  maxTokens?: true
+  usageAlerts?: true
   temperature?: true
   topP?: true
   createdAt?: true
@@ -101,6 +135,12 @@ export type ConversationSettingsCountAggregateInputType = {
   id?: true
   conversationId?: true
   systemPrompt?: true
+  enableThinking?: true
+  trackUsage?: true
+  enableWebSearch?: true
+  enableAssetGen?: true
+  maxTokens?: true
+  usageAlerts?: true
   temperature?: true
   topP?: true
   createdAt?: true
@@ -198,6 +238,12 @@ export type ConversationSettingsGroupByOutputType = {
   id: string
   conversationId: string
   systemPrompt: string | null
+  enableThinking: boolean | null
+  trackUsage: boolean | null
+  enableWebSearch: boolean | null
+  enableAssetGen: boolean | null
+  maxTokens: number | null
+  usageAlerts: boolean | null
   temperature: number | null
   topP: number | null
   createdAt: Date
@@ -231,6 +277,12 @@ export type ConversationSettingsWhereInput = {
   id?: Prisma.StringFilter<"ConversationSettings"> | string
   conversationId?: Prisma.StringFilter<"ConversationSettings"> | string
   systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null
+  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
+  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
   topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
   createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
@@ -242,6 +294,12 @@ export type ConversationSettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder
+  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
+  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
   temperature?: Prisma.SortOrderInput | Prisma.SortOrder
   topP?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -256,6 +314,12 @@ export type ConversationSettingsWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ConversationSettingsWhereInput[]
   NOT?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[]
   systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null
+  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
+  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
   topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
   createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
@@ -267,6 +331,12 @@ export type ConversationSettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder
+  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
+  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
+  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
   temperature?: Prisma.SortOrderInput | Prisma.SortOrder
   topP?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -285,6 +355,12 @@ export type ConversationSettingsScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string
   conversationId?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string
   systemPrompt?: Prisma.StringNullableWithAggregatesFilter<"ConversationSettings"> | string | null
+  enableThinking?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
+  trackUsage?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
+  enableWebSearch?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
+  enableAssetGen?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
+  maxTokens?: Prisma.IntNullableWithAggregatesFilter<"ConversationSettings"> | number | null
+  usageAlerts?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null
   topP?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationSettings"> | Date | string
@@ -294,6 +370,12 @@ export type ConversationSettingsScalarWhereWithAggregatesInput = {
 export type ConversationSettingsCreateInput = {
   id?: string
   systemPrompt?: string | null
+  enableThinking?: boolean | null
+  trackUsage?: boolean | null
+  enableWebSearch?: boolean | null
+  enableAssetGen?: boolean | null
+  maxTokens?: number | null
+  usageAlerts?: boolean | null
   temperature?: number | null
   topP?: number | null
   createdAt?: Date | string
@@ -305,6 +387,12 @@ export type ConversationSettingsUncheckedCreateInput = {
   id?: string
   conversationId: string
   systemPrompt?: string | null
+  enableThinking?: boolean | null
+  trackUsage?: boolean | null
+  enableWebSearch?: boolean | null
+  enableAssetGen?: boolean | null
+  maxTokens?: number | null
+  usageAlerts?: boolean | null
   temperature?: number | null
   topP?: number | null
   createdAt?: Date | string
@@ -314,6 +402,12 @@ export type ConversationSettingsUncheckedCreateInput = {
 export type ConversationSettingsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -325,6 +419,12 @@ export type ConversationSettingsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,6 +435,12 @@ export type ConversationSettingsCreateManyInput = {
   id?: string
   conversationId: string
   systemPrompt?: string | null
+  enableThinking?: boolean | null
+  trackUsage?: boolean | null
+  enableWebSearch?: boolean | null
+  enableAssetGen?: boolean | null
+  maxTokens?: number | null
+  usageAlerts?: boolean | null
   temperature?: number | null
   topP?: number | null
   createdAt?: Date | string
@@ -344,6 +450,12 @@ export type ConversationSettingsCreateManyInput = {
 export type ConversationSettingsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -354,6 +466,12 @@ export type ConversationSettingsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -369,6 +487,12 @@ export type ConversationSettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   systemPrompt?: Prisma.SortOrder
+  enableThinking?: Prisma.SortOrder
+  trackUsage?: Prisma.SortOrder
+  enableWebSearch?: Prisma.SortOrder
+  enableAssetGen?: Prisma.SortOrder
+  maxTokens?: Prisma.SortOrder
+  usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
   topP?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -376,6 +500,7 @@ export type ConversationSettingsCountOrderByAggregateInput = {
 }
 
 export type ConversationSettingsAvgOrderByAggregateInput = {
+  maxTokens?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
   topP?: Prisma.SortOrder
 }
@@ -384,6 +509,12 @@ export type ConversationSettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   systemPrompt?: Prisma.SortOrder
+  enableThinking?: Prisma.SortOrder
+  trackUsage?: Prisma.SortOrder
+  enableWebSearch?: Prisma.SortOrder
+  enableAssetGen?: Prisma.SortOrder
+  maxTokens?: Prisma.SortOrder
+  usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
   topP?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -394,6 +525,12 @@ export type ConversationSettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   systemPrompt?: Prisma.SortOrder
+  enableThinking?: Prisma.SortOrder
+  trackUsage?: Prisma.SortOrder
+  enableWebSearch?: Prisma.SortOrder
+  enableAssetGen?: Prisma.SortOrder
+  maxTokens?: Prisma.SortOrder
+  usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
   topP?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -401,6 +538,7 @@ export type ConversationSettingsMinOrderByAggregateInput = {
 }
 
 export type ConversationSettingsSumOrderByAggregateInput = {
+  maxTokens?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
   topP?: Prisma.SortOrder
 }
@@ -437,9 +575,19 @@ export type ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
 }
 
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type ConversationSettingsCreateWithoutConversationInput = {
   id?: string
   systemPrompt?: string | null
+  enableThinking?: boolean | null
+  trackUsage?: boolean | null
+  enableWebSearch?: boolean | null
+  enableAssetGen?: boolean | null
+  maxTokens?: number | null
+  usageAlerts?: boolean | null
   temperature?: number | null
   topP?: number | null
   createdAt?: Date | string
@@ -449,6 +597,12 @@ export type ConversationSettingsCreateWithoutConversationInput = {
 export type ConversationSettingsUncheckedCreateWithoutConversationInput = {
   id?: string
   systemPrompt?: string | null
+  enableThinking?: boolean | null
+  trackUsage?: boolean | null
+  enableWebSearch?: boolean | null
+  enableAssetGen?: boolean | null
+  maxTokens?: number | null
+  usageAlerts?: boolean | null
   temperature?: number | null
   topP?: number | null
   createdAt?: Date | string
@@ -474,6 +628,12 @@ export type ConversationSettingsUpdateToOneWithWhereWithoutConversationInput = {
 export type ConversationSettingsUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -483,6 +643,12 @@ export type ConversationSettingsUpdateWithoutConversationInput = {
 export type ConversationSettingsUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -495,6 +661,12 @@ export type ConversationSettingsSelect<ExtArgs extends runtime.Types.Extensions.
   id?: boolean
   conversationId?: boolean
   systemPrompt?: boolean
+  enableThinking?: boolean
+  trackUsage?: boolean
+  enableWebSearch?: boolean
+  enableAssetGen?: boolean
+  maxTokens?: boolean
+  usageAlerts?: boolean
   temperature?: boolean
   topP?: boolean
   createdAt?: boolean
@@ -506,6 +678,12 @@ export type ConversationSettingsSelectCreateManyAndReturn<ExtArgs extends runtim
   id?: boolean
   conversationId?: boolean
   systemPrompt?: boolean
+  enableThinking?: boolean
+  trackUsage?: boolean
+  enableWebSearch?: boolean
+  enableAssetGen?: boolean
+  maxTokens?: boolean
+  usageAlerts?: boolean
   temperature?: boolean
   topP?: boolean
   createdAt?: boolean
@@ -517,6 +695,12 @@ export type ConversationSettingsSelectUpdateManyAndReturn<ExtArgs extends runtim
   id?: boolean
   conversationId?: boolean
   systemPrompt?: boolean
+  enableThinking?: boolean
+  trackUsage?: boolean
+  enableWebSearch?: boolean
+  enableAssetGen?: boolean
+  maxTokens?: boolean
+  usageAlerts?: boolean
   temperature?: boolean
   topP?: boolean
   createdAt?: boolean
@@ -528,13 +712,19 @@ export type ConversationSettingsSelectScalar = {
   id?: boolean
   conversationId?: boolean
   systemPrompt?: boolean
+  enableThinking?: boolean
+  trackUsage?: boolean
+  enableWebSearch?: boolean
+  enableAssetGen?: boolean
+  maxTokens?: boolean
+  usageAlerts?: boolean
   temperature?: boolean
   topP?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"]>
+export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "enableThinking" | "trackUsage" | "enableWebSearch" | "enableAssetGen" | "maxTokens" | "usageAlerts" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"]>
 export type ConversationSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
 }
@@ -554,6 +744,12 @@ export type $ConversationSettingsPayload<ExtArgs extends runtime.Types.Extension
     id: string
     conversationId: string
     systemPrompt: string | null
+    enableThinking: boolean | null
+    trackUsage: boolean | null
+    enableWebSearch: boolean | null
+    enableAssetGen: boolean | null
+    maxTokens: number | null
+    usageAlerts: boolean | null
     temperature: number | null
     topP: number | null
     createdAt: Date
@@ -985,6 +1181,12 @@ export interface ConversationSettingsFieldRefs {
   readonly id: Prisma.FieldRef<"ConversationSettings", 'String'>
   readonly conversationId: Prisma.FieldRef<"ConversationSettings", 'String'>
   readonly systemPrompt: Prisma.FieldRef<"ConversationSettings", 'String'>
+  readonly enableThinking: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
+  readonly trackUsage: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
+  readonly enableWebSearch: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
+  readonly enableAssetGen: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
+  readonly maxTokens: Prisma.FieldRef<"ConversationSettings", 'Int'>
+  readonly usageAlerts: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
   readonly temperature: Prisma.FieldRef<"ConversationSettings", 'Float'>
   readonly topP: Prisma.FieldRef<"ConversationSettings", 'Float'>
   readonly createdAt: Prisma.FieldRef<"ConversationSettings", 'DateTime'>

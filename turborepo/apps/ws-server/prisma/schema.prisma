@@ -1,6 +1,6 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -44,15 +44,17 @@ model User {
 }
 
 model Profile {
-  id       String  @id @default(cuid(2))
-  bio      String?
-  city     String?
-  country  String?
-  lat      Float?
-  lng      Float?
-  timezone String?
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String  @unique
+  id         String  @id @default(cuid(2))
+  bio        String?
+  city       String?
+  region     String?
+  country    String?
+  postalCode String?
+  lat        Float?
+  lng        Float?
+  timezone   String?
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String  @unique
 }
 
 model Account {
@@ -131,6 +133,12 @@ model ConversationSettings {
   id             String       @id @default(cuid(2))
   conversationId String       @unique
   systemPrompt   String?
+  enableThinking Boolean?     @default(false)
+  trackUsage     Boolean?     @default(false)
+  enableWebSearch Boolean?    @default(false)
+  enableAssetGen Boolean?     @default(false)
+  maxTokens      Int?
+  usageAlerts    Boolean?     @default(true)
   temperature    Float?       @default(1.0)
   topP           Float?       @default(1.0)
   createdAt      DateTime     @default(now())
@@ -147,6 +155,12 @@ model Message {
   model          String?
   userKeyId      String?
   content        String
+  thinkingText   String?
+  citationsText  String?
+  citations      Json?
+  liked          Boolean?     @default(false)
+  disliked       Boolean?     @default(false)
+  tryAgain       Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   userKey        UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])

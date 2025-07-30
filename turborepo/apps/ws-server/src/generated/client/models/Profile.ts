@@ -39,7 +39,9 @@ export type ProfileMinAggregateOutputType = {
   id: string | null
   bio: string | null
   city: string | null
+  region: string | null
   country: string | null
+  postalCode: string | null
   lat: number | null
   lng: number | null
   timezone: string | null
@@ -50,7 +52,9 @@ export type ProfileMaxAggregateOutputType = {
   id: string | null
   bio: string | null
   city: string | null
+  region: string | null
   country: string | null
+  postalCode: string | null
   lat: number | null
   lng: number | null
   timezone: string | null
@@ -61,7 +65,9 @@ export type ProfileCountAggregateOutputType = {
   id: number
   bio: number
   city: number
+  region: number
   country: number
+  postalCode: number
   lat: number
   lng: number
   timezone: number
@@ -84,7 +90,9 @@ export type ProfileMinAggregateInputType = {
   id?: true
   bio?: true
   city?: true
+  region?: true
   country?: true
+  postalCode?: true
   lat?: true
   lng?: true
   timezone?: true
@@ -95,7 +103,9 @@ export type ProfileMaxAggregateInputType = {
   id?: true
   bio?: true
   city?: true
+  region?: true
   country?: true
+  postalCode?: true
   lat?: true
   lng?: true
   timezone?: true
@@ -106,7 +116,9 @@ export type ProfileCountAggregateInputType = {
   id?: true
   bio?: true
   city?: true
+  region?: true
   country?: true
+  postalCode?: true
   lat?: true
   lng?: true
   timezone?: true
@@ -204,7 +216,9 @@ export type ProfileGroupByOutputType = {
   id: string
   bio: string | null
   city: string | null
+  region: string | null
   country: string | null
+  postalCode: string | null
   lat: number | null
   lng: number | null
   timezone: string | null
@@ -238,7 +252,9 @@ export type ProfileWhereInput = {
   id?: Prisma.StringFilter<"Profile"> | string
   bio?: Prisma.StringNullableFilter<"Profile"> | string | null
   city?: Prisma.StringNullableFilter<"Profile"> | string | null
+  region?: Prisma.StringNullableFilter<"Profile"> | string | null
   country?: Prisma.StringNullableFilter<"Profile"> | string | null
+  postalCode?: Prisma.StringNullableFilter<"Profile"> | string | null
   lat?: Prisma.FloatNullableFilter<"Profile"> | number | null
   lng?: Prisma.FloatNullableFilter<"Profile"> | number | null
   timezone?: Prisma.StringNullableFilter<"Profile"> | string | null
@@ -250,7 +266,9 @@ export type ProfileOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -266,7 +284,9 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProfileWhereInput | Prisma.ProfileWhereInput[]
   bio?: Prisma.StringNullableFilter<"Profile"> | string | null
   city?: Prisma.StringNullableFilter<"Profile"> | string | null
+  region?: Prisma.StringNullableFilter<"Profile"> | string | null
   country?: Prisma.StringNullableFilter<"Profile"> | string | null
+  postalCode?: Prisma.StringNullableFilter<"Profile"> | string | null
   lat?: Prisma.FloatNullableFilter<"Profile"> | number | null
   lng?: Prisma.FloatNullableFilter<"Profile"> | number | null
   timezone?: Prisma.StringNullableFilter<"Profile"> | string | null
@@ -277,7 +297,9 @@ export type ProfileOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
+  postalCode?: Prisma.SortOrderInput | Prisma.SortOrder
   lat?: Prisma.SortOrderInput | Prisma.SortOrder
   lng?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -296,7 +318,9 @@ export type ProfileScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Profile"> | string
   bio?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
+  region?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   country?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
+  postalCode?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
   lat?: Prisma.FloatNullableWithAggregatesFilter<"Profile"> | number | null
   lng?: Prisma.FloatNullableWithAggregatesFilter<"Profile"> | number | null
   timezone?: Prisma.StringNullableWithAggregatesFilter<"Profile"> | string | null
@@ -307,7 +331,9 @@ export type ProfileCreateInput = {
   id?: string
   bio?: string | null
   city?: string | null
+  region?: string | null
   country?: string | null
+  postalCode?: string | null
   lat?: number | null
   lng?: number | null
   timezone?: string | null
@@ -318,7 +344,9 @@ export type ProfileUncheckedCreateInput = {
   id?: string
   bio?: string | null
   city?: string | null
+  region?: string | null
   country?: string | null
+  postalCode?: string | null
   lat?: number | null
   lng?: number | null
   timezone?: string | null
@@ -329,7 +357,9 @@ export type ProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -340,7 +370,9 @@ export type ProfileUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,7 +383,9 @@ export type ProfileCreateManyInput = {
   id?: string
   bio?: string | null
   city?: string | null
+  region?: string | null
   country?: string | null
+  postalCode?: string | null
   lat?: number | null
   lng?: number | null
   timezone?: string | null
@@ -362,7 +396,9 @@ export type ProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -372,7 +408,9 @@ export type ProfileUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -388,7 +426,9 @@ export type ProfileCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -404,7 +444,9 @@ export type ProfileMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -415,7 +457,9 @@ export type ProfileMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  region?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  postalCode?: Prisma.SortOrder
   lat?: Prisma.SortOrder
   lng?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -471,7 +515,9 @@ export type ProfileCreateWithoutUserInput = {
   id?: string
   bio?: string | null
   city?: string | null
+  region?: string | null
   country?: string | null
+  postalCode?: string | null
   lat?: number | null
   lng?: number | null
   timezone?: string | null
@@ -481,7 +527,9 @@ export type ProfileUncheckedCreateWithoutUserInput = {
   id?: string
   bio?: string | null
   city?: string | null
+  region?: string | null
   country?: string | null
+  postalCode?: string | null
   lat?: number | null
   lng?: number | null
   timezone?: string | null
@@ -507,7 +555,9 @@ export type ProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -517,7 +567,9 @@ export type ProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -529,7 +581,9 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   bio?: boolean
   city?: boolean
+  region?: boolean
   country?: boolean
+  postalCode?: boolean
   lat?: boolean
   lng?: boolean
   timezone?: boolean
@@ -541,7 +595,9 @@ export type ProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   bio?: boolean
   city?: boolean
+  region?: boolean
   country?: boolean
+  postalCode?: boolean
   lat?: boolean
   lng?: boolean
   timezone?: boolean
@@ -553,7 +609,9 @@ export type ProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   bio?: boolean
   city?: boolean
+  region?: boolean
   country?: boolean
+  postalCode?: boolean
   lat?: boolean
   lng?: boolean
   timezone?: boolean
@@ -565,14 +623,16 @@ export type ProfileSelectScalar = {
   id?: boolean
   bio?: boolean
   city?: boolean
+  region?: boolean
   country?: boolean
+  postalCode?: boolean
   lat?: boolean
   lng?: boolean
   timezone?: boolean
   userId?: boolean
 }
 
-export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bio" | "city" | "country" | "lat" | "lng" | "timezone" | "userId", ExtArgs["result"]["profile"]>
+export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bio" | "city" | "region" | "country" | "postalCode" | "lat" | "lng" | "timezone" | "userId", ExtArgs["result"]["profile"]>
 export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -592,7 +652,9 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     bio: string | null
     city: string | null
+    region: string | null
     country: string | null
+    postalCode: string | null
     lat: number | null
     lng: number | null
     timezone: string | null
@@ -1024,7 +1086,9 @@ export interface ProfileFieldRefs {
   readonly id: Prisma.FieldRef<"Profile", 'String'>
   readonly bio: Prisma.FieldRef<"Profile", 'String'>
   readonly city: Prisma.FieldRef<"Profile", 'String'>
+  readonly region: Prisma.FieldRef<"Profile", 'String'>
   readonly country: Prisma.FieldRef<"Profile", 'String'>
+  readonly postalCode: Prisma.FieldRef<"Profile", 'String'>
   readonly lat: Prisma.FieldRef<"Profile", 'Float'>
   readonly lng: Prisma.FieldRef<"Profile", 'Float'>
   readonly timezone: Prisma.FieldRef<"Profile", 'String'>

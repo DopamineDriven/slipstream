@@ -167,7 +167,10 @@ export class PrismaService extends ModelService {
       });
     } else {
       return this.prismaClient.conversation.update({
-        include: { messages: true, conversationSettings: true },
+        include: {
+          messages: { orderBy: { createdAt: "asc" } },
+          conversationSettings: true
+        },
         where: { id: data.conversationId },
         data: {
           messages: {
