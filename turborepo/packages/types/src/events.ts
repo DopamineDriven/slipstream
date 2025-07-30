@@ -52,6 +52,7 @@ export type AIChatChunk = {
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
+  sub_type: "text" | "citation" | "thinking"
 };
 
 export type AIChatError = {

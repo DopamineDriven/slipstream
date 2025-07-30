@@ -55,17 +55,17 @@ async function exe() {
 
     const { Resolver } = await import("@/resolver/index.ts");
 
-    const { getOpenAI } = await import("@/openai/index.ts");
+    const { OpenAIService } = await import("@/openai/index.ts");
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
-    const anthropic = new AnthropicService(cred);
+    const anthropic = new AnthropicService(cfg.ANTHROPIC_API_KEY);
 
-    const openai = await getOpenAI(cred);
+    const openai = new OpenAIService(cfg.OPENAI_API_KEY, cfg.X_AI_KEY);
 
     const { GeminiService } = await import("@/gemini/index.ts");
 
-    const gemini = new GeminiService(cred);
+    const gemini = new GeminiService(cfg.GOOGLE_API_KEY);
 
     const resolver = new Resolver(
       wsServer,
@@ -73,7 +73,8 @@ async function exe() {
       gemini,
       anthropic,
       r2,
-      cred
+      cfg.FASTAPI_URL,
+      cfg.R2_BUCKET
     );
 
     resolver.registerAll();

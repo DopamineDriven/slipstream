@@ -220,7 +220,7 @@ type GetConversationSettingsGroupByPayload<T extends ConversationSettingsGroupBy
           : Prisma.GetScalarType<T[P], ConversationSettingsGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

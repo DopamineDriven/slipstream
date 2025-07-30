@@ -203,7 +203,7 @@ type GetMessageGroupByPayload<T extends MessageGroupByArgs> = Prisma.PrismaPromi
           : Prisma.GetScalarType<T[P], MessageGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 

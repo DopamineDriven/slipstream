@@ -203,7 +203,7 @@ type GetConversationGroupByPayload<T extends ConversationGroupByArgs> = Prisma.P
           : Prisma.GetScalarType<T[P], ConversationGroupByOutputType[P]>
       }
     >
-  > 
+  >
 
 
 
