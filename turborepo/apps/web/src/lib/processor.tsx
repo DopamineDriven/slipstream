@@ -138,7 +138,7 @@ const components = {
 };
 
 function preprocessMathDelimiters(content: string) {
-  const inlineMath = /\\$$(.*?)\\$$/gs; // matches $$ … $$
+  const inlineMath = /\\\((.*?)\\\)/gs; // matches $$ … $$
   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
   const result = content
     .replace(displayMath, (_match, expr: string) => {
