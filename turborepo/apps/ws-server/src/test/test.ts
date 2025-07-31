@@ -27,7 +27,7 @@ data()
     return v.map(t => {
       return t.messages.map(w => {
         if (t.id === "y13vfghrg0f3oyypvyf3zx6n")
-          console.log(JSON.stringify(w.content));
+          console.log(w.content);
         return w;
       });
     });

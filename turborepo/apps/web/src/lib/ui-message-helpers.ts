@@ -13,8 +13,14 @@ export function createUserMessage(params: {
   provider: Provider;
   model: string;
   conversationId: string;
+  liked?: boolean;
+  disliked?: boolean;
+  tryAgain?: boolean;
 }): UIMessage {
   return {
+    liked: params?.liked ?? false,
+    disliked: params?.disliked ?? false,
+    tryAgain: params.tryAgain ?? false,
     id: params.id,
     senderType: "USER",
     provider: toPrismaFormat(params.provider),
@@ -39,8 +45,14 @@ export function createAIMessage(params: {
   model: string;
   conversationId: string;
   createdAt?: Date;
+  liked?: boolean;
+  disliked?: boolean;
+  tryAgain?: boolean;
 }): UIMessage {
   return {
+    liked: params?.liked ?? false,
+    disliked: params?.disliked ?? false,
+    tryAgain: params.tryAgain ?? false,
     id: params.id,
     senderType: "AI",
     provider: toPrismaFormat(params.provider),

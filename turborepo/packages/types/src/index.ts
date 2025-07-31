@@ -5,6 +5,7 @@ export type {
   AIChatChunk,
   AIChatError,
   AIChatInlineData,
+  AIChatRequestUserMetadata,
   AIChatRequest,
   AIChatResponse,
   AnyEvent,

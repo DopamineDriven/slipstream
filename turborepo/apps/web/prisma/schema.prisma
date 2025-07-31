@@ -25,7 +25,6 @@ enum Provider {
   GEMINI
   ANTHROPIC
 }
-
 model User {
   id            String         @id @default(cuid(2))
   name          String?
@@ -154,9 +153,6 @@ model Message {
   model          String?
   userKeyId      String?
   content        String
-  thinkingText   String?
-  citationsText  String?
-  citations      Json?
   liked          Boolean?     @default(false)
   disliked       Boolean?     @default(false)
   tryAgain       Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
