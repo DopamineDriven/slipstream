@@ -1,14 +1,28 @@
 // src/context/ai-chat-context.tsx
 "use client";
 
-import { createContext, useContext, useCallback, useState, useRef, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useChatWebSocketContext } from "@/context/chat-ws-context";
-import { useModelSelection } from "@/context/model-selection-context";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useApiKeys } from "@/context/api-keys-context";
-import { pathParser } from "@/lib/path-parser";
+import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import { useCookiesCtx } from "@/context/cookie-context";
+import { useModelSelection } from "@/context/model-selection-context";
 import { getModel } from "@/lib/get-model";
-import type { Provider, AllModelsUnion, EventTypeMap } from "@t3-chat-clone/types";
+import { pathParser } from "@/lib/path-parser";
+import type {
+  AllModelsUnion,
+  EventTypeMap,
+  Provider
+} from "@t3-chat-clone/types";
+import type { AIChatRequestUserMetadata } from "@t3-chat-clone/types/events";
 
 interface StreamingMessage {
   id: string;
@@ -67,14 +81,17 @@ export function AIChatProvider({
   }, [pathname]);
 
   // Core state - initialize from path
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(getConversationIdFromPath());
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(getConversationIdFromPath());
   const [title, setTitle] = useState<string | null>(null);
   const [streamedText, setStreamedText] = useState<string>("");
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isWaitingForRealId, setIsWaitingForRealId] = useState<boolean>(false);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState<StreamingMessage | null>(null);
+  const [currentStreamingMessage, setCurrentStreamingMessage] =
+    useState<StreamingMessage | null>(null);
 
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
@@ -94,7 +111,9 @@ export function AIChatProvider({
 
     // Only update if we have a valid path conversation ID and it's different
     if (pathConvId && pathConvId !== activeConversationId) {
-      console.log(`[AIChatContext] Updating conversation ID from path: ${pathConvId}`);
+      console.log(
+        `[AIChatContext] Updating conversation ID from path: ${pathConvId}`
+      );
       setActiveConversationId(pathConvId);
       originalConversationIdRef.current = pathConvId;
 
@@ -110,13 +129,16 @@ export function AIChatProvider({
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["ai_chat_chunk"]) => {
       // Handle first chunk with real conversation ID for new-chat transitions
-      if (!firstChunkReceivedRef.current &&
-          evt.conversationId &&
-          evt.conversationId !== 'new-chat' &&
-          originalConversationIdRef.current === 'new-chat' &&
-          isWaitingForRealId) {
-
-        console.log(`[AIChatContext] First chunk received with real ID: ${evt.conversationId}`);
+      if (
+        !firstChunkReceivedRef.current &&
+        evt.conversationId &&
+        evt.conversationId !== "new-chat" &&
+        originalConversationIdRef.current === "new-chat" &&
+        isWaitingForRealId
+      ) {
+        console.log(
+          `[AIChatContext] First chunk received with real ID: ${evt.conversationId}`
+        );
         firstChunkReceivedRef.current = true;
 
         // Update window.history immediately to show real URL
@@ -167,8 +189,14 @@ export function AIChatProvider({
 
       // Sync React Router only for new-chat transitions
       // For existing chats, we never manipulate the router
-      if (urlUpdatedRef.current || (originalConversationIdRef.current === 'new-chat' && evt.conversationId !== 'new-chat')) {
-        console.log(`[AIChatContext] Error occurred, syncing router to: /chat/${evt.conversationId}`);
+      if (
+        urlUpdatedRef.current ||
+        (originalConversationIdRef.current === "new-chat" &&
+          evt.conversationId !== "new-chat")
+      ) {
+        console.log(
+          `[AIChatContext] Error occurred, syncing router to: /chat/${evt.conversationId}`
+        );
         router.replace(`/chat/${evt.conversationId}`, { scroll: false });
         urlUpdatedRef.current = false;
       }
@@ -196,8 +224,14 @@ export function AIChatProvider({
 
         // Sync React Router only for new-chat transitions
         // For existing chats, we never manipulate the router
-        if (urlUpdatedRef.current || (originalConversationIdRef.current === 'new-chat' && evt.conversationId !== 'new-chat')) {
-          console.log(`[AIChatContext] Stream complete, syncing router to: /chat/${evt.conversationId}`);
+        if (
+          urlUpdatedRef.current ||
+          (originalConversationIdRef.current === "new-chat" &&
+            evt.conversationId !== "new-chat")
+        ) {
+          console.log(
+            `[AIChatContext] Stream complete, syncing router to: /chat/${evt.conversationId}`
+          );
           router.replace(`/chat/${evt.conversationId}`, { scroll: false });
           urlUpdatedRef.current = false;
         }
@@ -216,61 +250,101 @@ export function AIChatProvider({
       client.off("ai_chat_error");
       client.off("ai_chat_response");
     };
-  }, [client, streamedText, userId, isWaitingForRealId, selectedModel, activeConversationId, router]);
+  }, [
+    client,
+    streamedText,
+    userId,
+    isWaitingForRealId,
+    selectedModel,
+    activeConversationId,
+    router
+  ]);
 
-  const sendChat = useCallback((prompt: string) => {
-    if (!userId) {
-      console.warn("[AIChatContext] Cannot send chat without userId");
-      return;
-    }
+  const { getAll } = useCookiesCtx();
+  const metadata = useMemo(() => {
+    const { city, country, latlng, postalCode, region, tz } = getAll();
 
-    // Prevent duplicate sends
-    if (activeUserStreams.has(userId)) {
-      console.warn(`[AIChatContext] User ${userId} already has an active stream`);
-      return;
-    }
+    const [lat, lng] = latlng
+      ? latlng.split(",").map(p => {
+          return Number.parseFloat(p);
+        })
+      : [undefined, undefined];
+    return {
+      city,
+      country,
+      postalCode,
+      region,
+      tz,
+      lat,
+      lng
+    } satisfies AIChatRequestUserMetadata;
+  }, [getAll]);
+  const sendChat = useCallback(
+    (prompt: string) => {
+      if (!userId) {
+        console.warn("[AIChatContext] Cannot send chat without userId");
+        return;
+      }
 
-    // Use the active conversation ID
-    const conversationId = activeConversationId ?? 'new-chat';
+      // Prevent duplicate sends
+      if (activeUserStreams.has(userId)) {
+        console.warn(
+          `[AIChatContext] User ${userId} already has an active stream`
+        );
+        return;
+      }
 
-    // Get API key configuration
-    const hasProviderConfigured = apiKeys.isSet[selectedModel.provider];
-    const isDefaultProvider = apiKeys.isDefault[selectedModel.provider];
+      // Use the active conversation ID
+      const conversationId = activeConversationId ?? "new-chat";
 
-    console.log(`[AIChatContext] Sending chat with conversationId: ${conversationId}`);
-    console.log(`[AIChatContext] Using model: ${selectedModel.displayName} (${selectedModel.modelId})`);
+      // Get API key configuration
+      const hasProviderConfigured = apiKeys.isSet[selectedModel.provider];
+      const isDefaultProvider = apiKeys.isDefault[selectedModel.provider];
 
-    // Mark user as having active stream
-    activeUserStreams.add(userId);
+      console.log(
+        `[AIChatContext] Sending chat with conversationId: ${conversationId}`
+      );
+      console.log(
+        `[AIChatContext] Using model: ${selectedModel.displayName} (${selectedModel.modelId})`
+      );
 
-    // Reset state for new message
-    setStreamedText("");
-    setError(null);
-    setIsComplete(false);
-    setIsStreaming(true);
-    setCurrentStreamingMessage(null);
-    urlUpdatedRef.current = false;
-    firstChunkReceivedRef.current = false;
+      // Mark user as having active stream
+      activeUserStreams.add(userId);
 
-    if (conversationId === 'new-chat') {
-      setIsWaitingForRealId(true);
-      originalConversationIdRef.current = 'new-chat';
-    }
+      // Reset state for new message
+      setStreamedText("");
+      setError(null);
+      setIsComplete(false);
+      setIsStreaming(true);
+      setCurrentStreamingMessage(null);
+      urlUpdatedRef.current = false;
+      firstChunkReceivedRef.current = false;
 
-    sendEvent("ai_chat_request", {
-      type: "ai_chat_request",
-      conversationId,
-      prompt,
-      provider: selectedModel.provider,
-      model: getModel(selectedModel.provider, selectedModel.modelId as AllModelsUnion),
-      hasProviderConfigured,
-      isDefaultProvider,
-      maxTokens: undefined,
-      systemPrompt: undefined,
-      temperature: undefined,
-      topP: undefined
-    });
-  }, [sendEvent, userId, activeConversationId, selectedModel, apiKeys]);
+      if (conversationId === "new-chat") {
+        setIsWaitingForRealId(true);
+        originalConversationIdRef.current = "new-chat";
+      }
+
+      sendEvent("ai_chat_request", {
+        metadata,
+        type: "ai_chat_request",
+        conversationId,
+        prompt,
+        provider: selectedModel.provider,
+        model: getModel(
+          selectedModel.provider,
+          selectedModel.modelId as AllModelsUnion
+        ),
+        hasProviderConfigured,
+        isDefaultProvider,
+        maxTokens: undefined,
+        systemPrompt: undefined,
+        temperature: undefined,
+        topP: undefined
+      });
+    },
+    [sendEvent, metadata, userId, activeConversationId, selectedModel, apiKeys]
+  );
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -283,21 +357,22 @@ export function AIChatProvider({
   }, []);
 
   return (
-    <AIChatContext.Provider value={{
-      activeConversationId,
-      title,
-      streamedText,
-      isStreaming,
-      isComplete,
-      error,
-      currentStreamingMessage,
-      sendChat,
-      setActiveConversationId,
-      clearError,
-      resetStreamingState,
-      isWaitingForRealId,
-      isConnected
-    }}>
+    <AIChatContext.Provider
+      value={{
+        activeConversationId,
+        title,
+        streamedText,
+        isStreaming,
+        isComplete,
+        error,
+        currentStreamingMessage,
+        sendChat,
+        setActiveConversationId,
+        clearError,
+        resetStreamingState,
+        isWaitingForRealId,
+        isConnected
+      }}>
       {children}
     </AIChatContext.Provider>
   );
