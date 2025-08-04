@@ -1,0 +1,167 @@
+"use client";
+
+import type { UIMessage } from "@/types/shared";
+import type { User } from "next-auth";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useScrollObserver } from "@/hooks/use-scroll-observer";
+import { smoothScrollToBottom } from "@/lib/helpers";
+import { MessageBubble } from "@/ui/chat/message-bubble";
+import { motion } from "motion/react";
+
+interface ChatFeedProps {
+  messages: UIMessage[];
+  user?: User;
+  className?: string;
+  onUpdateMessage?: (messageId: string, newText: string) => void;
+  isAwaitingFirstChunk?: boolean;
+  thinkingText?: string;
+  isThinking?: boolean;
+  thinkingDuration?:number;
+  streamedText?: string;
+  isStreaming?: boolean;
+}
+
+export function ChatFeed({
+  messages,
+  className,
+  onUpdateMessage,
+  user,
+  isAwaitingFirstChunk,
+  isStreaming,
+  streamedText,
+  thinkingText,
+  isThinking,
+  thinkingDuration
+}: ChatFeedProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  // Use the scroll observer hook
+  const { isNearBottom } = useScrollObserver(scrollRef, {
+    nearBottomThreshold: 200,
+    scrollButtonThreshold: 100,
+    debounceMs: 50
+  });
+
+  // Notify parent about scroll button state
+
+  // Smooth scroll to bottom with velocity based on distance
+  const scrollToBottom = useCallback(() => {
+    if (!scrollRef.current || isScrolling) return;
+
+    setIsScrolling(true);
+    const container = scrollRef.current;
+    const startScrollTop = container.scrollTop;
+    const targetScrollTop = container.scrollHeight - container.clientHeight;
+    const distance = targetScrollTop - startScrollTop;
+
+    const duration = smoothScrollToBottom(distance);
+
+    const startTime = performance.now();
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // easeOutQuart easing function for natural deceleration
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+      const currentScrollTop = startScrollTop + distance * easeOutQuart;
+      container.scrollTop = currentScrollTop;
+
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      } else {
+        setIsScrolling(false);
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
+  }, [isScrolling]);
+
+  // Assign to global window for access from other components
+  useEffect(() => {
+    window.chatScrollToBottom = scrollToBottom;
+
+    return () => {
+      // Cleanup on unmount
+      delete window.chatScrollToBottom;
+    };
+  }, [scrollToBottom]);
+
+  // Ensure we start at the bottom on initial load
+  useEffect(() => {
+    // Use requestAnimationFrame for more reliable initial scroll
+    requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    });
+  }, []); // Only run on mount - messages always exist
+
+  // Auto-scroll when messages change or streaming updates occur (only if near bottom)
+  useEffect(() => {
+    if (!scrollRef.current || !isNearBottom) return;
+
+    // Use requestAnimationFrame for smooth scrolling
+    requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    });
+  }, [messages.length, streamedText, thinkingText, isAwaitingFirstChunk, isNearBottom]);
+
+  return (
+    <div
+      ref={scrollRef}
+      data-chat-feed
+      className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
+      {messages.map(message => (
+        <MessageBubble
+          key={message.id}
+          message={message}
+          user={user}
+          onUpdateMessage={onUpdateMessage}
+          isStreaming={isStreaming && message.id.startsWith("streaming-")}
+          // Pass live thinking data for the currently streaming message
+          liveThinkingText={isStreaming && message.id.startsWith("streaming-") ? thinkingText : undefined}
+          liveIsThinking={isStreaming && message.id.startsWith("streaming-") ? isThinking : undefined}
+          liveThinkingDuration={isStreaming && message.id.startsWith("streaming-") ? thinkingDuration : undefined}
+        />
+      ))}
+      {isStreaming && isAwaitingFirstChunk === true && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="flex w-full justify-start">
+          <div className="flex items-center gap-3">
+            {/* AI Avatar */}
+            <div className="mt-1 shrink-0">
+              <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full sm:size-8">
+                <div className="border-primary-foreground/20 border-t-primary-foreground/40 size-4 animate-spin rounded-full border-2" />
+              </div>
+            </div>
+            <div className="bg-muted rounded-2xl px-4 py-3">
+              <div className="flex gap-1">
+                <span
+                  className="bg-muted-foreground/70 size-2 animate-bounce rounded-full"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <span
+                  className="bg-muted-foreground/60 size-2 animate-bounce rounded-full"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="bg-muted-foreground/50 size-2 animate-bounce rounded-full"
+                  style={{ animationDelay: "300ms" }}
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+}

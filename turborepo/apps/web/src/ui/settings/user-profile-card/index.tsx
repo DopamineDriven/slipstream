@@ -1,6 +1,9 @@
 "use client";
 
+import type { KeyboardShortcut } from "@/types/ui";
 import type { User } from "next-auth";
+import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import {
   Avatar,
   AvatarFallback,
@@ -8,16 +11,18 @@ import {
   Button,
   Progress
 } from "@t3-chat-clone/ui";
-import { motion } from "motion/react";
-import type { KeyboardShortcut } from "@/types/ui";
-import { mockKeyboardShortcuts } from "@/lib/mock";
-import { cn } from "@/lib/utils";
 
 export interface UserProfileCardProps {
   user?: User;
   shortcuts?: KeyboardShortcut[];
   className?: string;
 }
+
+const mockKeyboardShortcuts = [
+  { action: "Search", keys: ["Ctrl", "K"] },
+  { action: "New Chat", keys: ["Shift", "O"] },
+  { action: "Toggle Sidebar", keys: ["Ctrl", "B"] }
+] satisfies KeyboardShortcut[];
 
 export function UserProfileCard({
   user,

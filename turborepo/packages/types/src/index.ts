@@ -4,9 +4,11 @@
 export type {
   AIChatChunk,
   AIChatError,
+  AIChatEventTypeUnion,
   AIChatInlineData,
   AIChatRequestUserMetadata,
   AIChatRequest,
+  AIChatResEntity,
   AIChatResponse,
   AnyEvent,
   AnyEventTypeUnion,
@@ -79,6 +81,7 @@ export {
 export type {
   ArrFieldReplacer,
   CTR,
+  DX,
   Equal,
   Expect,
   Extends,

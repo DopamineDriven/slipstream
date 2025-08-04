@@ -17,6 +17,7 @@ import { Code } from "@/icons/code";
 import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
 import { Edit } from "@/icons/edit";
+import { EditIcon } from "@/icons/edit-icon";
 import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 import { EmptyChatHistory } from "@/icons/empty-chat-history";
 import { Expand } from "@/icons/expand";
@@ -51,6 +52,8 @@ import { Paperclip } from "@/icons/paperclip";
 import { PenLine } from "@/icons/pen-line";
 import { Plus } from "@/icons/plus";
 import { QuestionMark } from "@/icons/question-mark";
+import { ReadAloud } from "@/icons/read-aloud";
+import { RetryIcon } from "@/icons/retry";
 import { Save } from "@/icons/save";
 import { Search } from "@/icons/search";
 import { Send } from "@/icons/send";
@@ -61,6 +64,8 @@ import { Sparkles } from "@/icons/sparkles";
 import { SquarePen } from "@/icons/square-pen";
 import { Sun } from "@/icons/sun";
 import { Terminal } from "@/icons/terminal";
+import { ThumbsDown } from "@/icons/thumbs-down";
+import { ThumbsUp } from "@/icons/thumbs-up";
 import { Tools } from "@/icons/tools";
 import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
@@ -85,6 +90,7 @@ const IconComponents = {
   Compass,
   Copy,
   Edit,
+  EditIcon,
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
@@ -119,6 +125,8 @@ const IconComponents = {
   PenLine,
   Plus,
   QuestionMark,
+  ReadAloud,
+  RetryIcon,
   Save,
   Search,
   Send,
@@ -129,6 +137,8 @@ const IconComponents = {
   SquarePen,
   Sun,
   Terminal,
+  ThumbsDown,
+  ThumbsUp,
   Tools,
   Trash,
   TrashSimple,
@@ -187,6 +197,7 @@ export {
   Compass,
   Copy,
   Edit,
+  EditIcon,
   EllipsisHorizontal,
   EmptyChatHistory,
   Expand,
@@ -221,6 +232,8 @@ export {
   PenLine,
   Plus,
   QuestionMark,
+  ReadAloud,
+  RetryIcon,
   Save,
   Search,
   Send,
@@ -231,6 +244,8 @@ export {
   SquarePen,
   Sun,
   Terminal,
+  ThumbsDown,
+  ThumbsUp,
   Tools,
   Trash,
   TrashSimple,

@@ -1,5 +1,6 @@
 import { AnthropicIcon, GeminiIcon, OpenAiIcon, XAiIcon } from "@/ui/icons";
 import type {
+  AllModelsUnion,
   AnthropicDisplayNameUnion,
   AnthropicModelIdUnion,
   GeminiDisplayNameUnion,
@@ -119,3 +120,18 @@ export const defaultModelSelection: ModelSelection = {
               defaultModelByProvider[defaultProvider]
             )
 };
+export function getModelDisplayName(
+  toProvider: Provider,
+  modelId: string | null
+) {
+  const model = (modelId ??
+    defaultModelIdByProvider[toProvider]) as AllModelsUnion;
+
+  return toProvider === "anthropic"
+    ? getDisplayNameByModelId(toProvider, model as AnthropicModelIdUnion)
+    : toProvider === "gemini"
+      ? getDisplayNameByModelId(toProvider, model as GeminiModelIdUnion)
+      : toProvider === "grok"
+        ? getDisplayNameByModelId(toProvider, model as GrokModelIdUnion)
+        : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
+}

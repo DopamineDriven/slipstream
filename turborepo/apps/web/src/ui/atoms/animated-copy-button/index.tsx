@@ -75,7 +75,7 @@ export function AnimatedCopyButton({
             : { opacity: 0, scale: 0.8, y: -5, pointerEvents: "none" }
         }
         transition={{ duration: 0.2, ease: "easeOut" }}>
-        <Copy className="size-3.5" />
+        <Copy width={initialIconSize*1.2} height={initialIconSize*1.2} className="size-3.5" />
       </motion.div>
       <motion.div
         className={iconContainerClasses}

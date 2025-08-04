@@ -5,7 +5,7 @@ import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import { memo, useEffect, useRef } from "react";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
-import { ChatMessage } from "@/ui/chat/chat-message";
+import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
 
 interface ChatAreaProps {
@@ -92,7 +92,6 @@ export const ChatArea = memo(function ChatArea({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, staggerChildren: 0.05 }}>
-
         {/* Render all messages */}
         {messages.map((msg, index) => (
           <motion.div
@@ -103,11 +102,11 @@ export const ChatArea = memo(function ChatArea({
               duration: 0.3,
               delay: index === messages.length - 1 ? 0 : 0
             }}>
-            <ChatMessage
+            <MessageBubble
               message={msg}
               user={user}
               onUpdateMessage={onUpdateMessage}
-              isStreaming={isStreaming && msg.id.startsWith('streaming-')}
+              isStreaming={isStreaming && msg.id.startsWith("streaming-")}
             />
           </motion.div>
         ))}
@@ -119,24 +118,29 @@ export const ChatArea = memo(function ChatArea({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="flex items-center gap-3 py-3">
-            <div className="bg-brand-component/10 flex size-8 items-center justify-center rounded-full">
-              <div className="border-brand-component/20 border-t-brand-component/40 size-4 animate-spin rounded-full border-2" />
-            </div>
-            <div className="bg-brand-component rounded-lg px-4 py-2">
-              <div className="flex gap-1">
-                <span
-                  className="bg-brand-component/70 size-2 animate-bounce rounded-full"
-                  style={{ animationDelay: "0ms" }}
-                />
-                <span
-                  className="bg-brand-component/60 size-2 animate-bounce rounded-full"
-                  style={{ animationDelay: "150ms" }}
-                />
-                <span
-                  className="bg-brand-component/50 size-2 animate-bounce rounded-full"
-                  style={{ animationDelay: "300ms" }}
-                />
+            className="flex w-full justify-start">
+            <div className="flex items-center gap-3">
+              {/* AI Avatar */}
+              <div className="mt-1 flex-shrink-0">
+                <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full">
+                  <div className="border-primary-foreground/20 border-t-primary-foreground/40 h-4 w-4 animate-spin rounded-full border-2" />
+                </div>
+              </div>
+              <div className="bg-muted rounded-2xl px-4 py-3">
+                <div className="flex gap-1">
+                  <span
+                    className="bg-muted-foreground/70 h-2 w-2 animate-bounce rounded-full"
+                    style={{ animationDelay: "0ms" }}
+                  />
+                  <span
+                    className="bg-muted-foreground/60 h-2 w-2 animate-bounce rounded-full"
+                    style={{ animationDelay: "150ms" }}
+                  />
+                  <span
+                    className="bg-muted-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                    style={{ animationDelay: "300ms" }}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

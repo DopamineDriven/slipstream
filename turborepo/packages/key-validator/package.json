@@ -71,7 +71,7 @@
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "typescript-eslint": "^8.38.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"

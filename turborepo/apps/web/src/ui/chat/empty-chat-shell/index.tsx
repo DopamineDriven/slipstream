@@ -287,7 +287,7 @@ export function ChatEmptyState() {
             </div>
           </div>
         </form>
-        <p className="text-muted-foreground mt-3 text-center text-xs">
+        <p className="text-muted-foreground mt-2 text-center text-xxs">
           AI can make mistakes. Consider checking important information.
         </p>
       </motion.div>

@@ -1,4 +1,5 @@
 import type { GetModelUtilRT, Provider } from "@/models.ts";
+import type { CTR, DX } from "./utils.ts";
 
 export type AIChatRequestUserMetadata = {
   city?: string;
@@ -8,7 +9,30 @@ export type AIChatRequestUserMetadata = {
   lng?: number;
   tz?: string;
   postalCode?: string;
+  locale?: string;
 };
+
+export type AIChatEventTypeUnion =
+  | "chunk"
+  | "error"
+  | "inline_data"
+  | "response";
+
+export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
+  type: T;
+  conversationId: string;
+  userId: string;
+  chunk?: string;
+  done: T extends "ai_chat_error" ? true : boolean;
+  data?: string;
+  provider?: Provider;
+  title?: string;
+  model?: string;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
+}
+
 export type AIChatRequest = {
   type: "ai_chat_request";
   conversationId: string;
@@ -24,59 +48,33 @@ export type AIChatRequest = {
   metadata?: AIChatRequestUserMetadata;
 };
 
-export type AIChatResponse = {
-  type: "ai_chat_response";
-  conversationId: string;
-  userId: string;
-  chunk: string;
-  done: boolean;
-  provider?: Provider;
-  title?: string;
-  model?: string;
-  systemPrompt?: string;
-  temperature?: number;
-  topP?: number;
-};
+export type AIChatInlineData = DX<
+  CTR<AIChatResEntity<"ai_chat_inline_data">, "data">
+>;
 
-export type AIChatInlineData = {
-  type: "ai_chat_inline_data";
-  conversationId: string;
-  userId: string;
-  data: string;
-  provider?: Provider;
-  model?: string;
-  systemPrompt?: string;
-  temperature?: number;
-  topP?: number;
-};
+export type AIChatChunk = DX<
+  Omit<AIChatResEntity<"ai_chat_chunk">, "data"> & {
+    isThinking?: boolean;
+    thinkingDuration?: number;
+    thinkingText?: string;
+  }
+>;
 
-export type AIChatChunk = {
-  type: "ai_chat_chunk";
-  conversationId: string;
-  userId: string;
-  chunk: string;
-  done: boolean;
-  provider?: Provider;
-  title?: string;
-  model?: string;
-  systemPrompt?: string;
-  temperature?: number;
-  topP?: number;
-  // sub_type: "text" | "citation" | "thinking"
-};
+export type AIChatResponse = DX<
+  CTR<AIChatResEntity<"ai_chat_response">, "chunk"> & {
+    usage?: number;
+    thinkingDuration?: number;
+    thinkingText?: string;
+  }
+>;
 
-export type AIChatError = {
-  type: "ai_chat_error";
-  conversationId: string;
-  userId: string;
-  message: string;
-  done: true;
-  provider?: Provider;
-  model?: string;
-  systemPrompt?: string;
-  temperature?: number;
-  topP?: number;
-};
+export type AIChatError = DX<
+  Omit<AIChatResEntity<"ai_chat_error">, "chunk" | "data"> & {
+    usage?: number;
+    stopReason?: unknown;
+    message: string;
+  }
+>;
 
 export type TypingIndicator = {
   type: "typing";
@@ -166,12 +164,12 @@ export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
 
-export type ProviderCountsProps = {
+export interface ProviderCountsProps {
   openai: number;
   grok: number;
   gemini: number;
   anthropic: number;
-};
+}
 
 export type RecordCountsProps = {
   isSet: ProviderCountsProps;
