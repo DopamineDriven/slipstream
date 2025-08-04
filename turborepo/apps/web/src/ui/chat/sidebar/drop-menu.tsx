@@ -18,19 +18,14 @@ import {
   LogOut,
   Settings
 } from "@t3-chat-clone/ui";
+import { getInitials } from "@/lib/helpers";
 
 export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
   const { state: sidebarState, isMobile } = useSidebar();
   // On mobile, always use expanded state
   const effectiveState = isMobile ? "expanded" : sidebarState;
 
-  const getInitials = (name?: string | null) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map(n => n.substring(0, 1))
-      .join("");
-  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

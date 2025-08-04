@@ -31,6 +31,8 @@ interface StreamingMessage {
   model: string;
   timestamp: Date;
   isUser: boolean;
+  thinkingText?: string;
+  thinkingDuration?: number;
 }
 
 interface AIChatContextValue {
@@ -41,6 +43,11 @@ interface AIChatContextValue {
   isStreaming: boolean;
   isComplete: boolean;
   error: string | null;
+
+  // Thinking state
+  thinkingText: string;
+  isThinking: boolean;
+  thinkingDuration: number | null;
 
   // Message tracking
   currentStreamingMessage: StreamingMessage | null;
@@ -60,6 +67,11 @@ const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 
 // Active user streams tracking (prevents duplicate sends)
 const activeUserStreams = new Set<string>();
+
+// Helper to check if provider supports thinking
+const _supportsThinking = (provider: Provider): boolean => {
+  return provider === "anthropic" || provider === "gemini";
+};
 
 export function AIChatProvider({
   children,
@@ -93,6 +105,11 @@ export function AIChatProvider({
   const [currentStreamingMessage, setCurrentStreamingMessage] =
     useState<StreamingMessage | null>(null);
 
+  // Thinking state
+  const [thinkingText, setThinkingText] = useState<string>("");
+  const [isThinking, setIsThinking] = useState<boolean>(false);
+  const [thinkingDuration, setThinkingDuration] = useState<number | null>(null);
+
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
   const firstChunkReceivedRef = useRef<boolean>(false);
@@ -119,6 +136,9 @@ export function AIChatProvider({
 
       // Reset streaming state when navigating to a different conversation
       setStreamedText("");
+      setThinkingText("");
+      setIsThinking(false);
+      setThinkingDuration(null);
       setCurrentStreamingMessage(null);
       setIsWaitingForRealId(false);
       firstChunkReceivedRef.current = false;
@@ -154,14 +174,42 @@ export function AIChatProvider({
         setTitle(evt.title);
       }
 
-      setStreamedText(prev => prev + evt.chunk);
-      setIsStreaming(true);
+      // Always set isStreaming true when we have conversationId and title
+      if (evt.conversationId && evt.title) {
+        setIsStreaming(true);
+      }
+
+      // Handle thinking chunks differently
+      if (evt.isThinking && evt.thinkingText) {
+        setThinkingText(prev => prev + evt.thinkingText);
+        setIsThinking(true);
+        setThinkingDuration(evt.thinkingDuration ?? null);
+      } else if (evt.chunk) {
+        // Regular chunk - if we were thinking, we're done now
+        if (isThinking) {
+          setIsThinking(false);
+          // Capture thinking duration if provided
+          if (evt.thinkingDuration) {
+            setThinkingDuration(evt.thinkingDuration);
+          }
+        }
+        setStreamedText(prev => prev + evt.chunk);
+      }
+
+      // Always update thinking duration if provided
+      // This handles both initial capture and updates during streaming
+      if (evt.thinkingDuration) {
+        setThinkingDuration(evt.thinkingDuration);
+      }
+
       setIsComplete(false);
 
-      // Update streaming message with conversationId from event
+      // Update streaming message with all relevant data
       setCurrentStreamingMessage({
         id: `stream-${evt.conversationId}`,
-        content: streamedText + evt.chunk,
+        content: streamedText + (evt.chunk ?? ""),
+        thinkingText: thinkingText + (evt.thinkingText ?? ""),
+        thinkingDuration: evt.thinkingDuration ?? thinkingDuration ?? undefined,
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
         timestamp: new Date(),
@@ -209,7 +257,18 @@ export function AIChatProvider({
       if (evt.done) {
         console.log("[AIChatContext] Stream completed");
         setIsStreaming(false);
+        setIsThinking(false);
         setIsWaitingForRealId(false);
+
+        // Capture final thinking duration if provided
+        if (evt.thinkingDuration) {
+          setThinkingDuration(evt.thinkingDuration);
+        }
+
+        if (evt.thinkingText) {
+          setThinkingText(evt.thinkingText);
+        }
+
         setCurrentStreamingMessage(null);
 
         // Update active conversation ID to match the event
@@ -253,6 +312,9 @@ export function AIChatProvider({
   }, [
     client,
     streamedText,
+    thinkingText,
+    isThinking,
+    thinkingDuration,
     userId,
     isWaitingForRealId,
     selectedModel,
@@ -262,7 +324,7 @@ export function AIChatProvider({
 
   const { getAll } = useCookiesCtx();
   const metadata = useMemo(() => {
-    const { city, country, latlng, postalCode, region, tz } = getAll();
+    const { city, country, latlng, postalCode, region, tz, locale } = getAll();
 
     const [lat, lng] = latlng
       ? latlng.split(",").map(p => {
@@ -276,7 +338,8 @@ export function AIChatProvider({
       region,
       tz,
       lat,
-      lng
+      lng,
+      locale
     } satisfies AIChatRequestUserMetadata;
   }, [getAll]);
   const sendChat = useCallback(
@@ -313,6 +376,9 @@ export function AIChatProvider({
 
       // Reset state for new message
       setStreamedText("");
+      setThinkingText("");
+      setIsThinking(false);
+      setThinkingDuration(null);
       setError(null);
       setIsComplete(false);
       setIsStreaming(true);
@@ -350,6 +416,9 @@ export function AIChatProvider({
 
   const resetStreamingState = useCallback(() => {
     setStreamedText("");
+    setThinkingText("");
+    setIsThinking(false);
+    setThinkingDuration(null);
     setCurrentStreamingMessage(null);
     setIsStreaming(false);
     setIsComplete(false);
@@ -365,6 +434,9 @@ export function AIChatProvider({
         isStreaming,
         isComplete,
         error,
+        thinkingText,
+        isThinking,
+        thinkingDuration,
         currentStreamingMessage,
         sendChat,
         setActiveConversationId,

@@ -9,12 +9,12 @@ import type {
   GenerateContentResponse
 } from "@google/genai";
 import type { ChatCompletionChunk } from "openai/resources/index.mjs";
-import type { RawData } from "ws";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
+import { BufferLike } from "@/types/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import { WebSocket } from "ws";
@@ -161,12 +161,16 @@ export class Resolver extends ModelService {
       await this.wsServer.redis.getStreamState(conversationId);
 
     let chunks = Array.of<string>();
-
+    let thinkingChunks = Array.of<string>();
     let resumedFromChunk = 0;
 
     let agg = "";
-    // let thinking = "";
-    // let citations = "";
+    let thinkingAgg = "";
+    let thinkingDuration = 0;
+    let thinkingStartTime: number | null = null;
+    let thinkingEndTime: number | null = null;
+    let isCurrentlyThinking = false;
+
     const title = res?.title ?? (await this.titleGenUtil(event));
 
     if (existingState && !existingState.metadata.completed) {
@@ -195,6 +199,8 @@ export class Resolver extends ModelService {
           conversationId,
           userId,
           chunk: chunks.join(""),
+          thinkingText: thinkingAgg,
+          thinkingDuration,
           done: false,
           model: existingState.metadata.model,
           provider: existingState.metadata.provider as Provider,
@@ -258,20 +264,27 @@ export class Resolver extends ModelService {
         })) satisfies AsyncGenerator<GenerateContentResponse>;
 
         for await (const chunk of stream) {
-
           // Gemini thinking chunks _always_ start with **TEXT** -- use regex to detect when thinking starts/stops at the onset of streaming
           // eg, const isThinkingRegex = /^\s*\*\*.+\*\*\s*$/;
 
           let dataPart: Blob | undefined = undefined;
           let textPart: string | undefined = undefined;
-          let done: keyof typeof FinishReason | undefined = undefined;
+          let thinkingPart: string | undefined = undefined;
 
+          let done: keyof typeof FinishReason | undefined = undefined;
+          let isThinking = false;
           if (chunk.candidates) {
             for (const candidate of chunk.candidates) {
               if (candidate.content?.parts) {
                 for (const part of candidate.content.parts) {
                   if (part.text) {
-                    textPart = part.text;
+                    if (part.thought) {
+                      isThinking = part.thought;
+                      thinkingPart = part.text;
+                    } else {
+                      isThinking = part.thought ?? false;
+                      textPart = part.text;
+                    }
                   }
                   if (part.inlineData) {
                     dataPart = part.inlineData;
@@ -284,9 +297,15 @@ export class Resolver extends ModelService {
               }
             }
           }
-          if (textPart) {
-            chunks.push(textPart);
-            agg += textPart;
+          if (isThinking && thinkingPart) {
+            // Track thinking start time
+            if (!isCurrentlyThinking && thinkingStartTime === null) {
+              thinkingStartTime = performance.now();
+              isCurrentlyThinking = true;
+            }
+
+            thinkingChunks.push(thinkingPart);
+            thinkingAgg += thinkingPart;
 
             ws.send(
               JSON.stringify({
@@ -296,10 +315,14 @@ export class Resolver extends ModelService {
                 model,
                 title,
                 systemPrompt,
+                isThinking: true,
                 temperature,
                 topP,
                 provider,
-                chunk: textPart,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                thinkingText: thinkingPart,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -317,6 +340,73 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 provider,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                thinkingText: thinkingPart,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
+          }
+          if (textPart) {
+            // Track thinking end time when transitioning from thinking to regular text
+            if (isCurrentlyThinking && thinkingStartTime !== null) {
+              thinkingEndTime = performance.now();
+              thinkingDuration = Math.round(
+                thinkingEndTime - thinkingStartTime
+              );
+              isCurrentlyThinking = false;
+            }
+
+            chunks.push(textPart);
+            agg += textPart;
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                isThinking,
+                temperature,
+                topP,
+                provider,
+                chunk: textPart,
+                thinkingDuration:
+                  thinkingDuration > 0 ? thinkingDuration : undefined,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingDuration:
+                  thinkingDuration > 0 ? thinkingDuration : undefined,
                 chunk: textPart,
                 done: false
               }
@@ -343,9 +433,11 @@ export class Resolver extends ModelService {
                 conversationId,
                 data: _dataUrl,
                 userId,
+                done: false,
                 model,
                 systemPrompt,
                 temperature,
+                title,
                 topP,
                 provider
               } satisfies EventTypeMap["ai_chat_inline_data"])
@@ -359,7 +451,12 @@ export class Resolver extends ModelService {
               title,
               provider,
               userId,
-              model
+              temperature,
+              topP,
+              model,
+              thinkingText: thinkingAgg.length > 0 ? thinkingAgg : undefined,
+              thinkingDuration:
+                thinkingDuration > 0 ? thinkingDuration : undefined
             });
             ws.send(
               JSON.stringify({
@@ -373,6 +470,9 @@ export class Resolver extends ModelService {
                 topP,
                 provider,
                 chunk: agg,
+                thinkingText: thinkingAgg.length > 0 ? thinkingAgg : undefined,
+                thinkingDuration:
+                  thinkingDuration > 0 ? thinkingDuration : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -399,6 +499,12 @@ export class Resolver extends ModelService {
           }
         }
       } else if (provider === "anthropic") {
+        // Initialize Anthropic thinking tracking
+        let anthropicThinkingStartTime: number | null = null;
+        let anthropicThinkingDuration = 0;
+        let anthropicIsCurrentlyThinking = false;
+        let anthropicThinkingAgg = "";
+
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
@@ -446,13 +552,36 @@ export class Resolver extends ModelService {
 
         for await (const chunk of stream) {
           let text: string | undefined = undefined;
+          let thinkingText: string | undefined = undefined;
           let done: StopReason | null = null;
+
           if (chunk.type === "content_block_delta") {
             if (chunk.delta.type === "thinking_delta") {
-              text = chunk.delta.thinking;
+              thinkingText = chunk.delta.thinking;
+
+              // Track thinking start
+              if (
+                !anthropicIsCurrentlyThinking &&
+                anthropicThinkingStartTime === null
+              ) {
+                anthropicThinkingStartTime = performance.now();
+                anthropicIsCurrentlyThinking = true;
+              }
             }
             if (chunk.delta.type === "text_delta") {
               text = chunk.delta.text;
+
+              // Track thinking end when switching to regular text
+              if (
+                anthropicIsCurrentlyThinking &&
+                anthropicThinkingStartTime !== null
+              ) {
+                const endTime = performance.now();
+                anthropicThinkingDuration = Math.round(
+                  endTime - anthropicThinkingStartTime
+                );
+                anthropicIsCurrentlyThinking = false;
+              }
             }
             if (chunk.delta.type === "citations_delta") {
               console.log(chunk.delta.citation);
@@ -461,6 +590,52 @@ export class Resolver extends ModelService {
             done = chunk.delta.stop_reason;
           }
 
+          // Handle thinking chunks
+          if (thinkingText) {
+            anthropicThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                provider,
+                title,
+                model,
+                systemPrompt,
+                temperature,
+                topP,
+                thinkingText: thinkingText,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                isThinking: true,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText: thinkingText,
+                isThinking: true,
+                done: false
+              }
+            );
+          }
+
+          // Handle regular text chunks
           if (text) {
             agg += text;
             chunks.push(text);
@@ -476,6 +651,11 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 chunk: text,
+                isThinking: false,
+                thinkingDuration:
+                  anthropicThinkingDuration > 0
+                    ? anthropicThinkingDuration
+                    : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -492,6 +672,15 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 provider,
+                thinkingText:
+                  anthropicThinkingAgg.length > 0
+                    ? anthropicThinkingAgg
+                    : undefined,
+                thinkingDuration:
+                  anthropicThinkingDuration > 0
+                    ? anthropicThinkingDuration
+                    : undefined,
+
                 chunk: text,
                 done: false
               }
@@ -521,7 +710,15 @@ export class Resolver extends ModelService {
               provider,
               userId,
               systemPrompt,
-              model
+              model,
+              thinkingText:
+                anthropicThinkingAgg.length > 0
+                  ? anthropicThinkingAgg
+                  : undefined,
+              thinkingDuration:
+                anthropicThinkingDuration > 0
+                  ? anthropicThinkingDuration
+                  : undefined
             });
             ws.send(
               JSON.stringify({
@@ -535,6 +732,11 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 chunk: agg,
+                thinkingText: anthropicThinkingAgg || undefined,
+                thinkingDuration:
+                  anthropicThinkingDuration > 0
+                    ? anthropicThinkingDuration
+                    : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -581,6 +783,7 @@ export class Resolver extends ModelService {
             temperature,
             max_completion_tokens: max_tokens,
             model,
+            stream_options: { include_usage: true },
             messages: this.openai.formatOpenAi(
               isNewChat,
               msgs,
@@ -596,7 +799,6 @@ export class Resolver extends ModelService {
           const choice = chunk.choices[0];
           const text = choice?.delta.content;
           const done = choice?.finish_reason != null;
-
           if (text) {
             chunks.push(text);
             agg += text;
@@ -873,7 +1075,7 @@ export class Resolver extends ModelService {
   public async handleRawMessage(
     ws: WebSocket,
     userId: string,
-    raw: RawData
+    raw: BufferLike
   ): Promise<void> {
     const event = this.parseEvent(raw);
     if (!event) {
@@ -919,14 +1121,62 @@ export class Resolver extends ModelService {
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */
-  private parseEvent(raw: RawData): AnyEvent | null {
+  private parseEvent(raw: BufferLike): AnyEvent | null {
     let msg: unknown;
     try {
-      if (Array.isArray(raw)) {
-        msg = JSON.parse(Buffer.concat(raw).toString());
+      let str: string;
+
+      if (typeof raw === "string") {
+        str = raw;
+      } else if (Array.isArray(raw)) {
+        str = Buffer.concat(raw).toString();
+      } else if (Buffer.isBuffer(raw)) {
+        str = raw.toString();
+      } else if (raw instanceof ArrayBuffer) {
+        str = Buffer.from(raw).toString();
+      } else if (raw instanceof DataView) {
+        str = Buffer.from(
+          raw.buffer,
+          raw.byteOffset,
+          raw.byteLength
+        ).toString();
+      } else if (ArrayBuffer.isView(raw)) {
+        str = Buffer.from(
+          raw.buffer,
+          raw.byteOffset,
+          raw.byteLength
+        ).toString();
+      } else if (raw instanceof Blob) {
+        console.error("Blob parsing not supported in sync context");
+        return null;
+      } else if (typeof raw === "number") {
+        str = raw.toString();
+      } else if (raw && typeof raw === "object") {
+        // Handle objects with valueOf() or Symbol.toPrimitive
+        if ("valueOf" in raw) {
+          const value = raw.valueOf();
+          if (typeof value === "string") {
+            str = value;
+          } else if (value instanceof ArrayBuffer) {
+            str = Buffer.from(value).toString();
+          } else if (value instanceof Uint8Array) {
+            str = Buffer.from(value).toString();
+          } else if (Array.isArray(value)) {
+            str = Buffer.from(value as number[]).toString();
+          } else {
+            return null;
+          }
+        } else if (Symbol.toPrimitive in raw) {
+          str = (raw as { [Symbol.toPrimitive](hint: string): string })[
+            Symbol.toPrimitive
+          ]("string");
+        } else {
+          return null;
+        }
       } else {
-        msg = JSON.parse(Buffer.from(raw).toString());
+        return null;
       }
+      msg = JSON.parse(str);
       if (
         typeof msg !== "object" ||
         msg === null ||
@@ -947,7 +1197,7 @@ export class Resolver extends ModelService {
 
   public async handleTyping(
     event: EventTypeMap["typing"],
-    ws: WebSocket,
+    _ws: WebSocket,
     userId: string
   ): Promise<void> {
     this.wsServer.broadcast("typing", { ...event, userId });

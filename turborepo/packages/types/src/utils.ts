@@ -20,7 +20,7 @@ export type XOR<T, U> =
   [T, U] extends [object, object]
     ? (Without<T, U> & U) | (Without<U, T> & T)
     : T | U
-    
+
 /**
  * Conditional to Required
  */
@@ -124,3 +124,7 @@ export type Equal<X, Y> =
  * CANNOT be passed to a function which expects 'a'.
  */
 export type Extends<X, Y> = Y extends X ? true : false;
+
+export type DX<Y> = {
+  [P in keyof Y]: Y[P];
+};

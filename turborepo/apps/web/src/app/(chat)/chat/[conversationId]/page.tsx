@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
-import { ChatContent } from "@/ui/chat/chat-input";
+import { ChatInput } from "@/ui/chat/chat-input";
 import { ChatInterface } from "@/ui/chat/dynamic";
-import { after } from "next/server";
 import type { InferGSPRT } from "@t3-chat-clone/types";
 
 // Create once at module level
@@ -59,16 +59,16 @@ export default async function ChatPage({
     }
   }
 
-  after(()=>{
-    console.log("[after]: "+conversationId);
-  })
+  after(() => {
+    console.log("[after]: " + conversationId);
+  });
 
   return (
     <Suspense
       fallback={
         <div className="flex h-full flex-col">
           <ChatAreaSkeleton />
-          <ChatContent user={session.user} conversationId={conversationId} />
+          <ChatInput user={session.user} conversationId={conversationId} />
         </div>
       }>
       <ChatInterface
@@ -76,7 +76,7 @@ export default async function ChatPage({
         conversationTitle={conversationTitle}
         conversationId={conversationId}
         user={session.user}>
-        <ChatContent user={session.user} conversationId={conversationId} />
+        <ChatInput user={session.user} conversationId={conversationId} />
       </ChatInterface>
     </Suspense>
   );

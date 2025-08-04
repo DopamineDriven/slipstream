@@ -130,39 +130,41 @@ model Conversation {
 }
 
 model ConversationSettings {
-  id             String       @id @default(cuid(2))
-  conversationId String       @unique
-  systemPrompt   String?
-  enableThinking Boolean?     @default(false)
-  trackUsage     Boolean?     @default(false)
-  enableWebSearch Boolean?    @default(false)
-  enableAssetGen Boolean?     @default(false)
-  maxTokens      Int?
-  usageAlerts    Boolean?     @default(true)
-  temperature    Float?       @default(1.0)
-  topP           Float?       @default(1.0)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  id              String       @id @default(cuid(2))
+  conversationId  String       @unique
+  systemPrompt    String?
+  enableThinking  Boolean?     @default(false)
+  trackUsage      Boolean?     @default(false)
+  enableWebSearch Boolean?     @default(false)
+  enableAssetGen  Boolean?     @default(false)
+  maxTokens       Int?
+  usageAlerts     Boolean?     @default(true)
+  temperature     Float?       @default(1.0)
+  topP            Float?       @default(1.0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model Message {
-  id             String       @id @default(cuid(2))
-  conversationId String
-  userId         String?
-  senderType     SenderType   @default(USER)
-  provider       Provider
-  model          String?
-  userKeyId      String?
-  content        String
-  liked          Boolean?     @default(false)
-  disliked       Boolean?     @default(false)
-  tryAgain       Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  userKey        UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])
-  attachments    Attachment[]
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  id               String       @id @default(cuid(2))
+  conversationId   String
+  userId           String?
+  senderType       SenderType   @default(USER)
+  provider         Provider
+  model            String?
+  userKeyId        String?
+  content          String
+  thinkingText     String?
+  thinkingDuration Int?        
+  liked            Boolean?     @default(false)
+  disliked         Boolean?     @default(false)
+  tryAgain         Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  userKey          UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])
+  attachments      Attachment[]
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model Attachment {

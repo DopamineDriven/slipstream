@@ -19,6 +19,7 @@ export { Code } from "@/icons/code";
 export { Compass } from "@/icons/compass";
 export { Copy } from "@/icons/copy";
 export { Edit } from "@/icons/edit";
+export { EditIcon } from "@/icons/edit-icon";
 export { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
 export { EmptyChatHistory } from "@/icons/empty-chat-history";
 export { Expand } from "@/icons/expand";
@@ -53,6 +54,8 @@ export { Paperclip } from "@/icons/paperclip";
 export { PenLine } from "@/icons/pen-line";
 export { Plus } from "@/icons/plus";
 export { QuestionMark } from "@/icons/question-mark";
+export { ReadAloud } from "@/icons/read-aloud";
+export { RetryIcon } from "@/icons/retry";
 export { Save } from "@/icons/save";
 export { Search } from "@/icons/search";
 export { Send } from "@/icons/send";
@@ -63,6 +66,8 @@ export { Sparkles } from "@/icons/sparkles";
 export { SquarePen } from "@/icons/square-pen";
 export { Sun } from "@/icons/sun";
 export { Terminal } from "@/icons/terminal";
+export { ThumbsDown } from "@/icons/thumbs-down";
+export { ThumbsUp } from "@/icons/thumbs-up";
 export { Tools } from "@/icons/tools";
 export { Trash } from "@/icons/trash";
 export { TrashSimple } from "@/icons/trash-simple";
@@ -74,6 +79,13 @@ export { Zap } from "@/icons/zap";
 export { cn } from "@/lib/utils";
 
 // ui
+export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/ui/accordion";
+export type { AccordionProps } from "@/ui/accordion";
 export {
   AlertDialog,
   AlertDialogPortal,

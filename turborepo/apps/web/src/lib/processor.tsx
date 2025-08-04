@@ -137,7 +137,7 @@ const components = {
   img: CustomImage
 };
 
-function preprocessMathDelimiters(content: string) {
+export function preprocessMathDelimiters(content: string) {
   const inlineMath = /\\\((.*?)\\\)/gs; // matches $$ … $$
   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
   const result = content

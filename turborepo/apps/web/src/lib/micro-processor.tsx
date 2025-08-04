@@ -3,7 +3,7 @@
 import type { Root } from "react-dom/client";
 import { memo, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { processMarkdownToReact } from "./processor";
+import { processMarkdownToReact } from "@/lib/processor";
 
 export const MicroMarkdown = memo(
   ({ chunk }: { chunk: string }) => {

@@ -1407,6 +1407,8 @@ export const MessageScalarFieldEnum = {
   model: 'model',
   userKeyId: 'userKeyId',
   content: 'content',
+  thinkingText: 'thinkingText',
+  thinkingDuration: 'thinkingDuration',
   liked: 'liked',
   disliked: 'disliked',
   tryAgain: 'tryAgain',

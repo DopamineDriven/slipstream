@@ -13,4 +13,4 @@ docker tag \
 docker push \
   782904577755.dkr.ecr.us-east-1.amazonaws.com/t3-chat-clone-ws-server:latest
 
-echo "ws-server image built & pushed to ECR 🚀"
+echo "ws-server deployment success 🚀"

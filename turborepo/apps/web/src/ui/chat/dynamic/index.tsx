@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { createUserMessage, createAIMessage, finalizeStreamingMessage } from "@/lib/ui-message-helpers";
-import { ChatArea } from "@/ui/chat/chat-area";
+import { ChatFeed } from "../chat-feed";
 
 interface ChatInterfaceProps {
   children: ReactNode;
@@ -35,7 +35,10 @@ export function ChatInterface({
     isComplete,
     sendChat,
     isWaitingForRealId,
-    resetStreamingState
+    resetStreamingState,
+    thinkingText,
+    isThinking,
+    thinkingDuration
   } = useAIChatContext();
 
   const { selectedModel } = useModelSelection();
@@ -82,7 +85,7 @@ export function ChatInterface({
 
   // Update messages with streaming content
   useEffect(() => {
-    if (!streamedText || !activeConversationId) return;
+    if (!activeConversationId || (!streamedText || !thinkingText)) return;
 
     setIsAwaitingFirstChunk(false);
 
@@ -96,7 +99,9 @@ export function ChatInterface({
         userId: user.id,
         provider: selectedModel.provider,
         model: selectedModel.modelId,
-        conversationId: activeConversationId
+        conversationId: activeConversationId,
+        thinkingText: isThinking ? thinkingText : (thinkingDuration ? thinkingText : undefined),
+        thinkingDuration: thinkingDuration ?? undefined
       });
 
       if (existingStreamIndex >= 0) {
@@ -109,7 +114,7 @@ export function ChatInterface({
         return [...prev, streamingMsg];
       }
     });
-  }, [streamedText, activeConversationId, selectedModel, user]);
+  }, [streamedText, activeConversationId, selectedModel, user, isThinking, thinkingText, thinkingDuration]);
 
   // Handle completion
   useEffect(() => {
@@ -121,7 +126,10 @@ export function ChatInterface({
           const updated = [...prev];
           const streamingMsg = updated[streamingIndex];
           if (streamingMsg) {
-            updated[streamingIndex] = finalizeStreamingMessage(streamingMsg, streamedText);
+            updated[streamingIndex] = finalizeStreamingMessage(streamingMsg, streamedText, {
+              thinkingText: thinkingText ?? undefined,
+              thinkingDuration: thinkingDuration ?? undefined
+            });
           }
           return updated;
         }
@@ -133,7 +141,7 @@ export function ChatInterface({
         resetStreamingState();
       }, 100);
     }
-  }, [isComplete, streamedText, resetStreamingState]);
+  }, [isComplete, streamedText, resetStreamingState, thinkingText, thinkingDuration]);
 
   // Reset processed flag when navigating away from new-chat
   useEffect(() => {
@@ -176,14 +184,14 @@ export function ChatInterface({
 
   return (
     <div className="flex h-full flex-col">
-      <ChatArea
+      <ChatFeed
         messages={messages}
         streamedText={isStreaming ? streamedText : ""}
         isAwaitingFirstChunk={isAwaitingFirstChunk}
         isStreaming={isStreaming}
-        model={selectedModel.modelId}
-        provider={selectedModel.provider}
-        conversationId={activeConversationId ?? 'new-chat'}
+        isThinking={isThinking}
+        thinkingText={thinkingText}
+        thinkingDuration={thinkingDuration ?? undefined}
         user={user}
       />
       {childrenWithProps}

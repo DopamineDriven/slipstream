@@ -5,9 +5,9 @@ import type {
   CookieKey,
   CookieValue,
   GetCookie
-} from "@/lib/cookies";
+} from "@/types/cookies";
 import React, { createContext, useCallback, useContext } from "react";
-import { COOKIES } from "@/lib/cookies";
+import { COOKIES } from "@/types/cookies";
 import Cookies from "js-cookie";
 
 const CookieContext = createContext<CookieContextType | undefined>(undefined);

@@ -24,8 +24,17 @@ function detectDeviceAndSetCookies(
 
   const { hostname } = request.nextUrl;
 
+  const accept = request.headers.get("accept-language") ?? "";
+  const m = accept.match(
+    /^\s*([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*)(?:;q=[0-9.]+)?/
+  );
+
   if (request.cookies.has("hostname")) {
     response.cookies.delete("hostname");
+  }
+
+  if (request.cookies.has("locale")) {
+    response.cookies.delete("locale");
   }
 
   if (request.cookies.has("viewport")) {
@@ -70,8 +79,15 @@ function detectDeviceAndSetCookies(
   // Set viewport type
   const viewport = device?.type === "mobile" ? "mobile" : "desktop";
 
+  let locale = m?.[1] ?? "en-US";
+
+  if (!locale.includes("-")) {
+    locale = `${locale.toLowerCase()}-${country}`;
+  }
+
   // Set cookies
   response.cookies.set("hostname", hostname);
+  response.cookies.set("locale", locale);
   response.cookies.set("viewport", viewport);
   response.cookies.set("ios", ios);
   response.cookies.set("latlng", latlng);

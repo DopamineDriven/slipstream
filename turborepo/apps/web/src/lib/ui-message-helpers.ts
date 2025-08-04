@@ -48,6 +48,8 @@ export function createAIMessage(params: {
   liked?: boolean;
   disliked?: boolean;
   tryAgain?: boolean;
+  thinkingText?: string;
+  thinkingDuration?: number;
 }): UIMessage {
   return {
     liked: params?.liked ?? false,
@@ -62,7 +64,9 @@ export function createAIMessage(params: {
     updatedAt: new Date(),
     userId: params.userId,
     userKeyId: null,
-    conversationId: params.conversationId
+    conversationId: params.conversationId,
+    thinkingText: params.thinkingText ?? null,
+    thinkingDuration: params.thinkingDuration ?? null
   };
 }
 
@@ -71,13 +75,19 @@ export function createAIMessage(params: {
  */
 export function finalizeStreamingMessage(
   streamingMsg: UIMessage,
-  finalContent: string
+  finalContent: string,
+  thinkingData?: {
+    thinkingText?: string;
+    thinkingDuration?: number;
+  }
 ): UIMessage {
   return {
     ...streamingMsg,
     id: `msg-${Date.now()}`,
     content: finalContent,
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    thinkingText: thinkingData?.thinkingText ?? streamingMsg.thinkingText ?? null,
+    thinkingDuration: thinkingData?.thinkingDuration ?? streamingMsg.thinkingDuration ?? null
   };
 }
 

@@ -156,6 +156,7 @@ export class PrismaService extends ModelService {
           },
           conversationSettings: {
             create: {
+              maxTokens: data.maxTokens,
               topP: data.topP,
               systemPrompt: data.systemPrompt,
               temperature: data.temperature
@@ -213,6 +214,8 @@ export class PrismaService extends ModelService {
             senderType: SenderType.AI,
             provider: this.providerToPrismaFormat(provider),
             model: data.model,
+            thinkingDuration: data.thinkingDuration,
+            thinkingText: data?.thinkingText,
             userId,
             userKeyId: keyId
           }
