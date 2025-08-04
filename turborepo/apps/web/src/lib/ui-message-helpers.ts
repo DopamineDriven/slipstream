@@ -16,8 +16,12 @@ export function createUserMessage(params: {
   liked?: boolean;
   disliked?: boolean;
   tryAgain?: boolean;
+  thinkingDuration?: number;
+  thinkingText?: string;
 }): UIMessage {
   return {
+    thinkingText: params.thinkingText ?? null,
+    thinkingDuration: params.thinkingDuration ?? null,
     liked: params?.liked ?? false,
     disliked: params?.disliked ?? false,
     tryAgain: params.tryAgain ?? false,
@@ -86,8 +90,10 @@ export function finalizeStreamingMessage(
     id: `msg-${Date.now()}`,
     content: finalContent,
     updatedAt: new Date(),
-    thinkingText: thinkingData?.thinkingText ?? streamingMsg.thinkingText ?? null,
-    thinkingDuration: thinkingData?.thinkingDuration ?? streamingMsg.thinkingDuration ?? null
+    thinkingText:
+      thinkingData?.thinkingText ?? streamingMsg.thinkingText ?? null,
+    thinkingDuration:
+      thinkingData?.thinkingDuration ?? streamingMsg.thinkingDuration ?? null
   };
 }
 
