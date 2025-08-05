@@ -24,6 +24,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { VFile } from "vfile";
+import { cn } from "./utils";
 
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
@@ -140,18 +141,41 @@ const components = {
   h5: createHeading(5),
   h6: createHeading(6),
   img: CustomImage,
- // TODO: Add analytics tracking, default classes, animations, etc.
+  // TODO: Add analytics tracking, default classes, animations, etc.
   p: ({ ...props }: ComponentPropsWithRef<"p">) => (
-    <p {...props}>{props.children}</p>
+    <p className={cn("mb-4 leading-7", props.className)} {...props}>
+      {props.children}
+    </p>
   ),
   li: ({ ...props }: ComponentPropsWithRef<"li">) => (
-    <li {...props}>{props.children}</li>
+    <li
+      className={cn(
+        "leading-7 [&>p]:mb-2 [&>p:last-child]:mb-0",
+        props.className
+      )}
+      {...props}>
+      {props.children}
+    </li>
   ),
   ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
-    <ol {...props}>{props.children}</ol>
+    <ol
+      className={cn(
+        "mb-4 ml-6 list-decimal space-y-2 [&_ol]:mt-2 [&_ol]:mb-0 [&_ul]:mt-2 [&_ul]:mb-0 [&>li]:pl-2",
+        props.className
+      )}
+      {...props}>
+      {props.children}
+    </ol>
   ),
   ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
-    <ul {...props}>{props.children}</ul>
+    <ul
+      className={cn(
+        "mb-4 ml-6 list-disc space-y-2 [&_ol]:mt-2 [&_ol]:mb-0 [&_ul]:mt-2 [&_ul]:mb-0 [&>li]:pl-2",
+        props.className
+      )}
+      {...props}>
+      {props.children}
+    </ul>
   ),
   div: ({ ...props }: ComponentPropsWithRef<"div">) => (
     <div {...props}>{props.children}</div>
@@ -160,7 +184,11 @@ const components = {
     <span {...props}>{props.children}</span>
   ),
   blockquote: ({ ...props }: ComponentPropsWithRef<"blockquote">) => (
-    <blockquote {...props}>{props.children}</blockquote>
+    <blockquote
+      className={cn("mb-4 border-l-4 pl-4 italic", props.className)}
+      {...props}>
+      {props.children}
+    </blockquote>
   ),
   cite: ({ ...props }: ComponentPropsWithRef<"cite">) => (
     <cite {...props}>{props.children}</cite>
@@ -174,16 +202,24 @@ const components = {
     <em {...props}>{props.children}</em>
   ),
   strong: ({ ...props }: ComponentPropsWithRef<"strong">) => (
-    <strong {...props}>{props.children}</strong>
+    <strong className={cn("font-bold", props.className)} {...props}>
+      {props.children}
+    </strong>
   ),
   b: ({ ...props }: ComponentPropsWithRef<"b">) => (
-    <b {...props}>{props.children}</b>
+    <b className={cn("font-bold", props.className)} {...props}>
+      {props.children}
+    </b>
   ),
   aside: ({ ...props }: ComponentPropsWithRef<"aside">) => (
     <aside {...props}>{props.children}</aside>
   ),
   table: ({ ...props }: ComponentPropsWithRef<"table">) => (
-    <table {...props}>{props.children}</table>
+    <table
+      className={cn("mb-4 w-full border-collapse border", props.className)}
+      {...props}>
+      {props.children}
+    </table>
   ),
   thead: ({ ...props }: ComponentPropsWithRef<"thead">) => (
     <thead {...props}>{props.children}</thead>
@@ -191,33 +227,39 @@ const components = {
   tbody: ({ ...props }: ComponentPropsWithRef<"tbody">) => (
     <tbody {...props}>{props.children}</tbody>
   ),
-  tspan:({ ...props }: ComponentPropsWithRef<"tspan">) => (
+  tspan: ({ ...props }: ComponentPropsWithRef<"tspan">) => (
     <tspan {...props}>{props.children}</tspan>
   ),
   tfoot: ({ ...props }: ComponentPropsWithRef<"tfoot">) => (
     <tfoot {...props}>{props.children}</tfoot>
   ),
   tr: ({ ...props }: ComponentPropsWithRef<"tr">) => (
-    <tr {...props}>{props.children}</tr>
+    <tr className={cn("border-b", props.className)} {...props}>
+      {props.children}
+    </tr>
   ),
-  td:({ ...props }: ComponentPropsWithRef<"td">) => (
-    <td {...props}>{props.children}</td>
+  td: ({ ...props }: ComponentPropsWithRef<"td">) => (
+    <td {...props} className={cn("px-4 py-2", props.className)}>
+      {props.children}
+    </td>
   ),
   th: ({ ...props }: ComponentPropsWithRef<"th">) => (
-    <th {...props}>{props.children}</th>
+    <th
+      className={cn("px-4 py-2 text-left font-semibold", props.className)}
+      {...props}>
+      {props.children}
+    </th>
   )
 };
 
 export function preprocessMathDelimiters(content: string) {
-  const inlineMath = /\\\((.*?)\\\)/gs; // matches $$ … $$
+  const inlineMath = /\\\((.*?)\\\)/gs; // matches \( … \)
   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
   const result = content
     .replace(displayMath, (_match, expr: string) => {
-      // console.log(`📐 Converting display math: "${match}" → "$$${expr}$$"`);
       return `$$${expr}$$`;
     })
     .replace(inlineMath, (_match, expr: string) => {
-      // console.log(`📏 Converting inline math: "${match}" → "$${expr}$"`);
       return `$${expr}$`;
     });
   return result;
