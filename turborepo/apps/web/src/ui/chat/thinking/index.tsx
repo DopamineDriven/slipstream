@@ -2,8 +2,10 @@
 
 import type { Properties } from "csstype";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { cn } from "@/lib/utils";
+import { AnimateNumber } from "motion-plus/react";
 import { motion } from "motion/react";
 import {
   Accordion,
@@ -18,16 +20,72 @@ interface ThinkingSectionProps {
   isStreaming?: boolean;
   duration?: number;
   className?: string;
+  isThinking?: boolean;
 }
 
 export function ThinkingSection({
   thinkingContent,
   isStreaming = false,
-  duration = 0,
-  className
+  duration,
+  className,
+  isThinking = false
 }: ThinkingSectionProps) {
   const [value, setValue] = useState<string | undefined>(undefined);
   const isExpanded = value === "thinking";
+  const [displayDuration, setDisplayDuration] = useState(0);
+  const startTimeRef = useRef<number | undefined>(undefined);
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const lastUpdateRef = useRef<number>(0);
+  useEffect(() => {
+    if (isThinking) {
+      if (!startTimeRef.current) {
+        startTimeRef.current = performance.now();
+        setDisplayDuration(0);
+      }
+
+      const updateDuration = (currentTime: number) => {
+        if (startTimeRef.current) {
+          const elapsed = currentTime - startTimeRef.current;
+          const seconds = elapsed / 1000;
+
+          // Update every ~100ms for smooth animation without overwhelming the component
+          if (currentTime - lastUpdateRef.current >= 100) {
+            setDisplayDuration(seconds);
+            lastUpdateRef.current = currentTime;
+          }
+
+          animationFrameRef.current = requestAnimationFrame(updateDuration);
+        }
+      };
+
+      animationFrameRef.current = requestAnimationFrame(updateDuration);
+    } else {
+      // Stop the animation
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
+      }
+
+      // Set final duration if provided
+      if (typeof duration !== "undefined") {
+        setDisplayDuration(duration / 1000);
+      }
+
+      // Reset for next thinking session
+      startTimeRef.current = undefined;
+      lastUpdateRef.current = 0;
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isThinking, duration]);
+
+  const { get } = useCookiesCtx();
+
+  const locale = get("locale") ?? "en-US";
 
   return (
     <div className={cn("border-foreground/80 my-3 border-l-2 pl-4", className)}>
@@ -58,15 +116,43 @@ export function ThinkingSection({
                 }}>
                 <path d="m9 18 6-6-6-6" />
               </motion.svg>
-              <Sparkles
-                className={cn(
-                  "h-4 w-4 flex-shrink-0",
-                  isStreaming && "animate-floating-bob"
-                )}
-                style={{ "--bob-multiplier": 1.2 }}
-              />
-              <span className="text-sm">
-                Thought for {Math.round(duration/1000)} seconds...
+              <motion.div
+                animate={{
+                  rotate: isThinking ? 360 : 0,
+                  scale: isThinking ? [1, 1.1, 1] : 1
+                }}
+                transition={{
+                  rotate: {
+                    duration: 2,
+                    repeat: isThinking ? Number.POSITIVE_INFINITY : 0,
+                    ease: "linear"
+                  },
+                  scale: {
+                    duration: 1.5,
+                    repeat: isThinking ? Number.POSITIVE_INFINITY : 0,
+                    ease: "easeInOut"
+                  }
+                }}>
+                <Sparkles className="h-4 w-4 flex-shrink-0" />
+              </motion.div>
+              <span className="flex items-center gap-1 text-sm">
+                <span>{isThinking ? "Thinking for" : "Thought for"}</span>
+                <AnimateNumber
+                  format={{
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                  }}
+                  locales={locale}
+                  className="font-mono tabular-nums"
+                  transition={{
+                    type: "spring",
+                    bounce: 0.1,
+                    duration: 0.3,
+                    visualDuration: isThinking ? 0.2 : 0.4
+                  }}>
+                  {displayDuration}
+                </AnimateNumber>
+                <span>seconds...</span>
                 <span className="sr-only">
                   {isExpanded ? " - Hide thinking" : " - Show thinking"}
                 </span>
@@ -93,6 +179,7 @@ export function ThinkingSection({
     </div>
   );
 }
+
 declare module "react" {
   export interface CSSProperties extends Properties<string | number> {
     "--bob-multiplier"?: number;

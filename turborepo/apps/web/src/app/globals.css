@@ -357,6 +357,20 @@
   --bob-multiplier: --value(integer);
 }
 
+@utility scale-* {
+  scale: calc(--value(integer) * 1%);
+  scale: calc(--value(ratio) * 100%);
+  scale: --value([percentage]);
+  scale: --value(--scale-*);
+}
+
+@utility -scale-* {
+  scale: calc(--value(integer) * -1%);
+  scale: calc(--value(ratio) * -100%);
+    scale: calc(--value([percentage]) *-1);
+  scale: --value(--scale-*);
+}
+
 @layer base {
   *,
   ::after,

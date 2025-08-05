@@ -85,7 +85,9 @@ export function ChatInterface({
 
   // Update messages with streaming content
   useEffect(() => {
-    if (!activeConversationId || (!streamedText || !thinkingText)) return;
+    if (!activeConversationId) return;
+
+    if (!streamedText && !thinkingText && !isThinking) return;
 
     setIsAwaitingFirstChunk(false);
 
