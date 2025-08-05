@@ -43,12 +43,17 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
       `h${level}` as const satisfies keyof React.JSX.IntrinsicElements;
     return createElement(
       target,
-      { id: slug, ...rest },
+      {
+        id: slug,
+        className:
+          " [&_h1]:text-5xl [&_h2]:text-4xl [&_h3]:text-3xl [&_h4]:text-2xl [&_h5]:text-xl [&_h6]:text-lg",
+        ...rest
+      },
       [
         createElement("a", {
           href: `#${slug}`,
           key: `link-${slug}`,
-          className: "anchor"
+          className: "anchor hover:underline"
         })
       ],
       children
@@ -134,7 +139,73 @@ const components = {
   h4: createHeading(4),
   h5: createHeading(5),
   h6: createHeading(6),
-  img: CustomImage
+  img: CustomImage,
+ // TODO: Add analytics tracking, default classes, animations, etc.
+  p: ({ ...props }: ComponentPropsWithRef<"p">) => (
+    <p {...props}>{props.children}</p>
+  ),
+  li: ({ ...props }: ComponentPropsWithRef<"li">) => (
+    <li {...props}>{props.children}</li>
+  ),
+  ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
+    <ol {...props}>{props.children}</ol>
+  ),
+  ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
+    <ul {...props}>{props.children}</ul>
+  ),
+  div: ({ ...props }: ComponentPropsWithRef<"div">) => (
+    <div {...props}>{props.children}</div>
+  ),
+  span: ({ ...props }: ComponentPropsWithRef<"span">) => (
+    <span {...props}>{props.children}</span>
+  ),
+  blockquote: ({ ...props }: ComponentPropsWithRef<"blockquote">) => (
+    <blockquote {...props}>{props.children}</blockquote>
+  ),
+  cite: ({ ...props }: ComponentPropsWithRef<"cite">) => (
+    <cite {...props}>{props.children}</cite>
+  ),
+  hr: ({ ...props }: ComponentPropsWithRef<"hr">) => <hr {...props} />,
+  br: ({ ...props }: ComponentPropsWithRef<"br">) => <br {...props} />,
+  caption: ({ ...props }: ComponentPropsWithRef<"caption">) => (
+    <caption {...props}>{props.children}</caption>
+  ),
+  em: ({ ...props }: ComponentPropsWithRef<"em">) => (
+    <em {...props}>{props.children}</em>
+  ),
+  strong: ({ ...props }: ComponentPropsWithRef<"strong">) => (
+    <strong {...props}>{props.children}</strong>
+  ),
+  b: ({ ...props }: ComponentPropsWithRef<"b">) => (
+    <b {...props}>{props.children}</b>
+  ),
+  aside: ({ ...props }: ComponentPropsWithRef<"aside">) => (
+    <aside {...props}>{props.children}</aside>
+  ),
+  table: ({ ...props }: ComponentPropsWithRef<"table">) => (
+    <table {...props}>{props.children}</table>
+  ),
+  thead: ({ ...props }: ComponentPropsWithRef<"thead">) => (
+    <thead {...props}>{props.children}</thead>
+  ),
+  tbody: ({ ...props }: ComponentPropsWithRef<"tbody">) => (
+    <tbody {...props}>{props.children}</tbody>
+  ),
+  tspan:({ ...props }: ComponentPropsWithRef<"tspan">) => (
+    <tspan {...props}>{props.children}</tspan>
+  ),
+  tfoot: ({ ...props }: ComponentPropsWithRef<"tfoot">) => (
+    <tfoot {...props}>{props.children}</tfoot>
+  ),
+  tr: ({ ...props }: ComponentPropsWithRef<"tr">) => (
+    <tr {...props}>{props.children}</tr>
+  ),
+  td:({ ...props }: ComponentPropsWithRef<"td">) => (
+    <td {...props}>{props.children}</td>
+  ),
+  th: ({ ...props }: ComponentPropsWithRef<"th">) => (
+    <th {...props}>{props.children}</th>
+  )
 };
 
 export function preprocessMathDelimiters(content: string) {

@@ -256,7 +256,7 @@ export function MessageBubble({
         {isAI && (
           <div className="mt-1 shrink-0">
             <div className="bg-foreground text-background flex size-6 items-center justify-center rounded-full sm:size-8">
-              <providerInfo.icon className="size-4.5 sm:size-6" />
+              <providerInfo.icon className="size-3 sm:size-4" />
             </div>
           </div>
         )}
