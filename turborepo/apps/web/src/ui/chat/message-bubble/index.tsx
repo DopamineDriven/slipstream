@@ -178,9 +178,7 @@ export function MessageBubble({
 
     // For live/streaming thinking text, use lightweight processor
     if (liveThinkingText && (isStreaming || liveIsThinking)) {
-      setRenderedThinkingContent(
-        processStreamingMarkdown(liveThinkingText)
-      );
+      setRenderedThinkingContent(processStreamingMarkdown(liveThinkingText));
       return;
     }
 
@@ -229,7 +227,13 @@ export function MessageBubble({
         thinkingProcessingRef.current = false;
       }
     })();
-  }, [message.thinkingText, message.id, isStreaming, liveThinkingText, liveIsThinking]);
+  }, [
+    message.thinkingText,
+    message.id,
+    isStreaming,
+    liveThinkingText,
+    liveIsThinking
+  ]);
 
   // Action button styling
   const actionButtonVariants = {
@@ -245,7 +249,7 @@ export function MessageBubble({
     <>
       <div
         className={cn(
-          "flex w-full max-w-4xl mx-auto gap-3",
+          "mx-auto flex w-full max-w-4xl gap-3",
           isUser ? "justify-end" : "justify-start",
           className
         )}>
@@ -258,7 +262,7 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "group relative max-w-[85%] rounded-2xl px-4 py-3 text-sm",
+            "group relative max-w-[85%] cursor-pointer rounded-2xl px-4 py-3 text-sm transition-transform active:scale-98 sm:cursor-default sm:active:scale-100",
             isUser
               ? "bg-muted text-forground"
               : "bg-primary/40 text-foreground",
@@ -266,22 +270,36 @@ export function MessageBubble({
               "cursor-pointer transition-transform active:scale-[0.98]"
           )}
           onClick={handleMessageClick}>
-          {(liveIsThinking  && liveThinkingText) ? (
+          {liveIsThinking || liveThinkingText ? (
             <ThinkingSection
+              isThinking={liveIsThinking}
               thinkingContent={renderedThinkingContent ?? message.thinkingText}
-              duration={liveThinkingDuration ?? message?.thinkingDuration ?? undefined}
+              duration={
+                liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+              }
               isStreaming={isStreaming ?? liveIsThinking ?? false}
             />
-          ) : message.thinkingText ? <ThinkingSection     thinkingContent={renderedThinkingContent ?? message.thinkingText}
-              duration={liveThinkingDuration ?? message?.thinkingDuration ?? undefined}
-              isStreaming={isStreaming ?? liveIsThinking ?? false} /> : <></>}
-          <div className="leading-relaxed whitespace-pre-wrap text-pretty">
+          ) : message.thinkingText ? (
+            <ThinkingSection
+              isThinking={liveIsThinking}
+              thinkingContent={renderedThinkingContent ?? message.thinkingText}
+              duration={
+                liveThinkingDuration ?? message?.thinkingDuration ?? undefined
+              }
+              isStreaming={isStreaming ?? liveIsThinking ?? false}
+            />
+          ) : (
+            <></>
+          )}
+          <div className="leading-relaxed text-pretty whitespace-pre-wrap">
             {renderedContent ?? message.content}
           </div>
           <div
             className={cn(
               "mt-2 flex items-center justify-between pt-1 text-xs",
-              isUser ? "text-foreground/90 [&_svg]:text-foreground/90" : "text-muted-foreground"
+              isUser
+                ? "text-foreground/90 [&_svg]:text-foreground/90"
+                : "text-muted-foreground"
             )}>
             {isAI ? (
               <>
@@ -312,7 +330,6 @@ export function MessageBubble({
                     <>
                       <span>•</span>
                       <span className="font-medium">
-
                         {getModelDisplayName(
                           message.provider.toLowerCase() as Provider,
                           message.model as AllModelsUnion
