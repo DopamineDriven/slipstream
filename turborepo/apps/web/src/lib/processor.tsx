@@ -143,14 +143,14 @@ const components = {
   img: CustomImage,
   // TODO: Add analytics tracking, default classes, animations, etc.
   p: ({ ...props }: ComponentPropsWithRef<"p">) => (
-    <p className={cn("mb-4 leading-7", props.className)} {...props}>
+    <p className={cn("mb-1.5 leading-7", props.className)} {...props}>
       {props.children}
     </p>
   ),
   li: ({ ...props }: ComponentPropsWithRef<"li">) => (
     <li
       className={cn(
-        "leading-7 [&>p]:mb-2 [&>p:last-child]:mb-0",
+        "leading-7 [&>p]:mb-1 [&>p:last-child]:mb-0",
         props.className
       )}
       {...props}>
@@ -160,7 +160,7 @@ const components = {
   ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
     <ol
       className={cn(
-        "mb-4 ml-6 list-decimal space-y-2 [&_ol]:mt-2 [&_ol]:mb-0 [&_ul]:mt-2 [&_ul]:mb-0 [&>li]:pl-2",
+        "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2",
         props.className
       )}
       {...props}>
@@ -170,7 +170,7 @@ const components = {
   ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
     <ul
       className={cn(
-        "mb-4 ml-6 list-disc space-y-2 [&_ol]:mt-2 [&_ol]:mb-0 [&_ul]:mt-2 [&_ul]:mb-0 [&>li]:pl-2",
+        "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2",
         props.className
       )}
       {...props}>
@@ -185,7 +185,7 @@ const components = {
   ),
   blockquote: ({ ...props }: ComponentPropsWithRef<"blockquote">) => (
     <blockquote
-      className={cn("mb-4 border-l-4 pl-4 italic", props.className)}
+      className={cn("mb-2 border-l-4 pl-4 italic", props.className)}
       {...props}>
       {props.children}
     </blockquote>
