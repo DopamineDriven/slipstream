@@ -11,6 +11,11 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "markdown-pdf-plus.pageSize": "letter",
+  "markdown-pdf-plus.marginBottom": "35px",
+  "markdown-pdf-plus.marginLeft": "35px",
+  "markdown-pdf-plus.marginRight": "35px",
+  "markdown-pdf-plus.marginTop": "35px",
   "editor.quickSuggestions": {
     "other": "on",
     "comments": "off",

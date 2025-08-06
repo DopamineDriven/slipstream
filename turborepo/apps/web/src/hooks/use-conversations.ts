@@ -39,7 +39,7 @@ export function useConversations(userId?: string): UseConversationsReturn {
   } = useSWR<SidebarProps[], Error>( userId ?
     `/api/users/${userId}/conversations` : null,
     fetcher,
-    { revalidateOnFocus: true, revalidateOnReconnect: true }
+    { revalidateOnFocus: false, revalidateOnReconnect: true,suspense: true }
   );
   /**
    * Revalidate from server

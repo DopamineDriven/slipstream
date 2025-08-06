@@ -82,17 +82,17 @@ export type ModelSelectionAlt<T extends Provider> = {
 };
 
 export const defaultModelByProvider = {
-  openai: "GPT 4o Mini" as OpenAiDisplayNameUnion,
-  gemini: "Gemini 2.5 Flash-Lite Preview 06-17" as GeminiDisplayNameUnion,
-  grok: "Grok 3" as GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 3.5 (New)" as AnthropicDisplayNameUnion
+  openai: "GPT 4.1 Nano" as OpenAiDisplayNameUnion,
+  gemini: "Gemini 2.5 Flash" as GeminiDisplayNameUnion,
+  grok: "Grok 4" as GrokDisplayNameUnion,
+  anthropic: "Claude Sonnet 4" as AnthropicDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-4o-mini" as OpenAiModelIdUnion,
-  gemini: "gemini-2.5-flash-lite-preview-06-17" as GeminiModelIdUnion,
-  grok: "grok-3" as GrokModelIdUnion,
-  anthropic: "claude-3-5-sonnet-20241022" as AnthropicModelIdUnion
+  openai: "gpt-4.1-nano" as OpenAiModelIdUnion,
+  gemini: "gemini-2.5-flash" as GeminiModelIdUnion,
+  grok: "grok-4-0709" as GrokModelIdUnion,
+  anthropic: "claude-sonnet-4-20250514" as AnthropicModelIdUnion
 };
 
 export let defaultProvider: "openai" | "gemini" | "grok" | "anthropic";

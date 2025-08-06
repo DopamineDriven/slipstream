@@ -49,6 +49,8 @@
     "dev": "pnpm build",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache",
+    "update:secrets":"tsx src/service/automate.ts",
+    "postupdate:secrets": "bash ./remote-helper.sh",
     "clean": "git clean -xdf .turbo dist node_modules",
     "fix": "npm pkg fix"
   },
@@ -62,7 +64,7 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.0",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^10.0.0",
     "eslint": "^9.32.0",
@@ -73,7 +75,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.38.0"
+    "typescript-eslint": "^8.39.0"
   },
   "prettier": "@t3-chat-clone/prettier-config"
 }

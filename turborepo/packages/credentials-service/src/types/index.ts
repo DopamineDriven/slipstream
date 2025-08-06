@@ -49,6 +49,7 @@ export interface CredentialEntity {
   REDIS_CA_PEM?: string;
   REDIS_CLIENT_CERT?: string;
   REDIS_CLIENT_KEY?: string;
+  RUNWAYML_API_SECRET?: string;
 } 
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

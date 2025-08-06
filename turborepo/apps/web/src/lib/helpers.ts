@@ -14,3 +14,13 @@ export const getFirstName = (name?: string | null) => {
 export const smoothScrollToBottom = (distance: number) => {
   return Math.min(Math.max(300, Math.sqrt(distance) * 20), 1500);
 };
+
+export const formatTime = (dateString: Date, locale: string, tz: string) => {
+  const date = new Date(dateString.toISOString());
+  return date.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: decodeURIComponent(tz)
+  });
+};

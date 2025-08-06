@@ -27,7 +27,8 @@
     "npm:registry": "npm set registry https://registry.npmjs.org",
     "run:web": "turbo dev --filter=@t3-chat-clone/web",
     "run:ws-server": "turbo dev --filter=@t3-chat-clone/ws-server",
-    "latest:pnpm": "corepack use pnpm@latest"
+    "latest:pnpm": "corepack use pnpm@latest",
+    "wsl2:info": "lsb_release -a"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
@@ -35,7 +36,7 @@
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.0",
     "dotenv": "^17.2.1",
     "eslint": "^9.32.0",
     "husky": "^9.1.7",
@@ -43,7 +44,7 @@
     "tsx": "^4.20.3",
     "turbo": "^2.5.5",
     "typescript": "^5.9.2",
-    "vercel": "^44.6.6"
+    "vercel": "^44.7.3"
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "engines": {
