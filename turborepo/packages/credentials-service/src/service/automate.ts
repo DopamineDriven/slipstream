@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import expand from "dotenv-expand";
 
 dotenv.config({ quiet: true });
-class Postbuild {
+class Automate {
   constructor(
     private additions: string,
     private creds: Credentials,
@@ -24,7 +24,7 @@ class Postbuild {
     return dotenv.config({ processEnv: {}, quiet: true });
   }
 
-  public parseDotEnv() {
+  private parseDotEnv() {
     return expand.expand(this.myEnv());
   }
 
@@ -43,9 +43,8 @@ class Postbuild {
       return arrHelper;
     }
   }
-  // TODO -- DEEP COMPARE -- IF A KEY ALREADY EXISTS ONCE IN THE CREDENTIALS STORE AND AGAIN LOCALLY IN DOTENV REMOVE IT FROM THE TRY BLOCK BEFORE IT GETS ADDED TO THE ARRHELPER FOR MERGING
-  // NOTE -- NOT AN ISSUE YET BUT COULD BECOME AN ISSUE IN THE FUTURE IF NOT CAREFUL
-  public async parseAdditions() {
+
+  private async parseAdditions() {
     const arrHelper = Array.of<[string, string]>();
     const toArr = this.additions.split(/,/g);
 
@@ -85,13 +84,13 @@ class Postbuild {
       })
       .then(async v => {
         return this.fs.wait(1000).then(() => {
-          let readIt = this.fs
+          let updateTypes = this.fs
             .fileToBuffer("src/types/index.ts")
             .toString("utf-8");
-          readIt = readIt.replace(this.deStringifyKeys, "$1$2$3?:");
-          readIt = readIt.replace(this.stripLiterals, "$1string;");
+          updateTypes = updateTypes.replace(this.deStringifyKeys, "$1$2$3?:");
+          updateTypes = updateTypes.replace(this.stripLiterals, "$1string;");
 
-          this.fs.withWs("src/types/index.ts", readIt);
+          this.fs.withWs("src/types/index.ts", updateTypes);
 
           return v;
         });
@@ -99,11 +98,10 @@ class Postbuild {
   }
 }
 
-if (process.argv[2] === "--secrets" && process.argv[3]) {
+if (process.argv?.[2] === "--secrets" && process.argv?.[3]) {
   const fs = new Fs(process.cwd());
-
   const creds = new Credentials();
-  const service = new Postbuild(process.argv[3] ?? "", creds, fs);
+  const service = new Automate(process.argv[3], creds, fs);
 
   service.rmAndReplace().then(data => {
     return data;

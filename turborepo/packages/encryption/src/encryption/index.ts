@@ -3,7 +3,7 @@ import type { EncryptedPayload } from "@/types/index.ts";
 import * as dotenv from "dotenv";
 import { Credentials } from "@t3-chat-clone/credentials";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export class EncryptionService {
   #ALGO = "aes-256-gcm" as const;

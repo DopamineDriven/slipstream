@@ -26,7 +26,7 @@ export const getModel = <
         providerModelChatApi[xTarget].includes(model as GetModelUtilRT<"grok">)
       ) {
         return model;
-      } else return "grok-3" as const as NonNullable<K>;
+      } else return "grok-4-0709" as const as NonNullable<K>;
     }
     case "anthropic": {
       if (
@@ -36,7 +36,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "claude-3-haiku-20240307" as const as NonNullable<K>;
+      } else return "claude-sonnet-4-20250514" as const as NonNullable<K>;
     }
     default: {
       if (
@@ -46,7 +46,7 @@ export const getModel = <
         )
       ) {
         return model;
-      } else return "gpt-4o-mini" as const as NonNullable<K>;
+      } else return "gpt-4.1-nano" as const as NonNullable<K>;
     }
   }
 };

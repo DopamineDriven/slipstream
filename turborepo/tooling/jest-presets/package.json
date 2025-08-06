@@ -16,7 +16,7 @@
     "clean": "git clean -xdf node_modules"
   },
   "dependencies": {
-    "ts-jest": "^29.4.0"
+    "ts-jest": "^29.4.1"
   },
   "devDependencies": {
     "@t3-chat-clone/prettier-config": "workspace:*",

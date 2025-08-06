@@ -623,6 +623,9 @@ export class Resolver extends ModelService {
                 conversationId,
                 userId,
                 model,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
                 title,
                 systemPrompt,
                 temperature,

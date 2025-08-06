@@ -71,7 +71,6 @@ export {
   modelIdsByProvider,
   modelIdToDisplayName,
   providerModelChatApi,
-  providerModelResponsesApi,
   toPrismaFormat
 } from "@/models.ts";
 

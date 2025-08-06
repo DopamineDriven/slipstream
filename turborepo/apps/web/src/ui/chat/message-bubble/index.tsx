@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { getFirstName, getInitials } from "@/lib/helpers";
+import { formatTime, getFirstName, getInitials } from "@/lib/helpers";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { getModelDisplayName, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ import {
   AvatarImage,
   Button,
   EditIcon,
+  EllipsisHorizontal,
   ReadAloud as ReadAloudIcon,
   RetryIcon,
   ShareIcon as Share,
@@ -102,23 +103,11 @@ export function MessageBubble({
   const tz = get("tz") ?? "america/chicago";
   const locale = get("locale") ?? "en-US";
 
-  const formatTime = (dateString: Date) => {
-    const date = new Date(dateString.toISOString());
-    return date.toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: decodeURIComponent(tz)
-    });
-  };
-
   const contentToCopy = message.content;
 
-  const handleMessageClick = useCallback(() => {
-    if (isMobile) {
-      setShowMobileActions(true);
-    }
-  }, [isMobile]);
+  const handleMobileActionsClick = useCallback(() => {
+    setShowMobileActions(true);
+  }, []);
 
   // Process markdown content
   useEffect(() => {
@@ -238,7 +227,7 @@ export function MessageBubble({
   // Action button styling
   const actionButtonVariants = {
     default: cn(
-      "h-4 w-4 p-0 bg-transparent hover:bg-transparent",
+      "size-3 sm:h-4 sm:w-4 p-0 bg-transparent hover:bg-transparent",
       isUser
         ? "text-primary-foreground/70 hover:text-primary-foreground/90"
         : "text-muted-foreground hover:text-foreground"
@@ -262,14 +251,24 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "group relative max-w-[85%] cursor-pointer rounded-2xl px-4 py-3 text-sm transition-transform active:scale-98 sm:cursor-default sm:active:scale-100",
-            isUser
-              ? "bg-muted text-forground"
-              : "bg-primary/40 text-foreground",
-            isMobile &&
-              "cursor-pointer transition-transform active:scale-[0.98]"
+            "group relative max-w-[85%] rounded-2xl px-4 py-3 text-sm",
+            isUser ? "bg-muted text-forground" : "bg-primary/40 text-foreground"
+          )}>
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleMobileActionsClick}
+              className={cn(
+                "absolute size-6 bg-transparent p-0 focus:bg-transparent",
+                isUser
+                  ? "text-primary-foreground/70 hover:text-primary-foreground/90"
+                  : "text-muted-foreground hover:text-foreground"
+              )}>
+              <EllipsisHorizontal className="h-3 w-3" />
+              <span className="sr-only">Message options</span>
+            </Button>
           )}
-          onClick={handleMessageClick}>
           {liveIsThinking || liveThinkingText ? (
             <ThinkingSection
               isThinking={liveIsThinking}
@@ -325,7 +324,7 @@ export function MessageBubble({
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>{formatTime(message.createdAt)}</span>
+                  <span>{formatTime(message.createdAt, locale, tz)}</span>
                   {message.model && message.provider && (
                     <>
                       <span>•</span>
@@ -342,7 +341,7 @@ export function MessageBubble({
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <span>{formatTime(message.createdAt)}</span>
+                  <span>{formatTime(message.createdAt, locale, tz)}</span>
                   <span>•</span>
                   <span className="font-medium">
                     {getFirstName(user?.name)}

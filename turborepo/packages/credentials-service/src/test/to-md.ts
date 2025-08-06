@@ -1,5 +1,5 @@
-import { Fs } from "@d0paminedriven/fs";
 import type { BufferEncodingUnion } from "@d0paminedriven/fs";
+import { Fs } from "@d0paminedriven/fs";
 
 type Opts = {
   encoding?: BufferEncodingUnion | null | undefined;
@@ -7,7 +7,7 @@ type Opts = {
   recursive?: boolean | undefined;
 };
 
-type Targets = "root" | "src/creds" | "src/index" | "src/types";
+type Targets = "root" | "src/creds" | "src/index" | "src/types" | "src/service";
 
 class OutputMd extends Fs {
   constructor(public override cwd: string) {
@@ -134,7 +134,7 @@ ${this.handleComments(target, fileContent, removeComments)}
   public incomingArgs(argv: string[]) {
     const omitComments = argv[4]?.includes("false") ? false : true;
     // prettier-ignore
-    const msg = `must provide an argv3 command, \n\n index | root | creds | types \n\n eg, \n\n \`\`\`bash \npnpm tsx src/test/to-md.ts --target root false\n \`\`\` \n argv[4] is optional (defaults to false) -> set to true to remove all comments from output aggregate`;
+    const msg = `must provide an argv3 command, \n\n index | root | creds | service | types \n\n eg, \n\n \`\`\`bash \npnpm tsx src/test/to-md.ts --target root false\n \`\`\` \n argv[4] is optional (defaults to false) -> set to true to remove all comments from output aggregate`;
 
     if (argv[3] && argv[3].length > 1) {
       if (argv[3]?.includes("creds")) {
@@ -152,7 +152,7 @@ ${this.handleComments(target, fileContent, removeComments)}
           "src/test/__out__/index.md",
           this.getRawFiles("src/index", omitComments).join("\n")
         );
-      }else if (argv[3]?.includes("root")) {
+      } else if (argv[3]?.includes("root")) {
         this.withWs(
           "src/test/__out__/root.md",
           this.getRawFiles("root", omitComments).join("\n")
@@ -161,7 +161,7 @@ ${this.handleComments(target, fileContent, removeComments)}
         console.log(msg);
       } else {
         console.log(
-          `argv[3] must be a valid value -- index | root | auth | types | logger | pubsub | ws-server`
+          `argv[3] must be a valid value -- index | root | creds | types | service`
         );
       }
     } else {
@@ -169,6 +169,6 @@ ${this.handleComments(target, fileContent, removeComments)}
     }
   }
 }
-const fs = new OutputMd(process.cwd());
+const generate = new OutputMd(process.cwd());
 
-fs.incomingArgs(process.argv);
+generate.incomingArgs(process.argv);

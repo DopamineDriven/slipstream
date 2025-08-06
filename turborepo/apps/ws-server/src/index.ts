@@ -8,6 +8,7 @@ async function exe() {
   const cred = new Credentials();
 
   const cfg = await cred.getAll();
+
   try {
     const accountId = cfg.R2_ACCOUNT_ID;
     const accessKeyId = cfg.R2_ACCESS_KEY_ID;
