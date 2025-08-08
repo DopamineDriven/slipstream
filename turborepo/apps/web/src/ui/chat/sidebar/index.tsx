@@ -3,7 +3,7 @@
 import type { SidebarProps } from "@/types/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useConversations } from "@/hooks/use-conversations";
 import { cn } from "@/lib/utils";
@@ -37,9 +37,9 @@ interface EnhancedSidebarProps {
 }
 
 export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const userId = session?.user?.id;
-  const { conversations, updateCache, deleteConversation, updateTitle } =
+  const { conversations, updateCache, deleteConversation, updateTitle, isLoading,isValidating } =
     useConversations(userId);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,10 +181,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     };
   }, []);
 
-  if (status === "loading") return <SidebarSkeleton />;
-  if (status === "unauthenticated" || !session?.user?.id) {
-    redirect("/api/auth/signin");
-  }
+  if (isLoading || isValidating) return <SidebarSkeleton />;
   return (
     <div
       className={cn(

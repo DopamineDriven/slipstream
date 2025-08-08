@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { after } from "next/server";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
-import { ChatInput } from "@/ui/chat/chat-input";
 import { ChatInterface } from "@/ui/chat/dynamic";
 import type { InferGSPRT } from "@t3-chat-clone/types";
 
@@ -38,10 +36,9 @@ export async function generateMetadata({
 export default async function ChatPage({
   params
 }: InferGSPRT<typeof generateStaticParams>) {
+  const { conversationId } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/api/auth/signin");
-
-  const { conversationId } = await params;
 
   // Fetch data directly on the server
   let messages = null;
@@ -59,25 +56,14 @@ export default async function ChatPage({
     }
   }
 
-  after(() => {
-    console.log("[after]: " + conversationId);
-  });
-
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-full flex-col">
-          <ChatAreaSkeleton />
-          <ChatInput user={session.user} conversationId={conversationId} />
-        </div>
-      }>
+    <Suspense fallback={<ChatAreaSkeleton />}>
       <ChatInterface
         initialMessages={messages}
         conversationTitle={conversationTitle}
         conversationId={conversationId}
-        user={session.user}>
-        <ChatInput user={session.user} conversationId={conversationId} />
-      </ChatInterface>
+        user={session.user}
+      />
     </Suspense>
   );
 }

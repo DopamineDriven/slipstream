@@ -10,7 +10,7 @@ export type UseConversationsReturn = {
   isLoading: boolean;
   error: Error | undefined;
   isValidating: boolean;
-  mutate: KeyedMutator<SidebarProps[]>
+  mutate: KeyedMutator<SidebarProps[]>;
   updateTitle: (id: string, title: string) => Promise<void>;
   deleteConversation: (id: string) => Promise<void>;
   refresh: () => Promise<SidebarProps[] | undefined>;
@@ -36,10 +36,15 @@ export function useConversations(userId?: string): UseConversationsReturn {
     isLoading,
     error,
     isValidating
-  } = useSWR<SidebarProps[], Error>( userId ?
-    `/api/users/${userId}/conversations` : null,
+  } = useSWR<SidebarProps[], Error>(
+    userId ? `/api/users/${userId}/conversations` : null,
     fetcher,
-    { revalidateOnFocus: false, revalidateOnReconnect: true,suspense: true }
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      fetcher,
+      revalidateOnMount: true
+    }
   );
   /**
    * Revalidate from server
