@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
@@ -113,7 +113,9 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
       <SidebarProvider>
         <div className="flex h-screen w-screen overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
-            <EnhancedSidebar />
+            <Suspense>
+              <EnhancedSidebar />
+            </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">
             <div className="flex h-full flex-col">

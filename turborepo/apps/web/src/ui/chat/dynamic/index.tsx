@@ -3,16 +3,19 @@
 
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
-import type { ReactNode } from "react";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import { createUserMessage, createAIMessage, finalizeStreamingMessage } from "@/lib/ui-message-helpers";
+import {
+  createAIMessage,
+  createUserMessage,
+  finalizeStreamingMessage
+} from "@/lib/ui-message-helpers";
 import { ChatFeed } from "../chat-feed";
+import { ChatInput } from "../chat-input";
 
 interface ChatInterfaceProps {
-  children: ReactNode;
   initialMessages?: UIMessage[] | null;
   conversationTitle?: string | null;
   conversationId: string; // From the dynamic route param - not used, context drives everything
@@ -20,9 +23,8 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({
-  children,
   initialMessages,
-  conversationId: _conversationId, // From route - not used, we rely on context
+  conversationId, // From route - not used, we rely on context
   user
 }: ChatInterfaceProps) {
   const searchParams = useSearchParams();
@@ -50,11 +52,12 @@ export function ChatInterface({
 
   // Handle initial prompt for new chats
   useEffect(() => {
-    if (activeConversationId === 'new-chat' &&
-        initialPrompt &&
-        !processedRef.current &&
-        !isWaitingForRealId) {
-
+    if (
+      activeConversationId === "new-chat" &&
+      initialPrompt &&
+      !processedRef.current &&
+      !isWaitingForRealId
+    ) {
       processedRef.current = true;
       setIsAwaitingFirstChunk(true);
 
@@ -93,7 +96,9 @@ export function ChatInterface({
 
     setMessages(prev => {
       // Check if we already have a streaming message
-      const existingStreamIndex = prev.findIndex(m => m.id.startsWith('streaming-'));
+      const existingStreamIndex = prev.findIndex(m =>
+        m.id.startsWith("streaming-")
+      );
 
       const streamingMsg = createAIMessage({
         id: `streaming-${activeConversationId}`,
@@ -102,7 +107,11 @@ export function ChatInterface({
         provider: selectedModel.provider,
         model: selectedModel.modelId,
         conversationId: activeConversationId,
-        thinkingText: isThinking ? thinkingText : (thinkingDuration ? thinkingText : undefined),
+        thinkingText: isThinking
+          ? thinkingText
+          : thinkingDuration
+            ? thinkingText
+            : undefined,
         thinkingDuration: thinkingDuration ?? undefined
       });
 
@@ -116,22 +125,36 @@ export function ChatInterface({
         return [...prev, streamingMsg];
       }
     });
-  }, [streamedText, activeConversationId, selectedModel, user, isThinking, thinkingText, thinkingDuration]);
+  }, [
+    streamedText,
+    activeConversationId,
+    selectedModel,
+    user,
+    isThinking,
+    thinkingText,
+    thinkingDuration
+  ]);
 
   // Handle completion
   useEffect(() => {
     if (isComplete && streamedText) {
       // Convert streaming message to final message
       setMessages(prev => {
-        const streamingIndex = prev.findIndex(m => m.id.startsWith('streaming-'));
+        const streamingIndex = prev.findIndex(m =>
+          m.id.startsWith("streaming-")
+        );
         if (streamingIndex >= 0) {
           const updated = [...prev];
           const streamingMsg = updated[streamingIndex];
           if (streamingMsg) {
-            updated[streamingIndex] = finalizeStreamingMessage(streamingMsg, streamedText, {
-              thinkingText: thinkingText ?? undefined,
-              thinkingDuration: thinkingDuration ?? undefined
-            });
+            updated[streamingIndex] = finalizeStreamingMessage(
+              streamingMsg,
+              streamedText,
+              {
+                thinkingText: thinkingText ?? undefined,
+                thinkingDuration: thinkingDuration ?? undefined
+              }
+            );
           }
           return updated;
         }
@@ -143,46 +166,55 @@ export function ChatInterface({
         resetStreamingState();
       }, 100);
     }
-  }, [isComplete, streamedText, resetStreamingState, thinkingText, thinkingDuration]);
+  }, [
+    isComplete,
+    streamedText,
+    resetStreamingState,
+    thinkingText,
+    thinkingDuration
+  ]);
 
   // Reset processed flag when navigating away from new-chat
   useEffect(() => {
-    if (activeConversationId !== 'new-chat') {
+    if (activeConversationId !== "new-chat") {
       processedRef.current = false;
     }
   }, [activeConversationId]);
 
   // Callback to handle new user messages from the input component
-  const handleUserMessage = useCallback((content: string) => {
-    if (!activeConversationId || !content.trim()) return;
+  const handleUserMessage = useCallback(
+    (content: string) => {
+      if (!activeConversationId || !content.trim()) return;
 
-    // Add optimistic user message immediately
-    const userMsg = createUserMessage({
-      id: `user-${Date.now()}-${Math.random()}`,
-      content: content.trim(),
-      userId: user.id,
-      provider: selectedModel.provider,
-      model: selectedModel.modelId,
-      conversationId: activeConversationId
-    });
+      // Add optimistic user message immediately
+      const userMsg = createUserMessage({
+        id: `user-${Date.now()}-${Math.random()}`,
+        content: content.trim(),
+        userId: user.id,
+        provider: selectedModel.provider,
+        model: selectedModel.modelId,
+        conversationId: activeConversationId
+      });
 
-    setMessages(prev => [...prev, userMsg]);
-    lastUserMessageRef.current = content.trim();
-    setIsAwaitingFirstChunk(true);
+      setMessages(prev => [...prev, userMsg]);
+      lastUserMessageRef.current = content.trim();
+      setIsAwaitingFirstChunk(true);
 
-    // Send to AI
-    sendChat(content);
-  }, [activeConversationId, selectedModel, sendChat, user]);
+      // Send to AI
+      sendChat(content);
+    },
+    [activeConversationId, selectedModel, sendChat, user]
+  );
 
   // Clone children and pass the message handler
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child as React.ReactElement<any>, {
-        onUserMessage: handleUserMessage
-      });
-    }
-    return child;
-  });
+  // const childrenWithProps = React.Children.map(children, child => {
+  //   if (React.isValidElement(child)) {
+  //     return React.cloneElement(child as React.ReactElement<any>, {
+  //       onUserMessage: handleUserMessage
+  //     });
+  //   }
+  //   return child;
+  // });
 
   return (
     <div className="flex h-full flex-col">
@@ -196,7 +228,11 @@ export function ChatInterface({
         thinkingDuration={thinkingDuration ?? undefined}
         user={user}
       />
-      {childrenWithProps}
+      <ChatInput
+        onUserMessage={handleUserMessage}
+        user={user}
+        conversationId={activeConversationId ?? conversationId}
+      />
     </div>
   );
 }
