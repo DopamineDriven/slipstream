@@ -23,5 +23,5 @@ spaces_around_brackets = outside
 # close enough to 1TB
 indent_brace_style = K&R
 
-[*.module.css]
+[*.css]
 max_line_length = 40

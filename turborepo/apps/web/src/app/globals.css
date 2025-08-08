@@ -170,36 +170,6 @@
   --color-brand-text: oklch(24.84% 0 0);
   --color-brand-text-muted: oklch(51.03% 0 0);
   --color-brand-text-emphasis: oklch(18.15% 0 0);
-  --color-prose-pre-bg: oklch(97.015% 0.00011 271.152);
-  --color-prose-pre-text: oklch(24.776% 0.00003 271.152);
-  --color-prose-code-not-pre-code-text: oklch(18.15% 0 0);
-  --color-prose-code-not-pre-code-bg: oklch(94.611% 0.00011 271.152);
-  --color-prose-pre-token-comment-doctype-prolog-cdata-text: oklch(
-    51.028% 0.00006 271.152
-  );
-  --color-prose-pre-token-punctuation-text: oklch(42.024% 0.00005 271.152);
-  --color-prose-pre-token-property-tag-boolean-number-constant-symbol-deleted-text: oklch(
-    54.586% 0.20291 356.499
-  );
-  --color-prose-pre-token-selector-attrname-string-char-builtin-inserted-text: oklch(
-    57.729% 0.12624 156.126
-  );
-  --color-prose-pre-token-operator-entity-url-language-css-style-text: oklch(
-    56.233% 0.1106 236.093
-  );
-  --color-prose-pre-token-atrule-attrvalue-keyword-text: oklch(
-    54.201% 0.2263 311.436
-  );
-  --color-prose-pre-token-function-classname-text: oklch(
-    63.075% 0.13435 60.247
-  );
-  --color-prose-pre-token-regex-important-variable-text: oklch(
-    33.581% 0.12548 23.959
-  );
-  --color-prose-pre-code-class-language-wildcard-text: oklch(
-    24.776% 0.00003 271.152
-  );
-
   --radius-sm: 0.25rem;
   --radius-radius: 0.65rem;
 
@@ -308,35 +278,6 @@
     --color-brand-text: oklch(100% 0 0);
     --color-brand-text-muted: oklch(70.79% 0 0);
     --color-brand-text-emphasis: oklch(100% 0 0);
-    --color-prose-pre-bg: oklch(24.68% 0.0374 269.5);
-    --color-prose-pre-text: oklch(97.015% 0.00011 271.152);
-    --color-prose-code-not-pre-code-text: oklch(80.03% 0.1821 151.71);
-    --color-prose-code-not-pre-code-bg: oklch(85.69% 0.0141 247.99 / 0.15);
-    --color-prose-pre-token-comment-doctype-prolog-cdata-text: oklch(
-      71.37% 0.0192 261.32
-    );
-    --color-prose-pre-token-punctuation-text: oklch(87.17% 0.0093 258.34);
-    --color-prose-pre-token-property-tag-boolean-number-constant-symbol-deleted-text: oklch(
-      80.03% 0.1821 151.71
-    );
-    --color-prose-pre-token-selector-attrname-string-char-builtin-inserted-text: oklch(
-      72.17% 0.1767 305.5
-    );
-    --color-prose-pre-token-operator-entity-url-language-css-style-text: oklch(
-      90.52% 0.1657 98.11
-    );
-    --color-prose-pre-token-atrule-attrvalue-keyword-text: oklch(
-      71.37% 0.1434 254.62
-    );
-    --color-prose-pre-token-function-classname-text: oklch(
-      72.53% 0.1752 349.76
-    );
-    --color-prose-pre-token-regex-important-variable-text: oklch(
-      86.06% 0.1731 91.94
-    );
-    --color-prose-pre-code-class-language-wildcard-text: oklch(
-      97.015% 0.00011 271.152
-    );
   }
 }
 
@@ -367,7 +308,7 @@
 @utility -scale-* {
   scale: calc(--value(integer) * -1%);
   scale: calc(--value(ratio) * -100%);
-    scale: calc(--value([percentage]) *-1);
+  scale: calc(--value([percentage]) * -1);
   scale: --value(--scale-*);
 }
 
@@ -492,7 +433,8 @@ code > [data-line] {
 code > [data-line]::before {
   counter-increment: line;
   content: counter(line);
-  display: inline-block;
+  display: none;
+  /* display: inline-block; */
   width: 1.25rem;
   margin-right: 0.75rem;
   text-align: right;
@@ -500,88 +442,43 @@ code > [data-line]::before {
 }
 
 .highlighted {
-  background-color: color-mix(
-    in oklab,
-    var(--color-brand-primary) 10%,
-    transparent
-  );
-  border-left: 0.125rem solid
-    color-mix(in oklab, var(--color-brand-primary) 50%, transparent);
+  @apply bg-[color-mix(in_oklab,var(--color-brand-primary)_10%,transparent)] [border-left:0.125rem_solid_color-mix(in_oklab,var(--color-brand-primary)_50%,transparent)];
 }
 
-/* Add styles for KaTeX rendered math */
+/* KaTeX rendered math */
 .katex-display {
-  @apply my-4 overflow-x-auto p-4;
-  background-color: oklch(97.614% 0.00011 271.152);
-  border-radius: 0.375rem;
-}
-
-.dark .katex-display {
-  background-color: oklch(21.779% 0.00002 271.152);
+  @apply my-4 overflow-x-auto rounded-md bg-[oklch(97.614%_0.00011_271.152)] p-4 dark:bg-[oklch(21.779%_0.00002_271.152)];
 }
 
 .word {
-  background-color: color-mix(
-    in oklab,
-    var(--color-brand-primary) 20%,
-    transparent
-  );
-  border-radius: 0.25rem;
-  padding: 0.1em 0.2em;
+  @apply rounded-sm bg-[color-mix(in_oklab,oklch(95.28%_0.005264_247.9)_20%,transparent)] px-[0.1em] py-[0.2em] dark:bg-[color-mix(in_oklab,oklch(60.13%_0.1982_263.1)_20%,transparent)];
 }
 
 .prose {
-  max-width: none;
+  @apply max-w-none;
 }
 
 .prose pre {
-  background-color: transparent;
-  color: var(--color-prose-pre-text);
-  position: relative;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 0;
-  padding-right: 0;
-  border-radius: 0.5rem;
-  margin: 0;
-  overflow-x: auto;
-  border: 1px solid var(--color-accent-foreground);
+  @apply border-accent-foreground relative m-0 overflow-x-auto rounded-lg border-[0.0625rem] border-solid bg-transparent p-0 text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
 }
 
-@media (max-width: 768px) {
-  :root .prose pre {
-    padding: 0;
-    font-size: 0.875rem;
+@media (width < 768px) {
+  .prose pre {
+    @apply p-0 text-sm;
   }
 }
 
 .prose pre code {
-  color: inherit;
-  background-color: transparent;
-  padding: 0;
+  @apply bg-transparent p-0 text-inherit;
 }
-@media (max-width: 768px) {
-  .dark .prose pre {
-    padding: 0;
-    font-size: 0.875rem;
-  }
-}
-/* Light mode inline code */
+
+/* inline code */
 .prose code:not(pre code) {
-  color: var(--color-prose-code-not-pre-code-text);
-  background-color: var(--color-prose-code-not-pre-code-bg);
-  padding: 0.2em 0.4em;
-  border-radius: 0.25rem;
-  font-size: 0.9em;
+  @apply rounded-sm bg-[oklch(94.611%_0.00011_271.152)] px-[0.2em] py-[0.4em] text-[0.9em] text-[oklch(18.15%_0_0)] dark:bg-[oklch(85.69%_0.0141_247.99/0.15)] dark:text-[oklch(80.03%_0.1821_151.71)];
 }
 
 .prose a {
-  color: var(--color-brand-ring);
-  text-decoration: none;
-}
-
-.prose a:hover {
-  text-decoration: underline;
+  @apply text-brand-ring [text-decoration:none] hover:[text-decoration:underline];
 }
 
 .prose h1,
@@ -590,25 +487,27 @@ code > [data-line]::before {
 .prose h4,
 .prose h5,
 .prose h6 {
-  color: var(--color-brand-text-emphasis);
+  @apply text-brand-text-emphasis;
 }
 
 .prose p,
 .prose ul,
 .prose ol,
 .prose li {
-  color: var(--color-brand-text);
+  @apply text-brand-text;
 }
 
 .prose pre .token.comment,
 .prose pre .token.prolog,
 .prose pre .token.doctype,
 .prose pre .token.cdata {
-  color: var(--color-prose-pre-token-comment-doctype-prolog-cdata-text);
+  @apply text-[oklch(51.028%_0.00006_271.152)] dark:text-[oklch(71.37%_0.0192_261.32)];
 }
+
 .prose pre .token.punctuation {
-  color: var(--color-prose-pre-token-punctuation-text);
+  @apply text-[oklch(42.024%_0.00005_271.152)] dark:text-[oklch(87.17%_0.0093_258.34)];
 }
+
 .prose pre .token.property,
 .prose pre .token.tag,
 .prose pre .token.boolean,
@@ -616,50 +515,45 @@ code > [data-line]::before {
 .prose pre .token.constant,
 .prose pre .token.symbol,
 .prose pre .token.deleted {
-  color: var(
-    --color-prose-pre-token-property-tag-boolean-number-constant-symbol-deleted-text
-  );
+  @apply text-[oklch(54.586%_0.20291_356.499)] dark:text-[oklch(80.03%_0.1821_151.71)];
 }
+
 .prose pre .token.selector,
 .prose pre .token.attr-name,
 .prose pre .token.string,
 .prose pre .token.char,
 .prose pre .token.builtin,
 .prose pre .token.inserted {
-  color: var(
-    --color-prose-pre-token-selector-attrname-string-char-builtin-inserted-text
-  );
+  @apply text-[oklch(57.729%_0.12624_156.126)] dark:text-[oklch(72.17%_0.1767_305.5)];
 }
+
 .prose pre .token.operator,
 .prose pre .token.entity,
 .prose pre .token.url,
 .prose pre .language-css .token.string,
 .prose pre .style .token.string {
-  color: var(
-    --color-prose-pre-token-operator-entity-url-language-css-style-text
-  );
+  @apply text-[oklch(56.233%_0.1106_236.093)] dark:text-[oklch(90.52%_0.1657_98.11)];
 }
+
 .prose pre .token.atrule,
 .prose pre .token.attr-value,
 .prose pre .token.keyword {
-  color: var(--color-prose-pre-token-atrule-attrvalue-keyword-text);
+  @apply text-[oklch(54.201%_0.2263_311.436)] dark:text-[oklch(71.37%_0.1434_254.62)];
 }
+
 .prose pre .token.function,
 .prose pre .token.class-name {
-  color: var(--color-prose-pre-token-function-classname-text);
+  @apply text-[oklch(63.075%_0.13435_60.247)] dark:text-[oklch(72.53%_0.1752_349.76)];
 }
+
 .prose pre .token.regex,
 .prose pre .token.important,
 .prose pre .token.variable {
-  color: var(--color-prose-pre-token-regex-important-variable-text);
-}
-.prose pre code[class*="language-"] {
-  color: var(--color-prose-pre-code-class-language-wildcard-text);
+  @apply text-[oklch(33.581%_0.12548_23.959)] dark:text-[oklch(86.06%_0.1731_91.94)];
 }
 
-.prose pre .code-header {
-  top: 0.5rem;
-  right: 0.5rem;
+.prose pre code[class*="language-"] {
+  @apply text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
 }
 
 .katex {
