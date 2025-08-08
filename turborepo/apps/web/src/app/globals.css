@@ -661,3 +661,18 @@ code > [data-line]::before {
   top: 0.5rem;
   right: 0.5rem;
 }
+
+.katex {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.katex::-webkit-scrollbar {
+  display: none;
+}
+.katex:has(> math[display="block"]) {
+  display: block;
+  margin: 0.5rem 0;
+}
