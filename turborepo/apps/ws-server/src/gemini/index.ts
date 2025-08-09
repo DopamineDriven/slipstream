@@ -1,4 +1,4 @@
-import type { Message } from "@/generated/client/client.ts"; // Assuming this is your Message type path
+import type { Message } from "@/generated/client/client.ts";
 import type { Content, ContentUnion } from "@google/genai";
 import { GoogleGenAI } from "@google/genai";
 
