@@ -52,6 +52,7 @@ import { Paperclip } from "@/icons/paperclip";
 import { PenLine } from "@/icons/pen-line";
 import { Plus } from "@/icons/plus";
 import { QuestionMark } from "@/icons/question-mark";
+import { QuoteIcon } from "@/icons/quote";
 import { ReadAloud } from "@/icons/read-aloud";
 import { RetryIcon } from "@/icons/retry";
 import { Save } from "@/icons/save";
@@ -125,6 +126,7 @@ const IconComponents = {
   PenLine,
   Plus,
   QuestionMark,
+  QuoteIcon,
   ReadAloud,
   RetryIcon,
   Save,
@@ -232,6 +234,7 @@ export {
   PenLine,
   Plus,
   QuestionMark,
+  QuoteIcon,
   ReadAloud,
   RetryIcon,
   Save,
