@@ -145,7 +145,30 @@ export function AIChatProvider({
     }
   }, [pathname, activeConversationId, getConversationIdFromPath, isStreaming]);
 
-  // WebSocket event handlers
+  // Store refs for state values that need to be accessed in event handlers
+  const streamedTextRef = useRef(streamedText);
+  const thinkingTextRef = useRef(thinkingText);
+  const isThinkingRef = useRef(isThinking);
+  const thinkingDurationRef = useRef(thinkingDuration);
+  
+  // Update refs when state changes
+  useEffect(() => {
+    streamedTextRef.current = streamedText;
+  }, [streamedText]);
+  
+  useEffect(() => {
+    thinkingTextRef.current = thinkingText;
+  }, [thinkingText]);
+  
+  useEffect(() => {
+    isThinkingRef.current = isThinking;
+  }, [isThinking]);
+  
+  useEffect(() => {
+    thinkingDurationRef.current = thinkingDuration;
+  }, [thinkingDuration]);
+
+  // WebSocket event handlers - only depend on stable references
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["ai_chat_chunk"]) => {
       // Handle first chunk with real conversation ID for new-chat transitions
@@ -186,7 +209,7 @@ export function AIChatProvider({
         setThinkingDuration(evt.thinkingDuration ?? null);
       } else if (evt.chunk) {
         // Regular chunk - if we were thinking, we're done now
-        if (isThinking) {
+        if (isThinkingRef.current) {
           setIsThinking(false);
           // Capture thinking duration if provided
           if (evt.thinkingDuration) {
@@ -204,12 +227,12 @@ export function AIChatProvider({
 
       setIsComplete(false);
 
-      // Update streaming message with all relevant data
+      // Update streaming message with all relevant data using refs
       setCurrentStreamingMessage({
         id: `stream-${evt.conversationId}`,
-        content: streamedText + (evt.chunk ?? ""),
-        thinkingText: thinkingText + (evt.thinkingText ?? ""),
-        thinkingDuration: evt.thinkingDuration ?? thinkingDuration ?? undefined,
+        content: streamedTextRef.current + (evt.chunk ?? ""),
+        thinkingText: thinkingTextRef.current + (evt.thinkingText ?? ""),
+        thinkingDuration: evt.thinkingDuration ?? thinkingDurationRef.current ?? undefined,
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
         timestamp: new Date(),
@@ -311,10 +334,6 @@ export function AIChatProvider({
     };
   }, [
     client,
-    streamedText,
-    thinkingText,
-    isThinking,
-    thinkingDuration,
     userId,
     isWaitingForRealId,
     selectedModel,
@@ -322,6 +341,9 @@ export function AIChatProvider({
     router
   ]);
 
+  // Track recently sent messages to prevent duplicates
+  const recentMessagesRef = useRef<Map<string, number>>(new Map());
+  
   const { getAll } = useCookiesCtx();
   const metadata = useMemo(() => {
     const { city, country, latlng, postalCode, region, tz, locale } = getAll();
@@ -356,6 +378,26 @@ export function AIChatProvider({
         );
         return;
       }
+      
+      // Check for duplicate messages sent within 500ms
+      const messageKey = `${userId}-${prompt}`;
+      const now = Date.now();
+      const lastSentTime = recentMessagesRef.current.get(messageKey);
+      
+      if (lastSentTime && now - lastSentTime < 500) {
+        console.warn(
+          `[AIChatContext] Duplicate message detected, skipping: "${prompt.substring(0, 50)}..."`
+        );
+        return;
+      }
+      
+      // Track this message
+      recentMessagesRef.current.set(messageKey, now);
+      
+      // Clean up old entries after 2 seconds
+      setTimeout(() => {
+        recentMessagesRef.current.delete(messageKey);
+      }, 2000);
 
       // Use the active conversation ID
       const conversationId = activeConversationId ?? "new-chat";
@@ -369,6 +411,12 @@ export function AIChatProvider({
       );
       console.log(
         `[AIChatContext] Using model: ${selectedModel.displayName} (${selectedModel.modelId})`
+      );
+      console.log(
+        `[AIChatContext] Message content: "${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}"`
+      );
+      console.log(
+        `[AIChatContext] Message length: ${prompt.length} characters`
       );
 
       // Mark user as having active stream

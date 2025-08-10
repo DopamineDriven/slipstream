@@ -36,6 +36,7 @@ export function ChatInterface({
     isStreaming,
     isComplete,
     sendChat,
+    isConnected,
     isWaitingForRealId,
     resetStreamingState,
     thinkingText,
@@ -200,8 +201,8 @@ export function ChatInterface({
       lastUserMessageRef.current = content.trim();
       setIsAwaitingFirstChunk(true);
 
-      // Send to AI
-      sendChat(content);
+      // Send to AI - ensure content is trimmed
+      sendChat(content.trim());
     },
     [activeConversationId, selectedModel, sendChat, user]
   );
@@ -221,6 +222,8 @@ export function ChatInterface({
       <ChatInput
         onUserMessage={handleUserMessage}
         user={user}
+        isConnected={isConnected}
+        activeConversationId={activeConversationId}
         conversationId={activeConversationId ?? conversationId}
       />
     </div>
