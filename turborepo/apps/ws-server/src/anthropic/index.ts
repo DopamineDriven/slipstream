@@ -64,8 +64,6 @@ export class AnthropicService {
         }
       }) satisfies MessageParam[];
 
-      messages.push({ role: "user", content: userPrompt });
-
       const enhancedSystemPrompt = systemPrompt
         ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
         : "Previous responses in this conversation may be tagged with their source model for context.";

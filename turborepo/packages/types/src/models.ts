@@ -149,14 +149,14 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT 4.1 Nano" satisfies OpenAiDisplayNameUnion,
+  openai: "GPT 5 Nano" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 2.5 Flash" satisfies GeminiDisplayNameUnion,
   grok: "Grok 4" satisfies GrokDisplayNameUnion,
   anthropic: "Claude Sonnet 4" satisfies AnthropicDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
-  openai: "gpt-4.1-nano" satisfies OpenAiModelIdUnion,
+  openai: "gpt-5-nano" satisfies OpenAiModelIdUnion,
   gemini: "gemini-2.5-flash" satisfies GeminiModelIdUnion,
   grok: "grok-4-0709" satisfies GrokModelIdUnion,
   anthropic: "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion
