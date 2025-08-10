@@ -1,10 +1,12 @@
 "use client";
 
-import type { User } from "next-auth";
 import type { Properties } from "csstype";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { User } from "next-auth";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/chat/attachment-popover";
@@ -23,7 +25,7 @@ import {
 } from "@t3-chat-clone/ui";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
-const INITIAL_TEXTAREA_HEIGHT_PX = 48;
+const INITIAL_TEXTAREA_HEIGHT_PX = 24;
 
 interface UnifiedChatInputProps {
   user?: User;
@@ -53,9 +55,9 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  const formRef = useRef<HTMLFormElement>(null);
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
-
+  const isMobile = useIsMobile();
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -68,10 +70,13 @@ export function ChatInput({
   // Monitor scroll state
   useEffect(() => {
     const checkScrollState = () => {
-      const chatFeed = document.querySelector("[data-chat-feed]") as HTMLDivElement | null;
+      const chatFeed = document.querySelector(
+        "[data-chat-feed]"
+      ) as HTMLDivElement | null;
       if (!chatFeed) return;
 
-      const distanceFromBottom = chatFeed.scrollHeight - (chatFeed.scrollTop + chatFeed.clientHeight);
+      const distanceFromBottom =
+        chatFeed.scrollHeight - (chatFeed.scrollTop + chatFeed.clientHeight);
       setShowScrollButton(distanceFromBottom > 100);
     };
 
@@ -100,11 +105,8 @@ export function ChatInput({
   }, [message]);
 
   const handleSend = useCallback(
-    async (e?: React.FormEvent) => {
-      if (e) {
-        e.preventDefault();
-      }
-
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
       const trimmedMessage = message.trim();
       if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
 
@@ -138,7 +140,15 @@ export function ChatInput({
         setIsSubmitting(false);
       }
     },
-    [message, onUserMessage, disabled, isSubmitting, isConnected, activeConversationId, conversationId]
+    [
+      isSubmitting,
+      message,
+      onUserMessage,
+      disabled,
+      isConnected,
+      activeConversationId,
+      conversationId
+    ]
   );
 
   const handleFullscreenSubmit = useCallback((fullText: string) => {
@@ -159,12 +169,27 @@ export function ChatInput({
     window.chatScrollToBottom?.();
   };
 
-  const effectivePlaceholder = placeholder ?? `Message ${selectedModel.displayName}...`;
+  const effectivePlaceholder = useMemo(
+    () => placeholder ?? `Shoot ${selectedModel.displayName} a message...`,
+    [placeholder, selectedModel.displayName]
+  );
+
   const isDisabled = !isConnected || isSubmitting || disabled;
+
+  const onKeydownCb = useCallback(
+    (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+      if (isMobile) return;
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        formRef.current?.requestSubmit();
+      }
+    },
+    [isMobile]
+  );
 
   return (
     <>
-      <div className={cn("border-t bg-background px-4", className)}>
+      <div className={cn("bg-background border-t px-4", className)}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -172,17 +197,17 @@ export function ChatInput({
           className="mx-auto w-full max-w-3xl">
           {/* Scroll to bottom button */}
           <div className="relative">
-            <div className="absolute w-full flex justify-center items-center top-[-40px] pointer-events-none">
+            <div className="pointer-events-none absolute top-[-40px] flex w-full items-center justify-center">
               <Button
                 variant="secondary"
                 size="icon"
                 onClick={handleScrollToBottom}
                 className={cn(
-                  "h-7 w-7 rounded-full shadow-lg hover:shadow-xl bg-background border border-border hover:opacity-50 pointer-events-auto",
+                  "bg-background border-border pointer-events-auto h-7 w-7 rounded-full border shadow-lg hover:opacity-50 hover:shadow-xl",
                   "transition-all duration-200 ease-[cubic-bezier(0.31,0.1,0.08,0.96)]",
                   showScrollButton
-                    ? "opacity-100 translate-y-0 pointer-events-auto animate-floating-bob"
-                    : "opacity-0 translate-y-2 pointer-events-none"
+                    ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-100"
+                    : "pointer-events-none translate-y-2 opacity-0"
                 )}
                 style={{ "--bob-multiplier": 0.7 }}
                 aria-label="Scroll to bottom">
@@ -190,28 +215,21 @@ export function ChatInput({
               </Button>
             </div>
 
-            <form onSubmit={handleSend}>
-              {/* Unified Input Container - matching empty-chat-shell */}
+            <form onSubmit={handleSend} ref={formRef}>
               <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
-                {/* Main Text Input Area */}
                 <div className="p-3 pb-2">
                   <Textarea
                     ref={textareaRef}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
+                    onKeyDown={onKeydownCb}
                     placeholder={effectivePlaceholder}
                     disabled={isDisabled}
                     className={cn(
                       "min-h-[60px] w-full resize-none border-none bg-transparent p-0 text-base leading-6 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
                       isDisabled ? "cursor-not-allowed" : ""
                     )}
-                    rows={3}
+                    rows={2}
                     style={{
                       maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px`
                     }}
@@ -274,10 +292,6 @@ export function ChatInput({
                       size="icon"
                       title="Submit prompt"
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                      onClick={e => {
-                        e.preventDefault();
-                        handleSend();
-                      }}
                       disabled={!message.trim() || isDisabled}>
                       {isSubmitting ? (
                         <Loader className="h-5 w-5 animate-spin" />
