@@ -1,3 +1,4 @@
+// styles
 import "./globals.css";
 
 // icons
@@ -54,6 +55,7 @@ export { Paperclip } from "@/icons/paperclip";
 export { PenLine } from "@/icons/pen-line";
 export { Plus } from "@/icons/plus";
 export { QuestionMark } from "@/icons/question-mark";
+export { QuoteIcon } from "@/icons/quote";
 export { ReadAloud } from "@/icons/read-aloud";
 export { RetryIcon } from "@/icons/retry";
 export { Save } from "@/icons/save";

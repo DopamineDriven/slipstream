@@ -25,6 +25,13 @@ import {
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 const INITIAL_TEXTAREA_HEIGHT_PX = 24;
+type QuoteDraft = {
+  messageId: string;
+  excerpt: string;
+  kind: "text" | "code";
+  language?: string;
+  selector: { exact: string; prefix?: string; suffix?: string };
+};
 
 interface UnifiedChatInputProps {
   user?: User;
@@ -48,7 +55,7 @@ export function ChatInput({
   className
 }: UnifiedChatInputProps) {
   const { selectedModel, openDrawer } = useModelSelection();
-
+  const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -68,6 +75,45 @@ export function ChatInput({
       }
     };
   }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<QuoteDraft>).detail;
+      if (!detail) return;
+      setQuotes(prev => {
+        // dedupe identical quotes
+        const key = JSON.stringify(detail);
+        const has = prev.some(q => JSON.stringify(q) === key);
+        return has ? prev : [...prev, detail];
+      });
+    };
+    window.addEventListener("chat:quote", handler as EventListener);
+    return () =>
+      window.removeEventListener("chat:quote", handler as EventListener);
+  }, []);
+
+  const removeQuote = (i: number) =>
+    setQuotes(prev => prev.filter((_, idx) => idx !== i));
+
+  const jumpToOriginal = (messageId: string) => {
+    const el = document.getElementById(`msg-${messageId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("quote-flash");
+    setTimeout(() => el.classList.remove("quote-flash"), 1600);
+  };
+
+  const formatAsMarkdown = (q: QuoteDraft) => {
+    if (q.kind === "code") {
+      const lang = q.language ?? "";
+      return `\`\`\`${lang}\n${q.excerpt}\n\`\`\``;
+    }
+    // blockquote each line
+    return q.excerpt
+      .split("\n")
+      .map(l => `> ${l}`)
+      .join("\n");
+  };
 
   // Monitor scroll state
   useEffect(() => {
@@ -115,17 +161,21 @@ export function ChatInput({
       if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
       isLockedRef.current = true;
       setIsSubmitting(true);
-
+      const quotedMarkdown = quotes.map(formatAsMarkdown).join("\n\n");
+      const composed = quotedMarkdown
+        ? `${quotedMarkdown}\n\n${trimmedMessage}`
+        : trimmedMessage;
       try {
         console.log(
           `[ChatInput] Sending message in conversation: ${activeConversationId ?? conversationId}`
         );
 
         // Call parent's handler if provided
-        onUserMessage?.(trimmedMessage);
+        onUserMessage?.(composed);
 
         // Clear message immediately for better UX
         setMessage("");
+        setQuotes([]);
 
         // Reset textarea height
         if (textareaRef.current) {
@@ -144,6 +194,7 @@ export function ChatInput({
       }
     },
     [
+      quotes,
       isSubmitting,
       message,
       onUserMessage,
@@ -157,7 +208,7 @@ export function ChatInput({
   const handleFullscreenSubmit = useCallback((fullText: string) => {
     setMessage(fullText);
     setIsFullScreenInputOpen(false);
-    // Don't auto-send, let user review and send manually
+    // don't autosend, choppy UX
   }, []);
 
   const handleAttachmentSelect = useCallback(
@@ -193,6 +244,35 @@ export function ChatInput({
   return (
     <>
       <div className={cn("bg-background border-t px-4", className)}>
+        {quotes.length > 0 && (
+          <div className="mx-auto w-full max-w-3xl pt-3">
+            <div className="bg-muted/40 rounded-lg border p-2">
+              <div className="flex flex-wrap gap-2">
+                {quotes.map((q, i) => (
+                  <div
+                    key={i}
+                    className="bg-background flex items-start gap-2 rounded-md border px-2 py-1 shadow-sm">
+                    <button
+                      type="button"
+                      className="text-muted-foreground max-w-[48ch] truncate font-mono text-xs"
+                      title="Jump to original"
+                      onClick={() => jumpToOriginal(q.messageId)}>
+                      {q.kind === "code" ? "``` " : "❝ "}
+                      {q.excerpt.replace(/\s+/g, " ").slice(0, 120)}
+                      {q.excerpt.length > 120 ? "…" : ""}
+                    </button>
+                    <button
+                      type="button"
+                      className="text-muted-foreground hover:text-foreground ml-1 text-xs"
+                      onClick={() => removeQuote(i)}>
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

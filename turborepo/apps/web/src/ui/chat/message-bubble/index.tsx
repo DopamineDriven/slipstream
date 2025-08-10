@@ -237,6 +237,8 @@ export function MessageBubble({
   return (
     <>
       <div
+        id={`msg-${message.id}`}
+        data-message-id={message.id}
         className={cn(
           "mx-auto flex w-full max-w-4xl gap-3",
           isUser ? "justify-end" : "justify-start",
