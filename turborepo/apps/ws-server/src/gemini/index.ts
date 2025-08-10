@@ -57,15 +57,19 @@ export class GeminiService {
     msgs: Message[],
     systemPrompt?: string
   ) {
-    const systemInstruction = this.formatSystemInstruction(isNewChat, systemPrompt);
+    const systemInstruction = this.formatSystemInstruction(
+      isNewChat,
+      systemPrompt
+    );
     if (isNewChat) {
       return {
         history: undefined,
         systemInstruction
       };
     } else {
+      const historyMsgs = msgs.slice(0, -1);
       return {
-        history: this.formatHistoryForSession(msgs),
+        history: this.formatHistoryForSession(historyMsgs),
         systemInstruction
       };
     }

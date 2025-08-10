@@ -70,7 +70,6 @@ export class OpenAIService {
           readonly content: string;
         }
     )[],
-    userPrompt: string,
     systemPrompt?: string
   ) {
     const enhancedSystemPrompt = systemPrompt
@@ -79,8 +78,7 @@ export class OpenAIService {
     if (systemPrompt) {
       return [
         { role: "system", content: enhancedSystemPrompt } as const,
-        ...msgs,
-        { role: "user", content: userPrompt } as const
+        ...msgs
       ] as const satisfies ChatCompletionMessageParam[];
     } else {
       return [
@@ -88,8 +86,7 @@ export class OpenAIService {
           role: "system",
           content: enhancedSystemPrompt
         },
-        ...msgs,
-        { role: "user", content: userPrompt } as const
+        ...msgs
       ] as const satisfies ChatCompletionMessageParam[];
     }
   }
@@ -114,7 +111,6 @@ export class OpenAIService {
     } else {
       return this.formatMsgs(
         this.prependProviderModelTag(msgs),
-        userPrompt,
         systemPrompt
       ) satisfies ChatCompletionMessageParam[];
     }

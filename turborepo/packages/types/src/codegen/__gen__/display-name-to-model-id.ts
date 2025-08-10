@@ -1,5 +1,8 @@
 export const displayNameToModelId = {
   "openai": {
+    "GPT 5": "gpt-5",
+    "GPT 5 Mini": "gpt-5-mini",
+    "GPT 5 Nano": "gpt-5-nano",
     "GPT 4.1": "gpt-4.1",
     "GPT 4.1 Mini": "gpt-4.1-mini",
     "GPT 4.1 Nano": "gpt-4.1-nano",
