@@ -80,7 +80,7 @@
     "types": "tsc --emitDeclarationOnly"
   },
   "peerDependencies": {
-    "next": ">=15.4.5",
+    "next": ">=15.4.6",
     "react": ">=19.1.1",
     "react-dom": ">=19.1.1",
     "tailwindcss": ">=4.1.11"
@@ -120,14 +120,14 @@
     "@d0paminedriven/fs": "^6.1.0",
     "@microsoft/api-extractor": "^7.52.10",
     "@tailwindcss/postcss": "^4.1.11",
-    "@types/node": "^24.2.0",
+    "@types/node": "^24.2.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "autoprefixer": "^10.4.21",
     "chokidar": "^4.0.3",
-    "eslint": "^9.32.0",
+    "eslint": "^9.33.0",
     "jiti": "^2.5.1",
-    "next": "^15.4.5",
+    "next": "^15.4.6",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "react": "^19.1.1",
