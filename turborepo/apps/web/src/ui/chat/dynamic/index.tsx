@@ -206,16 +206,6 @@ export function ChatInterface({
     [activeConversationId, selectedModel, sendChat, user]
   );
 
-  // Clone children and pass the message handler
-  // const childrenWithProps = React.Children.map(children, child => {
-  //   if (React.isValidElement(child)) {
-  //     return React.cloneElement(child as React.ReactElement<any>, {
-  //       onUserMessage: handleUserMessage
-  //     });
-  //   }
-  //   return child;
-  // });
-
   return (
     <div className="flex h-full flex-col">
       <ChatFeed
