@@ -19,64 +19,144 @@ export type AttachmentModel = runtime.Types.Result.DefaultSelection<Prisma.$Atta
 
 export type AggregateAttachment = {
   _count: AttachmentCountAggregateOutputType | null
+  _avg: AttachmentAvgAggregateOutputType | null
+  _sum: AttachmentSumAggregateOutputType | null
   _min: AttachmentMinAggregateOutputType | null
   _max: AttachmentMaxAggregateOutputType | null
 }
 
+export type AttachmentAvgAggregateOutputType = {
+  size: number | null
+}
+
+export type AttachmentSumAggregateOutputType = {
+  size: bigint | null
+}
+
 export type AttachmentMinAggregateOutputType = {
   id: string | null
-  messageId: string | null
-  url: string | null
-  type: string | null
-  createdAt: Date | null
   conversationId: string | null
+  userId: string | null
+  messageId: string | null
+  origin: $Enums.AssetOrigin | null
+  status: $Enums.AssetStatus | null
+  bucket: string | null
+  key: string | null
+  region: string | null
+  size: bigint | null
+  mime: string | null
+  etag: string | null
+  checksumSha256: string | null
+  sourceUrl: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AttachmentMaxAggregateOutputType = {
   id: string | null
-  messageId: string | null
-  url: string | null
-  type: string | null
-  createdAt: Date | null
   conversationId: string | null
+  userId: string | null
+  messageId: string | null
+  origin: $Enums.AssetOrigin | null
+  status: $Enums.AssetStatus | null
+  bucket: string | null
+  key: string | null
+  region: string | null
+  size: bigint | null
+  mime: string | null
+  etag: string | null
+  checksumSha256: string | null
+  sourceUrl: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AttachmentCountAggregateOutputType = {
   id: number
-  messageId: number
-  url: number
-  type: number
-  createdAt: number
   conversationId: number
+  userId: number
+  messageId: number
+  origin: number
+  status: number
+  bucket: number
+  key: number
+  region: number
+  size: number
+  mime: number
+  etag: number
+  checksumSha256: number
+  sourceUrl: number
+  meta: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
 
+export type AttachmentAvgAggregateInputType = {
+  size?: true
+}
+
+export type AttachmentSumAggregateInputType = {
+  size?: true
+}
+
 export type AttachmentMinAggregateInputType = {
   id?: true
-  messageId?: true
-  url?: true
-  type?: true
-  createdAt?: true
   conversationId?: true
+  userId?: true
+  messageId?: true
+  origin?: true
+  status?: true
+  bucket?: true
+  key?: true
+  region?: true
+  size?: true
+  mime?: true
+  etag?: true
+  checksumSha256?: true
+  sourceUrl?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type AttachmentMaxAggregateInputType = {
   id?: true
-  messageId?: true
-  url?: true
-  type?: true
-  createdAt?: true
   conversationId?: true
+  userId?: true
+  messageId?: true
+  origin?: true
+  status?: true
+  bucket?: true
+  key?: true
+  region?: true
+  size?: true
+  mime?: true
+  etag?: true
+  checksumSha256?: true
+  sourceUrl?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type AttachmentCountAggregateInputType = {
   id?: true
-  messageId?: true
-  url?: true
-  type?: true
-  createdAt?: true
   conversationId?: true
+  userId?: true
+  messageId?: true
+  origin?: true
+  status?: true
+  bucket?: true
+  key?: true
+  region?: true
+  size?: true
+  mime?: true
+  etag?: true
+  checksumSha256?: true
+  sourceUrl?: true
+  meta?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -118,6 +198,18 @@ export type AttachmentAggregateArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: AttachmentAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: AttachmentSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: AttachmentMinAggregateInputType
@@ -148,18 +240,33 @@ export type AttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   _count?: AttachmentCountAggregateInputType | true
+  _avg?: AttachmentAvgAggregateInputType
+  _sum?: AttachmentSumAggregateInputType
   _min?: AttachmentMinAggregateInputType
   _max?: AttachmentMaxAggregateInputType
 }
 
 export type AttachmentGroupByOutputType = {
   id: string
-  messageId: string
-  url: string
-  type: string
+  conversationId: string
+  userId: string
+  messageId: string | null
+  origin: $Enums.AssetOrigin
+  status: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region: string
+  size: bigint | null
+  mime: string | null
+  etag: string | null
+  checksumSha256: string | null
+  sourceUrl: string | null
+  meta: runtime.JsonValue | null
   createdAt: Date
-  conversationId: string | null
+  updatedAt: Date
   _count: AttachmentCountAggregateOutputType | null
+  _avg: AttachmentAvgAggregateOutputType | null
+  _sum: AttachmentSumAggregateOutputType | null
   _min: AttachmentMinAggregateOutputType | null
   _max: AttachmentMaxAggregateOutputType | null
 }
@@ -184,50 +291,100 @@ export type AttachmentWhereInput = {
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   id?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringFilter<"Attachment"> | string
-  url?: Prisma.StringFilter<"Attachment"> | string
-  type?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  userId?: Prisma.StringFilter<"Attachment"> | string
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
+  bucket?: Prisma.StringFilter<"Attachment"> | string
+  key?: Prisma.StringFilter<"Attachment"> | string
+  region?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  meta?: Prisma.JsonNullableFilter<"Attachment">
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
-  message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type AttachmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  origin?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  bucket?: Prisma.SortOrder
+  key?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  meta?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   conversation?: Prisma.ConversationOrderByWithRelationInput
   message?: Prisma.MessageOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  bucket_key?: Prisma.AttachmentBucketKeyCompoundUniqueInput
   AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  messageId?: Prisma.StringFilter<"Attachment"> | string
-  url?: Prisma.StringFilter<"Attachment"> | string
-  type?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  userId?: Prisma.StringFilter<"Attachment"> | string
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
+  bucket?: Prisma.StringFilter<"Attachment"> | string
+  key?: Prisma.StringFilter<"Attachment"> | string
+  region?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  meta?: Prisma.JsonNullableFilter<"Attachment">
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
-  message?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
-}, "id">
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+}, "id" | "bucket_key">
 
 export type AttachmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  origin?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  bucket?: Prisma.SortOrder
+  key?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
+  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  meta?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.AttachmentCountOrderByAggregateInput
+  _avg?: Prisma.AttachmentAvgOrderByAggregateInput
   _max?: Prisma.AttachmentMaxOrderByAggregateInput
   _min?: Prisma.AttachmentMinOrderByAggregateInput
+  _sum?: Prisma.AttachmentSumOrderByAggregateInput
 }
 
 export type AttachmentScalarWhereWithAggregatesInput = {
@@ -235,72 +392,159 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   OR?: Prisma.AttachmentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  messageId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  url?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  type?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  conversationId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  origin?: Prisma.EnumAssetOriginWithAggregatesFilter<"Attachment"> | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusWithAggregatesFilter<"Attachment"> | $Enums.AssetStatus
+  bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  region?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  size?: Prisma.BigIntNullableWithAggregatesFilter<"Attachment"> | bigint | number | null
+  mime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  etag?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  checksumSha256?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  meta?: Prisma.JsonNullableWithAggregatesFilter<"Attachment">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
-  conversationId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
 }
 
 export type AttachmentCreateInput = {
   id?: string
-  url: string
-  type: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
 }
 
 export type AttachmentUncheckedCreateInput = {
   id?: string
-  messageId: string
-  url: string
-  type: string
+  conversationId: string
+  userId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversationId?: string | null
+  updatedAt?: Date | string
 }
 
 export type AttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneRequiredWithoutAttachmentsNestedInput
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
 }
 
 export type AttachmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentCreateManyInput = {
   id?: string
-  messageId: string
-  url: string
-  type: string
+  conversationId: string
+  userId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversationId?: string | null
+  updatedAt?: Date | string
 }
 
 export type AttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentListRelationFilter = {
@@ -313,31 +557,117 @@ export type AttachmentOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type AttachmentBucketKeyCompoundUniqueInput = {
+  bucket: string
+  key: string
+}
+
 export type AttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  type?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  bucket?: Prisma.SortOrder
+  key?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksumSha256?: Prisma.SortOrder
+  sourceUrl?: Prisma.SortOrder
+  meta?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+}
+
+export type AttachmentAvgOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type AttachmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  type?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  bucket?: Prisma.SortOrder
+  key?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksumSha256?: Prisma.SortOrder
+  sourceUrl?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AttachmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  type?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  bucket?: Prisma.SortOrder
+  key?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksumSha256?: Prisma.SortOrder
+  sourceUrl?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+}
+
+export type AttachmentSumOrderByAggregateInput = {
+  size?: Prisma.SortOrder
+}
+
+export type AttachmentCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+}
+
+export type AttachmentUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
 }
 
 export type AttachmentCreateNestedManyWithoutConversationInput = {
@@ -424,20 +754,145 @@ export type AttachmentUncheckedUpdateManyWithoutMessageNestedInput = {
   deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
 }
 
+export type EnumAssetOriginFieldUpdateOperationsInput = {
+  set?: $Enums.AssetOrigin
+}
+
+export type EnumAssetStatusFieldUpdateOperationsInput = {
+  set?: $Enums.AssetStatus
+}
+
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
+export type AttachmentCreateWithoutUserInput = {
+  id?: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+}
+
+export type AttachmentUncheckedCreateWithoutUserInput = {
+  id?: string
+  conversationId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AttachmentCreateOrConnectWithoutUserInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
+}
+
+export type AttachmentCreateManyUserInputEnvelope = {
+  data: Prisma.AttachmentCreateManyUserInput | Prisma.AttachmentCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type AttachmentUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput>
+}
+
+export type AttachmentUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutUserInput, Prisma.AttachmentUncheckedUpdateWithoutUserInput>
+}
+
+export type AttachmentUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.AttachmentScalarWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutUserInput>
+}
+
+export type AttachmentScalarWhereInput = {
+  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  OR?: Prisma.AttachmentScalarWhereInput[]
+  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  id?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  userId?: Prisma.StringFilter<"Attachment"> | string
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
+  bucket?: Prisma.StringFilter<"Attachment"> | string
+  key?: Prisma.StringFilter<"Attachment"> | string
+  region?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  meta?: Prisma.JsonNullableFilter<"Attachment">
+  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+}
+
 export type AttachmentCreateWithoutConversationInput = {
   id?: string
-  url: string
-  type: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  message: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  updatedAt?: Date | string
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
 }
 
 export type AttachmentUncheckedCreateWithoutConversationInput = {
   id?: string
-  messageId: string
-  url: string
-  type: string
+  userId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AttachmentCreateOrConnectWithoutConversationInput = {
@@ -466,32 +921,42 @@ export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
   data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutConversationInput>
 }
 
-export type AttachmentScalarWhereInput = {
-  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  OR?: Prisma.AttachmentScalarWhereInput[]
-  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  id?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringFilter<"Attachment"> | string
-  url?: Prisma.StringFilter<"Attachment"> | string
-  type?: Prisma.StringFilter<"Attachment"> | string
-  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-}
-
 export type AttachmentCreateWithoutMessageInput = {
   id?: string
-  url: string
-  type: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
 }
 
 export type AttachmentUncheckedCreateWithoutMessageInput = {
   id?: string
-  url: string
-  type: string
+  conversationId: string
+  userId: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversationId?: string | null
+  updatedAt?: Date | string
 }
 
 export type AttachmentCreateOrConnectWithoutMessageInput = {
@@ -520,141 +985,367 @@ export type AttachmentUpdateManyWithWhereWithoutMessageInput = {
   data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutMessageInput>
 }
 
+export type AttachmentCreateManyUserInput = {
+  id?: string
+  conversationId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AttachmentUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AttachmentUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type AttachmentCreateManyConversationInput = {
   id?: string
-  messageId: string
-  url: string
-  type: string
+  userId: string
+  messageId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AttachmentUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  message?: Prisma.MessageUpdateOneRequiredWithoutAttachmentsNestedInput
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentCreateManyMessageInput = {
   id?: string
-  url: string
-  type: string
+  conversationId: string
+  userId: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  bucket: string
+  key: string
+  region?: string
+  size?: bigint | number | null
+  mime?: string | null
+  etag?: string | null
+  checksumSha256?: string | null
+  sourceUrl?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  conversationId?: string | null
+  updatedAt?: Date | string
 }
 
 export type AttachmentUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutAttachmentsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  messageId?: boolean
-  url?: boolean
-  type?: boolean
-  createdAt?: boolean
   conversationId?: boolean
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userId?: boolean
+  messageId?: boolean
+  origin?: boolean
+  status?: boolean
+  bucket?: boolean
+  key?: boolean
+  region?: boolean
+  size?: boolean
+  mime?: boolean
+  etag?: boolean
+  checksumSha256?: boolean
+  sourceUrl?: boolean
+  meta?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  messageId?: boolean
-  url?: boolean
-  type?: boolean
-  createdAt?: boolean
   conversationId?: boolean
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userId?: boolean
+  messageId?: boolean
+  origin?: boolean
+  status?: boolean
+  bucket?: boolean
+  key?: boolean
+  region?: boolean
+  size?: boolean
+  mime?: boolean
+  etag?: boolean
+  checksumSha256?: boolean
+  sourceUrl?: boolean
+  meta?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  messageId?: boolean
-  url?: boolean
-  type?: boolean
-  createdAt?: boolean
   conversationId?: boolean
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userId?: boolean
+  messageId?: boolean
+  origin?: boolean
+  status?: boolean
+  bucket?: boolean
+  key?: boolean
+  region?: boolean
+  size?: boolean
+  mime?: boolean
+  etag?: boolean
+  checksumSha256?: boolean
+  sourceUrl?: boolean
+  meta?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectScalar = {
   id?: boolean
-  messageId?: boolean
-  url?: boolean
-  type?: boolean
-  createdAt?: boolean
   conversationId?: boolean
+  userId?: boolean
+  messageId?: boolean
+  origin?: boolean
+  status?: boolean
+  bucket?: boolean
+  key?: boolean
+  region?: boolean
+  size?: boolean
+  mime?: boolean
+  etag?: boolean
+  checksumSha256?: boolean
+  sourceUrl?: boolean
+  meta?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageId" | "url" | "type" | "createdAt" | "conversationId", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "origin" | "status" | "bucket" | "key" | "region" | "size" | "mime" | "etag" | "checksumSha256" | "sourceUrl" | "meta" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AttachmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AttachmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Attachment"
   objects: {
-    conversation: Prisma.$ConversationPayload<ExtArgs> | null
-    message: Prisma.$MessagePayload<ExtArgs>
+    conversation: Prisma.$ConversationPayload<ExtArgs>
+    message: Prisma.$MessagePayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    messageId: string
-    url: string
-    type: string
+    conversationId: string
+    userId: string
+    messageId: string | null
+    origin: $Enums.AssetOrigin
+    status: $Enums.AssetStatus
+    bucket: string
+    key: string
+    region: string
+    size: bigint | null
+    mime: string | null
+    etag: string | null
+    checksumSha256: string | null
+    sourceUrl: string | null
+    meta: runtime.JsonValue | null
     createdAt: Date
-    conversationId: string | null
+    updatedAt: Date
   }, ExtArgs["result"]["attachment"]>
   composites: {}
 }
@@ -1049,8 +1740,9 @@ readonly fields: AttachmentFieldRefs;
  */
 export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  conversation<T extends Prisma.Attachment$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  message<T extends Prisma.MessageDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessageDefaultArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  conversation<T extends Prisma.ConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  message<T extends Prisma.Attachment$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$messageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1081,11 +1773,22 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
  */
 export interface AttachmentFieldRefs {
   readonly id: Prisma.FieldRef<"Attachment", 'String'>
-  readonly messageId: Prisma.FieldRef<"Attachment", 'String'>
-  readonly url: Prisma.FieldRef<"Attachment", 'String'>
-  readonly type: Prisma.FieldRef<"Attachment", 'String'>
-  readonly createdAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly conversationId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly userId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly messageId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly origin: Prisma.FieldRef<"Attachment", 'AssetOrigin'>
+  readonly status: Prisma.FieldRef<"Attachment", 'AssetStatus'>
+  readonly bucket: Prisma.FieldRef<"Attachment", 'String'>
+  readonly key: Prisma.FieldRef<"Attachment", 'String'>
+  readonly region: Prisma.FieldRef<"Attachment", 'String'>
+  readonly size: Prisma.FieldRef<"Attachment", 'BigInt'>
+  readonly mime: Prisma.FieldRef<"Attachment", 'String'>
+  readonly etag: Prisma.FieldRef<"Attachment", 'String'>
+  readonly checksumSha256: Prisma.FieldRef<"Attachment", 'String'>
+  readonly sourceUrl: Prisma.FieldRef<"Attachment", 'String'>
+  readonly meta: Prisma.FieldRef<"Attachment", 'Json'>
+  readonly createdAt: Prisma.FieldRef<"Attachment", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Attachment", 'DateTime'>
 }
     
 
@@ -1482,22 +2185,22 @@ export type AttachmentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
- * Attachment.conversation
+ * Attachment.message
  */
-export type Attachment$conversationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Attachment$messageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Conversation
+   * Select specific fields to fetch from the Message
    */
-  select?: Prisma.ConversationSelect<ExtArgs> | null
+  select?: Prisma.MessageSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Conversation
+   * Omit specific fields from the Message
    */
-  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  omit?: Prisma.MessageOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ConversationInclude<ExtArgs> | null
-  where?: Prisma.ConversationWhereInput
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
 }
 
 /**

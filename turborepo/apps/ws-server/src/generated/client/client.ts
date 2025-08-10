@@ -102,3 +102,9 @@ export const ThemePreference = $Enums.ThemePreference
 
 export type Provider = $Enums.Provider
 export const Provider = $Enums.Provider
+
+export type AssetOrigin = $Enums.AssetOrigin
+export const AssetOrigin = $Enums.AssetOrigin
+
+export type AssetStatus = $Enums.AssetStatus
+export const AssetStatus = $Enums.AssetStatus

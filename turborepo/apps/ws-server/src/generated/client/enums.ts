@@ -33,3 +33,27 @@ export const Provider = {
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]
+
+
+export const AssetOrigin = {
+  UPLOAD: 'UPLOAD',
+  REMOTE: 'REMOTE',
+  GENERATED: 'GENERATED'
+} as const
+
+export type AssetOrigin = (typeof AssetOrigin)[keyof typeof AssetOrigin]
+
+
+export const AssetStatus = {
+  REQUESTED: 'REQUESTED',
+  PLANNED: 'PLANNED',
+  UPLOADING: 'UPLOADING',
+  STORED: 'STORED',
+  SCANNING: 'SCANNING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  QUARANTINED: 'QUARANTINED',
+  ATTACHED: 'ATTACHED'
+} as const
+
+export type AssetStatus = (typeof AssetStatus)[keyof typeof AssetStatus]

@@ -27,6 +27,24 @@ enum Provider {
   ANTHROPIC
 }
 
+enum AssetOrigin {
+  UPLOAD
+  REMOTE
+  GENERATED
+}
+
+enum AssetStatus {
+  REQUESTED
+  PLANNED
+  UPLOADING
+  STORED
+  SCANNING
+  READY
+  FAILED
+  QUARANTINED
+  ATTACHED
+}
+
 model User {
   id            String         @id @default(cuid(2))
   name          String?
@@ -37,6 +55,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   keys          UserKey[]
+  attachments   Attachment[]
   conversations Conversation[]
   settings      Settings?
   createdAt     DateTime       @default(now())
@@ -156,7 +175,7 @@ model Message {
   userKeyId        String?
   content          String
   thinkingText     String?
-  thinkingDuration Int?        
+  thinkingDuration Int?
   liked            Boolean?     @default(false)
   disliked         Boolean?     @default(false)
   tryAgain         Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
@@ -168,14 +187,34 @@ model Message {
 }
 
 model Attachment {
-  id             String        @id @default(cuid(2))
-  messageId      String
-  url            String
-  type           String
-  createdAt      DateTime      @default(now())
-  conversationId String?
-  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message        Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  id             String      @id @default(cuid(2))
+  conversationId String
+  userId         String
+  messageId      String?
+  origin         AssetOrigin @default(UPLOAD)
+  status         AssetStatus @default(REQUESTED)
+
+  bucket         String
+  key            String
+  region         String  @default("us-east-1")
+  size           BigInt?
+  mime           String?
+  etag           String?
+  checksumSha256 String?
+  sourceUrl      String?
+  meta           Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message?     @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bucket, key])
+  @@index([conversationId, createdAt])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }
 
 model VerificationToken {
