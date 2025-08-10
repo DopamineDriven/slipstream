@@ -4,7 +4,6 @@ import type { Properties } from "csstype";
 import type { User } from "next-auth";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAIChatContext } from "@/context/ai-chat-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
@@ -34,20 +33,20 @@ interface UnifiedChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  isConnected:boolean;
+  activeConversationId: string | null;
 }
 
 export function ChatInput({
   user: _user,
   conversationId,
   onUserMessage,
-  disabled = false,
+  disabled = false,activeConversationId,isConnected,
   placeholder,
   className
 }: UnifiedChatInputProps) {
-  const { isConnected, activeConversationId } = useAIChatContext();
   const { selectedModel, openDrawer } = useModelSelection();
 
-  // Local state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -118,9 +117,7 @@ export function ChatInput({
         );
 
         // Call parent's handler if provided
-        if (onUserMessage) {
-          onUserMessage(trimmedMessage);
-        }
+        onUserMessage?.(trimmedMessage);
 
         // Clear message immediately for better UX
         setMessage("");

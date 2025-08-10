@@ -274,10 +274,20 @@ export class ChatWebSocketClient {
       type: T;
     };
     const msg = JSON.stringify(payload);
+    
+    // Debug logging for ai_chat_request events
+    if (data.type === "ai_chat_request") {
+      const prompt = data.prompt;
+      console.log(
+        `[WebSocketClient] Sending ${event} - prompt: "${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}" (${prompt.length} chars)`
+      );
+    }
 
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      console.log(`[WebSocketClient] Message sent immediately via WebSocket`);
       this.socket.send(msg);
     } else {
+      console.log(`[WebSocketClient] Message queued (socket not ready)`);
       this.messageQueue.push(msg);
       if (!this.socket) {
         console.log("Socket not connected, initiating connection...");
