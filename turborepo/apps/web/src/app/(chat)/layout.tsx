@@ -14,7 +14,6 @@ export default function ChatLayout({
 }>) {
   return (
     <ChatLayoutClient>
-      
       <ChatLayoutShell>
         {children}
       </ChatLayoutShell>

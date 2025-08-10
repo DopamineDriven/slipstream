@@ -33,7 +33,7 @@ interface UnifiedChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  isConnected:boolean;
+  isConnected: boolean;
   activeConversationId: string | null;
 }
 
@@ -41,7 +41,9 @@ export function ChatInput({
   user: _user,
   conversationId,
   onUserMessage,
-  disabled = false,activeConversationId,isConnected,
+  disabled = false,
+  activeConversationId,
+  isConnected,
   placeholder,
   className
 }: UnifiedChatInputProps) {
@@ -57,6 +59,7 @@ export function ChatInput({
   const formRef = useRef<HTMLFormElement>(null);
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
   const isMobile = useIsMobile();
+  const isLockedRef = useRef(false);
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -104,11 +107,13 @@ export function ChatInput({
   }, [message]);
 
   const handleSend = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
+    (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (isLockedRef.current === true) return;
+
       const trimmedMessage = message.trim();
       if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
-
+      isLockedRef.current = true;
       setIsSubmitting(true);
 
       try {
@@ -131,6 +136,7 @@ export function ChatInput({
         // Reset submitting state after a short delay
         submitTimeoutRef.current = setTimeout(() => {
           setIsSubmitting(false);
+          isLockedRef.current = false;
         }, 300);
       } catch (error) {
         console.error("Failed to send message:", error);
