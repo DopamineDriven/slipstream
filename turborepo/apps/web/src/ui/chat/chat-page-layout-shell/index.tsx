@@ -91,9 +91,8 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
 
   const { get } = useCookiesCtx();
-
+  const isMac = get("isMac") === "true";
   const keyboardShortcutsMemo = useMemo(() => {
-    const isMac = get("isMac") === "true";
     return [
       {
         key: "s",
@@ -104,7 +103,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
         description: "Toggle sidebar"
       }
     ];
-  }, [get, isSidebarOpen]);
+  }, [isMac, isSidebarOpen]);
 
   useKeyboardShortcuts(keyboardShortcutsMemo);
 
