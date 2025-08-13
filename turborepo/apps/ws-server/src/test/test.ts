@@ -6,7 +6,7 @@ dotenv.config({ quiet: true });
 
 const data = async () =>
   await prismaClient.conversation.findUnique({
-    where: { id: "k10gv81xj02pd2snd454o8xy" },
+    where: { id: "p13p137q681ur9qeiuucsvmj" },
     include: { messages: {orderBy: {createdAt: "asc"}} }
   });
 

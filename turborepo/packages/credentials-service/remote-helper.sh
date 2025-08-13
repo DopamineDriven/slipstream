@@ -5,9 +5,7 @@ REGION=us-east-1
 NAME=$(jq -r '.Name' src/service/__out__/credentials.json)
 CURRENT_SECRETS=$(jq -c '.secrets[0]' src/service/__out__/secrets.json)
 
-echo "$CURRENT_SECRETS"
-
-echo "→ Updating secret $NAME with payload: $CURRENT_SECRETS"
+echo "→ Updating secret $NAME"
 
 aws secretsmanager put-secret-value \
   --secret-id "$NAME" \

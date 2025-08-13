@@ -5,6 +5,9 @@ import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 
+export const fetchCache = "force-no-store";
+export const revalidate = 0;
+
 const { prismaConversationService } = ormHandler(prismaClient);
 
 export async function GET(

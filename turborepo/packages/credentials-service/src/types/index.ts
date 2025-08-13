@@ -51,7 +51,12 @@ export interface CredentialEntity {
   REDIS_CLIENT_KEY?: string;
   RUNWAYML_API_SECRET?: string;
   ASSETS_BUCKET?: string;
-} 
+  DIRECT_URL?: string;
+  V0_API_KEY?: string;
+  GEN_BUCKET?: string;
+  MOTION_PLUS_PERSONAL_ACCESS_TOKEN?: string;
+  LLAMA_API_KEY?: string;
+}
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"
     ? {

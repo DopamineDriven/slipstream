@@ -13,6 +13,8 @@ const { prismaConversationService } = ormHandler(prismaClient);
 
 export const dynamicParams = true;
 
+
+
 export async function generateStaticParams() {
   return [{ conversationId: "new-chat" }];
 }
