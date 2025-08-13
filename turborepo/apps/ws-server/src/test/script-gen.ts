@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import { Provider } from "@t3-chat-clone/types";
-import conversation from "../__out__/conversations/Grok's Favorite Hobby: A Quick Overview/k10gv81xj02pd2snd454o8xy.json" with { type: "json" };
+import conversation from "../__out__/conversations/Gemini Fusion: AI Incarnation of GeminxAI and Grok/p13p137q681ur9qeiuucsvmj.json" with { type: "json" };
 
 conversation.messages;
 class ScriptGen extends Fs {

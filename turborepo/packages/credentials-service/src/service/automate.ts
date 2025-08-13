@@ -72,7 +72,7 @@ class Automate {
     const flatWorkup = JSON.stringify(obj);
     const file = this.readTypesFile();
     // prettier-ignore
-    const templatedToWrite = `export interface CredentialEntity ${templateWorkup} \n`.concat(file.replace(this.credentialParser, "").trim())
+    const templatedToWrite = `export interface CredentialEntity ${templateWorkup}\n`.concat(file.replace(this.credentialParser, "").trim())
 
     const secretsTemplate = `{"secrets":[${flatWorkup}]}`;
     return Promise.all([

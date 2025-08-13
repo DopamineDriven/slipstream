@@ -2,21 +2,23 @@
 set -euo pipefail
 
 LOCAL=http://localhost:3030
+LOCAL_PY=http://localhost:8000
 ROOT=https://chat.d0paminedriven.com
 DEV=https://dev.chat.d0paminedriven.com
 STG=https://stg.chat.d0paminedriven.com
+PY=https://py.d0paminedriven.com
 
-CFG=$(jq -n --arg local "$LOCAL" --arg root "$ROOT" --arg dev "$DEV" --arg stg "$STG" '{
+CFG=$(jq -n --arg local "$LOCAL" --arg root "$ROOT" --arg dev "$DEV" --arg stg "$STG" --arg py "$PY" --arg local_py "$LOCAL_PY" '{
   CORSRules: [
     {
-      AllowedOrigins: [$local, $root, $dev, $stg],
+      AllowedOrigins: [$local, $root, $dev, $stg, $py, $local_py],
       AllowedMethods: ["PUT","POST","DELETE"],
       AllowedHeaders: ["*"],
       ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id"],
       MaxAgeSeconds: 3000
     },
     {
-      AllowedOrigins: [$local, $root, $dev, $stg],
+      AllowedOrigins: [$local, $root, $dev, $stg, $py, $local_py],
       AllowedMethods: ["GET","HEAD"],
       AllowedHeaders: ["*"],
       ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id"],
@@ -25,7 +27,7 @@ CFG=$(jq -n --arg local "$LOCAL" --arg root "$ROOT" --arg dev "$DEV" --arg stg "
   ]
 }')
 
-for B in ws-server-assets-dev ws-server-assets-prod; do
+for B in ws-server-assets-dev ws-server-assets-prod gen-assets-dev gen-assets-prod; do
   aws s3api put-bucket-cors --bucket "$B" --cors-configuration "$CFG"
 done
 

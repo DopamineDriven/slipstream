@@ -24,7 +24,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
       cacheStrategy: { swr: 3600, ttl: 60 }
     });
   }
-  
+
   public sanitizeTitle(generatedTitle: string) {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   }
@@ -60,8 +60,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
     return await this.prismaClient.conversation
       .findUnique({
         where: { id: conversationId },
-        select: { title: true },
-        cacheStrategy: { swr: 3600, ttl: 60 }
+        select: { title: true }
       })
       .then(t => {
         return t?.title ?? "Untitled";

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./highlight.css";
 
 @config "../../tailwind.config.ts";
 @plugin "tailwindcss-motion";
