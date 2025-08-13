@@ -3,3 +3,4 @@ src/test/__out__/*
 src/__out__/*
 public/inspect/*
 aes*
+prisma/db_dump.bak
