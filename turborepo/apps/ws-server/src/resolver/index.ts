@@ -15,7 +15,7 @@ import { GeminiService } from "@/gemini/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
-import { BufferLike } from "@/types/index.ts";
+import { BufferLike, UserData } from "@/types/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import { WebSocket } from "ws";
@@ -115,7 +115,8 @@ export class Resolver extends ModelService {
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
-    userId: string
+    userId: string,
+    userData?: UserData
   ) {
     const provider = event?.provider ?? "openai";
     const model = this.getModel(
@@ -151,6 +152,13 @@ export class Resolver extends ModelService {
       topP,
       model
     });
+
+
+    const [lat, lng] = userData
+      ? userData?.latlng?.split(",")?.map(p => {
+          return Number.parseFloat(p);
+        }) as [number, number]
+      : [undefined, undefined];
     //  configure token usage for a given conversation relative to model max context window limits
     const isNewChat = conversationIdInitial.startsWith("new-chat");
     const msgs = res.messages satisfies Message[];
@@ -252,7 +260,10 @@ export class Resolver extends ModelService {
           model: model,
           history
         });
-gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", config: {}})
+        const longitude =lng ?? -122.4194,
+        latitude =lat ?? 47.7749;
+        console.log(`DEBUG: Using Latitude: ${latitude}, Longitude: ${longitude}`);
+
         const stream = (await chat.sendMessageStream({
           message: prompt,
           config: {
@@ -262,8 +273,8 @@ gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", con
             toolConfig: {
               retrievalConfig: {
                 latLng: {
-                  latitude: event.metadata?.lat ?? 47.7749,
-                  longitude: event.metadata?.lng ?? -122.4194
+                  latitude,
+                  longitude
                 }
               }
             },
@@ -561,10 +572,10 @@ gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", con
                 max_uses: 5,
                 user_location: {
                   type: "approximate",
-                  city: event.metadata?.city,
-                  country: event.metadata?.country,
+                  city: userData?.city,
+                  country: userData?.country,
                   region: event.metadata?.region,
-                  timezone: event.metadata?.tz
+                  timezone: userData?.tz
                 }
               }
             ]
@@ -1113,7 +1124,8 @@ gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", con
   public async handleRawMessage(
     ws: WebSocket,
     userId: string,
-    raw: BufferLike
+    raw: BufferLike,
+    userData?: UserData
   ): Promise<void> {
     const event = this.parseEvent(raw);
     if (!event) {
@@ -1134,7 +1146,7 @@ gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", con
         await this.handleImageGenRequest(event, ws, userId);
         break;
       case "ai_chat_request":
-        await this.handleAIChat(event, ws, userId);
+        await this.handleAIChat(event, ws, userId, userData);
         break;
       default:
         await this.wsServer.redis.publish(
