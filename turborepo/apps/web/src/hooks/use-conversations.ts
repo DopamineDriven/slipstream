@@ -40,10 +40,8 @@ export function useConversations(userId?: string): UseConversationsReturn {
     userId ? `/api/users/${userId}/conversations` : null,
     fetcher,
     {
-      revalidateOnFocus: true,
       revalidateOnReconnect: true,
-      fetcher,
-      revalidateOnMount: true
+      fetcher
     }
   );
   /**
