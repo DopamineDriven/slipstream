@@ -33,7 +33,7 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
           variant="ghost"
           className={cn(
             "w-full justify-start text-left",
-            effectiveState === "collapsed" && "h-12 w-12 justify-center p-0"
+            effectiveState === "collapsed" && "h-12 w-12 justify-start p-0"
           )}>
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
@@ -46,7 +46,7 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
             <div
               className={cn(
                 "flex flex-col",
-                effectiveState === "collapsed" && "invisible"
+                effectiveState === "collapsed" && "hidden"
               )}>
               <span className="text-sm font-medium">{userProfile?.name}</span>
               <span className="text-muted-foreground text-xs">
