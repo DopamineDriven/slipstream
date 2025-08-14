@@ -345,8 +345,8 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
                                 <NativeTruncatedText
                                   text={thread?.title ?? "Untitled"}
                                   className="w-full text-left text-sm leading-tight font-medium"
-                                  baseChars={20}
-                                  maxExtraChars={4}
+                                  baseChars={15}
+                                  maxExtraChars={3}
                                 />
                                 <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
                                   {new Date(
