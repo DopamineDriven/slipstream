@@ -53,7 +53,7 @@ aws ecs update-service \
   --cluster "$CLUSTER_ARN" \
   --service "$SERVICE_NAME" \
   --force-new-deployment \
-  > /dev/null 2>&1
+  --no-cli-pager
 
 echo "📸 Syncing infrastructure state (post-deployment)..."
 ./aws-remote.sh
