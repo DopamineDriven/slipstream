@@ -56,6 +56,7 @@ export interface CredentialEntity {
   GEN_BUCKET?: string;
   MOTION_PLUS_PERSONAL_ACCESS_TOKEN?: string;
   LLAMA_API_KEY?: string;
+  NOTATION_FLAG?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

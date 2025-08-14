@@ -1,3 +1,3 @@
-# t3-chat-clone
+## Realtime websocket driven multi-model/multi-provider medium
 
-Check back for updates...
+### Pnpm Turborepo Workspace + FastAPI Microservie (Python)

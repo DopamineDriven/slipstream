@@ -1,7 +1,8 @@
 import type { Message } from "@/generated/client/client.ts";
 import type {
   RawMessageStreamEvent,
-  StopReason
+  StopReason,
+  WebSearchResultBlock
 } from "@anthropic-ai/sdk/resources/messages.mjs";
 import type {
   Blob,
@@ -251,12 +252,21 @@ export class Resolver extends ModelService {
           model: model,
           history
         });
-
+gemini.models.generateContentStream({contents: [{}],model: "gemini-2.5-pro", config: {}})
         const stream = (await chat.sendMessageStream({
           message: prompt,
           config: {
             temperature,
             maxOutputTokens: max_tokens,
+            tools: [{ googleSearch: {} }, { urlContext: {} }],
+            toolConfig: {
+              retrievalConfig: {
+                latLng: {
+                  latitude: event.metadata?.lat ?? 47.7749,
+                  longitude: event.metadata?.lng ?? -122.4194
+                }
+              }
+            },
             topP,
             thinkingConfig: { includeThoughts: true, thinkingBudget: -1 },
             systemInstruction
@@ -543,7 +553,21 @@ export class Resolver extends ModelService {
             temperature,
             system,
             model,
-            messages
+            messages,
+            tools: [
+              {
+                type: "web_search_20250305",
+                name: "web_search",
+                max_uses: 5,
+                user_location: {
+                  type: "approximate",
+                  city: event.metadata?.city,
+                  country: event.metadata?.country,
+                  region: event.metadata?.region,
+                  timezone: event.metadata?.tz
+                }
+              }
+            ]
           },
           { stream: true }
         )) satisfies Stream<RawMessageStreamEvent> & {
@@ -554,7 +578,18 @@ export class Resolver extends ModelService {
           let text: string | undefined = undefined;
           let thinkingText: string | undefined = undefined;
           let done: StopReason | null = null;
-
+          if (chunk.type === "content_block_start") {
+            if (chunk.content_block.type === "web_search_tool_result") {
+              if ("error" in chunk.content_block.content) {
+                console.log(chunk.content_block.content);
+              }
+              (chunk.content_block.content as WebSearchResultBlock[]).map(
+                (v) => {
+                  text = `[${v.title}](${v.url})`;
+                }
+              );
+            }
+          }
           if (chunk.type === "content_block_delta") {
             if (chunk.delta.type === "thinking_delta") {
               thinkingText = chunk.delta.thinking;
