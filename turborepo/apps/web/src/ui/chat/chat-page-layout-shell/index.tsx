@@ -120,7 +120,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
             <div className="flex h-full flex-col">
               <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex items-center">
-                  <SidebarTrigger className="-ml-2">
+                  <SidebarTrigger className="-ml-2 z-30">
                     <PanelLeft className="size-5" />
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>
@@ -129,7 +129,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
                 </div>
                 <HeaderActions />
               </header>
-              <main className="flex-1 overflow-y-auto">{children}</main>
+              <div className="flex-1 overflow-y-auto">{children}</div>
             </div>
           </SidebarInset>
         </div>
