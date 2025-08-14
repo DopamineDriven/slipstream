@@ -267,11 +267,11 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
         {filteredConversations && filteredConversations.length > 0 && (
           <div className="mb-2 flex items-center justify-between px-2 py-1">
             <h3 className="text-accent-foreground text-xs font-medium tracking-wider uppercase">
-              Recent
+              Recent ({filteredConversations.length})
             </h3>
-            <span className="text-accent-foreground text-xs">
+            {/* <span className="text-accent-foreground text-xs">
               {filteredConversations.length} conversations
-            </span>
+            </span> */}
           </div>
         )}
 
@@ -312,7 +312,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
                               if (e.key === "Enter") handleEditSave();
                               if (e.key === "Escape") handleEditCancel();
                             }}
-                            className="h-8 flex-1 text-sm"
+                            className="h-8 flex-1 text-sm "
                             autoFocus
                           />
                           <Button

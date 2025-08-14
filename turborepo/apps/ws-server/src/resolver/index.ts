@@ -153,11 +153,10 @@ export class Resolver extends ModelService {
       model
     });
 
-
     const [lat, lng] = userData
-      ? userData?.latlng?.split(",")?.map(p => {
+      ? (userData?.latlng?.split(",")?.map(p => {
           return Number.parseFloat(p);
-        }) as [number, number]
+        }) as [number, number])
       : [undefined, undefined];
     //  configure token usage for a given conversation relative to model max context window limits
     const isNewChat = conversationIdInitial.startsWith("new-chat");
@@ -260,9 +259,8 @@ export class Resolver extends ModelService {
           model: model,
           history
         });
-        const longitude =lng ?? -122.4194,
-        latitude =lat ?? 47.7749;
-        console.log(`DEBUG: Using Latitude: ${latitude}, Longitude: ${longitude}`);
+        const longitude = lng ?? -122.4194,
+          latitude = lat ?? 47.7749;
 
         const stream = (await chat.sendMessageStream({
           message: prompt,
@@ -594,11 +592,9 @@ export class Resolver extends ModelService {
               if ("error" in chunk.content_block.content) {
                 console.log(chunk.content_block.content);
               }
-              (chunk.content_block.content as WebSearchResultBlock[]).map(
-                (v) => {
-                  text = `[${v.title}](${v.url})`;
-                }
-              );
+              (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
+                text = `[${v.title}](${v.url})`;
+              });
             }
           }
           if (chunk.type === "content_block_delta") {
