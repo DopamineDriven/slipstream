@@ -9,6 +9,10 @@ function detectDeviceAndSetCookies(
   request: NextRequest,
   response: NextResponse
 ) {
+  const domain =
+    process.env.VERCEL_ENV !== "development"
+      ? ".d0paminedriven.com"
+      : undefined;
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
   const region =
     request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
@@ -85,18 +89,25 @@ function detectDeviceAndSetCookies(
     locale = `${locale.toLowerCase()}-${country}`;
   }
 
+  const config = {
+    domain,
+    path: "/",
+    secure: typeof domain !== "undefined",
+    sameSite: "lax",
+    httpOnly: false
+  } as const;
   // Set cookies
-  response.cookies.set("hostname", hostname);
-  response.cookies.set("locale", locale);
-  response.cookies.set("viewport", viewport);
-  response.cookies.set("ios", ios);
-  response.cookies.set("latlng", latlng);
-  response.cookies.set("tz", tz);
-  response.cookies.set("country", country);
-  response.cookies.set("city", city);
-  response.cookies.set("isMac", `${isMac}`);
-  response.cookies.set("region", region);
-  response.cookies.set("postalCode", postalCode);
+  response.cookies.set("hostname", hostname, config);
+  response.cookies.set("locale", locale, config);
+  response.cookies.set("viewport", viewport, config);
+  response.cookies.set("ios", ios, config);
+  response.cookies.set("latlng", latlng, config);
+  response.cookies.set("tz", tz, config);
+  response.cookies.set("country", country, config);
+  response.cookies.set("city", city, config);
+  response.cookies.set("isMac", `${isMac}`, config);
+  response.cookies.set("region", region, config);
+  response.cookies.set("postalCode", postalCode, config);
   response.headers.set("Access-Control-Allow-Origin", "*");
 
   return response;

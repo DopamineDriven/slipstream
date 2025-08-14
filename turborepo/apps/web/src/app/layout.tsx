@@ -27,11 +27,9 @@ const inter = Inter({
 
 export const viewport = {
   colorScheme: "normal",
-  userScalable: true,
   themeColor: "#020817",
   viewportFit: "cover",
   initialScale: 1,
-  maximumScale: 1,
   width: "device-width"
 } satisfies Viewport;
 
@@ -134,7 +132,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-basis m-0 min-h-[100dvh] overflow-hidden p-0 antialiased",
+          "bg-background font-basis m-0 w-[100dvw] h-[100dvh] overflow-hidden p-0 antialiased",
           inter.variable
         )}>
         <CookieProvider>

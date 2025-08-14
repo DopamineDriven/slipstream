@@ -1,6 +1,6 @@
-### Welcome to the `@t3-chat-clone/*` workspace 👋
+# Pnpm Workspace (Turborepo)
 
-#### add built-in output type support as a generic arg by augmenting internal JSON.parse method
+#### add injectable output type support (passing a generic arg on use) by augmenting internal `parse` method
 
 ```ts
 declare global {
