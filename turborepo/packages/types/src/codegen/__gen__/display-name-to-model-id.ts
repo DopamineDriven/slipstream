@@ -1,23 +1,23 @@
 export const displayNameToModelId = {
-  "openai": {
-    "GPT 5": "gpt-5",
-    "GPT 5 Mini": "gpt-5-mini",
-    "GPT 5 Nano": "gpt-5-nano",
-    "GPT 4.1": "gpt-4.1",
-    "GPT 4.1 Mini": "gpt-4.1-mini",
-    "GPT 4.1 Nano": "gpt-4.1-nano",
-    "o4 Mini": "o4-mini",
-    "o3": "o3",
-    "o3 Pro": "o3-pro",
-    "o3 Mini": "o3-mini",
-    "GPT 4o": "gpt-4o",
-    "GPT 4o Mini": "gpt-4o-mini",
-    "GPT 4": "gpt-4",
-    "GPT 4 Turbo": "gpt-4-turbo",
-    "GPT 3.5 Turbo": "gpt-3.5-turbo",
-    "GPT 3.5 Turbo 16k": "gpt-3.5-turbo-16k"
+  openai: {
+    "GPT-5": "gpt-5",
+    "GPT-5 mini": "gpt-5-mini",
+    "GPT-5 nano": "gpt-5-nano",
+    "GPT-4.1": "gpt-4.1",
+    "GPT-4.1 mini": "gpt-4.1-mini",
+    "GPT-4.1 nano": "gpt-4.1-nano",
+    "o4-mini": "o4-mini",
+    o3: "o3",
+    "o3-pro": "o3-pro",
+    "o3-mini": "o3-mini",
+    "GPT-4o": "gpt-4o",
+    "GPT-4o mini": "gpt-4o-mini",
+    "GPT-4": "gpt-4",
+    "GPT-4 turbo": "gpt-4-turbo",
+    "GPT-3.5 turbo": "gpt-3.5-turbo",
+    "GPT-3.5 turbo 16k": "gpt-3.5-turbo-16k"
   },
-  "gemini": {
+  gemini: {
     "Gemini 2.5 Pro": "gemini-2.5-pro",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
@@ -25,16 +25,17 @@ export const displayNameToModelId = {
     "Gemini 2.5 Flash Preview TTS": "gemini-2.5-flash-preview-tts",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
-    "Gemini 2.0 Flash Preview Image Generation": "gemini-2.0-flash-preview-image-generation",
+    "Gemini 2.0 Flash Preview Image Generation":
+      "gemini-2.0-flash-preview-image-generation",
     "Gemini Embedding 001": "gemini-embedding-001",
     "Imagen 4 (Preview)": "imagen-4.0-generate-preview-06-06",
     "Imagen 4 Ultra (Preview)": "imagen-4.0-ultra-generate-preview-06-06",
-    "Imagen 3.0 002 model": "imagen-3.0-generate-002",
+    "Imagen 3.0": "imagen-3.0-generate-002",
     "Veo 3": "veo-3.0-generate-preview",
     "Veo 3 fast": "veo-3.0-fast-generate-preview",
     "Veo 2": "veo-2.0-generate-001"
   },
-  "grok": {
+  grok: {
     "Grok 4": "grok-4-0709",
     "Grok 3": "grok-3",
     "Grok 3 Fast": "grok-3-fast",
@@ -43,7 +44,7 @@ export const displayNameToModelId = {
     "Grok 2 Image": "grok-2-image-1212",
     "Grok 2 Vision": "grok-2-vision-1212"
   },
-  "anthropic": {
+  anthropic: {
     "Claude Opus 4.1": "claude-opus-4-1-20250805",
     "Claude Opus 4": "claude-opus-4-20250514",
     "Claude Sonnet 4": "claude-sonnet-4-20250514",
@@ -52,5 +53,24 @@ export const displayNameToModelId = {
     "Claude Sonnet 3.5 (New)": "claude-3-5-sonnet-20241022",
     "Claude Sonnet 3.5 (Old)": "claude-3-5-sonnet-20240620",
     "Claude Haiku 3": "claude-3-haiku-20240307"
+  },
+  meta: {
+    "Llama 4 Maverick (17B/128E, Instruct, FP8)":
+      "Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "Llama 4 Scout (17B/16E, Instruct, FP8)":
+      "Llama-4-Scout-17B-16E-Instruct-FP8",
+    "Llama 3.3 (70B, Instruct)": "Llama-3.3-70B-Instruct",
+    "Llama 3.3 (8B, Instruct)": "Llama-3.3-8B-Instruct",
+    "Llama 4 Maverick (Cerebras, 17B/128E, Instruct)":
+      "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
+    "Llama 4 Scout (Cerebras, 17B/16E, Instruct)":
+      "Cerebras-Llama-4-Scout-17B-16E-Instruct",
+    "Llama 4 Maverick (Groq, 17B/128E, Instruct)":
+      "Groq-Llama-4-Maverick-17B-128E-Instruct"
+  },
+  vercel: {
+    "v0 medium": "v0-1.5-md",
+    "v0 large": "v0-1.5-lg",
+    "v0 medium (legacy)": "v0-1.0-md"
   }
 } as const;

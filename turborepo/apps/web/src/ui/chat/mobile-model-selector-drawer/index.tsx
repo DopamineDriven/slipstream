@@ -134,6 +134,58 @@ export function MobileModelSelectorDrawer() {
                               </Button>
                             );
                           })
+                        ) : provider === "vercel" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
+                        ) : provider === "meta" ? (
+                          getDisplayNamesForProvider(provider).map(model => {
+                            const isSelected =
+                              selectedModel.provider === provider &&
+                              selectedModel.displayName === model;
+                            return (
+                              <Button
+                                key={displayNameToModelId[provider][model]}
+                                variant={isSelected ? "default" : "outline"}
+                                className={cn(
+                                  styleMemo.default,
+                                  isSelected
+                                    ? styleMemo.isSelected
+                                    : styleMemo.isNotSelected
+                                )}
+                                onClick={() =>
+                                  handleModelSelect(provider, model)
+                                }>
+                                <ModelUI
+                                  model={model}
+                                  provider={provider}
+                                  isSelected={isSelected}
+                                />
+                              </Button>
+                            );
+                          })
                         ) : provider === "gemini" ? (
                           getDisplayNamesForProvider(provider).map(model => {
                             const isSelected =

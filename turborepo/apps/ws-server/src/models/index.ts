@@ -43,6 +43,26 @@ export class ModelService {
           return model;
         } else return "claude-sonnet-4-20250514" as const as NonNullable<K>;
       }
+      case "meta": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"meta">
+          )
+        ) {
+          return model;
+        } else return "Llama-3.3-70B-Instruct" as const as NonNullable<K>;
+      }
+      case "vercel": {
+        if (
+          model &&
+          providerModelChatApi[xTarget].includes(
+            model as GetModelUtilRT<"vercel">
+          )
+        ) {
+          return model;
+        } else return "v0-1.0-md" as const as NonNullable<K>;
+      }
       case "openai":
       default: {
         if (
@@ -52,7 +72,7 @@ export class ModelService {
           )
         ) {
           return model;
-        } else return "gpt-4.1-nano" as const as NonNullable<K>;
+        } else return "gpt-5-nano" as const as NonNullable<K>;
       }
     }
   };

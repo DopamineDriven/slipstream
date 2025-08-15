@@ -57,6 +57,7 @@ export interface CredentialEntity {
   MOTION_PLUS_PERSONAL_ACCESS_TOKEN?: string;
   LLAMA_API_KEY?: string;
   NOTATION_FLAG?: string;
+  SAFETY_ID_SECRET?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

@@ -1,9 +1,9 @@
 "use client";
 
-import type { Providers as Provider } from "@t3-chat-clone/types";
 import type { ClientWorkupProps } from "@/types/shared";
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
+import type { User } from "next-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ import {
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
-import type { User } from "next-auth";
+import type { Providers as Provider } from "@t3-chat-clone/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -162,7 +162,6 @@ export function ApiKeysTab({
     const currentKey = apiKeys.find(key => key.provider === provider);
 
     if (currentKey?.isSet) {
-
       setDecryptingKey(provider);
 
       try {
@@ -196,7 +195,6 @@ export function ApiKeysTab({
         setDecryptingKey(null);
       }
     } else {
-
       setEditingKey(provider);
       setTempDefaults(prev => ({
         ...prev,
@@ -423,6 +421,13 @@ export function ApiKeysTab({
         return "sk-ant-*******************************************";
       case "grok":
         return "xai-*******************************************";
+      case "meta":
+        return "LLM|******************|*******************";
+      case "vercel":
+        return "v0:team_******************:**************";
+      case "gemini":
+        return "AIza********************";
+      case "openai":
       default:
         return "sk-************************************************";
     }

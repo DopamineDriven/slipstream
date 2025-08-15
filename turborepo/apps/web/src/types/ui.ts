@@ -15,7 +15,7 @@ export interface Model {
 
 export interface MessageUI
   extends Omit<MessagePrisma, "createdAt" | "updatedAt" | "provider"> {
-  provider: "grok" | "openai" | "gemini" | "anthropic";
+  provider: "grok" | "openai" | "gemini" | "anthropic" | "vercel" | "meta";
   createdAt: string;
   updatedAt: string;
   text: string | React.ReactNode;
@@ -34,8 +34,8 @@ export interface KeyboardShortcut {
   keys: string[];
 }
 
-export type SidebarProps ={
+export type SidebarProps = {
   id: string;
   title: string;
   updatedAt: Date;
-}
+};

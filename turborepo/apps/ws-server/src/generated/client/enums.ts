@@ -29,7 +29,9 @@ export const Provider = {
   OPENAI: 'OPENAI',
   GROK: 'GROK',
   GEMINI: 'GEMINI',
-  ANTHROPIC: 'ANTHROPIC'
+  ANTHROPIC: 'ANTHROPIC',
+  META: 'META',
+  VERCEL: 'VERCEL'
 } as const
 
 export type Provider = (typeof Provider)[keyof typeof Provider]

@@ -94,12 +94,28 @@ export class WSServer {
 
   private async stashUserData(
     userId: string,
-    cookieObj: Record<keyof UserData, string> | null
+    cookieObj: Record<keyof UserData, string> | null,
+    email?: string
   ) {
     if (!cookieObj) return;
-    const { city, country, latlng, tz } = cookieObj;
-    void this.prisma.updateProfile({ city, country, latlng, tz, userId });
-    return this.userDataMap.set(userId, { city, country, latlng, tz });
+    const { city, country, latlng, tz, region } = cookieObj;
+    void this.prisma.updateProfile({
+      email: email ?? "",
+      region,
+      city,
+      country,
+      latlng,
+      tz,
+      userId
+    });
+    return this.userDataMap.set(userId, {
+      email,
+      region,
+      city,
+      country,
+      latlng,
+      tz
+    });
   }
 
   private async handleConnection(
@@ -109,26 +125,40 @@ export class WSServer {
     const cookies = req.headers.cookie;
     const cookieObj = this.parsedCookies(cookies);
 
-    const userId = await this.authenticateConnection(ws, req);
+    const { userId, email } = (await this.authenticateConnection(ws, req)) ?? {
+      userId: null,
+      email: undefined
+    };
     if (!userId) return;
-    await this.stashUserData(userId, cookieObj);
-    const { city, country, latlng, tz } = this.userDataMap.get(userId) ?? {
+    await this.stashUserData(userId, cookieObj, email);
+    const {
+      city,
+      country,
+      latlng,
+      tz,
+      region,
+      email: userEmail = email
+    } = this.userDataMap.get(userId) ?? {
+      email: "unknown email",
       city: "unknown city",
       country: "unknown country",
       latlng: "unknown latlng",
-      tz: "unknown tz"
+      tz: "unknown tz",
+      region: "unknown"
     };
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} connected from ${city}, ${country} in the ${tz} timezone having coordinates of ${latlng}`;
+    const message = `User ${userId} connected from ${city}, ${country} (${region} region) in the ${tz} timezone having coordinates of ${latlng}`;
     console.info(message);
     ws.on("message", raw => {
       if (this.resolver) {
         const uid = this.userMap.get(ws) ?? "";
         this.resolver.handleRawMessage(ws, uid, raw, {
+          email: userEmail,
           city,
           country,
           latlng,
+          region,
           tz
         });
       } else {
@@ -144,7 +174,7 @@ export class WSServer {
   private async authenticateConnection(
     ws: WebSocket,
     req: IncomingMessage
-  ): Promise<string | null> {
+  ): Promise<{ userId: string; email: string } | null> {
     const userEmail = this.extractUserEmailFromUrl(req);
 
     if (!userEmail) {
@@ -165,7 +195,7 @@ export class WSServer {
 
       if (userIsValid === false) throw new Error("Invalid Session");
 
-      return userId;
+      return { userId, email: decodedEmail };
     } catch (err) {
       if (err instanceof Error) {
         ws.close(4001, `Auth failed: ${err.message}`);
@@ -182,7 +212,7 @@ export class WSServer {
     try {
       if (cookieHeader) {
         cookieHeader.split(";").forEach(function (cookie) {
-          const cookieKeys = ["city", "country", "latlng", "tz"];
+          const cookieKeys = ["city", "country", "latlng", "tz", "region"];
           const parts = cookie.match(/(.*?)=(.*)/);
           if (parts) {
             const k = (parts?.[1]?.trim() ?? "").trimStart();

@@ -1,23 +1,23 @@
 export const displayNameModelsByProvider = {
-  "openai": [
-    "GPT 5",
-    "GPT 5 Mini",
-    "GPT 5 Nano",
-    "GPT 4.1",
-    "GPT 4.1 Mini",
-    "GPT 4.1 Nano",
-    "o4 Mini",
+  openai: [
+    "GPT-5",
+    "GPT-5 mini",
+    "GPT-5 nano",
+    "GPT-4.1",
+    "GPT-4.1 mini",
+    "GPT-4.1 nano",
+    "o4-mini",
     "o3",
-    "o3 Pro",
-    "o3 Mini",
-    "GPT 4o",
-    "GPT 4o Mini",
-    "GPT 4",
-    "GPT 4 Turbo",
-    "GPT 3.5 Turbo",
-    "GPT 3.5 Turbo 16k"
+    "o3-pro",
+    "o3-mini",
+    "GPT-4o",
+    "GPT-4o mini",
+    "GPT-4",
+    "GPT-4 turbo",
+    "GPT-3.5 turbo",
+    "GPT-3.5 turbo 16k"
   ],
-  "gemini": [
+  gemini: [
     "Gemini 2.5 Pro",
     "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
@@ -29,12 +29,12 @@ export const displayNameModelsByProvider = {
     "Gemini Embedding 001",
     "Imagen 4 (Preview)",
     "Imagen 4 Ultra (Preview)",
-    "Imagen 3.0 002 model",
+    "Imagen 3.0",
     "Veo 3",
     "Veo 3 fast",
     "Veo 2"
   ],
-  "grok": [
+  grok: [
     "Grok 4",
     "Grok 3",
     "Grok 3 Fast",
@@ -43,7 +43,7 @@ export const displayNameModelsByProvider = {
     "Grok 2 Image",
     "Grok 2 Vision"
   ],
-  "anthropic": [
+  anthropic: [
     "Claude Opus 4.1",
     "Claude Opus 4",
     "Claude Sonnet 4",
@@ -52,5 +52,15 @@ export const displayNameModelsByProvider = {
     "Claude Sonnet 3.5 (New)",
     "Claude Sonnet 3.5 (Old)",
     "Claude Haiku 3"
-  ]
+  ],
+  meta: [
+    "Llama 4 Maverick (17B/128E, Instruct, FP8)",
+    "Llama 4 Scout (17B/16E, Instruct, FP8)",
+    "Llama 3.3 (70B, Instruct)",
+    "Llama 3.3 (8B, Instruct)",
+    "Llama 4 Maverick (Cerebras, 17B/128E, Instruct)",
+    "Llama 4 Scout (Cerebras, 17B/16E, Instruct)",
+    "Llama 4 Maverick (Groq, 17B/128E, Instruct)"
+  ],
+  vercel: ["v0 medium", "v0 large", "v0 medium (legacy)"]
 } as const;

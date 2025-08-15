@@ -25,6 +25,8 @@ enum Provider {
   GROK
   GEMINI
   ANTHROPIC
+  META
+  VERCEL
 }
 
 enum AssetOrigin {

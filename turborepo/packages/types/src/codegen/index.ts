@@ -4,6 +4,7 @@ import type {
   GrokModelsResponse,
   OpenAiResponse
 } from "@/types.ts";
+import { Provider } from "@/models.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
@@ -67,7 +68,17 @@ const providerModelChatApi = {
     "claude-3-5-sonnet-20241022",
     "claude-3-5-sonnet-20240620",
     "claude-3-haiku-20240307"
-  ]
+  ],
+  meta: [
+    "Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "Llama-4-Scout-17B-16E-Instruct-FP8",
+    "Llama-3.3-70B-Instruct",
+    "Llama-3.3-8B-Instruct",
+    "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
+    "Cerebras-Llama-4-Scout-17B-16E-Instruct",
+    "Groq-Llama-4-Maverick-17B-128E-Instruct"
+  ],
+  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
 } as const;
 
 async function anthropicFetcher() {
@@ -101,6 +112,107 @@ async function geminiFetcher() {
   );
 }
 
+function displayNameV0(id: string): string {
+  const raw = id?.trim();
+  if (!raw) return "";
+  // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
+  const m = raw.toLowerCase().match(/^v0-(\d+(?:\.\d+)?)-([a-z]+)$/);
+  if (!m) return prettyModelName(raw); // fallback to your generic formatter
+
+  const [, version, tier] = m;
+
+  const TIER_MAP = {
+    lg: "large",
+    md: "medium",
+    sm: "small",
+    xl: "x-large"
+  } as const;
+
+  let name =
+    `v0 ${TIER_MAP[(tier ?? "lg") as keyof typeof TIER_MAP] ?? tier}` as const;
+  // Only the 1.0 medium is “legacy” per Vercel’s docs
+  if (version === "1.0" && tier === "md") {
+    name += " (legacy)";
+  }
+  return name;
+}
+
+// Replace formatMeta with this stronger normalizer
+function formatMeta(id: string): string {
+  const raw = id?.trim();
+  if (!raw) return "";
+
+  // Normalize: strip noise & standardize separators
+  let s = raw
+    .replace(/\s+/g, "")
+    .replace(/^models\//i, "")
+    .replace(/^hfs?:\/\//i, "")
+    // eslint-disable-next-line no-useless-escape
+    .replace(/^meta[._-]?llama[\/-]/i, "llama-") // meta-llama/llama-... -> llama-...
+    .replace(/_/g, "-");
+
+  // Host label (prefix before "llama-"): keep only well-known vendors
+  let host: string | null = null;
+  // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec, no-useless-escape
+  const hostMatch = s.match(/^([a-z0-9.]+)[-\/](?=llama[-_]\d)/i);
+  if (hostMatch) {
+    const candidate = hostMatch?.[1]?.toLowerCase();
+    if (candidate === "cerebras" || candidate === "groq") {
+      host = candidate?.[0]?.toUpperCase() + candidate.slice(1);
+    }
+  }
+
+  // Trim everything before the first "llama-<version>"
+  const firstLlama = s.toLowerCase().indexOf("llama-");
+  if (firstLlama >= 0) s = s.slice(firstLlama);
+  const core = s.toLowerCase();
+
+  // Tokenize
+  const tokens = core.split(/[-/]/).filter(Boolean);
+  if (!tokens[0]?.startsWith("llama")) return prettyModelName(raw);
+
+  // Version (supports "4" or "3.3")
+  const version =
+    tokens.find((t, i) => i > 0 && /^\d+(?:\.\d+)?$/.test(t)) ?? "";
+
+  // Known codenames (expand here as Meta adds more)
+  const codename = tokens.find(t => t === "maverick" || t === "scout") ?? null;
+
+  // Params & experts (e.g., 17B, 70B, 128E)
+  const params = tokens.find(t => /^\d+(?:b|m)$/.test(t)) ?? null; // 8B, 70B, 17B (or M)
+  const experts = tokens.find(t => /^\d+e$/.test(t)) ?? null; // 128E, 16E
+
+  // Feature flags
+  const has = (x: string) => tokens.includes(x);
+  const isVision = has("vision");
+  const isInstruct = has("instruct");
+  const quant = tokens.find(t => /^(fp\d+|bf16|int\d+|q\d)/.test(t)) ?? null; // FP8, BF16, INT4, Q*
+  const isHF = has("hf"); // sometimes appears in registry IDs
+
+  // Compose
+  const title = ["Llama", version, codename ? cap(codename) : null]
+    .filter(Boolean)
+    .join(" ");
+  if (!title) return prettyModelName(raw);
+
+  const size = params
+    ? params.toUpperCase() + (experts ? `/${experts.toUpperCase()}` : "")
+    : null;
+
+  const metaParts = [
+    host,
+    size,
+    isVision ? "Vision" : null,
+    isInstruct ? "Instruct" : null,
+    quant ? quant.toUpperCase() : null,
+    isHF ? "HF" : null
+  ].filter(Boolean);
+
+  return metaParts.length ? `${title} (${metaParts.join(", ")})` : title;
+}
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
 function normalizeGrokSegments(segments: string[]): string[] {
   if (segments[0] === "grok") {
     const last = segments[segments.length - 1] ?? "";
@@ -111,7 +223,7 @@ function normalizeGrokSegments(segments: string[]): string[] {
   return segments;
 }
 
-function prettyModelName(id: string): string {
+function prettyModelName(id: string, provider: Provider = "openai"): string {
   let segments = id.split(/[-_]/);
 
   segments = normalizeGrokSegments(segments);
@@ -127,15 +239,28 @@ function prettyModelName(id: string): string {
       ) {
         return segment.toUpperCase();
       }
-      return segment.charAt(0).toUpperCase() + segment.slice(1);
+      return provider === "openai"
+        ? !/(mini|nano|turbo|pro)/.test(segment)
+          ? segment.charAt(0).toUpperCase() + segment.slice(1)
+          : segment
+        : segment.charAt(0).toUpperCase() + segment.slice(1);
     })
-    .join(" ");
+    .map((s, i) =>
+      provider === "openai"
+        ? i === 0 && segments.length !== 1
+          ? s.concat("-")
+          : segments.length !== i + 1
+            ? s.concat(" ")
+            : s
+        : s
+    )
+    .join(provider === "openai" ? "" : " ");
 }
 
 function formattedGrok(props: GrokModelsResponse) {
   return props.data.map(t => {
     const { id, ...rest } = t;
-    const displayName = prettyModelName(id);
+    const displayName = prettyModelName(id, "grok");
     return { id, displayName, ...rest };
   });
 }
@@ -212,6 +337,26 @@ const modelMapper = async (modelKeys = true) => {
         });
         return helper;
       }
+      case "meta": {
+        let Helper = Array.of<[string, string]>();
+
+        models.forEach(function (model) {
+          modelKeys === true
+            ? Helper.push([model, formatMeta(model)])
+            : Helper.push([formatMeta(model), model]);
+        });
+        return Helper;
+      }
+      case "vercel": {
+        let Helper = Array.of<[string, string]>();
+
+        models.forEach(function (model) {
+          modelKeys === true
+            ? Helper.push([model, displayNameV0(model)])
+            : Helper.push([displayNameV0(model), model]);
+        });
+        return Helper;
+      }
       case "grok": {
         let helper = Array.of<[string, string]>();
         models.forEach(function (model) {
@@ -256,10 +401,12 @@ async function displayNameModelIdGen<
   );
   const openai = mapper[0];
   const gemini = mapper[1];
+  const meta = mapper[4];
+  const vercel = mapper[5];
   const grok = mapper[2];
   const anthropic = mapper[3];
 
-  if (!openai || !gemini || !grok || !anthropic)
+  if (!openai || !gemini || !grok || !anthropic || !meta || !vercel)
     throw new Error("empty data in displayNameModelIdGen");
 
   if (typeof arrayOnly !== "undefined") {
@@ -269,14 +416,18 @@ async function displayNameModelIdGen<
           openai: openai.map(([keys, _v]) => keys),
           gemini: gemini.map(([keys, _v]) => keys),
           grok: grok.map(([keys, _]) => keys),
-          anthropic: anthropic.map(([keys, _]) => keys)
+          anthropic: anthropic.map(([keys, _]) => keys),
+          meta: meta.map(([keys, _v]) => keys),
+          vercel: vercel.map(([keys, _v]) => keys)
         };
       } else {
         return {
           openai: openai.map(([_, vals]) => vals),
           gemini: gemini.map(([_, vals]) => vals),
           grok: grok.map(([_, vals]) => vals),
-          anthropic: anthropic.map(([_, vals]) => vals)
+          anthropic: anthropic.map(([_, vals]) => vals),
+          meta: meta.map(([_, vals]) => vals),
+          vercel: vercel.map(([_, vals]) => vals)
         };
       }
     } else {
@@ -285,14 +436,18 @@ async function displayNameModelIdGen<
           openai: openai.map(([_, vals]) => vals),
           gemini: gemini.map(([_, vals]) => vals),
           grok: grok.map(([_, vals]) => vals),
-          anthropic: anthropic.map(([_, vals]) => vals)
+          anthropic: anthropic.map(([_, vals]) => vals),
+          meta: meta.map(([_, vals]) => vals),
+          vercel: vercel.map(([_, vals]) => vals)
         };
       } else {
         return {
           openai: openai.map(([keys, _v]) => keys),
           gemini: gemini.map(([keys, _v]) => keys),
           grok: grok.map(([keys, _]) => keys),
-          anthropic: anthropic.map(([keys, _]) => keys)
+          anthropic: anthropic.map(([keys, _]) => keys),
+          meta: meta.map(([keys, _v]) => keys),
+          vercel: vercel.map(([keys, _v]) => keys)
         };
       }
     }
@@ -301,7 +456,9 @@ async function displayNameModelIdGen<
     openai: Object.fromEntries(openai),
     gemini: Object.fromEntries(gemini),
     grok: Object.fromEntries(grok),
-    anthropic: Object.fromEntries(anthropic)
+    anthropic: Object.fromEntries(anthropic),
+    meta: Object.fromEntries(meta),
+    vercel: Object.fromEntries(vercel)
   };
 }
 

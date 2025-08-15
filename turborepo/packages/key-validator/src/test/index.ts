@@ -18,6 +18,24 @@ async function anthropicFetcher() {
   });
 }
 
+async function llamaFetcher() {
+  const  res =  await fetch("https://api.llama.com/v1/models/Llama-4-Scout-17B-16E-Instruct-FP8", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
+      "Content-Type": "application/json"
+    }
+  });
+  console.log(res.headers);
+  return res
+}
+async function v0Fetcher() {
+  return await fetch("https://api.v0.dev/v1/user", {
+    headers: {
+      Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
+    }
+  });
+}
 async function openAiFetcher() {
   return await fetch("https://api.openai.com/v1/models", {
     headers: {
@@ -42,15 +60,26 @@ async function geminiFetcher() {
 
 const fs = new Fs(process.cwd());
 (async () => {
+  const v0Data =(await v0Fetcher()) as Response;
+  const llamaData = (await llamaFetcher()) as Response;
   const data = await anthropicFetcher();
   const openAiData = await openAiFetcher();
   const geminiData = await geminiFetcher();
   const grokData = await grokFetcher();
+  const parseV0 = JSON.parse(await v0Data.text()) as Record<string, any>
+  const parseLlama = JSON.parse(await llamaData.text()) as Record<string, any>;
   const parseGemini = JSON.parse(await geminiData.text()) as GeminiResponse;
   const parseOpenAi = JSON.parse(await openAiData.text()) as OpenAiResponse;
   const parseGrok = JSON.parse(await grokData.text()) as GrokModelsResponse;
   const parseIt = JSON.parse(await data.text()) as AnthropicResponse;
-
+  fs.withWs(
+    "src/test/__out__/llama-results.json",
+    JSON.stringify(parseLlama, null, 2)
+  );
+    fs.withWs(
+    "src/test/__out__/v0-results.json",
+    JSON.stringify(parseV0, null, 2)
+  );
   fs.withWs(
     "src/test/__out__/anthropic-results.json",
     JSON.stringify(parseIt, null, 2)
@@ -90,9 +119,7 @@ function normalizeGrokSegments(segments: string[]): string[] {
 }
 
 function _prettyModelName(id: string): string {
-
   let segments = id.split(/[-_]/);
-
 
   segments = normalizeGrokSegments(segments);
 

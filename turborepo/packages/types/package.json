@@ -6,16 +6,24 @@
     "access": "public",
     "typesVersions": {
       "*": {
-      "*": [
-        "dist/index.d.ts"
-      ],
+        "*": [
+          "dist/index.d.ts"
+        ],
         "events": [
           "dist/events.d.ts"
         ],
-        "models": ["dist/models.d.ts"],
-        "utils": ["dist/utils.d.ts"],
-        "types": ["dist/types.d.ts"],
-        "codegen": ["dist/codegen/*.d.ts"]
+        "models": [
+          "dist/models.d.ts"
+        ],
+        "utils": [
+          "dist/utils.d.ts"
+        ],
+        "types": [
+          "dist/types.d.ts"
+        ],
+        "codegen": [
+          "dist/codegen/*.d.ts"
+        ]
       }
     }
   },
@@ -26,13 +34,21 @@
       "*": [
         "dist/index.d.ts"
       ],
-        "events": [
-          "dist/events.d.ts"
-        ],
-        "models": ["dist/models.d.ts"],
-        "utils": ["dist/utils.d.ts"],
-        "types": ["dist/types.d.ts"],
-        "codegen": ["dist/codegen/*.d.ts"]
+      "events": [
+        "dist/events.d.ts"
+      ],
+      "models": [
+        "dist/models.d.ts"
+      ],
+      "utils": [
+        "dist/utils.d.ts"
+      ],
+      "types": [
+        "dist/types.d.ts"
+      ],
+      "codegen": [
+        "dist/codegen/*.d.ts"
+      ]
     }
   },
   "type": "module",

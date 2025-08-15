@@ -16,8 +16,10 @@ import type {
   AnthropicModelIdUnion,
   GeminiModelIdUnion,
   GrokModelIdUnion,
+  MetaModelIdUnion,
   OpenAiModelIdUnion,
-  Provider
+  Provider,
+  VercelModelIdUnion
 } from "@t3-chat-clone/types";
 import {
   defaultModelIdByProvider,
@@ -56,7 +58,11 @@ function getModelDisplayName(toProvider: Provider, modelId: string | null) {
       ? getDisplayNameByModelId(toProvider, model as GeminiModelIdUnion)
       : toProvider === "grok"
         ? getDisplayNameByModelId(toProvider, model as GrokModelIdUnion)
-        : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
+        : toProvider === "meta"
+          ? getDisplayNameByModelId(toProvider, model as MetaModelIdUnion)
+          : toProvider === "vercel"
+            ? getDisplayNameByModelId(toProvider, model as VercelModelIdUnion)
+            : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
 }
 
 // Lightweight markdown processor for streaming

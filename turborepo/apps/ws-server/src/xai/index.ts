@@ -2,18 +2,17 @@ import type { Message } from "@/generated/client/client.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { OpenAI } from "openai";
 
-export class OpenAIService {
+export class xAIService {
   private defaultClient: OpenAI;
 
-  constructor(
-    private apiKey: string,
-  ) {
-    this.defaultClient = new OpenAI({ apiKey: this.apiKey });
-
-
+  constructor(private apiKey: string) {
+    this.defaultClient = new OpenAI({
+      apiKey: this.apiKey,
+      baseURL: "https://api.x.ai/v1"
+    });
   }
 
-  public getClient(overrideKey?: string) {
+  public xAIClient(overrideKey?: string) {
     const client = this.defaultClient;
     if (overrideKey) {
       return client.withOptions({ apiKey: overrideKey });
@@ -76,7 +75,7 @@ export class OpenAIService {
     }
   }
 
-  public formatOpenAi(
+  public xAiFormat(
     isNewChat: boolean,
     msgs: Message[],
     userPrompt: string,

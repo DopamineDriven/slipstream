@@ -275,10 +275,6 @@ export function ChatEmptyState() {
                   size="icon"
                   title="Submit prompt"
                   className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
-                  onClick={e => {
-                    e.preventDefault();
-                    handleSendMessage(message.trim());
-                  }}
                   disabled={!message.trim() || !isConnected || isSubmitting}>
                   <SendMessage className="size-5" />
                   <span className="sr-only">{`Submit Prompt`}</span>

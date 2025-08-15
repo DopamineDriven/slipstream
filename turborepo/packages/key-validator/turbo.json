@@ -1,8 +1,18 @@
 {
   "extends": ["//"],
   "tasks": {
-    "build": {
-      "outputs": ["dist/**"]
+   "build": {
+      "outputs": ["dist/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "src/http/index.ts",
+        "src/index.ts",
+        "src/types/index.ts",
+        "tsconfig.json",
+        "package.json",
+        "eslint.config.mjs",
+        "tsup.config.ts"
+      ]
     }
   }
 }
