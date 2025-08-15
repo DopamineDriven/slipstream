@@ -1,5 +1,12 @@
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
-import { AnthropicIcon, GeminiIcon, OpenAiIcon, XAiIcon } from "@/ui/icons";
+import {
+  AnthropicIcon,
+  GeminiIcon,
+  MetaIcon,
+  OpenAiIcon,
+  v0Icon,
+  XAiIcon
+} from "@/ui/icons";
 
 export const providerObj = [
   {
@@ -33,6 +40,22 @@ export const providerObj = [
     value: "sk-************************************************",
     isSet: true,
     isDefault: true
+  },
+  {
+    provider: "meta",
+    text: "Llama",
+    icon: MetaIcon,
+    value: "LLM|******************|*******************",
+    isSet: false,
+    isDefault: false
+  },
+  {
+    provider: "vercel",
+    text: "v0",
+    icon: v0Icon,
+    value: "v0:team_******************:**************",
+    isDefault: false,
+    isSet: false
   }
 ] satisfies ApiKeyData[];
 

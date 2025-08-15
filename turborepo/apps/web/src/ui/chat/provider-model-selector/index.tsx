@@ -9,9 +9,11 @@ import type {
   AnthropicDisplayNameUnion,
   GeminiDisplayNameUnion,
   GrokDisplayNameUnion,
-  OpenAiDisplayNameUnion
+  MetaDisplayNameUnion,
+  OpenAiDisplayNameUnion,
+  Provider,
+  VercelDisplayNameUnion
 } from "@t3-chat-clone/types";
-import type { Provider } from "@t3-chat-clone/types";
 import {
   getModelIdByDisplayName,
   getModelsForProvider
@@ -49,6 +51,21 @@ export function ProviderModelSelector({
         updateModel(
           displayName,
           getModelIdByDisplayName("anthropic", displayName)
+        );
+        break;
+      }
+      case "meta": {
+        const displayName = defaultModelByProvider.meta;
+        updateProvider("meta");
+        updateModel(displayName, getModelIdByDisplayName("meta", displayName));
+        break;
+      }
+      case "vercel": {
+        const displayName = defaultModelByProvider.vercel;
+        updateProvider("vercel");
+        updateModel(
+          displayName,
+          getModelIdByDisplayName("vercel", displayName)
         );
         break;
       }
@@ -91,6 +108,16 @@ export function ProviderModelSelector({
       case "gemini": {
         const dn = name as GeminiDisplayNameUnion;
         updateModel(dn, getModelIdByDisplayName("gemini", dn));
+        break;
+      }
+      case "vercel": {
+        const dn = name as VercelDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("vercel", dn));
+        break;
+      }
+      case "meta": {
+        const dn = name as MetaDisplayNameUnion;
+        updateModel(dn, getModelIdByDisplayName("meta", dn));
         break;
       }
       case "grok": {

@@ -46,6 +46,9 @@ export type {
   GrokChatModels,
   GrokDisplayNameUnion,
   GrokModelIdUnion,
+  MetaChatModels,
+  MetaDisplayNameUnion,
+  MetaModelIdUnion,
   ModelDisplayNameToModelId,
   ModelIdToModelDisplayName,
   ModelMap,
@@ -54,7 +57,10 @@ export type {
   OpenAiDisplayNameUnion,
   OpenAiModelIdUnion,
   Provider,
-  Providers
+  Providers,
+  VercelChatModels,
+  VercelDisplayNameUnion,
+  VercelModelIdUnion
 } from "@/models.ts";
 
 export {

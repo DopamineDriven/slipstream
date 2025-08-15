@@ -21,7 +21,7 @@ import {
 interface ModelSelectionContextType {
   selectedModel: ModelSelection;
   isDrawerOpen: boolean;
-  providers: readonly ["anthropic", "gemini", "grok", "openai"]
+  providers: readonly ["anthropic", "gemini", "grok", "openai", "meta", "vercel"]
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;
   updateModel: (name: string, id: AllModelsUnion) => void;

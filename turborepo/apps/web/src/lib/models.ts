@@ -1,4 +1,11 @@
-import { AnthropicIcon, GeminiIcon, OpenAiIcon, XAiIcon } from "@/ui/icons";
+import {
+  AnthropicIcon,
+  GeminiIcon,
+  MetaIcon,
+  OpenAiIcon,
+  v0Icon,
+  XAiIcon
+} from "@/ui/icons";
 import type {
   AllModelsUnion,
   AnthropicDisplayNameUnion,
@@ -7,10 +14,16 @@ import type {
   GeminiModelIdUnion,
   GrokDisplayNameUnion,
   GrokModelIdUnion,
+  MetaDisplayNameUnion,
+  MetaModelIdUnion,
   OpenAiDisplayNameUnion,
-  OpenAiModelIdUnion
+  OpenAiModelIdUnion,
+  VercelDisplayNameUnion,
+  VercelModelIdUnion
 } from "@t3-chat-clone/types";
 import {
+  defaultModelDisplayNameByProvider,
+  defaultModelIdByProvider,
   displayNameToModelId,
   getDisplayNameByModelId,
   getModelIdByDisplayName
@@ -42,6 +55,18 @@ export const providerMetadata = {
     icon: AnthropicIcon,
     color: "#d97706",
     description: "Anthropic's helpful, harmless, and honest AI"
+  },
+  meta: {
+    name: "Meta Llama",
+    icon: MetaIcon,
+    description: "Industry Leading, Open-Source AI",
+    color: "#0081FB"
+  },
+  vercel: {
+    name: "Vercel v0",
+    icon: v0Icon,
+    color: "#000000",
+    description: "The AI Powered App Builder."
   }
 } as const;
 
@@ -53,7 +78,11 @@ export type DisplayNameWorkup<T extends Provider> = T extends "openai"
       ? ReturnType<typeof getDisplayNameByModelId<T, GrokModelIdUnion>>
       : T extends "gemini"
         ? ReturnType<typeof getDisplayNameByModelId<T, GeminiModelIdUnion>>
-        : never;
+        : T extends "meta"
+          ? ReturnType<typeof getDisplayNameByModelId<T, MetaModelIdUnion>>
+          : T extends "vercel"
+            ? ReturnType<typeof getDisplayNameByModelId<T, VercelModelIdUnion>>
+            : never;
 
 export type ModelIdWorkup<T extends Provider> = T extends "openai"
   ? ReturnType<typeof getModelIdByDisplayName<T, OpenAiDisplayNameUnion>>
@@ -63,7 +92,13 @@ export type ModelIdWorkup<T extends Provider> = T extends "openai"
       ? ReturnType<typeof getModelIdByDisplayName<T, GrokDisplayNameUnion>>
       : T extends "gemini"
         ? ReturnType<typeof getModelIdByDisplayName<T, GeminiDisplayNameUnion>>
-        : never;
+        : T extends "meta"
+          ? ReturnType<typeof getModelIdByDisplayName<T, MetaDisplayNameUnion>>
+          : T extends "vercel"
+            ? ReturnType<
+                typeof getModelIdByDisplayName<T, VercelDisplayNameUnion>
+              >
+            : never;
 /**
  * use this in client components where the select options are
  * the display names (the keys of the object) which, on select, outputs the
@@ -81,21 +116,17 @@ export type ModelSelectionAlt<T extends Provider> = {
   modelId: ModelIdWorkup<T>;
 };
 
-export const defaultModelByProvider = {
-  openai: "GPT 4.1 Nano" as OpenAiDisplayNameUnion,
-  gemini: "Gemini 2.5 Flash" as GeminiDisplayNameUnion,
-  grok: "Grok 4" as GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 4" as AnthropicDisplayNameUnion
-} as const;
+export const defaultModelByProvider = defaultModelDisplayNameByProvider;
 
-export const defaultModelIdByProvider = {
-  openai: "gpt-4.1-nano" as OpenAiModelIdUnion,
-  gemini: "gemini-2.5-flash" as GeminiModelIdUnion,
-  grok: "grok-4-0709" as GrokModelIdUnion,
-  anthropic: "claude-sonnet-4-20250514" as AnthropicModelIdUnion
-};
+export { defaultModelIdByProvider };
 
-export let defaultProvider: "openai" | "gemini" | "grok" | "anthropic";
+export let defaultProvider:
+  | "openai"
+  | "gemini"
+  | "grok"
+  | "anthropic"
+  | "meta"
+  | "vercel";
 export const defaultModelSelection: ModelSelection = {
   provider: (defaultProvider = "anthropic"),
   displayName: defaultModelByProvider[defaultProvider],
@@ -115,10 +146,20 @@ export const defaultModelSelection: ModelSelection = {
               (defaultProvider = "grok"),
               defaultModelByProvider[defaultProvider]
             )
-          : getModelIdByDisplayName(
-              (defaultProvider = "openai"),
-              defaultModelByProvider[defaultProvider]
-            )
+          : defaultProvider === "meta"
+            ? getModelIdByDisplayName(
+                (defaultProvider = "meta"),
+                defaultModelByProvider[defaultProvider]
+              )
+            : defaultProvider === "vercel"
+              ? getModelIdByDisplayName(
+                  (defaultProvider = "vercel"),
+                  defaultModelByProvider[defaultProvider]
+                )
+              : getModelIdByDisplayName(
+                  (defaultProvider = "openai"),
+                  defaultModelByProvider[defaultProvider]
+                )
 };
 export function getModelDisplayName(
   toProvider: Provider,
@@ -133,5 +174,9 @@ export function getModelDisplayName(
       ? getDisplayNameByModelId(toProvider, model as GeminiModelIdUnion)
       : toProvider === "grok"
         ? getDisplayNameByModelId(toProvider, model as GrokModelIdUnion)
-        : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
+        : toProvider === "meta"
+          ? getDisplayNameByModelId(toProvider, model as MetaModelIdUnion)
+          : toProvider === "vercel"
+            ? getDisplayNameByModelId(toProvider, model as VercelModelIdUnion)
+            : getDisplayNameByModelId(toProvider, model as OpenAiModelIdUnion);
 }

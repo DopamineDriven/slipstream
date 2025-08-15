@@ -1,4 +1,5 @@
 import type { Message } from "@/generated/client/client.ts";
+import type { BufferLike, UserData } from "@/types/index.ts";
 import type {
   RawMessageStreamEvent,
   StopReason,
@@ -9,14 +10,17 @@ import type {
   FinishReason,
   GenerateContentResponse
 } from "@google/genai";
-import type { ChatCompletionChunk } from "openai/resources/index.mjs";
+import type { ResponseStreamEvent } from "openai/resources/responses/responses.mjs";
+import { Stream as OpenAIStream } from "openai/core/streaming.mjs";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
+import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
-import { BufferLike, UserData } from "@/types/index.ts";
+import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
+import { xAIService } from "@/xai/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import { WebSocket } from "ws";
 import type {
@@ -36,7 +40,10 @@ export class Resolver extends ModelService {
     private anthropicService: AnthropicService,
     private r2: R2Instance,
     private fastApiUrl: string,
-    private Bucket: string
+    private Bucket: string,
+    private xAIService: xAIService,
+    private v0Service: v0Service,
+    private llamaService: LlamaService
   ) {
     super();
   }
@@ -112,6 +119,15 @@ export class Resolver extends ModelService {
     }
   }
 
+  public handleLatLng(latlng?: string) {
+    const [lat, lng] = latlng
+      ? (latlng?.split(",")?.map(p => {
+          return Number.parseFloat(p);
+        }) as [number, number])
+      : [47.7749, -122.4194];
+    return [lat, lng] as const;
+  }
+
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
@@ -152,12 +168,14 @@ export class Resolver extends ModelService {
       topP,
       model
     });
-
-    const [lat, lng] = userData
-      ? (userData?.latlng?.split(",")?.map(p => {
-          return Number.parseFloat(p);
-        }) as [number, number])
-      : [undefined, undefined];
+    const user_location = {
+      type: "approximate",
+      city: userData?.city,
+      country: userData?.country,
+      region: userData?.region,
+      timezone: userData?.tz
+    } as const;
+    const [lat, lng] = this.handleLatLng(userData?.latlng);
     //  configure token usage for a given conversation relative to model max context window limits
     const isNewChat = conversationIdInitial.startsWith("new-chat");
     const msgs = res.messages satisfies Message[];
@@ -563,18 +581,17 @@ export class Resolver extends ModelService {
             system,
             model,
             messages,
+            tool_choice: {
+              name: "web_search",
+              type: "tool",
+              disable_parallel_tool_use: false
+            },
             tools: [
               {
                 type: "web_search_20250305",
                 name: "web_search",
                 max_uses: 5,
-                user_location: {
-                  type: "approximate",
-                  city: userData?.city,
-                  country: userData?.country,
-                  region: event.metadata?.region,
-                  timezone: userData?.tz
-                }
+                user_location
               }
             ]
           },
@@ -807,7 +824,12 @@ export class Resolver extends ModelService {
             break;
           }
         }
-      } else if (provider === "grok") {
+      } else if (provider === "vercel") {
+        let v0ThinkingStartTime: number | null = null,
+          v0ThinkingDuration = 0,
+          v0IsCurrentlyThinking = false,
+          v0ThinkingAgg = "";
+
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
@@ -818,47 +840,126 @@ export class Resolver extends ModelService {
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
+        const client = this.v0Service.v0Client(key.apiKey ?? undefined);
 
-        const client = this.openai.getGrokClient(key.apiKey ?? undefined);
+        const responsesStream = (await client.responses.create({
+          stream: true,
+          input: this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
+          store: false,
+          model,
+          temperature,
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          truncation: "auto",
+          tools: [
+            {
+              type: "web_search_preview",
+              user_location
+            }
+          ]
+        })) satisfies OpenAIStream<ResponseStreamEvent> & {
+          _response_id?: string | null;
+        };
 
-        const stream = (await client.chat.completions.create(
-          {
-            user: userId,
-            top_p: topP,
-            temperature,
-            max_completion_tokens: max_tokens,
-            model,
-            stream_options: { include_usage: true },
-            messages: this.openai.formatOpenAi(
-              isNewChat,
-              msgs,
-              prompt,
-              systemPrompt
-            ),
-            stream: true
-          },
-          { stream: true }
-        )) satisfies AsyncIterable<ChatCompletionChunk>;
+        for await (const s of responsesStream) {
+          let text: string | undefined = undefined;
+          let thinkingText: string | undefined = undefined;
+          let done = false;
+          // s.type as ResponseStreamEvent['type'];
+          if (
+            s.type === "response.reasoning_text.delta" ||
+            s.type === "response.reasoning_summary_text.delta"
+          ) {
+            if (!v0IsCurrentlyThinking && v0ThinkingStartTime === null) {
+              v0IsCurrentlyThinking = true;
+              v0ThinkingStartTime = performance.now();
+            }
 
-        for await (const chunk of stream) {
-          const choice = chunk.choices[0];
-          const text = choice?.delta.content;
-          const done = choice?.finish_reason != null;
+            thinkingText = s.delta;
+          }
+          if (
+            (s.type === "response.reasoning_summary_text.done" ||
+              s.type === "response.reasoning_text.done") &&
+            v0IsCurrentlyThinking &&
+            v0ThinkingStartTime !== null
+          ) {
+            v0IsCurrentlyThinking = false;
+            v0ThinkingDuration = Math.round(
+              performance.now() - v0ThinkingStartTime
+            );
+          }
+          if (s.type === "response.output_text.delta") {
+            text = s.delta;
+          }
+          if (s.type === "response.output_text.done") {
+            done = true;
+          }
+
+          if (thinkingText) {
+            v0ThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                done: false,
+                userId,
+                model,
+                provider,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                thinkingText: thinkingText,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                isThinking: true
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText: thinkingText,
+                isThinking: true,
+                done: false
+              }
+            );
+          } // Handle regular text chunks
           if (text) {
-            chunks.push(text);
             agg += text;
+            chunks.push(text);
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
                 conversationId,
                 userId,
-                title,
                 provider,
+                title,
+                model,
                 systemPrompt,
                 temperature,
                 topP,
-                model,
                 chunk: text,
+                isThinking: false,
+                thinkingText:
+                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+                thinkingDuration:
+                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -875,6 +976,11 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 provider,
+                thinkingText:
+                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+                thinkingDuration:
+                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+
                 chunk: text,
                 done: false
               }
@@ -892,29 +998,39 @@ export class Resolver extends ModelService {
               });
             }
           }
-
           if (done) {
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
               conversationId,
               done: true,
-              provider,
               title,
+              temperature,
+              topP,
+              provider,
               userId,
-              model
+              systemPrompt,
+              model,
+              thinkingText:
+                v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+              thinkingDuration:
+                v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined
             });
             ws.send(
               JSON.stringify({
                 type: "ai_chat_response",
                 conversationId,
                 userId,
+                provider,
+                model,
                 title,
                 systemPrompt,
                 temperature,
                 topP,
-                provider,
-                model,
                 chunk: agg,
+                thinkingText:
+                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+                thinkingDuration:
+                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -928,6 +1044,492 @@ export class Resolver extends ModelService {
                 systemPrompt,
                 temperature,
                 title,
+                thinkingText:
+                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+                thinkingDuration:
+                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
+            break;
+          }
+        }
+      } else if (provider === "meta") {
+        let metaThinkingStartTime: number | null = null,
+          metaThinkingDuration = 0,
+          metaIsCurrentlyThinking = false,
+          metaThinkingAgg = "";
+
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
+        const client = this.llamaService.llamaClient(key.apiKey ?? undefined);
+
+        const responsesStream = (await client.responses.create({
+          stream: true,
+          input: this.llamaService.llamaFormat(
+            isNewChat,
+            msgs,
+            prompt,
+            systemPrompt
+          ),
+          store: false,
+          model,
+          temperature,
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          truncation: "auto",
+          tools: [
+            {
+              type: "web_search_preview",
+              user_location
+            }
+          ]
+        })) satisfies OpenAIStream<ResponseStreamEvent> & {
+          _response_id?: string | null;
+        };
+
+        for await (const s of responsesStream) {
+          let text: string | undefined = undefined;
+          let thinkingText: string | undefined = undefined;
+          let done = false;
+          // s.type as ResponseStreamEvent['type'];
+          if (
+            s.type === "response.reasoning_text.delta" ||
+            s.type === "response.reasoning_summary_text.delta"
+          ) {
+            if (!metaIsCurrentlyThinking && metaThinkingStartTime === null) {
+              metaIsCurrentlyThinking = true;
+              metaThinkingStartTime = performance.now();
+            }
+
+            thinkingText = s.delta;
+          }
+          if (
+            (s.type === "response.reasoning_summary_text.done" ||
+              s.type === "response.reasoning_text.done") &&
+            metaIsCurrentlyThinking &&
+            metaThinkingStartTime !== null
+          ) {
+            metaIsCurrentlyThinking = false;
+            metaThinkingDuration = Math.round(
+              performance.now() - metaThinkingStartTime
+            );
+          }
+          if (s.type === "response.output_text.delta") {
+            text = s.delta;
+          }
+          if (s.type === "response.output_text.done") {
+            done = true;
+          }
+
+          if (thinkingText) {
+            metaThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                done: false,
+                userId,
+                model,
+                provider,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                thinkingText: thinkingText,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                isThinking: true
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText: thinkingText,
+                isThinking: true,
+                done: false
+              }
+            );
+          } // Handle regular text chunks
+          if (text) {
+            agg += text;
+            chunks.push(text);
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                provider,
+                title,
+                model,
+                systemPrompt,
+                temperature,
+                topP,
+                chunk: text,
+                isThinking: false,
+                thinkingText:
+                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
+                thinkingDuration:
+                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText:
+                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
+                thinkingDuration:
+                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
+          }
+          if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              title,
+              temperature,
+              topP,
+              provider,
+              userId,
+              systemPrompt,
+              model,
+              thinkingText:
+                metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
+              thinkingDuration:
+                metaThinkingDuration > 0 ? metaThinkingDuration : undefined
+            });
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                provider,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                chunk: agg,
+                thinkingText:
+                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
+                thinkingDuration:
+                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                thinkingText:
+                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
+                thinkingDuration:
+                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
+            break;
+          }
+        }
+      } else if (provider === "grok") {
+        let xaiThinkingStartTime: number | null = null,
+          xaiThinkingDuration = 0,
+          xaiIsCurrentlyThinking = false,
+          xaiThinkingAgg = "";
+
+        let key: { apiKey: string | null; keyId: string | null } = {
+          apiKey: null,
+          keyId: null
+        };
+        if (hasProviderConfigured) {
+          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+          console.log(
+            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+          );
+        }
+        const client = this.xAIService.xAIClient(key.apiKey ?? undefined);
+
+        const responsesStream = (await client.responses.create({
+          stream: true,
+          input: this.xAIService.xAiFormat(
+            isNewChat,
+            msgs,
+            prompt,
+            systemPrompt
+          ),
+          store: false,
+          model,
+          temperature,
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          truncation: "auto",
+          tools: [
+            {
+              type: "web_search_preview",
+              user_location
+            }
+          ]
+        })) satisfies OpenAIStream<ResponseStreamEvent> & {
+          _response_id?: string | null;
+        };
+
+        for await (const s of responsesStream) {
+          let text: string | undefined = undefined;
+          let thinkingText: string | undefined = undefined;
+          let done = false;
+          // s.type as ResponseStreamEvent['type'];
+          if (
+            s.type === "response.reasoning_text.delta" ||
+            s.type === "response.reasoning_summary_text.delta"
+          ) {
+            if (!xaiIsCurrentlyThinking && xaiThinkingStartTime === null) {
+              xaiIsCurrentlyThinking = true;
+              xaiThinkingStartTime = performance.now();
+            }
+
+            thinkingText = s.delta;
+          }
+          if (
+            (s.type === "response.reasoning_summary_text.done" ||
+              s.type === "response.reasoning_text.done") &&
+            xaiIsCurrentlyThinking &&
+            xaiThinkingStartTime !== null
+          ) {
+            xaiIsCurrentlyThinking = false;
+            xaiThinkingDuration = Math.round(
+              performance.now() - xaiThinkingStartTime
+            );
+          }
+          if (s.type === "response.output_text.delta") {
+            text = s.delta;
+          }
+          if (s.type === "response.output_text.done") {
+            done = true;
+          }
+
+          if (thinkingText) {
+            xaiThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                done: false,
+                userId,
+                model,
+                provider,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                thinkingText: thinkingText,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                isThinking: true
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText: thinkingText,
+                isThinking: true,
+                done: false
+              }
+            );
+          } // Handle regular text chunks
+          if (text) {
+            agg += text;
+            chunks.push(text);
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                provider,
+                title,
+                model,
+                systemPrompt,
+                temperature,
+                topP,
+                chunk: text,
+                isThinking: false,
+                thinkingText:
+                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                thinkingDuration:
+                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText:
+                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                thinkingDuration:
+                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
+          }
+          if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              title,
+              temperature,
+              topP,
+              provider,
+              userId,
+              systemPrompt,
+              model,
+              thinkingText:
+                xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+              thinkingDuration:
+                xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined
+            });
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                provider,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                chunk: agg,
+                thinkingText:
+                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                thinkingDuration:
+                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                thinkingText:
+                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                thinkingDuration:
+                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
                 topP,
                 provider,
                 model,
@@ -941,6 +1543,11 @@ export class Resolver extends ModelService {
           }
         }
       } else {
+        let openaiThinkingStartTime: number | null = null,
+          openaiThinkingDuration = 0,
+          openaiIsCurrentlyThinking = false,
+          openaiThinkingAgg = "";
+
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
@@ -952,44 +1559,133 @@ export class Resolver extends ModelService {
           );
         }
         const client = this.openai.getClient(key.apiKey ?? undefined);
-        const stream = (await client.chat.completions.create(
-          {
-            user: userId,
-            top_p: topP,
-            temperature,
-            model,
-            max_completion_tokens: max_tokens,
-            messages: this.openai.formatOpenAi(
-              isNewChat,
-              msgs,
-              prompt,
-              systemPrompt
-            ),
-            stream: true
-          },
-          { stream: true }
-        )) satisfies AsyncIterable<ChatCompletionChunk>;
 
-        for await (const chunk of stream) {
-          const choice = chunk.choices[0];
-          const text = choice?.delta.content;
-          const done = choice?.finish_reason != null;
+        const responsesStream = await ( client.responses.create({
+          stream: true,
+          input: this.openai.formatOpenAi(
+            isNewChat,
+            msgs,
+            prompt,
+            systemPrompt
+          ),
+          store: false,
+          model,
+          temperature,
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          truncation: "auto",
+          tools: [
+            {
+              type: "web_search_preview",
+              user_location
+            }
+          ]
+        }));
 
+        for await (const s of responsesStream) {
+          let text: string | undefined = undefined;
+          let thinkingText: string | undefined = undefined;
+          let done = false;
+          // s.type as ResponseStreamEvent['type'];
+          if (
+            s.type === "response.reasoning_text.delta" ||
+            s.type === "response.reasoning_summary_text.delta"
+          ) {
+            if (
+              !openaiIsCurrentlyThinking &&
+              openaiThinkingStartTime === null
+            ) {
+              openaiIsCurrentlyThinking = true;
+              openaiThinkingStartTime = performance.now();
+            }
+
+            thinkingText = s.delta;
+          }
+          if (
+            (s.type === "response.reasoning_summary_text.done" ||
+              s.type === "response.reasoning_text.done") &&
+            openaiIsCurrentlyThinking &&
+            openaiThinkingStartTime !== null
+          ) {
+            openaiIsCurrentlyThinking = false;
+            openaiThinkingDuration = Math.round(
+              performance.now() - openaiThinkingStartTime
+            );
+          }
+          if (s.type === "response.output_text.delta") {
+            text = s.delta;
+          }
+          if (s.type === "response.output_text.done") {
+            done = true;
+          }
+
+          if (thinkingText) {
+            openaiThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
+
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                done: false,
+                userId,
+                model,
+                provider,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                thinkingText: thinkingText,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                isThinking: true
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                thinkingDuration: thinkingStartTime
+                  ? performance.now() - thinkingStartTime
+                  : undefined,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                thinkingText: thinkingText,
+                isThinking: true,
+                done: false
+              }
+            );
+          } // Handle regular text chunks
           if (text) {
-            chunks.push(text);
             agg += text;
+            chunks.push(text);
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
                 conversationId,
                 userId,
-                title,
                 provider,
+                title,
+                model,
                 systemPrompt,
                 temperature,
                 topP,
-                model,
                 chunk: text,
+                isThinking: false,
+                thinkingText:
+                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+                thinkingDuration:
+                  openaiThinkingDuration > 0
+                    ? openaiThinkingDuration
+                    : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -1006,6 +1702,13 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 provider,
+                thinkingText:
+                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+                thinkingDuration:
+                  openaiThinkingDuration > 0
+                    ? openaiThinkingDuration
+                    : undefined,
+
                 chunk: text,
                 done: false
               }
@@ -1023,16 +1726,22 @@ export class Resolver extends ModelService {
               });
             }
           }
-
           if (done) {
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
               conversationId,
               done: true,
-              provider,
               title,
+              temperature,
+              topP,
+              provider,
               userId,
-              model
+              systemPrompt,
+              model,
+              thinkingText:
+                openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+              thinkingDuration:
+                openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
             });
             ws.send(
               JSON.stringify({
@@ -1040,12 +1749,18 @@ export class Resolver extends ModelService {
                 conversationId,
                 userId,
                 provider,
-                systemPrompt,
+                model,
                 title,
+                systemPrompt,
                 temperature,
                 topP,
-                model,
                 chunk: agg,
+                thinkingText:
+                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+                thinkingDuration:
+                  openaiThinkingDuration > 0
+                    ? openaiThinkingDuration
+                    : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -1059,6 +1774,12 @@ export class Resolver extends ModelService {
                 systemPrompt,
                 temperature,
                 title,
+                thinkingText:
+                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+                thinkingDuration:
+                  openaiThinkingDuration > 0
+                    ? openaiThinkingDuration
+                    : undefined,
                 topP,
                 provider,
                 model,
@@ -1345,3 +2066,125 @@ export class Resolver extends ModelService {
     }
   }
 }
+
+/**
+ *
+         const stream = (await client.chat.completions.create(
+          {
+            user: userId,
+            top_p: topP,
+            temperature,
+            model,
+            max_completion_tokens: max_tokens,
+            messages: this.openai.formatOpenAi(
+              isNewChat,
+              msgs,
+              prompt,
+              systemPrompt
+            ),
+            stream: true
+          },
+          { stream: true }
+        )) satisfies AsyncIterable<ChatCompletionChunk>;
+         for await (const chunk of stream) {
+          const choice = chunk.choices[0];
+          const text = choice?.delta.content;
+          const done = choice?.finish_reason != null;
+
+          if (text) {
+            chunks.push(text);
+            agg += text;
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                title,
+                provider,
+                systemPrompt,
+                temperature,
+                topP,
+                model,
+                chunk: text,
+                done: false
+              } satisfies EventTypeMap["ai_chat_chunk"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_chunk",
+              {
+                type: "ai_chat_chunk",
+                conversationId,
+                userId,
+                model,
+                title,
+                systemPrompt,
+                temperature,
+                topP,
+                provider,
+                chunk: text,
+                done: false
+              }
+            );
+            if (chunks.length % 10 === 0) {
+              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              });
+            }
+          }
+
+          if (done) {
+            void this.wsServer.prisma.handleAiChatResponse({
+              chunk: agg,
+              conversationId,
+              done: true,
+              provider,
+              title,
+              userId,
+              model
+            });
+            ws.send(
+              JSON.stringify({
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                provider,
+                systemPrompt,
+                title,
+                temperature,
+                topP,
+                model,
+                chunk: agg,
+                done: true
+              } satisfies EventTypeMap["ai_chat_response"])
+            );
+            void this.wsServer.redis.publishTypedEvent(
+              streamChannel,
+              "ai_chat_response",
+              {
+                type: "ai_chat_response",
+                conversationId,
+                userId,
+                systemPrompt,
+                temperature,
+                title,
+                topP,
+                provider,
+                model,
+                chunk: agg,
+                done: true
+              }
+            );
+            // Clear saved state on successful completion
+            void this.wsServer.redis.del(`stream:state:${conversationId}`);
+            break;
+          }
+        }
+ */

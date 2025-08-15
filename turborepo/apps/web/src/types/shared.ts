@@ -20,7 +20,7 @@ export type ClientWorkupProps = {
 export type UIMessage = RTC<MessagePrisma, "conversationId">;
 export interface MessageClient
   extends Omit<MessagePrisma, "createdAt" | "updatedAt" | "provider"> {
-  provider: "grok" | "openai" | "gemini" | "anthropic";
+  provider: "grok" | "openai" | "gemini" | "anthropic" | "meta" | "vercel";
   createdAt: string;
   updatedAt: string;
   text: string | React.ReactNode;

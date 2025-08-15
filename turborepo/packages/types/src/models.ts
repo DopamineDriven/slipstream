@@ -37,6 +37,10 @@ export type GrokChatModels = ModelMap["grok"];
 
 export type AnthropicChatModels = ModelMap["anthropic"];
 
+export type VercelChatModels = ModelMap["vercel"];
+
+export type MetaChatModels = ModelMap["meta"];
+
 export type AllModelsUnion = ModelMap[Provider];
 
 export type AllDisplayNamesUnion = DisplayNameModelMap[Provider];
@@ -49,7 +53,11 @@ export type GetModelUtilRT<T = Provider> = T extends "openai"
       ? GrokChatModels
       : T extends "anthropic"
         ? AnthropicChatModels
-        : never;
+        : T extends "meta"
+          ? MetaChatModels
+          : T extends "vercel"
+            ? VercelChatModels
+            : never;
 
 export function toPrismaFormat<const T extends Providers>(provider: T) {
   return provider.toUpperCase() as Uppercase<T>;
@@ -91,6 +99,23 @@ export const getModelIdByDisplayName = <
       } else
         return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
     }
+    case "meta": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"meta">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+    }
+    case "vercel": {
+      if (model && model in displayNameToModelId[xTarget]) {
+        return displayNameToModelId[xTarget][
+          model as ModelDisplayNameToModelId<"vercel">
+        ] as (typeof displayNameToModelId)[V][K];
+      } else
+        return defaultModelIdByProvider.anthropic as (typeof displayNameToModelId)[V][K];
+    }
+    case "openai":
     default: {
       if (model && model in displayNameToModelId[xTarget]) {
         return displayNameToModelId[xTarget][
@@ -137,6 +162,23 @@ export const getDisplayNameByModelId = <
       } else
         return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
     }
+    case "meta": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"meta">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "vercel": {
+      if (model && model in modelIdToDisplayName[xTarget]) {
+        return modelIdToDisplayName[xTarget][
+          model as ModelIdToModelDisplayName<"vercel">
+        ] as (typeof modelIdToDisplayName)[V][K];
+      } else
+        return defaultModelDisplayNameByProvider.anthropic as (typeof modelIdToDisplayName)[V][K];
+    }
+    case "openai":
     default: {
       if (model && model in modelIdToDisplayName[xTarget]) {
         return modelIdToDisplayName[xTarget][
@@ -149,17 +191,21 @@ export const getDisplayNameByModelId = <
 };
 
 export const defaultModelDisplayNameByProvider = {
-  openai: "GPT 5 Nano" satisfies OpenAiDisplayNameUnion,
+  openai: "GPT-5 nano" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 2.5 Flash" satisfies GeminiDisplayNameUnion,
   grok: "Grok 4" satisfies GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 4" satisfies AnthropicDisplayNameUnion
+  anthropic: "Claude Sonnet 4" satisfies AnthropicDisplayNameUnion,
+  meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
+  vercel: "v0 medium (legacy)" satisfies VercelDisplayNameUnion
 } as const;
 
 export const defaultModelIdByProvider = {
   openai: "gpt-5-nano" satisfies OpenAiModelIdUnion,
   gemini: "gemini-2.5-flash" satisfies GeminiModelIdUnion,
   grok: "grok-4-0709" satisfies GrokModelIdUnion,
-  anthropic: "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion
+  anthropic: "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion,
+  meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
+  vercel: "v0-1.0-md" satisfies VercelModelIdUnion
 } as const;
 
 export type ModelDisplayNameToModelId<T extends Provider> =
@@ -184,6 +230,14 @@ export type GeminiDisplayNameUnion = ModelDisplayNameToModelId<"gemini">;
  * valid anthropic model display names
  */
 export type AnthropicDisplayNameUnion = ModelDisplayNameToModelId<"anthropic">;
+/**
+ * valid meta model display names
+ */
+export type MetaDisplayNameUnion = ModelDisplayNameToModelId<"meta">;
+/**
+ * valid v0 model display names
+ */
+export type VercelDisplayNameUnion = ModelDisplayNameToModelId<"vercel">;
 
 /**
  * valid grok models to call
@@ -201,7 +255,14 @@ export type GeminiModelIdUnion = ModelIdToModelDisplayName<"gemini">;
  * valid anthropic models to call
  */
 export type AnthropicModelIdUnion = ModelIdToModelDisplayName<"anthropic">;
-
+/**
+ * valid meta models to call
+ */
+export type MetaModelIdUnion = ModelIdToModelDisplayName<"meta">;
+/**
+ * valid v0 models to call
+ */
+export type VercelModelIdUnion = ModelIdToModelDisplayName<"vercel">;
 // re-export for consumer apps
 export {
   modelIdToDisplayName,
@@ -218,7 +279,11 @@ export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
       ? GrokModelIdUnion
       : T extends "openai"
         ? OpenAiModelIdUnion
-        : never;
+        : T extends "vercel"
+          ? VercelModelIdUnion
+          : T extends "meta"
+            ? MetaModelIdUnion
+            : never;
 
 export type GetDisplayNamesForProviderRT<T extends Provider> =
   T extends "anthropic"
@@ -229,7 +294,11 @@ export type GetDisplayNamesForProviderRT<T extends Provider> =
         ? GrokDisplayNameUnion
         : T extends "openai"
           ? OpenAiDisplayNameUnion
-          : never;
+          : T extends "vercel"
+            ? VercelDisplayNameUnion
+            : T extends "meta"
+              ? MetaDisplayNameUnion
+              : never;
 
 export function getModelsForProvider<const T extends Provider>(provider: T) {
   return Object.entries(displayNameToModelId[provider])
@@ -250,7 +319,7 @@ export function getDisplayNamesForProvider<const T extends Provider>(
 }
 
 export function allProviders() {
-  return ["anthropic", "gemini", "grok", "openai"] as const;
+  return ["anthropic", "gemini", "grok", "openai", "meta", "vercel"] as const;
 }
 
 export function getAllProviders() {

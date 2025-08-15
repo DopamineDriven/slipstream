@@ -9,8 +9,10 @@ export interface WSServerOptions {
 }
 
 export interface UserData {
+  email?: string;
   city?: string;
   country?: string;
+  region?: string;
   latlng?: string;
   tz?: string;
 }

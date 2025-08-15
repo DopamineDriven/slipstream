@@ -7,10 +7,14 @@ export type FlexiProvider =
   | "anthropic"
   | "gemini"
   | "grok"
+  | "meta"
+  | "vercel"
   | "OPENAI"
   | "ANTHROPIC"
   | "GEMINI"
-  | "GROK";
+  | "GROK"
+  | "META"
+  | "VERCEL";
 
 /**
  * helper workup for use in XOR type below
@@ -73,7 +77,13 @@ export type AnthropicError = {
   };
 };
 
-
+export interface V0User {
+  id: string;
+  object: string;
+  name: string;
+  email: string;
+  avatar: string;
+}
 
 export interface AnthropicModel {
   created_at: string;
@@ -87,7 +97,7 @@ export type AnthropicSuccess = {
   first_id: string | null;
   last_id: string | null;
   has_more: boolean;
-}
+};
 
 export interface GeminiModel {
   name: string;

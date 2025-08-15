@@ -56,13 +56,25 @@ async function exe() {
 
     const { Resolver } = await import("@/resolver/index.ts");
 
+    const { v0Service } = await import("@/vercel/index.ts");
+
+    const v0 = new v0Service(cfg.V0_API_KEY);
+
+    const { LlamaService } = await import("@/meta/index.ts");
+
+    const meta = new LlamaService(cfg.LLAMA_API_KEY);
+
+    const { xAIService } = await import("@/xai/index.ts");
+
+    const xai = new xAIService(cfg.X_AI_KEY);
+
     const { OpenAIService } = await import("@/openai/index.ts");
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(cfg.ANTHROPIC_API_KEY);
 
-    const openai = new OpenAIService(cfg.OPENAI_API_KEY, cfg.X_AI_KEY);
+    const openai = new OpenAIService(cfg.OPENAI_API_KEY);
 
     const { GeminiService } = await import("@/gemini/index.ts");
 
@@ -75,7 +87,10 @@ async function exe() {
       anthropic,
       r2,
       cfg.FASTAPI_URL,
-      cfg.R2_BUCKET
+      cfg.R2_BUCKET,
+      xai,
+      v0,
+      meta
     );
 
     resolver.registerAll();
@@ -103,4 +118,3 @@ declare module "ws" {
     _socket: Socket;
   }
 }
-
