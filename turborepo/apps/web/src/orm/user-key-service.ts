@@ -1,8 +1,8 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
 import type { ClientWorkupProps, RecordCountsProps } from "@/types/shared";
 import type { UserKey } from "@prisma/client";
-import type { Providers } from "@t3-chat-clone/types";
 import { ErrorHelperService } from "@/orm/err-helper";
+import type { Providers } from "@t3-chat-clone/types";
 
 export class PrismaUserKeyService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
@@ -27,9 +27,18 @@ export class PrismaUserKeyService extends ErrorHelperService {
         openai: 0,
         grok: 0,
         gemini: 0,
-        anthropic: 0
+        anthropic: 0,
+        vercel: 0,
+        meta: 0
       },
-      isDefault: { openai: 0, grok: 0, gemini: 0, anthropic: 0 }
+      isDefault: {
+        vercel: 0,
+        meta: 0,
+        openai: 0,
+        grok: 0,
+        gemini: 0,
+        anthropic: 0
+      }
     };
     props.forEach(function (res) {
       const provider = res.provider.toLowerCase() as Providers;
