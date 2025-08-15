@@ -58,7 +58,7 @@ export function MobileModelSelectorDrawer() {
   return (
     <Drawer open={isDrawerOpen} onOpenChange={open => !open && closeDrawer()}>
       <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[85vh] flex-col">
-        <div className="mx-auto flex h-full w-full max-w-lg flex-col overflow-hidden">
+        <div className="mx-auto flex h-full w-full max-w-2xl flex-col overflow-hidden">
           <DrawerHeader className="flex-shrink-0 pb-4">
             <DrawerTitle className="text-brand-text-emphasis text-xl">
               Select AI Model
@@ -72,7 +72,7 @@ export function MobileModelSelectorDrawer() {
               value={draftProvider}
               onValueChange={prov => setDraftProvider(prov as Provider)}
               className="flex h-full flex-col">
-              <TabsList className="bg-brand-sidebar border-brand-border mb-6 grid h-12 w-full flex-shrink-0 grid-cols-4 border">
+              <TabsList className="bg-brand-sidebar border-brand-border mb-6 grid h-12 w-full flex-shrink-0 grid-cols-6 border">
                 {providers.map(provider => {
                   const Icon = providerMetadata[provider].icon;
                   return (
