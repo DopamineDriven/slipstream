@@ -31,8 +31,9 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
         <Button
           variant="ghost"
           className={cn(
-            "mt-auto w-full justify-center text-left",
-            effectiveState === "collapsed" && "h-12 w-12 justify-start p-0"
+            "mt-auto w-full text-left",
+            effectiveState === "collapsed" && "h-12 w-12 justify-start p-0",
+            effectiveState ==="collapsed" ? "justify-center" : "justify-start"
           )}>
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
