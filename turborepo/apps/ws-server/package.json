@@ -26,6 +26,9 @@
       "generated": [
         "dist/generated/*.d.ts"
       ],
+      "meta": [
+        "dist/meta/index.d.ts"
+      ],
       "models": [
         "dist/models/index.d.ts"
       ],
@@ -44,8 +47,14 @@
       "types": [
         "dist/types/index.d.ts"
       ],
+      "vercel": [
+        "dist/vercel/index.d.ts"
+      ],
       "ws-server": [
         "dist/ws-server/index.d.ts"
+      ],
+      "xai": [
+        "dist/xai/index.d.ts"
       ]
     }
   },
@@ -67,6 +76,7 @@
   },
   "prettier": "@t3-chat-clone/prettier-config",
   "dependencies": {
+    "@ai-sdk/vercel": "^1.0.7",
     "@anthropic-ai/sdk": "^0.59.0",
     "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/client-secrets-manager": "^3.864.0",
@@ -80,11 +90,13 @@
     "@t3-chat-clone/types": "workspace:*",
     "@types/node": "^24.2.1",
     "@types/ws": "^8.18.1",
+    "ai":"^5.0.15",
     "bullmq": "^5.56.9",
     "dotenv": "^17.2.1",
     "dotenv-cli": "^10.0.0",
     "dotenv-expand": "^12.0.2",
     "jose": "^6.0.12",
+    "llama-api-client": "^0.1.5",
     "node-html-parser": "^7.0.1",
     "openai": "^5.12.2",
     "p-limit": "^6.2.0",

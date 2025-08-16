@@ -10,7 +10,7 @@ function detectDeviceAndSetCookies(
   response: NextResponse
 ) {
   const domain =
-    process.env.VERCEL_ENV !== "development"
+    process.env.NODE_ENV !== "development"
       ? ".d0paminedriven.com"
       : undefined;
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
@@ -21,7 +21,7 @@ function detectDeviceAndSetCookies(
   const lat = request.headers.get("x-vercel-ip-latitude") ?? "41.8338486";
   const postalCode = request.headers.get("x-vercel-ip-postal-code") ?? "60010";
 
-  const tz = request.headers.get("x-vercel-ip-timezone") ?? "america/chicago";
+  const tz = request.headers.get("x-vercel-ip-timezone") ?? "America/Chicago";
   const { os, device, ua } = userAgent(request);
   const isMac = /(mac)/gim.test(os?.name ?? "") ?? false;
   const latlng = `${lat},${lng}` as const;
