@@ -10,8 +10,6 @@ import type {
   FinishReason,
   GenerateContentResponse
 } from "@google/genai";
-import type { ResponseStreamEvent } from "openai/resources/responses/responses.mjs";
-import { Stream as OpenAIStream } from "openai/core/streaming.mjs";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -22,13 +20,15 @@ import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import { streamText } from "ai";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  Provider
+  Provider,
+  VercelModelIdUnion
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 
@@ -170,10 +170,10 @@ export class Resolver extends ModelService {
     });
     const user_location = {
       type: "approximate",
-      city: userData?.city,
-      country: userData?.country,
-      region: userData?.region,
-      timezone: userData?.tz
+      city: userData?.city ?? "Barrington",
+      country: userData?.country ?? "US",
+      region: userData?.region ?? "Illinois",
+      timezone: userData?.tz ?? "America/Chicago"
     } as const;
     const [lat, lng] = this.handleLatLng(userData?.latlng);
     //  configure token usage for a given conversation relative to model max context window limits
@@ -581,11 +581,6 @@ export class Resolver extends ModelService {
             system,
             model,
             messages,
-            tool_choice: {
-              name: "web_search",
-              type: "tool",
-              disable_parallel_tool_use: false
-            },
             tools: [
               {
                 type: "web_search_20250305",
@@ -825,8 +820,8 @@ export class Resolver extends ModelService {
           }
         }
       } else if (provider === "vercel") {
-        let v0ThinkingStartTime: number | null = null,
-          v0ThinkingDuration = 0,
+        let _v0ThinkingStartTime: number | undefined = undefined;
+        let v0ThinkingDuration = 0,
           v0IsCurrentlyThinking = false,
           v0ThinkingAgg = "";
 
@@ -840,129 +835,132 @@ export class Resolver extends ModelService {
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const client = this.v0Service.v0Client(key.apiKey ?? undefined);
+        const client = this.v0Service.getClient(key.apiKey ?? undefined);
 
-        const responsesStream = (await client.responses.create({
-          stream: true,
-          input: this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
-          store: false,
-          model,
-          temperature,
-          max_output_tokens: max_tokens,
-          top_p: topP,
-          truncation: "auto",
-          tools: [
-            {
-              type: "web_search_preview",
-              user_location
-            }
-          ]
-        })) satisfies OpenAIStream<ResponseStreamEvent> & {
-          _response_id?: string | null;
-        };
+        const s = streamText({
+          model: client(model as VercelModelIdUnion),
+          messages: this.v0Service.v0Format(
+            isNewChat,
+            msgs,
+            prompt,
+            systemPrompt
+          ),
+          topP: topP,
+          temperature
+        });
+        // const stream = this.v0Service.stream(
+        //   model,
+        //   this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
+        //   key.apiKey ?? undefined,
+        //   {
+        //     temperature,
+        //     top_p: topP,
+        //     max_tokens: max_tokens
+        //   }
+        // );
 
-        for await (const s of responsesStream) {
+        for await (const chunk of s.fullStream) {
+          // Process each choice in the chunk
           let text: string | undefined = undefined;
-          let thinkingText: string | undefined = undefined;
-          let done = false;
-          // s.type as ResponseStreamEvent['type'];
-          if (
-            s.type === "response.reasoning_text.delta" ||
-            s.type === "response.reasoning_summary_text.delta"
-          ) {
-            if (!v0IsCurrentlyThinking && v0ThinkingStartTime === null) {
-              v0IsCurrentlyThinking = true;
-              v0ThinkingStartTime = performance.now();
-            }
+          // let thinkingText: string | undefined = undefined;
+          let finishReason:
+            | "length"
+            | "error"
+            | "other"
+            | "stop"
+            | "content-filter"
+            | "tool-calls"
+            | "unknown"
+            | undefined = undefined;
+          // if (chunk.type === "reasoning-start") {
+          //   v0IsCurrentlyThinking = true;
+          //   if (typeof v0ThinkingStartTime === "undefined") {
+          //     v0ThinkingStartTime = performance.now();
+          //   }
+          // }
+          if (chunk.type === "text-end") {
+            finishReason = "stop";
+          }
+          if (chunk.type === "text-delta") {
+            text = chunk.text;
+          }
+          // if (chunk.type === "reasoning-delta") {
+          //   thinkingText = chunk.text;
+          // }
+          // if (chunk.type === "reasoning-end" && v0ThinkingStartTime) {
+          //   v0IsCurrentlyThinking = false;
+          //   v0ThinkingDuration = performance.now() - v0ThinkingStartTime;
+          //
+          // Handle thinking chunks
+          // if (thinkingText) {
+          //   v0ThinkingAgg += thinkingText;
+          //   thinkingChunks.push(thinkingText);
 
-            thinkingText = s.delta;
-          }
-          if (
-            (s.type === "response.reasoning_summary_text.done" ||
-              s.type === "response.reasoning_text.done") &&
-            v0IsCurrentlyThinking &&
-            v0ThinkingStartTime !== null
-          ) {
-            v0IsCurrentlyThinking = false;
-            v0ThinkingDuration = Math.round(
-              performance.now() - v0ThinkingStartTime
-            );
-          }
-          if (s.type === "response.output_text.delta") {
-            text = s.delta;
-          }
-          if (s.type === "response.output_text.done") {
-            done = true;
-          }
+          //   ws.send(
+          //     JSON.stringify({
+          //       type: "ai_chat_chunk",
+          //       conversationId,
+          //       userId,
+          //       provider,
+          //       title,
+          //       model,
+          //       systemPrompt,
+          //       temperature,
+          //       topP,
+          //       thinkingText: thinkingText,
+          //       thinkingDuration: thinkingStartTime
+          //         ? performance.now() - thinkingStartTime
+          //         : undefined,
+          //       isThinking: true,
+          //       done: false
+          //     } satisfies EventTypeMap["ai_chat_chunk"])
+          //   );
 
-          if (thinkingText) {
-            v0ThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                done: false,
-                userId,
-                model,
-                provider,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                thinkingText: thinkingText,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                isThinking: true
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText: thinkingText,
-                isThinking: true,
-                done: false
-              }
-            );
-          } // Handle regular text chunks
+          //   void this.wsServer.redis.publishTypedEvent(
+          //     streamChannel,
+          //     "ai_chat_chunk",
+          //     {
+          //       type: "ai_chat_chunk",
+          //       conversationId,
+          //       userId,
+          //       model,
+          //       thinkingDuration: thinkingStartTime
+          //         ? performance.now() - thinkingStartTime
+          //         : undefined,
+          //       title,
+          //       systemPrompt,
+          //       temperature,
+          //       topP,
+          //       provider,
+          //       thinkingText: thinkingText,
+          //       isThinking: true,
+          //       done: false
+          //     }
+          //   );
+          // }
           if (text) {
-            agg += text;
             chunks.push(text);
+            agg += text;
+
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
                 conversationId,
                 userId,
-                provider,
                 title,
-                model,
+                provider,
                 systemPrompt,
                 temperature,
+                thinkingText: v0ThinkingAgg,
+                isThinking: v0IsCurrentlyThinking,
+                thinkingDuration: v0ThinkingDuration,
                 topP,
+                model,
                 chunk: text,
-                isThinking: false,
-                thinkingText:
-                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-                thinkingDuration:
-                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+
             void this.wsServer.redis.publishTypedEvent(
               streamChannel,
               "ai_chat_chunk",
@@ -972,19 +970,18 @@ export class Resolver extends ModelService {
                 userId,
                 model,
                 title,
+                isThinking: false,
+                thinkingDuration: v0ThinkingDuration,
+                thinkingText: v0ThinkingAgg,
                 systemPrompt,
                 temperature,
                 topP,
                 provider,
-                thinkingText:
-                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-                thinkingDuration:
-                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-
                 chunk: text,
                 done: false
               }
             );
+
             if (chunks.length % 10 === 0) {
               void this.wsServer.redis.saveStreamState(conversationId, chunks, {
                 model,
@@ -998,42 +995,42 @@ export class Resolver extends ModelService {
               });
             }
           }
-          if (done) {
+
+          // Check if stream is finished
+          if (finishReason) {
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
               conversationId,
               done: true,
-              title,
-              temperature,
-              topP,
               provider,
+              title,
               userId,
-              systemPrompt,
               model,
-              thinkingText:
-                v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-              thinkingDuration:
-                v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined
+              systemPrompt,
+              thinkingText: v0ThinkingAgg,
+              thinkingDuration: v0ThinkingDuration,
+              temperature,
+              topP
             });
+
             ws.send(
               JSON.stringify({
                 type: "ai_chat_response",
                 conversationId,
                 userId,
                 provider,
-                model,
-                title,
                 systemPrompt,
+                thinkingText: v0ThinkingAgg,
+                thinkingDuration: v0ThinkingDuration,
+                title,
                 temperature,
                 topP,
+                model,
                 chunk: agg,
-                thinkingText:
-                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-                thinkingDuration:
-                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
+
             void this.wsServer.redis.publishTypedEvent(
               streamChannel,
               "ai_chat_response",
@@ -1044,10 +1041,8 @@ export class Resolver extends ModelService {
                 systemPrompt,
                 temperature,
                 title,
-                thinkingText:
-                  v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-                thinkingDuration:
-                  v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+                thinkingText: v0ThinkingAgg,
+                thinkingDuration: v0ThinkingDuration,
                 topP,
                 provider,
                 model,
@@ -1055,17 +1050,13 @@ export class Resolver extends ModelService {
                 done: true
               }
             );
+
             // Clear saved state on successful completion
             void this.wsServer.redis.del(`stream:state:${conversationId}`);
             break;
           }
         }
       } else if (provider === "meta") {
-        let metaThinkingStartTime: number | null = null,
-          metaThinkingDuration = 0,
-          metaIsCurrentlyThinking = false,
-          metaThinkingAgg = "";
-
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
           keyId: null
@@ -1077,130 +1068,55 @@ export class Resolver extends ModelService {
           );
         }
         const client = this.llamaService.llamaClient(key.apiKey ?? undefined);
+        const stream = await client.chat.completions.create(
+          {
+            user: userId,
+            top_p: topP,
+            temperature,
+            model,
+            max_completion_tokens: max_tokens,
+            messages: this.llamaService.llamaFormat(
+              isNewChat,
+              msgs,
+              prompt,
+              systemPrompt
+            ),
+            stream: true
+          },
+          { stream: true }
+        );
 
-        const responsesStream = (await client.responses.create({
-          stream: true,
-          input: this.llamaService.llamaFormat(
-            isNewChat,
-            msgs,
-            prompt,
-            systemPrompt
-          ),
-          store: false,
-          model,
-          temperature,
-          max_output_tokens: max_tokens,
-          top_p: topP,
-          truncation: "auto",
-          tools: [
-            {
-              type: "web_search_preview",
-              user_location
-            }
-          ]
-        })) satisfies OpenAIStream<ResponseStreamEvent> & {
-          _response_id?: string | null;
-        };
-
-        for await (const s of responsesStream) {
+        for await (const chunk of stream) {
           let text: string | undefined = undefined;
-          let thinkingText: string | undefined = undefined;
-          let done = false;
-          // s.type as ResponseStreamEvent['type'];
-          if (
-            s.type === "response.reasoning_text.delta" ||
-            s.type === "response.reasoning_summary_text.delta"
-          ) {
-            if (!metaIsCurrentlyThinking && metaThinkingStartTime === null) {
-              metaIsCurrentlyThinking = true;
-              metaThinkingStartTime = performance.now();
-            }
-
-            thinkingText = s.delta;
+          let finish_reason:
+            | null
+            | "length"
+            | "stop"
+            | "tool_calls"
+            | "content_filter"
+            | "function_call" = null;
+          if (chunk.event.delta.type === "text") {
+            text = chunk.event.delta.text;
           }
-          if (
-            (s.type === "response.reasoning_summary_text.done" ||
-              s.type === "response.reasoning_text.done") &&
-            metaIsCurrentlyThinking &&
-            metaThinkingStartTime !== null
-          ) {
-            metaIsCurrentlyThinking = false;
-            metaThinkingDuration = Math.round(
-              performance.now() - metaThinkingStartTime
-            );
-          }
-          if (s.type === "response.output_text.delta") {
-            text = s.delta;
-          }
-          if (s.type === "response.output_text.done") {
-            done = true;
+          if (chunk.event.event_type === "complete") {
+            finish_reason = "stop";
           }
 
-          if (thinkingText) {
-            metaThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                done: false,
-                userId,
-                model,
-                provider,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                thinkingText: thinkingText,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                isThinking: true
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText: thinkingText,
-                isThinking: true,
-                done: false
-              }
-            );
-          } // Handle regular text chunks
           if (text) {
-            agg += text;
             chunks.push(text);
+            agg += text;
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
                 conversationId,
                 userId,
-                provider,
                 title,
-                model,
+                provider,
                 systemPrompt,
                 temperature,
                 topP,
+                model,
                 chunk: text,
-                isThinking: false,
-                thinkingText:
-                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
-                thinkingDuration:
-                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -1217,11 +1133,6 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 provider,
-                thinkingText:
-                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
-                thinkingDuration:
-                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
-
                 chunk: text,
                 done: false
               }
@@ -1239,22 +1150,19 @@ export class Resolver extends ModelService {
               });
             }
           }
-          if (done) {
+
+          if (finish_reason != null) {
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
-              conversationId,
-              done: true,
-              title,
+              systemPrompt,
               temperature,
               topP,
+              conversationId,
+              done: true,
               provider,
+              title,
               userId,
-              systemPrompt,
-              model,
-              thinkingText:
-                metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
-              thinkingDuration:
-                metaThinkingDuration > 0 ? metaThinkingDuration : undefined
+              model
             });
             ws.send(
               JSON.stringify({
@@ -1262,16 +1170,12 @@ export class Resolver extends ModelService {
                 conversationId,
                 userId,
                 provider,
-                model,
-                title,
                 systemPrompt,
+                title,
                 temperature,
                 topP,
+                model,
                 chunk: agg,
-                thinkingText:
-                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
-                thinkingDuration:
-                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -1285,10 +1189,6 @@ export class Resolver extends ModelService {
                 systemPrompt,
                 temperature,
                 title,
-                thinkingText:
-                  metaThinkingAgg.length > 0 ? metaThinkingAgg : undefined,
-                thinkingDuration:
-                  metaThinkingDuration > 0 ? metaThinkingDuration : undefined,
                 topP,
                 provider,
                 model,
@@ -1302,10 +1202,10 @@ export class Resolver extends ModelService {
           }
         }
       } else if (provider === "grok") {
-        let xaiThinkingStartTime: number | null = null,
-          xaiThinkingDuration = 0,
-          xaiIsCurrentlyThinking = false,
-          xaiThinkingAgg = "";
+        let xAiThinkingStartTime: number | null = null;
+        let xAiThinkingDuration = 0;
+        let xAiIsCurrentlyThinking = false;
+        let xAiThinkingAgg = "";
 
         let key: { apiKey: string | null; keyId: string | null } = {
           apiKey: null,
@@ -1317,89 +1217,103 @@ export class Resolver extends ModelService {
             `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
           );
         }
-        const client = this.xAIService.xAIClient(key.apiKey ?? undefined);
 
-        const responsesStream = (await client.responses.create({
-          stream: true,
-          input: this.xAIService.xAiFormat(
-            isNewChat,
-            msgs,
-            prompt,
-            systemPrompt
-          ),
-          store: false,
-          model,
-          temperature,
-          max_output_tokens: max_tokens,
-          top_p: topP,
-          truncation: "auto",
-          tools: [
-            {
-              type: "web_search_preview",
-              user_location
-            }
-          ]
-        })) satisfies OpenAIStream<ResponseStreamEvent> & {
-          _response_id?: string | null;
+        const xAi = this.xAIService.xAIClient(key.apiKey ?? undefined);
+
+        const { messages, system } = this.xAIService.xAiFormatHistory(
+          isNewChat,
+          msgs,
+          prompt,
+          systemPrompt
+        );
+
+        const { max_tokens, thinking } =
+          this.xAIService.handleMaxTokensAndThinking(model, event.maxTokens);
+
+        const stream = (await xAi.messages.create(
+          {
+            max_tokens,
+            stream: true,
+            thinking,
+            top_p: topP,
+            temperature,
+            system,
+            model,
+            messages
+          },
+          { stream: true }
+        )) satisfies Stream<RawMessageStreamEvent> & {
+          _request_id?: string | null;
         };
 
-        for await (const s of responsesStream) {
+        for await (const chunk of stream) {
           let text: string | undefined = undefined;
           let thinkingText: string | undefined = undefined;
-          let done = false;
-          // s.type as ResponseStreamEvent['type'];
-          if (
-            s.type === "response.reasoning_text.delta" ||
-            s.type === "response.reasoning_summary_text.delta"
-          ) {
-            if (!xaiIsCurrentlyThinking && xaiThinkingStartTime === null) {
-              xaiIsCurrentlyThinking = true;
-              xaiThinkingStartTime = performance.now();
+          let done: StopReason | null = null;
+          if (chunk.type === "content_block_start") {
+            if (chunk.content_block.type === "web_search_tool_result") {
+              if ("error" in chunk.content_block.content) {
+                console.log(chunk.content_block.content);
+              }
+              (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
+                text = `[${v.title}](${v.url})`;
+              });
             }
+          }
+          if (chunk.type === "content_block_delta") {
+            if (chunk.delta.type === "thinking_delta") {
+              thinkingText = chunk.delta.thinking;
 
-            thinkingText = s.delta;
-          }
-          if (
-            (s.type === "response.reasoning_summary_text.done" ||
-              s.type === "response.reasoning_text.done") &&
-            xaiIsCurrentlyThinking &&
-            xaiThinkingStartTime !== null
-          ) {
-            xaiIsCurrentlyThinking = false;
-            xaiThinkingDuration = Math.round(
-              performance.now() - xaiThinkingStartTime
-            );
-          }
-          if (s.type === "response.output_text.delta") {
-            text = s.delta;
-          }
-          if (s.type === "response.output_text.done") {
-            done = true;
+              // Track thinking start
+              if (!xAiIsCurrentlyThinking && xAiThinkingStartTime === null) {
+                xAiThinkingStartTime = performance.now();
+                xAiIsCurrentlyThinking = true;
+              }
+            }
+            if (chunk.delta.type === "text_delta") {
+              text = chunk.delta.text;
+
+              // Track thinking end when switching to regular text
+              if (xAiIsCurrentlyThinking && xAiThinkingStartTime !== null) {
+                const endTime = performance.now();
+                xAiThinkingDuration = Math.round(
+                  endTime - xAiThinkingStartTime
+                );
+                xAiIsCurrentlyThinking = false;
+              }
+            }
+            if (chunk.delta.type === "citations_delta") {
+              console.log(chunk.delta.citation);
+            }
+          } else if (chunk.type === "message_delta") {
+            done = chunk.delta.stop_reason;
           }
 
+          // Handle thinking chunks
           if (thinkingText) {
-            xaiThinkingAgg += thinkingText;
+            xAiThinkingAgg += thinkingText;
             thinkingChunks.push(thinkingText);
 
             ws.send(
               JSON.stringify({
                 type: "ai_chat_chunk",
                 conversationId,
-                done: false,
                 userId,
-                model,
                 provider,
+                title,
+                model,
                 systemPrompt,
                 temperature,
-                title,
                 topP,
                 thinkingText: thinkingText,
                 thinkingDuration: thinkingStartTime
                   ? performance.now() - thinkingStartTime
                   : undefined,
-                isThinking: true
+                isThinking: true,
+                done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
+
             void this.wsServer.redis.publishTypedEvent(
               streamChannel,
               "ai_chat_chunk",
@@ -1421,7 +1335,9 @@ export class Resolver extends ModelService {
                 done: false
               }
             );
-          } // Handle regular text chunks
+          }
+
+          // Handle regular text chunks
           if (text) {
             agg += text;
             chunks.push(text);
@@ -1438,10 +1354,8 @@ export class Resolver extends ModelService {
                 topP,
                 chunk: text,
                 isThinking: false,
-                thinkingText:
-                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
                 thinkingDuration:
-                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
                 done: false
               } satisfies EventTypeMap["ai_chat_chunk"])
             );
@@ -1459,9 +1373,9 @@ export class Resolver extends ModelService {
                 topP,
                 provider,
                 thinkingText:
-                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                  xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
                 thinkingDuration:
-                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
 
                 chunk: text,
                 done: false
@@ -1480,6 +1394,7 @@ export class Resolver extends ModelService {
               });
             }
           }
+
           if (done) {
             void this.wsServer.prisma.handleAiChatResponse({
               chunk: agg,
@@ -1493,9 +1408,9 @@ export class Resolver extends ModelService {
               systemPrompt,
               model,
               thinkingText:
-                xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
               thinkingDuration:
-                xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined
+                xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined
             });
             ws.send(
               JSON.stringify({
@@ -1509,10 +1424,9 @@ export class Resolver extends ModelService {
                 temperature,
                 topP,
                 chunk: agg,
-                thinkingText:
-                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
+                thinkingText: xAiThinkingAgg || undefined,
                 thinkingDuration:
-                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
+                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
                 done: true
               } satisfies EventTypeMap["ai_chat_response"])
             );
@@ -1525,11 +1439,9 @@ export class Resolver extends ModelService {
                 userId,
                 systemPrompt,
                 temperature,
+                thinkingText: xAiThinkingAgg,
+                thinkingDuration: xAiThinkingDuration,
                 title,
-                thinkingText:
-                  xaiThinkingAgg.length > 0 ? xaiThinkingAgg : undefined,
-                thinkingDuration:
-                  xaiThinkingDuration > 0 ? xaiThinkingDuration : undefined,
                 topP,
                 provider,
                 model,
@@ -1560,27 +1472,24 @@ export class Resolver extends ModelService {
         }
         const client = this.openai.getClient(key.apiKey ?? undefined);
 
-        const responsesStream = await ( client.responses.create({
+        const responsesStream = await client.responses.create({
           stream: true,
-          input: this.openai.formatOpenAi(
-            isNewChat,
-            msgs,
-            prompt,
-            systemPrompt
-          ),
+          input: this.openai.formatOpenAi(isNewChat, msgs, prompt),
+          instructions: this.openai.buildInstructions(systemPrompt),
           store: false,
           model,
           temperature,
           max_output_tokens: max_tokens,
           top_p: topP,
           truncation: "auto",
+          parallel_tool_calls: true,
           tools: [
             {
               type: "web_search_preview",
               user_location
             }
           ]
-        }));
+        });
 
         for await (const s of responsesStream) {
           let text: string | undefined = undefined;
@@ -2069,122 +1978,235 @@ export class Resolver extends ModelService {
 
 /**
  *
-         const stream = (await client.chat.completions.create(
-          {
-            user: userId,
-            top_p: topP,
-            temperature,
-            model,
-            max_completion_tokens: max_tokens,
-            messages: this.openai.formatOpenAi(
-              isNewChat,
-              msgs,
-              prompt,
-              systemPrompt
-            ),
-            stream: true
-          },
-          { stream: true }
-        )) satisfies AsyncIterable<ChatCompletionChunk>;
-         for await (const chunk of stream) {
-          const choice = chunk.choices[0];
-          const text = choice?.delta.content;
-          const done = choice?.finish_reason != null;
+ // else if (provider === "vercel") {
+      //   let v0ThinkingStartTime: number | null = null,
+      //     v0ThinkingDuration = 0,
+      //     v0IsCurrentlyThinking = false,
+      //     v0ThinkingAgg = "";
 
-          if (text) {
-            chunks.push(text);
-            agg += text;
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                title,
-                provider,
-                systemPrompt,
-                temperature,
-                topP,
-                model,
-                chunk: text,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                chunk: text,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
+      //   let key: { apiKey: string | null; keyId: string | null } = {
+      //     apiKey: null,
+      //     keyId: null
+      //   };
+      //   if (hasProviderConfigured) {
+      //     key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
+      //     console.log(
+      //       `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
+      //     );
+      //   }
+      //   const client = this.v0Service.v0Client(key.apiKey ?? undefined);
 
-          if (done) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              provider,
-              title,
-              userId,
-              model
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                systemPrompt,
-                title,
-                temperature,
-                topP,
-                model,
-                chunk: agg,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
+      //   const responsesStream = (await client.responses.create({
+      //     stream: true,
+      //     input: this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
+      //     store: false,
+      //     model,
+      //     temperature,
+      //     max_output_tokens: max_tokens,
+      //     top_p: topP,
+      //     truncation: "auto"
+      //   })) satisfies OpenAIStream<ResponseStreamEvent> & {
+      //     _response_id?: string | null;
+      //   };
+
+      //   for await (const s of responsesStream) {
+      //     let text: string | undefined = undefined;
+      //     let thinkingText: string | undefined = undefined;
+      //     let done = false;
+      //     // s.type as ResponseStreamEvent['type'];
+      //     if (
+      //       s.type === "response.reasoning_text.delta" ||
+      //       s.type === "response.reasoning_summary_text.delta"
+      //     ) {
+      //       if (!v0IsCurrentlyThinking && v0ThinkingStartTime === null) {
+      //         v0IsCurrentlyThinking = true;
+      //         v0ThinkingStartTime = performance.now();
+      //       }
+
+      //       thinkingText = s.delta;
+      //     }
+      //     if (
+      //       (s.type === "response.reasoning_summary_text.done" ||
+      //         s.type === "response.reasoning_text.done") &&
+      //       v0IsCurrentlyThinking &&
+      //       v0ThinkingStartTime !== null
+      //     ) {
+      //       v0IsCurrentlyThinking = false;
+      //       v0ThinkingDuration = Math.round(
+      //         performance.now() - v0ThinkingStartTime
+      //       );
+      //     }
+      //     if (s.type === "response.output_text.delta") {
+      //       text = s.delta;
+      //     }
+      //     if (s.type === "response.output_text.done") {
+      //       done = true;
+      //     }
+
+      //     if (thinkingText) {
+      //       v0ThinkingAgg += thinkingText;
+      //       thinkingChunks.push(thinkingText);
+
+      //       ws.send(
+      //         JSON.stringify({
+      //           type: "ai_chat_chunk",
+      //           conversationId,
+      //           done: false,
+      //           userId,
+      //           model,
+      //           provider,
+      //           systemPrompt,
+      //           temperature,
+      //           title,
+      //           topP,
+      //           thinkingText: thinkingText,
+      //           thinkingDuration: thinkingStartTime
+      //             ? performance.now() - thinkingStartTime
+      //             : undefined,
+      //           isThinking: true
+      //         } satisfies EventTypeMap["ai_chat_chunk"])
+      //       );
+      //       void this.wsServer.redis.publishTypedEvent(
+      //         streamChannel,
+      //         "ai_chat_chunk",
+      //         {
+      //           type: "ai_chat_chunk",
+      //           conversationId,
+      //           userId,
+      //           model,
+      //           thinkingDuration: thinkingStartTime
+      //             ? performance.now() - thinkingStartTime
+      //             : undefined,
+      //           title,
+      //           systemPrompt,
+      //           temperature,
+      //           topP,
+      //           provider,
+      //           thinkingText: thinkingText,
+      //           isThinking: true,
+      //           done: false
+      //         }
+      //       );
+      //     } // Handle regular text chunks
+      //     if (text) {
+      //       agg += text;
+      //       chunks.push(text);
+      //       ws.send(
+      //         JSON.stringify({
+      //           type: "ai_chat_chunk",
+      //           conversationId,
+      //           userId,
+      //           provider,
+      //           title,
+      //           model,
+      //           systemPrompt,
+      //           temperature,
+      //           topP,
+      //           chunk: text,
+      //           isThinking: false,
+      //           thinkingText:
+      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      //           thinkingDuration:
+      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+      //           done: false
+      //         } satisfies EventTypeMap["ai_chat_chunk"])
+      //       );
+      //       void this.wsServer.redis.publishTypedEvent(
+      //         streamChannel,
+      //         "ai_chat_chunk",
+      //         {
+      //           type: "ai_chat_chunk",
+      //           conversationId,
+      //           userId,
+      //           model,
+      //           title,
+      //           systemPrompt,
+      //           temperature,
+      //           topP,
+      //           provider,
+      //           thinkingText:
+      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      //           thinkingDuration:
+      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+
+      //           chunk: text,
+      //           done: false
+      //         }
+      //       );
+      //       if (chunks.length % 10 === 0) {
+      //         void this.wsServer.redis.saveStreamState(conversationId, chunks, {
+      //           model,
+      //           provider,
+      //           title,
+      //           totalChunks: chunks.length,
+      //           completed: false,
+      //           systemPrompt,
+      //           temperature,
+      //           topP
+      //         });
+      //       }
+      //     }
+      //     if (done) {
+      //       void this.wsServer.prisma.handleAiChatResponse({
+      //         chunk: agg,
+      //         conversationId,
+      //         done: true,
+      //         title,
+      //         temperature,
+      //         topP,
+      //         provider,
+      //         userId,
+      //         systemPrompt,
+      //         model,
+      //         thinkingText:
+      //           v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      //         thinkingDuration:
+      //           v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined
+      //       });
+      //       ws.send(
+      //         JSON.stringify({
+      //           type: "ai_chat_response",
+      //           conversationId,
+      //           userId,
+      //           provider,
+      //           model,
+      //           title,
+      //           systemPrompt,
+      //           temperature,
+      //           topP,
+      //           chunk: agg,
+      //           thinkingText:
+      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      //           thinkingDuration:
+      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+      //           done: true
+      //         } satisfies EventTypeMap["ai_chat_response"])
+      //       );
+      //       void this.wsServer.redis.publishTypedEvent(
+      //         streamChannel,
+      //         "ai_chat_response",
+      //         {
+      //           type: "ai_chat_response",
+      //           conversationId,
+      //           userId,
+      //           systemPrompt,
+      //           temperature,
+      //           title,
+      //           thinkingText:
+      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
+      //           thinkingDuration:
+      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+      //           topP,
+      //           provider,
+      //           model,
+      //           chunk: agg,
+      //           done: true
+      //         }
+      //       );
+      //       // Clear saved state on successful completion
+      //       void this.wsServer.redis.del(`stream:state:${conversationId}`);
+      //       break;
+      //     }
+      //   }
+      // }
  */

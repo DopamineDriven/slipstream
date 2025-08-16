@@ -10,7 +10,7 @@ const data = async (env: string) => {
   try {
     prismaClient.$connect();
     return await prismaClient.conversation.findUnique({
-      where: { id: "jm2jtoa6wd2c1ywfb3jj5i55" },
+      where: { id: "n8xvzlvl4n7t5h0s9jkredt2" },
       include: { messages: { orderBy: { createdAt: "asc" } } }
     });
   } catch (err) {

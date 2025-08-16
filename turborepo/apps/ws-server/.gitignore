@@ -4,3 +4,4 @@ src/__out__/*
 public/inspect/*
 aes*
 prisma/db_dump.bak
+public/*

@@ -34,6 +34,7 @@
   "editor.bracketPairColorization.enabled": false,
   "svg.preview.autoShow": false,
   "js/ts.hover.maximumLength": 500,
+  "typescript.experimental.useTsgo": false,
   "svg.preview.disable": true,
   "svg.preview.mode": "svg",
   "editor.defaultFormatter": "esbenp.prettier-vscode",

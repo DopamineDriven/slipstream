@@ -1,14 +1,13 @@
 import type { Message } from "@/generated/client/client.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import { OpenAI } from "openai";
+import { LlamaAPIClient } from "llama-api-client";
 
 export class LlamaService {
-  private defaultClient: OpenAI;
+  private defaultClient: LlamaAPIClient;
 
   constructor(private apiKey: string) {
-    this.defaultClient = new OpenAI({
-      apiKey: this.apiKey,
-      baseURL: "https://api.llama.com/v1"
+    this.defaultClient = new LlamaAPIClient({
+      apiKey: this.apiKey
     });
   }
 
@@ -21,10 +20,6 @@ export class LlamaService {
     return client;
   }
 
-  private sanitizeModel(model: string) {
-    return model.replace(/\./g, "dot");
-  }
-
   private prependProviderModelTag(msgs: Message[]) {
     return msgs.map(msg => {
       if (msg.senderType === "USER") {
@@ -35,7 +30,6 @@ export class LlamaService {
         const modelIdentifier = `[${provider}/${model}]`;
         return {
           role: "assistant",
-          name: `${provider}_${this.sanitizeModel(model)}`,
           content: `${modelIdentifier} \n` + msg.content
         } as const;
       }
@@ -50,7 +44,6 @@ export class LlamaService {
         }
       | {
           readonly role: "assistant";
-          readonly name: `${string}_${string}`;
           readonly content: string;
         }
     )[],
