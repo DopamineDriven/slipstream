@@ -2,6 +2,7 @@
 
 import type { User } from "next-auth";
 import Link from "next/link";
+import { getInitials } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/ui/atoms/sidebar";
 import {
@@ -18,13 +19,11 @@ import {
   LogOut,
   Settings
 } from "@t3-chat-clone/ui";
-import { getInitials } from "@/lib/helpers";
 
 export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
   const { state: sidebarState, isMobile } = useSidebar();
   // On mobile, always use expanded state
   const effectiveState = isMobile ? "expanded" : sidebarState;
-
 
   return (
     <DropdownMenu>
@@ -32,7 +31,7 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start text-left",
+            "mt-auto w-full justify-center text-left",
             effectiveState === "collapsed" && "h-12 w-12 justify-start p-0"
           )}>
           <div className="flex items-center gap-3">
