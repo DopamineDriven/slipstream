@@ -1,18 +1,39 @@
 import type { Message } from "@/generated/client/client.ts";
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   MessageParam,
-  TextBlockParam
+  RawMessageStreamEvent,
+  StopReason,
+  TextBlockParam,
+  WebSearchResultBlock
 } from "@anthropic-ai/sdk/resources/messages";
+import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
+import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type {
   AllModelsUnion,
-  AnthropicModelIdUnion
+  AnthropicModelIdUnion,
+  EventTypeMap
 } from "@t3-chat-clone/types";
+import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
+interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
+  user_location?: {
+    type: "approximate";
+    city?: string;
+    region?: string;
+    country?: string;
+    tz?: string;
+  };
+}
 export class AnthropicService {
   private defaultClient: Anthropic;
 
-  constructor(private apiKey: string) {
+  constructor(
+    private prisma: PrismaService,
+    private redis: EnhancedRedisPubSub,
+    private apiKey: string
+  ) {
     this.defaultClient = new Anthropic({ apiKey: this.apiKey });
   }
 
@@ -120,5 +141,289 @@ export class AnthropicService {
       thinking: this.handleThinking(mod, max_tokens),
       max_tokens: this.handleMaxTokens(mod, max_tokens)
     };
+  }
+
+  public async handleAnthropicAiChatRequest({
+    chunks,
+    conversationId,
+    isNewChat,
+    msgs,
+    prompt,
+    streamChannel,
+    thinkingChunks,
+    userId,
+    ws,
+    apiKey,
+    max_tokens,
+    model = "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion,
+    systemPrompt,
+    temperature,
+    title,
+    topP,
+    user_location
+  }: ProviderAnthropicChatRequestEntity) {
+    const provider = "anthropic" as const;
+    let anthropicThinkingStartTime: number | null = null;
+    let anthropicThinkingDuration = 0;
+    let anthropicIsCurrentlyThinking = false;
+    let anthropicThinkingAgg = "";
+    let anthropicAgg = "";
+
+    const anthropic = this.getClient(apiKey ?? undefined);
+
+    const { messages, system } = this.formatAnthropicHistory(
+      isNewChat,
+      msgs,
+      prompt,
+      systemPrompt
+    );
+
+    const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
+      model as AllModelsUnion,
+      max_tokens
+    );
+
+    const stream = (await anthropic.messages.create(
+      {
+        max_tokens: maxTokens,
+        stream: true,
+        thinking,
+        top_p: topP,
+        temperature,
+        system,
+        model,
+        messages,
+        tools: [
+          {
+            type: "web_search_20250305",
+            name: "web_search",
+            max_uses: 5,
+            user_location
+          }
+        ]
+      },
+      { stream: true }
+    )) satisfies Stream<RawMessageStreamEvent> & {
+      _request_id?: string | null;
+    };
+
+    for await (const chunk of stream) {
+      let text: string | undefined = undefined;
+      let thinkingText: string | undefined = undefined;
+      let done: StopReason | null = null;
+      if (chunk.type === "content_block_start") {
+        if (chunk.content_block.type === "web_search_tool_result") {
+          if ("error" in chunk.content_block.content) {
+            console.log(chunk.content_block.content);
+          }
+          (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
+            text = `[${v.title}](${v.url})`;
+          });
+        }
+      }
+      if (chunk.type === "content_block_delta") {
+        if (chunk.delta.type === "thinking_delta") {
+          thinkingText = chunk.delta.thinking;
+
+          // Track thinking start
+          if (
+            !anthropicIsCurrentlyThinking &&
+            anthropicThinkingStartTime === null
+          ) {
+            anthropicThinkingStartTime = performance.now();
+            anthropicIsCurrentlyThinking = true;
+          }
+        }
+        if (chunk.delta.type === "text_delta") {
+          text = chunk.delta.text;
+
+          // Track thinking end when switching to regular text
+          if (
+            anthropicIsCurrentlyThinking &&
+            anthropicThinkingStartTime !== null
+          ) {
+            const endTime = performance.now();
+            anthropicThinkingDuration = Math.round(
+              endTime - anthropicThinkingStartTime
+            );
+            anthropicIsCurrentlyThinking = false;
+          }
+        }
+        if (chunk.delta.type === "citations_delta") {
+          console.log(chunk.delta.citation);
+        }
+      } else if (chunk.type === "message_delta") {
+        done = chunk.delta.stop_reason;
+      }
+
+      // Handle thinking chunks
+      if (thinkingText) {
+        anthropicThinkingAgg += thinkingText;
+        thinkingChunks.push(thinkingText);
+
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            provider,
+            title,
+            model,
+            systemPrompt,
+            temperature,
+            topP,
+            thinkingText: thinkingText,
+            thinkingDuration: anthropicThinkingStartTime
+              ? performance.now() - anthropicThinkingStartTime
+              : undefined,
+            isThinking: true,
+            done: false
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          thinkingDuration: anthropicThinkingStartTime
+            ? performance.now() - anthropicThinkingStartTime
+            : undefined,
+          title,
+          systemPrompt,
+          temperature,
+          topP,
+          provider,
+          thinkingText: thinkingText,
+          isThinking: true,
+          done: false
+        });
+      }
+
+      // Handle regular text chunks
+      if (text) {
+        anthropicAgg += text;
+        chunks.push(text);
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            provider,
+            title,
+            model,
+            systemPrompt,
+            temperature,
+            topP,
+            chunk: text,
+            isThinking: false,
+            thinkingDuration:
+              anthropicThinkingDuration > 0
+                ? anthropicThinkingDuration
+                : undefined,
+            done: false
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          title,
+          systemPrompt,
+          temperature,
+          topP,
+          provider,
+          thinkingText:
+            anthropicThinkingAgg.length > 0 ? anthropicThinkingAgg : undefined,
+          thinkingDuration:
+            anthropicThinkingDuration > 0
+              ? anthropicThinkingDuration
+              : undefined,
+
+          chunk: text,
+          done: false
+        });
+        if (chunks.length % 10 === 0) {
+          void this.redis.saveStreamState(
+            conversationId,
+            chunks,
+            {
+              model,
+              provider,
+              title,
+              totalChunks: chunks.length,
+              completed: false,
+              systemPrompt,
+              temperature,
+              topP
+            },
+            thinkingChunks
+          );
+        }
+      }
+
+      if (done) {
+        void this.prisma.handleAiChatResponse({
+          chunk: anthropicAgg,
+          conversationId,
+          done: true,
+          title,
+          temperature,
+          topP,
+          provider,
+          userId,
+          systemPrompt,
+          model,
+          thinkingText:
+            anthropicThinkingAgg.length > 0 ? anthropicThinkingAgg : undefined,
+          thinkingDuration:
+            anthropicThinkingDuration > 0
+              ? anthropicThinkingDuration
+              : undefined
+        });
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_response",
+            conversationId,
+            userId,
+            provider,
+            model,
+            title,
+            systemPrompt,
+            temperature,
+            topP,
+            chunk: anthropicAgg,
+            thinkingText: anthropicThinkingAgg || undefined,
+            thinkingDuration:
+              anthropicThinkingDuration > 0
+                ? anthropicThinkingDuration
+                : undefined,
+            done: true
+          } satisfies EventTypeMap["ai_chat_response"])
+        );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
+          type: "ai_chat_response",
+          conversationId,
+          userId,
+          systemPrompt,
+          temperature,
+          title,
+          topP,
+          provider,
+          thinkingText: anthropicThinkingAgg || undefined,
+          thinkingDuration:
+            anthropicThinkingDuration > 0
+              ? anthropicThinkingDuration
+              : undefined,
+          model,
+          chunk: anthropicAgg,
+          done: true
+        });
+        // Clear saved state on successful completion
+        void this.redis.del(`stream:state:${conversationId}`);
+        break;
+      }
+    }
   }
 }

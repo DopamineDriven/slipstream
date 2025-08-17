@@ -1,31 +1,11 @@
 import type { Message } from "@/generated/client/client.ts";
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { createV0SSEParser, isReasoningDelta } from "@/vercel/sse.ts";
-import { WebSocket } from "ws";
 import type { EventTypeMap, VercelModelIdUnion } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
-
-interface v0Entity {
-  isNewChat: boolean;
-  conversationId: string;
-  title?: string;
-  keyId: string | null;
-  apiKey?: string;
-  msgs: Message[];
-  systemPrompt?: string;
-  userId: string;
-  prompt: string;
-  topP?: number;
-  streamChannel: `stream:${string}`;
-  temperature?: number;
-  ws: WebSocket;
-  max_tokens?: number;
-  model?: string;
-  chunks: string[];
-  thinkingChunks: string[];
-}
 
 export class v0Service {
   private readonly baseUrl = "https://api.v0.dev/v1/chat/completions";
@@ -220,7 +200,7 @@ export class v0Service {
     temperature,
     title,
     topP
-  }: v0Entity) {
+  }: ProviderChatRequestEntity) {
     const provider = "vercel" as const;
     let v0ThinkingStartTime: number | null = null,
       v0ThinkingDuration = 0,

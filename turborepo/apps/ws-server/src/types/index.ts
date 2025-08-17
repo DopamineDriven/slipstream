@@ -1,3 +1,4 @@
+import type { Message } from "@/generated/client/client.ts";
 import { Provider } from "@/generated/client/enums.ts";
 import { WebSocket } from "ws";
 import type { EventTypeMap } from "@t3-chat-clone/types";
@@ -63,3 +64,22 @@ export type ClientContextWorkupProps = {
   isSet: Record<Lowercase<keyof typeof Provider>, boolean>;
   isDefault: Record<Lowercase<keyof typeof Provider>, boolean>;
 };
+
+export interface ProviderChatRequestEntity {
+  isNewChat: boolean;
+  conversationId: string;
+  title?: string;
+  apiKey?: string;
+  msgs: Message[];
+  systemPrompt?: string;
+  userId: string;
+  prompt: string;
+  topP?: number;
+  streamChannel: `stream:${string}`;
+  temperature?: number;
+  ws: WebSocket;
+  max_tokens?: number;
+  model?: string;
+  chunks: string[];
+  thinkingChunks: string[];
+}
