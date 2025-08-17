@@ -90,7 +90,7 @@ export class EnhancedRedisPubSub extends RedisInstance {
           this.createHeartbeat(subClient, channel),
           this.options.heartbeatInterval
         );
-
+        heartbeat.unref();
         this.subHeartbeats.set(channel, heartbeat);
       }
 
@@ -167,13 +167,22 @@ export class EnhancedRedisPubSub extends RedisInstance {
       systemPrompt?: string;
       temperature?: number;
       topP?: number;
-    }
+    },
+    thinkingChunks?: string[]
   ): Promise<void> {
     const key = `stream:state:${conversationId}`;
+    const multi = this.client.multi();
+    const data: Record<string, string> = {
+      chunks: JSON.stringify(chunks),
+      metadata: JSON.stringify(metadata)
+    };
+    if (thinkingChunks && thinkingChunks.length > 0) {
+      data.thinkingChunks = JSON.stringify(thinkingChunks);
+    }
 
-    await this.hSet(key, "chunks", JSON.stringify(chunks));
-    await this.hSet(key, "metadata", JSON.stringify(metadata));
-    await this.expire(key, 3600); // 1 hour TTL
+    multi.hSet(key, data);
+    multi.expire(key, 3600); // 1 hour TTL
+    await multi.exec();
   }
 
   public async getStreamState(
@@ -186,7 +195,12 @@ export class EnhancedRedisPubSub extends RedisInstance {
 
     return {
       chunks: JSON.parse(data.chunks) as StreamStateProps["chunks"],
-      metadata: JSON.parse(data.metadata) as StreamStateProps["metadata"]
+      metadata: JSON.parse(data.metadata) as StreamStateProps["metadata"],
+      ...(typeof data.thinkingChunks !== "undefined" && {
+        thinkingChunks: JSON.parse(
+          data.thinkingChunks
+        ) as StreamStateProps["thinkingChunks"]
+      })
     };
   }
 

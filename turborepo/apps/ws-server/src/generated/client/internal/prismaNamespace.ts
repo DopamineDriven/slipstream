@@ -92,12 +92,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 6.13.0
- * Query Engine version: 361e86d0ea4987e9f53a565309b3eed797a6bcbd
+ * Prisma Client JS version: 6.14.0
+ * Query Engine version: 717184b7b35ea05dfa71a3236b7af656013e1e49
  */
 export const prismaVersion: PrismaVersion = {
-  client: "6.13.0",
-  engine: "361e86d0ea4987e9f53a565309b3eed797a6bcbd"
+  client: "6.14.0",
+  engine: "717184b7b35ea05dfa71a3236b7af656013e1e49"
 }
 
 /**
@@ -411,8 +411,8 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 
 
-export interface TypeMapCb<ClientOptions = {}> extends runtime.Types.Utils.Fn<{extArgs: runtime.Types.Extensions.InternalArgs }, runtime.Types.Utils.Record<string, any>> {
-  returns: TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
+export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{extArgs: runtime.Types.Extensions.InternalArgs }, runtime.Types.Utils.Record<string, any>> {
+  returns: TypeMap<this['params']['extArgs'], GlobalOmitOptions>
 }
 
 export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> = {
@@ -1809,25 +1809,6 @@ export type PrismaAction =
   | 'runCommandRaw'
   | 'findRaw'
   | 'groupBy'
-
-/**
- * These options are being passed into the middleware as "params"
- */
-export type MiddlewareParams = {
-  model?: ModelName
-  action: PrismaAction
-  args: any
-  dataPath: string[]
-  runInTransaction: boolean
-}
-
-/**
- * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
- */
-export type Middleware<T = any> = (
-  params: MiddlewareParams,
-  next: (params: MiddlewareParams) => runtime.Types.Utils.JsPromise<T>,
-) => runtime.Types.Utils.JsPromise<T>
 
 /**
  * `PrismaClient` proxy available in interactive transactions.

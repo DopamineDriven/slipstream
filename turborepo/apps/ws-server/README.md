@@ -275,3 +275,60 @@ model VerificationToken {
 }
 
 ```
+
+```diff
+diff --git a/apps/ws-server/src/WSServer.ts b/apps/ws-server/src/WSServer.ts
+@@
+ export class WSServer {
+   private wss: WebSocketServer;
+   public readonly channel: string;
+   private readonly jwtSecret: string;
+   private unsubscribePubSub?: () => Promise<void>;
+   private userMap = new Map<WebSocket, string>();
+   private userDataMap = new Map<string, UserData>();
+   private httpServer: http.Server;
+
+   public readonly handlers: HandlerMap = {};
+   private resolver?: {
+     handleRawMessage: (
+       ws: WebSocket,
+       userId: string,
+       raw: RawData,
+       userData?: UserData
+     ) => void | Promise<void>;
+   };
+
+   constructor(
+     private opts: WSServerOptions,
+-    public redis: EnhancedRedisPubSub,
++    // NOTE: lifecycle (connect/quit/heartbeat) is owned by composition root
++    public redis: EnhancedRedisPubSub,
+     public prisma: PrismaService
+   ) {
+@@
+   }
+
+   public async start(): Promise<void> {
+-    await this.redis.connect();
+     // now we listen on our HTTP server (which also speaks WS)
+     this.httpServer.listen(this.opts.port, () => {
+       console.info(`HTTP+WebSocket server listening on port ${this.opts.port}`);
+     });
+
+@@
+     // Redis pub/sub for broadcast
+-    this.unsubscribePubSub = await this.redis.subscribeToMessages(
++    this.unsubscribePubSub = await this.redis.subscribeToMessages(
+       this.channel,
+       msg => this.broadcastRaw(msg)
+     );
+   }
+@@
+   public async stop(): Promise<void> {
+     await this.teardownPubSub();
+-    await this.redis.quit();
+     this.wss.close();
+     console.info("Server shut down.");
+   }
+ }
+ ```

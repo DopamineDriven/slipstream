@@ -58,7 +58,7 @@ async function exe() {
 
     const { v0Service } = await import("@/vercel/index.ts");
 
-    const v0 = new v0Service(cfg.V0_API_KEY);
+    const v0 = new v0Service(prisma, redisInstance, cfg.V0_API_KEY);
 
     const { LlamaService } = await import("@/meta/index.ts");
 

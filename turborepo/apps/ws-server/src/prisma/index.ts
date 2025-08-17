@@ -139,9 +139,9 @@ export class PrismaService extends ModelService {
     provider,
     ...data
   }: HandleAiChatRequestProps) {
-    const { keyId } = await this.handleApiKeyLookup(provider, userId);
+    const { keyId, apiKey } = await this.handleApiKeyLookup(provider, userId);
     if (data.conversationId === "new-chat") {
-      return this.prismaClient.conversation.create({
+      const p =await this.prismaClient.conversation.create({
         include: { messages: true, conversationSettings: true },
         data: {
           messages: {
@@ -166,8 +166,10 @@ export class PrismaService extends ModelService {
           userId
         }
       });
+      const apiKeyAndRes = {apiKey,...p}
+      return apiKeyAndRes
     } else {
-      return this.prismaClient.conversation.update({
+      const pr = await this.prismaClient.conversation.update({
         include: {
           messages: { orderBy: { createdAt: "asc" } },
           conversationSettings: true
@@ -187,7 +189,8 @@ export class PrismaService extends ModelService {
           conversationSettings: {
             update: {
               topP: data.topP,
-              systemPrompt: data.systemPrompt,
+              systemPrompt: data.systemPrompt,maxTokens:
+              data.maxTokens,
               temperature: data.temperature
             }
           },
@@ -195,6 +198,8 @@ export class PrismaService extends ModelService {
           userKeyId: keyId
         }
       });
+      const apiKeyAndRes = {apiKey, ...pr};
+      return apiKeyAndRes
     }
   }
 
