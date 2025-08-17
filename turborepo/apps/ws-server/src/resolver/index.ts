@@ -1,15 +1,5 @@
 import type { Message } from "@/generated/client/client.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
-import type {
-  RawMessageStreamEvent,
-  StopReason,
-  WebSearchResultBlock
-} from "@anthropic-ai/sdk/resources/messages.mjs";
-import type {
-  Blob,
-  FinishReason,
-  GenerateContentResponse
-} from "@google/genai";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -19,18 +9,16 @@ import { R2Instance } from "@/r2-helper/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
-import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import { streamText } from "ai";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  Provider,
-  VercelModelIdUnion
+  Provider
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
+
 
 export class Resolver extends ModelService {
   constructor(
@@ -84,6 +72,10 @@ export class Resolver extends ModelService {
         return "Gemini";
       case "grok":
         return "Grok";
+      case "meta":
+        return "Meta";
+      case "vercel":
+        return "Vercel";
       case "openai":
       default:
         return "OpenAI";
@@ -175,12 +167,12 @@ export class Resolver extends ModelService {
       region: userData?.region ?? "Illinois",
       timezone: userData?.tz ?? "America/Chicago"
     } as const;
-    const [lat, lng] = this.handleLatLng(userData?.latlng);
     //  configure token usage for a given conversation relative to model max context window limits
     const isNewChat = conversationIdInitial.startsWith("new-chat");
     const msgs = res.messages satisfies Message[];
     const conversationId = res.id;
-
+    const apiKey = res.apiKey ?? undefined;
+    const keyId = res.userKeyId;
     const streamChannel = RedisChannels.conversationStream(conversationId);
     const userChannel = RedisChannels.user(userId);
     const existingState =
@@ -188,14 +180,12 @@ export class Resolver extends ModelService {
 
     let chunks = Array.of<string>();
     let thinkingChunks = Array.of<string>();
+    // TODO handle thinkingChunks and nonThinkingChunks into allChunks for resumable streaming with high specificity
+    // let allChunks = Array.of<string>();
     let resumedFromChunk = 0;
 
-    let agg = "";
-    let thinkingAgg = "";
-    let thinkingDuration = 0;
-    let thinkingStartTime: number | null = null;
-    let thinkingEndTime: number | null = null;
-    let isCurrentlyThinking = false;
+    let thinkingAgg = "",
+      thinkingDuration = 0;
 
     const title = res?.title ?? (await this.titleGenUtil(event));
 
@@ -251,1456 +241,126 @@ export class Resolver extends ModelService {
         }
       );
     }
+
+    console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
     try {
       if (provider === "gemini") {
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-
-        const { history, systemInstruction } =
-          this.geminiService.getHistoryAndInstruction(
-            isNewChat,
-            msgs,
-            systemPrompt
-          );
-
-        const gemini = this.geminiService.getClient(key.apiKey ?? undefined);
-
-        const chat = gemini.chats.create({
-          model: model,
-          history
-        });
-        const longitude = lng ?? -122.4194,
-          latitude = lat ?? 47.7749;
-
-        const stream = (await chat.sendMessageStream({
-          message: prompt,
-          config: {
-            temperature,
-            maxOutputTokens: max_tokens,
-            tools: [{ googleSearch: {} }, { urlContext: {} }],
-            toolConfig: {
-              retrievalConfig: {
-                latLng: {
-                  latitude,
-                  longitude
-                }
-              }
-            },
-            topP,
-            thinkingConfig: { includeThoughts: true, thinkingBudget: -1 },
-            systemInstruction
-          }
-        })) satisfies AsyncGenerator<GenerateContentResponse>;
-
-        for await (const chunk of stream) {
-          // Gemini thinking chunks _always_ start with **TEXT** -- use regex to detect when thinking starts/stops at the onset of streaming
-          // eg, const isThinkingRegex = /^\s*\*\*.+\*\*\s*$/;
-
-          let dataPart: Blob | undefined = undefined;
-          let textPart: string | undefined = undefined;
-          let thinkingPart: string | undefined = undefined;
-
-          let done: keyof typeof FinishReason | undefined = undefined;
-          let isThinking = false;
-          if (chunk.candidates) {
-            for (const candidate of chunk.candidates) {
-              if (candidate.content?.parts) {
-                for (const part of candidate.content.parts) {
-                  if (part.text) {
-                    if (part.thought) {
-                      isThinking = part.thought;
-                      thinkingPart = part.text;
-                    } else {
-                      isThinking = part.thought ?? false;
-                      textPart = part.text;
-                    }
-                  }
-                  if (part.inlineData) {
-                    dataPart = part.inlineData;
-                  }
-                }
-              }
-
-              if (candidate.finishReason) {
-                done = candidate.finishReason;
-              }
-            }
-          }
-          if (isThinking && thinkingPart) {
-            // Track thinking start time
-            if (!isCurrentlyThinking && thinkingStartTime === null) {
-              thinkingStartTime = performance.now();
-              isCurrentlyThinking = true;
-            }
-
-            thinkingChunks.push(thinkingPart);
-            thinkingAgg += thinkingPart;
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                isThinking: true,
-                temperature,
-                topP,
-                provider,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                thinkingText: thinkingPart,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                thinkingText: thinkingPart,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-          if (textPart) {
-            // Track thinking end time when transitioning from thinking to regular text
-            if (isCurrentlyThinking && thinkingStartTime !== null) {
-              thinkingEndTime = performance.now();
-              thinkingDuration = Math.round(
-                thinkingEndTime - thinkingStartTime
-              );
-              isCurrentlyThinking = false;
-            }
-
-            chunks.push(textPart);
-            agg += textPart;
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                isThinking,
-                temperature,
-                topP,
-                provider,
-                chunk: textPart,
-                thinkingDuration:
-                  thinkingDuration > 0 ? thinkingDuration : undefined,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingDuration:
-                  thinkingDuration > 0 ? thinkingDuration : undefined,
-                chunk: textPart,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-          if (dataPart?.data && dataPart?.mimeType) {
-            const _dataUrl =
-              `data:${dataPart.mimeType};base64,${dataPart.data}` as const;
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_inline_data",
-                conversationId,
-                data: _dataUrl,
-                userId,
-                done: false,
-                model,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider
-              } satisfies EventTypeMap["ai_chat_inline_data"])
-            );
-          }
-          if (done) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              title,
-              provider,
-              userId,
-              temperature,
-              topP,
-              model,
-              thinkingText: thinkingAgg.length > 0 ? thinkingAgg : undefined,
-              thinkingDuration:
-                thinkingDuration > 0 ? thinkingDuration : undefined
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                model,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider,
-                chunk: agg,
-                thinkingText: thinkingAgg.length > 0 ? thinkingAgg : undefined,
-                thinkingDuration:
-                  thinkingDuration > 0 ? thinkingDuration : undefined,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
-      } else if (provider === "anthropic") {
-        // Initialize Anthropic thinking tracking
-        let anthropicThinkingStartTime: number | null = null;
-        let anthropicThinkingDuration = 0;
-        let anthropicIsCurrentlyThinking = false;
-        let anthropicThinkingAgg = "";
-
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-
-        const anthropic = this.anthropicService.getClient(
-          key.apiKey ?? undefined
-        );
-
-        const { messages, system } =
-          this.anthropicService.formatAnthropicHistory(
-            isNewChat,
-            msgs,
-            prompt,
-            systemPrompt
-          );
-
-        const { max_tokens, thinking } =
-          this.anthropicService.handleMaxTokensAndThinking(
-            model,
-            event.maxTokens
-          );
-
-        const stream = (await anthropic.messages.create(
-          {
-            max_tokens,
-            stream: true,
-            thinking,
-            top_p: topP,
-            temperature,
-            system,
-            model,
-            messages,
-            tools: [
-              {
-                type: "web_search_20250305",
-                name: "web_search",
-                max_uses: 5,
-                user_location
-              }
-            ]
-          },
-          { stream: true }
-        )) satisfies Stream<RawMessageStreamEvent> & {
-          _request_id?: string | null;
-        };
-
-        for await (const chunk of stream) {
-          let text: string | undefined = undefined;
-          let thinkingText: string | undefined = undefined;
-          let done: StopReason | null = null;
-          if (chunk.type === "content_block_start") {
-            if (chunk.content_block.type === "web_search_tool_result") {
-              if ("error" in chunk.content_block.content) {
-                console.log(chunk.content_block.content);
-              }
-              (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
-                text = `[${v.title}](${v.url})`;
-              });
-            }
-          }
-          if (chunk.type === "content_block_delta") {
-            if (chunk.delta.type === "thinking_delta") {
-              thinkingText = chunk.delta.thinking;
-
-              // Track thinking start
-              if (
-                !anthropicIsCurrentlyThinking &&
-                anthropicThinkingStartTime === null
-              ) {
-                anthropicThinkingStartTime = performance.now();
-                anthropicIsCurrentlyThinking = true;
-              }
-            }
-            if (chunk.delta.type === "text_delta") {
-              text = chunk.delta.text;
-
-              // Track thinking end when switching to regular text
-              if (
-                anthropicIsCurrentlyThinking &&
-                anthropicThinkingStartTime !== null
-              ) {
-                const endTime = performance.now();
-                anthropicThinkingDuration = Math.round(
-                  endTime - anthropicThinkingStartTime
-                );
-                anthropicIsCurrentlyThinking = false;
-              }
-            }
-            if (chunk.delta.type === "citations_delta") {
-              console.log(chunk.delta.citation);
-            }
-          } else if (chunk.type === "message_delta") {
-            done = chunk.delta.stop_reason;
-          }
-
-          // Handle thinking chunks
-          if (thinkingText) {
-            anthropicThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                provider,
-                title,
-                model,
-                systemPrompt,
-                temperature,
-                topP,
-                thinkingText: thinkingText,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                isThinking: true,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText: thinkingText,
-                isThinking: true,
-                done: false
-              }
-            );
-          }
-
-          // Handle regular text chunks
-          if (text) {
-            agg += text;
-            chunks.push(text);
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                provider,
-                title,
-                model,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: text,
-                isThinking: false,
-                thinkingDuration:
-                  anthropicThinkingDuration > 0
-                    ? anthropicThinkingDuration
-                    : undefined,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText:
-                  anthropicThinkingAgg.length > 0
-                    ? anthropicThinkingAgg
-                    : undefined,
-                thinkingDuration:
-                  anthropicThinkingDuration > 0
-                    ? anthropicThinkingDuration
-                    : undefined,
-
-                chunk: text,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-
-          if (done) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              title,
-              temperature,
-              topP,
-              provider,
-              userId,
-              systemPrompt,
-              model,
-              thinkingText:
-                anthropicThinkingAgg.length > 0
-                  ? anthropicThinkingAgg
-                  : undefined,
-              thinkingDuration:
-                anthropicThinkingDuration > 0
-                  ? anthropicThinkingDuration
-                  : undefined
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: agg,
-                thinkingText: anthropicThinkingAgg || undefined,
-                thinkingDuration:
-                  anthropicThinkingDuration > 0
-                    ? anthropicThinkingDuration
-                    : undefined,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
-      } else if (provider === "vercel") {
-        let _v0ThinkingStartTime: number | undefined = undefined;
-        let v0ThinkingDuration = 0,
-          v0IsCurrentlyThinking = false,
-          v0ThinkingAgg = "";
-
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-        const client = this.v0Service.getClient(key.apiKey ?? undefined);
-
-        const s = streamText({
-          model: client(model as VercelModelIdUnion),
-          messages: this.v0Service.v0Format(
-            isNewChat,
-            msgs,
-            prompt,
-            systemPrompt
-          ),
-          topP: topP,
-          temperature
-        });
-        // const stream = this.v0Service.stream(
-        //   model,
-        //   this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
-        //   key.apiKey ?? undefined,
-        //   {
-        //     temperature,
-        //     top_p: topP,
-        //     max_tokens: max_tokens
-        //   }
-        // );
-
-        for await (const chunk of s.fullStream) {
-          // Process each choice in the chunk
-          let text: string | undefined = undefined;
-          // let thinkingText: string | undefined = undefined;
-          let finishReason:
-            | "length"
-            | "error"
-            | "other"
-            | "stop"
-            | "content-filter"
-            | "tool-calls"
-            | "unknown"
-            | undefined = undefined;
-          // if (chunk.type === "reasoning-start") {
-          //   v0IsCurrentlyThinking = true;
-          //   if (typeof v0ThinkingStartTime === "undefined") {
-          //     v0ThinkingStartTime = performance.now();
-          //   }
-          // }
-          if (chunk.type === "text-end") {
-            finishReason = "stop";
-          }
-          if (chunk.type === "text-delta") {
-            text = chunk.text;
-          }
-          // if (chunk.type === "reasoning-delta") {
-          //   thinkingText = chunk.text;
-          // }
-          // if (chunk.type === "reasoning-end" && v0ThinkingStartTime) {
-          //   v0IsCurrentlyThinking = false;
-          //   v0ThinkingDuration = performance.now() - v0ThinkingStartTime;
-          //
-          // Handle thinking chunks
-          // if (thinkingText) {
-          //   v0ThinkingAgg += thinkingText;
-          //   thinkingChunks.push(thinkingText);
-
-          //   ws.send(
-          //     JSON.stringify({
-          //       type: "ai_chat_chunk",
-          //       conversationId,
-          //       userId,
-          //       provider,
-          //       title,
-          //       model,
-          //       systemPrompt,
-          //       temperature,
-          //       topP,
-          //       thinkingText: thinkingText,
-          //       thinkingDuration: thinkingStartTime
-          //         ? performance.now() - thinkingStartTime
-          //         : undefined,
-          //       isThinking: true,
-          //       done: false
-          //     } satisfies EventTypeMap["ai_chat_chunk"])
-          //   );
-
-          //   void this.wsServer.redis.publishTypedEvent(
-          //     streamChannel,
-          //     "ai_chat_chunk",
-          //     {
-          //       type: "ai_chat_chunk",
-          //       conversationId,
-          //       userId,
-          //       model,
-          //       thinkingDuration: thinkingStartTime
-          //         ? performance.now() - thinkingStartTime
-          //         : undefined,
-          //       title,
-          //       systemPrompt,
-          //       temperature,
-          //       topP,
-          //       provider,
-          //       thinkingText: thinkingText,
-          //       isThinking: true,
-          //       done: false
-          //     }
-          //   );
-          // }
-          if (text) {
-            chunks.push(text);
-            agg += text;
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                title,
-                provider,
-                systemPrompt,
-                temperature,
-                thinkingText: v0ThinkingAgg,
-                isThinking: v0IsCurrentlyThinking,
-                thinkingDuration: v0ThinkingDuration,
-                topP,
-                model,
-                chunk: text,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                isThinking: false,
-                thinkingDuration: v0ThinkingDuration,
-                thinkingText: v0ThinkingAgg,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                chunk: text,
-                done: false
-              }
-            );
-
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-
-          // Check if stream is finished
-          if (finishReason) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              provider,
-              title,
-              userId,
-              model,
-              systemPrompt,
-              thinkingText: v0ThinkingAgg,
-              thinkingDuration: v0ThinkingDuration,
-              temperature,
-              topP
-            });
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                systemPrompt,
-                thinkingText: v0ThinkingAgg,
-                thinkingDuration: v0ThinkingDuration,
-                title,
-                temperature,
-                topP,
-                model,
-                chunk: agg,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                thinkingText: v0ThinkingAgg,
-                thinkingDuration: v0ThinkingDuration,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
-      } else if (provider === "meta") {
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-        const client = this.llamaService.llamaClient(key.apiKey ?? undefined);
-        const stream = await client.chat.completions.create(
-          {
-            user: userId,
-            top_p: topP,
-            temperature,
-            model,
-            max_completion_tokens: max_tokens,
-            messages: this.llamaService.llamaFormat(
-              isNewChat,
-              msgs,
-              prompt,
-              systemPrompt
-            ),
-            stream: true
-          },
-          { stream: true }
-        );
-
-        for await (const chunk of stream) {
-          let text: string | undefined = undefined;
-          let finish_reason:
-            | null
-            | "length"
-            | "stop"
-            | "tool_calls"
-            | "content_filter"
-            | "function_call" = null;
-          if (chunk.event.delta.type === "text") {
-            text = chunk.event.delta.text;
-          }
-          if (chunk.event.event_type === "complete") {
-            finish_reason = "stop";
-          }
-
-          if (text) {
-            chunks.push(text);
-            agg += text;
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                title,
-                provider,
-                systemPrompt,
-                temperature,
-                topP,
-                model,
-                chunk: text,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                chunk: text,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-
-          if (finish_reason != null) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              systemPrompt,
-              temperature,
-              topP,
-              conversationId,
-              done: true,
-              provider,
-              title,
-              userId,
-              model
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                systemPrompt,
-                title,
-                temperature,
-                topP,
-                model,
-                chunk: agg,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
-      } else if (provider === "grok") {
-        let xAiThinkingStartTime: number | null = null;
-        let xAiThinkingDuration = 0;
-        let xAiIsCurrentlyThinking = false;
-        let xAiThinkingAgg = "";
-
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-
-        const xAi = this.xAIService.xAIClient(key.apiKey ?? undefined);
-
-        const { messages, system } = this.xAIService.xAiFormatHistory(
+        await this.geminiService.handleGeminiAiChatRequest({
+          chunks,
+          conversationId,
           isNewChat,
           msgs,
           prompt,
-          systemPrompt
-        );
-
-        const { max_tokens, thinking } =
-          this.xAIService.handleMaxTokensAndThinking(model, event.maxTokens);
-
-        const stream = (await xAi.messages.create(
-          {
-            max_tokens,
-            stream: true,
-            thinking,
-            top_p: topP,
-            temperature,
-            system,
-            model,
-            messages
-          },
-          { stream: true }
-        )) satisfies Stream<RawMessageStreamEvent> & {
-          _request_id?: string | null;
-        };
-
-        for await (const chunk of stream) {
-          let text: string | undefined = undefined;
-          let thinkingText: string | undefined = undefined;
-          let done: StopReason | null = null;
-          if (chunk.type === "content_block_start") {
-            if (chunk.content_block.type === "web_search_tool_result") {
-              if ("error" in chunk.content_block.content) {
-                console.log(chunk.content_block.content);
-              }
-              (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
-                text = `[${v.title}](${v.url})`;
-              });
-            }
-          }
-          if (chunk.type === "content_block_delta") {
-            if (chunk.delta.type === "thinking_delta") {
-              thinkingText = chunk.delta.thinking;
-
-              // Track thinking start
-              if (!xAiIsCurrentlyThinking && xAiThinkingStartTime === null) {
-                xAiThinkingStartTime = performance.now();
-                xAiIsCurrentlyThinking = true;
-              }
-            }
-            if (chunk.delta.type === "text_delta") {
-              text = chunk.delta.text;
-
-              // Track thinking end when switching to regular text
-              if (xAiIsCurrentlyThinking && xAiThinkingStartTime !== null) {
-                const endTime = performance.now();
-                xAiThinkingDuration = Math.round(
-                  endTime - xAiThinkingStartTime
-                );
-                xAiIsCurrentlyThinking = false;
-              }
-            }
-            if (chunk.delta.type === "citations_delta") {
-              console.log(chunk.delta.citation);
-            }
-          } else if (chunk.type === "message_delta") {
-            done = chunk.delta.stop_reason;
-          }
-
-          // Handle thinking chunks
-          if (thinkingText) {
-            xAiThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                provider,
-                title,
-                model,
-                systemPrompt,
-                temperature,
-                topP,
-                thinkingText: thinkingText,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                isThinking: true,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText: thinkingText,
-                isThinking: true,
-                done: false
-              }
-            );
-          }
-
-          // Handle regular text chunks
-          if (text) {
-            agg += text;
-            chunks.push(text);
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                provider,
-                title,
-                model,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: text,
-                isThinking: false,
-                thinkingDuration:
-                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText:
-                  xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
-                thinkingDuration:
-                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-
-                chunk: text,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-
-          if (done) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              title,
-              temperature,
-              topP,
-              provider,
-              userId,
-              systemPrompt,
-              model,
-              thinkingText:
-                xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
-              thinkingDuration:
-                xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: agg,
-                thinkingText: xAiThinkingAgg || undefined,
-                thinkingDuration:
-                  xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                thinkingText: xAiThinkingAgg,
-                thinkingDuration: xAiThinkingDuration,
-                title,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
-      } else {
-        let openaiThinkingStartTime: number | null = null,
-          openaiThinkingDuration = 0,
-          openaiIsCurrentlyThinking = false,
-          openaiThinkingAgg = "";
-
-        let key: { apiKey: string | null; keyId: string | null } = {
-          apiKey: null,
-          keyId: null
-        };
-        if (hasProviderConfigured) {
-          key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-          console.log(
-            `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-          );
-        }
-        const client = this.openai.getClient(key.apiKey ?? undefined);
-
-        const responsesStream = await client.responses.create({
-          stream: true,
-          input: this.openai.formatOpenAi(isNewChat, msgs, prompt),
-          instructions: this.openai.buildInstructions(systemPrompt),
-          store: false,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
           model,
+          systemPrompt,
           temperature,
-          max_output_tokens: max_tokens,
-          top_p: topP,
-          truncation: "auto",
-          parallel_tool_calls: true,
-          tools: [
-            {
-              type: "web_search_preview",
-              user_location
-            }
-          ]
+          title,
+          topP,
+          userData
         });
-
-        for await (const s of responsesStream) {
-          let text: string | undefined = undefined;
-          let thinkingText: string | undefined = undefined;
-          let done = false;
-          // s.type as ResponseStreamEvent['type'];
-          if (
-            s.type === "response.reasoning_text.delta" ||
-            s.type === "response.reasoning_summary_text.delta"
-          ) {
-            if (
-              !openaiIsCurrentlyThinking &&
-              openaiThinkingStartTime === null
-            ) {
-              openaiIsCurrentlyThinking = true;
-              openaiThinkingStartTime = performance.now();
-            }
-
-            thinkingText = s.delta;
-          }
-          if (
-            (s.type === "response.reasoning_summary_text.done" ||
-              s.type === "response.reasoning_text.done") &&
-            openaiIsCurrentlyThinking &&
-            openaiThinkingStartTime !== null
-          ) {
-            openaiIsCurrentlyThinking = false;
-            openaiThinkingDuration = Math.round(
-              performance.now() - openaiThinkingStartTime
-            );
-          }
-          if (s.type === "response.output_text.delta") {
-            text = s.delta;
-          }
-          if (s.type === "response.output_text.done") {
-            done = true;
-          }
-
-          if (thinkingText) {
-            openaiThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                done: false,
-                userId,
-                model,
-                provider,
-                systemPrompt,
-                temperature,
-                title,
-                topP,
-                thinkingText: thinkingText,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                isThinking: true
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                thinkingDuration: thinkingStartTime
-                  ? performance.now() - thinkingStartTime
-                  : undefined,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText: thinkingText,
-                isThinking: true,
-                done: false
-              }
-            );
-          } // Handle regular text chunks
-          if (text) {
-            agg += text;
-            chunks.push(text);
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                provider,
-                title,
-                model,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: text,
-                isThinking: false,
-                thinkingText:
-                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-                thinkingDuration:
-                  openaiThinkingDuration > 0
-                    ? openaiThinkingDuration
-                    : undefined,
-                done: false
-              } satisfies EventTypeMap["ai_chat_chunk"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_chunk",
-              {
-                type: "ai_chat_chunk",
-                conversationId,
-                userId,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                provider,
-                thinkingText:
-                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-                thinkingDuration:
-                  openaiThinkingDuration > 0
-                    ? openaiThinkingDuration
-                    : undefined,
-
-                chunk: text,
-                done: false
-              }
-            );
-            if (chunks.length % 10 === 0) {
-              void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-                model,
-                provider,
-                title,
-                totalChunks: chunks.length,
-                completed: false,
-                systemPrompt,
-                temperature,
-                topP
-              });
-            }
-          }
-          if (done) {
-            void this.wsServer.prisma.handleAiChatResponse({
-              chunk: agg,
-              conversationId,
-              done: true,
-              title,
-              temperature,
-              topP,
-              provider,
-              userId,
-              systemPrompt,
-              model,
-              thinkingText:
-                openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-              thinkingDuration:
-                openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
-            });
-            ws.send(
-              JSON.stringify({
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                provider,
-                model,
-                title,
-                systemPrompt,
-                temperature,
-                topP,
-                chunk: agg,
-                thinkingText:
-                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-                thinkingDuration:
-                  openaiThinkingDuration > 0
-                    ? openaiThinkingDuration
-                    : undefined,
-                done: true
-              } satisfies EventTypeMap["ai_chat_response"])
-            );
-            void this.wsServer.redis.publishTypedEvent(
-              streamChannel,
-              "ai_chat_response",
-              {
-                type: "ai_chat_response",
-                conversationId,
-                userId,
-                systemPrompt,
-                temperature,
-                title,
-                thinkingText:
-                  openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-                thinkingDuration:
-                  openaiThinkingDuration > 0
-                    ? openaiThinkingDuration
-                    : undefined,
-                topP,
-                provider,
-                model,
-                chunk: agg,
-                done: true
-              }
-            );
-            // Clear saved state on successful completion
-            void this.wsServer.redis.del(`stream:state:${conversationId}`);
-            break;
-          }
-        }
+      } else if (provider === "anthropic") {
+        await this.anthropicService.handleAnthropicAiChatRequest({
+          chunks,
+          conversationId,
+          isNewChat,
+          msgs,
+          prompt,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
+          model,
+          systemPrompt,
+          temperature,
+          title,
+          topP,
+          user_location
+        });
+      } else if (provider === "vercel") {
+        await this.v0Service.handleV0AiChatRequest({
+          chunks,
+          conversationId,
+          isNewChat,
+          msgs,
+          prompt,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
+          model,
+          systemPrompt,
+          temperature,
+          title,
+          topP
+        });
+      } else if (provider === "meta") {
+        await this.llamaService.handleMetaAiChatRequest({
+          chunks,
+          conversationId,
+          isNewChat,
+          msgs,
+          prompt,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
+          model,
+          systemPrompt,
+          temperature,
+          title,
+          topP
+        });
+      } else if (provider === "grok") {
+        await this.xAIService.handleGrokAiChatRequest({
+          chunks,
+          conversationId,
+          isNewChat,
+          msgs,
+          prompt,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
+          model,
+          systemPrompt,
+          temperature,
+          title,
+          topP
+        });
+      } else {
+        await this.openai.handleOpenaiAiChatRequest({
+          chunks,
+          conversationId,
+          isNewChat,
+          msgs,
+          prompt,
+          streamChannel,
+          thinkingChunks,
+          userId,
+          ws,
+          apiKey,
+          max_tokens,
+          model,
+          systemPrompt,
+          temperature,
+          title,
+          topP,
+          user_location
+        });
       }
     } catch (err) {
       console.error(`AI Stream Error`, err);
@@ -1711,6 +371,9 @@ export class Resolver extends ModelService {
           conversationId,
           model,
           systemPrompt,
+          temperature,
+          topP,
+          title,
           userId,
           done: true,
           message: this.safeErrMsg(err)
@@ -1734,16 +397,21 @@ export class Resolver extends ModelService {
       );
 
       // Save state for potential resume after error
-      void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-        model,
-        provider,
-        title,
-        totalChunks: chunks.length,
-        completed: false,
-        systemPrompt,
-        temperature,
-        topP
-      });
+      void this.wsServer.redis.saveStreamState(
+        conversationId,
+        chunks,
+        {
+          model,
+          provider,
+          title,
+          totalChunks: chunks.length,
+          completed: false,
+          systemPrompt,
+          temperature,
+          topP
+        },
+        thinkingChunks
+      );
     }
   }
   /** Dispatches incoming events to handlers */
@@ -1975,238 +643,3 @@ export class Resolver extends ModelService {
     }
   }
 }
-
-/**
- *
- // else if (provider === "vercel") {
-      //   let v0ThinkingStartTime: number | null = null,
-      //     v0ThinkingDuration = 0,
-      //     v0IsCurrentlyThinking = false,
-      //     v0ThinkingAgg = "";
-
-      //   let key: { apiKey: string | null; keyId: string | null } = {
-      //     apiKey: null,
-      //     keyId: null
-      //   };
-      //   if (hasProviderConfigured) {
-      //     key = await this.wsServer.prisma.handleApiKeyLookup(provider, userId);
-      //     console.log(
-      //       `key lookup res for ${provider}, ${key.keyId ?? "no key"}`
-      //     );
-      //   }
-      //   const client = this.v0Service.v0Client(key.apiKey ?? undefined);
-
-      //   const responsesStream = (await client.responses.create({
-      //     stream: true,
-      //     input: this.v0Service.v0Format(isNewChat, msgs, prompt, systemPrompt),
-      //     store: false,
-      //     model,
-      //     temperature,
-      //     max_output_tokens: max_tokens,
-      //     top_p: topP,
-      //     truncation: "auto"
-      //   })) satisfies OpenAIStream<ResponseStreamEvent> & {
-      //     _response_id?: string | null;
-      //   };
-
-      //   for await (const s of responsesStream) {
-      //     let text: string | undefined = undefined;
-      //     let thinkingText: string | undefined = undefined;
-      //     let done = false;
-      //     // s.type as ResponseStreamEvent['type'];
-      //     if (
-      //       s.type === "response.reasoning_text.delta" ||
-      //       s.type === "response.reasoning_summary_text.delta"
-      //     ) {
-      //       if (!v0IsCurrentlyThinking && v0ThinkingStartTime === null) {
-      //         v0IsCurrentlyThinking = true;
-      //         v0ThinkingStartTime = performance.now();
-      //       }
-
-      //       thinkingText = s.delta;
-      //     }
-      //     if (
-      //       (s.type === "response.reasoning_summary_text.done" ||
-      //         s.type === "response.reasoning_text.done") &&
-      //       v0IsCurrentlyThinking &&
-      //       v0ThinkingStartTime !== null
-      //     ) {
-      //       v0IsCurrentlyThinking = false;
-      //       v0ThinkingDuration = Math.round(
-      //         performance.now() - v0ThinkingStartTime
-      //       );
-      //     }
-      //     if (s.type === "response.output_text.delta") {
-      //       text = s.delta;
-      //     }
-      //     if (s.type === "response.output_text.done") {
-      //       done = true;
-      //     }
-
-      //     if (thinkingText) {
-      //       v0ThinkingAgg += thinkingText;
-      //       thinkingChunks.push(thinkingText);
-
-      //       ws.send(
-      //         JSON.stringify({
-      //           type: "ai_chat_chunk",
-      //           conversationId,
-      //           done: false,
-      //           userId,
-      //           model,
-      //           provider,
-      //           systemPrompt,
-      //           temperature,
-      //           title,
-      //           topP,
-      //           thinkingText: thinkingText,
-      //           thinkingDuration: thinkingStartTime
-      //             ? performance.now() - thinkingStartTime
-      //             : undefined,
-      //           isThinking: true
-      //         } satisfies EventTypeMap["ai_chat_chunk"])
-      //       );
-      //       void this.wsServer.redis.publishTypedEvent(
-      //         streamChannel,
-      //         "ai_chat_chunk",
-      //         {
-      //           type: "ai_chat_chunk",
-      //           conversationId,
-      //           userId,
-      //           model,
-      //           thinkingDuration: thinkingStartTime
-      //             ? performance.now() - thinkingStartTime
-      //             : undefined,
-      //           title,
-      //           systemPrompt,
-      //           temperature,
-      //           topP,
-      //           provider,
-      //           thinkingText: thinkingText,
-      //           isThinking: true,
-      //           done: false
-      //         }
-      //       );
-      //     } // Handle regular text chunks
-      //     if (text) {
-      //       agg += text;
-      //       chunks.push(text);
-      //       ws.send(
-      //         JSON.stringify({
-      //           type: "ai_chat_chunk",
-      //           conversationId,
-      //           userId,
-      //           provider,
-      //           title,
-      //           model,
-      //           systemPrompt,
-      //           temperature,
-      //           topP,
-      //           chunk: text,
-      //           isThinking: false,
-      //           thinkingText:
-      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-      //           thinkingDuration:
-      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-      //           done: false
-      //         } satisfies EventTypeMap["ai_chat_chunk"])
-      //       );
-      //       void this.wsServer.redis.publishTypedEvent(
-      //         streamChannel,
-      //         "ai_chat_chunk",
-      //         {
-      //           type: "ai_chat_chunk",
-      //           conversationId,
-      //           userId,
-      //           model,
-      //           title,
-      //           systemPrompt,
-      //           temperature,
-      //           topP,
-      //           provider,
-      //           thinkingText:
-      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-      //           thinkingDuration:
-      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-
-      //           chunk: text,
-      //           done: false
-      //         }
-      //       );
-      //       if (chunks.length % 10 === 0) {
-      //         void this.wsServer.redis.saveStreamState(conversationId, chunks, {
-      //           model,
-      //           provider,
-      //           title,
-      //           totalChunks: chunks.length,
-      //           completed: false,
-      //           systemPrompt,
-      //           temperature,
-      //           topP
-      //         });
-      //       }
-      //     }
-      //     if (done) {
-      //       void this.wsServer.prisma.handleAiChatResponse({
-      //         chunk: agg,
-      //         conversationId,
-      //         done: true,
-      //         title,
-      //         temperature,
-      //         topP,
-      //         provider,
-      //         userId,
-      //         systemPrompt,
-      //         model,
-      //         thinkingText:
-      //           v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-      //         thinkingDuration:
-      //           v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined
-      //       });
-      //       ws.send(
-      //         JSON.stringify({
-      //           type: "ai_chat_response",
-      //           conversationId,
-      //           userId,
-      //           provider,
-      //           model,
-      //           title,
-      //           systemPrompt,
-      //           temperature,
-      //           topP,
-      //           chunk: agg,
-      //           thinkingText:
-      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-      //           thinkingDuration:
-      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-      //           done: true
-      //         } satisfies EventTypeMap["ai_chat_response"])
-      //       );
-      //       void this.wsServer.redis.publishTypedEvent(
-      //         streamChannel,
-      //         "ai_chat_response",
-      //         {
-      //           type: "ai_chat_response",
-      //           conversationId,
-      //           userId,
-      //           systemPrompt,
-      //           temperature,
-      //           title,
-      //           thinkingText:
-      //             v0ThinkingAgg.length > 0 ? v0ThinkingAgg : undefined,
-      //           thinkingDuration:
-      //             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-      //           topP,
-      //           provider,
-      //           model,
-      //           chunk: agg,
-      //           done: true
-      //         }
-      //       );
-      //       // Clear saved state on successful completion
-      //       void this.wsServer.redis.del(`stream:state:${conversationId}`);
-      //       break;
-      //     }
-      //   }
-      // }
- */

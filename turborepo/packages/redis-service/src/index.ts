@@ -15,3 +15,5 @@ export type {
 } from "@/pubsub/extended-events.ts";
 export { RedisChannels } from "@/pubsub/channels.ts";
 export { EnhancedRedisPubSub } from "@/pubsub/enhanced-client.ts";
+export { createRedisPubSubContext } from "@/context/index.ts";
+export type { RedisPubSubContext } from "@/context/index.ts";

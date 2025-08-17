@@ -1,42 +1,22 @@
 import type { Message } from "@/generated/client/client.ts";
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import {
-  createVercel,
-  VercelProvider,
-  VercelProviderSettings
-} from "@ai-sdk/vercel";
+import { PrismaService } from "@/prisma/index.ts";
+import { createV0SSEParser, isReasoningDelta } from "@/vercel/sse.ts";
+import type { EventTypeMap, VercelModelIdUnion } from "@t3-chat-clone/types";
+import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
-import { createSSEParser } from "./sse.ts";
-
-// it is compatible with the openai ChatCompletion Shape for
-
-interface V0Chunk {
-  id: string;
-  object: "chat.completion.chunk";
-  created: number;
-  model: string;
-  choices: {
-    index: number;
-    delta: {
-      content?: string;
-      role?: "assistant";
-    };
-    finish_reason: "stop" | "length" | null;
-  }[];
-}
 export class v0Service {
   private readonly baseUrl = "https://api.v0.dev/v1/chat/completions";
-  private v: (options?: VercelProviderSettings) => VercelProvider;
-  constructor(private apiKey?: string) {
-    this.v = createVercel;
-  }
-  public getClient(userApiKey?: string) {
-    if (userApiKey) {
-      return this.v({ apiKey: userApiKey });
-    } else return this.v({ apiKey: this.apiKey });
-  }
+  constructor(
+    private prisma: PrismaService,
+    private redis: EnhancedRedisPubSub,
+    private apiKey?: string
+  ) {}
+
   public async *stream(
-    model: string,
+    model = "v0-1.5-md" satisfies VercelModelIdUnion,
     messages: readonly ChatCompletionMessageParam[],
     apiKey?: string,
     options?: {
@@ -44,9 +24,9 @@ export class v0Service {
       top_p?: number;
       max_tokens?: number;
     }
-  ) {
-    const _x = options;
+  ): AsyncGenerator<v0ChatCompletionsRes, void, unknown> {
     const key = apiKey ?? this.apiKey;
+
     const response = await fetch(this.baseUrl, {
       method: "POST",
       headers: {
@@ -56,42 +36,77 @@ export class v0Service {
       body: JSON.stringify({
         model,
         messages,
-        stream: true
+        stream: true,
+        ...(options && {
+          temperature: options.temperature,
+          top_p: options.top_p,
+          max_tokens: options.max_tokens
+        })
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Vercel API error (${response.status}): ${errorText}`);
+      throw new Error(
+        `Vercel v0 API error (${response.status}, ${response.statusText}): ${errorText}`
+      );
     }
 
-    const parser = createSSEParser(response);
+    const parser = createV0SSEParser(response);
+
+    // Track if we've started outputting content (vs reasoning)
 
     for await (const event of parser) {
-      if (event.data === "[DONE]") {
+      const chunk = event.data;
+
+      // Check if stream is complete (empty choices array with usage stats)
+      if (chunk.choices?.length === 0 && chunk.usage) {
+        // Yield final chunk with usage stats
+        yield {
+          created: event.data.created,
+          id: event.data.id,
+          model: event.data.model,
+          object: event.data.object,
+          service_tier: event.data.service_tier,
+          system_fingerprint: event.data.system_fingerprint,
+          choices: [],
+          usage: chunk.usage
+        };
         return; // Stream finished
       }
 
-      try {
-        const chunk = JSON.parse(event.data) as V0Chunk;
-        // Return the full chunk structure that the resolver expects
-        yield {
-          choices: chunk.choices.map(choice => ({
-            delta: { content: choice.delta.content },
-            finish_reason: choice.finish_reason
-          })),
-          // Add usage if available (v0 might not provide this during streaming)
+      // Process active chunks with content
+      if (chunk.choices && chunk.choices.length > 0) {
+        const transformedChunk = {
+          choices: chunk.choices.map(choice => {
+            if (isReasoningDelta(choice.delta)) {
+              return {
+                delta: { reasoning_content: choice.delta.reasoning_content },
+                index: choice.index,
+                logprobs: choice.logprobs,
+                finish_reason: null as null
+              };
+            } else {
+              return {
+                delta: { content: choice.delta.content },
+                index: choice.index,
+                logprobs: choice.logprobs,
+                finish_reason: null as null
+              };
+            }
+          }),
+          created: event.data.created,
+          id: event.data.id,
+          model: event.data.model,
+          object: event.data.object,
+          service_tier: event.data.service_tier,
+          system_fingerprint: event.data.system_fingerprint,
           usage: undefined
         };
-      } catch (error) {
-        console.log(error);
-        console.error("Failed to parse Vercel stream chunk:", event.data);
+
+        yield transformedChunk;
       }
     }
-  }
-
-  private sanitizeModel(model: string) {
-    return model.replace(/\./g, "dot");
   }
 
   private prependProviderModelTag(msgs: Message[]) {
@@ -123,9 +138,10 @@ export class v0Service {
     )[],
     systemPrompt?: string
   ) {
+    const basePrompt = `You are a knowledgeable full-stack expert; provide assistance by outputting formatted code blocks into chat; tools such as quick edit are unnecessary for this task.\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`;
     const enhancedSystemPrompt = systemPrompt
-      ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      ? `${systemPrompt}\n\n${basePrompt}`
+      : basePrompt;
     if (systemPrompt) {
       return [
         { role: "system", content: enhancedSystemPrompt } as const,
@@ -164,6 +180,268 @@ export class v0Service {
         this.prependProviderModelTag(msgs),
         systemPrompt
       ) satisfies ChatCompletionMessageParam[];
+    }
+  }
+
+  public async handleV0AiChatRequest({
+    chunks,
+    conversationId,
+    streamChannel,
+    msgs,
+    thinkingChunks,
+    apiKey,
+    prompt,
+    ws,
+    userId,
+    isNewChat,
+    max_tokens,
+    model,
+    systemPrompt,
+    temperature,
+    title,
+    topP
+  }: ProviderChatRequestEntity) {
+    const provider = "vercel" as const;
+    let v0ThinkingStartTime: number | null = null,
+      v0ThinkingDuration = 0,
+      v0IsCurrentlyThinking = false,
+      v0ThinkingAgg = "",
+      v0Agg = "";
+
+    const streamer = this.stream(
+      model,
+      this.v0Format(isNewChat, msgs, prompt, systemPrompt),
+      apiKey ?? undefined,
+      { max_tokens, top_p: topP, temperature }
+    );
+
+    for await (const chunk of streamer) {
+      // Process each choice in the chunk
+      let text: string | undefined = undefined,
+        thinkingText: string | undefined = undefined,
+        done: boolean | undefined = undefined,
+        usage: v0Usage | undefined = undefined;
+      // usage only appears in the very last chunk streamed in
+      if ("usage" in chunk && typeof chunk.usage !== "undefined") {
+        done = true;
+        usage = chunk.usage;
+      }
+
+      if (chunk?.choices) {
+        for (const choice of chunk.choices) {
+          if (
+            "reasoning_content" in choice.delta &&
+            typeof choice.delta.reasoning_content !== "undefined"
+          ) {
+            if (typeof v0ThinkingStartTime !== "number") {
+              v0ThinkingStartTime = performance.now();
+            }
+            if (v0IsCurrentlyThinking === false) {
+              v0IsCurrentlyThinking = true;
+            }
+            thinkingText = choice.delta.reasoning_content;
+          }
+          if (
+            "content" in choice.delta &&
+            typeof choice.delta.content !== "undefined"
+          ) {
+            if (v0IsCurrentlyThinking === true && v0ThinkingStartTime) {
+              v0IsCurrentlyThinking = false;
+              const endThinkingTime = performance.now();
+              v0ThinkingDuration = Math.round(
+                endThinkingTime - v0ThinkingStartTime
+              );
+            }
+            text = choice.delta.content;
+          }
+        }
+      }
+      if (thinkingText && v0IsCurrentlyThinking) {
+        if (thinkingText.startsWith(v0ThinkingAgg)) {
+          v0ThinkingAgg = thinkingText;
+        } else {
+          v0ThinkingAgg += thinkingText;
+          thinkingChunks.push(thinkingText);
+        }
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            title,
+            provider,
+            systemPrompt,
+            temperature,
+            thinkingText: thinkingText,
+            isThinking: v0IsCurrentlyThinking,
+            thinkingDuration: v0ThinkingStartTime
+              ? performance.now() - v0ThinkingStartTime
+              : undefined,
+            topP,
+            model,
+            done: false
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          title,
+          isThinking: v0IsCurrentlyThinking,
+          thinkingDuration: v0ThinkingStartTime
+            ? performance.now() - v0ThinkingStartTime
+            : undefined,
+          thinkingText: thinkingText,
+          systemPrompt,
+          temperature,
+          topP,
+          provider,
+          chunk: text,
+          done: false
+        });
+
+        if (thinkingChunks.length % 10 === 0) {
+          void this.redis.saveStreamState(
+            conversationId,
+            chunks,
+            {
+              model,
+              provider,
+              title,
+              totalChunks: thinkingChunks.length,
+              completed: false,
+              systemPrompt,
+              temperature,
+              topP
+            },
+            thinkingChunks
+          );
+        }
+      }
+      if (text) {
+        chunks.push(text);
+        v0Agg += text;
+
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            title,
+            provider,
+            systemPrompt,
+            temperature,
+            thinkingDuration:
+              v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+            isThinking: v0IsCurrentlyThinking,
+            thinkingText: v0ThinkingAgg,
+            topP,
+            model,
+            chunk: text,
+            done: false
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          title,
+          thinkingDuration:
+            v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+          isThinking: v0IsCurrentlyThinking,
+          thinkingText: v0ThinkingAgg,
+          systemPrompt,
+          temperature,
+          topP,
+          provider,
+          chunk: text,
+          done: false
+        });
+
+        if (chunks.length % 10 === 0) {
+          void this.redis.saveStreamState(
+            conversationId,
+            chunks,
+            {
+              model,
+              provider,
+              title,
+              totalChunks: chunks.length,
+              completed: false,
+              systemPrompt,
+              temperature,
+              topP
+            },
+            thinkingChunks
+          );
+        }
+      }
+
+      // Check if stream is finished
+      if (done) {
+        void this.prisma.handleAiChatResponse({
+          chunk: v0Agg,
+          conversationId,
+          done,
+          provider,
+          title,
+          userId,
+          model,
+          systemPrompt,
+          thinkingDuration:
+            v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+          thinkingText: v0ThinkingAgg,
+          temperature,
+          usage: usage?.total_tokens,
+          topP
+        });
+
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_response",
+            conversationId,
+            userId,
+            provider,
+            systemPrompt,
+            thinkingDuration:
+              v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+            thinkingText: v0ThinkingAgg,
+            title,
+            temperature,
+            topP,
+            model,
+            usage: usage?.total_tokens,
+            chunk: v0Agg,
+            done
+          } satisfies EventTypeMap["ai_chat_response"])
+        );
+
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
+          type: "ai_chat_response",
+          conversationId,
+          userId,
+          systemPrompt,
+          temperature,
+          title,
+          thinkingDuration:
+            v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
+          thinkingText: v0ThinkingAgg,
+          topP,
+          usage: usage?.total_tokens,
+          provider,
+          model,
+          chunk: v0Agg,
+          done
+        });
+
+        // Clear saved state on successful completion
+        void this.redis.del(`stream:state:${conversationId}`);
+        break;
+      }
     }
   }
 }

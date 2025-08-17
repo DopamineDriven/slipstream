@@ -54,6 +54,7 @@ export type AllEventTypes = AllEvents[keyof AllEvents]["type"];
 export type EventByType<T extends AllEventTypes> = Extract<AllEvents[keyof AllEvents], { type: T }>;
 
 export type StreamStateProps = {
+  thinkingChunks?: string[];
   chunks: string[];
   metadata: {
     model?: string;

@@ -58,27 +58,31 @@ async function exe() {
 
     const { v0Service } = await import("@/vercel/index.ts");
 
-    const v0 = new v0Service(cfg.V0_API_KEY);
+    const v0 = new v0Service(prisma, redisInstance, cfg.V0_API_KEY);
 
     const { LlamaService } = await import("@/meta/index.ts");
 
-    const meta = new LlamaService(cfg.LLAMA_API_KEY);
+    const meta = new LlamaService(prisma, redisInstance, cfg.LLAMA_API_KEY);
 
     const { xAIService } = await import("@/xai/index.ts");
 
-    const xai = new xAIService(cfg.X_AI_KEY);
+    const xai = new xAIService(cfg.X_AI_KEY, prisma, redisInstance);
 
     const { OpenAIService } = await import("@/openai/index.ts");
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
-    const anthropic = new AnthropicService(cfg.ANTHROPIC_API_KEY);
+    const anthropic = new AnthropicService(
+      prisma,
+      redisInstance,
+      cfg.ANTHROPIC_API_KEY
+    );
 
-    const openai = new OpenAIService(cfg.OPENAI_API_KEY);
+    const openai = new OpenAIService(prisma, redisInstance, cfg.OPENAI_API_KEY);
 
     const { GeminiService } = await import("@/gemini/index.ts");
 
-    const gemini = new GeminiService(cfg.GOOGLE_API_KEY);
+    const gemini = new GeminiService(prisma, redisInstance, cfg.GOOGLE_API_KEY);
 
     const resolver = new Resolver(
       wsServer,

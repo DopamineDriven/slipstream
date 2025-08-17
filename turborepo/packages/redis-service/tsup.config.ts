@@ -6,6 +6,7 @@ const tsupConfig = (options: Options) =>
   ({
     entry: [
       "src/index.ts",
+      "src/context/index.ts",
       "src/service/index.ts",
       "src/service/types.ts",
       "src/pubsub/channels.ts",
