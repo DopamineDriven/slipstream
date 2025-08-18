@@ -125,7 +125,8 @@ export class GeminiService {
       geminiThinkingDuration = 0,
       geminiIsCurrentlyThinking = false,
       geminiThinkingAgg = "",
-      geminiAgg = "";
+      geminiAgg = "",
+      geminiDataPart: Blob | undefined = undefined;
 
     const { history, systemInstruction } = this.getHistoryAndInstruction(
       isNewChat,
@@ -163,10 +164,10 @@ export class GeminiService {
     })) satisfies AsyncGenerator<GenerateContentResponse>;
 
     for await (const chunk of stream) {
-      let dataPart: Blob | undefined = undefined;
-      let textPart: string | undefined = undefined;
-      let thinkingPart: string | undefined = undefined;
-      let done: keyof typeof FinishReason | undefined = undefined;
+      let dataPart: Blob | undefined = undefined,
+        textPart: string | undefined = undefined,
+        thinkingPart: string | undefined = undefined,
+        done: keyof typeof FinishReason | undefined = undefined;
 
       if (chunk.candidates) {
         for (const candidate of chunk.candidates) {
@@ -174,10 +175,24 @@ export class GeminiService {
             for (const part of candidate.content.parts) {
               if (part.text) {
                 if (part.thought) {
-                  geminiIsCurrentlyThinking = part.thought;
+                  if (
+                    geminiIsCurrentlyThinking === false &&
+                    typeof geminiThinkingStartTime !== "number"
+                  ) {
+                    geminiIsCurrentlyThinking = part.thought;
+                    geminiThinkingStartTime = performance.now();
+                  }
                   thinkingPart = part.text;
                 } else {
-                  geminiIsCurrentlyThinking = part.thought ?? false;
+                  if (
+                    geminiThinkingDuration === 0 &&
+                    typeof geminiThinkingStartTime === "number"
+                  ) {
+                    geminiThinkingDuration = Math.round(
+                      performance.now() - geminiThinkingStartTime
+                    );
+                    geminiIsCurrentlyThinking = part.thought ?? false;
+                  }
                   textPart = part.text;
                 }
               }
@@ -192,13 +207,7 @@ export class GeminiService {
           }
         }
       }
-      if (geminiIsCurrentlyThinking && thinkingPart) {
-        // Track thinking start time
-        if (!geminiIsCurrentlyThinking && geminiThinkingStartTime === null) {
-          geminiThinkingStartTime = performance.now();
-          geminiIsCurrentlyThinking = true;
-        }
-
+      if (thinkingPart) {
         thinkingChunks.push(thinkingPart);
         geminiThinkingAgg += thinkingPart;
 
@@ -210,12 +219,14 @@ export class GeminiService {
             model,
             title,
             systemPrompt,
-            isThinking: geminiIsCurrentlyThinking,
+            isThinking: true,
             temperature,
             topP,
             provider,
             thinkingDuration: geminiThinkingStartTime
-              ? performance.now() - geminiThinkingStartTime
+              ? ((start: number) => performance.now() - start)(
+                  geminiThinkingStartTime
+                )
               : undefined,
             thinkingText: thinkingPart,
             done: false
@@ -232,9 +243,11 @@ export class GeminiService {
           temperature,
           topP,
           provider,
-          isThinking: geminiIsCurrentlyThinking,
+          isThinking: true,
           thinkingDuration: geminiThinkingStartTime
-            ? performance.now() - geminiThinkingStartTime
+            ? ((start: number) => performance.now() - start)(
+                geminiThinkingStartTime
+              )
             : undefined,
           thinkingText: thinkingPart,
           done: false
@@ -258,15 +271,6 @@ export class GeminiService {
         }
       }
       if (textPart) {
-        // Track thinking end time when transitioning from thinking to regular text
-        if (geminiIsCurrentlyThinking && geminiThinkingStartTime !== null) {
-          const thinkingEndTime = performance.now();
-          geminiThinkingDuration = Math.round(
-            thinkingEndTime - geminiThinkingStartTime
-          );
-          geminiIsCurrentlyThinking = false;
-        }
-
         chunks.push(textPart);
         geminiAgg += textPart;
 
@@ -278,7 +282,7 @@ export class GeminiService {
             model,
             title,
             systemPrompt,
-            isThinking: geminiIsCurrentlyThinking,
+            isThinking: false,
             temperature,
             topP,
             provider,
@@ -296,7 +300,7 @@ export class GeminiService {
           userId,
           model,
           title,
-          isThinking: geminiIsCurrentlyThinking,
+          isThinking: false,
           systemPrompt,
           temperature,
           topP,
@@ -326,6 +330,7 @@ export class GeminiService {
         }
       }
       if (dataPart?.data && dataPart?.mimeType) {
+        geminiDataPart = dataPart;
         const _dataUrl =
           `data:${dataPart.mimeType};base64,${dataPart.data}` as const;
         ws.send(
@@ -355,6 +360,9 @@ export class GeminiService {
           userId,
           systemPrompt,
           temperature,
+          data: geminiDataPart
+            ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+            : undefined,
           topP,
           model,
           thinkingText: geminiThinkingAgg,
@@ -368,6 +376,9 @@ export class GeminiService {
             userId,
             model,
             systemPrompt,
+            data: geminiDataPart
+              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+              : undefined,
             temperature,
             title,
             topP,
@@ -385,6 +396,9 @@ export class GeminiService {
           userId,
           systemPrompt,
           temperature,
+          data: geminiDataPart
+            ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+            : undefined,
           thinkingDuration: geminiThinkingDuration,
           title,
           topP,

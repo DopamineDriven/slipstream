@@ -270,7 +270,10 @@ function SidebarTrigger({
   );
 }
 
-function SidebarRail({ className, ...props }: React.ComponentPropsWithRef<"button">) {
+function SidebarRail({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"button">) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -297,13 +300,17 @@ function SidebarRail({ className, ...props }: React.ComponentPropsWithRef<"butto
   );
 }
 
-function SidebarInset({ className, ...props }: React.ComponentPropsWithRef<"main">) {
+function SidebarInset({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"main">) {
   return (
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "bg-background relative flex w-full flex-1 flex-col z-20",
-        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "bg-background relative z-20 flex h-full w-full flex-1 flex-col",
+        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl",
+        "md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}
       {...props}
@@ -325,7 +332,10 @@ function SidebarInput({
   );
 }
 
-function SidebarHeader({ className, ...props }: React.ComponentPropsWithRef<"div">) {
+function SidebarHeader({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"div">) {
   return (
     <div
       data-slot="sidebar-header"
@@ -336,7 +346,10 @@ function SidebarHeader({ className, ...props }: React.ComponentPropsWithRef<"div
   );
 }
 
-function SidebarFooter({ className, ...props }: React.ComponentPropsWithRef<"div">) {
+function SidebarFooter({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"div">) {
   return (
     <div
       data-slot="sidebar-footer"
@@ -361,7 +374,10 @@ function SidebarSeparator({
   );
 }
 
-function SidebarContent({ className, ...props }: React.ComponentPropsWithRef<"div">) {
+function SidebarContent({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"div">) {
   return (
     <div
       data-slot="sidebar-content"
@@ -375,7 +391,10 @@ function SidebarContent({ className, ...props }: React.ComponentPropsWithRef<"di
   );
 }
 
-function SidebarGroup({ className, ...props }: React.ComponentPropsWithRef<"div">) {
+function SidebarGroup({
+  className,
+  ...props
+}: React.ComponentPropsWithRef<"div">) {
   return (
     <div
       data-slot="sidebar-group"
