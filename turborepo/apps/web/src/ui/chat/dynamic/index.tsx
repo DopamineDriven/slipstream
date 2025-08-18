@@ -208,7 +208,7 @@ export function ChatInterface({
   );
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-y-auto">
       <ChatFeed
         messages={messages}
         streamedText={isStreaming ? streamedText : ""}

@@ -136,30 +136,24 @@ export class GeminiService {
 
     const gemini = this.getClient(apiKey);
 
-    const chat = gemini.chats.create({
-      model: model,
-      history
-    });
-    const longitude = lng ?? -122.4194,
-      latitude = lat ?? 47.7749;
+    const fullContent = [
+      ...(history ?? []),
+      { role: "user", parts: [{ text: prompt }] }
+    ] as const satisfies Content[];
 
-    const stream = (await chat.sendMessageStream({
-      message: prompt,
+    const stream = (await gemini.models.generateContentStream({
+      contents: fullContent,
+      model,
       config: {
-        temperature,
         maxOutputTokens: max_tokens,
-        tools: [{ googleSearch: {} }, { urlContext: {} }],
         toolConfig: {
-          retrievalConfig: {
-            latLng: {
-              latitude,
-              longitude
-            }
-          }
+          retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
         },
+        tools: [{ googleSearch: {} }, { urlContext: {} }],
         topP,
-        thinkingConfig: { includeThoughts: true, thinkingBudget: -1 },
-        systemInstruction
+        temperature,
+        systemInstruction,
+        thinkingConfig: { includeThoughts: true, thinkingBudget: -1 }
       }
     })) satisfies AsyncGenerator<GenerateContentResponse>;
 

@@ -40,7 +40,6 @@ export function useConversations(userId?: string): UseConversationsReturn {
     userId ? `/api/users/${userId}/conversations` : null,
     fetcher,
     {
-      revalidateOnReconnect: true,
       fetcher
     }
   );

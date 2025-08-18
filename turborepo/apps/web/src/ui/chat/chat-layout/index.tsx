@@ -6,7 +6,7 @@ export function ChatLayoutClient({
   children
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="bg-background text-foreground h-full w-full overflow-hidden">
+    <div className="bg-background text-foreground h-full w-screen overflow-hidden">
       {children}
     </div>
   );
