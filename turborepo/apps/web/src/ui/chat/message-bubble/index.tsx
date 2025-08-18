@@ -240,7 +240,7 @@ export function MessageBubble({
         id={`msg-${message.id}`}
         data-message-id={message.id}
         className={cn(
-          "mx-auto flex w-full max-w-4xl gap-3",
+          "mx-auto flex w-full max-w-[100dvw] sm:max-w-3xl md:max-w-4xl gap-3",
           isUser ? "justify-end" : "justify-start",
           className
         )}>
@@ -253,7 +253,7 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "group relative max-w-[85%] rounded-2xl px-4 py-3 text-sm",
+            "group relative min-w-0 max-w-[85%] rounded-2xl px-4 py-3 text-sm",
             isUser ? "bg-muted text-forground" : "bg-primary/40 text-foreground"
           )}>
           {isMobile && (

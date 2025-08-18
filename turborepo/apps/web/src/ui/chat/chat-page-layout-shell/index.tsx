@@ -110,7 +110,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   return (
     <>
       <SidebarProvider>
-        <div className="flex h-screen w-screen overflow-hidden">
+        <div className="flex h-full w-full overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
             <Suspense>
               <EnhancedSidebar />

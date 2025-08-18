@@ -180,7 +180,7 @@ export function ChatFeed({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="flex w-full justify-start">
+            className="mx-auto flex w-full max-w-[100dvw] justify-start gap-3 sm:max-w-3xl md:max-w-4xl">
             <div className="flex items-center gap-3">
               {/* AI Avatar */}
               <div className="mt-1 shrink-0">
