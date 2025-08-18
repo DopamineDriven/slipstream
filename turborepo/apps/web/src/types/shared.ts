@@ -33,3 +33,11 @@ export interface MessageClient
 
   isEditing?: boolean;
 }
+
+export type RxnUnion =
+  | "liked"
+  | "disliked"
+  | "unliked"
+  | "undisliked"
+  | "switch-to-liked"
+  | "switch-to-disliked"

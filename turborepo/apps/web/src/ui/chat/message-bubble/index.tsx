@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useReaction } from "@/hooks/use-reaction";
 import { formatTime, getFirstName, getInitials } from "@/lib/helpers";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { getModelDisplayName, providerMetadata } from "@/lib/models";
@@ -43,33 +44,6 @@ interface ChatMessageProps {
   liveThinkingDuration?: number;
 }
 
-const IconMap = [
-  {
-    id: "like-action",
-    icon: ThumbsUp,
-    onClick: () => console.log("thumbs up")
-  },
-  {
-    id: "dislike-action",
-    icon: ThumbsDown,
-    onClick: () => console.log("thumbs up")
-  },
-  {
-    id: "read-aloud-action",
-    icon: ReadAloudIcon,
-    onClick: () => console.log("read aloud")
-  },
-  {
-    id: "share-action",
-    icon: Share,
-    onClick: () => console.log("share action")
-  },
-  {
-    id: "retry-action",
-    icon: RetryIcon,
-    onClick: () => console.log("try again")
-  }
-];
 // Global cache for processed markdown
 const markdownCache = new Map<string, ReactNode>();
 
@@ -89,6 +63,42 @@ export function MessageBubble({
   );
   const [renderedThinkingContent, setRenderedThinkingContent] =
     useState<ReactNode | null>(null);
+
+  const { handleReaction, isPending, reactionState } = useReaction(message);
+
+  const IconMap = [
+    {
+      id: "like-action",
+      icon: ThumbsUp,
+      onClick: () => handleReaction("like"),
+      isActive: reactionState.liked
+    },
+    {
+      id: "dislike-action",
+      icon: ThumbsDown,
+      onClick: () => handleReaction("dislike"),
+      isActive: reactionState.disliked
+    },
+    {
+      id: "read-aloud-action",
+      icon: ReadAloudIcon,
+      onClick: () => console.log("read aloud"),
+      isActive: false
+    },
+    {
+      id: "share-action",
+      icon: Share,
+      onClick: () => console.log("share action"),
+      isActive: false
+    },
+    {
+      id: "retry-action",
+      icon: RetryIcon,
+      onClick: () => console.log("try again"),
+      isActive: false
+    }
+  ];
+
   const processingRef = useRef(false);
   const thinkingProcessingRef = useRef(false);
   const isUser = message.senderType === "USER";
@@ -240,7 +250,7 @@ export function MessageBubble({
         id={`msg-${message.id}`}
         data-message-id={message.id}
         className={cn(
-          "mx-auto flex w-full max-w-[100dvw] sm:max-w-3xl md:max-w-4xl gap-3",
+          "mx-auto flex w-full max-w-[100dvw] gap-3 sm:max-w-3xl md:max-w-4xl",
           isUser ? "justify-end" : "justify-start",
           className
         )}>
@@ -253,7 +263,7 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "group relative min-w-0 max-w-[85%] rounded-2xl px-4 py-3 text-sm",
+            "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
             isUser ? "bg-muted text-forground" : "bg-primary/40 text-foreground"
           )}>
           {isMobile && (
@@ -318,8 +328,14 @@ export function MessageBubble({
                       key={action.id}
                       variant="ghost"
                       size="icon"
-                      disabled={isStreaming === true}
-                      className={actionButtonVariants.default}
+                      disabled={isStreaming === true || isPending}
+                      className={cn(
+                        actionButtonVariants.default,
+                        `transition-colors`,
+                        action.isActive
+                          ? "[&_svg]:fill-primary-foreground/75"
+                          : ""
+                      )}
                       onClick={action.onClick}>
                       <action.icon className="size-3" />
                     </Button>

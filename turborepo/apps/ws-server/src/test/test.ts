@@ -24,8 +24,14 @@ const fs = new Fs(process.cwd());
   const { Credentials } = await import("@t3-chat-clone/credentials");
   const cred = new Credentials();
   const env = await cred.get("DATABASE_URL");
-  data(env, "n8xvzlvl4n7t5h0s9jkredt2").then(s => {
+  data(env, "i4864prhixp8nvotmt2xrgxt").then(s => {
     if (!s) return;
+
+    // for (const ss of s.messages) {
+    //   ss.senderType === "AI"
+    //     ? console.log({ thinkingText: ss.thinkingText ?? "" })
+    //     : ss;
+    // }
 
     fs.withWs(
       `src/__out__/conversations/${s.title}/${s.id}.json`,

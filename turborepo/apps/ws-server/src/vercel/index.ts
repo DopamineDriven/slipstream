@@ -138,7 +138,7 @@ export class v0Service {
     )[],
     systemPrompt?: string
   ) {
-    const basePrompt = `You are a knowledgeable full-stack expert; provide assistance by outputting formatted code blocks into chat; tools such as quick edit are unnecessary for this task.\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`;
+    const basePrompt = `You are a knowledgeable full-stack expert; **without using any tools** provide assistance by outputting formatted code blocks into chat; tools such as QuickEdit are not to be used and are unnecessary for this.\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`;
     const enhancedSystemPrompt = systemPrompt
       ? `${systemPrompt}\n\n${basePrompt}`
       : basePrompt;
@@ -206,7 +206,9 @@ export class v0Service {
       v0ThinkingDuration = 0,
       v0IsCurrentlyThinking = false,
       v0ThinkingAgg = "",
-      v0Agg = "";
+      v0Agg = "",
+      iThink = 0,
+      v0HasThinkingAggregateFinal = false;
 
     const streamer = this.stream(
       model,
@@ -220,7 +222,8 @@ export class v0Service {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
         done: boolean | undefined = undefined,
-        usage: v0Usage | undefined = undefined;
+        usage: v0Usage | undefined = undefined,
+        finalThinkingChunk = "";
       // usage only appears in the very last chunk streamed in
       if ("usage" in chunk && typeof chunk.usage !== "undefined") {
         done = true;
@@ -257,8 +260,21 @@ export class v0Service {
         }
       }
       if (thinkingText && v0IsCurrentlyThinking) {
-        if (thinkingText.startsWith(v0ThinkingAgg)) {
-          v0ThinkingAgg = thinkingText;
+        iThink++;
+        if (
+          iThink > 3 &&
+          Math.abs(v0ThinkingAgg.length - thinkingText.length) <= 4 * iThink
+        ) {
+          v0HasThinkingAggregateFinal = true;
+          const prependNew = `\n` + thinkingText;
+          finalThinkingChunk =
+            v0ThinkingAgg.length < prependNew.length
+              ? prependNew.substring(v0ThinkingAgg.length)
+              : "";
+        }
+        if (v0HasThinkingAggregateFinal) {
+          v0ThinkingAgg += finalThinkingChunk;
+          thinkingChunks.push(finalThinkingChunk);
         } else {
           v0ThinkingAgg += thinkingText;
           thinkingChunks.push(thinkingText);
@@ -272,7 +288,9 @@ export class v0Service {
             provider,
             systemPrompt,
             temperature,
-            thinkingText: thinkingText,
+            thinkingText: v0HasThinkingAggregateFinal
+              ? finalThinkingChunk
+              : thinkingText,
             isThinking: v0IsCurrentlyThinking,
             thinkingDuration: v0ThinkingStartTime
               ? performance.now() - v0ThinkingStartTime
@@ -293,7 +311,9 @@ export class v0Service {
           thinkingDuration: v0ThinkingStartTime
             ? performance.now() - v0ThinkingStartTime
             : undefined,
-          thinkingText: thinkingText,
+          thinkingText: v0HasThinkingAggregateFinal
+            ? finalThinkingChunk
+            : thinkingText,
           systemPrompt,
           temperature,
           topP,
@@ -335,8 +355,7 @@ export class v0Service {
             temperature,
             thinkingDuration:
               v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-            isThinking: v0IsCurrentlyThinking,
-            thinkingText: v0ThinkingAgg,
+            isThinking: false,
             topP,
             model,
             chunk: text,
@@ -352,7 +371,7 @@ export class v0Service {
           title,
           thinkingDuration:
             v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
-          isThinking: v0IsCurrentlyThinking,
+          isThinking: false,
           thinkingText: v0ThinkingAgg,
           systemPrompt,
           temperature,
