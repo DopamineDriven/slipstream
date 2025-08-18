@@ -240,7 +240,11 @@
     }
   }
 }
-
+input,
+textarea,
+select {
+  font-size: max(1rem, 16px);
+}
 @layer theme {
   .dark {
     --color-background: oklch(14.45% 0 0);
