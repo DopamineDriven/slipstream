@@ -1,3 +1,4 @@
+import process from "node:process";
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
 import { Credentials } from "@t3-chat-clone/credentials";
@@ -110,6 +111,18 @@ async function exe() {
       }
     }, 30000);
     await wsServer.start();
+
+    process.on("SIGTERM", async () => {
+      console.log("SIGTERM received, shutting down gracefully...");
+      await wsServer.stop();
+      process.exitCode = 1;
+    });
+
+    process.on("SIGINT", async () => {
+      console.log("SIGINT received, shutting down gracefully...");
+      await wsServer.stop();
+      process.exitCode = 1;
+    });
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message);
     else throw new Error(`something went wrong...`);

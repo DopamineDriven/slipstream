@@ -240,7 +240,7 @@ export function MessageBubble({
       "size-3 sm:h-4 sm:w-4 p-0 bg-transparent hover:bg-transparent",
       isUser
         ? "text-primary-foreground/70 hover:text-primary-foreground/90"
-        : "text-muted-foreground hover:text-foreground"
+        : ""
     )
   };
 
@@ -317,7 +317,7 @@ export function MessageBubble({
                 <div className="hidden items-center gap-2 md:flex">
                   <AnimatedCopyButton
                     textToCopy={contentToCopy ?? ""}
-                    className={actionButtonVariants.default}
+                    className={cn(actionButtonVariants.default, "text-muted-foreground hover:text-foreground")}
                     iconClassName="text-xs"
                     disabled={isStreaming === true}
                     initialIconSize={12}
@@ -333,8 +333,8 @@ export function MessageBubble({
                         actionButtonVariants.default,
                         `transition-colors`,
                         action.isActive
-                          ? "[&_svg]:fill-primary-foreground/75"
-                          : ""
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
                       )}
                       onClick={action.onClick}>
                       <action.icon className="size-3" />
