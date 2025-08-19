@@ -115,13 +115,13 @@ async function exe() {
     process.on("SIGTERM", async () => {
       console.log("SIGTERM received, shutting down gracefully...");
       await wsServer.stop();
-      process.exitCode = 1;
+      process.exitCode = 0;
     });
 
     process.on("SIGINT", async () => {
       console.log("SIGINT received, shutting down gracefully...");
       await wsServer.stop();
-      process.exitCode = 1;
+      process.exitCode = 0;
     });
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message);
