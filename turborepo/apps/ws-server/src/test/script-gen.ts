@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import { Provider } from "@t3-chat-clone/types";
-import conversation from "../__out__/conversations/Whimsical Gemini: A Catullan Day/n8xvzlvl4n7t5h0s9jkredt2.json" with { type: "json" };
+import conversation from "../__out__/conversations/Grok's Grokamole: Irreverent Musings on Self-Defeat/v34lpnqafg9yr6elx5wksn3e.json" with { type: "json" };
 
 conversation.messages;
 class ScriptGen extends Fs {

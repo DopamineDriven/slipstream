@@ -122,7 +122,7 @@
   --font-cal-sans: CalSans, sans-serif;
   --font-basis: BasisGrotesquePro, sans-serif;
   --font-inter: var(--font-inter);
-  --color-background: oklch(100% 0 0);
+  /* --color-background: oklch(100% 0 0);
   --color-foreground: oklch(14.45% 0 0);
   --color-card: oklch(100% 0 0);
   --color-card-foreground: oklch(14.45% 0 0);
@@ -170,7 +170,78 @@
   --color-brand-primary-foreground: oklch(32.11% 0 0);
   --color-brand-text: oklch(24.84% 0 0);
   --color-brand-text-muted: oklch(51.03% 0 0);
-  --color-brand-text-emphasis: oklch(18.15% 0 0);
+  --color-brand-text-emphasis: oklch(18.15% 0 0); */
+    /* Base neutrals - keeping your existing structure */
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(14.45% 0 0);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(14.45% 0 0);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(14.45% 0 0);
+
+  /* Primary - shifted to harmonize better with brand */
+  --color-primary: oklch(54.49% 0.2154 255);
+  --color-primary-foreground: oklch(98.48% 0 0);
+
+  /* Secondary with subtle brand hue influence */
+  --color-secondary: oklch(96.5% 0.008 255);
+  --color-secondary-foreground: oklch(20.44% 0.02 255);
+
+  /* Muted with consistent hue */
+  --color-muted: oklch(96.5% 0.008 255);
+  --color-muted-foreground: oklch(55.55% 0.015 255);
+
+  /* Accent harmonized */
+  --color-accent: oklch(94.5% 0.025 255);
+  --color-accent-foreground: oklch(20.44% 0.02 255);
+
+  /* Destructive - keeping your existing red */
+  --color-destructive: oklch(63.68% 0.2078 25.33);
+  --color-destructive-foreground: oklch(98.48% 0 0);
+
+  /* Borders with subtle brand tint */
+  --color-border: oklch(92.19% 0.005 255);
+  --color-input: oklch(92.19% 0.005 255);
+  --color-ring: oklch(54.49% 0.2154 255);
+
+  /* Sidebar - harmonized with main theme */
+  --color-sidebar: oklch(98.5% 0.005 255);
+  --color-sidebar-foreground: oklch(14.1% 0.01 255);
+  --color-sidebar-primary: oklch(54.49% 0.2154 255);
+  --color-sidebar-primary-foreground: oklch(97% 0.01 255);
+  --color-sidebar-accent: oklch(94.5% 0.015 255);
+  --color-sidebar-accent-foreground: oklch(21% 0.02 255);
+  --color-sidebar-border: oklch(90% 0.01 255);
+  --color-sidebar-ring: oklch(54.49% 0.2154 255);
+
+  /* Charts - keeping your existing variety but with better harmony */
+  --color-chart-1: oklch(67.72% 0.1571 35.19);
+  --color-chart-2: oklch(63.09% 0.1013 183.5);
+  --color-chart-3: oklch(54.49% 0.15 255); /* Harmonized with primary */
+  --color-chart-4: oklch(83.36% 0.1186 88.15);
+  --color-chart-5: oklch(78.34% 0.1261 58.75);
+
+  /* Hue scale - keeping your existing variety */
+  --color-hue-0: oklch(94.34% 0.199 105.96);
+  --color-hue-1: oklch(64.77% 0.263 359.98);
+  --color-hue-2: oklch(64.04% 0.3 324.36);
+  --color-hue-3: oklch(56.36% 0.292 301.63);
+  --color-hue-4: oklch(54.49% 0.2154 255); /* Harmonized */
+  --color-hue-5: oklch(82.03% 0.141 210.49);
+  --color-hue-6: oklch(88.42% 0.107 168.47);
+
+  /* Brand - refined for better cohesion */
+  --color-brand-background: oklch(100% 0 0);
+  --color-brand-sidebar: oklch(98.5% 0.005 255);
+  --color-brand-component: oklch(96.5% 0.008 255);
+  --color-brand-border: oklch(90% 0.01 255);
+  --color-brand-ring: oklch(54.49% 0.2154 255);
+  --color-brand-primary: oklch(54.49% 0.2154 255);
+  --color-brand-primary-foreground: oklch(98% 0.005 255);
+  --color-brand-text: oklch(24.84% 0.02 255);
+  --color-brand-text-muted: oklch(51.03% 0.015 255);
+  --color-brand-text-emphasis: oklch(18.15% 0.025 255);
+
   --radius-sm: 0.25rem;
   --radius-radius: 0.65rem;
 
@@ -247,7 +318,7 @@ select {
 }
 @layer theme {
   .dark {
-    --color-background: oklch(14.45% 0 0);
+    /* --color-background: oklch(14.45% 0 0);
     --color-foreground: oklch(98.48% 0 0);
     --color-card: oklch(14.45% 0 0);
     --color-card-foreground: oklch(98.48% 0 0);
@@ -295,7 +366,76 @@ select {
     --color-brand-primary-foreground: oklch(97.06% 0.01392 258.3);
     --color-brand-text: oklch(100% 0 0);
     --color-brand-text-muted: oklch(70.79% 0 0);
-    --color-brand-text-emphasis: oklch(100% 0 0);
+    --color-brand-text-emphasis: oklch(100% 0 0); */
+    --color-background: oklch(14.45% 0.008 255);
+    --color-foreground: oklch(98.48% 0.005 255);
+    --color-card: oklch(14.45% 0.008 255);
+    --color-card-foreground: oklch(98.48% 0.005 255);
+    --color-popover: oklch(14.45% 0.008 255);
+    --color-popover-foreground: oklch(98.48% 0.005 255);
+
+    /* Primary - harmonized with brand */
+    --color-primary: oklch(60.13% 0.1982 255);
+    --color-primary-foreground: oklch(97.06% 0.01 255);
+
+    /* Secondary with consistent hue */
+    --color-secondary: oklch(26.86% 0.015 255);
+    --color-secondary-foreground: oklch(98.48% 0.005 255);
+
+    /* Muted with brand influence */
+    --color-muted: oklch(26.86% 0.015 255);
+    --color-muted-foreground: oklch(71.53% 0.01 255);
+
+    /* Accent harmonized */
+    --color-accent: oklch(26.86% 0.015 255);
+    --color-accent-foreground: oklch(98.48% 0.005 255);
+
+    /* Destructive - keeping your existing red */
+    --color-destructive: oklch(39.59% 0.1331 25.72);
+    --color-destructive-foreground: oklch(98.48% 0 0);
+
+    /* Borders and inputs with subtle brand tint */
+    --color-border: oklch(26.86% 0.015 255);
+    --color-input: oklch(26.86% 0.015 255);
+    --color-ring: oklch(60.13% 0.1982 255);
+
+    /* Sidebar - harmonized */
+    --color-sidebar: oklch(21% 0.015 255);
+    --color-sidebar-foreground: oklch(98.5% 0.005 255);
+    --color-sidebar-primary: oklch(60.13% 0.1982 255);
+    --color-sidebar-primary-foreground: oklch(97.06% 0.01 255);
+    --color-sidebar-accent: oklch(27.4% 0.015 255);
+    --color-sidebar-accent-foreground: oklch(98.5% 0.005 255);
+    --color-sidebar-border: oklch(100% 0 0 / 10%);
+    --color-sidebar-ring: oklch(60.13% 0.1982 255);
+
+    /* Charts - keeping variety but harmonizing one with primary */
+    --color-chart-1: oklch(60.13% 0.1982 255); /* Harmonized with primary */
+    --color-chart-2: oklch(69.83% 0.1337 165.5);
+    --color-chart-3: oklch(72.32% 0.15 60.63);
+    --color-chart-4: oklch(61.92% 0.2037 312.7);
+    --color-chart-5: oklch(61.23% 0.2093 6.386);
+
+    /* Hue scale - keeping your existing variety */
+    --color-hue-0: oklch(94.34% 0.199 105.96);
+    --color-hue-1: oklch(64.77% 0.263 359.98);
+    --color-hue-2: oklch(64.04% 0.3 324.36);
+    --color-hue-3: oklch(56.36% 0.292 301.63);
+    --color-hue-4: oklch(60.13% 0.1982 255); /* Harmonized */
+    --color-hue-5: oklch(82.03% 0.141 210.49);
+    --color-hue-6: oklch(88.42% 0.107 168.47);
+
+    /* Brand - refined for cohesion */
+    --color-brand-background: oklch(17.24% 0.015 255);
+    --color-brand-sidebar: oklch(20.27% 0.018 255);
+    --color-brand-component: oklch(24.68% 0.02 255);
+    --color-brand-border: oklch(31.62% 0.025 255);
+    --color-brand-ring: oklch(60.13% 0.1982 255);
+    --color-brand-primary: oklch(60.13% 0.1982 255);
+    --color-brand-primary-foreground: oklch(97.06% 0.01 255);
+    --color-brand-text: oklch(100% 0.005 255);
+    --color-brand-text-muted: oklch(70.79% 0.008 255);
+    --color-brand-text-emphasis: oklch(100% 0.005 255);
   }
 }
 

@@ -24,7 +24,7 @@ const fs = new Fs(process.cwd());
   const { Credentials } = await import("@t3-chat-clone/credentials");
   const cred = new Credentials();
   const env = await cred.get("DATABASE_URL");
-  data(env, "i4864prhixp8nvotmt2xrgxt").then(s => {
+  data(env, "v34lpnqafg9yr6elx5wksn3e").then(s => {
     if (!s) return;
 
     // for (const ss of s.messages) {
