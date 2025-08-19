@@ -38,10 +38,9 @@ export type RTC<T, X extends keyof T = keyof T> = RemoveFields<T, X> & {
 /**
  * To Conditionally never
  */
-export type TCN<
-  T,
-  X extends keyof T = keyof T
-> = RemoveFields<T, X> & { [Q in X]?: XOR<T[Q], never> };
+export type TCN<T, X extends keyof T = keyof T> = RemoveFields<T, X> & {
+  [Q in X]?: XOR<T[Q], never>;
+};
 
 export type ArrFieldReplacer<
   T extends unknown[] | readonly unknown[],
@@ -51,8 +50,8 @@ export type ArrFieldReplacer<
 > = T extends (infer U)[] | readonly (infer U)[]
   ? V extends keyof U
     ? Q extends true
-      ? P extends Record<V, infer X>
-        ? (RemoveFields<U, V> & Record<V, X>)[]
+      ? P extends Record<infer Y, infer X>
+        ? (RemoveFields<U, V> & Record<Y, X>)[]
         : (RemoveFields<U, V> & P)[]
       : Q extends false
         ? RemoveFields<U, V>[]
@@ -74,13 +73,11 @@ export type OnlyRequired<T> = {
   [K in keyof T as IsOptional<T, K> extends false ? K : never]: T[K];
 };
 
-
 /**
  * workup for next.js dynamic route generate static params handling
  */
 export type InferGSPRTWorkup<T> =
   T extends Promise<readonly (infer U)[] | (infer U)[]> ? U : T;
-
 
 /**
  * infer generate static params return type in next.js dynamic routes
@@ -88,7 +85,6 @@ export type InferGSPRTWorkup<T> =
 export type InferGSPRT<V extends (...args: any) => any> = {
   params: Promise<InferGSPRTWorkup<ReturnType<V>>>;
 };
-
 
 /**
  * Expect that the thing passed to Expect<T> is true.
@@ -128,3 +124,32 @@ export type Extends<X, Y> = Y extends X ? true : false;
 export type DX<Y> = {
   [P in keyof Y]: Y[P];
 };
+
+export type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
+
+export type DeepPartialFields<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]?: DeepPartial<T[P]>;
+};
+
+// Recursive type replacement
+export type DeepReplace<T, From, To> = T extends From
+  ? To
+  : T extends object
+    ? { [K in keyof T]: DeepReplace<T[K], From, To> }
+    : T;
+
+// Make certain nested fields required
+export type RequireNested<
+  T,
+  Path extends string
+> = Path extends `${infer K}.${infer Rest}`
+  ? K extends keyof T
+    ? Omit<T, K> & Record<K, RequireNested<Required<T>[K], Rest>>
+    : T
+  : Path extends keyof T
+    ? Omit<T, Path> & Record<Path, Required<T>[Path]>
+    : T;
