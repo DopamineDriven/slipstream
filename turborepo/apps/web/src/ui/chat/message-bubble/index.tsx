@@ -66,7 +66,7 @@ export function MessageBubble({
 
   const { handleReaction, isPending, reactionState } = useReaction(message);
 
-  const IconMap = [
+  const RxnIcons = [
     {
       id: "like-action",
       icon: ThumbsUp,
@@ -78,7 +78,10 @@ export function MessageBubble({
       icon: ThumbsDown,
       onClick: () => handleReaction("dislike"),
       isActive: reactionState.disliked
-    },
+    }
+  ];
+
+  const IconMap = [
     {
       id: "read-aloud-action",
       icon: ReadAloudIcon,
@@ -317,13 +320,16 @@ export function MessageBubble({
                 <div className="hidden items-center gap-2 md:flex">
                   <AnimatedCopyButton
                     textToCopy={contentToCopy ?? ""}
-                    className={cn(actionButtonVariants.default, "text-muted-foreground hover:text-foreground")}
+                    className={cn(
+                      actionButtonVariants.default,
+                      "text-muted-foreground hover:text-foreground"
+                    )}
                     iconClassName="text-xs"
                     disabled={isStreaming === true}
                     initialIconSize={12}
                     size="icon"
                   />
-                  {IconMap.map(action => (
+                  {RxnIcons.map(action => (
                     <Button
                       key={action.id}
                       variant="ghost"
@@ -335,6 +341,20 @@ export function MessageBubble({
                         action.isActive
                           ? "text-foreground"
                           : "text-muted-foreground hover:text-foreground"
+                      )}
+                      onClick={action.onClick}>
+                      <action.icon className="size-3" />
+                    </Button>
+                  ))}
+                  {IconMap.map(action => (
+                    <Button
+                      key={action.id}
+                      variant="ghost"
+                      size="icon"
+                      disabled={isStreaming === true || isPending}
+                      className={cn(
+                        actionButtonVariants.default,
+                        `text-muted-foreground hover:text-foreground transition-colors`
                       )}
                       onClick={action.onClick}>
                       <action.icon className="size-3" />

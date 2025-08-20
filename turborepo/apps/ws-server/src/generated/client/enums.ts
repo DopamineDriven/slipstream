@@ -37,10 +37,24 @@ export const Provider = {
 export type Provider = (typeof Provider)[keyof typeof Provider]
 
 
+export const UploadMethod = {
+  FETCHED: 'FETCHED',
+  PRESIGNED: 'PRESIGNED',
+  SERVER: 'SERVER',
+  GENERATED: 'GENERATED'
+} as const
+
+export type UploadMethod = (typeof UploadMethod)[keyof typeof UploadMethod]
+
+
 export const AssetOrigin = {
   UPLOAD: 'UPLOAD',
   REMOTE: 'REMOTE',
-  GENERATED: 'GENERATED'
+  GENERATED: 'GENERATED',
+  PASTED: 'PASTED',
+  SCREENSHOT: 'SCREENSHOT',
+  IMPORTED: 'IMPORTED',
+  SCRAPED: 'SCRAPED'
 } as const
 
 export type AssetOrigin = (typeof AssetOrigin)[keyof typeof AssetOrigin]
@@ -55,7 +69,8 @@ export const AssetStatus = {
   READY: 'READY',
   FAILED: 'FAILED',
   QUARANTINED: 'QUARANTINED',
-  ATTACHED: 'ATTACHED'
+  ATTACHED: 'ATTACHED',
+  DELETED: 'DELETED'
 } as const
 
 export type AssetStatus = (typeof AssetStatus)[keyof typeof AssetStatus]

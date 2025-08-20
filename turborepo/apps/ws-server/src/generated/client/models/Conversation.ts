@@ -452,6 +452,11 @@ export type ConversationScalarRelationFilter = {
   isNot?: Prisma.ConversationWhereInput
 }
 
+export type ConversationNullableScalarRelationFilter = {
+  is?: Prisma.ConversationWhereInput | null
+  isNot?: Prisma.ConversationWhereInput | null
+}
+
 export type ConversationCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[]
@@ -528,10 +533,12 @@ export type ConversationCreateNestedOneWithoutAttachmentsInput = {
   connect?: Prisma.ConversationWhereUniqueInput
 }
 
-export type ConversationUpdateOneRequiredWithoutAttachmentsNestedInput = {
+export type ConversationUpdateOneWithoutAttachmentsNestedInput = {
   create?: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput>
   connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutAttachmentsInput
   upsert?: Prisma.ConversationUpsertWithoutAttachmentsInput
+  disconnect?: Prisma.ConversationWhereInput | boolean
+  delete?: Prisma.ConversationWhereInput | boolean
   connect?: Prisma.ConversationWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ConversationUpdateWithoutAttachmentsInput>, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput>
 }

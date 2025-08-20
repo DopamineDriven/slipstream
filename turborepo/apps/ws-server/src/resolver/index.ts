@@ -6,6 +6,7 @@ import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
+import { S3Service } from "@/s3/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
@@ -19,16 +20,17 @@ import type {
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 
-
 export class Resolver extends ModelService {
   constructor(
     public wsServer: WSServer,
     private openai: OpenAIService,
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
+    private s3Service: S3Service,
     private r2: R2Instance,
     private fastApiUrl: string,
     private Bucket: string,
+    private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
     private llamaService: LlamaService
@@ -243,122 +245,50 @@ export class Resolver extends ModelService {
     }
 
     console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
+    const commonProps = {
+      chunks,
+      conversationId,
+      isNewChat,
+      msgs,
+      prompt,
+      streamChannel,
+      thinkingChunks,
+      userId,
+      ws,
+      apiKey,
+      max_tokens,
+      model,
+      systemPrompt,
+      temperature,
+      title,
+      topP
+    };
     try {
       if (provider === "gemini") {
         await this.geminiService.handleGeminiAiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP,
+          ...commonProps,
           userData
         });
       } else if (provider === "anthropic") {
         await this.anthropicService.handleAnthropicAiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP,
+          ...commonProps,
           user_location
         });
       } else if (provider === "vercel") {
         await this.v0Service.handleV0AiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP
+          ...commonProps
         });
       } else if (provider === "meta") {
         await this.llamaService.handleMetaAiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP
+          ...commonProps
         });
       } else if (provider === "grok") {
         await this.xAIService.handleGrokAiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP
+          ...commonProps
         });
       } else {
         await this.openai.handleOpenaiAiChatRequest({
-          chunks,
-          conversationId,
-          isNewChat,
-          msgs,
-          prompt,
-          streamChannel,
-          thinkingChunks,
-          userId,
-          ws,
-          apiKey,
-          max_tokens,
-          model,
-          systemPrompt,
-          temperature,
-          title,
-          topP,
+          ...commonProps,
           user_location
         });
       }
@@ -387,6 +317,7 @@ export class Resolver extends ModelService {
           provider,
           conversationId,
           model,
+          title,
           systemPrompt,
           temperature,
           topP,
@@ -456,6 +387,15 @@ export class Resolver extends ModelService {
     "image_gen_request",
     "image_gen_response",
     "ai_chat_response",
+    "asset_attached",
+    "asset_batch_upload",
+    "asset_deleted",
+    "asset_fetch_request",
+    "asset_fetch_response",
+    "asset_paste",
+    "asset_upload_progress",
+    "asset_uploaded",
+    "image_gen_progress",
     "asset_upload_request",
     "asset_upload_response",
     "ai_chat_chunk",
@@ -536,6 +476,108 @@ export class Resolver extends ModelService {
     } catch {
       console.error("Invalid message received");
       return null;
+    }
+  }
+  public async handleAssetPaste(
+    event: EventTypeMap["asset_paste"],
+    ws: WebSocket,
+    userId: string
+  ): Promise<void> {
+    try {
+      const {
+        conversationId = "new-chat",
+        filename,
+        contentType,
+        size
+      } = event;
+
+      // Detect MIME type using fs utility
+      const mimeType =
+        contentType || this.wsServer.prisma.fs.getMimeTypeForPath(filename);
+
+      const presignedData = await this.s3Service.generatePresignedUpload(
+        {
+          userId,
+          conversationId,
+          filename,
+          size,
+          contentType: mimeType,
+          origin: "PASTED"
+        },
+        3600 // 1 hour expiry
+      );
+      // Create attachment record in database
+      const attachment = await this.wsServer.prisma.createAttachment({
+        conversationId,
+        userId,
+        filename: filename,
+        region:this.region,
+        mime: mimeType,
+        bucket: presignedData.bucket,
+        cdnUrl: presignedData.publicUrl,
+        sourceUrl: presignedData.uploadUrl,
+        meta: presignedData.fields,
+        key: presignedData.key,
+        size: BigInt(size),
+        origin: "PASTED",
+        status: "REQUESTED",
+        uploadMethod: "PRESIGNED"
+      });
+
+      // Generate presigned URL for direct client upload
+      // Update attachment with S3 details
+      void this.wsServer.prisma.updateAttachment({
+        id: attachment.id,
+        bucket: presignedData.bucket,
+        key: presignedData.key,
+        conversationId,
+        userId,
+        status: "UPLOADING",
+        region: this.region
+      });
+
+      // Send presigned URL to client for direct upload
+      ws.send(
+        JSON.stringify({
+          type: "asset_uploaded",
+          conversationId,
+          attachmentId: attachment.id,
+          userId,
+          filename,
+          mime: mimeType,
+          size: size || 0,
+          bucket: presignedData.bucket,
+          key: presignedData.key,
+          url: presignedData.uploadUrl,
+          origin: "PASTED",
+          status: "UPLOADING"
+        } satisfies EventTypeMap["asset_uploaded"])
+      );
+
+      // Notify other participants via Redis
+      await this.wsServer.redis.publishTypedEvent(
+        RedisChannels.conversationStream(conversationId),
+        "asset_upload_progress",
+        {
+          type: "asset_upload_progress",
+          conversationId,
+          attachmentId: attachment.id,
+          progress: 0,
+          bytesUploaded: 0,
+          totalBytes: size || 0
+        }
+      );
+    } catch (error) {
+      console.error("Asset paste error:", error);
+      ws.send(
+        JSON.stringify({
+          type: "asset_upload_response",
+          userId,
+          conversationId: event.conversationId,
+          success: false,
+          error: this.safeErrMsg(error)
+        } satisfies EventTypeMap["asset_upload_response"])
+      );
     }
   }
 

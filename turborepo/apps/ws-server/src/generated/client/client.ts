@@ -103,6 +103,9 @@ export const ThemePreference = $Enums.ThemePreference
 export type Provider = $Enums.Provider
 export const Provider = $Enums.Provider
 
+export type UploadMethod = $Enums.UploadMethod
+export const UploadMethod = $Enums.UploadMethod
+
 export type AssetOrigin = $Enums.AssetOrigin
 export const AssetOrigin = $Enums.AssetOrigin
 

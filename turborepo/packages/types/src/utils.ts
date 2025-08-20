@@ -2,7 +2,7 @@ export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
   : T;
 
-export type RemoveFields<T, P extends keyof T = keyof T> = {
+export type Rm<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };
 
@@ -24,21 +24,27 @@ export type XOR<T, U> =
 /**
  * Conditional to Required
  */
-export type CTR<T, Z extends keyof T = keyof T> = RemoveFields<T, Z> & {
-  [Q in Z]-?: T[Q];
+export type CTR<
+  T,
+  K extends keyof OnlyOptional<T> = keyof OnlyOptional<T>
+> = Rm<T, K> & {
+  [Q in K]-?: T[Q];
 };
 
 /**
  * Required to Conditional
  */
-export type RTC<T, X extends keyof T = keyof T> = RemoveFields<T, X> & {
-  [Q in X]?: T[Q];
+export type RTC<
+  T,
+  K extends keyof OnlyRequired<T> = keyof OnlyRequired<T>
+> = Rm<T, K> & {
+  [Q in K]?: T[Q];
 };
-
+export type IsExact<T, U> = [T] extends [U] ? ([U] extends [T] ? true : false) : false;
 /**
  * To Conditionally never
  */
-export type TCN<T, X extends keyof T = keyof T> = RemoveFields<T, X> & {
+export type TCN<T, X extends keyof T = keyof T> = Rm<T, X> & {
   [Q in X]?: XOR<T[Q], never>;
 };
 
@@ -51,10 +57,10 @@ export type ArrFieldReplacer<
   ? V extends keyof U
     ? Q extends true
       ? P extends Record<infer Y, infer X>
-        ? (RemoveFields<U, V> & Record<Y, X>)[]
-        : (RemoveFields<U, V> & P)[]
+        ? (Rm<U, V> & Record<Y, X>)[]
+        : (Rm<U, V> & P)[]
       : Q extends false
-        ? RemoveFields<U, V>[]
+        ? Rm<U, V>[]
         : U
     : T
   : T;
@@ -148,8 +154,8 @@ export type RequireNested<
   Path extends string
 > = Path extends `${infer K}.${infer Rest}`
   ? K extends keyof T
-    ? Omit<T, K> & Record<K, RequireNested<Required<T>[K], Rest>>
+    ? Rm<T, K> & Record<K, RequireNested<Required<T>[K], Rest>>
     : T
   : Path extends keyof T
-    ? Omit<T, Path> & Record<Path, Required<T>[Path]>
+    ? Rm<T, Path> & Record<Path, Required<T>[Path]>
     : T;
