@@ -2,7 +2,6 @@ import { Fs } from "@d0paminedriven/fs";
 import { Provider } from "@t3-chat-clone/types";
 import conversation from "../__out__/conversations/Grok's Grokamole: Irreverent Musings on Self-Defeat/v34lpnqafg9yr6elx5wksn3e.json" with { type: "json" };
 
-conversation.messages;
 class ScriptGen extends Fs {
   constructor(
     public override cwd: string,
@@ -21,7 +20,16 @@ class ScriptGen extends Fs {
         model = msg.model ?? "",
         sender = msg.senderType as "USER" | "AI" | "SYSTEM",
         thinking = msg.thinkingText ?? null;
-      return { thinking, msgNumber: i, content, timestamp, id, provider, model, sender };
+      return {
+        thinking,
+        msgNumber: i,
+        content,
+        timestamp,
+        id,
+        provider,
+        model,
+        sender
+      };
     });
   }
 
@@ -54,7 +62,9 @@ class ScriptGen extends Fs {
       });
       const agg =
         p.sender === "AI"
-          ? p.thinking ? `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.thinking}\n${p.content}\n\n${d}\n\n` : `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.content}\n${d}\n`
+          ? p.thinking
+            ? `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.thinking}\n${p.content}\n\n${d}\n\n`
+            : `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.content}\n${d}\n`
           : `(${p.msgNumber})\n\n[user/andrew]\n\n${p.content}\n\n${d}\n\n`;
       arr.push(agg);
     }

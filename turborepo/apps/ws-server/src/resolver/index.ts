@@ -113,41 +113,25 @@ export class Resolver extends ModelService {
     }
   }
 
-  public handleLatLng(latlng?: string) {
-    const [lat, lng] = latlng
-      ? (latlng?.split(",")?.map(p => {
-          return Number.parseFloat(p);
-        }) as [number, number])
-      : [47.7749, -122.4194];
-    return [lat, lng] as const;
-  }
-
   public async handleAIChat(
     event: EventTypeMap["ai_chat_request"],
     ws: WebSocket,
     userId: string,
     userData?: UserData
   ) {
-    const provider = event?.provider ?? "openai";
-    const model = this.getModel(
-      provider,
-      event?.model as AllModelsUnion | undefined
-    );
-    const topP = event.topP;
-
-    const temperature = event.temperature;
-
-    const systemPrompt = event.systemPrompt;
-
-    const max_tokens = event.maxTokens;
-
-    const hasProviderConfigured = event.hasProviderConfigured;
-
-    const isDefaultProvider = event.isDefaultProvider;
-
-    const prompt = event.prompt;
-
-    const conversationIdInitial = event.conversationId;
+    const provider = event.provider,
+      model = this.getModel(
+        provider,
+        event?.model as AllModelsUnion | undefined
+      ),
+      topP = event.topP,
+      temperature = event.temperature,
+      systemPrompt = event.systemPrompt,
+      max_tokens = event.maxTokens,
+      hasProviderConfigured = event.hasProviderConfigured,
+      isDefaultProvider = event.isDefaultProvider,
+      prompt = event.prompt,
+      conversationIdInitial = event.conversationId;
 
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
@@ -162,6 +146,7 @@ export class Resolver extends ModelService {
       topP,
       model
     });
+
     const user_location = {
       type: "approximate",
       city: userData?.city ?? "Barrington",
@@ -169,24 +154,20 @@ export class Resolver extends ModelService {
       region: userData?.region ?? "Illinois",
       timezone: userData?.tz ?? "America/Chicago"
     } as const;
-    //  configure token usage for a given conversation relative to model max context window limits
-    const isNewChat = conversationIdInitial.startsWith("new-chat");
-    const msgs = res.messages satisfies Message[];
-    const conversationId = res.id;
-    const apiKey = res.apiKey ?? undefined;
-    const keyId = res.userKeyId;
-    const streamChannel = RedisChannels.conversationStream(conversationId);
-    const userChannel = RedisChannels.user(userId);
-    const existingState =
-      await this.wsServer.redis.getStreamState(conversationId);
 
-    let chunks = Array.of<string>();
-    let thinkingChunks = Array.of<string>();
-    // TODO handle thinkingChunks and nonThinkingChunks into allChunks for resumable streaming with high specificity
-    // let allChunks = Array.of<string>();
-    let resumedFromChunk = 0;
+    const isNewChat = conversationIdInitial.startsWith("new-chat"),
+      msgs = res.messages satisfies Message[],
+      conversationId = res.id,
+      apiKey = res.apiKey ?? undefined,
+      keyId = res.userKeyId,
+      streamChannel = RedisChannels.conversationStream(conversationId),
+      userChannel = RedisChannels.user(userId),
+      existingState = await this.wsServer.redis.getStreamState(conversationId);
 
-    let thinkingAgg = "",
+    let chunks = Array.of<string>(),
+      thinkingChunks = Array.of<string>(),
+      resumedFromChunk = 0,
+      thinkingAgg = "",
       thinkingDuration = 0;
 
     const title = res?.title ?? (await this.titleGenUtil(event));
@@ -194,7 +175,8 @@ export class Resolver extends ModelService {
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
       resumedFromChunk = chunks.length;
-
+      if (existingState.thinkingChunks)
+        thinkingChunks = existingState.thinkingChunks;
       // Send resume event
       void this.wsServer.redis.publishTypedEvent(
         streamChannel,
@@ -326,8 +308,6 @@ export class Resolver extends ModelService {
           message: this.safeErrMsg(err)
         }
       );
-
-      // Save state for potential resume after error
       void this.wsServer.redis.saveStreamState(
         conversationId,
         chunks,
@@ -490,10 +470,29 @@ export class Resolver extends ModelService {
         contentType,
         size
       } = event;
+      const [cType, cTypePkg] = [
+        contentType,
+        this.wsServer.prisma.fs.getMimeTypeForPath(filename)
+      ];
 
+      console.log({ cType, cTypePkg });
       // Detect MIME type using fs utility
-      const mimeType =
-        contentType || this.wsServer.prisma.fs.getMimeTypeForPath(filename);
+      const mimeType = cType ?? cTypePkg;
+
+      const extension = this.wsServer.prisma.fs.assetType(filename) ?? "bin";
+
+      const properFilename = filename.includes(".")
+        ? filename
+        : `${filename}.${extension}`;
+
+      // ✅ Use fs package for human-readable size logging
+      const sizeInfo = this.wsServer.prisma.fs.getSize(size || 0, "auto", {
+        decimals: 2,
+        includeUnits: true
+      });
+      console.log(
+        `[Asset Paste] User ${userId} pasting ${properFilename} (${sizeInfo})`
+      );
 
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
@@ -511,7 +510,7 @@ export class Resolver extends ModelService {
         conversationId,
         userId,
         filename: filename,
-        region:this.region,
+        region: this.region,
         mime: mimeType,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,

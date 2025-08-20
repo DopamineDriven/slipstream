@@ -118,6 +118,12 @@ export class S3Service {
     });
   }
 
+  public cleanFilename(filename: string): string {
+    // Remove path traversal attempts and get just the filename
+    const basename = filename.split(/[/\\]/).pop() ?? "file";
+    // Replace unsafe characters but preserve extension
+    return basename.replace(/[^a-zA-Z0-9._-]/g, "_");
+  }
   /**
    * Get the singleton instance of S3Service
    * @param config Optional S3Config - only used on first call
@@ -137,6 +143,22 @@ export class S3Service {
   public static hasInstance(): boolean {
     return S3Service.instance !== null;
   }
+public generateAssetKey(
+  userId: string,
+  filename: string,
+  origin: AssetOriginType
+): string {
+  const timestamp = Date.now();
+  const sanitizedFilename = this.sanitizeFilename(filename);
+
+  // Clean structure: origin/userId/timestamp-filename
+  // No conversationId in the path!
+  return [
+    origin.toLowerCase(),
+    userId,
+    `${timestamp}-${sanitizedFilename}`
+  ].join('/');
+}
 
   /**
    * Reset the singleton instance (useful for testing or graceful shutdown)
@@ -366,9 +388,7 @@ export class S3Service {
   /**
    * Generate a consistent key structure
    */
-  private generateKey({
-    ...metadata
-  }: AssetMetadata): string {
+  private generateKey({ ...metadata }: AssetMetadata): string {
     const timestamp = Date.now();
     const sanitizedFilename = this.sanitizeFilename(metadata.filename);
 
