@@ -7,6 +7,51 @@
 *
 * 🟢 You can import this file directly.
 */
+export const ChecksumAlgo = {
+  CRC32: 'CRC32',
+  CRC32C: 'CRC32C',
+  SHA1: 'SHA1',
+  SHA256: 'SHA256',
+  CRC64NVME: 'CRC64NVME'
+} as const
+
+export type ChecksumAlgo = (typeof ChecksumAlgo)[keyof typeof ChecksumAlgo]
+
+
+export const ImageFormat = {
+  apng: 'apng',
+  jpeg: 'jpeg',
+  png: 'png',
+  webp: 'webp',
+  avif: 'avif',
+  heic: 'heic',
+  gif: 'gif',
+  tiff: 'tiff',
+  bmp: 'bmp',
+  svg: 'svg',
+  unknown: 'unknown'
+} as const
+
+export type ImageFormat = (typeof ImageFormat)[keyof typeof ImageFormat]
+
+
+export const ColorSpace = {
+  srgb: 'srgb',
+  display_p3: 'display_p3',
+  adobe_rgb: 'adobe_rgb',
+  prophoto_rgb: 'prophoto_rgb',
+  rec2020: 'rec2020',
+  rec709: 'rec709',
+  cmyk: 'cmyk',
+  lab: 'lab',
+  xyz: 'xyz',
+  gray: 'gray',
+  unknown: 'unknown'
+} as const
+
+export type ColorSpace = (typeof ColorSpace)[keyof typeof ColorSpace]
+
+
 export const SenderType = {
   USER: 'USER',
   AI: 'AI',

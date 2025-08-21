@@ -89,10 +89,24 @@ export type Message = Prisma.MessageModel
  */
 export type Attachment = Prisma.AttachmentModel
 /**
+ * Model ImageMetadata
+ * 
+ */
+export type ImageMetadata = Prisma.ImageMetadataModel
+/**
  * Model VerificationToken
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
+
+export type ChecksumAlgo = $Enums.ChecksumAlgo
+export const ChecksumAlgo = $Enums.ChecksumAlgo
+
+export type ImageFormat = $Enums.ImageFormat
+export const ImageFormat = $Enums.ImageFormat
+
+export type ColorSpace = $Enums.ColorSpace
+export const ColorSpace = $Enums.ColorSpace
 
 export type SenderType = $Enums.SenderType
 export const SenderType = $Enums.SenderType

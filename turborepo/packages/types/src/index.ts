@@ -58,6 +58,9 @@ export type {
   GrokChatModels,
   GrokDisplayNameUnion,
   GrokModelIdUnion,
+  ImageGenModels,
+  ImageGenModelsByProvider,
+  ImageGenProviders,
   MetaChatModels,
   MetaDisplayNameUnion,
   MetaModelIdUnion,
@@ -86,9 +89,11 @@ export {
   getDisplayNamesForProvider,
   getModelIdByDisplayName,
   getModelsForProvider,
+  imageGenProvders,
   modelIdsByProvider,
   modelIdToDisplayName,
   providerModelChatApi,
+  providerModelImageGenApi,
   toPrismaFormat
 } from "@/models.ts";
 

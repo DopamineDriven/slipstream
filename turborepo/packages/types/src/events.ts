@@ -1,4 +1,9 @@
-import type { GetModelUtilRT, Provider } from "@/models.ts";
+import type {
+  GetModelUtilRT,
+  ImageGenModelsByProvider,
+  ImageGenProviders,
+  Provider
+} from "@/models.ts";
 import type { CTR, DX, Rm } from "./utils.ts";
 
 export type AttachmentMetadata = {
@@ -105,7 +110,9 @@ export type PingMessage = {
  * Origin types for assets
  */
 
-export type UploadMethod = Uppercase<"server" | "presigned" | "generated" | "fetched">;
+export type UploadMethod = Uppercase<
+  "server" | "presigned" | "generated" | "fetched"
+>;
 export type AssetOrigin =
   | "UPLOAD"
   | "GENERATED"
@@ -215,6 +222,16 @@ export type AssetFetchResponse = {
   error?: string;
 };
 
+export type AssetFetchError = {
+  type: "asset_fetch_error";
+  conversationId: string;
+  attachmentId?: string;
+  url?: string;
+  success: false;
+  statusCode?: number;
+  error?: string;
+};
+
 /**
  * Legacy: Direct base64 upload (backward compatibility)
  * @deprecated Use server-side uploads instead
@@ -243,6 +260,16 @@ export type AssetUploadResponse = {
   error?: string;
 };
 
+export type AssetUploadError = {
+  type: "asset_upload_error";
+  userId: string;
+  conversationId: string;
+  url?: string;
+  attachmentId?: string;
+  success: false;
+  error?: string;
+};
+
 /**
  * Enhanced image generation request
  */
@@ -250,9 +277,8 @@ export type ImageGenRequest = {
   type: "image_gen_request";
   userId: string;
   conversationId: string;
-  messageId?: string;
   prompt: string;
-  model?: "stable-diffusion" | "dalle-3" | "midjourney";
+  model: ImageGenModelsByProvider<ImageGenProviders>;
   width?: number;
   height?: number;
   seed?: number;
@@ -268,11 +294,24 @@ export type ImageGenResponse = {
   type: "image_gen_response";
   userId: string;
   conversationId: string;
+  messageId?: string;
   attachmentId?: string;
   imageUrl?: string;
   taskId?: string;
   success: boolean;
   error?: string;
+};
+
+export type ImageGenError = {
+  type: "image_gen_error";
+  userId: string;
+  conversationId: string;
+  messageId?: string;
+  attachmentId?: string;
+  imageUrl?: string;
+  taskId?: string;
+  success: false;
+  error: string;
 };
 
 /**
@@ -308,13 +347,16 @@ export type AnyEvent =
   | AssetAttachedToMessage
   | AssetBatchUpload
   | AssetDeleted
+  | AssetFetchError
   | AssetFetchRequest
   | AssetFetchResponse
   | AssetPasteEvent
   | AssetUploadedNotification
+  | AssetUploadError
   | AssetUploadProgress
   | AssetUploadRequest
   | AssetUploadResponse
+  | ImageGenError
   | ImageGenProgress
   | ImageGenRequest
   | ImageGenResponse
@@ -342,13 +384,16 @@ export type EventTypeMap = {
   asset_attached: AssetAttachedToMessage;
   asset_batch_upload: AssetBatchUpload;
   asset_deleted: AssetDeleted;
+  asset_fetch_error: AssetFetchError;
   asset_fetch_request: AssetFetchRequest;
   asset_fetch_response: AssetFetchResponse;
   asset_paste: AssetPasteEvent;
   asset_uploaded: AssetUploadedNotification;
+  asset_upload_error: AssetUploadError;
   asset_upload_progress: AssetUploadProgress;
   asset_upload_request: AssetUploadRequest;
   asset_upload_response: AssetUploadResponse;
+  image_gen_error: ImageGenError;
   image_gen_progress: ImageGenProgress;
   image_gen_request: ImageGenRequest;
   image_gen_response: ImageGenResponse;

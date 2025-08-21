@@ -6,6 +6,41 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+enum ChecksumAlgo {
+  CRC32
+  CRC32C
+  SHA1
+  SHA256
+  CRC64NVME
+}
+
+enum ImageFormat {
+  apng
+  jpeg
+  png
+  webp
+  avif
+  heic
+  gif
+  tiff
+  bmp
+  svg
+  unknown
+}
+
+enum ColorSpace {
+  srgb
+  display_p3
+  adobe_rgb
+  prophoto_rgb
+  rec2020
+  rec709
+  cmyk
+  lab
+  xyz
+  gray
+  unknown
+}
 
 enum SenderType {
   USER
@@ -200,45 +235,94 @@ model Message {
 }
 
 model Attachment {
-  id             String  @id @default(cuid(2))
+  id             String       @id @default(cuid(2))
   conversationId String
   userId         String
   messageId      String?
-
-  origin       AssetOrigin  @default(UPLOAD)
-  status       AssetStatus  @default(REQUESTED)
-  uploadMethod UploadMethod @default(SERVER) // "server" | "presigned" | "generated"
+  s3ObjectId     String       @unique // "s3://bucket/key#<versionId|nov>"
+  origin         AssetOrigin  @default(UPLOAD)
+  status         AssetStatus  @default(REQUESTED)
+  uploadMethod   UploadMethod @default(SERVER) // "server" | "presigned" | "generated"
 
   uploadDuration Int? // milliseconds
   cdnUrl         String? // publicUrl
   sourceUrl      String? // uploadUrl
   thumbnailKey   String? // image/video thumbnails
-  meta           Json? // set a default to stop manual type casting
+  meta           Json?
 
   bucket String
   key    String
   region String @default("us-east-1")
+
+  cacheControl       String?
+  contentDisposition String?
+  contentEncoding    String?
+  expiresAt          DateTime?
 
   size           BigInt?
   filename       String?
   ext            String?
   mime           String?
   etag           String?
+  checksumAlgo   ChecksumAlgo @default(SHA256)
   checksumSha256 String?
 
-  deletedAt DateTime? // soft deletes
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  storageClass   String?
+  sseAlgorithm   String? // e.g., "aws:kms"
+  sseKmsKeyId    String?
+  s3LastModified DateTime? // from HeadObject
+  deletedAt      DateTime? // soft deletes
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message      Message?      @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation?  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image        ImageMetadata?
 
-  @@unique([bucket, key, conversationId])
+  @@index([conversationId])
+  @@index([bucket, key])
   @@index([userId, createdAt])
   @@index([status, createdAt])
   @@index([messageId, createdAt])
   @@index([deletedAt])
+}
+
+model ImageMetadata {
+  attachmentId String     @id
+  attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  format      ImageFormat
+  width       Int
+  height      Int
+  aspectRatio Decimal     @db.Decimal(6, 4) // store precomputed (e.g., 1.778)
+  frames      Int         @default(1) // >1 => animated
+  hasAlpha    Boolean?
+  animated    Boolean     @default(false)
+
+  orientation Int?        @db.SmallInt // EXIF orientation if preserved
+  colorSpace  ColorSpace?
+
+  // optional EXIF bits
+  exifDateTimeOriginal DateTime?
+  cameraMake           String?
+  cameraModel          String?
+  lensModel            String?
+
+  // optional GPS
+  gpsLat Decimal? @db.Decimal(10, 7)
+  gpsLon Decimal? @db.Decimal(10, 7)
+
+  // display sugar
+  dominantColorHex String? @db.VarChar(7) // "#RRGGBB"
+  iccProfile       String? // "Display P3" etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([format])
+  @@index([width, height])
+  @@index([animated])
 }
 
 model VerificationToken {

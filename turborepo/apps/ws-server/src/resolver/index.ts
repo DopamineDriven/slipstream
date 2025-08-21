@@ -364,26 +364,29 @@ export class Resolver extends ModelService {
   }
 
   public EVENT_TYPES = [
-    "typing",
-    "ping",
-    "image_gen_request",
-    "image_gen_response",
+    "ai_chat_chunk",
+    "ai_chat_error",
+    "ai_chat_inline_data",
+    "ai_chat_request",
     "ai_chat_response",
     "asset_attached",
     "asset_batch_upload",
     "asset_deleted",
+    "asset_fetch_error",
     "asset_fetch_request",
     "asset_fetch_response",
     "asset_paste",
+    "asset_upload_error",
     "asset_upload_progress",
-    "asset_uploaded",
-    "image_gen_progress",
     "asset_upload_request",
     "asset_upload_response",
-    "ai_chat_chunk",
-    "ai_chat_request",
-    "ai_chat_inline_data",
-    "ai_chat_error"
+    "asset_uploaded",
+    "image_gen_error",
+    "image_gen_progress",
+    "image_gen_request",
+    "image_gen_response",
+    "ping",
+    "typing"
   ] as const satisfies readonly AnyEventTypeUnion[];
 
   /** Parses a raw WebSocket message into an event */
@@ -477,6 +480,10 @@ export class Resolver extends ModelService {
         `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
       );
     }
+    const streamChannel =
+      event.conversationId === "new-chat"
+        ? RedisChannels.user(userId)
+        : RedisChannels.conversationStream(event.conversationId);
     try {
       const {
         conversationId = "new-chat",
@@ -512,7 +519,7 @@ export class Resolver extends ModelService {
         {
           userId,
           conversationId,
-          filename,
+          filename: properFilename,
           size,
           contentType: mimeType,
           origin: "PASTED"
@@ -543,40 +550,31 @@ export class Resolver extends ModelService {
         status: "REQUESTED",
         uploadMethod: "PRESIGNED"
       });
-      console.log(`[Asset Paste] Created attachment ${attachment.id} with key: ${presignedData.key}`);
-      // Generate presigned URL for direct client upload
-      // Update attachment with S3 details
-      void this.wsServer.prisma.updateAttachment({
-        id: attachment.id,
+      console.log(
+        `[Asset Paste] Created attachment ${attachment.id} with key: ${presignedData.key}`
+      );
+
+      const assetUploadedRes = {
+        type: "asset_uploaded",
+        conversationId,
+        attachmentId: attachment.id,
+        userId,
+        filename: properFilename,
+        mime: mimeType,
+        size: size ?? 0,
         bucket: presignedData.bucket,
         key: presignedData.key,
-        conversationId,
-        userId,
-        status: "UPLOADING",
-        region: this.region
-      });
-
+        url: presignedData.uploadUrl,
+        origin: "PASTED",
+        status: "UPLOADING"
+      } satisfies EventTypeMap["asset_uploaded"];
       // Send presigned URL to client for direct upload
-      ws.send(
-        JSON.stringify({
-          type: "asset_uploaded",
-          conversationId,
-          attachmentId: attachment.id,
-          userId,
-          filename,
-          mime: mimeType,
-          size: size || 0,
-          bucket: presignedData.bucket,
-          key: presignedData.key,
-          url: presignedData.uploadUrl,
-          origin: "PASTED",
-          status: "UPLOADING"
-        } satisfies EventTypeMap["asset_uploaded"])
-      );
+
+      ws.send(JSON.stringify(assetUploadedRes));
 
       // Notify other participants via Redis
       void this.wsServer.redis.publishTypedEvent(
-        RedisChannels.conversationStream(conversationId),
+        streamChannel,
         "asset_upload_progress",
         {
           type: "asset_upload_progress",
@@ -584,23 +582,393 @@ export class Resolver extends ModelService {
           attachmentId: attachment.id,
           progress: 0,
           bytesUploaded: 0,
-          totalBytes: size || 0
+          totalBytes: size ?? 0
         }
       );
+      // TODO implement polling REQUESTED -> UPLOADING -> READY via a listener--alternatively have the client send an event
     } catch (error) {
-      console.error("Asset paste error:", error);
-      ws.send(
-        JSON.stringify({
-          type: "asset_upload_response",
-          userId,
-          conversationId: event.conversationId,
-          success: false,
-          error: this.safeErrMsg(error)
-        } satisfies EventTypeMap["asset_upload_response"])
+this.fs.parseUrl("")
+      console.error("[Asset Paste] Error:", error);
+
+      const uploadError = {
+        type: "asset_upload_error",
+        userId,
+        conversationId: event.conversationId,
+        success: false,
+        error: this.safeErrMsg(error)
+      } satisfies EventTypeMap["asset_upload_error"];
+
+      ws.send(JSON.stringify(uploadError));
+
+      void this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "asset_upload_error",
+        uploadError
       );
     }
   }
 
+  public async promoteAttachmentToConversation(
+  attachmentId: string,
+  realConversationId: string,
+  messageId: string,
+  userId: string,
+  userData?: UserData
+): Promise<void> {
+  // The beauty is we DON'T need to update the S3 key!
+  // Just update the conversationId and messageId in the database
+
+  const attachment = await this.wsServer.prisma.getAttachment(attachmentId);
+
+  if (!attachment) {
+    throw new Error(`Attachment ${attachmentId} not found`);
+  }
+
+  if (attachment.userId !== userId) {
+    throw new Error(`Unauthorized to update attachment ${attachmentId}`);
+  }
+
+  // Update conversationId AND messageId - key stays the same!
+  void this.wsServer.prisma.updateAttachment({
+    id: attachmentId,
+    conversationId: realConversationId,
+    messageId, // Now the attachment is linked to the specific message
+    userId,
+    bucket: attachment.bucket,
+    key: attachment.key, // SAME KEY - no S3 operations needed!
+    status: attachment.status === "REQUESTED" ? "READY" : attachment.status
+  });
+
+  console.log(`[Attachment Promoted] ${attachmentId} moved from new-chat to ${realConversationId}, message: ${messageId}, user from ${userData?.city || 'unknown'}`);
+}
+/**
+ * Handle fetching remote assets from URLs
+ * Uses fs package's intelligent fetchRemoteWriteLocalLargeFiles which:
+ * - Automatically checks file size with HEAD request
+ * - Streams to disk if >100MB
+ * - Uses in-memory processing if <100MB
+ * - Creates directories automatically
+ */
+public async handleAssetFetchRequest(
+  event: EventTypeMap["asset_fetch_request"],
+  ws: WebSocket,
+  userId: string,
+  userData: UserData
+): Promise<void> {
+  const {
+    conversationId = "new-chat",
+    url,
+    type,
+    messageId
+  } = event;
+
+  console.log(`[${type}] User ${userId} requesting: ${url}`);
+
+  try {
+    // Validate URL first using fs package
+    if (!this.isValidUrl(url)) {
+      throw new Error(`Invalid or unsupported URL: ${url}`);
+    }
+
+    // Optional: Check if file type is supported
+    if (!this.isSupportedFileType(url)) {
+      console.warn(`[Asset Fetch] Unsupported file type for URL: ${url}`);
+      // Continue anyway - let user fetch what they want
+    }
+
+    // ✅ Use fs package for MIME type and extension detection from URL
+    const mimeType = this.wsServer.prisma.fs.getMimeTypeForPath(url);
+    const extension = this.wsServer.prisma.fs.assetType(url) ?? 'bin';
+
+    // ✅ Use fs package to parse URL and extract filename
+    const parsedUrl = this.wsServer.prisma.fs.parseUrl(url);
+    if (!parsedUrl) {
+      throw new Error(`Invalid URL format: ${url}`);
+    }
+
+    // Extract filename from pathname
+    const urlFilename = parsedUrl.pathname.split('/').pop() || `remote_${Date.now()}`;
+    const filename = urlFilename.includes('.')
+      ? urlFilename
+      : `${urlFilename}.${extension}`;
+
+    // Sanitize filename for S3
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+    // Check file size with HEAD request first
+    const headResponse = await fetch(url, { method: "HEAD" });
+    if (!headResponse.ok) {
+      throw new Error(`Failed to access URL: ${headResponse.status} ${headResponse.statusText}`);
+    }
+
+    const contentLength = headResponse.headers.get("content-length");
+    const contentType = headResponse.headers.get("content-type") || mimeType;
+    const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
+    const fileSizeMb = fileSizeBytes / (1024 * 1024);
+
+    // ✅ Use fs package for human-readable size
+    const sizeInfo = this.wsServer.prisma.fs.getSize(
+      fileSizeBytes,
+      "auto",
+      { decimals: 2, includeUnits: true }
+    );
+    console.log(`[Asset Fetch] Remote file: ${sanitizedFilename} (${sizeInfo})`);
+
+    // Notify client that fetch is starting
+    const progressEvent: EventTypeMap["asset_upload_progress"] = {
+      type: "asset_upload_progress",
+      conversationId,
+      attachmentId: "", // Will be filled after creation
+      progress: 0,
+      bytesUploaded: 0,
+      totalBytes: fileSizeBytes
+    };
+    ws.send(JSON.stringify(progressEvent));
+
+    let s3UploadResult;
+    let actualSize = fileSizeBytes;
+
+    // 🔥 Use the SMART fetchRemoteWriteLocalLargeFiles method
+    // It automatically chooses streaming vs in-memory based on file size!
+    const tempPath = `/tmp/${Date.now()}_${sanitizedFilename}`;
+
+    try {
+      console.log(`[Asset Fetch] Fetching ${url} (method will auto-select strategy)`);
+
+      // This ONE method handles EVERYTHING:
+      // - HEAD request to check size
+      // - Streams to disk if >100MB
+      // - Uses in-memory if <100MB
+      // - Creates directories automatically
+      await this.wsServer.prisma.fs.fetchRemoteWriteLocalLargeFiles(
+        url,
+        tempPath,
+        false // We already have the extension
+      );
+
+      // Get actual file size after download
+      const tempFileStats = await this.wsServer.prisma.fs.fileSize(
+        tempPath,
+        "b",
+        { includeUnits: false }
+      );
+      actualSize = Number(tempFileStats);
+
+      // Log the actual size vs expected
+      const actualSizeInfo = this.wsServer.prisma.fs.getSize(
+        actualSize,
+        "auto",
+        { decimals: 2, includeUnits: true }
+      );
+      console.log(`[Asset Fetch] Downloaded: ${actualSizeInfo} (expected: ${sizeInfo})`);
+
+      // Read file as buffer for S3 upload
+      const fileBuffer = this.wsServer.prisma.fs.fileToBuffer(tempPath);
+
+      // Upload to S3
+      s3UploadResult = await this.s3Service.uploadDirect(
+        fileBuffer,
+        {
+          userId,
+          conversationId,
+          messageId,
+          filename: sanitizedFilename,
+          contentType,
+          size: actualSize,
+          origin: "REMOTE"
+        }
+      );
+
+      // Clean up temp file
+      await this.wsServer.prisma.fs.unlink(tempPath);
+      console.log(`[Asset Fetch] Cleaned up temp file: ${tempPath}`);
+
+    } catch (fetchError) {
+      // Try to clean up temp file even on error
+      try {
+        if (await this.wsServer.prisma.fs.exists(tempPath)) {
+          await this.wsServer.prisma.fs.unlink(tempPath);
+        }
+      } catch {}
+      throw fetchError;
+    }
+
+    // Create attachment record in database
+    const attachment = await this.wsServer.prisma.createAttachment({
+      conversationId,
+      userId,
+      messageId,
+      filename: sanitizedFilename,
+      region: this.region,
+      mime: contentType,
+      bucket: s3UploadResult.bucket,
+      cdnUrl: s3UploadResult.url,
+      sourceUrl: url, // Store original URL
+      key: s3UploadResult.key,
+      size: BigInt(actualSize),
+      origin: "REMOTE",
+      status: "READY",
+      uploadMethod: "FETCHED",
+      ext: extension,
+      etag: s3UploadResult.etag,
+      meta: {
+        originalUrl: url,
+        fetchedAt: new Date().toISOString(),
+        originalSize: fileSizeBytes,
+        originalContentType: contentType
+      }
+    });
+
+    console.log(`[Asset Fetch] Created attachment ${attachment.id} from ${url}`);
+
+    // Send success response
+    const successEvent: EventTypeMap["asset_fetch_response"] = {
+      type: "asset_fetch_response",
+      conversationId,
+      attachmentId: attachment.id,
+      url: s3UploadResult.url, // CDN URL for the asset
+      success: true
+    };
+
+    ws.send(JSON.stringify(successEvent));
+
+    // Notify via Redis for other clients
+    const streamChannel = conversationId === "new-chat"
+      ? RedisChannels.user(userId)
+      : RedisChannels.conversationStream(conversationId);
+
+    await this.wsServer.redis.publishTypedEvent(
+      streamChannel,
+      "asset_uploaded",
+      {
+        type: "asset_uploaded",
+        conversationId,
+        attachmentId: attachment.id,
+        userId,
+        filename: sanitizedFilename,
+        mime: contentType,
+        size: actualSize,
+        bucket: s3UploadResult.bucket,
+        key: s3UploadResult.key,
+        url: s3UploadResult.url,
+        origin: "REMOTE",
+        status: "READY"
+      }
+    );
+
+  } catch (error) {
+    console.error('[Asset Fetch] Error:', error);
+
+    // Send error event
+    const errorEvent: EventTypeMap["asset_fetch_error"] = {
+      type: "asset_fetch_error",
+      conversationId,
+      url,
+      message: this.safeErrMsg(error)
+    };
+
+    ws.send(JSON.stringify(errorEvent));
+
+    // Also publish error to Redis
+    const streamChannel = conversationId === "new-chat"
+      ? RedisChannels.user(userId)
+      : RedisChannels.conversationStream(conversationId);
+
+    await this.wsServer.redis.publishTypedEvent(
+      streamChannel,
+      "asset_fetch_error",
+      errorEvent
+    );
+  }
+}
+
+/**
+ * Batch fetch multiple URLs
+ * Useful for fetching multiple images from a webpage or gallery
+ */
+public async handleBatchAssetFetch(
+  urls: string[],
+  conversationId: string,
+  messageId: string,
+  userId: string,
+  ws: WebSocket
+): Promise<{ successful: string[]; failed: Array<{ url: string; error: string }> }> {
+  const successful: string[] = [];
+  const failed: Array<{ url: string; error: string }> = [];
+
+  // Process in parallel with concurrency limit
+  const CONCURRENCY_LIMIT = 3;
+  const chunks = this.wsServer.prisma.fs.chunkArray(urls, CONCURRENCY_LIMIT);
+
+  for (const chunk of chunks) {
+    const results = await Promise.allSettled(
+      chunk.map(url =>
+        this.handleAssetFetchRequest(
+          {
+            type: "asset_fetch_request",
+            conversationId,
+            url,
+            messageId
+          },
+          ws,
+          userId
+        )
+      )
+    );
+
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successful.push(chunk[index]);
+      } else {
+        failed.push({
+          url: chunk[index],
+          error: this.safeErrMsg(result.reason)
+        });
+      }
+    });
+  }
+
+  return { successful, failed };
+}
+
+/**
+ * Helper to validate URL before fetching
+ * Uses fs package's parseUrl which returns null for invalid URLs
+ */
+private isValidUrl(url: string): boolean {
+  // Use fs package to parse URL
+  const parsed = this.wsServer.prisma.fs.parseUrl(url);
+
+  if (!parsed) {
+    return false; // Invalid URL format
+  }
+
+  // Only allow http/https protocols
+  // parsed.protocol includes the colon, e.g., "https:" or "http:"
+  return ['http:', 'https:'].includes(parsed.protocol.toLowerCase());
+}
+
+/**
+ * Helper to detect if URL points to a supported file type
+ */
+private isSupportedFileType(url: string): boolean {
+  const extension = this.wsServer.prisma.fs.assetType(url);
+  if (!extension) return false;
+
+  // Define supported file types
+  const supportedTypes = [
+    // Images
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif',
+    // Documents
+    'pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'json', 'xml',
+    // Archives (for future)
+    'zip', 'tar', 'gz',
+    // Media (for future)
+    'mp3', 'mp4', 'webm', 'ogg'
+  ];
+
+  return supportedTypes.includes(extension);
+}
   public async handleTyping(
     event: EventTypeMap["typing"],
     _ws: WebSocket,
