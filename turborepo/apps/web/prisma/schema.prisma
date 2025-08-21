@@ -6,6 +6,7 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
 enum ChecksumAlgo {
   CRC32
   CRC32C
@@ -248,11 +249,11 @@ model Attachment {
   cdnUrl         String? // publicUrl
   sourceUrl      String? // uploadUrl
   thumbnailKey   String? // image/video thumbnails
-  meta           Json?
 
-  bucket String
-  key    String
-  region String @default("us-east-1")
+  bucket    String
+  key       String
+  versionId String?
+  region    String  @default("us-east-1")
 
   cacheControl       String?
   contentDisposition String?
