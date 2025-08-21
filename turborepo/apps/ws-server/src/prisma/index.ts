@@ -3,7 +3,7 @@ import { Attachment, Prisma, PrismaClient } from "@/generated/client/client.ts";
 import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { InputJsonValue, JsonValue } from "@prisma/client/runtime/library";
+import { Exact, InputJsonValue, JsonValue } from "@prisma/client/runtime/library";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import * as dotenv from "dotenv";
 import type {
@@ -16,6 +16,7 @@ import type {
   XOR
 } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
+import { AttachmentWhereUniqueInput } from "@/generated/client/models.ts";
 
 dotenv.config({ quiet: true });
 export const prismaClient = new PrismaClient().$extends(withAccelerate());
@@ -347,7 +348,7 @@ export class PrismaService extends ModelService {
     messageId: string,
     userId: string
   ) {
-    const { attachments } = await this.prismaClient.$transaction(async t => {
+    const attachments = await this.prismaClient.$transaction(async t => {
       const attachment = await this.getAttachment(attachmentId);
 
       if (!attachment) {
@@ -377,7 +378,7 @@ export class PrismaService extends ModelService {
               {
                 status: "ATTACHED",
                 messageId,
-                meta: meta as InputJsonValue | JsonValue | undefined,
+                meta: {...meta},
                 bucket_key_conversationId: { bucket, conversationId, key },
                 ...rest,
                 bucket,

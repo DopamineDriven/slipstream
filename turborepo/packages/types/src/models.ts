@@ -4,6 +4,44 @@ import { displayNameModelsByProvider } from "@/codegen/__gen__/display-names-by-
 import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name.ts";
 import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
 
+export type ImageGenModels =
+  | "stable-diffusion"
+  | "gpt-image-1"
+  | "dall-e-2"
+  | "dall-e-3"
+  | "midjourney"
+  | "grok-2-image-1212"
+  | "imagen-3.0-generate-002"
+  | "imagen-4.0-fast-generate-001"
+  | "imagen-4.0-ultra-generate-001"
+  | "imagen-4.0-generate-001"
+  | "gemini-2.0-flash-preview-image-generation";
+export const providerModelImageGenApi = {
+  openai: ["gpt-image-1", "dall-e-2", "dall-e-3"],
+  gemini: [
+    "gemini-2.0-flash-preview-image-generation",
+    "imagen-3.0-generate-002",
+    "imagen-4.0-fast-generate-001",
+    "imagen-4.0-generate-001",
+    "imagen-4.0-ultra-generate-001"
+  ],
+  grok: ["grok-2-image-1212"],
+  discord: ["midjourney"]
+} as const;
+
+export const imageGenProvders = [
+  "grok",
+  "gemini",
+  "openai",
+  "discord"
+] as const;
+
+export type ImageGenProviders = keyof typeof providerModelImageGenApi;
+
+export type ImageGenModelsByProvider<
+  T extends keyof typeof providerModelImageGenApi
+> = Unenumerate<(typeof providerModelImageGenApi)[T]>;
+
 export const providerModelChatApi = modelIdsByProvider;
 
 export type Provider = keyof typeof modelIdsByProvider;

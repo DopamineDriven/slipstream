@@ -4,8 +4,8 @@ import {
   AssetStatus,
   UploadMethod
 } from "@/generated/client/enums.ts";
-import { Sha256 } from "@aws-crypto/sha256-js";
 import {
+  ChecksumAlgorithm,
   CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
@@ -15,16 +15,14 @@ import {
   S3Client,
   waitUntilObjectExists
 } from "@aws-sdk/client-s3";
-import {
-  getSignedUrl,
-  S3RequestPresigner
-} from "@aws-sdk/s3-request-presigner";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 // These provide compile-time type safety while avoiding runtime enum overhead
 export type AssetOriginType = keyof typeof AssetOrigin;
 export type AssetStatusType = keyof typeof AssetStatus;
 export type UploadMethodType = keyof typeof UploadMethod;
+export type ChecksumAlgorithmType = keyof typeof ChecksumAlgorithm;
 
 export interface S3Config {
   accessKeyId: string;
@@ -59,6 +57,18 @@ export interface AssetMetadata {
   origin: AssetOriginType; // Using literal union type
 }
 
+type FinalizeResult = {
+  bucket: string;
+  key: string;
+  versionId: string | null;
+  s3ObjectId: string;
+  etag?: string;
+  size?: number;
+  contentType?: string;
+  lastModified?: string;
+  checksum?: { algo: ChecksumAlgorithmType; value: string } | undefined;
+};
+
 // This ensures compile-time validation that all AssetOrigin values are mapped
 const BUCKET_MAP = {
   GENERATED: "pyGenAssets",
@@ -71,10 +81,10 @@ const BUCKET_MAP = {
 } as const satisfies Record<AssetOriginType, keyof S3Config["buckets"]>;
 
 export class S3Service {
+
+  static #instance: S3Service | null = null;
   private readonly s3Client: S3Client;
   private readonly config: S3Config;
-  private readonly presigner: S3RequestPresigner;
-
   // Cache for frequently used commands (optional optimization)
   private readonly commandCache = new Map<string, HeadObjectCommand>();
 
@@ -93,7 +103,6 @@ export class S3Service {
         accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey
       },
-      maxAttempts: 3,
       requestHandler: new NodeHttpHandler({
         connectionTimeout: config.connectionTimeout ?? 3000,
         requestTimeout: config.socketTimeout ?? 3000,
@@ -104,100 +113,67 @@ export class S3Service {
         })
       })
     });
-
-    // Initialize presigner with proper ChecksumConstructor
-    // This gives us more control over presigning configuration
-    // and allows for potential custom signing logic
-    this.presigner = new S3RequestPresigner({
-      credentials: {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey
-      },
-      region: config.region,
-      sha256: Sha256 // Using the ChecksumConstructor (not the deprecated HashConstructor)
-    });
   }
 
-  public cleanFilename(filename: string): string {
-    // Remove path traversal attempts and get just the filename
-    const basename = filename.split(/[/\\]/).pop() ?? "file";
-    // Replace unsafe characters but preserve extension
-    return basename.replace(/[^a-zA-Z0-9._-]/g, "_");
-  }
-  /**
-   * Get the singleton instance of S3Service
-   * @param config Optional S3Config - only used on first call
-   * @returns The singleton S3Service instance
-   */
-  public static getInstance(config: S3Config): S3Service {
-    if (!S3Service.instance) {
-      S3Service.instance = new S3Service(config);
-      return S3Service.instance;
+  static getInstance(config: S3Config) {
+    if (!this.#instance) {
+      this.#instance = new S3Service(config);
+      return this.#instance;
     }
-    return S3Service.instance;
+    return this.#instance;
   }
 
-  /**
-   * Check if an instance exists without creating one
-   */
-  public static hasInstance(): boolean {
+  public static hasInstance() {
     return S3Service.instance !== null;
   }
-public generateAssetKey(
-  userId: string,
-  filename: string,
-  origin: AssetOriginType
-): string {
-  const timestamp = Date.now();
-  const sanitizedFilename = this.sanitizeFilename(filename);
 
-  // Clean structure: origin/userId/timestamp-filename
-  // No conversationId in the path!
-  return [
-    origin.toLowerCase(),
-    userId,
-    `${timestamp}-${sanitizedFilename}`
-  ].join('/');
-}
-
-  /**
-   * Reset the singleton instance (useful for testing or graceful shutdown)
-   */
-  public static async resetInstance(): Promise<void> {
+  public static async resetInstance() {
     if (S3Service.instance) {
       S3Service.instance.destroy();
       S3Service.instance = null;
     }
   }
 
-  /**
-   * Generate a presigned URL for direct client upload
-   * @performance Reuses S3Client and presigner instances
-   */
+  private stripQuotes = (s?: string | null) =>
+    s ? s.replace(/^"(.*)"$/, "$1") : undefined;
+
+  public generateAssetKey(
+    userId: string,
+    filename: string,
+    origin: AssetOriginType
+  ) {
+    const timestamp = Date.now();
+    const sanitizedFilename = this.sanitizeFilename(filename);
+
+    return [
+      origin.toLowerCase(),
+      userId,
+      `${timestamp}-${sanitizedFilename}`
+    ].join("/");
+  }
+
   async generatePresignedUpload(
     { ...metadata }: AssetMetadata,
     expiresIn = 3600
-  ): Promise<PresignedUploadResponse> {
+  ) {
     const key = this.generateKey(metadata);
     const bucket = this.selectBucket(metadata.origin);
+    const fields = {
+      userId: metadata.userId,
+      messageId: metadata.messageId ?? "",
+      filename: metadata.filename,
+      origin: metadata.origin
+    };
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
       ContentType: metadata.contentType,
       Metadata: {
-        userId: metadata.userId,
-        messageId: metadata.messageId ?? "",
-        filename: metadata.filename,
-        origin: metadata.origin
+        ...fields
       }
     });
 
-    // Option 1: Use getSignedUrl helper (recommended)
     const uploadUrl = await getSignedUrl(this.s3Client, command, { expiresIn });
-
-    // Option 2: Use presigner directly for more control (alternative)
-    // const presignedRequest = await this.presigner.presign(command, { expiresIn });
-    // const uploadUrl = presignedRequest.url;
 
     const publicUrl = this.getPublicUrl(bucket, key);
 
@@ -205,18 +181,16 @@ public generateAssetKey(
       uploadUrl,
       publicUrl,
       key,
-      bucket
-    };
+      bucket,
+      fields
+    } satisfies PresignedUploadResponse;
   }
 
-  /**
-   * Generate a presigned URL for download
-   */
   async generatePresignedDownload(
     bucket: string,
     key: string,
     expiresIn = 3600
-  ): Promise<string> {
+  ) {
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key
@@ -225,13 +199,10 @@ public generateAssetKey(
     return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
-  /**
-   * Direct upload from server (for generated content)
-   */
   async uploadDirect(
     data: Buffer | Uint8Array | string,
     { conversationId = "new-chat", ...metadata }: AssetMetadata
-  ): Promise<{ url: string; key: string; bucket: string; etag?: string }> {
+  ) {
     const key = this.generateKey({ conversationId, ...metadata });
     const bucket = this.selectBucket(metadata.origin);
 
@@ -260,18 +231,14 @@ public generateAssetKey(
     };
   }
 
-  /**
-   * Check if an object exists
-   * @performance Uses cached HeadObjectCommand when possible
-   */
-  async objectExists(bucket: string, key: string): Promise<boolean> {
+  async objectExists(bucket: string, key: string) {
     try {
       const cacheKey = `${bucket}:${key}`;
       let command = this.commandCache.get(cacheKey);
 
       if (!command) {
         command = new HeadObjectCommand({ Bucket: bucket, Key: key });
-        // Limit cache size to prevent memory bloat
+
         if (this.commandCache.size > 100) {
           const firstKey = this.commandCache.keys().next().value;
           if (firstKey) this.commandCache.delete(firstKey);
@@ -287,9 +254,6 @@ public generateAssetKey(
     }
   }
 
-  /**
-   * Get object metadata
-   */
   async getObjectMetadata(bucket: string, key: string) {
     const cacheKey = `${bucket}:${key}`;
     let command = this.commandCache.get(cacheKey);
@@ -316,10 +280,7 @@ public generateAssetKey(
     }
   }
 
-  /**
-   * Delete an object
-   */
-  async deleteObject(bucket: string, key: string): Promise<boolean> {
+  public async deleteObject(bucket: string, key: string): Promise<boolean> {
     try {
       await this.s3Client.send(
         new DeleteObjectCommand({
@@ -327,7 +288,7 @@ public generateAssetKey(
           Key: key
         })
       );
-      // Clear from cache if present
+
       this.commandCache.delete(`${bucket}:${key}`);
       return true;
     } catch (error) {
@@ -336,19 +297,62 @@ public generateAssetKey(
     }
   }
 
-  async copyAsset(
+  async finalizeUploadedObject(
+    bucket: string,
+    key: string
+  ): Promise<FinalizeResult> {
+    // Optional safety if you’re paranoid / doing cross-region writes:
+    // await waitUntilObjectExists({ client: this.s3Client, maxWaitTime: 10 }, { Bucket: bucket, Key: key });
+
+    const head = await this.s3Client.send(
+      new HeadObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        // Ask for checksums in the response headers.
+        // (If the object is SSE-KMS encrypted, IAM/KMS must allow decrypt/datakey to read checksums.)
+        ChecksumMode: "ENABLED"
+      })
+    );
+
+    const versionId = head.VersionId ?? null; // present when bucket has versioning
+    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}`;
+
+    // Prefer SHA256, then CRC32C/CRC32, then SHA1
+    const checksum = head.ChecksumSHA256
+      ? ({ algo: "SHA256", value: head.ChecksumSHA256 } as const)
+      : head.ChecksumCRC32C
+        ? ({ algo: "CRC32C", value: head.ChecksumCRC32C } as const)
+        : head.ChecksumCRC32
+          ? ({ algo: "CRC32", value: head.ChecksumCRC32 } as const)
+          : head.ChecksumSHA1
+            ? ({ algo: "SHA1", value: head.ChecksumSHA1 } as const)
+            : undefined;
+
+    return {
+      bucket,
+      key,
+      versionId,
+      s3ObjectId,
+      etag: this.stripQuotes(head.ETag),
+      size: head.ContentLength ?? undefined,
+      contentType: head.ContentType ?? undefined,
+      lastModified: head.LastModified?.toISOString(),
+      checksum
+    };
+  }
+
+  public async copyAsset(
     sourceBucket: string,
     sourceKey: string,
     destBucket: string,
     destKey: string
-  ): Promise<boolean> {
+  ) {
     try {
-      // Server-side copy - no data transfer through your application!
       const copyCommand = new CopyObjectCommand({
         CopySource: `${sourceBucket}/${sourceKey}`,
         Bucket: destBucket,
         Key: destKey,
-        MetadataDirective: "COPY" // Preserves original metadata
+        MetadataDirective: "COPY"
       });
 
       await this.s3Client.send(copyCommand);
@@ -363,21 +367,28 @@ public generateAssetKey(
       );
       return true;
     } catch (error) {
+      if (error instanceof ObjectNotInActiveTierError) {
+        console.error(
+          `[Fault: ${error.$fault}]: Could not copy ${sourceKey} from ${sourceBucket}. Object is not in the active tier.
+            Attempts: ${error.$metadata.attempts ?? 0}
+            Message: ${error.message}
+            Name: ${error.name}
+            Stack: ${error.stack ?? ""}
+            `
+        );
+      }
       if (error instanceof Error) {
-        // Handle specific S3 errors
         if (error.name === "NoSuchKey") {
           console.error(
             `Source object not found: ${sourceBucket}/${sourceKey}`
           );
-        } else if (error.name === "AccessDenied") {
+        }
+        if (error.name === "AccessDenied") {
           console.error(`Access denied for copy operation`);
-        } else if (error.name === "ObjectNotInActiveTierError") {
+        }
+        if (error.name === "ObjectNotInActiveTierError") {
           console.error(
             `Object is in Glacier/Deep Archive and not available for copy`
-          );
-        } else if (error instanceof ObjectNotInActiveTierError) {
-          console.error(
-            `Could not copy ${sourceKey} from ${sourceBucket}. Object is not in the active tier.`
           );
         }
       }
@@ -385,14 +396,11 @@ public generateAssetKey(
     }
   }
 
-  /**
-   * Generate a consistent key structure
-   */
   private generateKey({ ...metadata }: AssetMetadata): string {
     const timestamp = Date.now();
     const sanitizedFilename = this.sanitizeFilename(metadata.filename);
 
-    // Structure: origin/userId/conversationId/timestamp-filename
+    // origin/userId/conversationId/timestamp-filename
     const parts = [
       metadata.origin.toLowerCase(),
       metadata.userId,
@@ -402,35 +410,20 @@ public generateAssetKey(
     return parts.join("/");
   }
 
-  /**
-   * Select appropriate bucket based on origin
-   * @performance Uses const map lookup instead of switch statement
-   */
-  private selectBucket(origin: AssetOriginType): string {
+  private selectBucket(origin: AssetOriginType) {
     const bucketKey = BUCKET_MAP[origin];
     return this.config.buckets[bucketKey];
   }
 
-  /**
-   * Sanitize filename for S3
-   */
-  private sanitizeFilename(filename: string): string {
-    // Remove path traversal attempts
+  private sanitizeFilename(filename: string) {
     const basename = filename.split(/[/\\]/).pop() ?? "file";
-    // Replace unsafe characters, but preserve file extension
     return basename.replace(/[^a-zA-Z0-9._-]/g, "_");
   }
 
-  /**
-   * Get public URL (if bucket is public)
-   */
   private getPublicUrl(bucket: string, key: string): string {
     return `https://${bucket}.s3.${this.config.region}.amazonaws.com/${key}`;
   }
 
-  /**
-   * Cleanup resources (called internally on reset)
-   */
   private destroy(): void {
     this.commandCache.clear();
     this.s3Client.destroy();

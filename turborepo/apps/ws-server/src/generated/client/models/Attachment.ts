@@ -40,6 +40,7 @@ export type AttachmentMinAggregateOutputType = {
   conversationId: string | null
   userId: string | null
   messageId: string | null
+  s3ObjectId: string | null
   origin: $Enums.AssetOrigin | null
   status: $Enums.AssetStatus | null
   uploadMethod: $Enums.UploadMethod | null
@@ -50,12 +51,21 @@ export type AttachmentMinAggregateOutputType = {
   bucket: string | null
   key: string | null
   region: string | null
+  cacheControl: string | null
+  contentDisposition: string | null
+  contentEncoding: string | null
+  expiresAt: Date | null
   size: bigint | null
   filename: string | null
   ext: string | null
   mime: string | null
   etag: string | null
+  checksumAlgo: $Enums.ChecksumAlgo | null
   checksumSha256: string | null
+  storageClass: string | null
+  sseAlgorithm: string | null
+  sseKmsKeyId: string | null
+  s3LastModified: Date | null
   deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -66,6 +76,7 @@ export type AttachmentMaxAggregateOutputType = {
   conversationId: string | null
   userId: string | null
   messageId: string | null
+  s3ObjectId: string | null
   origin: $Enums.AssetOrigin | null
   status: $Enums.AssetStatus | null
   uploadMethod: $Enums.UploadMethod | null
@@ -76,12 +87,21 @@ export type AttachmentMaxAggregateOutputType = {
   bucket: string | null
   key: string | null
   region: string | null
+  cacheControl: string | null
+  contentDisposition: string | null
+  contentEncoding: string | null
+  expiresAt: Date | null
   size: bigint | null
   filename: string | null
   ext: string | null
   mime: string | null
   etag: string | null
+  checksumAlgo: $Enums.ChecksumAlgo | null
   checksumSha256: string | null
+  storageClass: string | null
+  sseAlgorithm: string | null
+  sseKmsKeyId: string | null
+  s3LastModified: Date | null
   deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -92,6 +112,7 @@ export type AttachmentCountAggregateOutputType = {
   conversationId: number
   userId: number
   messageId: number
+  s3ObjectId: number
   origin: number
   status: number
   uploadMethod: number
@@ -103,12 +124,21 @@ export type AttachmentCountAggregateOutputType = {
   bucket: number
   key: number
   region: number
+  cacheControl: number
+  contentDisposition: number
+  contentEncoding: number
+  expiresAt: number
   size: number
   filename: number
   ext: number
   mime: number
   etag: number
+  checksumAlgo: number
   checksumSha256: number
+  storageClass: number
+  sseAlgorithm: number
+  sseKmsKeyId: number
+  s3LastModified: number
   deletedAt: number
   createdAt: number
   updatedAt: number
@@ -131,6 +161,7 @@ export type AttachmentMinAggregateInputType = {
   conversationId?: true
   userId?: true
   messageId?: true
+  s3ObjectId?: true
   origin?: true
   status?: true
   uploadMethod?: true
@@ -141,12 +172,21 @@ export type AttachmentMinAggregateInputType = {
   bucket?: true
   key?: true
   region?: true
+  cacheControl?: true
+  contentDisposition?: true
+  contentEncoding?: true
+  expiresAt?: true
   size?: true
   filename?: true
   ext?: true
   mime?: true
   etag?: true
+  checksumAlgo?: true
   checksumSha256?: true
+  storageClass?: true
+  sseAlgorithm?: true
+  sseKmsKeyId?: true
+  s3LastModified?: true
   deletedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -157,6 +197,7 @@ export type AttachmentMaxAggregateInputType = {
   conversationId?: true
   userId?: true
   messageId?: true
+  s3ObjectId?: true
   origin?: true
   status?: true
   uploadMethod?: true
@@ -167,12 +208,21 @@ export type AttachmentMaxAggregateInputType = {
   bucket?: true
   key?: true
   region?: true
+  cacheControl?: true
+  contentDisposition?: true
+  contentEncoding?: true
+  expiresAt?: true
   size?: true
   filename?: true
   ext?: true
   mime?: true
   etag?: true
+  checksumAlgo?: true
   checksumSha256?: true
+  storageClass?: true
+  sseAlgorithm?: true
+  sseKmsKeyId?: true
+  s3LastModified?: true
   deletedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -183,6 +233,7 @@ export type AttachmentCountAggregateInputType = {
   conversationId?: true
   userId?: true
   messageId?: true
+  s3ObjectId?: true
   origin?: true
   status?: true
   uploadMethod?: true
@@ -194,12 +245,21 @@ export type AttachmentCountAggregateInputType = {
   bucket?: true
   key?: true
   region?: true
+  cacheControl?: true
+  contentDisposition?: true
+  contentEncoding?: true
+  expiresAt?: true
   size?: true
   filename?: true
   ext?: true
   mime?: true
   etag?: true
+  checksumAlgo?: true
   checksumSha256?: true
+  storageClass?: true
+  sseAlgorithm?: true
+  sseKmsKeyId?: true
+  s3LastModified?: true
   deletedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -297,6 +357,7 @@ export type AttachmentGroupByOutputType = {
   conversationId: string
   userId: string
   messageId: string | null
+  s3ObjectId: string
   origin: $Enums.AssetOrigin
   status: $Enums.AssetStatus
   uploadMethod: $Enums.UploadMethod
@@ -308,12 +369,21 @@ export type AttachmentGroupByOutputType = {
   bucket: string
   key: string
   region: string
+  cacheControl: string | null
+  contentDisposition: string | null
+  contentEncoding: string | null
+  expiresAt: Date | null
   size: bigint | null
   filename: string | null
   ext: string | null
   mime: string | null
   etag: string | null
+  checksumAlgo: $Enums.ChecksumAlgo
   checksumSha256: string | null
+  storageClass: string | null
+  sseAlgorithm: string | null
+  sseKmsKeyId: string | null
+  s3LastModified: Date | null
   deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -347,6 +417,7 @@ export type AttachmentWhereInput = {
   conversationId?: Prisma.StringFilter<"Attachment"> | string
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
   origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
@@ -358,18 +429,28 @@ export type AttachmentWhereInput = {
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   region?: Prisma.StringFilter<"Attachment"> | string
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
   filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
   ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
   mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
   etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
 }
 
 export type AttachmentOrderByWithRelationInput = {
@@ -377,6 +458,7 @@ export type AttachmentOrderByWithRelationInput = {
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -388,23 +470,33 @@ export type AttachmentOrderByWithRelationInput = {
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   region?: Prisma.SortOrder
+  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   size?: Prisma.SortOrderInput | Prisma.SortOrder
   filename?: Prisma.SortOrderInput | Prisma.SortOrder
   ext?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
   etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksumAlgo?: Prisma.SortOrder
   checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
+  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder
+  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder
+  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   conversation?: Prisma.ConversationOrderByWithRelationInput
   message?: Prisma.MessageOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
+  image?: Prisma.ImageMetadataOrderByWithRelationInput
 }
 
 export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  bucket_key_conversationId?: Prisma.AttachmentBucketKeyConversationIdCompoundUniqueInput
+  s3ObjectId?: string
   AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
@@ -422,25 +514,36 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   region?: Prisma.StringFilter<"Attachment"> | string
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
   filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
   ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
   mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
   etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "bucket_key_conversationId">
+  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
+}, "id" | "s3ObjectId">
 
 export type AttachmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -452,12 +555,21 @@ export type AttachmentOrderByWithAggregationInput = {
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   region?: Prisma.SortOrder
+  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   size?: Prisma.SortOrderInput | Prisma.SortOrder
   filename?: Prisma.SortOrderInput | Prisma.SortOrder
   ext?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
   etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksumAlgo?: Prisma.SortOrder
   checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
+  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder
+  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder
+  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -476,6 +588,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   conversationId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  s3ObjectId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   origin?: Prisma.EnumAssetOriginWithAggregatesFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusWithAggregatesFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodWithAggregatesFilter<"Attachment"> | $Enums.UploadMethod
@@ -487,12 +600,21 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   region?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  cacheControl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  contentDisposition?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  contentEncoding?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
   size?: Prisma.BigIntNullableWithAggregatesFilter<"Attachment"> | bigint | number | null
   filename?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   ext?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   mime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   etag?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoWithAggregatesFilter<"Attachment"> | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  storageClass?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  sseAlgorithm?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  sseKmsKeyId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  s3LastModified?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
@@ -500,6 +622,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
 
 export type AttachmentCreateInput = {
   id?: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -511,18 +634,28 @@ export type AttachmentCreateInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateInput = {
@@ -530,6 +663,7 @@ export type AttachmentUncheckedCreateInput = {
   conversationId: string
   userId: string
   messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -541,19 +675,30 @@ export type AttachmentUncheckedCreateInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -565,18 +710,28 @@ export type AttachmentUpdateInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateInput = {
@@ -584,6 +739,7 @@ export type AttachmentUncheckedUpdateInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -595,15 +751,25 @@ export type AttachmentUncheckedUpdateInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentCreateManyInput = {
@@ -611,6 +777,7 @@ export type AttachmentCreateManyInput = {
   conversationId: string
   userId: string
   messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -622,12 +789,21 @@ export type AttachmentCreateManyInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -635,6 +811,7 @@ export type AttachmentCreateManyInput = {
 
 export type AttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -646,12 +823,21 @@ export type AttachmentUpdateManyMutationInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -662,6 +848,7 @@ export type AttachmentUncheckedUpdateManyInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -673,12 +860,21 @@ export type AttachmentUncheckedUpdateManyInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -694,17 +890,12 @@ export type AttachmentOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type AttachmentBucketKeyConversationIdCompoundUniqueInput = {
-  bucket: string
-  key: string
-  conversationId: string
-}
-
 export type AttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -716,12 +907,21 @@ export type AttachmentCountOrderByAggregateInput = {
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   region?: Prisma.SortOrder
+  cacheControl?: Prisma.SortOrder
+  contentDisposition?: Prisma.SortOrder
+  contentEncoding?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   size?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   etag?: Prisma.SortOrder
+  checksumAlgo?: Prisma.SortOrder
   checksumSha256?: Prisma.SortOrder
+  storageClass?: Prisma.SortOrder
+  sseAlgorithm?: Prisma.SortOrder
+  sseKmsKeyId?: Prisma.SortOrder
+  s3LastModified?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -737,6 +937,7 @@ export type AttachmentMaxOrderByAggregateInput = {
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -747,12 +948,21 @@ export type AttachmentMaxOrderByAggregateInput = {
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   region?: Prisma.SortOrder
+  cacheControl?: Prisma.SortOrder
+  contentDisposition?: Prisma.SortOrder
+  contentEncoding?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   size?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   etag?: Prisma.SortOrder
+  checksumAlgo?: Prisma.SortOrder
   checksumSha256?: Prisma.SortOrder
+  storageClass?: Prisma.SortOrder
+  sseAlgorithm?: Prisma.SortOrder
+  sseKmsKeyId?: Prisma.SortOrder
+  s3LastModified?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -763,6 +973,7 @@ export type AttachmentMinOrderByAggregateInput = {
   conversationId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -773,12 +984,21 @@ export type AttachmentMinOrderByAggregateInput = {
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   region?: Prisma.SortOrder
+  cacheControl?: Prisma.SortOrder
+  contentDisposition?: Prisma.SortOrder
+  contentEncoding?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   size?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   ext?: Prisma.SortOrder
   mime?: Prisma.SortOrder
   etag?: Prisma.SortOrder
+  checksumAlgo?: Prisma.SortOrder
   checksumSha256?: Prisma.SortOrder
+  storageClass?: Prisma.SortOrder
+  sseAlgorithm?: Prisma.SortOrder
+  sseKmsKeyId?: Prisma.SortOrder
+  s3LastModified?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -787,6 +1007,11 @@ export type AttachmentMinOrderByAggregateInput = {
 export type AttachmentSumOrderByAggregateInput = {
   uploadDuration?: Prisma.SortOrder
   size?: Prisma.SortOrder
+}
+
+export type AttachmentScalarRelationFilter = {
+  is?: Prisma.AttachmentWhereInput
+  isNot?: Prisma.AttachmentWhereInput
 }
 
 export type AttachmentCreateNestedManyWithoutUserInput = {
@@ -935,8 +1160,27 @@ export type NullableBigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
+export type EnumChecksumAlgoFieldUpdateOperationsInput = {
+  set?: $Enums.ChecksumAlgo
+}
+
+export type AttachmentCreateNestedOneWithoutImageInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutImageNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput
+  upsert?: Prisma.AttachmentUpsertWithoutImageInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageInput, Prisma.AttachmentUpdateWithoutImageInput>, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+}
+
 export type AttachmentCreateWithoutUserInput = {
   id?: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -948,23 +1192,34 @@ export type AttachmentCreateWithoutUserInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutUserInput = {
   id?: string
   conversationId: string
   messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -976,15 +1231,25 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutUserInput = {
@@ -1021,6 +1286,7 @@ export type AttachmentScalarWhereInput = {
   conversationId?: Prisma.StringFilter<"Attachment"> | string
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
   origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
@@ -1032,12 +1298,21 @@ export type AttachmentScalarWhereInput = {
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   region?: Prisma.StringFilter<"Attachment"> | string
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
   filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
   ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
   mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
   etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
@@ -1045,6 +1320,7 @@ export type AttachmentScalarWhereInput = {
 
 export type AttachmentCreateWithoutConversationInput = {
   id?: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1056,23 +1332,34 @@ export type AttachmentCreateWithoutConversationInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutConversationInput = {
   id?: string
   userId: string
   messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1084,15 +1371,25 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutConversationInput = {
@@ -1123,6 +1420,7 @@ export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
 
 export type AttachmentCreateWithoutMessageInput = {
   id?: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1134,23 +1432,34 @@ export type AttachmentCreateWithoutMessageInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentUncheckedCreateWithoutMessageInput = {
   id?: string
   conversationId: string
   userId: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1162,15 +1471,25 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
 }
 
 export type AttachmentCreateOrConnectWithoutMessageInput = {
@@ -1199,10 +1518,9 @@ export type AttachmentUpdateManyWithWhereWithoutMessageInput = {
   data: Prisma.XOR<Prisma.AttachmentUpdateManyMutationInput, Prisma.AttachmentUncheckedUpdateManyWithoutMessageInput>
 }
 
-export type AttachmentCreateManyUserInput = {
+export type AttachmentCreateWithoutImageInput = {
   id?: string
-  conversationId: string
-  messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1214,12 +1532,187 @@ export type AttachmentCreateManyUserInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+}
+
+export type AttachmentUncheckedCreateWithoutImageInput = {
+  id?: string
+  conversationId: string
+  userId: string
+  messageId?: string | null
+  s3ObjectId: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bucket: string
+  key: string
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AttachmentCreateOrConnectWithoutImageInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+}
+
+export type AttachmentUpsertWithoutImageInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+}
+
+export type AttachmentUpdateWithoutImageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutImageInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AttachmentCreateManyUserInput = {
+  id?: string
+  conversationId: string
+  messageId?: string | null
+  s3ObjectId: string
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bucket: string
+  key: string
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1227,6 +1720,7 @@ export type AttachmentCreateManyUserInput = {
 
 export type AttachmentUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1238,23 +1732,34 @@ export type AttachmentUpdateWithoutUserInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1266,21 +1771,32 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1292,12 +1808,21 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1307,6 +1832,7 @@ export type AttachmentCreateManyConversationInput = {
   id?: string
   userId: string
   messageId?: string | null
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1318,12 +1844,21 @@ export type AttachmentCreateManyConversationInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1331,6 +1866,7 @@ export type AttachmentCreateManyConversationInput = {
 
 export type AttachmentUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1342,23 +1878,34 @@ export type AttachmentUpdateWithoutConversationInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1370,21 +1917,32 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1396,12 +1954,21 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1411,6 +1978,7 @@ export type AttachmentCreateManyMessageInput = {
   id?: string
   conversationId: string
   userId: string
+  s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1422,12 +1990,21 @@ export type AttachmentCreateManyMessageInput = {
   bucket: string
   key: string
   region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
   size?: bigint | number | null
   filename?: string | null
   ext?: string | null
   mime?: string | null
   etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
   checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1435,6 +2012,7 @@ export type AttachmentCreateManyMessageInput = {
 
 export type AttachmentUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1446,23 +2024,34 @@ export type AttachmentUpdateWithoutMessageInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1474,21 +2063,32 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
 }
 
 export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1500,12 +2100,21 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
   checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1518,6 +2127,7 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   conversationId?: boolean
   userId?: boolean
   messageId?: boolean
+  s3ObjectId?: boolean
   origin?: boolean
   status?: boolean
   uploadMethod?: boolean
@@ -1529,18 +2139,28 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   bucket?: boolean
   key?: boolean
   region?: boolean
+  cacheControl?: boolean
+  contentDisposition?: boolean
+  contentEncoding?: boolean
+  expiresAt?: boolean
   size?: boolean
   filename?: boolean
   ext?: boolean
   mime?: boolean
   etag?: boolean
+  checksumAlgo?: boolean
   checksumSha256?: boolean
+  storageClass?: boolean
+  sseAlgorithm?: boolean
+  sseKmsKeyId?: boolean
+  s3LastModified?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1548,6 +2168,7 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   conversationId?: boolean
   userId?: boolean
   messageId?: boolean
+  s3ObjectId?: boolean
   origin?: boolean
   status?: boolean
   uploadMethod?: boolean
@@ -1559,12 +2180,21 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   bucket?: boolean
   key?: boolean
   region?: boolean
+  cacheControl?: boolean
+  contentDisposition?: boolean
+  contentEncoding?: boolean
+  expiresAt?: boolean
   size?: boolean
   filename?: boolean
   ext?: boolean
   mime?: boolean
   etag?: boolean
+  checksumAlgo?: boolean
   checksumSha256?: boolean
+  storageClass?: boolean
+  sseAlgorithm?: boolean
+  sseKmsKeyId?: boolean
+  s3LastModified?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1578,6 +2208,7 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   conversationId?: boolean
   userId?: boolean
   messageId?: boolean
+  s3ObjectId?: boolean
   origin?: boolean
   status?: boolean
   uploadMethod?: boolean
@@ -1589,12 +2220,21 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   bucket?: boolean
   key?: boolean
   region?: boolean
+  cacheControl?: boolean
+  contentDisposition?: boolean
+  contentEncoding?: boolean
+  expiresAt?: boolean
   size?: boolean
   filename?: boolean
   ext?: boolean
   mime?: boolean
   etag?: boolean
+  checksumAlgo?: boolean
   checksumSha256?: boolean
+  storageClass?: boolean
+  sseAlgorithm?: boolean
+  sseKmsKeyId?: boolean
+  s3LastModified?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1608,6 +2248,7 @@ export type AttachmentSelectScalar = {
   conversationId?: boolean
   userId?: boolean
   messageId?: boolean
+  s3ObjectId?: boolean
   origin?: boolean
   status?: boolean
   uploadMethod?: boolean
@@ -1619,22 +2260,32 @@ export type AttachmentSelectScalar = {
   bucket?: boolean
   key?: boolean
   region?: boolean
+  cacheControl?: boolean
+  contentDisposition?: boolean
+  contentEncoding?: boolean
+  expiresAt?: boolean
   size?: boolean
   filename?: boolean
   ext?: boolean
   mime?: boolean
   etag?: boolean
+  checksumAlgo?: boolean
   checksumSha256?: boolean
+  storageClass?: boolean
+  sseAlgorithm?: boolean
+  sseKmsKeyId?: boolean
+  s3LastModified?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "meta" | "bucket" | "key" | "region" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumSha256" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "meta" | "bucket" | "key" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
 }
 export type AttachmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
@@ -1653,12 +2304,14 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     conversation: Prisma.$ConversationPayload<ExtArgs> | null
     message: Prisma.$MessagePayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs>
+    image: Prisma.$ImageMetadataPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     conversationId: string
     userId: string
     messageId: string | null
+    s3ObjectId: string
     origin: $Enums.AssetOrigin
     status: $Enums.AssetStatus
     uploadMethod: $Enums.UploadMethod
@@ -1670,12 +2323,21 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     bucket: string
     key: string
     region: string
+    cacheControl: string | null
+    contentDisposition: string | null
+    contentEncoding: string | null
+    expiresAt: Date | null
     size: bigint | null
     filename: string | null
     ext: string | null
     mime: string | null
     etag: string | null
+    checksumAlgo: $Enums.ChecksumAlgo
     checksumSha256: string | null
+    storageClass: string | null
+    sseAlgorithm: string | null
+    sseKmsKeyId: string | null
+    s3LastModified: Date | null
     deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -2076,6 +2738,7 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
   conversation<T extends Prisma.Attachment$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   message<T extends Prisma.Attachment$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$messageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  image<T extends Prisma.Attachment$imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$imageArgs<ExtArgs>>): Prisma.Prisma__ImageMetadataClient<runtime.Types.Result.GetResult<Prisma.$ImageMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2109,6 +2772,7 @@ export interface AttachmentFieldRefs {
   readonly conversationId: Prisma.FieldRef<"Attachment", 'String'>
   readonly userId: Prisma.FieldRef<"Attachment", 'String'>
   readonly messageId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly s3ObjectId: Prisma.FieldRef<"Attachment", 'String'>
   readonly origin: Prisma.FieldRef<"Attachment", 'AssetOrigin'>
   readonly status: Prisma.FieldRef<"Attachment", 'AssetStatus'>
   readonly uploadMethod: Prisma.FieldRef<"Attachment", 'UploadMethod'>
@@ -2120,12 +2784,21 @@ export interface AttachmentFieldRefs {
   readonly bucket: Prisma.FieldRef<"Attachment", 'String'>
   readonly key: Prisma.FieldRef<"Attachment", 'String'>
   readonly region: Prisma.FieldRef<"Attachment", 'String'>
+  readonly cacheControl: Prisma.FieldRef<"Attachment", 'String'>
+  readonly contentDisposition: Prisma.FieldRef<"Attachment", 'String'>
+  readonly contentEncoding: Prisma.FieldRef<"Attachment", 'String'>
+  readonly expiresAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly size: Prisma.FieldRef<"Attachment", 'BigInt'>
   readonly filename: Prisma.FieldRef<"Attachment", 'String'>
   readonly ext: Prisma.FieldRef<"Attachment", 'String'>
   readonly mime: Prisma.FieldRef<"Attachment", 'String'>
   readonly etag: Prisma.FieldRef<"Attachment", 'String'>
+  readonly checksumAlgo: Prisma.FieldRef<"Attachment", 'ChecksumAlgo'>
   readonly checksumSha256: Prisma.FieldRef<"Attachment", 'String'>
+  readonly storageClass: Prisma.FieldRef<"Attachment", 'String'>
+  readonly sseAlgorithm: Prisma.FieldRef<"Attachment", 'String'>
+  readonly sseKmsKeyId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly s3LastModified: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Attachment", 'DateTime'>
@@ -2560,6 +3233,25 @@ export type Attachment$messageArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.MessageInclude<ExtArgs> | null
   where?: Prisma.MessageWhereInput
+}
+
+/**
+ * Attachment.image
+ */
+export type Attachment$imageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImageMetadata
+   */
+  select?: Prisma.ImageMetadataSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImageMetadata
+   */
+  omit?: Prisma.ImageMetadataOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageMetadataInclude<ExtArgs> | null
+  where?: Prisma.ImageMetadataWhereInput
 }
 
 /**

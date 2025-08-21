@@ -404,6 +404,7 @@ export const ModelName = {
   ConversationSettings: 'ConversationSettings',
   Message: 'Message',
   Attachment: 'Attachment',
+  ImageMetadata: 'ImageMetadata',
   VerificationToken: 'VerificationToken'
 } as const
 
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "verificationToken"
+    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "imageMetadata" | "verificationToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1164,6 +1165,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ImageMetadata: {
+      payload: Prisma.$ImageMetadataPayload<ExtArgs>
+      fields: Prisma.ImageMetadataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageMetadataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageMetadataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        findFirst: {
+          args: Prisma.ImageMetadataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageMetadataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        findMany: {
+          args: Prisma.ImageMetadataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>[]
+        }
+        create: {
+          args: Prisma.ImageMetadataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        createMany: {
+          args: Prisma.ImageMetadataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImageMetadataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>[]
+        }
+        delete: {
+          args: Prisma.ImageMetadataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        update: {
+          args: Prisma.ImageMetadataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageMetadataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageMetadataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImageMetadataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImageMetadataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageMetadataPayload>
+        }
+        aggregate: {
+          args: Prisma.ImageMetadataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageMetadata>
+        }
+        groupBy: {
+          args: Prisma.ImageMetadataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageMetadataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageMetadataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
     VerificationToken: {
       payload: Prisma.$VerificationTokenPayload<ExtArgs>
       fields: Prisma.VerificationTokenFieldRefs
@@ -1424,6 +1499,7 @@ export const AttachmentScalarFieldEnum = {
   conversationId: 'conversationId',
   userId: 'userId',
   messageId: 'messageId',
+  s3ObjectId: 's3ObjectId',
   origin: 'origin',
   status: 'status',
   uploadMethod: 'uploadMethod',
@@ -1435,18 +1511,53 @@ export const AttachmentScalarFieldEnum = {
   bucket: 'bucket',
   key: 'key',
   region: 'region',
+  cacheControl: 'cacheControl',
+  contentDisposition: 'contentDisposition',
+  contentEncoding: 'contentEncoding',
+  expiresAt: 'expiresAt',
   size: 'size',
   filename: 'filename',
   ext: 'ext',
   mime: 'mime',
   etag: 'etag',
+  checksumAlgo: 'checksumAlgo',
   checksumSha256: 'checksumSha256',
+  storageClass: 'storageClass',
+  sseAlgorithm: 'sseAlgorithm',
+  sseKmsKeyId: 'sseKmsKeyId',
+  s3LastModified: 's3LastModified',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
+
+
+export const ImageMetadataScalarFieldEnum = {
+  attachmentId: 'attachmentId',
+  format: 'format',
+  width: 'width',
+  height: 'height',
+  aspectRatio: 'aspectRatio',
+  frames: 'frames',
+  hasAlpha: 'hasAlpha',
+  animated: 'animated',
+  orientation: 'orientation',
+  colorSpace: 'colorSpace',
+  exifDateTimeOriginal: 'exifDateTimeOriginal',
+  cameraMake: 'cameraMake',
+  cameraModel: 'cameraModel',
+  lensModel: 'lensModel',
+  gpsLat: 'gpsLat',
+  gpsLon: 'gpsLon',
+  dominantColorHex: 'dominantColorHex',
+  iccProfile: 'iccProfile',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageMetadataScalarFieldEnum = (typeof ImageMetadataScalarFieldEnum)[keyof typeof ImageMetadataScalarFieldEnum]
 
 
 export const VerificationTokenScalarFieldEnum = {
@@ -1679,6 +1790,62 @@ export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
+
+/**
+ * Reference to a field of type 'ChecksumAlgo'
+ */
+export type EnumChecksumAlgoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChecksumAlgo'>
+    
+
+
+/**
+ * Reference to a field of type 'ChecksumAlgo[]'
+ */
+export type ListEnumChecksumAlgoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChecksumAlgo[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageFormat'
+ */
+export type EnumImageFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageFormat'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageFormat[]'
+ */
+export type ListEnumImageFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageFormat[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ColorSpace'
+ */
+export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace'>
+    
+
+
+/**
+ * Reference to a field of type 'ColorSpace[]'
+ */
+export type ListEnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -1772,6 +1939,7 @@ export type GlobalOmitConfig = {
   conversationSettings?: Prisma.ConversationSettingsOmit
   message?: Prisma.MessageOmit
   attachment?: Prisma.AttachmentOmit
+  imageMetadata?: Prisma.ImageMetadataOmit
   verificationToken?: Prisma.VerificationTokenOmit
 }
 
