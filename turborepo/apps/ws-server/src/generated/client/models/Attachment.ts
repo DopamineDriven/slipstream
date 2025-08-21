@@ -50,6 +50,7 @@ export type AttachmentMinAggregateOutputType = {
   thumbnailKey: string | null
   bucket: string | null
   key: string | null
+  versionId: string | null
   region: string | null
   cacheControl: string | null
   contentDisposition: string | null
@@ -86,6 +87,7 @@ export type AttachmentMaxAggregateOutputType = {
   thumbnailKey: string | null
   bucket: string | null
   key: string | null
+  versionId: string | null
   region: string | null
   cacheControl: string | null
   contentDisposition: string | null
@@ -120,9 +122,9 @@ export type AttachmentCountAggregateOutputType = {
   cdnUrl: number
   sourceUrl: number
   thumbnailKey: number
-  meta: number
   bucket: number
   key: number
+  versionId: number
   region: number
   cacheControl: number
   contentDisposition: number
@@ -171,6 +173,7 @@ export type AttachmentMinAggregateInputType = {
   thumbnailKey?: true
   bucket?: true
   key?: true
+  versionId?: true
   region?: true
   cacheControl?: true
   contentDisposition?: true
@@ -207,6 +210,7 @@ export type AttachmentMaxAggregateInputType = {
   thumbnailKey?: true
   bucket?: true
   key?: true
+  versionId?: true
   region?: true
   cacheControl?: true
   contentDisposition?: true
@@ -241,9 +245,9 @@ export type AttachmentCountAggregateInputType = {
   cdnUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
-  meta?: true
   bucket?: true
   key?: true
+  versionId?: true
   region?: true
   cacheControl?: true
   contentDisposition?: true
@@ -365,9 +369,9 @@ export type AttachmentGroupByOutputType = {
   cdnUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
-  meta: runtime.JsonValue | null
   bucket: string
   key: string
+  versionId: string | null
   region: string
   cacheControl: string | null
   contentDisposition: string | null
@@ -425,9 +429,9 @@ export type AttachmentWhereInput = {
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  meta?: Prisma.JsonNullableFilter<"Attachment">
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   region?: Prisma.StringFilter<"Attachment"> | string
   cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -466,9 +470,9 @@ export type AttachmentOrderByWithRelationInput = {
   cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  meta?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  versionId?: Prisma.SortOrderInput | Prisma.SortOrder
   region?: Prisma.SortOrder
   cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
   contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -510,9 +514,9 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  meta?: Prisma.JsonNullableFilter<"Attachment">
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   region?: Prisma.StringFilter<"Attachment"> | string
   cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -551,9 +555,9 @@ export type AttachmentOrderByWithAggregationInput = {
   cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  meta?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  versionId?: Prisma.SortOrderInput | Prisma.SortOrder
   region?: Prisma.SortOrder
   cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
   contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -596,9 +600,9 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   cdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  meta?: Prisma.JsonNullableWithAggregatesFilter<"Attachment">
   bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  versionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   region?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   cacheControl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   contentDisposition?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
@@ -630,9 +634,9 @@ export type AttachmentCreateInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -671,9 +675,9 @@ export type AttachmentUncheckedCreateInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -706,9 +710,9 @@ export type AttachmentUpdateInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -747,9 +751,9 @@ export type AttachmentUncheckedUpdateInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -785,9 +789,9 @@ export type AttachmentCreateManyInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -819,9 +823,9 @@ export type AttachmentUpdateManyMutationInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -856,9 +860,9 @@ export type AttachmentUncheckedUpdateManyInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -903,9 +907,9 @@ export type AttachmentCountOrderByAggregateInput = {
   cdnUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
-  meta?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  versionId?: Prisma.SortOrder
   region?: Prisma.SortOrder
   cacheControl?: Prisma.SortOrder
   contentDisposition?: Prisma.SortOrder
@@ -947,6 +951,7 @@ export type AttachmentMaxOrderByAggregateInput = {
   thumbnailKey?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  versionId?: Prisma.SortOrder
   region?: Prisma.SortOrder
   cacheControl?: Prisma.SortOrder
   contentDisposition?: Prisma.SortOrder
@@ -983,6 +988,7 @@ export type AttachmentMinOrderByAggregateInput = {
   thumbnailKey?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  versionId?: Prisma.SortOrder
   region?: Prisma.SortOrder
   cacheControl?: Prisma.SortOrder
   contentDisposition?: Prisma.SortOrder
@@ -1188,9 +1194,9 @@ export type AttachmentCreateWithoutUserInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1227,9 +1233,9 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1294,9 +1300,9 @@ export type AttachmentScalarWhereInput = {
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  meta?: Prisma.JsonNullableFilter<"Attachment">
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   region?: Prisma.StringFilter<"Attachment"> | string
   cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -1328,9 +1334,9 @@ export type AttachmentCreateWithoutConversationInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1367,9 +1373,9 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1428,9 +1434,9 @@ export type AttachmentCreateWithoutMessageInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1467,9 +1473,9 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1528,9 +1534,9 @@ export type AttachmentCreateWithoutImageInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1568,9 +1574,9 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1618,9 +1624,9 @@ export type AttachmentUpdateWithoutImageInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1658,9 +1664,9 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1694,9 +1700,9 @@ export type AttachmentCreateManyUserInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1728,9 +1734,9 @@ export type AttachmentUpdateWithoutUserInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1767,9 +1773,9 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1804,9 +1810,9 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1840,9 +1846,9 @@ export type AttachmentCreateManyConversationInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -1874,9 +1880,9 @@ export type AttachmentUpdateWithoutConversationInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1913,9 +1919,9 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1950,9 +1956,9 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1986,9 +1992,9 @@ export type AttachmentCreateManyMessageInput = {
   cdnUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket: string
   key: string
+  versionId?: string | null
   region?: string
   cacheControl?: string | null
   contentDisposition?: string | null
@@ -2020,9 +2026,9 @@ export type AttachmentUpdateWithoutMessageInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2059,9 +2065,9 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2096,9 +2102,9 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   region?: Prisma.StringFieldUpdateOperationsInput | string
   cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2135,9 +2141,9 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   cdnUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
-  meta?: boolean
   bucket?: boolean
   key?: boolean
+  versionId?: boolean
   region?: boolean
   cacheControl?: boolean
   contentDisposition?: boolean
@@ -2176,9 +2182,9 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   cdnUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
-  meta?: boolean
   bucket?: boolean
   key?: boolean
+  versionId?: boolean
   region?: boolean
   cacheControl?: boolean
   contentDisposition?: boolean
@@ -2216,9 +2222,9 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   cdnUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
-  meta?: boolean
   bucket?: boolean
   key?: boolean
+  versionId?: boolean
   region?: boolean
   cacheControl?: boolean
   contentDisposition?: boolean
@@ -2256,9 +2262,9 @@ export type AttachmentSelectScalar = {
   cdnUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
-  meta?: boolean
   bucket?: boolean
   key?: boolean
+  versionId?: boolean
   region?: boolean
   cacheControl?: boolean
   contentDisposition?: boolean
@@ -2280,7 +2286,7 @@ export type AttachmentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "meta" | "bucket" | "key" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
@@ -2319,9 +2325,9 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     cdnUrl: string | null
     sourceUrl: string | null
     thumbnailKey: string | null
-    meta: runtime.JsonValue | null
     bucket: string
     key: string
+    versionId: string | null
     region: string
     cacheControl: string | null
     contentDisposition: string | null
@@ -2780,9 +2786,9 @@ export interface AttachmentFieldRefs {
   readonly cdnUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly sourceUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly thumbnailKey: Prisma.FieldRef<"Attachment", 'String'>
-  readonly meta: Prisma.FieldRef<"Attachment", 'Json'>
   readonly bucket: Prisma.FieldRef<"Attachment", 'String'>
   readonly key: Prisma.FieldRef<"Attachment", 'String'>
+  readonly versionId: Prisma.FieldRef<"Attachment", 'String'>
   readonly region: Prisma.FieldRef<"Attachment", 'String'>
   readonly cacheControl: Prisma.FieldRef<"Attachment", 'String'>
   readonly contentDisposition: Prisma.FieldRef<"Attachment", 'String'>
