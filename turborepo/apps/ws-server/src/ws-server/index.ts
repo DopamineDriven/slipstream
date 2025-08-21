@@ -98,10 +98,11 @@ export class WSServer {
     email?: string
   ) {
     if (!cookieObj) return;
-    const { city, country, latlng, tz, region } = cookieObj;
+    const { city, country, latlng, tz, region, postalCode } = cookieObj;
     void this.prisma.updateProfile({
       email: email ?? "",
       region,
+      postalCode,
       city,
       country,
       latlng,
@@ -111,6 +112,7 @@ export class WSServer {
     return this.userDataMap.set(userId, {
       email,
       region,
+      postalCode,
       city,
       country,
       latlng,
@@ -136,6 +138,7 @@ export class WSServer {
       country,
       latlng,
       tz,
+      postalCode,
       region,
       email: userEmail = email
     } = this.userDataMap.get(userId) ?? {
@@ -144,11 +147,12 @@ export class WSServer {
       country: "unknown country",
       latlng: "unknown latlng",
       tz: "unknown tz",
+      postalCode: "unknown postal code",
       region: "unknown"
     };
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} connected from ${city}, ${country} (${region} region) in the ${tz} timezone having coordinates of ${latlng}`;
+    const message = `User ${userId} connected from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with an approx location of ${latlng}`;
     console.info(message);
     ws.on("message", raw => {
       if (this.resolver) {
@@ -158,6 +162,7 @@ export class WSServer {
           city,
           country,
           latlng,
+          postalCode,
           region,
           tz
         });
@@ -212,7 +217,14 @@ export class WSServer {
     try {
       if (cookieHeader) {
         cookieHeader.split(";").forEach(function (cookie) {
-          const cookieKeys = ["city", "country", "latlng", "tz", "region"];
+          const cookieKeys = [
+            "city",
+            "country",
+            "latlng",
+            "tz",
+            "region",
+            "postalCode"
+          ];
           const parts = cookie.match(/(.*?)=(.*)/);
           if (parts) {
             const k = (parts?.[1]?.trim() ?? "").trimStart();

@@ -1,5 +1,21 @@
 import type { GetModelUtilRT, Provider } from "@/models.ts";
-import type { CTR, DX } from "./utils.ts";
+import type { CTR, DX, Rm } from "./utils.ts";
+
+export type AttachmentMetadata = {
+  filename: string;
+  originalName?: string;
+  uploadMethod?: UploadMethod;
+  uploadDuration?: number;
+  uploadedAt: string;
+  scannedAt?: string;
+  scanResult?: "clean" | "infected";
+  thumbnailGenerated?: boolean;
+  extractedText?: string;
+  dimensions?: { width: number; height: number };
+  quality?: number;
+  duration?: number;
+  [key: string]: unknown;
+};
 
 export type AIChatRequestUserMetadata = {
   city?: string;
@@ -53,7 +69,7 @@ export type AIChatInlineData = DX<
 >;
 
 export type AIChatChunk = DX<
-  Omit<AIChatResEntity<"ai_chat_chunk">, "data"> & {
+  AIChatResEntity<"ai_chat_chunk"> & {
     isThinking?: boolean;
     thinkingDuration?: number;
     thinkingText?: string;
@@ -69,7 +85,7 @@ export type AIChatResponse = DX<
 >;
 
 export type AIChatError = DX<
-  Omit<AIChatResEntity<"ai_chat_error">, "chunk" | "data"> & {
+  Rm<AIChatResEntity<"ai_chat_error">, "chunk" | "data"> & {
     usage?: number;
     stopReason?: unknown;
     message: string;
@@ -85,24 +101,124 @@ export type TypingIndicator = {
 export type PingMessage = {
   type: "ping";
 };
+/**
+ * Origin types for assets
+ */
 
-export type ImageGenRequest = {
-  type: "image_gen_request";
-  userId: string;
+export type UploadMethod = Uppercase<"server" | "presigned" | "generated" | "fetched">;
+export type AssetOrigin =
+  | "UPLOAD"
+  | "GENERATED"
+  | "REMOTE"
+  | "PASTED"
+  | "IMPORT"
+  | "SCRAPED"
+  | "SCREENSHOT";
+
+/**
+ * Asset status lifecycle
+ */
+export type AssetStatus =
+  | "REQUESTED" // Presigned URL requested (legacy)
+  | "PLANNED" // Generation job created
+  | "UPLOADING" // Currently uploading
+  | "STORED" // In S3, not verified
+  | "SCANNING" // Security/virus scan
+  | "READY" // Available for use
+  | "FAILED" // Upload/generation failed
+  | "QUARANTINED" // Failed security scan
+  | "ATTACHED" // Attached to a message
+  | "DELETED"; // Soft deleted
+
+/**
+ * Server notifies client that an asset was uploaded server-side
+ * (After successful upload via API route or server action)
+ */
+export type AssetUploadedNotification = {
+  type: "asset_uploaded";
   conversationId: string;
-  prompt: string;
-  seed?: number;
+  attachmentId: string;
+  userId: string;
+  filename: string;
+  mime: string;
+  size: number;
+  bucket: string;
+  key: string;
+  url: string; // Signed URL for immediate access
+  origin: AssetOrigin;
+  status: AssetStatus;
 };
 
-export type ImageGenResponse = {
-  type: "image_gen_response";
-  userId: string;
+/**
+ * Client notifies server when paste event occurs
+ * Server will respond with upload instructions
+ */
+export type AssetPasteEvent = {
+  type: "asset_paste";
   conversationId: string;
-  imageUrl?: string;
+  filename: string; // Usually "paste.png" or similar
+  contentType: string;
+  size: number;
+};
+
+/**
+ * Track upload progress (server → client)
+ */
+export type AssetUploadProgress = {
+  type: "asset_upload_progress";
+  conversationId: string;
+  attachmentId: string;
+  progress: number; // 0-100
+  bytesUploaded: number;
+  totalBytes: number;
+};
+
+/**
+ * Notify when an asset is attached to a message
+ */
+export type AssetAttachedToMessage = {
+  type: "asset_attached";
+  conversationId: string;
+  messageId: string;
+  attachmentId: string;
+};
+
+/**
+ * Notify when an asset is deleted
+ */
+export type AssetDeleted = {
+  type: "asset_deleted";
+  conversationId: string;
+  attachmentId: string;
+  userId: string;
+};
+
+/**
+ * Request to fetch and store a remote URL
+ */
+export type AssetFetchRequest = {
+  type: "asset_fetch_request";
+  conversationId: string;
+  url: string;
+  messageId?: string;
+};
+
+/**
+ * Response for fetched remote asset
+ */
+export type AssetFetchResponse = {
+  type: "asset_fetch_response";
+  conversationId: string;
+  attachmentId?: string;
+  url?: string;
   success: boolean;
   error?: string;
 };
 
+/**
+ * Legacy: Direct base64 upload (backward compatibility)
+ * @deprecated Use server-side uploads instead
+ */
 export type AssetUploadRequest = {
   type: "asset_upload_request";
   userId: string;
@@ -110,29 +226,100 @@ export type AssetUploadRequest = {
   filename: string;
   contentType: string;
   base64: string;
+  origin?: AssetOrigin;
 };
 
+/**
+ * Legacy: Response for direct upload
+ * @deprecated
+ */
 export type AssetUploadResponse = {
   type: "asset_upload_response";
   userId: string;
   conversationId: string;
   url?: string;
+  attachmentId?: string;
   success: boolean;
   error?: string;
 };
 
+/**
+ * Enhanced image generation request
+ */
+export type ImageGenRequest = {
+  type: "image_gen_request";
+  userId: string;
+  conversationId: string;
+  messageId?: string;
+  prompt: string;
+  model?: "stable-diffusion" | "dalle-3" | "midjourney";
+  width?: number;
+  height?: number;
+  seed?: number;
+  negativePrompt?: string;
+  steps?: number;
+  guidanceScale?: number;
+};
+
+/**
+ * Enhanced generation response
+ */
+export type ImageGenResponse = {
+  type: "image_gen_response";
+  userId: string;
+  conversationId: string;
+  attachmentId?: string;
+  imageUrl?: string;
+  taskId?: string;
+  success: boolean;
+  error?: string;
+};
+
+/**
+ * Generation progress updates
+ */
+export type ImageGenProgress = {
+  type: "image_gen_progress";
+  conversationId: string;
+  taskId: string;
+  progress: number; // 0-100
+  stage?: string; // "queued" | "processing" | "finalizing"
+  eta?: number; // seconds remaining
+};
+
+/**
+ * Batch upload notification
+ */
+export type AssetBatchUpload = {
+  type: "asset_batch_upload";
+  conversationId: string;
+  attachmentIds: string[];
+  totalCount: number;
+  successCount: number;
+  failedCount: number;
+};
+
 export type AnyEvent =
-  | AssetUploadRequest
-  | AssetUploadResponse
   | AIChatChunk
   | AIChatError
   | AIChatInlineData
   | AIChatRequest
   | AIChatResponse
-  | TypingIndicator
-  | PingMessage
+  | AssetAttachedToMessage
+  | AssetBatchUpload
+  | AssetDeleted
+  | AssetFetchRequest
+  | AssetFetchResponse
+  | AssetPasteEvent
+  | AssetUploadedNotification
+  | AssetUploadProgress
+  | AssetUploadRequest
+  | AssetUploadResponse
+  | ImageGenProgress
   | ImageGenRequest
-  | ImageGenResponse;
+  | ImageGenResponse
+  | PingMessage
+  | TypingIndicator;
 
 export type AnyEventTypeUnion = AnyEvent["type"];
 
@@ -152,28 +339,30 @@ export type EventTypeMap = {
   ai_chat_inline_data: AIChatInlineData;
   ai_chat_request: AIChatRequest;
   ai_chat_response: AIChatResponse;
+  asset_attached: AssetAttachedToMessage;
+  asset_batch_upload: AssetBatchUpload;
+  asset_deleted: AssetDeleted;
+  asset_fetch_request: AssetFetchRequest;
+  asset_fetch_response: AssetFetchResponse;
+  asset_paste: AssetPasteEvent;
+  asset_uploaded: AssetUploadedNotification;
+  asset_upload_progress: AssetUploadProgress;
   asset_upload_request: AssetUploadRequest;
   asset_upload_response: AssetUploadResponse;
-  typing: TypingIndicator;
-  ping: PingMessage;
+  image_gen_progress: ImageGenProgress;
   image_gen_request: ImageGenRequest;
   image_gen_response: ImageGenResponse;
+  ping: PingMessage;
+  typing: TypingIndicator;
 };
 
 export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
 
-export interface ProviderCountsProps {
-  openai: number;
-  grok: number;
-  gemini: number;
-  anthropic: number;
-}
-
 export type RecordCountsProps = {
-  isSet: ProviderCountsProps;
-  isDefault: ProviderCountsProps;
+  isSet: Record<Provider, number>;
+  isDefault: Record<Provider, number>;
 };
 
 export type ClientContextWorkupProps = {

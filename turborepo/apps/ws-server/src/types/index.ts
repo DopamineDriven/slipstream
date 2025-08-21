@@ -15,6 +15,7 @@ export interface UserData {
   country?: string;
   region?: string;
   latlng?: string;
+  postalCode?: string;
   tz?: string;
 }
 
@@ -83,3 +84,41 @@ export interface ProviderChatRequestEntity {
   chunks: string[];
   thinkingChunks: string[];
 }
+export type Signals =
+  | "SIGABRT"
+  | "SIGALRM"
+  | "SIGBREAK"
+  | "SIGBUS"
+  | "SIGCHLD"
+  | "SIGCONT"
+  | "SIGFPE"
+  | "SIGHUP"
+  | "SIGILL"
+  | "SIGINFO"
+  | "SIGINT"
+  | "SIGIO"
+  | "SIGIOT"
+  | "SIGKILL"
+  | "SIGLOST"
+  | "SIGPIPE"
+  | "SIGPOLL"
+  | "SIGPROF"
+  | "SIGPWR"
+  | "SIGQUIT"
+  | "SIGSEGV"
+  | "SIGSTKFLT"
+  | "SIGSTOP"
+  | "SIGSYS"
+  | "SIGTERM"
+  | "SIGTRAP"
+  | "SIGTSTP"
+  | "SIGTTIN"
+  | "SIGTTOU"
+  | "SIGUNUSED"
+  | "SIGURG"
+  | "SIGUSR1"
+  | "SIGUSR2"
+  | "SIGVTALRM"
+  | "SIGWINCH"
+  | "SIGXCPU"
+  | "SIGXFSZ";

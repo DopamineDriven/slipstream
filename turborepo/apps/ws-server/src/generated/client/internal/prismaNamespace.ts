@@ -1426,15 +1426,22 @@ export const AttachmentScalarFieldEnum = {
   messageId: 'messageId',
   origin: 'origin',
   status: 'status',
+  uploadMethod: 'uploadMethod',
+  uploadDuration: 'uploadDuration',
+  cdnUrl: 'cdnUrl',
+  sourceUrl: 'sourceUrl',
+  thumbnailKey: 'thumbnailKey',
+  meta: 'meta',
   bucket: 'bucket',
   key: 'key',
   region: 'region',
   size: 'size',
+  filename: 'filename',
+  ext: 'ext',
   mime: 'mime',
   etag: 'etag',
   checksumSha256: 'checksumSha256',
-  sourceUrl: 'sourceUrl',
-  meta: 'meta',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1632,16 +1639,16 @@ export type ListEnumAssetStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'BigInt'
+ * Reference to a field of type 'UploadMethod'
  */
-export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+export type EnumUploadMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UploadMethod'>
     
 
 
 /**
- * Reference to a field of type 'BigInt[]'
+ * Reference to a field of type 'UploadMethod[]'
  */
-export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+export type ListEnumUploadMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UploadMethod[]'>
     
 
 
@@ -1656,6 +1663,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 /**

@@ -6,44 +6,30 @@ interface OrmServiceEntity {
   prismaApiKeyService: PrismaUserKeyService;
   prismaConversationService: PrismaUserMessageService;
 }
-
 /**
- *
- * to use, you import this ormHandler to a page file (app/page.tsx, for example) and import the prisma client from "@/lib/prisma", eg:
- *
- * ```tsx
- *import type { Metadata } from "next";
-import type { Session } from "next-auth";
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { prismaClient } from "@/lib/prisma";
-import { ormHandler } from "@/orm";
-import { ChatPage } from "@/ui/clone";
+ 
+  async deleteAttachment(id: string, userId: string): Promise<Attachment> {
+    // Verify ownership
+    const attachment = await this.prismaClient.attachment.findUnique({
+      where: { id }
+    });
 
-export const metadata = {
-  title: "t3 clone home"
-} satisfies Metadata;
+    if (!attachment) {
+      throw new Error("Attachment not found");
+    }
 
-const { prismaApiKeyService } = ormHandler(prismaClient);
+    if (attachment.userId !== userId) {
+      throw new Error("Unauthorized to delete this attachment");
+    }
 
-export default async function HomePage() {
-  const session = (await auth()) satisfies Session | null;
-
-  if (!session?.user) return redirect("/api/auth/signin");
-  const providerConfig = await prismaApiKeyService.getClientApiKeys(
-    session.user.id
-  );
-  return (
-    <Suspense fallback={"Loading..."}>
-      <ChatPage user={session.user} providerConfig={providerConfig} />
-    </Suspense>
-  );
-}
-
- *
- * ```
- *
+    return this.prismaClient.attachment.update({
+      where: { id },
+      data: {
+        status: "DELETED",
+        deletedAt: new Date()
+      }
+    });
+  }
  */
 export function ormHandler(
   prisma: PrismaClientWithAccelerate

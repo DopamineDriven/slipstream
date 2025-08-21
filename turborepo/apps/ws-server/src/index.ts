@@ -1,4 +1,5 @@
 import process from "node:process";
+import type { Signals } from "@/types/index.ts";
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
 import { Credentials } from "@t3-chat-clone/credentials";
@@ -16,6 +17,24 @@ async function exe() {
     const secretAccessKey = cfg.R2_SECRET_ACCESS_KEY;
     const r2PublicUrl = cfg.R2_PUBLIC_URL;
 
+    const awsAccessKeyId = cfg.AWS_ACCESS_KEY,
+      awsSecretAccessLey = cfg.AWS_SECRET_ACCESS_KEY,
+      region = cfg.AWS_REGION,
+      pyGenAssets = process.env.GEN_BUCKET ?? cfg.GEN_BUCKET,
+      wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET;
+
+    const { S3Service } = await import("@/s3/index.ts");
+
+    const s3 = S3Service.getInstance({
+      accessKeyId: awsAccessKeyId,
+      secretAccessKey: awsSecretAccessLey,
+      buckets: {
+        pyGenAssets,
+        wsAssets
+      },
+      region
+    });
+
     const { R2Instance } = await import("@/r2-helper/index.ts");
 
     const r2 = new R2Instance({
@@ -25,11 +44,12 @@ async function exe() {
       r2PublicUrl
     });
 
-    const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379";
-    const ca = cred.unflattenNewlines(cfg.REDIS_CA_PEM);
-    const cert = cred.unflattenNewlines(cfg.REDIS_CLIENT_CERT);
-    const key = cred.unflattenNewlines(cfg.REDIS_CLIENT_KEY);
-    const host = cfg.REDIS_HOST;
+    const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379",
+      ca = cred.unflattenNewlines(cfg.REDIS_CA_PEM),
+      cert = cred.unflattenNewlines(cfg.REDIS_CLIENT_CERT),
+      key = cred.unflattenNewlines(cfg.REDIS_CLIENT_KEY),
+      host = cfg.REDIS_HOST;
+
     const { EnhancedRedisPubSub } = await import(
       "@t3-chat-clone/redis-service"
     );
@@ -43,8 +63,9 @@ async function exe() {
     );
 
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
-
-    const prisma = new PrismaService(prismaClient);
+    const { Fs } = await import("@d0paminedriven/fs");
+    const fs = new Fs(process.cwd());
+    const prisma = new PrismaService(prismaClient, fs);
 
     const jwtSecret =
       cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
@@ -90,12 +111,15 @@ async function exe() {
       openai,
       gemini,
       anthropic,
+      s3,
       r2,
       cfg.FASTAPI_URL,
       cfg.R2_BUCKET,
+      region,
       xai,
       v0,
-      meta
+      meta,
+      fs
     );
 
     resolver.registerAll();
@@ -111,18 +135,31 @@ async function exe() {
       }
     }, 30000);
     await wsServer.start();
+    let isShuttingDown = false;
 
-    process.on("SIGTERM", async () => {
-      console.log("SIGTERM received, shutting down gracefully...");
-      await wsServer.stop();
-      process.exitCode = 1;
-    });
+    const gracefulShutdown = async <const T extends Signals>(signal: T) => {
+      if (isShuttingDown) {
+        console.log(`Already shutting down, ignoring ${signal}`);
+        return;
+      }
 
-    process.on("SIGINT", async () => {
-      console.log("SIGINT received, shutting down gracefully...");
-      await wsServer.stop();
-      process.exitCode = 1;
-    });
+      isShuttingDown = true;
+      console.log(`${signal} received, shutting down gracefully...`);
+
+      try {
+        await wsServer.stop();
+        console.log("Cleanup complete, exiting gracefully");
+        process.exitCode = 0;
+      } catch (error) {
+        console.error("Error during shutdown:", error);
+        if (error instanceof Error) {
+          console.error(error.stack);
+        }
+        process.exitCode = 1;
+      }
+    };
+    process.on("SIGTERM", async () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", async () => gracefulShutdown("SIGINT"));
   } catch (err) {
     if (err instanceof Error) throw new Error(err.message);
     else throw new Error(`something went wrong...`);
@@ -135,3 +172,12 @@ declare module "ws" {
     _socket: Socket;
   }
 }
+// declare global {
+//  namespace NodeJS {
+//     interface ProcessEnv {
+//       readonly ASSETS_BUCKET: "ws-server-assets-dev" | "ws-server-assets-prod";
+//       readonly GEN_BUCKET: "py-gen-assets-dev" | "py-gen-assets-prod"
+//     }
+//   }
+
+// }

@@ -28,10 +28,21 @@ enum Provider {
   VERCEL
 }
 
-enum AssetOrigin {
-  UPLOAD
-  REMOTE
+enum UploadMethod {
+  FETCHED
+  PRESIGNED
+  SERVER
   GENERATED
+}
+
+enum AssetOrigin {
+  UPLOAD // local asset
+  REMOTE // external resource
+  GENERATED // created by generative AI
+  PASTED // pasted from clipboard
+  SCREENSHOT // specific type of capture
+  IMPORTED // migrated from another system
+  SCRAPED // extracted from web pages
 }
 
 enum AssetStatus {
@@ -44,6 +55,7 @@ enum AssetStatus {
   FAILED
   QUARANTINED
   ATTACHED
+  DELETED
 }
 
 model User {
@@ -188,34 +200,45 @@ model Message {
 }
 
 model Attachment {
-  id             String      @id @default(cuid(2))
+  id             String  @id @default(cuid(2))
   conversationId String
   userId         String
   messageId      String?
-  origin         AssetOrigin @default(UPLOAD)
-  status         AssetStatus @default(REQUESTED)
 
-  bucket         String
-  key            String
-  region         String  @default("us-east-1")
+  origin       AssetOrigin  @default(UPLOAD)
+  status       AssetStatus  @default(REQUESTED)
+  uploadMethod UploadMethod @default(SERVER) // "server" | "presigned" | "generated"
+
+  uploadDuration Int? // milliseconds
+  cdnUrl         String? // publicUrl
+  sourceUrl      String? // uploadUrl
+  thumbnailKey   String? // image/video thumbnails
+  meta           Json? // set a default to stop manual type casting
+
+  bucket String
+  key    String
+  region String @default("us-east-1")
+
   size           BigInt?
+  filename       String?
+  ext            String?
   mime           String?
   etag           String?
   checksumSha256 String?
-  sourceUrl      String?
-  meta           Json?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deletedAt DateTime? // soft deletes
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message      Message?     @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message?      @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([bucket, key])
-  @@index([conversationId, createdAt])
+  @@unique([bucket, key, conversationId])
   @@index([userId, createdAt])
   @@index([status, createdAt])
+  @@index([messageId, createdAt])
+  @@index([deletedAt])
 }
 
 model VerificationToken {
