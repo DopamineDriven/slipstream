@@ -10,6 +10,7 @@ import { S3Service } from "@/s3/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
+import { Fs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -33,7 +34,8 @@ export class Resolver extends ModelService {
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
-    private llamaService: LlamaService
+    private llamaService: LlamaService,
+    private fs: Fs
   ) {
     super();
   }
@@ -461,8 +463,20 @@ export class Resolver extends ModelService {
   public async handleAssetPaste(
     event: EventTypeMap["asset_paste"],
     ws: WebSocket,
-    userId: string
+    userId: string,
+    userData?: UserData
   ): Promise<void> {
+    if (
+      userData &&
+      "city" in userData &&
+      "country" in userData &&
+      "postalCode" in userData &&
+      "region" in userData
+    ) {
+      console.log(
+        `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
+      );
+    }
     try {
       const {
         conversationId = "new-chat",
@@ -472,28 +486,28 @@ export class Resolver extends ModelService {
       } = event;
       const [cType, cTypePkg] = [
         contentType,
-        this.wsServer.prisma.fs.getMimeTypeForPath(filename)
+        this.fs.getMimeTypeForPath(filename)
       ];
 
       console.log({ cType, cTypePkg });
       // Detect MIME type using fs utility
       const mimeType = cType ?? cTypePkg;
 
-      const extension = this.wsServer.prisma.fs.assetType(filename) ?? "bin";
+      const extension = this.fs.assetType(filename) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.wsServer.prisma.fs.getSize(size || 0, "auto", {
+      const sizeInfo = this.fs.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
       console.log(
         `[Asset Paste] User ${userId} pasting ${properFilename} (${sizeInfo})`
       );
-
+      // TODO handle messageId if it exists
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
@@ -512,17 +526,24 @@ export class Resolver extends ModelService {
         filename: filename,
         region: this.region,
         mime: mimeType,
+        ext: extension,
+        meta: {
+          ...presignedData.fields,
+          originalName: filename,
+          uploadMethod: "PRESIGNED",
+          pastedAt: new Date(Date.now()).toISOString(),
+          size: size || 0
+        },
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
-        meta: presignedData.fields,
         key: presignedData.key,
         size: BigInt(size),
         origin: "PASTED",
         status: "REQUESTED",
         uploadMethod: "PRESIGNED"
       });
-
+      console.log(`[Asset Paste] Created attachment ${attachment.id} with key: ${presignedData.key}`);
       // Generate presigned URL for direct client upload
       // Update attachment with S3 details
       void this.wsServer.prisma.updateAttachment({
@@ -554,7 +575,7 @@ export class Resolver extends ModelService {
       );
 
       // Notify other participants via Redis
-      await this.wsServer.redis.publishTypedEvent(
+      void this.wsServer.redis.publishTypedEvent(
         RedisChannels.conversationStream(conversationId),
         "asset_upload_progress",
         {

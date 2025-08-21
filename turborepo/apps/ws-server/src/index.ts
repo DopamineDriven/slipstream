@@ -118,7 +118,8 @@ async function exe() {
       region,
       xai,
       v0,
-      meta
+      meta,
+      fs
     );
 
     resolver.registerAll();
