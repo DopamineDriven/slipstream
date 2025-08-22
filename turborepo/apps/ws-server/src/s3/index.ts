@@ -1,11 +1,5 @@
 import * as https from "https";
 import {
-  AssetOrigin,
-  AssetStatus,
-  UploadMethod
-} from "@/generated/client/enums.ts";
-import {
-  ChecksumAlgorithm,
   CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
@@ -19,10 +13,44 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 // These provide compile-time type safety while avoiding runtime enum overhead
-export type AssetOriginType = keyof typeof AssetOrigin;
-export type AssetStatusType = keyof typeof AssetStatus;
-export type UploadMethodType = keyof typeof UploadMethod;
-export type ChecksumAlgorithmType = keyof typeof ChecksumAlgorithm;
+export type AssetOriginType =
+  | "UPLOAD"
+  | "REMOTE"
+  | "GENERATED"
+  | "PASTED"
+  | "SCREENSHOT"
+  | "IMPORTED"
+  | "SCRAPED";
+export type AssetStatusType =
+  | "REQUESTED"
+  | "PLANNED"
+  | "UPLOADING"
+  | "STORED"
+  | "SCANNING"
+  | "READY"
+  | "FAILED"
+  | "QUARANTINED"
+  | "ATTACHED"
+  | "DELETED";
+export type UploadMethodType = "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
+export type ChecksumAlgorithmType =
+  | "CRC32"
+  | "CRC32C"
+  | "CRC64NVME"
+  | "SHA1"
+  | "SHA256";
+export type ImageFormatType =
+  | "apng"
+  | "jpeg"
+  | "png"
+  | "webp"
+  | "avif"
+  | "heic"
+  | "gif"
+  | "tiff"
+  | "bmp"
+  | "svg"
+  | "unknown";
 
 export interface S3Config {
   accessKeyId: string;
@@ -81,7 +109,6 @@ const BUCKET_MAP = {
 } as const satisfies Record<AssetOriginType, keyof S3Config["buckets"]>;
 
 export class S3Service {
-
   static #instance: S3Service | null = null;
   private readonly s3Client: S3Client;
   private readonly config: S3Config;

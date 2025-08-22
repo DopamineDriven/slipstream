@@ -1497,6 +1497,7 @@ export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeo
 export const AttachmentScalarFieldEnum = {
   id: 'id',
   conversationId: 'conversationId',
+  draftId: 'draftId',
   userId: 'userId',
   messageId: 'messageId',
   s3ObjectId: 's3ObjectId',

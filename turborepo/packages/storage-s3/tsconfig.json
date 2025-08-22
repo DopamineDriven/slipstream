@@ -1,0 +1,22 @@
+{
+  "extends": "@t3-chat-clone/tsconfig/node-pkg.json",
+    "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "baseUrl": "./"
+  },
+
+  "include": [
+    "**/*.ts",
+    "src/index.ts",
+    "src/service/index.ts",
+    "src/service/types.ts",
+    "src/**/*.ts",
+    "**/*.mjs",
+    "**/*.preset.ts",
+    "tsup.config.ts"
+  ],
+  "exclude": ["dist"]
+}

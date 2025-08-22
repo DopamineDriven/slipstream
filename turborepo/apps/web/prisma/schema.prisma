@@ -237,7 +237,8 @@ model Message {
 
 model Attachment {
   id             String       @id @default(cuid(2))
-  conversationId String
+  conversationId String?
+  draftId        String? // temp id before convo id exists for new chats
   userId         String
   messageId      String?
   s3ObjectId     String       @unique // "s3://bucket/key#<versionId|nov>"
@@ -281,12 +282,9 @@ model Attachment {
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   image        ImageMetadata?
 
-  @@index([conversationId])
-  @@index([bucket, key])
+  @@index([conversationId, createdAt])
+  @@index([draftId])
   @@index([userId, createdAt])
-  @@index([status, createdAt])
-  @@index([messageId, createdAt])
-  @@index([deletedAt])
 }
 
 model ImageMetadata {
