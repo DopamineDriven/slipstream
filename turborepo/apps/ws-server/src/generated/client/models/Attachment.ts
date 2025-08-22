@@ -38,6 +38,7 @@ export type AttachmentSumAggregateOutputType = {
 export type AttachmentMinAggregateOutputType = {
   id: string | null
   conversationId: string | null
+  draftId: string | null
   userId: string | null
   messageId: string | null
   s3ObjectId: string | null
@@ -75,6 +76,7 @@ export type AttachmentMinAggregateOutputType = {
 export type AttachmentMaxAggregateOutputType = {
   id: string | null
   conversationId: string | null
+  draftId: string | null
   userId: string | null
   messageId: string | null
   s3ObjectId: string | null
@@ -112,6 +114,7 @@ export type AttachmentMaxAggregateOutputType = {
 export type AttachmentCountAggregateOutputType = {
   id: number
   conversationId: number
+  draftId: number
   userId: number
   messageId: number
   s3ObjectId: number
@@ -161,6 +164,7 @@ export type AttachmentSumAggregateInputType = {
 export type AttachmentMinAggregateInputType = {
   id?: true
   conversationId?: true
+  draftId?: true
   userId?: true
   messageId?: true
   s3ObjectId?: true
@@ -198,6 +202,7 @@ export type AttachmentMinAggregateInputType = {
 export type AttachmentMaxAggregateInputType = {
   id?: true
   conversationId?: true
+  draftId?: true
   userId?: true
   messageId?: true
   s3ObjectId?: true
@@ -235,6 +240,7 @@ export type AttachmentMaxAggregateInputType = {
 export type AttachmentCountAggregateInputType = {
   id?: true
   conversationId?: true
+  draftId?: true
   userId?: true
   messageId?: true
   s3ObjectId?: true
@@ -358,7 +364,8 @@ export type AttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 
 export type AttachmentGroupByOutputType = {
   id: string
-  conversationId: string
+  conversationId: string | null
+  draftId: string | null
   userId: string
   messageId: string | null
   s3ObjectId: string
@@ -418,7 +425,8 @@ export type AttachmentWhereInput = {
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   id?: Prisma.StringFilter<"Attachment"> | string
-  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
@@ -459,7 +467,8 @@ export type AttachmentWhereInput = {
 
 export type AttachmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  draftId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
   s3ObjectId?: Prisma.SortOrder
@@ -504,7 +513,8 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
@@ -544,7 +554,8 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
 
 export type AttachmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  draftId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
   s3ObjectId?: Prisma.SortOrder
@@ -589,7 +600,8 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   OR?: Prisma.AttachmentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  conversationId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  draftId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   s3ObjectId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
@@ -626,6 +638,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
 
 export type AttachmentCreateInput = {
   id?: string
+  draftId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
@@ -664,7 +677,8 @@ export type AttachmentCreateInput = {
 
 export type AttachmentUncheckedCreateInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   userId: string
   messageId?: string | null
   s3ObjectId: string
@@ -702,6 +716,7 @@ export type AttachmentUncheckedCreateInput = {
 
 export type AttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -740,7 +755,8 @@ export type AttachmentUpdateInput = {
 
 export type AttachmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -778,7 +794,8 @@ export type AttachmentUncheckedUpdateInput = {
 
 export type AttachmentCreateManyInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   userId: string
   messageId?: string | null
   s3ObjectId: string
@@ -815,6 +832,7 @@ export type AttachmentCreateManyInput = {
 
 export type AttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -849,7 +867,8 @@ export type AttachmentUpdateManyMutationInput = {
 
 export type AttachmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -897,6 +916,7 @@ export type AttachmentOrderByRelationAggregateInput = {
 export type AttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  draftId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
   s3ObjectId?: Prisma.SortOrder
@@ -939,6 +959,7 @@ export type AttachmentAvgOrderByAggregateInput = {
 export type AttachmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  draftId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
   s3ObjectId?: Prisma.SortOrder
@@ -976,6 +997,7 @@ export type AttachmentMaxOrderByAggregateInput = {
 export type AttachmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  draftId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrder
   s3ObjectId?: Prisma.SortOrder
@@ -1186,6 +1208,7 @@ export type AttachmentUpdateOneRequiredWithoutImageNestedInput = {
 
 export type AttachmentCreateWithoutUserInput = {
   id?: string
+  draftId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
@@ -1223,7 +1246,8 @@ export type AttachmentCreateWithoutUserInput = {
 
 export type AttachmentUncheckedCreateWithoutUserInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   messageId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
@@ -1289,7 +1313,8 @@ export type AttachmentScalarWhereInput = {
   OR?: Prisma.AttachmentScalarWhereInput[]
   NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
   id?: Prisma.StringFilter<"Attachment"> | string
-  conversationId?: Prisma.StringFilter<"Attachment"> | string
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
@@ -1326,6 +1351,7 @@ export type AttachmentScalarWhereInput = {
 
 export type AttachmentCreateWithoutConversationInput = {
   id?: string
+  draftId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
@@ -1363,6 +1389,7 @@ export type AttachmentCreateWithoutConversationInput = {
 
 export type AttachmentUncheckedCreateWithoutConversationInput = {
   id?: string
+  draftId?: string | null
   userId: string
   messageId?: string | null
   s3ObjectId: string
@@ -1426,6 +1453,7 @@ export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
 
 export type AttachmentCreateWithoutMessageInput = {
   id?: string
+  draftId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
@@ -1463,7 +1491,8 @@ export type AttachmentCreateWithoutMessageInput = {
 
 export type AttachmentUncheckedCreateWithoutMessageInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   userId: string
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
@@ -1526,6 +1555,7 @@ export type AttachmentUpdateManyWithWhereWithoutMessageInput = {
 
 export type AttachmentCreateWithoutImageInput = {
   id?: string
+  draftId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
@@ -1563,7 +1593,8 @@ export type AttachmentCreateWithoutImageInput = {
 
 export type AttachmentUncheckedCreateWithoutImageInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   userId: string
   messageId?: string | null
   s3ObjectId: string
@@ -1616,6 +1647,7 @@ export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
 
 export type AttachmentUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -1653,7 +1685,8 @@ export type AttachmentUpdateWithoutImageInput = {
 
 export type AttachmentUncheckedUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1690,7 +1723,8 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
 
 export type AttachmentCreateManyUserInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   messageId?: string | null
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
@@ -1726,6 +1760,7 @@ export type AttachmentCreateManyUserInput = {
 
 export type AttachmentUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -1763,7 +1798,8 @@ export type AttachmentUpdateWithoutUserInput = {
 
 export type AttachmentUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
@@ -1800,7 +1836,8 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
 
 export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
@@ -1836,6 +1873,7 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
 
 export type AttachmentCreateManyConversationInput = {
   id?: string
+  draftId?: string | null
   userId: string
   messageId?: string | null
   s3ObjectId: string
@@ -1872,6 +1910,7 @@ export type AttachmentCreateManyConversationInput = {
 
 export type AttachmentUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -1909,6 +1948,7 @@ export type AttachmentUpdateWithoutConversationInput = {
 
 export type AttachmentUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1946,6 +1986,7 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
 
 export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1982,7 +2023,8 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
 
 export type AttachmentCreateManyMessageInput = {
   id?: string
-  conversationId: string
+  conversationId?: string | null
+  draftId?: string | null
   userId: string
   s3ObjectId: string
   origin?: $Enums.AssetOrigin
@@ -2018,6 +2060,7 @@ export type AttachmentCreateManyMessageInput = {
 
 export type AttachmentUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
@@ -2055,7 +2098,8 @@ export type AttachmentUpdateWithoutMessageInput = {
 
 export type AttachmentUncheckedUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
@@ -2092,7 +2136,8 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
 
 export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
@@ -2131,6 +2176,7 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
 export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  draftId?: boolean
   userId?: boolean
   messageId?: boolean
   s3ObjectId?: boolean
@@ -2172,6 +2218,7 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  draftId?: boolean
   userId?: boolean
   messageId?: boolean
   s3ObjectId?: boolean
@@ -2212,6 +2259,7 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  draftId?: boolean
   userId?: boolean
   messageId?: boolean
   s3ObjectId?: boolean
@@ -2252,6 +2300,7 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type AttachmentSelectScalar = {
   id?: boolean
   conversationId?: boolean
+  draftId?: boolean
   userId?: boolean
   messageId?: boolean
   s3ObjectId?: boolean
@@ -2286,7 +2335,7 @@ export type AttachmentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
@@ -2314,7 +2363,8 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    conversationId: string
+    conversationId: string | null
+    draftId: string | null
     userId: string
     messageId: string | null
     s3ObjectId: string
@@ -2776,6 +2826,7 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
 export interface AttachmentFieldRefs {
   readonly id: Prisma.FieldRef<"Attachment", 'String'>
   readonly conversationId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly draftId: Prisma.FieldRef<"Attachment", 'String'>
   readonly userId: Prisma.FieldRef<"Attachment", 'String'>
   readonly messageId: Prisma.FieldRef<"Attachment", 'String'>
   readonly s3ObjectId: Prisma.FieldRef<"Attachment", 'String'>

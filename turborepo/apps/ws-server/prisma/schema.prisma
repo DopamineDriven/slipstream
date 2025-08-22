@@ -238,7 +238,8 @@ model Message {
 
 model Attachment {
   id             String       @id @default(cuid(2))
-  conversationId String
+  conversationId String?
+  draftId        String? // temp id before convo id exists for new chats
   userId         String
   messageId      String?
   s3ObjectId     String       @unique // "s3://bucket/key#<versionId|nov>"
@@ -251,10 +252,10 @@ model Attachment {
   sourceUrl      String? // uploadUrl
   thumbnailKey   String? // image/video thumbnails
 
-  bucket String
-  key    String
-  versionId  String?
-  region String @default("us-east-1")
+  bucket    String
+  key       String
+  versionId String?
+  region    String  @default("us-east-1")
 
   cacheControl       String?
   contentDisposition String?
@@ -282,12 +283,9 @@ model Attachment {
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   image        ImageMetadata?
 
-  @@index([conversationId])
-  @@index([bucket, key])
+  @@index([conversationId, createdAt])
+  @@index([draftId])
   @@index([userId, createdAt])
-  @@index([status, createdAt])
-  @@index([messageId, createdAt])
-  @@index([deletedAt])
 }
 
 model ImageMetadata {
