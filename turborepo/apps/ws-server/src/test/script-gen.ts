@@ -63,9 +63,9 @@ class ScriptGen extends Fs {
       const agg =
         p.sender === "AI"
           ? p.thinking
-            ? `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.thinking}\n${p.content}\n\n${d}\n\n`
-            : `(${p.msgNumber})\n\n[${p.provider}/${p.model}]\n\n${p.content}\n${d}\n`
-          : `(${p.msgNumber})\n\n[user/andrew]\n\n${p.content}\n\n${d}\n\n`;
+            ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.thinking}\n${p.content}\n${d}\n`
+            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n${d}\n`
+          : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n${d}\n`;
       arr.push(agg);
     }
 
@@ -80,4 +80,4 @@ const toMd = t
   .map(co => co)
   .join(`\n`);
 
-t.withWs(`src/test/__out__/${conversation.title}.md`, toMd);
+t.withWs(`src/test/__out__/${conversation.title}-2.md`, toMd);

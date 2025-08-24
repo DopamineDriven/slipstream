@@ -235,8 +235,8 @@ importers:
         version: 6.0.3
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@playwright/test':
         specifier: ^1.55.0
         version: 1.55.0
@@ -379,8 +379,8 @@ importers:
         specifier: ^3.862.0
         version: 3.862.0
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@google/genai':
         specifier: ^1.15.0
         version: 1.15.0
@@ -522,8 +522,8 @@ importers:
         version: 12.0.2
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -586,8 +586,8 @@ importers:
         version: 12.0.2
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -637,8 +637,8 @@ importers:
   packages/key-validator:
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -701,8 +701,8 @@ importers:
         version: 5.8.2
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -771,8 +771,8 @@ importers:
         version: 0.34.3
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -822,8 +822,8 @@ importers:
   packages/types:
     dependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
     devDependencies:
       '@t3-chat-clone/eslint-config':
         specifier: workspace:*
@@ -956,8 +956,8 @@ importers:
         version: 1.1.2(@types/react-dom@19.1.7(@types/react@19.1.10))(@types/react@19.1.10)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^6.5.0
-        version: 6.5.0
+        specifier: ^7.3.0
+        version: 7.3.0
       '@microsoft/api-extractor':
         specifier: ^7.52.11
         version: 7.52.11(@types/node@24.3.0)
@@ -1650,6 +1650,9 @@ packages:
 
   '@d0paminedriven/fs@6.5.0':
     resolution: {integrity: sha512-/iWW3jG8sk+PI/EbFOC247SKfur7upC6GKNPfSbpfE0i55jOYVa882FNys/9WJCAr+eUhZ0Q49JAKsTSI/q02A==}
+
+  '@d0paminedriven/fs@7.3.0':
+    resolution: {integrity: sha512-FaVXB0PavtovVQf4ped1A7tE2Hm9mTJuukCboy96fnXoqm1QUYfzIKMq0o0Xmq+IUghbx64PhQBFCvrzc/Ie9A==}
 
   '@d0paminedriven/turbogen@5.6.0':
     resolution: {integrity: sha512-fRPoRST5Ah9oZHE3f30+Z2IF2t2dqxWI3tDFZQGMWmYQyT4MlWSdm4ZvaMnx4zVPFKTmMwT/62rnKLSZckK4Vw==}
@@ -9478,6 +9481,12 @@ snapshots:
   '@csstools/css-tokenizer@3.0.4': {}
 
   '@d0paminedriven/fs@6.5.0':
+    dependencies:
+      dotenv: 17.2.1
+      dotenv-expand: 12.0.2
+      sharp: 0.34.3
+
+  '@d0paminedriven/fs@7.3.0':
     dependencies:
       dotenv: 17.2.1
       dotenv-expand: 12.0.2

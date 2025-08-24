@@ -57,7 +57,7 @@
     "fix": "npm pkg fix"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^6.5.0",
+    "@d0paminedriven/fs": "^7.3.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
