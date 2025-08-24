@@ -30,8 +30,9 @@ const BUCKET_MAP = {
 >;
 const { NodeHttpHandler } = await import("@smithy/node-http-handler");
 
-
 export class S3Storage extends S3Utils {
+  // Cache for frequently used commands (optional optimization)
+  private readonly commandCache = new Map<string, HeadObjectCommand>();
   private client: S3Client;
   private cfg: CTR<Pick<StorageConfig, "region" | "buckets">> &
     Pick<StorageConfig, "kmsKeyId" | "defaultPresignExpiry">;
@@ -63,7 +64,10 @@ export class S3Storage extends S3Utils {
   }
 
   // ---------- Core API ----------
-  async presign(meta: PresignMeta, expiresIn = this.cfg.defaultPresignExpiry) {
+  public async presign(
+    meta: PresignMeta,
+    expiresIn = this.cfg.defaultPresignExpiry
+  ) {
     const bucket = this.cfg.buckets[BUCKET_MAP[meta.origin]];
     const key = this.generateKey(meta);
     const cmd = new PutObjectCommand({
@@ -93,7 +97,7 @@ export class S3Storage extends S3Utils {
     } satisfies PresignResult;
   }
 
-  async finalize(bucket: string, key: string) {
+  public async finalize(bucket: string, key: string) {
     const head = await this.client.send(
       new HeadObjectCommand({
         Bucket: bucket,
@@ -116,7 +120,7 @@ export class S3Storage extends S3Utils {
     const versionId = VersionId ?? null;
     const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}`;
 
-    const checksum = this.checksum(head)
+    const checksum = this.checksum(head);
 
     const expires = this.handleExpires(ExpiresString);
 
@@ -137,7 +141,7 @@ export class S3Storage extends S3Utils {
     } satisfies FinalizeResult;
   }
 
-  async signDownloadById(
+  public async signDownloadById(
     s3ObjectId: string,
     expiresIn = this.cfg.defaultPresignExpiry
   ) {
@@ -150,7 +154,7 @@ export class S3Storage extends S3Utils {
     return getSignedUrl(this.client, cmd, { expiresIn });
   }
 
-  async deleteById(s3ObjectId: string) {
+  public async deleteById(s3ObjectId: string) {
     const { bucket, key, versionId } = this.parseS3ObjectId(s3ObjectId);
     await this.client.send(
       new DeleteObjectCommand({
@@ -169,5 +173,29 @@ export class S3Storage extends S3Utils {
   }
   private publicUrl(bucket: string, key: string) {
     return `https://${bucket}.s3.${this.cfg.region}.amazonaws.com/${key}`;
+  }
+
+  public async objectExists(bucket: string, key: string) {
+    try {
+      const cacheKey = `${bucket}:${key}`;
+      let command = this.commandCache.get(cacheKey);
+
+      if (!command) {
+        command = new HeadObjectCommand({ Bucket: bucket, Key: key });
+
+        if (this.commandCache.size > 100) {
+          const firstKey = this.commandCache.keys().next().value;
+          if (firstKey) this.commandCache.delete(firstKey);
+        }
+        this.commandCache.set(cacheKey, command);
+      }
+
+     const x = await this.client.send(command);
+     x.VersionId;
+     return true;
+    } catch (error) {
+      console.log(`Object check failed for ${bucket}/${key}:`, error);
+      return false;
+    }
   }
 }

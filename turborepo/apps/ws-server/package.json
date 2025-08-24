@@ -85,7 +85,7 @@
     "@aws-sdk/client-secrets-manager": "^3.872.0",
     "@aws-sdk/s3-request-presigner": "^3.872.0",
     "@aws-sdk/types": "^3.862.0",
-    "@d0paminedriven/fs": "^6.5.0",
+    "@d0paminedriven/fs": "^7.4.0",
     "@google/genai": "^1.15.0",
     "@prisma/adapter-pg": "^6.14.0",
     "@prisma/client": "^6.14.0",
