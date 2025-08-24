@@ -65,8 +65,9 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.872.0",
-    "@aws-sdk/s3-request-presigner": "^3.872.0",
+    "@aws-sdk/client-s3": "^3.873.0",
+    "@aws-sdk/lib-storage": "^3.873.0",
+    "@aws-sdk/s3-request-presigner": "^3.873.0",
     "@aws-sdk/types": "^3.862.0",
     "@t3-chat-clone/types": "workspace:*",
     "sharp": "^0.34.3"
@@ -79,13 +80,13 @@
     "@types/node": "^24.3.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.1",
-    "eslint": "^9.33.0",
+    "eslint": "^9.34.0",
     "jiti": "^2.5.1",
     "prettier": "^3.6.2",
     "terser": "^5.43.1",
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
-    "tsx": "^4.20.4",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.40.0"
   },
