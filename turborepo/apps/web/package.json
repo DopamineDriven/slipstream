@@ -83,7 +83,7 @@
     "vfile": "^6.0.3"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^7.3.0",
+    "@d0paminedriven/fs": "^7.4.0",
     "@playwright/test": "^1.55.0",
     "@shikijs/transformers": "^3.11.0",
     "@t3-chat-clone/eslint-config": "workspace:*",

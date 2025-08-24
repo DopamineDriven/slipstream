@@ -76,7 +76,7 @@
     "generate-models": "pnpm tsx src/codegen/index.ts"
   },
   "dependencies": {
-    "@d0paminedriven/fs": "^7.3.0"
+    "@d0paminedriven/fs": "^7.4.0"
   },
   "devDependencies": {
     "@t3-chat-clone/eslint-config": "workspace:*",

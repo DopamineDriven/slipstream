@@ -83,7 +83,7 @@
     "redis": "^5.8.2"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^7.3.0",
+    "@d0paminedriven/fs": "^7.4.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
