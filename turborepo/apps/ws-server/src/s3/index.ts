@@ -11,8 +11,8 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
+import type { Readable } from "node:stream";
 
-// These provide compile-time type safety while avoiding runtime enum overhead
 export type AssetOriginType =
   | "UPLOAD"
   | "REMOTE"
@@ -179,6 +179,38 @@ export class S3Service {
     ].join("/");
   }
 
+    public async uploadDirect(
+    data: Buffer | Uint8Array | string | Readable,
+    { conversationId = "new-chat", ...metadata }: AssetMetadata
+  ): Promise<{ url: string; key: string; bucket: string; etag?: string }> {
+    const key = this.generateKey({ conversationId, ...metadata });
+    const bucket = this.selectBucket(metadata.origin);
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: data,
+      ContentType: metadata.contentType,
+      // Include ContentLength if we know the size (important for streams)
+      ...(metadata.size && { ContentLength: metadata.size }),
+      Metadata: {
+        userId: metadata.userId,
+        conversationId,
+        messageId: metadata.messageId ?? "",
+        filename: metadata.filename,
+        origin: metadata.origin
+      }
+    });
+        const result = await this.s3Client.send(command);
+    const url = await this.generatePresignedDownload(bucket, key);
+
+    return {
+      url,
+      key,
+      bucket,
+      etag: result.ETag
+    };
+  }
   async generatePresignedUpload(
     { ...metadata }: AssetMetadata,
     expiresIn = 3600
@@ -226,8 +258,8 @@ export class S3Service {
     return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
-  async uploadDirect(
-    data: Buffer | Uint8Array | string,
+  async suploadDirect(
+    data: Buffer | Uint8Array | string | Readable,
     { conversationId = "new-chat", ...metadata }: AssetMetadata
   ) {
     const key = this.generateKey({ conversationId, ...metadata });
@@ -251,6 +283,7 @@ export class S3Service {
     const url = await this.generatePresignedDownload(bucket, key);
 
     return {
+      versionId: result.VersionId ?? "nov",
       url,
       key,
       bucket,

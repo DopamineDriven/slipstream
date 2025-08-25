@@ -5,6 +5,7 @@ export type {
   AssetStatusType,
   ChecksumAlgorithmType,
   ColorSpaceType,
+  CopyOptions,
   FinalizeResult,
   ImageFormatType,
   ImageProbe,
@@ -12,6 +13,9 @@ export type {
   PresignResult,
   PresignedUploadResponse,
   StorageConfig,
-  UploadMethodType
+  StreamOptions,
+  UploadMethodType,
+  UploadOptions,
+  UploadResult
 } from "@/types/index.ts";
 export { S3Utils } from "@/utils/index.ts";
