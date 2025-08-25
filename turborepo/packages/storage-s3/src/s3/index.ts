@@ -155,6 +155,7 @@ export class S3Storage extends S3Utils {
 
   private async destroy() {
     this.commandCache.clear();
+    this.uploadCache.clear();
     this.client.destroy();
   }
 
