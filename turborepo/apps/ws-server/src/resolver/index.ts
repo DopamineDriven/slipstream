@@ -22,6 +22,7 @@ import type {
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
+import { S3Storage} from "@t3-chat-clone/storage-s3"
 
 export class Resolver extends ModelService {
   constructor(

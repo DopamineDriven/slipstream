@@ -1,8 +1,11 @@
-import * as https from "https";
+import { Agent as HttpAgent } from "node:http";
+import { Agent as HttpsAgent } from "node:https";
 import { Readable } from "node:stream";
 import type {
+  AssetMetadata,
   CopyOptions,
   FinalizeResult,
+  PresignedUploadResponse,
   PresignMeta,
   PresignResult,
   StorageConfig,
@@ -16,6 +19,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  ObjectNotInActiveTierError,
   PutObjectCommand,
   S3Client,
   S3ServiceException,
@@ -44,11 +48,31 @@ export class S3Storage extends S3Utils {
   // Cache for frequently used commands (optional optimization)
   private readonly commandCache = new Map<string, HeadObjectCommand>();
   private readonly uploadCache = new Map<string, Promise<UploadResult>>();
+  private readonly httpAgent = new HttpAgent({
+    keepAlive: true,
+    maxSockets: 256,
+    keepAliveMsecs: 1000
+  });
+  private readonly httpsAgent = new HttpsAgent({
+    keepAlive: true,
+    maxSockets: 256,
+    keepAliveMsecs: 1000
+  });
+  private readonly requestHandler = new NodeHttpHandler({
+    connectionTimeout: 5000,
+    requestTimeout: 300000,
+    httpsAgent: this.httpsAgent,
+    httpAgent: this.httpAgent
+  });
+
   private client: S3Client;
+  static #instance: S3Storage | null = null;
   private cfg: CTR<Pick<StorageConfig, "region" | "buckets">> &
     Pick<StorageConfig, "kmsKeyId" | "defaultPresignExpiry">;
-
-  constructor(
+  private readonly inflightUploads = new Set<{
+    abort: () => Promise<void> | void;
+  }>();
+  private constructor(
     cfg: StorageConfig,
     public fs: Fs
   ) {
@@ -62,19 +86,76 @@ export class S3Storage extends S3Utils {
         accessKeyId: cfg.accessKeyId,
         secretAccessKey: cfg.secretAccessKey
       },
-
       region: cfg.region,
-      requestHandler: new NodeHttpHandler({
-        connectionTimeout: 3000,
-        requestTimeout: 3000,
-        httpsAgent: new https.Agent({
-          maxSockets: 50,
-          keepAlive: true,
-          keepAliveMsecs: 1000
-        })
-      })
-      // creds: default provider chain (env/SSO/role)
+      requestHandler: this.requestHandler
     });
+  }
+  private selectBucket(origin: PresignMeta["origin"]) {
+    const bucketKey = BUCKET_MAP[origin];
+    return this.cfg.buckets[bucketKey];
+  }
+  // TODO
+  private track<T extends { abort: () => Promise<void> | void }>(u: T): T {
+    this.inflightUploads.add(u);
+    const _untrack = () => this.inflightUploads.delete(u);
+
+    return u;
+  }
+  public async generatePresignedUpload(
+    { ...metadata }: AssetMetadata,
+    expiresIn = 3600
+  ) {
+    const key = this.generateKey(metadata);
+    const bucket = this.selectBucket(metadata.origin);
+    const fields = {
+      userId: metadata.userId,
+      messageId: metadata.messageId ?? "",
+      filename: metadata.filename,
+      origin: metadata.origin
+    };
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: metadata.contentType,
+      Metadata: {
+        ...fields
+      }
+    });
+
+    const uploadUrl = await getSignedUrl(this.client, command, { expiresIn });
+
+    const publicUrl = this.publicUrl(bucket, key);
+
+    return {
+      uploadUrl,
+      publicUrl,
+      key,
+      bucket,
+      fields
+    } satisfies PresignedUploadResponse;
+  }
+  public static getInstance(config: StorageConfig, fs: Fs) {
+    if (this.#instance === null) {
+      this.#instance = new S3Storage(config, fs);
+      return this.#instance;
+    }
+    return this.#instance;
+  }
+
+  public static hasInstance() {
+    return this.#instance !== null;
+  }
+
+  public static async resetInstance() {
+    if (this.#instance) {
+      this.#instance.destroy();
+      this.#instance = null;
+    }
+  }
+
+  private async destroy() {
+    this.commandCache.clear();
+    this.client.destroy();
   }
 
   private contentTypeToExt(ContentType?: string) {
@@ -244,34 +325,65 @@ export class S3Storage extends S3Utils {
       ? `${source.bucket}/${source.key}?versionId=${source.versionId}`
       : `${source.bucket}/${source.key}`;
 
-    const command = new CopyObjectCommand({
-      CopySource: copySource,
-      Bucket: destination.bucket,
-      Key: destination.key,
-      MetadataDirective: options?.copyMetadata ? "COPY" : "REPLACE",
-      ...(options?.metadata && { Metadata: options.metadata }),
-      ...(options?.contentType && { ContentType: options.contentType }),
-      ...(this.cfg.kmsKeyId && {
-        ServerSideEncryption: "aws:kms",
-        SSEKMSKeyId: this.cfg.kmsKeyId
-      })
-    });
+    try {
+      const command = new CopyObjectCommand({
+        CopySource: copySource,
+        Bucket: destination.bucket,
+        Key: destination.key,
+        MetadataDirective: options?.copyMetadata ? "COPY" : "REPLACE",
+        ...(options?.metadata && { Metadata: options.metadata }),
+        ...(options?.contentType && { ContentType: options.contentType }),
+        ...(this.cfg.kmsKeyId && {
+          ServerSideEncryption: "aws:kms",
+          SSEKMSKeyId: this.cfg.kmsKeyId
+        })
+      });
 
-    const result = await this.client.send(command);
+      const result = await this.client.send(command);
 
-    await waitUntilObjectExists(
-      { client: this.client, maxWaitTime: 10, minDelay: 1, maxDelay: 2 },
-      { Bucket: destination.bucket, Key: destination.key }
-    );
+      await waitUntilObjectExists(
+        { client: this.client, maxWaitTime: 10, minDelay: 1, maxDelay: 2 },
+        { Bucket: destination.bucket, Key: destination.key }
+      );
 
-    return {
-      objectId: `s3://${destination.bucket}/${destination.key}#${result.VersionId ?? "nov"}`,
-      bucket: destination.bucket,
-      key: destination.key,
-      etag: this.stripQuotes(result.CopyObjectResult?.ETag),
-      s3Uri: `s3://${destination.bucket}/${destination.key}`,
-      publicUrl: this.publicUrl(destination.bucket, destination.key)
-    };
+      return {
+        objectId: `s3://${destination.bucket}/${destination.key}#${result.VersionId ?? "nov"}`,
+        bucket: destination.bucket,
+        key: destination.key,
+        etag: this.stripQuotes(result.CopyObjectResult?.ETag),
+        s3Uri: `s3://${destination.bucket}/${destination.key}`,
+        publicUrl: this.publicUrl(destination.bucket, destination.key)
+      };
+    } catch (error) {
+      if (error instanceof ObjectNotInActiveTierError) {
+        console.error(
+          `[Fault: ${error.$fault}]: Could not copy ${source.key} from ${source.bucket} to ${destination.key} of ${destination.bucket}. Object is not in the active tier.
+            Attempts: ${error.$metadata.attempts ?? 0}
+            Message: ${error.message}
+            Name: ${error.name}
+            Stack: ${error.stack ?? ""}
+            `
+        );
+      }
+      if (error instanceof Error) {
+        if (error.name === "NoSuchKey") {
+          console.error(
+            `Source object not found: ${source.bucket}/${source.key}`
+          );
+        }
+        if (error.name === "AccessDenied") {
+          console.error(`Access denied for copy operation`);
+        }
+        if (error.name === "ObjectNotInActiveTierError") {
+          console.error(
+            `Object is in Glacier/Deep Archive and not available for copy`
+          );
+        }
+      }
+      throw new Error(
+        `could not copy key: ${source.key}, bucket: ${source.bucket} to key: ${destination.key}, bucket: ${destination.bucket}.`
+      );
+    }
   }
   private formatTags(tags: Record<string, string>): string {
     return Object.entries(tags)
@@ -298,7 +410,9 @@ export class S3Storage extends S3Utils {
         SSEKMSKeyId: this.cfg.kmsKeyId
       })
     });
+
     const uploadUrl = await getSignedUrl(this.client, cmd, { expiresIn });
+
     return {
       uploadUrl,
       key,
@@ -383,18 +497,17 @@ export class S3Storage extends S3Utils {
       new DeleteObjectCommand({
         Bucket: bucket,
         Key: key,
-        ...(versionId && { VersionId: versionId })
+        VersionId: versionId
       })
     );
   }
 
-  // ---------- helpers ----------
   private generateKey(meta: PresignMeta) {
     const ts = Date.now();
     const name = this.extractCleanFilename(meta.filename);
     return [meta.origin.toLowerCase(), meta.userId, `${ts}-${name}`].join("/");
   }
-  private publicUrl(bucket: string, key: string) {
+  public publicUrl(bucket: string, key: string) {
     return `https://${bucket}.s3.${this.cfg.region}.amazonaws.com/${key}`;
   }
 
@@ -578,5 +691,20 @@ export class S3Storage extends S3Utils {
       console.error(`Failed to delete ${bucket}/${key}:`, error);
       return undefined;
     }
+  }
+
+  public async generatePresignedDownload(
+    bucket: string,
+    key: string,
+    expiresIn = 3600,
+    versionId?: string
+  ) {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      VersionId: versionId
+    });
+
+    return getSignedUrl(this.client, command, { expiresIn });
   }
 }
