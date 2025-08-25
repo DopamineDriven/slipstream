@@ -73,7 +73,7 @@
     "sharp": "^0.34.3"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^7.4.0",
+    "@d0paminedriven/fs": "^7.5.0",
     "@t3-chat-clone/eslint-config": "workspace:*",
     "@t3-chat-clone/prettier-config": "workspace:*",
     "@t3-chat-clone/tsconfig": "workspace:*",
