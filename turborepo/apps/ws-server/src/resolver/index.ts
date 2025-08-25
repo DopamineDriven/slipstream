@@ -6,11 +6,9 @@ import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { R2Instance } from "@/r2-helper/index.ts";
-import { S3Service } from "@/s3/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
-import { Fs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -30,15 +28,14 @@ export class Resolver extends ModelService {
     private openai: OpenAIService,
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
-    private s3Service: S3Service,
+    private s3Service: S3Storage,
     private r2: R2Instance,
     private fastApiUrl: string,
     private Bucket: string,
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
-    private llamaService: LlamaService,
-    private fs: Fs
+    private llamaService: LlamaService
   ) {
     super();
   }
@@ -496,21 +493,21 @@ export class Resolver extends ModelService {
       } = event;
       const [cType, cTypePkg] = [
         contentType,
-        this.fs.getMimeTypeForPath(filename)
+        this.s3Service.fs.getMimeTypeForPath(filename)
       ];
 
       console.log({ cType, cTypePkg });
       // Detect MIME type using fs utility
       const mimeType = cType ?? cTypePkg;
 
-      const extension = this.fs.assetType(filename) ?? "bin";
+      const extension = this.s3Service.fs.assetType(filename) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.fs.getSize(size ?? 0, "auto", {
+      const sizeInfo = this.s3Service.fs.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
@@ -586,11 +583,10 @@ export class Resolver extends ModelService {
           progress: 0,
           bytesUploaded: 0,
           totalBytes: size ?? 0
-        }
+        } satisfies EventTypeMap['asset_upload_progress']
       );
       // TODO implement polling REQUESTED -> UPLOADING -> READY via a listener--alternatively have the client send an event
     } catch (error) {
-      this.fs.parseUrl("");
       console.error("[Asset Paste] Error:", error);
 
       const uploadError = {
@@ -643,7 +639,7 @@ export class Resolver extends ModelService {
     });
 
     console.log(
-      `[Attachment Promoted] ${attachmentId} moved from new-chat to ${realConversationId}, message: ${messageId}, user from ${userData?.city || "unknown"}`
+      `[Attachment Promoted] ${attachmentId} moved from new-chat to ${realConversationId}, message: ${messageId}, user from ${userData?.city ?? "unknown"}`
     );
   }
   /**
@@ -660,6 +656,7 @@ export class Resolver extends ModelService {
   userId: string,
   userData?: UserData
 ): Promise<void> {
+  const _userData = userData;
   const { conversationId = "new-chat", url, messageId } = event;
 
   console.log(`[Asset Fetch] User ${userId} requesting: ${url}`);
@@ -683,7 +680,7 @@ export class Resolver extends ModelService {
     // 3. Extract filename from URL
     const urlPath = new URL(url).pathname;
     const urlFilename = urlPath.split('/')?.pop() ?? `remote_${Date.now()}`;
-    const extension = this.fs.assetType(url) ?? 'bin';
+    const extension = this.s3Service.fs.assetType(url) ?? 'bin';
     const filename = urlFilename.includes('.')
       ? urlFilename
       : `${urlFilename}.${extension}`;
@@ -777,7 +774,7 @@ export class Resolver extends ModelService {
       region: this.region,
       mime: contentType,
       bucket: s3Result.bucket,
-      cdnUrl: s3Result.url,
+      cdnUrl: s3Result.publicUrl,
 
       sourceUrl: url,
       key: s3Result.key,
@@ -811,7 +808,7 @@ export class Resolver extends ModelService {
       type: "asset_fetch_response",
       conversationId,
       attachmentId: attachment.id,
-      url: s3Result.url,
+      url: s3Result.publicUrl,
       error: undefined,
       success: true
     } satisfies EventTypeMap["asset_fetch_response"];
@@ -831,7 +828,7 @@ export class Resolver extends ModelService {
         size: uploadedBytes,
         bucket: s3Result.bucket,
         key: s3Result.key,
-        url: s3Result.url,
+        url: s3Result.publicUrl,
         origin: "REMOTE",
         status: "READY"
       }
