@@ -12,22 +12,15 @@ CFG=$(jq -n --arg local "$LOCAL" --arg root "$ROOT" --arg dev "$DEV" --arg stg "
   CORSRules: [
     {
       AllowedOrigins: [$local, $root, $dev, $stg, $py, $local_py],
-      AllowedMethods: ["PUT","POST","DELETE"],
+      AllowedMethods: ["GET","HEAD","PUT","POST","DELETE"],
       AllowedHeaders: ["*"],
-      ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id"],
-      MaxAgeSeconds: 3000
-    },
-    {
-      AllowedOrigins: [$local, $root, $dev, $stg, $py, $local_py],
-      AllowedMethods: ["GET","HEAD"],
-      AllowedHeaders: ["*"],
-      ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id"],
+      ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id","Content-Range","Accept-Ranges","Content-Length","Content-Type","Last-Modified","Cache-Control"],
       MaxAgeSeconds: 3000
     }
   ]
 }')
 
-for B in ws-server-assets-dev ws-server-assets-prod gen-assets-dev gen-assets-prod; do
+for B in ws-server-assets-dev ws-server-assets-prod py-gen-assets-dev py-gen-assets-prod; do
   aws s3api put-bucket-cors --bucket "$B" --cors-configuration "$CFG"
 done
 

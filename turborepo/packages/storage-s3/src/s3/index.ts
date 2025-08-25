@@ -4,6 +4,7 @@ import { Readable } from "node:stream";
 import type {
   AssetMetadata,
   CopyOptions,
+  DeleteResult,
   FinalizeResult,
   PresignedUploadResponse,
   PresignMeta,
@@ -123,6 +124,7 @@ export class S3Storage extends S3Utils {
     });
 
     const uploadUrl = await getSignedUrl(this.client, command, { expiresIn });
+    const expiresAt = Date.now() + expiresIn * 1000; // Convert seconds to ms
 
     const publicUrl = this.publicUrl(bucket, key);
 
@@ -131,7 +133,9 @@ export class S3Storage extends S3Utils {
       publicUrl,
       key,
       bucket,
-      fields
+      fields,
+      expiresAt,
+      s3Uri: `s3://${bucket}/${key}` // NO version fragment per CLAUDE.md
     } satisfies PresignedUploadResponse;
   }
   public static getInstance(config: StorageConfig, fs: Fs) {
@@ -155,6 +159,7 @@ export class S3Storage extends S3Utils {
 
   private async destroy() {
     this.commandCache.clear();
+    this.uploadCache.clear();
     this.client.destroy();
   }
 
@@ -253,16 +258,15 @@ export class S3Storage extends S3Utils {
         }
 
         const result = await parallelUploads3.done();
-        result.VersionId;
+        const s3Uri = `s3://${bucket}/${key}` as const;
         return {
           bucket,
           key,
           etag: this.stripQuotes(result.ETag),
-          versionId: result.VersionId ?? undefined,
-          objectId: `s3://${bucket}/${key}#${result.VersionId ?? "nov"}`,
-          s3Uri: result.VersionId
-            ? `s3://${bucket}/${key}?versionId=${result.VersionId}`
-            : `s3://${bucket}/${key}`,
+          versionId: result.VersionId ?? "nov",
+          s3ObjectId:
+            `s3://${bucket}/${key}#${result.VersionId ?? "nov"}` as const,
+          s3Uri,
           publicUrl: this.publicUrl(bucket, key),
           size: size ?? undefined,
           location: result.Location
@@ -295,12 +299,11 @@ export class S3Storage extends S3Utils {
         return {
           bucket,
           key,
-          objectId: `s3://${bucket}/${key}#${result.VersionId ?? "nov"}`,
+          s3ObjectId:
+            `s3://${bucket}/${key}#${result.VersionId ?? "nov"}` as const,
           etag: this.stripQuotes(result.ETag),
-          versionId: result.VersionId ?? undefined,
-          s3Uri: result.VersionId
-            ? `s3://${bucket}/${key}?versionId=${result.VersionId}`
-            : `s3://${bucket}/${key}`,
+          versionId: result.VersionId ?? "nov",
+          s3Uri: `s3://${bucket}/${key}` as const,
           publicUrl: this.publicUrl(bucket, key),
           size: size ?? undefined
         };
@@ -324,7 +327,6 @@ export class S3Storage extends S3Utils {
     const copySource = source.versionId
       ? `${source.bucket}/${source.key}?versionId=${source.versionId}`
       : `${source.bucket}/${source.key}`;
-
     try {
       const command = new CopyObjectCommand({
         CopySource: copySource,
@@ -347,9 +349,11 @@ export class S3Storage extends S3Utils {
       );
 
       return {
-        objectId: `s3://${destination.bucket}/${destination.key}#${result.VersionId ?? "nov"}`,
+        s3ObjectId:
+          `s3://${destination.bucket}/${destination.key}#${result.VersionId ?? "nov"}` as const,
         bucket: destination.bucket,
         key: destination.key,
+        versionId: result.VersionId ?? "nov",
         etag: this.stripQuotes(result.CopyObjectResult?.ETag),
         s3Uri: `s3://${destination.bucket}/${destination.key}`,
         publicUrl: this.publicUrl(destination.bucket, destination.key)
@@ -412,13 +416,15 @@ export class S3Storage extends S3Utils {
     });
 
     const uploadUrl = await getSignedUrl(this.client, cmd, { expiresIn });
+    const expiresAt = Date.now() + (expiresIn ?? 3600) * 1000; // Convert seconds to ms
 
     return {
       uploadUrl,
       key,
       bucket,
-      s3Uri: `s3://${bucket}/${key}`,
+      s3Uri: `s3://${bucket}/${key}`, // NO version fragment
       publicUrl: this.publicUrl(bucket, key),
+      expiresAt,
       requiredHeaders: { "Content-Type": meta.contentType } // if you sign SSE headers, include them here too
     } satisfies PresignResult;
   }
@@ -453,7 +459,7 @@ export class S3Storage extends S3Utils {
     } = head;
 
     const versionId = VersionId ?? null;
-    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}`;
+    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}` as const;
 
     const checksum = this.checksum(head);
 
@@ -486,9 +492,19 @@ export class S3Storage extends S3Utils {
     const cmd = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
-      ...(versionId && { VersionId: versionId })
+      VersionId: versionId
     });
-    return getSignedUrl(this.client, cmd, { expiresIn });
+    const downloadUrl = await getSignedUrl(this.client, cmd, { expiresIn });
+    const expiresAt = Date.now() + (expiresIn ?? 3600) * 1000;
+
+    return {
+      downloadUrl,
+      s3ObjectId,
+      expiresAt,
+      bucket,
+      key,
+      versionId: versionId ?? "nov"
+    };
   }
 
   public async deleteById(s3ObjectId: string) {
@@ -511,13 +527,19 @@ export class S3Storage extends S3Utils {
     return `https://${bucket}.s3.${this.cfg.region}.amazonaws.com/${key}`;
   }
 
-  public async objectExists(bucket: string, key: string) {
+  public async objectExists(bucket: string, key: string, versionId?: string) {
     try {
-      const cacheKey = `${bucket}:${key}`;
+      const cacheKey = versionId
+        ? `${bucket}:${key}#${versionId}`
+        : `${bucket}:${key}`;
       let command = this.commandCache.get(cacheKey);
 
       if (!command) {
-        command = new HeadObjectCommand({ Bucket: bucket, Key: key });
+        command = new HeadObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          VersionId: versionId
+        });
 
         if (this.commandCache.size > 100) {
           const firstKey = this.commandCache.keys().next().value;
@@ -526,11 +548,17 @@ export class S3Storage extends S3Utils {
         this.commandCache.set(cacheKey, command);
       }
 
-      await this.client.send(command);
-      return true;
+      const response = await this.client.send(command);
+      return {
+        exists: true,
+        s3ObjectId: `s3://${bucket}/${key}#${response.VersionId ?? "nov"}`,
+        versionId: response.VersionId ?? "nov",
+        etag: this.stripQuotes(response.ETag),
+        size: response.ContentLength
+      };
     } catch (error) {
       console.log(`Object check failed for ${bucket}/${key}:`, error);
-      return false;
+      return { exists: false };
     }
   }
 
@@ -559,6 +587,7 @@ export class S3Storage extends S3Utils {
     if (typeof response.Contents === "undefined") {
       throw new Error("List Object Error");
     }
+
     return {
       objects: response.Contents?.map(obj => ({
         key: obj.Key,
@@ -610,7 +639,7 @@ export class S3Storage extends S3Utils {
     return {
       body,
       extension,
-      objectId: `s3://${bucket}/${key}#${response.VersionId ?? "nov"}`,
+      objectId: `s3://${bucket}/${key}#${response.VersionId ?? "nov"}` as const,
       metadata: response.Metadata ?? {},
       contentType: response.ContentType,
       contentLength: response.ContentLength,
@@ -674,7 +703,7 @@ export class S3Storage extends S3Utils {
 
   public async deleteObject(bucket: string, key: string, versionId?: string) {
     try {
-      await this.client.send(
+      const response = await this.client.send(
         new DeleteObjectCommand({
           Bucket: bucket,
           Key: key,
@@ -686,7 +715,27 @@ export class S3Storage extends S3Utils {
         ? `${bucket}:${key}#${versionId}`
         : `${bucket}:${key}`;
       this.commandCache.delete(cacheKey);
-      return key;
+
+      // Build result with proper typing
+
+      const result = {
+        key,
+        deleted: true,
+        versionId: versionId,
+        s3ObjectId: `s3://${bucket}/${key}#${versionId ?? "nov"}` as const,
+        deleteMarker: response.DeleteMarker
+      } satisfies DeleteResult;
+
+      if (response.VersionId) {
+        result.versionId = response.VersionId;
+        result.s3ObjectId =
+          `s3://${bucket}/${key}#${response.VersionId}` as const;
+      } else if (versionId) {
+        result.versionId = versionId;
+        result.s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
+      }
+
+      return result;
     } catch (error) {
       console.error(`Failed to delete ${bucket}/${key}:`, error);
       return undefined;
@@ -705,6 +754,17 @@ export class S3Storage extends S3Utils {
       VersionId: versionId
     });
 
-    return getSignedUrl(this.client, command, { expiresIn });
+    const downloadUrl = await getSignedUrl(this.client, command, { expiresIn });
+    const expiresAt = Date.now() + expiresIn * 1000;
+    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}` as const;
+
+    return {
+      downloadUrl,
+      s3ObjectId,
+      expiresAt,
+      bucket,
+      key,
+      versionId: versionId ?? "nov"
+    };
   }
 }

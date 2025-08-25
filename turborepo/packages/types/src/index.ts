@@ -15,11 +15,19 @@ export type {
   AssetAttachedToMessage,
   AssetBatchUpload,
   AssetDeleted,
+  AssetFetchError,
   AssetFetchRequest,
   AssetFetchResponse,
   AssetOrigin,
   AssetPasteEvent,
+  AssetReady,
   AssetStatus,
+  AssetUploadAbort,
+  AssetUploadAborted,
+  AssetUploadComplete,
+  AssetUploadError,
+  AssetUploadInstructions,
+  AssetUploadPrepare,
   AssetUploadProgress,
   AssetUploadedNotification,
   AssetUploadRequest,
@@ -30,13 +38,16 @@ export type {
   ClientContextWorkupProps,
   EventMap,
   EventTypeMap,
+  ImageGenError,
   ImageGenProgress,
   ImageGenRequest,
   ImageGenResponse,
   PingMessage,
   RecordCountsProps,
+  S3ObjectId,
   TypingIndicator,
-  UploadMethod
+  UploadMethod,
+  WithExpiry
 } from "@/events.ts";
 
 /**
