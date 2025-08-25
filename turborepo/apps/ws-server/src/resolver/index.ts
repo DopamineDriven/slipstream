@@ -1,3 +1,5 @@
+import { PassThrough, Readable } from "node:stream";
+import { ReadableStream } from "node:stream/web";
 import type { Message } from "@/generated/client/client.ts";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
@@ -15,12 +17,11 @@ import type {
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  Provider
+  Provider,
+  S3ObjectId
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
-import { PassThrough, Readable } from "node:stream";
-import { ReadableStream } from "node:stream/web";
-import { S3Storage} from "@t3-chat-clone/storage-s3"
+import { S3Storage } from "@t3-chat-clone/storage-s3";
 
 export class Resolver extends ModelService {
   constructor(
@@ -376,7 +377,13 @@ export class Resolver extends ModelService {
     "asset_fetch_request",
     "asset_fetch_response",
     "asset_paste",
+    "asset_ready",
+    "asset_upload_abort",
+    "asset_upload_aborted",
+    "asset_upload_complete",
     "asset_upload_error",
+    "asset_upload_instructions",
+    "asset_upload_prepare",
     "asset_upload_progress",
     "asset_upload_request",
     "asset_upload_response",
@@ -484,15 +491,11 @@ export class Resolver extends ModelService {
       event.conversationId === "new-chat"
         ? RedisChannels.user(userId)
         : RedisChannels.conversationStream(event.conversationId);
+    let attachmentId = "";
     try {
-      const {
-        conversationId = "new-chat",
-        filename,
-        contentType,
-        size
-      } = event;
+      const { conversationId = "new-chat", filename, mime, size } = event;
       const [cType, cTypePkg] = [
-        contentType,
+        mime,
         this.s3Service.fs.getMimeTypeForPath(filename)
       ];
 
@@ -518,6 +521,9 @@ export class Resolver extends ModelService {
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
+          extension: this.s3Service.fs.mimeToExt(
+            mime as keyof typeof this.s3Service.fs.toExtObj
+          ),
           conversationId,
           filename: properFilename,
           size,
@@ -534,13 +540,8 @@ export class Resolver extends ModelService {
         region: this.region,
         mime: mimeType,
         ext: extension,
-        meta: {
-          ...presignedData.fields,
-          originalName: filename,
-          uploadMethod: "PRESIGNED",
-          pastedAt: new Date(Date.now()).toISOString(),
-          size: size || 0
-        },
+        s3ObjectId: `s3://${presignedData.bucket}/${presignedData.key}#nov`, // need the real version to construct s3ObjectId
+        versionId: "nov", // need version
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
@@ -562,9 +563,15 @@ export class Resolver extends ModelService {
         filename: properFilename,
         mime: mimeType,
         size: size ?? 0,
+        s3ObjectId: attachment.s3ObjectId as S3ObjectId,
+        versionId: attachment.versionId ?? "nov",
         bucket: presignedData.bucket,
         key: presignedData.key,
-        url: presignedData.uploadUrl,
+        uploadUrl: presignedData.uploadUrl,
+        uploadUrlExpiresAt: presignedData.expiresAt,
+        downloadUrl: presignedData.publicUrl,
+        downloadUrlExpiresAt: presignedData.expiresAt,
+        etag: attachment.etag ?? undefined,
         origin: "PASTED",
         status: "UPLOADING"
       } satisfies EventTypeMap["asset_uploaded"];
@@ -583,7 +590,7 @@ export class Resolver extends ModelService {
           progress: 0,
           bytesUploaded: 0,
           totalBytes: size ?? 0
-        } satisfies EventTypeMap['asset_upload_progress']
+        } satisfies EventTypeMap["asset_upload_progress"]
       );
       // TODO implement polling REQUESTED -> UPLOADING -> READY via a listener--alternatively have the client send an event
     } catch (error) {
@@ -592,6 +599,7 @@ export class Resolver extends ModelService {
       const uploadError = {
         type: "asset_upload_error",
         userId,
+        attachmentId,
         conversationId: event.conversationId,
         success: false,
         error: this.safeErrMsg(error)
@@ -630,6 +638,10 @@ export class Resolver extends ModelService {
     // Update conversationId AND messageId - key stays the same!
     void this.wsServer.prisma.updateAttachment({
       id: attachmentId,
+      s3ObjectId: attachment.s3ObjectId,
+      versionId: attachment.versionId,
+      cdnUrl: attachment.cdnUrl,
+      ext: attachment.ext,
       conversationId: realConversationId,
       messageId, // Now the attachment is linked to the specific message
       userId,
@@ -650,111 +662,113 @@ export class Resolver extends ModelService {
    * - Uses in-memory processing if <100MB
    * - Creates directories automatically
    */
- public async handleAssetFetchRequest(
-  event: EventTypeMap["asset_fetch_request"],
-  ws: WebSocket,
-  userId: string,
-  userData?: UserData
-): Promise<void> {
-  const _userData = userData;
-  const { conversationId = "new-chat", url, messageId } = event;
+  public async handleAssetFetchRequest(
+    event: EventTypeMap["asset_fetch_request"],
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ): Promise<void> {
+    const _userData = userData;
+    const { conversationId = "new-chat", sourceUrl, messageId } = event;
 
-  console.log(`[Asset Fetch] User ${userId} requesting: ${url}`);
+    console.log(`[Asset Fetch] User ${userId} requesting: ${sourceUrl}`);
 
-  try {
-    // 1. Validate URL
-    if (!this.isValidUrl(url)) {
-      throw new Error(`Invalid URL: ${url}`);
-    }
-
-    // 2. Get file metadata with HEAD request
-    const headResponse = await fetch(url, { method: "HEAD" });
-    if (!headResponse.ok) {
-      throw new Error(`Failed to access URL: ${headResponse.status}`);
-    }
-
-    const contentLength = headResponse.headers.get("content-length");
-    const contentType = headResponse.headers.get("content-type") ?? "application/octet-stream";
-    const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
-
-    // 3. Extract filename from URL
-    const urlPath = new URL(url).pathname;
-    const urlFilename = urlPath.split('/')?.pop() ?? `remote_${Date.now()}`;
-    const extension = this.s3Service.fs.assetType(url) ?? 'bin';
-    const filename = urlFilename.includes('.')
-      ? urlFilename
-      : `${urlFilename}.${extension}`;
-    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-
-    // 4. Check file size limit
-    const MAX_SIZE_MB = 100;
-    if (fileSizeBytes && fileSizeBytes > MAX_SIZE_MB * 1024 * 1024) {
-      throw new Error(`File too large: ${(fileSizeBytes / (1024 * 1024)).toFixed(2)} MB`);
-    }
-
-    // 5. Setup Redis channel for progress updates
-    const streamChannel = conversationId === "new-chat"
-      ? RedisChannels.user(userId)
-      : RedisChannels.conversationStream(conversationId);
-
-    // 6. Send initial progress
-    const startProgress: EventTypeMap["asset_upload_progress"] = {
-      type: "asset_upload_progress",
-      conversationId,
-      attachmentId: "", // Will be filled later
-      progress: 0,
-      bytesUploaded: 0,
-      totalBytes: fileSizeBytes
-    };
-    ws.send(JSON.stringify(startProgress));
-
-    // 7. Fetch the actual content
-    const response = await fetch(url);
-    if (!response.body) {
-      throw new Error(`Failed to download: ${response.status}`);
-    }
-
-    // 8. Setup streaming upload to S3
-    // Create a PassThrough stream to track progress
-    const passThrough = new PassThrough();
-    let uploadedBytes = 0;
-    let lastProgressUpdate = Date.now();
-
-    // Convert web stream to Node stream
-    const nodeStream = Readable.fromWeb(response.body as ReadableStream);
-
-    // Track progress as data flows through
-    nodeStream.on('data', (chunk: Uint8Array<ArrayBuffer>) => {
-      uploadedBytes += chunk.length;
-
-      // Throttle progress updates to every 100ms
-      const now = Date.now();
-      if (now - lastProgressUpdate > 100) {
-        const progress = fileSizeBytes
-          ? Math.min(100, Math.round((uploadedBytes / fileSizeBytes) * 100))
-          : 0;
-
-        const progressEvent: EventTypeMap["asset_upload_progress"] = {
-          type: "asset_upload_progress",
-          conversationId,
-          attachmentId: "",
-          progress,
-          bytesUploaded: uploadedBytes,
-          totalBytes: fileSizeBytes
-        };
-
-        ws.send(JSON.stringify(progressEvent));
-        lastProgressUpdate = now;
+    try {
+      // 1. Validate URL
+      if (!this.isValidUrl(sourceUrl)) {
+        throw new Error(`Invalid URL: ${sourceUrl}`);
       }
-    });
 
-    // Pipe the node stream to passThrough
-    nodeStream.pipe(passThrough);
+      // 2. Get file metadata with HEAD request
+      const headResponse = await fetch(sourceUrl, { method: "HEAD" });
+      if (!headResponse.ok) {
+        throw new Error(`Failed to access URL: ${headResponse.status}`);
+      }
 
-    // 9. Upload to S3 (streaming)
-    const s3Result = await this.s3Service.uploadDirect(
-      passThrough,
-      {
+      const contentLength = headResponse.headers.get("content-length");
+      const contentType =
+        headResponse.headers.get("content-type") ?? "application/octet-stream";
+      const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
+
+      // 3. Extract filename from URL
+      const urlPath = new URL(sourceUrl).pathname;
+      const urlFilename = urlPath.split("/")?.pop() ?? `remote_${Date.now()}`;
+      const extension = this.s3Service.fs.assetType(sourceUrl) ?? "bin";
+      const filename = urlFilename.includes(".")
+        ? urlFilename
+        : `${urlFilename}.${extension}`;
+      const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+      // 4. Check file size limit
+      const MAX_SIZE_MB = 100;
+      if (fileSizeBytes && fileSizeBytes > MAX_SIZE_MB * 1024 * 1024) {
+        throw new Error(
+          `File too large: ${(fileSizeBytes / (1024 * 1024)).toFixed(2)} MB`
+        );
+      }
+
+      // 5. Setup Redis channel for progress updates
+      const streamChannel =
+        conversationId === "new-chat"
+          ? RedisChannels.user(userId)
+          : RedisChannels.conversationStream(conversationId);
+
+      // 6. Send initial progress
+      const startProgress = {
+        type: "asset_upload_progress",
+        conversationId,
+        attachmentId: "", // Will be filled later
+        progress: 0,
+        bytesUploaded: 0,
+        totalBytes: fileSizeBytes
+      } satisfies EventTypeMap["asset_upload_progress"];
+      ws.send(JSON.stringify(startProgress));
+
+      // 7. Fetch the actual content
+      const response = await fetch(sourceUrl);
+      if (!response.body) {
+        throw new Error(`Failed to download: ${response.status}`);
+      }
+
+      // 8. Setup streaming upload to S3
+      // Create a PassThrough stream to track progress
+      const passThrough = new PassThrough();
+      let uploadedBytes = 0;
+      let lastProgressUpdate = Date.now();
+
+      // Convert web stream to Node stream
+      const nodeStream = Readable.fromWeb(response.body as ReadableStream);
+
+      // Track progress as data flows through
+      nodeStream.on("data", (chunk: Uint8Array<ArrayBuffer>) => {
+        uploadedBytes += chunk.length;
+
+        // Throttle progress updates to every 100ms
+        const now = Date.now();
+        if (now - lastProgressUpdate > 100) {
+          const progress = fileSizeBytes
+            ? Math.min(100, Math.round((uploadedBytes / fileSizeBytes) * 100))
+            : 0;
+
+          const progressEvent = {
+            type: "asset_upload_progress",
+            conversationId,
+            attachmentId: "",
+            progress,
+            bytesUploaded: uploadedBytes,
+            totalBytes: fileSizeBytes
+          } satisfies EventTypeMap["asset_upload_progress"];
+
+          ws.send(JSON.stringify(progressEvent));
+          lastProgressUpdate = now;
+        }
+      });
+
+      // Pipe the node stream to passThrough
+      nodeStream.pipe(passThrough);
+
+      // 9. Upload to S3 (streaming)
+      const s3Result = await this.s3Service.uploadDirect(passThrough, {
         userId,
         conversationId,
         messageId,
@@ -762,92 +776,101 @@ export class Resolver extends ModelService {
         contentType,
         size: fileSizeBytes,
         origin: "REMOTE"
-      }
-    );
+      });
 
-    // 10. Create database record
-    const attachment = await this.wsServer.prisma.createAttachment({
-      conversationId,
-      userId,
-      messageId,
-      filename: sanitizedFilename,
-      region: this.region,
-      mime: contentType,
-      bucket: s3Result.bucket,
-      cdnUrl: s3Result.publicUrl,
+      // 10. Create database record
+      const attachment = await this.wsServer.prisma.createAttachment({
+        conversationId,
+        userId,
+        messageId,
+        filename: sanitizedFilename,
+        region: this.region,
+        mime: contentType,
+        bucket: s3Result.bucket,
+        cdnUrl: s3Result.publicUrl,
+        s3ObjectId: s3Result.s3ObjectId,
+        versionId: s3Result.versionId,
+        sourceUrl,
+        checksumAlgo: s3Result.checksum?.algo,
+        checksumSha256: s3Result.checksum?.value,
+        key: s3Result.key,
+        size: BigInt(uploadedBytes), // Use actual uploaded size
+        origin: "REMOTE",
+        status: "READY",
+        uploadMethod: "FETCHED",
+        ext: extension,
+        etag: s3Result.etag
+      });
 
-      sourceUrl: url,
-      key: s3Result.key,
-      size: BigInt(uploadedBytes), // Use actual uploaded size
-      origin: "REMOTE",
-      status: "READY",
-      uploadMethod: "FETCHED",
-      ext: extension,
-      etag: s3Result.etag,
-      meta: {
-        originalUrl: url,
-        fetchedAt: new Date().toISOString(),
-        originalSize: fileSizeBytes,
-        originalContentType: contentType
-      }
-    });
-
-    // 11. Send final progress
-    const finalProgress= {
-      type: "asset_upload_progress",
-      conversationId,
-      attachmentId: attachment.id,
-      progress: 100,
-      bytesUploaded: uploadedBytes,
-      totalBytes: fileSizeBytes
-    } satisfies EventTypeMap["asset_upload_progress"] ;
-    ws.send(JSON.stringify(finalProgress));
-
-    // 12. Send success response
-    const successEvent = {
-      type: "asset_fetch_response",
-      conversationId,
-      attachmentId: attachment.id,
-      url: s3Result.publicUrl,
-      error: undefined,
-      success: true
-    } satisfies EventTypeMap["asset_fetch_response"];
-    ws.send(JSON.stringify(successEvent));
-
-    // 13. Notify via Redis
-    await this.wsServer.redis.publishTypedEvent(
-      streamChannel,
-      "asset_uploaded",
-      {
-        type: "asset_uploaded",
+      // 11. Send final progress
+      const finalProgress = {
+        type: "asset_upload_progress",
         conversationId,
         attachmentId: attachment.id,
-        userId,
-        filename: sanitizedFilename,
-        mime: contentType,
-        size: uploadedBytes,
+        progress: 100,
+        bytesUploaded: uploadedBytes,
+        totalBytes: fileSizeBytes
+      } satisfies EventTypeMap["asset_upload_progress"];
+      ws.send(JSON.stringify(finalProgress));
+
+      // 12. Send success response
+      const successEvent = {
+        type: "asset_fetch_response",
+        conversationId,
+        attachmentId: attachment.id,
+        sourceUrl: sourceUrl,
+        s3ObjectId: s3Result.s3ObjectId,
         bucket: s3Result.bucket,
+        downloadUrl: s3Result.publicUrl,
+        downloadUrlExpiresAt: attachment.expiresAt?.valueOf(),
         key: s3Result.key,
-        url: s3Result.publicUrl,
-        origin: "REMOTE",
-        status: "READY"
-      }
-    );
+        versionId: s3Result.versionId,
+        error: undefined,
+        success: true
+      } satisfies EventTypeMap["asset_fetch_response"];
+      ws.send(JSON.stringify(successEvent));
 
-  } catch (error) {
-    console.error("[Asset Fetch] Error:", error);
+      // 13. Notify via Redis
+      void this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "asset_uploaded",
+        {
+          type: "asset_uploaded",
+          conversationId,
+          attachmentId: attachment.id,
+          userId,
+          filename: sanitizedFilename,
+          mime: contentType,
+          etag: s3Result.etag,
+          size: uploadedBytes,
+          s3ObjectId: s3Result.s3ObjectId,
+          versionId: s3Result.versionId,
+          uploadUrl: s3Result.publicUrl,
+          bucket: s3Result.bucket,
+          uploadUrlExpiresAt:
+            attachment.expiresAt?.valueOf() ?? Date.now() * 3600 * 1000,
+          key: s3Result.key,
+          downloadUrl: s3Result.publicUrl,
+          downloadUrlExpiresAt:
+            attachment.expiresAt?.valueOf() ?? Date.now() * 3600 * 1000,
+          origin: "REMOTE",
+          status: "READY"
+        }
+      );
+    } catch (error) {
+      console.error("[Asset Fetch] Error:", error);
 
-    const errorEvent = {
-      type: "asset_fetch_error",
-      conversationId,
-      url,
-      success: false,
-      error: this.safeErrMsg(error)
-    } satisfies EventTypeMap["asset_fetch_error"];
+      const errorEvent = {
+        type: "asset_fetch_error",
+        conversationId,
+        sourceUrl,
+        success: false,
+        error: this.safeErrMsg(error)
+      } satisfies EventTypeMap["asset_fetch_error"];
 
-    ws.send(JSON.stringify(errorEvent));
+      ws.send(JSON.stringify(errorEvent));
+    }
   }
-}
 
   /**
    * Batch fetch multiple URLs
@@ -865,7 +888,7 @@ export class Resolver extends ModelService {
     failed: { url: string; error: string }[];
   }> {
     const successful = Array.of<string>();
-    const failed= Array.of<{ url: string; error: string }>();
+    const failed = Array.of<{ url: string; error: string }>();
 
     // Process in parallel with concurrency limit
     const CONCURRENCY_LIMIT = 3;
@@ -878,7 +901,8 @@ export class Resolver extends ModelService {
             {
               type: "asset_fetch_request",
               conversationId,
-              url,
+              sourceUrl: url,
+              userId,
               messageId
             },
             ws,
@@ -911,19 +935,9 @@ export class Resolver extends ModelService {
 
   /**
    * Helper to validate URL before fetching
-   * Uses fs package's parseUrl which returns null for invalid URLs
    */
-  private isValidUrl(url: string): boolean {
-    // Use fs package to parse URL
-    const parsed = this.wsServer.prisma.fs.parseUrl(url);
-
-    if (!parsed) {
-      return false; // Invalid URL format
-    }
-
-    // Only allow http/https protocols
-    // parsed.protocol includes the colon, e.g., "https:" or "http:"
-    return ["http:", "https:"].includes(parsed.protocol.toLowerCase());
+  private isValidUrl(url: string) {
+    return URL.canParse(url);
   }
 
   /**
@@ -939,12 +953,14 @@ export class Resolver extends ModelService {
       "jpg",
       "jpeg",
       "png",
+      "apng",
       "gif",
       "webp",
       "svg",
       "bmp",
       "ico",
       "avif",
+      "tiff",
       // Documents
       "pdf",
       "doc",
@@ -961,6 +977,7 @@ export class Resolver extends ModelService {
       // Media (for future)
       "mp3",
       "mp4",
+      "weba",
       "webm",
       "ogg"
     ];

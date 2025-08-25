@@ -17,6 +17,7 @@ export type AttachmentMetadata = {
   thumbnailGenerated?: boolean;
   extractedText?: string;
   dimensions?: { width: number; height: number };
+  thumbnailDimensions?: { width: number; height: number };
   quality?: number;
   duration?: number;
   [key: string]: unknown;
@@ -109,6 +110,11 @@ export type PingMessage = {
 /**
  * Origin types for assets
  */
+export type S3ObjectId = `s3://${string}/${string}#${string}`;
+
+export type WithExpiry<K extends string> = {
+  [P in K | `${K}ExpiresAt`]: P extends K ? string : number; // epoch ms
+};
 
 export type UploadMethod = Uppercase<
   "server" | "presigned" | "generated" | "fetched"
@@ -141,20 +147,27 @@ export type AssetStatus =
  * Server notifies client that an asset was uploaded server-side
  * (After successful upload via API route or server action)
  */
-export type AssetUploadedNotification = {
-  type: "asset_uploaded";
-  conversationId: string;
-  attachmentId: string;
-  userId: string;
-  filename: string;
-  mime: string;
-  size: number;
-  bucket: string;
-  key: string;
-  url: string; // Signed URL for immediate access
-  origin: AssetOrigin;
-  status: AssetStatus;
-};
+export type AssetUploadedNotification = DX<
+  {
+    type: "asset_uploaded";
+    conversationId: string;
+    attachmentId: string;
+    userId: string;
+    filename: string;
+    mime: string;
+    size: number;
+    bucket: string;
+    key: string;
+    versionId: string;
+    s3ObjectId: S3ObjectId;
+  } & WithExpiry<"downloadUrl"> & WithExpiry<"uploadUrl"> & {
+      origin: AssetOrigin;
+      status: AssetStatus;
+      etag?: string;
+      /** @deprecated use downloadUrl */
+      url?: string;
+    }
+>;
 
 /**
  * Client notifies server when paste event occurs
@@ -164,9 +177,31 @@ export type AssetPasteEvent = {
   type: "asset_paste";
   conversationId: string;
   filename: string; // Usually "paste.png" or similar
-  contentType: string;
+  mime: string;
   size: number;
 };
+
+export type AssetReady = DX<
+  {
+    type: "asset_ready";
+    conversationId: string;
+    attachmentId: string;
+
+    // canonical S3 identity
+    bucket: string;
+    key: string;
+    versionId?: string;
+    s3ObjectId: S3ObjectId; // eg, "s3://bucket/key#<versionId|nov>"
+    // object facts
+    etag?: string;
+    size: number; // bytes
+    mime: string;
+    origin: AssetOrigin;
+    status: Extract<AssetStatus, "READY">;
+    metadata?: AttachmentMetadata;
+  } & WithExpiry<"downloadUrl"> &
+    Partial<WithExpiry<"thumbnailUrl">>
+>;
 
 /**
  * Track upload progress (server → client)
@@ -198,6 +233,10 @@ export type AssetDeleted = {
   conversationId: string;
   attachmentId: string;
   userId: string;
+  bucket: string;
+  key: string;
+  versionId: string;
+  s3ObjectId: S3ObjectId;
 };
 
 /**
@@ -205,31 +244,65 @@ export type AssetDeleted = {
  */
 export type AssetFetchRequest = {
   type: "asset_fetch_request";
+  userId: string;
   conversationId: string;
-  url: string;
+  sourceUrl: string;
   messageId?: string;
 };
 
 /**
  * Response for fetched remote asset
  */
-export type AssetFetchResponse = {
-  type: "asset_fetch_response";
-  conversationId: string;
-  attachmentId?: string;
-  url?: string;
-  success: boolean;
-  error?: string;
-};
+export type AssetFetchResponse = DX<
+  {
+    type: "asset_fetch_response";
+    conversationId: string;
+    attachmentId?: string;
+    sourceUrl?: string;
+    success: boolean;
+    error?: string;
+    bucket?: string;
+    key?: string;
+    versionId?: string;
+    s3ObjectId?: S3ObjectId;
+  } & Partial<WithExpiry<"downloadUrl">>
+>;
 
 export type AssetFetchError = {
   type: "asset_fetch_error";
   conversationId: string;
   attachmentId?: string;
-  url?: string;
+  sourceUrl?: string;
   success: false;
   statusCode?: number;
   error?: string;
+};
+
+export type AssetUploadAbort = {
+  type: "asset_upload_abort";
+  conversationId: string;
+  attachmentId: string;
+  reason?:
+    | "user" // user hit cancel / navigated away
+    | "network" // network error/timeout on client
+    | "server" // server told client to abort
+    | "timeout"
+    | "unknown";
+  bytesUploaded?: number; // last known
+  totalBytes?: number;
+};
+
+/**
+ * (Optional) Server → Client ack for the abort
+ * Use if you want the UI to reconcile list state immediately.
+ * Status sticks to your existing enum; we flag the reason separately.
+ */
+export type AssetUploadAborted = {
+  type: "asset_upload_aborted";
+  conversationId: string;
+  attachmentId: string;
+  status: Extract<AssetStatus, "FAILED">;
+  error?: string; // eg, "aborted_by_user"
 };
 
 /**
@@ -265,9 +338,41 @@ export type AssetUploadError = {
   userId: string;
   conversationId: string;
   url?: string;
-  attachmentId?: string;
+  attachmentId: string;
   success: false;
   error?: string;
+};
+
+export type AssetUploadPrepare = {
+  type: "asset_upload_prepare";
+  conversationId: string;
+  filename: string;
+  mime: string; // keep naming consistent with other events
+  size: number;
+  origin: Exclude<AssetOrigin, "REMOTE" | "GENERATED" | "IMPORT" | "SCRAPED">;
+  messageId?: string;
+};
+
+// server -> client
+export type AssetUploadInstructions = {
+  type: "asset_upload_instructions";
+  conversationId: string;
+  attachmentId: string;
+  method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
+  uploadUrl: string;
+  requiredHeaders?: Record<string, string>; // e.g. { "Content-Type": mime }
+  expiresIn: number; // seconds
+  bucket: string;
+  key: string;
+};
+
+// client -> server
+export type AssetUploadComplete = {
+  type: "asset_upload_complete";
+  conversationId: string;
+  attachmentId: string;
+  versionId?: string;
+  s3ObjectId?: S3ObjectId;
 };
 
 /**
@@ -351,8 +456,14 @@ export type AnyEvent =
   | AssetFetchRequest
   | AssetFetchResponse
   | AssetPasteEvent
+  | AssetReady
+  | AssetUploadAbort
+  | AssetUploadAborted
   | AssetUploadedNotification
+  | AssetUploadComplete
   | AssetUploadError
+  | AssetUploadInstructions
+  | AssetUploadPrepare
   | AssetUploadProgress
   | AssetUploadRequest
   | AssetUploadResponse
@@ -388,11 +499,17 @@ export type EventTypeMap = {
   asset_fetch_request: AssetFetchRequest;
   asset_fetch_response: AssetFetchResponse;
   asset_paste: AssetPasteEvent;
-  asset_uploaded: AssetUploadedNotification;
+  asset_ready: AssetReady;
+  asset_upload_abort: AssetUploadAbort;
+  asset_upload_aborted: AssetUploadAborted;
+  asset_upload_complete: AssetUploadComplete;
   asset_upload_error: AssetUploadError;
+  asset_upload_instructions: AssetUploadInstructions;
+  asset_upload_prepare: AssetUploadPrepare;
   asset_upload_progress: AssetUploadProgress;
   asset_upload_request: AssetUploadRequest;
   asset_upload_response: AssetUploadResponse;
+  asset_uploaded: AssetUploadedNotification;
   image_gen_error: ImageGenError;
   image_gen_progress: ImageGenProgress;
   image_gen_request: ImageGenRequest;

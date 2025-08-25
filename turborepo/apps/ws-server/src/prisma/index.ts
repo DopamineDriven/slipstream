@@ -1,9 +1,8 @@
 import type { UserData } from "@/types/index.ts";
-import { Attachment, Prisma, PrismaClient } from "@/generated/client/client.ts";
+import { Attachment, PrismaClient } from "@/generated/client/client.ts";
 import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { Exact, InputJsonValue, JsonValue } from "@prisma/client/runtime/library";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import * as dotenv from "dotenv";
 import type {
@@ -16,7 +15,6 @@ import type {
   XOR
 } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
-import { AttachmentWhereUniqueInput } from "@/generated/client/models.ts";
 
 dotenv.config({ quiet: true });
 export const prismaClient = new PrismaClient().$extends(withAccelerate());
@@ -246,9 +244,10 @@ export class PrismaService extends ModelService {
   }
   async createAttachment({
     ...data
-  }: CTR<Rm<RTC<Attachment>, "id" | "meta">, "bucket" | "key" | "userId"> & {
-    meta?: InputJsonValue;
-  }) {
+  }: CTR<
+    Rm<RTC<Attachment>, "id">,
+    "bucket" | "key" | "versionId" | "userId" | "s3ObjectId"
+  > & {}) {
     return await this.prismaClient.attachment.create({
       data: { ...data, conversationId: data.conversationId ?? "new-chat" }
     });
@@ -261,27 +260,22 @@ export class PrismaService extends ModelService {
     ...data
   }: CTR<
     RTC<Attachment>,
-    "id" | "userId" | "conversationId" | "bucket" | "key"
+    "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
   >): Promise<Attachment> {
     return await this.prismaClient.attachment.update({
       where: {
-        bucket_key_conversationId: {
-          bucket: data.bucket,
-          key: data.key,
-          conversationId: data.conversationId
-        },
+        s3ObjectId: `s3://${data.bucket}/${data.key}#${data.versionId}`,
         id: data.id
       },
       data: {
-        ...data,
-        meta: data.meta ?? undefined
+        ...data
       }
     });
   }
 
   /**
    * Get attachment by ID
-   * [string,string,string] -> [bucket, key, conversationId]
+   * [string,string,string] -> [bucket, key, versionId]
    */
   async getAttachment(
     props: XOR<[string, string, string], string>
@@ -293,11 +287,7 @@ export class PrismaService extends ModelService {
     }
     return await this.prismaClient.attachment.findUnique({
       where: {
-        bucket_key_conversationId: {
-          bucket: props[0],
-          key: props[1],
-          conversationId: props[2]
-        }
+        s3ObjectId: `s3://${props[0]}/${props[1]}#${props[2] ?? "nov"}`
       }
     });
   }
@@ -361,9 +351,10 @@ export class PrismaService extends ModelService {
 
       const {
         bucket,
-        meta,
         conversationId,
+        s3ObjectId,
         key,
+        versionId,
         status: _oldStatus,
         messageId: _oldId,
         ...rest
@@ -374,16 +365,18 @@ export class PrismaService extends ModelService {
         select: { attachments: true, id: true },
         data: {
           attachments: {
-            connect: [
+            connectOrCreate: [
               {
-                status: "ATTACHED",
-                messageId,
-                meta: {...meta},
-                bucket_key_conversationId: { bucket, conversationId, key },
-                ...rest,
-                bucket,
-                key,
-                conversationId
+                where: { s3ObjectId: s3ObjectId },
+                create: {
+                  status: "ATTACHED",
+                  s3ObjectId,
+                  ...rest,
+                  bucket,
+                  key,
+                  versionId,
+                  conversationId
+                }
               }
             ]
           }
@@ -424,11 +417,7 @@ export class PrismaService extends ModelService {
     return this.prismaClient.attachment.update({
       where: { id: attachmentId },
       data: {
-        status: scanResult === "clean" ? "READY" : "QUARANTINED",
-        meta: {
-          scannedAt: new Date(Date.now()).toISOString(),
-          scanResult
-        }
+        status: scanResult === "clean" ? "READY" : "QUARANTINED"
       }
     });
   }
@@ -525,10 +514,10 @@ export class PrismaService extends ModelService {
   async createBatchedAttachments({
     conversationId,
     ...data
-  }: CTR<Rm<RTC<Attachment>, "id" | "meta">, "bucket" | "key" | "userId"> &
-    {
-      meta?: InputJsonValue;
-    }[]) {
+  }: CTR<
+    Rm<RTC<Attachment>, "id">,
+    "bucket" | "key" | "userId" | "versionId" | "s3ObjectId"
+  >) {
     return await this.prismaClient.attachment.createManyAndReturn({
       data: { ...data, conversationId: conversationId ?? "new-chat" },
       skipDuplicates: true,
@@ -540,6 +529,11 @@ export class PrismaService extends ModelService {
         conversationId: true,
         sourceUrl: true,
         mime: true,
+        s3ObjectId: true,
+        versionId: true,
+        cdnUrl: true,
+        etag: true,
+        ext: true,
         status: true,
         size: true,
         messageId: true,
@@ -580,7 +574,7 @@ export class PrismaService extends ModelService {
         throw new Error("Unauthorized to copy this attachment");
       }
       const {
-        meta,
+        s3ObjectId,
         conversationId: _oldConvId,
         messageId: _oldMsgId,
         id: _oldId,
@@ -588,11 +582,7 @@ export class PrismaService extends ModelService {
       } = source;
 
       return await tx.attachment.create({
-        data: {
-          conversationId: targetConversationId,
-          meta: meta as InputJsonValue,
-          ...rest
-        }
+        data: { s3ObjectId, conversationId: targetConversationId, ...rest }
       });
     });
   }
@@ -628,52 +618,51 @@ export class PrismaService extends ModelService {
   }
 
   /**
-   * Search attachments by filename
-   */
-  async searchAttachmentsByFilename(
-    userId: string,
-    searchTerm: string,
-    conversationId?: string
-  ): Promise<Attachment[]> {
-    const where: Prisma.AttachmentWhereInput = {
-      userId,
-      deletedAt: null,
-      ...(conversationId ? { conversationId } : {}),
-      OR: [
-        { meta: { path: ["filename"], string_contains: searchTerm } },
-        { meta: { path: ["originalName"], string_contains: searchTerm } }
-      ]
-    };
-
-    return this.prismaClient.attachment.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: 20
-    });
-  }
-
-  /**
    * Update attachment metadata
    */
-  async updateAttachmentMetadata(
-    attachmentId: string,
-    metadata: Record<string, any>
-  ): Promise<Attachment> {
+  async updateAttachmentMetadata(attachmentId: string): Promise<Attachment> {
     const attachment = await this.getAttachment(attachmentId);
 
     if (!attachment) {
       throw new Error("Attachment not found");
     }
+    if (!attachment.cdnUrl)
+      throw new Error("cdn url not available for metadata extraction");
 
-    const currentMeta = (attachment.meta as object) || {};
+    const {
+      aspectRatio,
+      width,
+      height,
+      colorSpace,
+      frames,
+      format,
+      iccProfile,
+      orientation,
+      hasAlpha,
+      animated,
+      exifDateTimeOriginal
+    } = await this.fs.getImageSpecsFlexi(attachment.cdnUrl);
 
     return this.prismaClient.attachment.update({
       where: { id: attachmentId },
       data: {
-        meta: {
-          ...currentMeta,
-          ...metadata,
-          lastMetadataUpdate: new Date(Date.now()).toISOString()
+        image: {
+          connectOrCreate: {
+            where: { attachmentId },
+            create: {
+              aspectRatio,
+              format,
+              height,
+              width,
+              animated,
+              colorSpace,
+              exifDateTimeOriginal,
+              frames,
+              hasAlpha,
+              iccProfile,
+              orientation
+            }
+          }
         }
       }
     });

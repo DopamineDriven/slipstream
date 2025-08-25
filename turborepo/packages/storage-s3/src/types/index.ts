@@ -1,4 +1,5 @@
 import type { StorageClass } from "@aws-sdk/client-s3";
+import { S3ObjectId } from "@t3-chat-clone/types";
 
 export interface StorageConfig {
   accessKeyId: string;
@@ -12,18 +13,18 @@ export interface StorageConfig {
   defaultPresignExpiry?: number;
 }
 
-
-export type UploadResult ={
+export type UploadResult = {
   bucket: string;
   key: string;
   etag?: string;
-  objectId: string;
-  versionId?: string;
+  s3ObjectId: S3ObjectId;
+  versionId: string;
   s3Uri: string;
   publicUrl: string;
   size?: number;
   location?: string;
-}
+  checksum?: { algo: ChecksumAlgorithmType; value: string };
+};
 
 export type UploadOptions = {
   onProgress?: (progress: {
@@ -35,19 +36,18 @@ export type UploadOptions = {
   cacheControl?: string;
   contentDisposition?: string;
   metadata?: Record<string, string>;
-}
+};
 
-export type CopyOptions ={
+export type CopyOptions = {
   copyMetadata?: boolean;
   metadata?: Record<string, string>;
   contentType?: string;
-}
+};
 
 export type StreamOptions = {
   highWaterMark?: number;
   chunkSize?: number;
-}
-
+};
 
 export interface StorageConfig {
   accessKeyId: string;
@@ -70,6 +70,8 @@ export interface PresignedUploadResponse {
   key: string;
   bucket: string;
   fields?: Record<string, string>;
+  expiresAt: number; // epoch ms
+  s3Uri: string; // s3://bucket/key (no version yet per CLAUDE.md)
 }
 
 export interface AssetMetadata {
@@ -78,6 +80,7 @@ export interface AssetMetadata {
   messageId?: string;
   filename: string;
   contentType: string;
+  extension?: string;
   size?: number;
   origin: AssetOriginType; // Using literal union type
 }
@@ -102,6 +105,15 @@ export type PresignResult = {
   s3Uri: string;
   publicUrl: string;
   requiredHeaders: Record<string, string>;
+  expiresAt: number; // epoch ms
+};
+
+export type DeleteResult = {
+  key: string;
+  deleted: boolean;
+  deleteMarker?: boolean;
+  versionId?: string;
+  s3ObjectId?: S3ObjectId;
 };
 
 export type FinalizeResult = {
@@ -111,7 +123,7 @@ export type FinalizeResult = {
   /**
    * s3://bucket/key#<version|nov>
    */
-  s3ObjectId: string;
+  s3ObjectId: S3ObjectId;
   extension?: string;
   etag?: string;
   size?: number;
@@ -128,12 +140,33 @@ export type ImageProbe = {
   format: ImageFormatType;
   width: number;
   height: number;
+  colorModel:
+    | "rgb"
+    | "rgba"
+    | "grayscale"
+    | "grayscale-alpha"
+    | "indexed"
+    | "cmyk"
+    | "ycbcr"
+    | "ycck"
+    | "unknown";
   frames: number;
   animated: boolean;
   hasAlpha: boolean | null;
   orientation: number | null;
   aspectRatio: number;
-  colorSpace: ColorSpaceType;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray";
   iccProfile: string | null;
   exifDateTimeOriginal: string | null;
 };
