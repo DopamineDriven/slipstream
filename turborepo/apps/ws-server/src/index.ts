@@ -23,17 +23,23 @@ async function exe() {
       pyGenAssets = process.env.GEN_BUCKET ?? cfg.GEN_BUCKET,
       wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET;
 
-    const { S3Service } = await import("@/s3/index.ts");
+    const { Fs } = await import("@d0paminedriven/fs");
+    const fs = new Fs(process.cwd());
 
-    const s3 = S3Service.getInstance({
-      accessKeyId: awsAccessKeyId,
-      secretAccessKey: awsSecretAccessLey,
-      buckets: {
-        pyGenAssets,
-        wsAssets
+    const { S3Storage } = await import("@t3-chat-clone/storage-s3");
+
+    const s3 = S3Storage.getInstance(
+      {
+        accessKeyId: awsAccessKeyId,
+        secretAccessKey: awsSecretAccessLey,
+        buckets: {
+          pyGenAssets,
+          wsAssets
+        },
+        region
       },
-      region
-    });
+      fs
+    );
 
     const { R2Instance } = await import("@/r2-helper/index.ts");
 
@@ -63,8 +69,7 @@ async function exe() {
     );
 
     const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
-    const { Fs } = await import("@d0paminedriven/fs");
-    const fs = new Fs(process.cwd());
+
     const prisma = new PrismaService(prismaClient, fs);
 
     const jwtSecret =
@@ -118,8 +123,7 @@ async function exe() {
       region,
       xai,
       v0,
-      meta,
-      fs
+      meta
     );
 
     resolver.registerAll();

@@ -44,9 +44,6 @@
       "resolver": [
         "dist/resolver/index.d.ts"
       ],
-      "s3": [
-        "dist/s3/index.d.ts"
-      ],
       "types": [
         "dist/types/index.d.ts"
       ],
