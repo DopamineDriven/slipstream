@@ -368,7 +368,7 @@ export type AttachmentGroupByOutputType = {
   draftId: string | null
   userId: string
   messageId: string | null
-  s3ObjectId: string
+  s3ObjectId: string | null
   origin: $Enums.AssetOrigin
   status: $Enums.AssetStatus
   uploadMethod: $Enums.UploadMethod
@@ -429,7 +429,7 @@ export type AttachmentWhereInput = {
   draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
+  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
@@ -471,7 +471,7 @@ export type AttachmentOrderByWithRelationInput = {
   draftId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -558,7 +558,7 @@ export type AttachmentOrderByWithAggregationInput = {
   draftId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   messageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrder
+  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   origin?: Prisma.SortOrder
   status?: Prisma.SortOrder
   uploadMethod?: Prisma.SortOrder
@@ -604,7 +604,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   draftId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  s3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   origin?: Prisma.EnumAssetOriginWithAggregatesFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusWithAggregatesFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodWithAggregatesFilter<"Attachment"> | $Enums.UploadMethod
@@ -639,7 +639,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
 export type AttachmentCreateInput = {
   id?: string
   draftId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -681,7 +681,7 @@ export type AttachmentUncheckedCreateInput = {
   draftId?: string | null
   userId: string
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -717,7 +717,7 @@ export type AttachmentUncheckedCreateInput = {
 export type AttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -759,7 +759,7 @@ export type AttachmentUncheckedUpdateInput = {
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -798,7 +798,7 @@ export type AttachmentCreateManyInput = {
   draftId?: string | null
   userId: string
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -833,7 +833,7 @@ export type AttachmentCreateManyInput = {
 export type AttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -871,7 +871,7 @@ export type AttachmentUncheckedUpdateManyInput = {
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1209,7 +1209,7 @@ export type AttachmentUpdateOneRequiredWithoutImageNestedInput = {
 export type AttachmentCreateWithoutUserInput = {
   id?: string
   draftId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1249,7 +1249,7 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   conversationId?: string | null
   draftId?: string | null
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1317,7 +1317,7 @@ export type AttachmentScalarWhereInput = {
   draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   userId?: Prisma.StringFilter<"Attachment"> | string
   messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringFilter<"Attachment"> | string
+  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
   origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
@@ -1352,7 +1352,7 @@ export type AttachmentScalarWhereInput = {
 export type AttachmentCreateWithoutConversationInput = {
   id?: string
   draftId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1392,7 +1392,7 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   draftId?: string | null
   userId: string
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1454,7 +1454,7 @@ export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
 export type AttachmentCreateWithoutMessageInput = {
   id?: string
   draftId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1494,7 +1494,7 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   conversationId?: string | null
   draftId?: string | null
   userId: string
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1556,7 +1556,7 @@ export type AttachmentUpdateManyWithWhereWithoutMessageInput = {
 export type AttachmentCreateWithoutImageInput = {
   id?: string
   draftId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1597,7 +1597,7 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   draftId?: string | null
   userId: string
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1648,7 +1648,7 @@ export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
 export type AttachmentUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1689,7 +1689,7 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1726,7 +1726,7 @@ export type AttachmentCreateManyUserInput = {
   conversationId?: string | null
   draftId?: string | null
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1761,7 +1761,7 @@ export type AttachmentCreateManyUserInput = {
 export type AttachmentUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1801,7 +1801,7 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1839,7 +1839,7 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1876,7 +1876,7 @@ export type AttachmentCreateManyConversationInput = {
   draftId?: string | null
   userId: string
   messageId?: string | null
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -1911,7 +1911,7 @@ export type AttachmentCreateManyConversationInput = {
 export type AttachmentUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1951,7 +1951,7 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -1989,7 +1989,7 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -2026,7 +2026,7 @@ export type AttachmentCreateManyMessageInput = {
   conversationId?: string | null
   draftId?: string | null
   userId: string
-  s3ObjectId: string
+  s3ObjectId?: string | null
   origin?: $Enums.AssetOrigin
   status?: $Enums.AssetStatus
   uploadMethod?: $Enums.UploadMethod
@@ -2061,7 +2061,7 @@ export type AttachmentCreateManyMessageInput = {
 export type AttachmentUpdateWithoutMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -2101,7 +2101,7 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -2139,7 +2139,7 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  s3ObjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
   status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
   uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
@@ -2367,7 +2367,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     draftId: string | null
     userId: string
     messageId: string | null
-    s3ObjectId: string
+    s3ObjectId: string | null
     origin: $Enums.AssetOrigin
     status: $Enums.AssetStatus
     uploadMethod: $Enums.UploadMethod

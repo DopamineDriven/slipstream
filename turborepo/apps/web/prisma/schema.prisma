@@ -241,10 +241,10 @@ model Attachment {
   draftId        String? // temp id before convo id exists for new chats
   userId         String
   messageId      String?
-  s3ObjectId     String       @unique // "s3://bucket/key#<versionId|nov>"
+  s3ObjectId     String?      @unique // "s3://bucket/key#<versionId|nov>"
   origin         AssetOrigin  @default(UPLOAD)
   status         AssetStatus  @default(REQUESTED)
-  uploadMethod   UploadMethod @default(SERVER) // "server" | "presigned" | "generated"
+  uploadMethod   UploadMethod @default(SERVER) // "server" | "presigned" | "generated" | "fetched"
 
   uploadDuration Int? // milliseconds
   cdnUrl         String? // publicUrl
