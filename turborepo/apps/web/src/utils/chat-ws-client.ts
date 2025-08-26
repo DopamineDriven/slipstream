@@ -1,5 +1,9 @@
 import type { HandlerMap, RawData } from "@/types/chat-ws";
-import type { ChatWsEvent, EventTypeMap, ChatWsEventTypeUnion } from "@t3-chat-clone/types";
+import type {
+  ChatWsEvent,
+  ChatWsEventTypeUnion,
+  EventTypeMap
+} from "@t3-chat-clone/types";
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 
@@ -10,20 +14,42 @@ class EventHandlerRegistry {
 
   // Event types for validation
   private readonly EVENT_TYPES = [
-    "typing",
-    "ping",
-    "image_gen_request",
-    "image_gen_response",
+    "ai_chat_chunk",
+    "ai_chat_error",
+    "ai_chat_inline_data",
+    "ai_chat_request",
     "ai_chat_response",
+    "asset_attached",
+    "asset_batch_upload",
+    "asset_deleted",
+    "asset_fetch_error",
+    "asset_fetch_request",
+    "asset_fetch_response",
+    "asset_paste",
+    "asset_ready",
+    "asset_upload_abort",
+    "asset_upload_aborted",
+    "asset_upload_complete",
+    "asset_upload_complete_error",
+    "asset_upload_error",
+    "asset_upload_instructions",
+    "asset_upload_prepare",
+    "asset_upload_progress",
     "asset_upload_request",
     "asset_upload_response",
-    "ai_chat_chunk",
-    "ai_chat_request",
-    "ai_chat_inline_data",
-    "ai_chat_error"
+    "asset_uploaded",
+    "image_gen_error",
+    "image_gen_progress",
+    "image_gen_request",
+    "image_gen_response",
+    "ping",
+    "typing"
   ] as const;
 
- public register<const K extends keyof HandlerMap>(event: K, handler: HandlerMap[K]) {
+  public register<const K extends keyof HandlerMap>(
+    event: K,
+    handler: HandlerMap[K]
+  ) {
     if (this.activeHandlers.has(event)) {
       console.warn(`Handler for ${event} already registered, replacing...`);
     }
@@ -31,18 +57,18 @@ class EventHandlerRegistry {
     this.activeHandlers.add(event);
   }
 
- public unregister<const K extends keyof HandlerMap>(event: K) {
+  public unregister<const K extends keyof HandlerMap>(event: K) {
     delete this.handlers[event];
     this.activeHandlers.delete(event);
   }
 
   // Parse and validate incoming messages
- public parseEvent(raw: RawData): ChatWsEvent | null {
+  public parseEvent(raw: RawData): ChatWsEvent | null {
     try {
       let msg: unknown;
 
       // Handle both string and buffer data
-      if (typeof raw === 'string') {
+      if (typeof raw === "string") {
         msg = JSON.parse(raw);
       } else if (Array.isArray(raw)) {
         msg = JSON.parse(Buffer.concat(raw).toString());
@@ -72,7 +98,7 @@ class EventHandlerRegistry {
   }
 
   // Type-safe dispatch with built-in event handling
- public dispatch(event: ChatWsEvent, socket: WebSocket): boolean {
+  public dispatch(event: ChatWsEvent, socket: WebSocket): boolean {
     // Handle built-in events first
     switch (event.type) {
       case "ping":
@@ -94,67 +120,181 @@ class EventHandlerRegistry {
     type EventType = ChatWsEvent["type"];
 
     const dispatcher: Record<EventType, () => void> = {
-      "ai_chat_chunk": () => {
+      ai_chat_chunk: () => {
         const handler = this.handlers.ai_chat_chunk;
         if (handler && event.type === "ai_chat_chunk") {
           handler(event, socket);
         }
       },
-      "ai_chat_error": () => {
+      ai_chat_error: () => {
         const handler = this.handlers.ai_chat_error;
         if (handler && event.type === "ai_chat_error") {
           handler(event, socket);
         }
       },
-      "ai_chat_inline_data": () => {
+      ai_chat_inline_data: () => {
         const handler = this.handlers.ai_chat_inline_data;
         if (handler && event.type === "ai_chat_inline_data") {
           handler(event, socket);
         }
       },
-      "ai_chat_request": () => {
+      ai_chat_request: () => {
         const handler = this.handlers.ai_chat_request;
         if (handler && event.type === "ai_chat_request") {
           handler(event, socket);
         }
       },
-      "ai_chat_response": () => {
+      ai_chat_response: () => {
         const handler = this.handlers.ai_chat_response;
         if (handler && event.type === "ai_chat_response") {
           handler(event, socket);
         }
       },
-      "asset_upload_request": () => {
+      asset_attached: () => {
+        const handler = this.handlers.asset_attached;
+        if (handler && event.type === "asset_attached") {
+          handler(event, socket);
+        }
+      },
+      asset_batch_upload: () => {
+        const handler = this.handlers.asset_batch_upload;
+        if (handler && event.type === "asset_batch_upload") {
+          handler(event, socket);
+        }
+      },
+      asset_deleted: () => {
+        const handler = this.handlers.asset_deleted;
+        if (handler && event.type === "asset_deleted") {
+          handler(event, socket);
+        }
+      },
+      asset_fetch_error: () => {
+        const handler = this.handlers.asset_fetch_error;
+        if (handler && event.type === "asset_fetch_error") {
+          handler(event, socket);
+        }
+      },
+      asset_fetch_request: () => {
+        const handler = this.handlers.asset_fetch_request;
+        if (handler && event.type === "asset_fetch_request") {
+          handler(event, socket);
+        }
+      },
+      asset_fetch_response: () => {
+        const handler = this.handlers.asset_fetch_response;
+        if (handler && event.type === "asset_fetch_response") {
+          handler(event, socket);
+        }
+      },
+      asset_paste: () => {
+        const handler = this.handlers.asset_paste;
+        if (handler && event.type === "asset_paste") {
+          handler(event, socket);
+        }
+      },
+      asset_ready: () => {
+        const handler = this.handlers.asset_ready;
+        if (handler && event.type === "asset_ready") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_abort: () => {
+        const handler = this.handlers.asset_upload_abort;
+        if (handler && event.type === "asset_upload_abort") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_aborted: () => {
+        const handler = this.handlers.asset_upload_aborted;
+        if (handler && event.type === "asset_upload_aborted") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_complete: () => {
+        const handler = this.handlers.asset_upload_complete;
+        if (handler && event.type === "asset_upload_complete") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_complete_error: () => {
+        const handler = this.handlers.asset_upload_complete_error;
+        if (handler && event.type === "asset_upload_complete_error") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_error: () => {
+        const handler = this.handlers.asset_upload_error;
+        if (handler && event.type === "asset_upload_error") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_instructions: () => {
+        const handler = this.handlers.asset_upload_instructions;
+        if (handler && event.type === "asset_upload_instructions") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_prepare: () => {
+        const handler = this.handlers.asset_upload_prepare;
+        if (handler && event.type === "asset_upload_prepare") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_progress: () => {
+        const handler = this.handlers.asset_upload_progress;
+        if (handler && event.type === "asset_upload_progress") {
+          handler(event, socket);
+        }
+      },
+      asset_upload_request: () => {
         const handler = this.handlers.asset_upload_request;
         if (handler && event.type === "asset_upload_request") {
           handler(event, socket);
         }
       },
-      "asset_upload_response": () => {
+      asset_upload_response: () => {
         const handler = this.handlers.asset_upload_response;
         if (handler && event.type === "asset_upload_response") {
           handler(event, socket);
         }
       },
-      "image_gen_request": () => {
+      asset_uploaded: () => {
+        const handler = this.handlers.asset_uploaded;
+        if (handler && event.type === "asset_uploaded") {
+          handler(event, socket);
+        }
+      },
+      image_gen_progress: () => {
+        const handler = this.handlers.image_gen_progress;
+        if (handler && event.type === "image_gen_progress") {
+          handler(event, socket);
+        }
+      },
+      image_gen_request: () => {
         const handler = this.handlers.image_gen_request;
         if (handler && event.type === "image_gen_request") {
           handler(event, socket);
         }
       },
-      "image_gen_response": () => {
+      image_gen_response: () => {
         const handler = this.handlers.image_gen_response;
         if (handler && event.type === "image_gen_response") {
           handler(event, socket);
         }
       },
-      "ping": () => {
+      image_gen_error: () => {
+        const handler = this.handlers.image_gen_error;
+        if (handler && event.type === "image_gen_error") {
+          handler(event, socket);
+        }
+      },
+      ping: () => {
         const handler = this.handlers.ping;
         if (handler && event.type === "ping") {
           handler(event, socket);
         }
       },
-      "typing": () => {
+      typing: () => {
         const handler = this.handlers.typing;
         if (handler && event.type === "typing") {
           handler(event, socket);
@@ -232,7 +372,7 @@ export class ChatWebSocketClient {
         try {
           listener(data);
         } catch (error) {
-          console.error('Error in event listener:', error);
+          console.error("Error in event listener:", error);
         }
       });
 
@@ -245,16 +385,20 @@ export class ChatWebSocketClient {
       this._isConnected = false;
     };
 
-    this.socket.onclose = (event) => {
+    this.socket.onclose = event => {
       this._isConnected = false;
       this.socket = null;
 
-      console.log(`WebSocket closed: code=${event.code}, reason=${event.reason}`);
+      console.log(
+        `WebSocket closed: code=${event.code}, reason=${event.reason}`
+      );
 
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts += 1;
         const delay = 1000 * Math.pow(2, this.reconnectAttempts);
-        console.log(`Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`);
+        console.log(
+          `Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`
+        );
         this.reconnectTimeout = setTimeout(() => this.connect(), delay);
       } else {
         console.error("Max reconnect attempts reached");
@@ -274,12 +418,12 @@ export class ChatWebSocketClient {
       type: T;
     };
     const msg = JSON.stringify(payload);
-    
+
     // Debug logging for ai_chat_request events
     if (data.type === "ai_chat_request") {
       const prompt = data.prompt;
       console.log(
-        `[WebSocketClient] Sending ${event} - prompt: "${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}" (${prompt.length} chars)`
+        `[WebSocketClient] Sending ${event} - prompt: "${prompt.substring(0, 50)}${prompt.length > 50 ? "..." : ""}" (${prompt.length} chars)`
       );
     }
 
