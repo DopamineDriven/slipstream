@@ -163,7 +163,7 @@ export class S3Storage extends S3Utils {
     this.client.destroy();
   }
 
-  private contentTypeToExt(ContentType?: string) {
+  public contentTypeToExt(ContentType?: string) {
     if (ContentType) {
       return this.fs.mimeToExt(ContentType as keyof typeof this.fs.toExtObj);
     } else return undefined;
@@ -438,7 +438,7 @@ export class S3Storage extends S3Utils {
     return undefined; // Can't determine size of stream
   }
 
-  public async finalize(bucket: string, key: string) {
+  public async finalize(bucket: string, key: string, versionId = "nov") {
     const head = await this.client.send(
       new HeadObjectCommand({
         Bucket: bucket,
@@ -457,23 +457,28 @@ export class S3Storage extends S3Utils {
       ContentLength,
       VersionId
     } = head;
+    let v = VersionId;
 
-    const versionId = VersionId ?? null;
-    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}` as const;
+    if (typeof v === "undefined" || (v !== versionId && versionId !== "nov")) {
+      v = versionId;
+    }
+
+    const s3ObjectId = `s3://${bucket}/${key}#${v ?? "nov"}` as const;
 
     const checksum = this.checksum(head);
 
     const expires = this.handleExpires(ExpiresString);
     const extension = this.contentTypeToExt(ContentType);
-
+    const publicUrl = this.publicUrl(bucket, key);
     return {
       bucket,
       key,
-      versionId,
+      versionId: v,
       contentDisposition: ContentDisposition,
       cacheControl: CacheControl,
       extension,
       expires,
+      publicUrl,
       storageClass: StorageClass,
       s3ObjectId,
       etag: this.stripQuotes(ETag),

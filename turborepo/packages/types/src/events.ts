@@ -124,7 +124,7 @@ export type AssetOrigin =
   | "GENERATED"
   | "REMOTE"
   | "PASTED"
-  | "IMPORT"
+  | "IMPORTED"
   | "SCRAPED"
   | "SCREENSHOT";
 
@@ -160,7 +160,8 @@ export type AssetUploadedNotification = DX<
     key: string;
     versionId: string;
     s3ObjectId: S3ObjectId;
-  } & WithExpiry<"downloadUrl"> & WithExpiry<"uploadUrl"> & {
+  } & WithExpiry<"downloadUrl"> &
+    WithExpiry<"uploadUrl"> & {
       origin: AssetOrigin;
       status: AssetStatus;
       etag?: string;
@@ -184,6 +185,7 @@ export type AssetPasteEvent = {
 export type AssetReady = DX<
   {
     type: "asset_ready";
+    userId: string;
     conversationId: string;
     attachmentId: string;
 
@@ -208,6 +210,7 @@ export type AssetReady = DX<
  */
 export type AssetUploadProgress = {
   type: "asset_upload_progress";
+  userId: string;
   conversationId: string;
   attachmentId: string;
   progress: number; // 0-100
@@ -244,7 +247,6 @@ export type AssetDeleted = {
  */
 export type AssetFetchRequest = {
   type: "asset_fetch_request";
-  userId: string;
   conversationId: string;
   sourceUrl: string;
   messageId?: string;
@@ -256,6 +258,7 @@ export type AssetFetchRequest = {
 export type AssetFetchResponse = DX<
   {
     type: "asset_fetch_response";
+    userId: string;
     conversationId: string;
     attachmentId?: string;
     sourceUrl?: string;
@@ -270,6 +273,7 @@ export type AssetFetchResponse = DX<
 
 export type AssetFetchError = {
   type: "asset_fetch_error";
+  userId: string;
   conversationId: string;
   attachmentId?: string;
   sourceUrl?: string;
@@ -280,6 +284,7 @@ export type AssetFetchError = {
 
 export type AssetUploadAbort = {
   type: "asset_upload_abort";
+  userId: string;
   conversationId: string;
   attachmentId: string;
   reason?:
@@ -299,6 +304,7 @@ export type AssetUploadAbort = {
  */
 export type AssetUploadAborted = {
   type: "asset_upload_aborted";
+  userId: string;
   conversationId: string;
   attachmentId: string;
   status: Extract<AssetStatus, "FAILED">;
@@ -356,6 +362,7 @@ export type AssetUploadPrepare = {
 // server -> client
 export type AssetUploadInstructions = {
   type: "asset_upload_instructions";
+  userId: string;
   conversationId: string;
   attachmentId: string;
   method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
@@ -370,17 +377,41 @@ export type AssetUploadInstructions = {
 export type AssetUploadComplete = {
   type: "asset_upload_complete";
   conversationId: string;
+  userId: string;
+  bucket: string;
+  key: string;
+  attachmentId: string;
+  versionId: string;
+  publicUrl: string;
+  etag?: string;
+  success: boolean;
+  duration: number; //milliseconds
+  bytesUploaded?: number;
+};
+
+export type AssetUploadCompleteError = {
+  type: "asset_upload_complete_error";
+  conversationId: string;
+  bucket: string;
+  key: string;
+  userId: string;
   attachmentId: string;
   versionId?: string;
-  s3ObjectId?: S3ObjectId;
+  publicUrl?: string;
+  etag?: string;
+  duration?: number; //milliseconds
+  bytesUploaded?: number;
+  error: string;
+  success: false;
+  code?: number;
 };
+
 
 /**
  * Enhanced image generation request
  */
 export type ImageGenRequest = {
   type: "image_gen_request";
-  userId: string;
   conversationId: string;
   prompt: string;
   model: ImageGenModelsByProvider<ImageGenProviders>;
@@ -424,6 +455,7 @@ export type ImageGenError = {
  */
 export type ImageGenProgress = {
   type: "image_gen_progress";
+  userId: string;
   conversationId: string;
   taskId: string;
   progress: number; // 0-100
@@ -436,6 +468,7 @@ export type ImageGenProgress = {
  */
 export type AssetBatchUpload = {
   type: "asset_batch_upload";
+  userId: string;
   conversationId: string;
   attachmentIds: string[];
   totalCount: number;
@@ -461,6 +494,7 @@ export type AnyEvent =
   | AssetUploadAborted
   | AssetUploadedNotification
   | AssetUploadComplete
+  | AssetUploadCompleteError
   | AssetUploadError
   | AssetUploadInstructions
   | AssetUploadPrepare
@@ -503,6 +537,7 @@ export type EventTypeMap = {
   asset_upload_abort: AssetUploadAbort;
   asset_upload_aborted: AssetUploadAborted;
   asset_upload_complete: AssetUploadComplete;
+  asset_upload_complete_error: AssetUploadCompleteError;
   asset_upload_error: AssetUploadError;
   asset_upload_instructions: AssetUploadInstructions;
   asset_upload_prepare: AssetUploadPrepare;

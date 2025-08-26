@@ -1,6 +1,9 @@
 import type { UserData } from "@/types/index.ts";
 import { Attachment, PrismaClient } from "@/generated/client/client.ts";
-import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
+import {
+  AssetOrigin,
+  SenderType
+} from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -242,15 +245,70 @@ export class PrismaService extends ModelService {
       }
     });
   }
+  
   async createAttachment({
     ...data
-  }: CTR<
-    Rm<RTC<Attachment>, "id">,
-    "bucket" | "key" | "versionId" | "userId" | "s3ObjectId"
-  > & {}) {
+  }: CTR<Rm<RTC<Attachment>, "id">, "bucket" | "key" | "userId"> & {}) {
+    const mime = data.mime ?? "application/octet-stream";
+    const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
+    if (
+      this.isSupportedImageType(extension) &&
+      data.sourceUrl &&
+      URL.canParse(data.sourceUrl)
+    ) {
+      const {
+        animated,
+        aspectRatio,
+        colorSpace,
+        exifDateTimeOriginal,
+        format,
+        frames,
+        hasAlpha,
+        height,
+        iccProfile,
+        orientation,
+        width
+      } = await this.fs.getImageSpecs(data.sourceUrl, 4096 * 6);
+      return await this.prismaClient.attachment.create({
+        include: { image: true },
+        data: {
+          ...data,
+          conversationId: data.conversationId ?? "new-chat",
+          image: {
+            create: {
+              aspectRatio,
+              format,
+              height,
+              width,
+              animated,
+              colorSpace,
+              exifDateTimeOriginal,
+              frames,
+              hasAlpha,
+              iccProfile,
+              orientation
+            }
+          }
+        }
+      });
+    }
     return await this.prismaClient.attachment.create({
+      include: { image: true },
       data: { ...data, conversationId: data.conversationId ?? "new-chat" }
     });
+  }
+
+  public isSupportedImageType(ext: string) {
+    const x = ["apng", "png", "jpeg", "jpg", "gif", "bmp", "webp", "avif"];
+    if (x.includes(ext)) {
+      return true;
+    } else return false;
+  }
+
+  public contentTypeToExt(contentType?: string) {
+    return contentType
+      ? this.fs.mimeToExt(contentType as keyof typeof this.fs.toExtObj)
+      : undefined;
   }
 
   /**
@@ -267,6 +325,7 @@ export class PrismaService extends ModelService {
         s3ObjectId: `s3://${data.bucket}/${data.key}#${data.versionId}`,
         id: data.id
       },
+
       data: {
         ...data
       }
@@ -367,7 +426,9 @@ export class PrismaService extends ModelService {
           attachments: {
             connectOrCreate: [
               {
-                where: { s3ObjectId: s3ObjectId },
+                where: s3ObjectId
+                  ? { s3ObjectId: s3ObjectId }
+                  : { id: rest.id },
                 create: {
                   status: "ATTACHED",
                   s3ObjectId,
