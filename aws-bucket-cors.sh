@@ -14,7 +14,7 @@ CFG=$(jq -n --arg local "$LOCAL" --arg root "$ROOT" --arg dev "$DEV" --arg stg "
       AllowedOrigins: [$local, $root, $dev, $stg, $py, $local_py],
       AllowedMethods: ["GET","HEAD","PUT","POST","DELETE"],
       AllowedHeaders: ["*"],
-      ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id","Content-Range","Accept-Ranges","Content-Length","Content-Type","Last-Modified","Cache-Control"],
+      ExposeHeaders: ["ETag","x-amz-request-id","x-amz-version-id","x-amz-checksum-type","x-amz-checksum-crc32","x-amz-checksum-crc32c","x-amz-checksum-crc64nvme","x-amz-checksum-sha1","x-amz-checksum-sha256","Content-Range","Accept-Ranges","Content-Length","Content-Type","Last-Modified","Content-Encoding","Cache-Control"],
       MaxAgeSeconds: 3000
     }
   ]
