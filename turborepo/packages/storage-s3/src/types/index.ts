@@ -127,6 +127,7 @@ export type FinalizeResult = {
   extension?: string;
   etag?: string;
   size?: number;
+  publicUrl: string;
   contentType?: string;
   lastModified?: string;
   cacheControl?: string;

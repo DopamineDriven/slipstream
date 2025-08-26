@@ -150,20 +150,20 @@ export function AIChatProvider({
   const thinkingTextRef = useRef(thinkingText);
   const isThinkingRef = useRef(isThinking);
   const thinkingDurationRef = useRef(thinkingDuration);
-  
+
   // Update refs when state changes
   useEffect(() => {
     streamedTextRef.current = streamedText;
   }, [streamedText]);
-  
+
   useEffect(() => {
     thinkingTextRef.current = thinkingText;
   }, [thinkingText]);
-  
+
   useEffect(() => {
     isThinkingRef.current = isThinking;
   }, [isThinking]);
-  
+
   useEffect(() => {
     thinkingDurationRef.current = thinkingDuration;
   }, [thinkingDuration]);
@@ -232,7 +232,8 @@ export function AIChatProvider({
         id: `stream-${evt.conversationId}`,
         content: streamedTextRef.current + (evt.chunk ?? ""),
         thinkingText: thinkingTextRef.current + (evt.thinkingText ?? ""),
-        thinkingDuration: evt.thinkingDuration ?? thinkingDurationRef.current ?? undefined,
+        thinkingDuration:
+          evt.thinkingDuration ?? thinkingDurationRef.current ?? undefined,
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
         timestamp: new Date(),
@@ -343,7 +344,7 @@ export function AIChatProvider({
 
   // Track recently sent messages to prevent duplicates
   const recentMessagesRef = useRef<Map<string, number>>(new Map());
-  
+
   const { getAll } = useCookiesCtx();
   const metadata = useMemo(() => {
     const { city, country, latlng, postalCode, region, tz, locale } = getAll();
@@ -378,22 +379,22 @@ export function AIChatProvider({
         );
         return;
       }
-      
+
       // Check for duplicate messages sent within 500ms
       const messageKey = `${userId}-${prompt}`;
       const now = Date.now();
       const lastSentTime = recentMessagesRef.current.get(messageKey);
-      
+
       if (lastSentTime && now - lastSentTime < 500) {
         console.warn(
           `[AIChatContext] Duplicate message detected, skipping: "${prompt.substring(0, 50)}..."`
         );
         return;
       }
-      
+
       // Track this message
       recentMessagesRef.current.set(messageKey, now);
-      
+
       // Clean up old entries after 2 seconds
       setTimeout(() => {
         recentMessagesRef.current.delete(messageKey);
@@ -413,7 +414,7 @@ export function AIChatProvider({
         `[AIChatContext] Using model: ${selectedModel.displayName} (${selectedModel.modelId})`
       );
       console.log(
-        `[AIChatContext] Message content: "${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}"`
+        `[AIChatContext] Message content: "${prompt.substring(0, 100)}${prompt.length > 100 ? "..." : ""}"`
       );
       console.log(
         `[AIChatContext] Message length: ${prompt.length} characters`

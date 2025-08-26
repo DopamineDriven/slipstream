@@ -38,9 +38,6 @@
       "prisma": [
         "dist/prisma/index.d.ts"
       ],
-      "r2-helper": [
-        "dist/r2-helper/index.d.ts"
-      ],
       "resolver": [
         "dist/resolver/index.d.ts"
       ],

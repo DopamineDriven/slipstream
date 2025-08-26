@@ -25,6 +25,7 @@ export type {
   AssetUploadAbort,
   AssetUploadAborted,
   AssetUploadComplete,
+  AssetUploadCompleteError,
   AssetUploadError,
   AssetUploadInstructions,
   AssetUploadPrepare,

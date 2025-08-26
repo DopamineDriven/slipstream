@@ -12,43 +12,25 @@ async function exe() {
   const cfg = await cred.getAll();
 
   try {
-    const accountId = cfg.R2_ACCOUNT_ID;
-    const accessKeyId = cfg.R2_ACCESS_KEY_ID;
-    const secretAccessKey = cfg.R2_SECRET_ACCESS_KEY;
-    const r2PublicUrl = cfg.R2_PUBLIC_URL;
-
-    const awsAccessKeyId = cfg.AWS_ACCESS_KEY,
-      awsSecretAccessLey = cfg.AWS_SECRET_ACCESS_KEY,
+    const accessKeyId = cfg.AWS_ACCESS_KEY,
+      secretAccessKey = cfg.AWS_SECRET_ACCESS_KEY,
       region = cfg.AWS_REGION,
       pyGenAssets = process.env.GEN_BUCKET ?? cfg.GEN_BUCKET,
-      wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET;
+      wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET,
+      buckets = { pyGenAssets, wsAssets },
+      config = {
+        accessKeyId,
+        secretAccessKey,
+        buckets,
+        region
+      };
 
     const { Fs } = await import("@d0paminedriven/fs");
     const fs = new Fs(process.cwd());
 
     const { S3Storage } = await import("@t3-chat-clone/storage-s3");
 
-    const s3 = S3Storage.getInstance(
-      {
-        accessKeyId: awsAccessKeyId,
-        secretAccessKey: awsSecretAccessLey,
-        buckets: {
-          pyGenAssets,
-          wsAssets
-        },
-        region
-      },
-      fs
-    );
-
-    const { R2Instance } = await import("@/r2-helper/index.ts");
-
-    const r2 = new R2Instance({
-      accountId,
-      accessKeyId,
-      secretAccessKey,
-      r2PublicUrl
-    });
+    const s3 = S3Storage.getInstance(config, fs);
 
     const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379",
       ca = cred.unflattenNewlines(cfg.REDIS_CA_PEM),
@@ -117,9 +99,7 @@ async function exe() {
       gemini,
       anthropic,
       s3,
-      r2,
       cfg.FASTAPI_URL,
-      cfg.R2_BUCKET,
       region,
       xai,
       v0,

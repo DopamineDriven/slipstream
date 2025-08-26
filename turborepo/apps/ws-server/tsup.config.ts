@@ -15,7 +15,6 @@ const tsupConfig = (options: Options) =>
       "src/models/index.ts",
       "src/openai/index.ts",
       "src/prisma/index.ts",
-      "src/r2-helper/index.ts",
       "src/resolver/index.ts",
       "src/types/index.ts",
       "src/vercel/index.ts",

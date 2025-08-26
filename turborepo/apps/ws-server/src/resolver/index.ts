@@ -7,7 +7,6 @@ import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
-import { R2Instance } from "@/r2-helper/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
@@ -17,11 +16,11 @@ import type {
   AnyEvent,
   AnyEventTypeUnion,
   EventTypeMap,
-  Provider,
-  S3ObjectId
+  Provider
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 import { S3Storage } from "@t3-chat-clone/storage-s3";
+
 
 export class Resolver extends ModelService {
   constructor(
@@ -30,9 +29,7 @@ export class Resolver extends ModelService {
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
     private s3Service: S3Storage,
-    private r2: R2Instance,
     private fastApiUrl: string,
-    private Bucket: string,
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
@@ -44,15 +41,16 @@ export class Resolver extends ModelService {
   public registerAll() {
     this.wsServer.on("typing", this.handleTyping.bind(this));
     this.wsServer.on("ping", this.handlePing.bind(this));
+    this.wsServer.on("asset_paste", this.handleAssetPaste.bind(this));
     this.wsServer.on(
-      "image_gen_request",
-      this.handleImageGenRequest.bind(this)
-    );
-    this.wsServer.on(
-      "asset_upload_request",
-      this.handleAssetUploadRequest.bind(this)
+      "asset_fetch_request",
+      this.handleAssetFetchRequest.bind(this)
     );
     this.wsServer.on("ai_chat_request", this.handleAIChat.bind(this));
+    this.wsServer.on(
+      "asset_upload_complete",
+      this.handleAssetUploadComplete.bind(this)
+    );
   }
 
   public safeErrMsg(err: unknown) {
@@ -67,6 +65,10 @@ export class Resolver extends ModelService {
     } else if (typeof err === "boolean") {
       return `${err}`;
     } else return String(err);
+  }
+
+  private isValidUrl(url: string) {
+    return URL.canParse(url);
   }
 
   private formatProvider(provider?: Provider) {
@@ -90,7 +92,19 @@ export class Resolver extends ModelService {
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   };
+  private contentTypeToExt(contentType?: string) {
+    return contentType
+      ? this.wsServer.prisma.fs.mimeToExt(
+          contentType as keyof typeof this.wsServer.prisma.fs.toExtObj
+        )
+      : undefined;
+  }
 
+  private resolveChannel(conversationId: string, userId: string) {
+    return conversationId === "new-chat"
+      ? RedisChannels.user(userId)
+      : RedisChannels.conversationStream(conversationId);
+  }
   private async titleGenUtil({
     prompt,
     provider
@@ -347,14 +361,17 @@ export class Resolver extends ModelService {
       case "ping":
         await this.handlePing(event, ws, userId);
         break;
-      case "asset_upload_request":
-        await this.handleAssetUploadRequest(event, ws, userId);
-        break;
-      case "image_gen_request":
-        await this.handleImageGenRequest(event, ws, userId);
-        break;
       case "ai_chat_request":
         await this.handleAIChat(event, ws, userId, userData);
+        break;
+      case "asset_paste":
+        await this.handleAssetPaste(event, ws, userId, userData);
+        break;
+      case "asset_fetch_request":
+        await this.handleAssetFetchRequest(event, ws, userId, userData);
+        break;
+      case "asset_upload_complete":
+        await this.handleAssetUploadComplete(event, ws, userId, userData);
         break;
       default:
         await this.wsServer.redis.publish(
@@ -381,6 +398,7 @@ export class Resolver extends ModelService {
     "asset_upload_abort",
     "asset_upload_aborted",
     "asset_upload_complete",
+    "asset_upload_complete_error",
     "asset_upload_error",
     "asset_upload_instructions",
     "asset_upload_prepare",
@@ -514,10 +532,11 @@ export class Resolver extends ModelService {
         decimals: 2,
         includeUnits: true
       });
+
       console.log(
         `[Asset Paste] User ${userId} pasting ${properFilename} (${sizeInfo})`
       );
-      // TODO handle messageId if it exists
+
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
@@ -540,8 +559,6 @@ export class Resolver extends ModelService {
         region: this.region,
         mime: mimeType,
         ext: extension,
-        s3ObjectId: `s3://${presignedData.bucket}/${presignedData.key}#nov`, // need the real version to construct s3ObjectId
-        versionId: "nov", // need version
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
@@ -555,29 +572,21 @@ export class Resolver extends ModelService {
         `[Asset Paste] Created attachment ${attachment.id} with key: ${presignedData.key}`
       );
 
-      const assetUploadedRes = {
-        type: "asset_uploaded",
+      const uploadInstructions = {
+        type: "asset_upload_instructions", // Changed event type
         conversationId,
         attachmentId: attachment.id,
-        userId,
-        filename: properFilename,
-        mime: mimeType,
-        size: size ?? 0,
-        s3ObjectId: attachment.s3ObjectId as S3ObjectId,
-        versionId: attachment.versionId ?? "nov",
         bucket: presignedData.bucket,
         key: presignedData.key,
+        userId,
         uploadUrl: presignedData.uploadUrl,
-        uploadUrlExpiresAt: presignedData.expiresAt,
-        downloadUrl: presignedData.publicUrl,
-        downloadUrlExpiresAt: presignedData.expiresAt,
-        etag: attachment.etag ?? undefined,
-        origin: "PASTED",
-        status: "UPLOADING"
-      } satisfies EventTypeMap["asset_uploaded"];
+        expiresIn: presignedData.expiresAt,
+        method: "PUT",
+        requiredHeaders: { "Content-Type": mimeType }
+      } satisfies EventTypeMap["asset_upload_instructions"];
       // Send presigned URL to client for direct upload
 
-      ws.send(JSON.stringify(assetUploadedRes));
+      ws.send(JSON.stringify(uploadInstructions));
 
       // Notify other participants via Redis
       void this.wsServer.redis.publishTypedEvent(
@@ -585,6 +594,7 @@ export class Resolver extends ModelService {
         "asset_upload_progress",
         {
           type: "asset_upload_progress",
+          userId,
           conversationId,
           attachmentId: attachment.id,
           progress: 0,
@@ -680,6 +690,9 @@ export class Resolver extends ModelService {
       }
 
       // 2. Get file metadata with HEAD request
+
+
+
       const headResponse = await fetch(sourceUrl, { method: "HEAD" });
       if (!headResponse.ok) {
         throw new Error(`Failed to access URL: ${headResponse.status}`);
@@ -688,12 +701,15 @@ export class Resolver extends ModelService {
       const contentLength = headResponse.headers.get("content-length");
       const contentType =
         headResponse.headers.get("content-type") ?? "application/octet-stream";
+
+      const ext =this.contentTypeToExt(contentType) ?? "bin";
+
       const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
       // 3. Extract filename from URL
       const urlPath = new URL(sourceUrl).pathname;
       const urlFilename = urlPath.split("/")?.pop() ?? `remote_${Date.now()}`;
-      const extension = this.s3Service.fs.assetType(sourceUrl) ?? "bin";
+      const extension = ext;
       const filename = urlFilename.includes(".")
         ? urlFilename
         : `${urlFilename}.${extension}`;
@@ -719,6 +735,7 @@ export class Resolver extends ModelService {
         conversationId,
         attachmentId: "", // Will be filled later
         progress: 0,
+        userId,
         bytesUploaded: 0,
         totalBytes: fileSizeBytes
       } satisfies EventTypeMap["asset_upload_progress"];
@@ -753,6 +770,7 @@ export class Resolver extends ModelService {
           const progressEvent = {
             type: "asset_upload_progress",
             conversationId,
+            userId,
             attachmentId: "",
             progress,
             bytesUploaded: uploadedBytes,
@@ -807,6 +825,7 @@ export class Resolver extends ModelService {
         type: "asset_upload_progress",
         conversationId,
         attachmentId: attachment.id,
+        userId,
         progress: 100,
         bytesUploaded: uploadedBytes,
         totalBytes: fileSizeBytes
@@ -818,6 +837,7 @@ export class Resolver extends ModelService {
         type: "asset_fetch_response",
         conversationId,
         attachmentId: attachment.id,
+        userId,
         sourceUrl: sourceUrl,
         s3ObjectId: s3Result.s3ObjectId,
         bucket: s3Result.bucket,
@@ -863,6 +883,7 @@ export class Resolver extends ModelService {
       const errorEvent = {
         type: "asset_fetch_error",
         conversationId,
+        userId,
         sourceUrl,
         success: false,
         error: this.safeErrMsg(error)
@@ -872,6 +893,130 @@ export class Resolver extends ModelService {
     }
   }
 
+  public async handleAssetUploadComplete(
+    event: EventTypeMap["asset_upload_complete"],
+    ws: WebSocket,
+    userId: string,
+    _userData?: UserData
+  ): Promise<void> {
+    const {
+      conversationId = "new-chat",
+      attachmentId,
+      publicUrl,
+      bucket,
+      key,
+      duration,
+      bytesUploaded,
+      versionId,
+      etag
+    } = event;
+
+    try {
+      // ✅ HEAD request to S3 to get full metadata
+      const {
+        publicUrl,
+        bucket: finalBucket,
+        cacheControl,
+        checksum,
+        contentDisposition,
+        contentType,
+        etag,
+        expires,
+        extension,
+        key: finalKey,
+        lastModified,
+        versionId: v,
+        size,
+        storageClass
+      } = await this.s3Service.finalize(bucket, key, versionId);
+
+      const s3ObjectId = `s3://${finalBucket}/${finalKey}#${v}` as const;
+
+      // ✅ Update DB with real values
+      const attachment = await this.wsServer.prisma.updateAttachment({
+        bucket: finalBucket,
+        cacheControl,
+        checksumAlgo: checksum?.algo,
+        checksumSha256: checksum?.value,
+        contentDisposition,
+        expiresAt: expires,
+        s3LastModified: lastModified ? new Date(lastModified) : undefined,
+        storageClass,
+        conversationId,
+        id: attachmentId,
+        key: finalKey,
+        region: this.region,
+        uploadDuration: duration,
+        userId,
+        cdnUrl: publicUrl,
+        versionId: v,
+        s3ObjectId,
+        etag: etag,
+        ext: extension ?? this.contentTypeToExt(contentType),
+        mime: contentType,
+        size: size
+          ? BigInt(size)
+          : bytesUploaded
+            ? BigInt(bytesUploaded)
+            : undefined
+      });
+
+      // ✅ NOW send the real "asset_ready" event with actual values
+      const assetReady = {
+        type: "asset_ready",
+        conversationId,
+        attachmentId,
+        s3ObjectId,metadata: {filename: attachment.filename ?? "",uploadedAt: attachment.updatedAt.toISOString()},
+        mime: attachment.mime ?? "",
+        origin: attachment.origin,
+        size: bytesUploaded ?? 0,
+        status: "READY",
+        etag: etag,
+        bucket,
+        userId,
+        key,
+        versionId,
+        downloadUrl: publicUrl,
+        downloadUrlExpiresAt: Date.now() + 3600000
+      } satisfies EventTypeMap["asset_ready"];
+
+      ws.send(JSON.stringify(assetReady));
+
+      void this.wsServer.redis.publishTypedEvent(
+        this.resolveChannel(conversationId, userId),
+        "asset_ready",
+        {
+          ...assetReady
+        }
+      );
+    } catch (error) {
+      console.error("[Asset Upload Complete] Error:", error);
+
+      const uploadError = {
+        type: "asset_upload_complete_error",
+        userId,
+        bucket,
+        attachmentId,
+        key,
+        publicUrl: publicUrl.length > 1 ? publicUrl : undefined,
+        bytesUploaded,
+        duration: duration ?? 0,
+        etag,
+        versionId,
+        conversationId: event.conversationId,
+        success: false,
+        error: this.safeErrMsg(error)
+      } satisfies EventTypeMap["asset_upload_complete_error"];
+
+      ws.send(JSON.stringify(uploadError));
+
+      void this.wsServer.redis.publishTypedEvent(
+        this.resolveChannel(conversationId, userId),
+        "asset_upload_complete_error",
+        uploadError
+      );
+    }
+  }
   /**
    * Batch fetch multiple URLs
    * Useful for fetching multiple images from a webpage or gallery
@@ -902,7 +1047,6 @@ export class Resolver extends ModelService {
               type: "asset_fetch_request",
               conversationId,
               sourceUrl: url,
-              userId,
               messageId
             },
             ws,
@@ -932,17 +1076,7 @@ export class Resolver extends ModelService {
 
     return { successful, failed };
   }
-
-  /**
-   * Helper to validate URL before fetching
-   */
-  private isValidUrl(url: string) {
-    return URL.canParse(url);
-  }
-
-  /**
-   * Helper to detect if URL points to a supported file type
-   */
+  
   private isSupportedFileType(url: string): boolean {
     const extension = this.wsServer.prisma.fs.assetType(url);
     if (!extension) return false;
@@ -999,92 +1133,5 @@ export class Resolver extends ModelService {
   ): Promise<void> {
     console.log(event.type);
     ws.send(JSON.stringify({ type: "pong", userId }));
-  }
-
-  public async handleImageGenRequest(
-    event: EventTypeMap["image_gen_request"],
-    ws: WebSocket,
-    userId: string
-  ): Promise<void> {
-    try {
-      const res = await fetch(this.fastApiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: event.prompt,
-          seed: event.seed
-        })
-      });
-      if (!res.ok) {
-        const errorText = await res.text();
-        ws.send(
-          JSON.stringify({
-            type: "image_gen_response",
-            userId,
-            conversationId: event.conversationId,
-            success: false,
-            error: `Image gen failed: ${errorText}`
-          } satisfies EventTypeMap["image_gen_response"])
-        );
-        return;
-      }
-      const { url } = (await res.json()) as { url: string };
-      ws.send(
-        JSON.stringify({
-          type: "image_gen_response",
-          userId,
-          conversationId: event.conversationId,
-          imageUrl: url,
-          success: true
-        } satisfies EventTypeMap["image_gen_response"])
-      );
-    } catch (error) {
-      ws.send(
-        JSON.stringify({
-          type: "image_gen_response",
-          userId,
-          conversationId: event.conversationId,
-          success: false,
-          error: error instanceof Error ? error.message : String(error)
-        } satisfies EventTypeMap["image_gen_response"])
-      );
-    }
-  }
-
-  public async handleAssetUploadRequest(
-    event: EventTypeMap["asset_upload_request"],
-    ws: WebSocket,
-    userId: string
-  ): Promise<void> {
-    try {
-      const data = Buffer.from(event.base64, "base64");
-      const key = `user-assets/${userId}/${Date.now()}_${event.filename}`;
-      const url = await this.r2.uploadToR2({
-        Key: key,
-        Body: data,
-        ContentType: event.contentType,
-        Bucket: this.Bucket
-      });
-      ws.send(
-        JSON.stringify({
-          type: "asset_upload_response",
-          userId,
-          conversationId: event.conversationId,
-          url,
-          success: true
-        } as EventTypeMap["asset_upload_response"])
-      );
-    } catch (err) {
-      const error = this.safeErrMsg(err);
-      ws.send(
-        JSON.stringify({
-          type: "asset_upload_response",
-          userId,
-          conversationId: event.conversationId,
-          success: false,
-          error
-        } as EventTypeMap["asset_upload_response"])
-      );
-    }
   }
 }
