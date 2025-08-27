@@ -15,6 +15,7 @@ export type {
   AssetAttachedToMessage,
   AssetBatchUpload,
   AssetDeleted,
+  AssetDraftId,
   AssetFetchError,
   AssetFetchRequest,
   AssetFetchResponse,
@@ -133,6 +134,8 @@ export type {
   Without,
   XOR
 } from "@/utils.ts";
+
+export { createDraftId, parseDraftId } from "@/utils.ts";
 
 /**
  * api-handling types for codegen

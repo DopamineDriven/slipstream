@@ -103,6 +103,7 @@ export type AIChatRequest = {
   hasProviderConfigured?: boolean;
   isDefaultProvider?: boolean;
   metadata?: AIChatRequestUserMetadata;
+  batchId?: string;
 };
 
 export type AIChatInlineData = DX<
@@ -142,10 +143,10 @@ export type TypingIndicator = {
 export type PingMessage = {
   type: "ping";
 };
-/**
- * Origin types for assets
- */
+
 export type S3ObjectId = `s3://${string}/${string}#${string}`;
+
+export type AssetDraftId = `${string}~${string}~${string}~${number}`;
 
 export type WithExpiry<K extends string> = {
   [P in K | `${K}ExpiresAt`]: P extends K ? string : number; // epoch ms
@@ -191,6 +192,8 @@ export type AssetUploadedNotification = DX<
     filename: string;
     mime: string;
     size: number;
+    draftId?: string;
+    batchId?: string;
     bucket: string;
     key: string;
     versionId: string;
@@ -208,6 +211,8 @@ export type AssetUploadedNotification = DX<
 export type AssetPasteEvent = {
   type: "asset_paste";
   conversationId: string;
+  draftId: string;
+  batchId: string;
   filename: string; // Usually "paste.png" or similar
   mime: string;
   size: number;
@@ -224,6 +229,8 @@ export type AssetReady = DX<
     attachmentId: string;
     bucket: string;
     key: string;
+    draftId?: string;
+    batchId?: string;
     versionId?: string;
     s3ObjectId: S3ObjectId; // eg, "s3://bucket/key#<versionId|nov>"
     etag?: string;
@@ -239,6 +246,8 @@ export type AssetReady = DX<
 export type AssetUploadProgress = {
   type: "asset_upload_progress";
   userId: string;
+  draftId?: string;
+  batchId?: string;
   conversationId: string;
   attachmentId: string;
   progress: number; // 0-100
@@ -246,13 +255,14 @@ export type AssetUploadProgress = {
   totalBytes: number;
 };
 
-
 export type AssetAttachedToMessage = {
   type: "asset_attached";
   conversationId: string;
   filename: string;
   mime: string;
   size: number;
+  draftId: string;
+  batchId: string;
   width?: number;
   height?: number;
   metadata?: ImageSpecs;
@@ -262,6 +272,9 @@ export type AssetDeleted = {
   type: "asset_deleted";
   conversationId: string;
   attachmentId: string;
+  messageId?: string;
+  draftId?: string;
+  batchId?: string;
   userId: string;
   bucket: string;
   key: string;
@@ -273,7 +286,6 @@ export type AssetFetchRequest = {
   type: "asset_fetch_request";
   conversationId: string;
   sourceUrl: string;
-  messageId?: string;
 };
 
 /**
@@ -311,6 +323,8 @@ export type AssetUploadAbort = {
   userId: string;
   conversationId: string;
   attachmentId: string;
+  draftId?: string;
+  batchId?: string;
   reason?:
     | "user" // user hit cancel / navigated away
     | "network" // network error/timeout on client
@@ -330,6 +344,8 @@ export type AssetUploadAborted = {
   type: "asset_upload_aborted";
   userId: string;
   conversationId: string;
+  draftId?: string;
+  batchId?: string;
   attachmentId: string;
   status: Extract<AssetStatus, "FAILED">;
   error?: string; // eg, "aborted_by_user"
@@ -367,6 +383,8 @@ export type AssetUploadError = {
   type: "asset_upload_error";
   userId: string;
   conversationId: string;
+  draftId?: string;
+  batchId?: string;
   url?: string;
   attachmentId: string;
   success: false;
@@ -380,7 +398,8 @@ export type AssetUploadPrepare = {
   mime: string; // keep naming consistent with other events
   size: number;
   origin: Exclude<AssetOrigin, "REMOTE" | "GENERATED" | "IMPORTED" | "SCRAPED">;
-  messageId?: string;
+  draftId?: string;
+  batchId?: string;
 };
 
 // server -> client
@@ -388,6 +407,8 @@ export type AssetUploadInstructions = {
   type: "asset_upload_instructions";
   userId: string;
   conversationId: string;
+  draftId?: string;
+  batchId?: string;
   attachmentId: string;
   method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
   uploadUrl: string;
@@ -406,6 +427,8 @@ export type AssetUploadComplete = {
   key: string;
   attachmentId: string;
   versionId: string;
+  draftId?: string;
+  batchId?: string;
   publicUrl: string;
   etag?: string;
   success: boolean;
@@ -420,6 +443,8 @@ export type AssetUploadCompleteError = {
   key: string;
   userId: string;
   attachmentId: string;
+  draftId?: string;
+  batchId?: string;
   versionId?: string;
   publicUrl?: string;
   etag?: string;
@@ -429,7 +454,6 @@ export type AssetUploadCompleteError = {
   success: false;
   code?: number;
 };
-
 
 /**
  * Enhanced image generation request
