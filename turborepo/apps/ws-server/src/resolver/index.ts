@@ -21,7 +21,6 @@ import type {
 import { RedisChannels } from "@t3-chat-clone/redis-service";
 import { S3Storage } from "@t3-chat-clone/storage-s3";
 
-
 export class Resolver extends ModelService {
   constructor(
     public wsServer: WSServer,
@@ -51,6 +50,7 @@ export class Resolver extends ModelService {
       "asset_upload_complete",
       this.handleAssetUploadComplete.bind(this)
     );
+    this.wsServer.on("asset_attached", this.handleAssetAttached.bind(this));
   }
 
   public safeErrMsg(err: unknown) {
@@ -373,6 +373,9 @@ export class Resolver extends ModelService {
       case "asset_upload_complete":
         await this.handleAssetUploadComplete(event, ws, userId, userData);
         break;
+      case "asset_attached":
+        await this.handleAssetAttached(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -488,6 +491,138 @@ export class Resolver extends ModelService {
       return null;
     }
   }
+
+  public async handleAssetAttached(
+    event: EventTypeMap["asset_attached"],
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
+    if (
+      userData &&
+      "city" in userData &&
+      "country" in userData &&
+      "postalCode" in userData &&
+      "region" in userData
+    ) {
+      console.log(
+        `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
+      );
+    }
+    const { conversationId, filename, mime, size } = event;
+    const streamChannel = this.resolveChannel(conversationId, userId);
+    let attachmentId = "";
+    try {
+      const [cType, cTypePkg] = [
+        mime,
+        this.s3Service.fs.getMimeTypeForPath(filename)
+      ];
+
+      console.log({ cType, cTypePkg });
+      // Detect MIME type using fs utility
+      const mimeType = cType ?? cTypePkg;
+
+      const extension = this.contentTypeToExt(mime) ?? "bin";
+
+      const properFilename = filename.includes(".")
+        ? filename
+        : `${filename}.${extension}`;
+
+      // ✅ Use fs package for human-readable size logging
+      const sizeInfo = this.s3Service.fs.getSize(size ?? 0, "auto", {
+        decimals: 2,
+        includeUnits: true
+      });
+
+      console.log(
+        `[Asset Attached] User ${userId} pasting ${properFilename} (${sizeInfo})`
+      );
+
+      const presignedData = await this.s3Service.generatePresignedUpload(
+        {
+          userId,
+          extension: this.contentTypeToExt(mime),
+          conversationId,
+          filename: properFilename,
+          size,
+          contentType: mimeType,
+          origin: "UPLOAD"
+        },
+        3600 // 1 hour expiry
+      );
+      // Create attachment record in database
+      const attachment = await this.wsServer.prisma.createAttachment({
+        conversationId,
+        userId,
+        filename: filename,
+        region: this.region,
+        mime: mimeType,
+        ext: extension,
+        bucket: presignedData.bucket,
+        cdnUrl: presignedData.publicUrl,
+        sourceUrl: presignedData.uploadUrl,
+        key: presignedData.key,
+        size: BigInt(size),
+        origin: "UPLOAD",
+        status: "REQUESTED",
+        uploadMethod: "PRESIGNED"
+      });
+      console.log(
+        `[Asset Attached] Created attachment ${attachment.id} with key: ${presignedData.key}`
+      );
+
+      const uploadInstructions = {
+        type: "asset_upload_instructions", // Changed event type
+        conversationId,
+        attachmentId: attachment.id,
+        bucket: presignedData.bucket,
+        key: presignedData.key,
+        userId,
+        uploadUrl: presignedData.uploadUrl,
+        expiresIn: presignedData.expiresAt,
+        method: "PUT",
+        requiredHeaders: { "Content-Type": mimeType }
+      } satisfies EventTypeMap["asset_upload_instructions"];
+      // Send presigned URL to client for direct upload
+
+      ws.send(JSON.stringify(uploadInstructions));
+
+      // Notify other participants via Redis
+      void this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "asset_upload_progress",
+        {
+          type: "asset_upload_progress",
+          userId,
+          conversationId,
+          attachmentId: attachment.id,
+          progress: 0,
+          bytesUploaded: 0,
+          totalBytes: size ?? 0
+        } satisfies EventTypeMap["asset_upload_progress"]
+      );
+      // TODO implement polling REQUESTED -> UPLOADING -> READY via a listener--alternatively have the client send an event
+    } catch (error) {
+      console.error("[Asset Paste] Error:", error);
+
+      const uploadError = {
+        type: "asset_upload_error",
+        userId,
+        attachmentId,
+        conversationId: event.conversationId,
+        success: false,
+        error: this.safeErrMsg(error)
+      } satisfies EventTypeMap["asset_upload_error"];
+
+      ws.send(JSON.stringify(uploadError));
+
+      void this.wsServer.redis.publishTypedEvent(
+        streamChannel,
+        "asset_upload_error",
+        uploadError
+      );
+    }
+  }
   public async handleAssetPaste(
     event: EventTypeMap["asset_paste"],
     ws: WebSocket,
@@ -505,13 +640,10 @@ export class Resolver extends ModelService {
         `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
       );
     }
-    const streamChannel =
-      event.conversationId === "new-chat"
-        ? RedisChannels.user(userId)
-        : RedisChannels.conversationStream(event.conversationId);
+    const { conversationId, filename, mime, size } = event;
+    const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-      const { conversationId = "new-chat", filename, mime, size } = event;
       const [cType, cTypePkg] = [
         mime,
         this.s3Service.fs.getMimeTypeForPath(filename)
@@ -540,9 +672,7 @@ export class Resolver extends ModelService {
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
-          extension: this.s3Service.fs.mimeToExt(
-            mime as keyof typeof this.s3Service.fs.toExtObj
-          ),
+          extension: this.contentTypeToExt(mime),
           conversationId,
           filename: properFilename,
           size,
@@ -691,8 +821,6 @@ export class Resolver extends ModelService {
 
       // 2. Get file metadata with HEAD request
 
-
-
       const headResponse = await fetch(sourceUrl, { method: "HEAD" });
       if (!headResponse.ok) {
         throw new Error(`Failed to access URL: ${headResponse.status}`);
@@ -702,7 +830,7 @@ export class Resolver extends ModelService {
       const contentType =
         headResponse.headers.get("content-type") ?? "application/octet-stream";
 
-      const ext =this.contentTypeToExt(contentType) ?? "bin";
+      const ext = this.contentTypeToExt(contentType) ?? "bin";
 
       const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
@@ -966,7 +1094,11 @@ export class Resolver extends ModelService {
         type: "asset_ready",
         conversationId,
         attachmentId,
-        s3ObjectId,metadata: {filename: attachment.filename ?? "",uploadedAt: attachment.updatedAt.toISOString()},
+        s3ObjectId,
+        metadata: {
+          filename: attachment.filename ?? "",
+          uploadedAt: attachment.updatedAt.toISOString()
+        },
         mime: attachment.mime ?? "",
         origin: attachment.origin,
         size: bytesUploaded ?? 0,
@@ -1076,7 +1208,7 @@ export class Resolver extends ModelService {
 
     return { successful, failed };
   }
-  
+
   private isSupportedFileType(url: string): boolean {
     const extension = this.wsServer.prisma.fs.assetType(url);
     if (!extension) return false;
