@@ -12,25 +12,39 @@ import {
   ImageIcon,
   X
 } from "@t3-chat-clone/ui";
+import type { ImageSpecs } from "@t3-chat-clone/types";
 
 interface AttachmentPreviewProps {
   attachments: AttachmentPreview[];
   onRemove: (id: string) => void;
   className?: string;
+  // Optional: if provided, component won't run useAssetMetadata
+  thumbnails?: Record<string, string>;
+  metadata?: Record<string, ImageSpecs>;
+  getStatusText?: (attachment: AttachmentPreview) => string;
+  getStatusColor?: (status: AttachmentPreview["status"]) => string;
+  formatFileSize?: (bytes: number) => string;
 }
 
 export function AttachmentPreviewComponent({
   attachments,
   onRemove,
-  className
+  className,
+  thumbnails: externalThumbnails,
+  metadata: externalMetadata,
+  getStatusText: externalGetStatusText,
+  getStatusColor: externalGetStatusColor,
+  formatFileSize: externalFormatFileSize
 }: AttachmentPreviewProps) {
-  const {
-    thumbnails,
-    metadata,
-    getStatusText,
-    getStatusColor,
-    formatFileSize
-  } = useAssetMetadata({ attachments });
+  // Always call hook (React rules) but only use if external props not provided
+  const internalData = useAssetMetadata({ attachments });
+  
+  // Use external props if provided, otherwise fall back to hook data
+  const thumbnails = externalThumbnails ?? internalData.thumbnails;
+  const metadata = externalMetadata ?? internalData.metadata;
+  const getStatusText = externalGetStatusText ?? internalData.getStatusText;
+  const getStatusColor = externalGetStatusColor ?? internalData.getStatusColor;
+  const formatFileSize = externalFormatFileSize ?? internalData.formatFileSize;
 
   if (attachments.length === 0) return null;
 
