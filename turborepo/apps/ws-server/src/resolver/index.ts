@@ -149,7 +149,7 @@ export class Resolver extends ModelService {
       isDefaultProvider = event.isDefaultProvider,
       prompt = event.prompt,
       conversationIdInitial = event.conversationId;
-
+    // TODO handle batchId (string | undefined) for parseDraftId(draftId)->[userId,conversationId,batchId,ordinal] asset coupling on create/update
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
       conversationId: conversationIdInitial,
@@ -509,7 +509,18 @@ export class Resolver extends ModelService {
         `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
       );
     }
-    const { conversationId, filename, mime, size } = event;
+    const {
+      conversationId,
+      filename,
+      mime,
+      size,
+      batchId,
+      draftId,
+      // TODO implement this handling
+      height: _height,
+      width: _width,
+      metadata: _metadata
+    } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
@@ -541,20 +552,22 @@ export class Resolver extends ModelService {
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
-          extension: this.contentTypeToExt(mime),
+          batchId,
+          draftId,
           conversationId,
           filename: properFilename,
-          size,
           contentType: mimeType,
           origin: "UPLOAD"
         },
         3600 // 1 hour expiry
       );
       // Create attachment record in database
+
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
-        filename: filename,
+        filename: properFilename,
+        draftId,
         region: this.region,
         mime: mimeType,
         ext: extension,
@@ -576,12 +589,14 @@ export class Resolver extends ModelService {
         conversationId,
         attachmentId: attachment.id,
         bucket: presignedData.bucket,
+        batchId: presignedData.batchId,
+        draftId: presignedData.draftId,
         key: presignedData.key,
         userId,
         uploadUrl: presignedData.uploadUrl,
         expiresIn: presignedData.expiresAt,
         method: "PUT",
-        requiredHeaders: { "Content-Type": mimeType }
+        requiredHeaders: presignedData.requiredHeaders
       } satisfies EventTypeMap["asset_upload_instructions"];
       // Send presigned URL to client for direct upload
 
@@ -595,6 +610,8 @@ export class Resolver extends ModelService {
           type: "asset_upload_progress",
           userId,
           conversationId,
+          batchId,
+          draftId,
           attachmentId: attachment.id,
           progress: 0,
           bytesUploaded: 0,
@@ -609,6 +626,8 @@ export class Resolver extends ModelService {
         type: "asset_upload_error",
         userId,
         attachmentId,
+        batchId,
+        draftId,
         conversationId: event.conversationId,
         success: false,
         error: this.safeErrMsg(error)
@@ -640,7 +659,18 @@ export class Resolver extends ModelService {
         `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
       );
     }
-    const { conversationId, filename, mime, size } = event;
+    const {
+      conversationId,
+      filename,
+      mime,
+      size,
+      batchId,
+      draftId,
+      // TODO address integrating these fields
+      height: _height,
+      width: _width,
+      metadata: _metadata
+    } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
@@ -650,10 +680,10 @@ export class Resolver extends ModelService {
       ];
 
       console.log({ cType, cTypePkg });
-      // Detect MIME type using fs utility
+
       const mimeType = cType ?? cTypePkg;
 
-      const extension = this.s3Service.fs.assetType(filename) ?? "bin";
+      const extension = this.contentTypeToExt(mimeType) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
@@ -672,10 +702,10 @@ export class Resolver extends ModelService {
       const presignedData = await this.s3Service.generatePresignedUpload(
         {
           userId,
-          extension: this.contentTypeToExt(mime),
+          batchId,
+          draftId,
           conversationId,
           filename: properFilename,
-          size,
           contentType: mimeType,
           origin: "PASTED"
         },
@@ -685,10 +715,11 @@ export class Resolver extends ModelService {
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
-        filename: filename,
+        filename: properFilename,
         region: this.region,
         mime: mimeType,
         ext: extension,
+        draftId,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
@@ -707,12 +738,14 @@ export class Resolver extends ModelService {
         conversationId,
         attachmentId: attachment.id,
         bucket: presignedData.bucket,
+        batchId,
+        draftId,
         key: presignedData.key,
         userId,
         uploadUrl: presignedData.uploadUrl,
         expiresIn: presignedData.expiresAt,
         method: "PUT",
-        requiredHeaders: { "Content-Type": mimeType }
+        requiredHeaders: presignedData.requiredHeaders
       } satisfies EventTypeMap["asset_upload_instructions"];
       // Send presigned URL to client for direct upload
 
@@ -725,6 +758,8 @@ export class Resolver extends ModelService {
         {
           type: "asset_upload_progress",
           userId,
+          batchId,
+          draftId,
           conversationId,
           attachmentId: attachment.id,
           progress: 0,
@@ -740,6 +775,8 @@ export class Resolver extends ModelService {
         type: "asset_upload_error",
         userId,
         attachmentId,
+        batchId,
+        draftId,
         conversationId: event.conversationId,
         success: false,
         error: this.safeErrMsg(error)
@@ -809,7 +846,7 @@ export class Resolver extends ModelService {
     userData?: UserData
   ): Promise<void> {
     const _userData = userData;
-    const { conversationId = "new-chat", sourceUrl, messageId } = event;
+    const { conversationId = "new-chat", sourceUrl } = event;
 
     console.log(`[Asset Fetch] User ${userId} requesting: ${sourceUrl}`);
 
@@ -917,7 +954,6 @@ export class Resolver extends ModelService {
       const s3Result = await this.s3Service.uploadDirect(passThrough, {
         userId,
         conversationId,
-        messageId,
         filename: sanitizedFilename,
         contentType,
         size: fileSizeBytes,
@@ -928,7 +964,6 @@ export class Resolver extends ModelService {
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
-        messageId,
         filename: sanitizedFilename,
         region: this.region,
         mime: contentType,
@@ -1032,13 +1067,15 @@ export class Resolver extends ModelService {
       attachmentId,
       publicUrl,
       bucket,
+      batchId,
+      draftId,
       key,
       duration,
       bytesUploaded,
       versionId,
       etag
     } = event;
-
+    const redisChannel = this.resolveChannel(conversationId, userId);
     try {
       // ✅ HEAD request to S3 to get full metadata
       const {
@@ -1050,6 +1087,7 @@ export class Resolver extends ModelService {
         contentType,
         etag,
         expires,
+        s3ObjectId: _fromFinalize,
         extension,
         key: finalKey,
         lastModified,
@@ -1067,6 +1105,7 @@ export class Resolver extends ModelService {
         checksumAlgo: checksum?.algo,
         checksumSha256: checksum?.value,
         contentDisposition,
+        draftId,
         expiresAt: expires,
         s3LastModified: lastModified ? new Date(lastModified) : undefined,
         storageClass,
@@ -1095,6 +1134,8 @@ export class Resolver extends ModelService {
         conversationId,
         attachmentId,
         s3ObjectId,
+        batchId,
+        draftId,
         metadata: {
           filename: attachment.filename ?? "",
           uploadedAt: attachment.updatedAt.toISOString()
@@ -1114,13 +1155,9 @@ export class Resolver extends ModelService {
 
       ws.send(JSON.stringify(assetReady));
 
-      void this.wsServer.redis.publishTypedEvent(
-        this.resolveChannel(conversationId, userId),
-        "asset_ready",
-        {
-          ...assetReady
-        }
-      );
+      void this.wsServer.redis.publishTypedEvent(redisChannel, "asset_ready", {
+        ...assetReady
+      });
     } catch (error) {
       console.error("[Asset Upload Complete] Error:", error);
 
@@ -1128,6 +1165,8 @@ export class Resolver extends ModelService {
         type: "asset_upload_complete_error",
         userId,
         bucket,
+        batchId,
+        draftId,
         attachmentId,
         key,
         publicUrl: publicUrl.length > 1 ? publicUrl : undefined,
@@ -1143,7 +1182,7 @@ export class Resolver extends ModelService {
       ws.send(JSON.stringify(uploadError));
 
       void this.wsServer.redis.publishTypedEvent(
-        this.resolveChannel(conversationId, userId),
+        redisChannel,
         "asset_upload_complete_error",
         uploadError
       );
@@ -1156,7 +1195,6 @@ export class Resolver extends ModelService {
   public async handleBatchAssetFetch(
     urls: string[],
     conversationId: string,
-    messageId: string,
     userId: string,
     ws: WebSocket,
     userData?: UserData
@@ -1178,8 +1216,7 @@ export class Resolver extends ModelService {
             {
               type: "asset_fetch_request",
               conversationId,
-              sourceUrl: url,
-              messageId
+              sourceUrl: url
             },
             ws,
             userId,

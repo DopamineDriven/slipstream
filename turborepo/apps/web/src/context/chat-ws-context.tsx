@@ -78,6 +78,7 @@ export function ChatWebSocketProvider({
 
   // Register this client with the manager
   useEffect(() => {
+    if (!user?.email) return;
     const wsManagerInner = wsManager.current;
     const key = user?.email ?? "no-user@gmail.com";
     wsManagerInner.setClient(key, client);

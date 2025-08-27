@@ -40,7 +40,11 @@ export type RTC<
 > = Rm<T, K> & {
   [Q in K]?: T[Q];
 };
-export type IsExact<T, U> = [T] extends [U] ? ([U] extends [T] ? true : false) : false;
+export type IsExact<T, U> = [T] extends [U]
+  ? [U] extends [T]
+    ? true
+    : false
+  : false;
 /**
  * To Conditionally never
  */
@@ -159,3 +163,38 @@ export type RequireNested<
   : Path extends keyof T
     ? Rm<T, Path> & Record<Path, Required<T>[Path]>
     : T;
+
+
+export function createDraftId(
+  userId: string,
+  conversationId: string,
+  batchId: string,
+  ordinal: number
+) {
+  if (!Number.isInteger(ordinal) || ordinal < 0) {
+    throw new Error("ordinal must be a non-negative integer");
+  }
+  if (
+    ![userId, conversationId, batchId].every(s => /^[A-Za-z0-9_-]+$/.test(s))
+  ) {
+    throw new Error("ids must be [A-Za-z0-9_-]+");
+  }
+  return `${userId}~${conversationId}~${batchId}~${ordinal}` as const;
+}
+/**
+ * returns `[string, string, string, number]`
+ *
+ * corresponds to `[userId, conversationId, batchId, ordinal (asset count)]`
+ *
+ * which is the anatomy of an asset draftId
+ */
+export function parseDraftId(draftId: string) {
+  if (/^(?:[A-Za-z0-9_-]+~){3}(?:0|[1-9][0-9]*)$/.test(draftId) === false) {
+    throw new Error(`invalid draftId ${draftId}`);
+  }
+  const toArr = draftId.split("~");
+
+  return toArr.map((v, o) =>
+    o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
+  ) as [string, string, string, number];
+}

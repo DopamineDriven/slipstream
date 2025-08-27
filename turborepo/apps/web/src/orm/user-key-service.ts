@@ -1,8 +1,11 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
-import type { ClientWorkupProps, RecordCountsProps } from "@/types/shared";
-import type { UserKey } from "@prisma/client";
+import type { UserKey, $Enums } from "@prisma/client";
 import { ErrorHelperService } from "@/orm/err-helper";
-import type { Providers } from "@t3-chat-clone/types";
+import type {
+  ClientContextWorkupProps,
+  Provider,
+  RecordCountsProps
+} from "@t3-chat-clone/types";
 
 export class PrismaUserKeyService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
@@ -11,15 +14,15 @@ export class PrismaUserKeyService extends ErrorHelperService {
   public formatProps(props: RecordCountsProps) {
     const isDefault = Object.fromEntries(
       Object.entries(props.isDefault).map(([t, o]) => {
-        return [t as Providers, o === 0 ? false : true] as const;
+        return [t as Provider, o === 0 ? false : true] as const;
       })
     );
     const isSet = Object.fromEntries(
       Object.entries(props.isSet).map(([t, o]) => {
-        return [t as Providers, o === 0 ? false : true] as const;
+        return [t as Provider, o === 0 ? false : true] as const;
       })
     );
-    return { isSet, isDefault } as ClientWorkupProps;
+    return { isSet, isDefault } as ClientContextWorkupProps;
   }
   public handleExistingKeysForClient(props: UserKey[]) {
     const initialProps = {
@@ -41,17 +44,26 @@ export class PrismaUserKeyService extends ErrorHelperService {
       }
     };
     props.forEach(function (res) {
-      const provider = res.provider.toLowerCase() as Providers;
+      const provider = res.provider.toLowerCase() as Lowercase<$Enums.Provider>;
       const isDefault = res.isDefault;
       initialProps.isSet[provider] += 1;
       initialProps.isDefault[provider] += isDefault ? 1 : 0;
     });
-    return this.formatProps(initialProps);
+    return this.formatProps(initialProps) satisfies ClientContextWorkupProps;
+  }
+
+  public apiKeysCacheTag(userId: string){
+    return [`user_api_keys_${userId}`] as const;
   }
 
   public async getClientApiKeys(userId: string) {
     const data = await this.prismaClient.userKey.findMany({
-      where: { userId }
+      where: { userId },
+      cacheStrategy: {
+        ttl: 60,
+        swr: 300,
+        tags: this.apiKeysCacheTag(userId)
+      }
     });
     return this.handleExistingKeysForClient(data);
   }

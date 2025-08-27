@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import "@t3-chat-clone/ui/globals.css";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Script from "next/script";
 import { AIChatProvider } from "@/context/ai-chat-context";
@@ -12,10 +13,10 @@ import { ApiKeysProvider } from "@/context/api-keys-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { CookieProvider } from "@/context/cookie-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
+import { PathnameProvider } from "@/context/pathname-context";
 import { auth } from "@/lib/auth";
-import { prismaClient } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/site-url";
-import { ormHandler } from "@/orm";
+import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
 import { SessionProvider } from "next-auth/react";
 import "./katex.css";
@@ -97,8 +98,6 @@ export const metadata: Metadata = {
   }
 };
 
-const { prismaApiKeyService } = ormHandler(prismaClient);
-
 export default async function RootLayout({
   children
 }: Readonly<{
@@ -107,9 +106,6 @@ export default async function RootLayout({
   const session = await auth();
   if (!session?.user?.id) redirect("/api/auth/signin");
 
-  const apiKeysData = await prismaApiKeyService.getClientApiKeys(
-    session.user.id
-  );
   return (
     <html suppressHydrationWarning lang="en">
       <head>
@@ -132,21 +128,26 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "bg-background font-basis m-0 w-[100dvw] h-[100dvh] overflow-hidden p-0 antialiased",
+          "bg-background font-basis m-0 h-[100dvh] w-[100dvw] overflow-hidden p-0 antialiased",
           inter.variable
         )}>
         <CookieProvider>
           <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
             <SessionProvider session={session}>
-              <ChatWebSocketProvider user={session?.user}>
-                <ModelSelectionProvider>
-                  <ApiKeysProvider initialApiKeys={apiKeysData}>
-                    <AIChatProvider userId={session?.user?.id}>
-                      {children}
-                    </AIChatProvider>
-                  </ApiKeysProvider>
-                </ModelSelectionProvider>
-              </ChatWebSocketProvider>
+              <PathnameProvider>
+                <ChatWebSocketProvider user={session?.user}>
+                  <ModelSelectionProvider>
+                    <ApiKeysProvider userId={session?.user?.id}>
+                      <AIChatProvider userId={session?.user?.id}>
+                        <Suspense fallback={null}>
+                          <PathnameSync />
+                        </Suspense>
+                        {children}
+                      </AIChatProvider>
+                    </ApiKeysProvider>
+                  </ModelSelectionProvider>
+                </ChatWebSocketProvider>
+              </PathnameProvider>
             </SessionProvider>
           </ThemeProvider>
         </CookieProvider>

@@ -69,21 +69,34 @@ export interface PresignedUploadResponse {
   publicUrl: string;
   key: string;
   bucket: string;
-  fields?: Record<string, string>;
+  batchId: string;
+  draftId: string;
+  conversationId: string;
+  requiredHeaders: { "Content-Type": string } & { [record: string]: string };
+
   expiresAt: number; // epoch ms
   s3Uri: string; // s3://bucket/key (no version yet per CLAUDE.md)
 }
 
 export interface AssetMetadata {
   userId: string;
-  conversationId?: string;
-  messageId?: string;
+  conversationId: string; // "new-chat" is fine
+  batchId: string;
+  draftId: string; // <= required for correlation
   filename: string;
   contentType: string;
-  extension?: string;
-  size?: number;
   origin: AssetOriginType; // Using literal union type
 }
+
+
+export type PresignedDownloadOptions = {
+  versionId?: string | null;
+  expiresIn?: number;                     // seconds (default 3600)
+  asAttachment?: boolean;                 // true => download; false => inline
+  filename?: string;                      // suggest a name to the browser
+  contentTypeOverride?: string;           // e.g., "image/png" if you want to force it
+  cacheControl?: string;                  // e.g., "private, max-age=60"
+};
 
 export interface PresignMeta {
   userId: string;
@@ -104,7 +117,7 @@ export type PresignResult = {
    */
   s3Uri: string;
   publicUrl: string;
-  requiredHeaders: Record<string, string>;
+  requiredHeaders: { "Content-Type": string } & { [record: string]: string };
   expiresAt: number; // epoch ms
 };
 

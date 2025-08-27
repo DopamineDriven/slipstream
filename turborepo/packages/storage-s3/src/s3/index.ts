@@ -6,6 +6,7 @@ import type {
   CopyOptions,
   DeleteResult,
   FinalizeResult,
+  PresignedDownloadOptions,
   PresignedUploadResponse,
   PresignMeta,
   PresignResult,
@@ -13,6 +14,7 @@ import type {
   UploadOptions,
   UploadResult
 } from "@/types/index.ts";
+import type { GetObjectCommandInput } from "@aws-sdk/client-s3";
 import { S3Utils } from "@/utils/index.ts";
 import {
   CopyObjectCommand,
@@ -31,19 +33,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Fs } from "@d0paminedriven/fs";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 import type { CTR, XOR } from "@t3-chat-clone/types";
-
-const BUCKET_MAP = {
-  GENERATED: "pyGenAssets",
-  UPLOAD: "wsAssets",
-  REMOTE: "wsAssets",
-  PASTED: "wsAssets",
-  SCREENSHOT: "wsAssets",
-  IMPORTED: "wsAssets",
-  SCRAPED: "wsAssets"
-} as const satisfies Record<
-  PresignMeta["origin"],
-  keyof StorageConfig["buckets"]
->;
 
 export class S3Storage extends S3Utils {
   // Cache for frequently used commands (optional optimization)
@@ -92,7 +81,7 @@ export class S3Storage extends S3Utils {
     });
   }
   private selectBucket(origin: PresignMeta["origin"]) {
-    const bucketKey = BUCKET_MAP[origin];
+    const bucketKey = this.BUCKET_MAP[origin];
     return this.cfg.buckets[bucketKey];
   }
   // TODO
@@ -102,41 +91,60 @@ export class S3Storage extends S3Utils {
 
     return u;
   }
-  public async generatePresignedUpload(
-    { ...metadata }: AssetMetadata,
-    expiresIn = 3600
-  ) {
-    const key = this.generateKey(metadata);
-    const bucket = this.selectBucket(metadata.origin);
-    const fields = {
-      userId: metadata.userId,
-      messageId: metadata.messageId ?? "",
-      filename: metadata.filename,
-      origin: metadata.origin
+
+  public BUCKET_MAP = {
+    GENERATED: "pyGenAssets",
+    UPLOAD: "wsAssets",
+    REMOTE: "wsAssets",
+    PASTED: "wsAssets",
+    SCREENSHOT: "wsAssets",
+    IMPORTED: "wsAssets",
+    SCRAPED: "wsAssets"
+  } as const satisfies Record<
+    PresignMeta["origin"],
+    keyof StorageConfig["buckets"]
+  >;
+  public async generatePresignedUpload(input: AssetMetadata, expiresIn = 3600) {
+    const key = this.generateKey(input);
+    const bucket = this.selectBucket(input.origin);
+
+    // keep these tiny — S3 metadata has limits (~2KB total)
+    // ${envPrefix}/u/${userId}/${YYYYMM}/${ULID()}.${ext}
+    const meta = {
+      u: input.userId, // short keys keep headroom
+      conv: input.conversationId,
+      batch: input.batchId,
+      draft: input.draftId,
+      origin: input.origin,
+      filename: input.filename // optional; useful in audits
     };
+
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
-      ContentType: metadata.contentType,
-      Metadata: {
-        ...fields
-      }
+      ContentType: input.contentType, // enforce via signature
+      // ContentDisposition: `inline; filename="${sanitize(input.filename)}"`, // optional
+      Metadata: meta
+      // Optional tags (good for lifecycle/routing); SDK will sign x-amz-tagging
+      // Tagging: `app=t3&state=staged&batch=${encodeURIComponent(input.batchId)}`
     });
 
     const uploadUrl = await getSignedUrl(this.client, command, { expiresIn });
-    const expiresAt = Date.now() + expiresIn * 1000; // Convert seconds to ms
-
-    const publicUrl = this.publicUrl(bucket, key);
+    const expiresAt = Date.now() + expiresIn * 1000;
 
     return {
       uploadUrl,
-      publicUrl,
+      publicUrl: this.publicUrl(bucket, key),
       key,
       bucket,
-      fields,
+      // echo back what client/server both need to correlate
+      draftId: input.draftId,
+      batchId: input.batchId,
+      conversationId: input.conversationId,
+      requiredHeaders: { "Content-Type": input.contentType }, // client MUST send this
       expiresAt,
-      s3Uri: `s3://${bucket}/${key}` // NO version fragment per CLAUDE.md
-    } satisfies PresignedUploadResponse;
+      s3Uri: `s3://${bucket}/${key}`
+    } as const satisfies PresignedUploadResponse;
   }
   public static getInstance(config: StorageConfig, fs: Fs) {
     if (this.#instance === null) {
@@ -174,7 +182,7 @@ export class S3Storage extends S3Utils {
     meta: PresignMeta & { conversationId?: string },
     options?: UploadOptions
   ): Promise<UploadResult> {
-    const bucket = this.cfg.buckets[BUCKET_MAP[meta.origin]];
+    const bucket = this.cfg.buckets[this.BUCKET_MAP[meta.origin]];
     const key = this.generateKey(meta);
     let uploadPromise: Promise<UploadResult> | undefined;
     // Dedup concurrent uploads of same content
@@ -398,7 +406,7 @@ export class S3Storage extends S3Utils {
     meta: PresignMeta,
     expiresIn = this.cfg.defaultPresignExpiry
   ) {
-    const bucket = this.cfg.buckets[BUCKET_MAP[meta.origin]];
+    const bucket = this.cfg.buckets[this.BUCKET_MAP[meta.origin]];
     const key = this.generateKey(meta);
     const cmd = new PutObjectCommand({
       Bucket: bucket,
@@ -612,15 +620,7 @@ export class S3Storage extends S3Utils {
     bucket: string,
     key: string,
     options?: { versionId?: string; range?: string }
-  ): Promise<{
-    body: Readable;
-    objectId: string;
-    metadata: Record<string, string>;
-    contentType?: string;
-    contentLength?: number;
-    extension?: string;
-    etag?: string;
-  }> {
+  ) {
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -746,30 +746,58 @@ export class S3Storage extends S3Utils {
       return undefined;
     }
   }
-
+  public buildContentDisposition(
+    filename: string | undefined,
+    asAttachment = false
+  ) {
+    if (!filename) return undefined;
+    // RFC 5987 + quoted fallback
+    const encoded = encodeURIComponent(filename);
+    const type = asAttachment ? "attachment" : "inline";
+    // Use both filename and filename* for widest browser support
+    return `${type}; filename="${filename.replace(/"/g, '\\"')}"; filename*=UTF-8''${encoded}`;
+  }
   public async generatePresignedDownload(
     bucket: string,
     key: string,
-    expiresIn = 3600,
-    versionId?: string
+    opts: PresignedDownloadOptions = {}
   ) {
-    const command = new GetObjectCommand({
+    const {
+      versionId,
+      expiresIn = 3600,
+      asAttachment = false,
+      filename,
+      contentTypeOverride,
+      cacheControl
+    } = opts;
+
+    const input = {
       Bucket: bucket,
       Key: key,
-      VersionId: versionId
-    });
+      VersionId: versionId ?? undefined,
+      // Response header overrides (become query params on the signed URL)
+      ResponseContentDisposition: this.buildContentDisposition(
+        filename,
+        asAttachment
+      ),
+      ResponseContentType: contentTypeOverride,
+      ResponseCacheControl: cacheControl
+      // You can also set ResponseContentLanguage / ResponseExpires if you need them
+    } satisfies GetObjectCommandInput;
 
+    const command = new GetObjectCommand(input);
     const downloadUrl = await getSignedUrl(this.client, command, { expiresIn });
-    const expiresAt = Date.now() + expiresIn * 1000;
-    const s3ObjectId = `s3://${bucket}/${key}#${versionId ?? "nov"}` as const;
+    const expiresAt = new Date(Date.now() + expiresIn * 1000);
+
+    const s3Uri = `s3://${bucket}/${key}${versionId ? `#${versionId}` : ""}`;
 
     return {
       downloadUrl,
-      s3ObjectId,
+      s3Uri,
       expiresAt,
       bucket,
       key,
-      versionId: versionId ?? "nov"
-    };
+      versionId: versionId ?? undefined
+    } as const;
   }
 }

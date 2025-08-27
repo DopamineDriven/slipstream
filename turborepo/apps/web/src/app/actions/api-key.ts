@@ -26,12 +26,15 @@ export async function upsertApiKey(formdata: FormData) {
     return {
       success: false,
       id: "input api key is not of type string"
-    };
+    } as const;
   }
   const validator = new KeyValidator(getKey, getProvider as Providers);
+
   const { isValid, message } = await validator.validateProvider();
+
   if (getProvider && typeof getProvider === "string" && userId && isValid) {
     const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
+
     const { authTag, data, iv } = await cryptService.encryptText(getKey);
     const createUserKey = await prismaClient.userKey.upsert({
       create: {
@@ -55,7 +58,9 @@ export async function upsertApiKey(formdata: FormData) {
         }
       }
     });
-
+    void prismaClient.$accelerate.invalidate({
+      tags: [`user_api_keys_${userId}`] as const
+    });
     revalidatePath("/(settings)/settings");
     return { success: true, id: createUserKey.id } as const;
   } else return { success: false, id: message } as const;

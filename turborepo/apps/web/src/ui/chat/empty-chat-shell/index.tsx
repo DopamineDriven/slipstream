@@ -1,13 +1,11 @@
 // src/ui/chat/empty-chat-shell/index.tsx
 "use client";
 
-import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
-import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useModelSelection } from "@/context/model-selection-context";
-import { useAssetMetadata } from "@/hooks/use-asset-metadata";
+import { useAssets } from "@/hooks/use-assets";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/chat/attachment-popover";
@@ -16,10 +14,6 @@ import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialo
 import { Logo } from "@/ui/logo";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
-import type {
-  AssetAttachedToMessage,
-  AssetPasteEvent
-} from "@t3-chat-clone/types";
 import {
   Button,
   Card,
@@ -71,74 +65,16 @@ export function ChatEmptyState() {
   // Local state for the input
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [attachments, setAttachments] = useState<AttachmentPreview[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const {
-    attachments: attchments,
-    formatFileSize,
-    getStatusColor,
-    getStatusText,
-    metadata,
-    size,
-    thumbnails
-  } = useAssetMetadata({ attachments });
-  // const chatws =useChatWebSocketContext();
-  // Mock WebSocket send function
-  const mockWebSocketSend = useCallback((event: any) => {
-    // chatws.client.send("asset_attached", {conversationId: "new-chat" })
-    console.log("Mock WebSocket Send (Paste):", event);
-    // In real implementation, this would send to your WebSocket connection
-  }, []);
-  const handleRemove = useCallback((id: string) => {
-    setAttachments((prev) => prev.filter((att) => att.id !== id))
-  }, [])
-  const createAttachmentWithDimensions = useCallback(
-    async (file: File, filename: string): Promise<AttachmentPreview> => {
-      const baseAttachment: AttachmentPreview = {
-        id: `paste-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        file,
-        filename,
-        mime: file.type,
-        size: file.size,
-        status: "pending"
-      };
-
-      // Extract dimensions for images
-      if (file.type.startsWith("image/")) {
-        try {
-          const dimensions = await new Promise<{
-            width: number;
-            height: number;
-          }>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-              resolve({
-                width: img.naturalWidth,
-                height: img.naturalHeight
-              });
-            };
-            img.onerror = reject;
-            img.src = URL.createObjectURL(file);
-          });
-
-          return {
-            ...baseAttachment,
-            width: dimensions.width,
-            height: dimensions.height
-          };
-        } catch (error) {
-          console.warn("Failed to extract image dimensions:", error);
-        }
-      }
-
-      return baseAttachment;
-    },
-    []
-  );
+  // Use the new assets hook for all attachment management
+  const assets = useAssets({
+    max: 10,
+    allowedTypes: ["image/*", "application/pdf"]
+  });
 
   useEffect(() => {
     const ta = textareaRef.current;
@@ -265,9 +201,17 @@ export function ChatEmptyState() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="w-full max-w-2xl">
-        {attachments.length > 0 && (
+        {assets.attachments.length > 0 && (
           <div className="mb-1.5">
-            <AttachmentPreviewComponent attachments={attachments} onRemove={handleRemove} />
+            <AttachmentPreviewComponent
+              attachments={assets.attachments}
+              onRemove={assets.remove}
+              thumbnails={assets.thumbnails}
+              metadata={assets.metadata}
+              getStatusText={assets.getStatusText}
+              getStatusColor={assets.getStatusColor}
+              formatFileSize={assets.formatFileSize}
+            />
           </div>
         )}
         <form onSubmit={handleSubmit}>
@@ -277,6 +221,7 @@ export function ChatEmptyState() {
                 ref={textareaRef}
                 value={message}
                 onChange={e => setMessage(e.target.value)}
+                onPaste={assets.handlePaste}
                 onKeyDown={e => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
