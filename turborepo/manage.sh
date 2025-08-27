@@ -161,6 +161,22 @@ build_by_pattern() {
     done < <(discover_packages)
 }
 
+run_by_pattern() {
+    local pattern="$1"
+    log "running packages matching pattern: $pattern"
+
+    # Discover packages and filter by pattern
+    while IFS= read -r package_dir; do
+        local package_name=$(get_package_name "$package_dir")
+
+        if [[ -n "$package_name" ]] && [[ "$package_name" == *"$pattern"* ]]; then
+            log "spinning up $package_name"
+            pnpm turbo dev --filter="$package_name"
+        fi
+    done < <(discover_packages)
+}
+
+
 list_packages() {
     log "Discovering packages in monorepo:"
     echo ""
@@ -235,7 +251,7 @@ main() {
         build:targeted)
             build_targeted
             ;;
-        clean)
+        clean|--clean|-c)
             if [[ -n "${2:-}" ]]; then
                 clean_by_pattern "$2"
             else
@@ -243,11 +259,19 @@ main() {
                 exit 1
             fi
             ;;
-        build)
+        build|--build|-b)
             if [[ -n "${2:-}" ]]; then
                 build_by_pattern "$2"
             else
                 error "Please provide a pattern to build (e.g., ./manage.sh build encryption)"
+                exit 1
+            fi
+            ;;
+        run|--run|-r)
+            if [[ -n "${2:-}" ]]; then
+                run_by_pattern "$2"
+            else
+                error "Please provide a pattern to run (e.g., ./manage.sh run ws-server)"
                 exit 1
             fi
             ;;

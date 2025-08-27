@@ -47,57 +47,188 @@ export class ImgMetadataExtractor {
     app1Pos: number,
     app1Size: number
   ): { orientation: number | null; dateTimeOriginal: string | null } {
-    const exifHeader = buffer.toString("ascii", app1Pos + 2, app1Pos + 8);
-    if (exifHeader !== "Exif\0\0")
+    // APP1 segment structure:
+    // - 2 bytes: 0xFF 0xE1 (marker - already read)
+    // - 2 bytes: segment size (includes these 2 bytes but not marker)
+    // - 6 bytes: "Exif\0\0" identifier
+    // - Rest: TIFF data structure
+
+    const segmentStart = app1Pos + 4; // Skip marker (2) and size (2)
+    const segmentEnd = app1Pos + 2 + app1Size; // Marker not included in size
+
+    // Minimum viable EXIF: 6 (header) + 8 (TIFF header) + 2 (IFD count) = 16 bytes
+    if (segmentEnd - segmentStart < 16 || segmentEnd > buffer.length) {
       return { orientation: null, dateTimeOriginal: null };
+    }
 
-    let tiffPos = app1Pos + 8;
+    // Verify EXIF header
+    const headerEnd = Math.min(segmentStart + 6, segmentEnd, buffer.length);
+    if (headerEnd - segmentStart < 6) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
 
-    const app1End = app1Pos + app1Size;
-    if (tiffPos + 10 > app1End)
-      return { orientation: null, dateTimeOriginal: null }; // Minimum for TIFF header
-    const byteOrder = buffer.toString("ascii", tiffPos, tiffPos + 2);
+    const exifHeader = buffer.toString("ascii", segmentStart, headerEnd);
+    if (exifHeader !== "Exif\0\0") {
+      return { orientation: null, dateTimeOriginal: null };
+    }
+
+    // TIFF data starts after EXIF header
+    const tiffStart = segmentStart + 6;
+    const tiffEnd = segmentEnd;
+
+    // Need at least 8 bytes for TIFF header
+    if (tiffEnd - tiffStart < 8) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
+
+    // Read byte order (2 bytes)
+    const byteOrder = buffer.toString("ascii", tiffStart, tiffStart + 2);
     const littleEndian = byteOrder === "II";
-    const readUInt16 = littleEndian
-      ? buffer.readUInt16LE.bind(buffer)
-      : buffer.readUInt16BE.bind(buffer);
-    const readUInt32 = littleEndian
-      ? buffer.readUInt32LE.bind(buffer)
-      : buffer.readUInt32BE.bind(buffer);
+    const bigEndian = byteOrder === "MM";
 
-    if (readUInt16(tiffPos + 2) !== 0x2a)
-      return { orientation: null, dateTimeOriginal: null }; // Not TIFF
-    const ifdOffset = readUInt32(tiffPos + 4);
-    tiffPos += ifdOffset;
+    if (!littleEndian && !bigEndian) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
 
-    const numEntries = readUInt16(tiffPos);
-    tiffPos += 2;
+    // Create bounded read functions
+    const readUInt16 = (pos: number): number | null => {
+      if (pos < 0 || pos + 2 > tiffEnd || pos + 2 > buffer.length) return null;
+      return littleEndian ? buffer.readUInt16LE(pos) : buffer.readUInt16BE(pos);
+    };
+
+    const readUInt32 = (pos: number): number | null => {
+      if (pos < 0 || pos + 4 > tiffEnd || pos + 4 > buffer.length) return null;
+      return littleEndian ? buffer.readUInt32LE(pos) : buffer.readUInt32BE(pos);
+    };
+
+    // Verify TIFF magic number (0x002A)
+    const magic = readUInt16(tiffStart + 2);
+    if (magic !== 0x002a) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
+
+    // Get IFD0 offset (relative to TIFF start)
+    const ifd0Offset = readUInt32(tiffStart + 4);
+    if (ifd0Offset === null || ifd0Offset < 8) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
+
+    // IFD0 position (absolute in buffer)
+    const ifd0Pos = tiffStart + ifd0Offset;
+
+    // Need at least 2 bytes for entry count
+    if (ifd0Pos + 2 > tiffEnd) {
+      return { orientation: null, dateTimeOriginal: null };
+    }
+
+    const numEntries = readUInt16(ifd0Pos);
+    if (numEntries === null || numEntries === 0 || numEntries > 500) {
+      // 500 is a sanity check - no valid IFD should have that many entries
+      return { orientation: null, dateTimeOriginal: null };
+    }
 
     let orientation: number | null = null;
     let dateTimeOriginal: string | null = null;
 
-    for (let i = 0; i < numEntries; i++) {
-      const tag = readUInt16(tiffPos),
-        type = readUInt16(tiffPos + 2),
-        count = readUInt32(tiffPos + 4),
-        valueOffset = tiffPos + 8;
+    // Each IFD entry is 12 bytes
+    const ifdDataStart = ifd0Pos + 2;
+    const ifdDataEnd = ifdDataStart + numEntries * 12;
 
-      if (tag === 0x0112 && type === 3 && count === 1) {
-        // Orientation (short)
-        orientation = readUInt16(valueOffset);
-      } else if (tag === 0x9003 && type === 2 && count === 20) {
-        // DateTimeOriginal (ASCII, 19 chars + null)
-        const offset = readUInt32(valueOffset);
-        if (app1Pos + 2 + offset + 19 > app1End) {
-          dateTimeOriginal = null; // Truncated
-        } else {
-          dateTimeOriginal = buffer
-            .toString("ascii", app1Pos + 2 + offset, app1Pos + 2 + offset + 19)
-            .trim();
+    if (ifdDataEnd > tiffEnd) {
+      // IFD extends beyond segment - process what's possible
+      const maxEntries = Math.floor((tiffEnd - ifdDataStart) / 12);
+      if (maxEntries <= 0) {
+        return { orientation, dateTimeOriginal };
+      }
+      // Process only complete entries that fit
+      for (let i = 0; i < maxEntries; i++) {
+        const entryPos = ifdDataStart + i * 12;
+
+        const tag = readUInt16(entryPos);
+        const type = readUInt16(entryPos + 2);
+        const count = readUInt32(entryPos + 4);
+
+        if (tag === null || type === null || count === null) continue;
+
+        // Tag 0x0112: Orientation (SHORT type=3, count=1)
+        if (tag === 0x0112 && type === 3 && count === 1) {
+          // SHORT (2 bytes) with count=1 fits in the 4-byte value field
+          orientation = readUInt16(entryPos + 8);
+          if (orientation && (orientation < 1 || orientation > 8)) {
+            orientation = null; // Invalid orientation value
+          }
+        }
+
+        // Tag 0x9003: DateTimeOriginal (ASCII type=2, count=20)
+        if (tag === 0x9003 && type === 2 && count === 20) {
+          // ASCII strings > 4 bytes use offset pointer
+          const offset = readUInt32(entryPos + 8);
+          if (offset !== null) {
+            const stringPos = tiffStart + offset;
+            const stringEnd = stringPos + 19; // 19 chars + null terminator
+
+            if (stringEnd <= tiffEnd && stringEnd <= buffer.length) {
+              try {
+                dateTimeOriginal = buffer.toString(
+                  "ascii",
+                  stringPos,
+                  stringEnd
+                );
+                // Validate format: "YYYY:MM:DD HH:MM:SS"
+                if (
+                  !/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(dateTimeOriginal)
+                ) {
+                  dateTimeOriginal = null;
+                }
+              } catch {
+                dateTimeOriginal = null;
+              }
+            }
+          }
+        }
+
+        // Could also look for EXIF IFD pointer (tag 0x8769) for more data
+        // but orientation and date are usually in IFD0
+      }
+    } else {
+      // Normal case - all entries fit
+      for (let i = 0; i < numEntries; i++) {
+        const entryPos = ifdDataStart + i * 12;
+
+        const tag = readUInt16(entryPos);
+        const type = readUInt16(entryPos + 2);
+        const count = readUInt32(entryPos + 4);
+
+        if (tag === null || type === null || count === null) continue;
+
+        if (tag === 0x0112 && type === 3 && count === 1) {
+          orientation = readUInt16(entryPos + 8);
+          if (orientation && (orientation < 1 || orientation > 8)) {
+            orientation = null;
+          }
+        } else if (tag === 0x9003 && type === 2 && count === 20) {
+          const offset = readUInt32(entryPos + 8);
+          if (offset !== null) {
+            const stringPos = tiffStart + offset;
+            const stringEnd = stringPos + 19;
+
+            if (stringEnd <= tiffEnd && stringEnd <= buffer.length) {
+              try {
+                const extracted = buffer.toString(
+                  "ascii",
+                  stringPos,
+                  stringEnd
+                );
+                if (/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(extracted)) {
+                  dateTimeOriginal = extracted;
+                }
+              } catch {
+                console.warn("invalid ascii data");
+              }
+            }
+          }
         }
       }
-
-      tiffPos += 12;
     }
 
     return { orientation, dateTimeOriginal };
@@ -468,7 +599,7 @@ export class ImgMetadataExtractor {
       return "gray";
     return fallback; // Preserve d
   }
-  public getImageSpecsWorkup(rawbuffer: Buffer<ArrayBufferLike>, size = 4096) {
+  public getImageSpecsWorkup(rawbuffer: Buffer<ArrayBufferLike>, size = 4096*6) {
     // 8KB handles most JPEGs with metadata while minimizing memory usage
     // Professional photos with EXIF + Photoshop data typically need 6-7KB
     const MAX_HEADER_SIZE = size;

@@ -66,7 +66,7 @@
     "prisma:studio": "prisma studio --browser none --port 7777",
     "clean": "git clean -xdf .turbo dist node_modules",
     "devv": "tsup --config tsup.config.dev.ts",
-    "dev": "nodemon --watch src --ext ts --exec \"tsx src/index.ts\"",
+    "dev": "nodemon --watch src --ext ts --exit-child --exec \"tsx src/index.ts\"",
     "lint": "eslint",
     "output:md": "tsx src/test/to-md.ts --target root false",
     "start": "node dist/index.js"
