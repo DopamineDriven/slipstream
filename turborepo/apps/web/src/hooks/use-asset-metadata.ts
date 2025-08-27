@@ -19,14 +19,11 @@ export interface AttachmentPreview {
   metadata?: ImageSpecs;
 }
 
-interface AttachmentPreviewProps {
+export interface AttachmentPreviewProps {
   attachments: AttachmentPreview[];
-
 }
 
-export function useAssetMetadata({
-  attachments
-}: AttachmentPreviewProps) {
+export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [metadata, setMetadata] = useState<Record<string, ImageSpecs>>({});
   const [size, setSize] = useState<Record<string, number>>({});

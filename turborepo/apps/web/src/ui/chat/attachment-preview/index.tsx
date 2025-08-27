@@ -1,7 +1,6 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
-import { useCallback } from "react";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
@@ -33,12 +32,6 @@ export function AttachmentPreviewComponent({
     formatFileSize
   } = useAssetMetadata({ attachments });
 
-  const handleRemove = useCallback(
-    (id: string) => {
-      onRemove(id);
-    },
-    [onRemove]
-  );
   if (attachments.length === 0) return null;
 
   return (
@@ -154,7 +147,7 @@ export function AttachmentPreviewComponent({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleRemove(attachment.id)}
+                onClick={() => onRemove(attachment.id)}
                 className="text-muted-foreground hover:text-foreground h-6 w-6 md:h-8 md:w-8"
                 disabled={attachment.status === "uploading"}>
                 <X className="h-3 w-3 md:h-4 md:w-4" />
