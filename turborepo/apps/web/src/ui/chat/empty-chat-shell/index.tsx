@@ -1,17 +1,25 @@
 // src/ui/chat/empty-chat-shell/index.tsx
 "use client";
 
+import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
+import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/chat/attachment-popover";
+import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { Logo } from "@/ui/logo";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
+import type {
+  AssetAttachedToMessage,
+  AssetPasteEvent
+} from "@t3-chat-clone/types";
 import {
   Button,
   Card,
@@ -58,17 +66,79 @@ const MAX_TEXTAREA_HEIGHT_PX = 120;
 export function ChatEmptyState() {
   const router = useRouter();
   const { data: session } = useSession();
-
   const { isConnected } = useAIChatContext();
   const { selectedModel, openDrawer } = useModelSelection();
-
   // Local state for the input
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attachments, setAttachments] = useState<AttachmentPreview[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const {
+    attachments: attchments,
+    formatFileSize,
+    getStatusColor,
+    getStatusText,
+    metadata,
+    size,
+    thumbnails
+  } = useAssetMetadata({ attachments });
+  // const chatws =useChatWebSocketContext();
+  // Mock WebSocket send function
+  const mockWebSocketSend = useCallback((event: any) => {
+    // chatws.client.send("asset_attached", {conversationId: "new-chat" })
+    console.log("Mock WebSocket Send (Paste):", event);
+    // In real implementation, this would send to your WebSocket connection
+  }, []);
+  const handleRemove = useCallback((id: string) => {
+    setAttachments((prev) => prev.filter((att) => att.id !== id))
+  }, [])
+  const createAttachmentWithDimensions = useCallback(
+    async (file: File, filename: string): Promise<AttachmentPreview> => {
+      const baseAttachment: AttachmentPreview = {
+        id: `paste-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        file,
+        filename,
+        mime: file.type,
+        size: file.size,
+        status: "pending"
+      };
+
+      // Extract dimensions for images
+      if (file.type.startsWith("image/")) {
+        try {
+          const dimensions = await new Promise<{
+            width: number;
+            height: number;
+          }>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              resolve({
+                width: img.naturalWidth,
+                height: img.naturalHeight
+              });
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(file);
+          });
+
+          return {
+            ...baseAttachment,
+            width: dimensions.width,
+            height: dimensions.height
+          };
+        } catch (error) {
+          console.warn("Failed to extract image dimensions:", error);
+        }
+      }
+
+      return baseAttachment;
+    },
+    []
+  );
 
   useEffect(() => {
     const ta = textareaRef.current;
@@ -195,6 +265,11 @@ export function ChatEmptyState() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="w-full max-w-2xl">
+        {attachments.length > 0 && (
+          <div className="mb-1.5">
+            <AttachmentPreviewComponent attachments={attachments} onRemove={handleRemove} />
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
             <div className="p-3 pb-2">
@@ -283,7 +358,7 @@ export function ChatEmptyState() {
             </div>
           </div>
         </form>
-        <p className="text-muted-foreground mt-2 text-center text-xxs">
+        <p className="text-muted-foreground text-xxs mt-2 text-center">
           AI can make mistakes. Consider checking important information.
         </p>
       </motion.div>

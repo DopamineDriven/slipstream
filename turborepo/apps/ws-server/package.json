@@ -66,7 +66,7 @@
     "prisma:studio": "prisma studio --browser none --port 7777",
     "clean": "git clean -xdf .turbo dist node_modules",
     "devv": "tsup --config tsup.config.dev.ts",
-    "dev": "nodemon --watch src --ext ts --exec \"tsx src/index.ts\"",
+    "dev": "nodemon --watch src --ext ts --exit-child --exec \"tsx src/index.ts\"",
     "lint": "eslint",
     "output:md": "tsx src/test/to-md.ts --target root false",
     "start": "node dist/index.js"
@@ -75,9 +75,10 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.60.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.873.0",
-    "@aws-sdk/client-secrets-manager": "^3.873.0",
-    "@aws-sdk/s3-request-presigner": "^3.873.0",
+    "@aws-sdk/client-s3": "^3.876.0",
+    "@aws-sdk/client-secrets-manager": "^3.876.0",
+    "@aws-sdk/credential-providers": "^3.876.0",
+    "@aws-sdk/s3-request-presigner": "^3.876.0",
     "@aws-sdk/types": "^3.862.0",
     "@d0paminedriven/fs": "^7.5.0",
     "@google/genai": "^1.15.0",
@@ -93,14 +94,14 @@
     "@types/node": "^24.3.0",
     "@types/pg": "^8.15.5",
     "@types/ws": "^8.18.1",
-    "bullmq": "^5.58.1",
+    "bullmq": "^5.58.2",
     "dotenv": "^17.2.1",
     "dotenv-cli": "^10.0.0",
     "dotenv-expand": "^12.0.2",
     "jose": "^6.0.13",
-    "llama-api-client": "^0.1.5",
+    "llama-api-client": "^0.2.0",
     "node-html-parser": "^7.0.1",
-    "openai": "^5.15.0",
+    "openai": "^5.16.0",
     "p-limit": "^7.1.0",
     "pg": "^8.16.3",
     "redis": "^5.8.2",
@@ -123,6 +124,6 @@
     "terser": "^5.43.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.5",
-    "typescript-eslint": "^8.40.0"
+    "typescript-eslint": "^8.41.0"
   }
 }

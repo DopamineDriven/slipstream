@@ -43,6 +43,7 @@ export type {
   ImageGenProgress,
   ImageGenRequest,
   ImageGenResponse,
+  ImageSpecs,
   PingMessage,
   RecordCountsProps,
   S3ObjectId,

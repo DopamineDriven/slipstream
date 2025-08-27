@@ -68,10 +68,6 @@ const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 // Active user streams tracking (prevents duplicate sends)
 const activeUserStreams = new Set<string>();
 
-// Helper to check if provider supports thinking
-const _supportsThinking = (provider: Provider): boolean => {
-  return provider === "anthropic" || provider === "gemini";
-};
 
 export function AIChatProvider({
   children,
@@ -346,9 +342,8 @@ export function AIChatProvider({
   const recentMessagesRef = useRef<Map<string, number>>(new Map());
 
   const { getAll } = useCookiesCtx();
+  const { city, country, latlng, postalCode, region, tz, locale } = getAll(); // already wrapped in a useCallback
   const metadata = useMemo(() => {
-    const { city, country, latlng, postalCode, region, tz, locale } = getAll();
-
     const [lat, lng] = latlng
       ? latlng.split(",").map(p => {
           return Number.parseFloat(p);
@@ -364,7 +359,7 @@ export function AIChatProvider({
       lng,
       locale
     } satisfies AIChatRequestUserMetadata;
-  }, [getAll]);
+  }, [city, country, latlng, postalCode, region, tz, locale]);
   const sendChat = useCallback(
     (prompt: string) => {
       if (!userId) {

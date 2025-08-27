@@ -4,7 +4,42 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
-import type { CTR, DX, Rm } from "./utils.ts";
+import type { CTR, DX, Rm } from "@/utils.ts";
+
+export interface ImageSpecs {
+  width: number;
+  height: number;
+  format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "unknown";
+  frames: number;
+  animated: boolean;
+  hasAlpha: boolean | null;
+  orientation: number | null; // EXIF orientation (1-8) or null
+  aspectRatio: number;
+  colorModel:
+    | "rgb"
+    | "rgba"
+    | "grayscale"
+    | "grayscale-alpha"
+    | "indexed"
+    | "cmyk"
+    | "ycbcr"
+    | "ycck"
+    | "unknown";
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray";
+  iccProfile: string | null; // Profile name/description if available, or 'embedded' if present but unnamed, null otherwise
+  exifDateTimeOriginal: string | null; // ISO-like string or null
+}
 
 export type AttachmentMetadata = {
   filename: string;
@@ -170,16 +205,15 @@ export type AssetUploadedNotification = DX<
     }
 >;
 
-/**
- * Client notifies server when paste event occurs
- * Server will respond with upload instructions
- */
 export type AssetPasteEvent = {
   type: "asset_paste";
   conversationId: string;
   filename: string; // Usually "paste.png" or similar
   mime: string;
   size: number;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
 };
 
 export type AssetReady = DX<
@@ -188,13 +222,10 @@ export type AssetReady = DX<
     userId: string;
     conversationId: string;
     attachmentId: string;
-
-    // canonical S3 identity
     bucket: string;
     key: string;
     versionId?: string;
     s3ObjectId: S3ObjectId; // eg, "s3://bucket/key#<versionId|nov>"
-    // object facts
     etag?: string;
     size: number; // bytes
     mime: string;
@@ -205,9 +236,6 @@ export type AssetReady = DX<
     Partial<WithExpiry<"thumbnailUrl">>
 >;
 
-/**
- * Track upload progress (server → client)
- */
 export type AssetUploadProgress = {
   type: "asset_upload_progress";
   userId: string;
@@ -218,19 +246,18 @@ export type AssetUploadProgress = {
   totalBytes: number;
 };
 
-/**
- * Notify when an asset is attached to a message
- */
+
 export type AssetAttachedToMessage = {
   type: "asset_attached";
   conversationId: string;
-  messageId: string;
-  attachmentId: string;
+  filename: string;
+  mime: string;
+  size: number;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
 };
 
-/**
- * Notify when an asset is deleted
- */
 export type AssetDeleted = {
   type: "asset_deleted";
   conversationId: string;
@@ -242,9 +269,6 @@ export type AssetDeleted = {
   s3ObjectId: S3ObjectId;
 };
 
-/**
- * Request to fetch and store a remote URL
- */
 export type AssetFetchRequest = {
   type: "asset_fetch_request";
   conversationId: string;
@@ -355,7 +379,7 @@ export type AssetUploadPrepare = {
   filename: string;
   mime: string; // keep naming consistent with other events
   size: number;
-  origin: Exclude<AssetOrigin, "REMOTE" | "GENERATED" | "IMPORT" | "SCRAPED">;
+  origin: Exclude<AssetOrigin, "REMOTE" | "GENERATED" | "IMPORTED" | "SCRAPED">;
   messageId?: string;
 };
 
@@ -388,7 +412,7 @@ export type AssetUploadComplete = {
   duration: number; //milliseconds
   bytesUploaded?: number;
 };
-
+// client -> server
 export type AssetUploadCompleteError = {
   type: "asset_upload_complete_error";
   conversationId: string;
