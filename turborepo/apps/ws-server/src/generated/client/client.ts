@@ -94,10 +94,28 @@ export type Attachment = Prisma.AttachmentModel
  */
 export type ImageMetadata = Prisma.ImageMetadataModel
 /**
+ * Model VideoMetadata
+ * 
+ */
+export type VideoMetadata = Prisma.VideoMetadataModel
+/**
+ * Model AudioMetadata
+ * 
+ */
+export type AudioMetadata = Prisma.AudioMetadataModel
+/**
+ * Model DocumentMetadata
+ * 
+ */
+export type DocumentMetadata = Prisma.DocumentMetadataModel
+/**
  * Model VerificationToken
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
+
+export type AssetType = $Enums.AssetType
+export const AssetType = $Enums.AssetType
 
 export type ChecksumAlgo = $Enums.ChecksumAlgo
 export const ChecksumAlgo = $Enums.ChecksumAlgo

@@ -468,7 +468,7 @@ export type ImageMetadataScalarWhereWithAggregatesInput = {
 }
 
 export type ImageMetadataCreateInput = {
-  format: $Enums.ImageFormat
+  format?: $Enums.ImageFormat
   width: number
   height: number
   aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -492,7 +492,7 @@ export type ImageMetadataCreateInput = {
 
 export type ImageMetadataUncheckedCreateInput = {
   attachmentId: string
-  format: $Enums.ImageFormat
+  format?: $Enums.ImageFormat
   width: number
   height: number
   aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -561,7 +561,7 @@ export type ImageMetadataUncheckedUpdateInput = {
 
 export type ImageMetadataCreateManyInput = {
   attachmentId: string
-  format: $Enums.ImageFormat
+  format?: $Enums.ImageFormat
   width: number
   height: number
   aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -786,7 +786,7 @@ export type NullableDecimalFieldUpdateOperationsInput = {
 }
 
 export type ImageMetadataCreateWithoutAttachmentInput = {
-  format: $Enums.ImageFormat
+  format?: $Enums.ImageFormat
   width: number
   height: number
   aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -808,7 +808,7 @@ export type ImageMetadataCreateWithoutAttachmentInput = {
 }
 
 export type ImageMetadataUncheckedCreateWithoutAttachmentInput = {
-  format: $Enums.ImageFormat
+  format?: $Enums.ImageFormat
   width: number
   height: number
   aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string

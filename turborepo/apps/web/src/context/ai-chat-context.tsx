@@ -182,6 +182,7 @@ export function AIChatProvider({
 
         // Update window.history immediately to show real URL
         window.history.replaceState(null, "", `/chat/${evt.conversationId}`);
+
         urlUpdatedRef.current = true;
 
         // Update active conversation ID to the real one from the event
@@ -191,6 +192,7 @@ export function AIChatProvider({
 
       if (evt.title) {
         setTitle(evt.title);
+        window.document.title = evt.title;
       }
 
       // Always set isStreaming true when we have conversationId and title

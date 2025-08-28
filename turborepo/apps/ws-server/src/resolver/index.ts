@@ -10,6 +10,7 @@ import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
+import { ImageSpecs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -98,6 +99,12 @@ export class Resolver extends ModelService {
           contentType as keyof typeof this.wsServer.prisma.fs.toExtObj
         )
       : undefined;
+  }
+
+  private extToContentType(metadata?: ImageSpecs) {
+    return metadata?.format && metadata.format !== "unknown"
+      ? this.s3Service.fs.getMimes(metadata.format)[0]
+      : "";
   }
 
   private resolveChannel(conversationId: string, userId: string) {
@@ -1070,6 +1077,9 @@ export class Resolver extends ModelService {
       batchId,
       draftId,
       key,
+      height,
+      metadata,
+      width,
       duration,
       bytesUploaded,
       versionId,
@@ -1085,19 +1095,23 @@ export class Resolver extends ModelService {
         checksum,
         contentDisposition,
         contentType,
-        etag,
+        etag: finalEtag,
         expires,
-        s3ObjectId: _fromFinalize,
+        s3ObjectId: finalS3ObjectId,
         extension,
         key: finalKey,
         lastModified,
-        versionId: v,
+        versionId: finalVersion,
         size,
         storageClass
       } = await this.s3Service.finalize(bucket, key, versionId);
 
-      const s3ObjectId = `s3://${finalBucket}/${finalKey}#${v}` as const;
-
+      const s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
+      console.log(
+        `final s3ObjectId and constructed s3ObjectId are equal: ` +
+          finalS3ObjectId ===
+          s3ObjectId
+      );
       // ✅ Update DB with real values
       const attachment = await this.wsServer.prisma.updateAttachment({
         bucket: finalBucket,
@@ -1116,9 +1130,10 @@ export class Resolver extends ModelService {
         uploadDuration: duration,
         userId,
         cdnUrl: publicUrl,
-        versionId: v,
-        s3ObjectId,
-        etag: etag,
+        versionId: finalVersion,
+        s3ObjectId: finalS3ObjectId,
+        etag: finalEtag ?? etag,
+        status: "READY",
         ext: extension ?? this.contentTypeToExt(contentType),
         mime: contentType,
         size: size
@@ -1133,22 +1148,24 @@ export class Resolver extends ModelService {
         type: "asset_ready",
         conversationId,
         attachmentId,
-        s3ObjectId,
+        s3ObjectId: finalS3ObjectId,
         batchId,
         draftId,
         metadata: {
+          dimensions: width && height ? { width, height } : undefined,
           filename: attachment.filename ?? "",
+          uploadDuration: duration,
           uploadedAt: attachment.updatedAt.toISOString()
         },
-        mime: attachment.mime ?? "",
+        mime: attachment.mime ?? contentType ?? this.extToContentType(metadata),
         origin: attachment.origin,
-        size: bytesUploaded ?? 0,
+        size: size ?? bytesUploaded ?? 0,
         status: "READY",
-        etag: etag,
+        etag: attachment.etag ?? finalEtag ?? etag,
         bucket,
         userId,
         key,
-        versionId,
+        versionId: versionId,
         downloadUrl: publicUrl,
         downloadUrlExpiresAt: Date.now() + 3600000
       } satisfies EventTypeMap["asset_ready"];
@@ -1168,6 +1185,9 @@ export class Resolver extends ModelService {
         batchId,
         draftId,
         attachmentId,
+        height,
+        metadata,
+        width,
         key,
         publicUrl: publicUrl.length > 1 ? publicUrl : undefined,
         bytesUploaded,

@@ -1,7 +1,16 @@
+import type {
+  Attachment,
+  AudioMetadata,
+  DocumentMetadata,
+  ImageMetadata,
+  VideoMetadata
+} from "@/generated/client/client.ts";
+import type {AttachmentUncheckedCreateInput} from "@/generated/client/models/Attachment.ts";
 import type { UserData } from "@/types/index.ts";
-import { Attachment, PrismaClient } from "@/generated/client/client.ts";
+import { PrismaClient } from "@/generated/client/client.ts";
 import {
   AssetOrigin,
+  AssetType,
   SenderType
 } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
@@ -24,6 +33,21 @@ export const prismaClient = new PrismaClient().$extends(withAccelerate());
 
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
+
+export type AssetEnumType = keyof typeof AssetType;
+
+export type AssetMetadataObject ={
+  AUDIO: AudioMetadata;
+  DOCUMENT: DocumentMetadata;
+  IMAGE: ImageMetadata;
+  VIDEO: VideoMetadata;
+  UNKNOWN: never;
+}
+
+export type DocumentMetadataNarrowing<T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"> ={[P in T]: AssetMetadataObject[P]}[T];
+
+export type CreatAttachmentUncheckInput<T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"> = T extends "UNKNOWN" ? AttachmentUncheckedCreateInput : CTR<AttachmentUncheckedCreateInput, Lowercase<Exclude<T, "UNKNOWN">>>;
+ export type CreateAttachmentProps<T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"> = CTR<Rm<RTC<Attachment>, "id">, "bucket" | "key" | "userId" | "assetType"> & {type:T} & DocumentMetadataNarrowing<T>
 
 export type PrismaClientWithAccelerate = typeof prismaClient;
 
@@ -245,17 +269,19 @@ export class PrismaService extends ModelService {
       }
     });
   }
-  
-  async createAttachment({
+
+  async createAttachment<const T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN">({
     ...data
-  }: CTR<Rm<RTC<Attachment>, "id">, "bucket" | "key" | "userId"> & {}) {
+  }: CreatAttachmentUncheckInput<T>) {
     const mime = data.mime ?? "application/octet-stream";
     const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
     if (
       this.isSupportedImageType(extension) &&
       data.sourceUrl &&
+      data.assetType === "IMAGE" &&
       URL.canParse(data.sourceUrl)
     ) {
+
       const {
         animated,
         aspectRatio,
@@ -273,6 +299,7 @@ export class PrismaService extends ModelService {
         include: { image: true },
         data: {
           ...data,
+          assetType: data.assetType,
           conversationId: data.conversationId ?? "new-chat",
           image: {
             create: {

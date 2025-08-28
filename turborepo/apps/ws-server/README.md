@@ -12,6 +12,40 @@ generator client {
   output   = "../src/generated/client"
   previewFeatures = ["typedSql"]
 }
+enum StreamingFormat {
+  hls       // .m3u8 - HLS playlist/manifest
+  dash      // .mpd - DASH manifest
+  smooth    // .ism - Smooth Streaming
+}
+
+enum AudioCodec {
+  aac       // most common in MP4
+  mp3       // universal but older
+  opus      // modern, efficient (WebM)
+  vorbis    // older open codec (WebM)
+  ac3       // Dolby Digital
+  eac3      // Dolby Digital Plus
+  dts       // DTS audio
+  flac      // lossless
+  pcm       // uncompressed
+  mp2       // older MPEG audio
+  unknown
+}
+
+
+enum VideoCodec {
+  h264      // AVC, most compatible
+  h265      // HEVC, better compression
+  vp8       // older WebM codec
+  vp9       // modern WebM codec
+  av1       // newest, most efficient
+  mpeg4     // older MPEG-4 Part 2
+  h263      // very old
+  theora    // open source, older
+  prores    // Apple professional
+  dnxhd     // Avid professional
+  unknown
+}
 
 enum SenderType {
   USER

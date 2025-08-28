@@ -7,6 +7,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum AssetType {
+  DOCUMENT
+  IMAGE
+  VIDEO
+  AUDIO
+  UNKNOWN
+}
+
 enum ChecksumAlgo {
   CRC32
   CRC32C
@@ -16,16 +24,39 @@ enum ChecksumAlgo {
 }
 
 enum ImageFormat {
-  apng
-  jpeg
-  png
-  webp
-  avif
-  heic
-  gif
-  tiff
-  bmp
-  svg
+  jpeg // .jpg, .jpeg - most common lossy format
+  png // .png - lossless with transparency
+  gif // .gif - animated, limited colors
+  webp // .webp - modern Google format
+  avif // .avif - AV1 based, very efficient
+  heic // .heic, .heif - Apple's efficient format
+  apng // .apng - animated PNG
+  bmp // .bmp - uncompressed bitmap
+  tiff // .tif, .tiff - professional/archival
+  ico // .ico - icons
+
+  // jpeg imposters
+  jxl // JPEG XL (.jxl) the newest "JPEG"
+  jp2 // JPEG 2000 (.jp2, .j2k)
+  jpx // JPEG 2000 extended (.jpx, .jpf)
+  jxr // JPEG XR / HD Photo (.jxr, .hdp (original name), .wdp (Windows media photo))
+  jls // JPEG-LS (lossless/near-lossless)
+
+  // vector
+  svg // .svg - scalable vector graphics
+  // raw
+  raw // generic RAW indicator
+  dng // .dng - Adobe Digital Negative
+  cr2 // .cr2 - Canon RAW 2
+  nef // .nef - Nikon Electronic Format
+  arw // .arw - Sony Alpha RAW
+
+  // HDR extensions used for 3d images
+  hdr
+  pic
+  rgbe
+  xyze
+
   unknown
 }
 
@@ -238,13 +269,15 @@ model Message {
 model Attachment {
   id             String       @id @default(cuid(2))
   conversationId String?
-  draftId        String? // temp id before convo id exists for new chats
+  draftId        String? // has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
+  batchId        String?
   userId         String
   messageId      String?
   s3ObjectId     String?      @unique // "s3://bucket/key#<versionId|nov>"
   origin         AssetOrigin  @default(UPLOAD)
   status         AssetStatus  @default(REQUESTED)
   uploadMethod   UploadMethod @default(SERVER) // "server" | "presigned" | "generated" | "fetched"
+  assetType      AssetType    @default(UNKNOWN)
 
   uploadDuration Int? // milliseconds
   cdnUrl         String? // publicUrl
@@ -277,13 +310,18 @@ model Attachment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  conversation Conversation?  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message      Message?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation?     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message?          @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   image        ImageMetadata?
+  video        VideoMetadata?
+  document     DocumentMetadata?
+  audio        AudioMetadata?
 
+  @@index([assetType, createdAt])
   @@index([conversationId, createdAt])
   @@index([draftId])
+  @@index([batchId, conversationId])
   @@index([userId, createdAt])
 }
 
@@ -291,7 +329,7 @@ model ImageMetadata {
   attachmentId String     @id
   attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
 
-  format      ImageFormat
+  format      ImageFormat @default(unknown)
   width       Int
   height      Int
   aspectRatio Decimal     @db.Decimal(6, 4) // store precomputed (e.g., 1.778)
@@ -322,6 +360,98 @@ model ImageMetadata {
   @@index([format])
   @@index([width, height])
   @@index([animated])
+}
+
+model VideoMetadata {
+  attachmentId String     @id
+  attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  format       String
+  width        Int
+  height       Int
+  aspectRatio  Decimal    @db.Decimal(6, 4)
+  duration     Int // milliseconds
+  frameRate    Decimal?   @db.Decimal(5, 2)
+  bitrate      Int? // kbps
+  codec        String? // h264, h265, av1, etc.
+  hasAudio     Boolean    @default(false)
+
+  // Video-specific
+  resolution  String? // "1080p", "4K", etc. (denormalized for convenience)
+  orientation Int?    @db.SmallInt
+  rotation    Int? // 0, 90, 180, 270
+
+  // Optional thumbnails info
+  thumbnailCount Int?  @default(0)
+  keyframeTimes  Int[] // array of millisecond timestamps
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([duration])
+  @@index([resolution])
+  @@index([format])
+}
+
+model AudioMetadata {
+  attachmentId String     @id
+  attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  format       String
+  duration     Int // milliseconds
+  bitrate      Int? // kbps
+  sampleRate   Int? // Hz (44100, 48000, etc.)
+  channels     Int? // 1=mono, 2=stereo, 6=5.1, etc.
+  codec        String? // mp3, aac, opus, flac, etc.
+
+  // Optional metadata
+  title  String?
+  artist String?
+  album  String?
+  year   Int?    @db.SmallInt
+  genre  String?
+
+  // Waveform data for visualization (stored as array of peaks)
+  waveformPeaks Int[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([duration])
+  @@index([artist, album])
+  @@index([format])
+}
+
+model DocumentMetadata {
+  attachmentId String     @id
+  attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  format       String
+  pageCount    Int?
+  wordCount    Int?
+  language     String? // ISO 639-1 code
+
+  // Document-specific
+  title    String?
+  author   String?
+  subject  String?
+  keywords String[] // array of keywords
+
+  // For PDFs
+  pdfVersion   String? // "1.4", "1.7", etc.
+  isEncrypted  Boolean @default(false)
+  isSearchable Boolean @default(true) // has text layer
+
+  // For text documents
+  encoding  String? // UTF-8, etc.
+  lineCount Int?
+
+  // Extracted text preview (first ~500 chars)
+  textPreview String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pageCount])
+  @@index([language])
+  @@index([format])
 }
 
 model VerificationToken {

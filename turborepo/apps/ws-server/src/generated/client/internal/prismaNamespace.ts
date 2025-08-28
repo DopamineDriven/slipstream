@@ -405,6 +405,9 @@ export const ModelName = {
   Message: 'Message',
   Attachment: 'Attachment',
   ImageMetadata: 'ImageMetadata',
+  VideoMetadata: 'VideoMetadata',
+  AudioMetadata: 'AudioMetadata',
+  DocumentMetadata: 'DocumentMetadata',
   VerificationToken: 'VerificationToken'
 } as const
 
@@ -421,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "imageMetadata" | "verificationToken"
+    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "verificationToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1239,6 +1242,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VideoMetadata: {
+      payload: Prisma.$VideoMetadataPayload<ExtArgs>
+      fields: Prisma.VideoMetadataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VideoMetadataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VideoMetadataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        findFirst: {
+          args: Prisma.VideoMetadataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VideoMetadataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        findMany: {
+          args: Prisma.VideoMetadataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>[]
+        }
+        create: {
+          args: Prisma.VideoMetadataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        createMany: {
+          args: Prisma.VideoMetadataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VideoMetadataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>[]
+        }
+        delete: {
+          args: Prisma.VideoMetadataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        update: {
+          args: Prisma.VideoMetadataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        deleteMany: {
+          args: Prisma.VideoMetadataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VideoMetadataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VideoMetadataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>[]
+        }
+        upsert: {
+          args: Prisma.VideoMetadataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoMetadataPayload>
+        }
+        aggregate: {
+          args: Prisma.VideoMetadataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVideoMetadata>
+        }
+        groupBy: {
+          args: Prisma.VideoMetadataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoMetadataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VideoMetadataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
+    AudioMetadata: {
+      payload: Prisma.$AudioMetadataPayload<ExtArgs>
+      fields: Prisma.AudioMetadataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AudioMetadataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AudioMetadataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        findFirst: {
+          args: Prisma.AudioMetadataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AudioMetadataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        findMany: {
+          args: Prisma.AudioMetadataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>[]
+        }
+        create: {
+          args: Prisma.AudioMetadataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        createMany: {
+          args: Prisma.AudioMetadataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AudioMetadataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>[]
+        }
+        delete: {
+          args: Prisma.AudioMetadataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        update: {
+          args: Prisma.AudioMetadataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        deleteMany: {
+          args: Prisma.AudioMetadataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AudioMetadataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AudioMetadataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>[]
+        }
+        upsert: {
+          args: Prisma.AudioMetadataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioMetadataPayload>
+        }
+        aggregate: {
+          args: Prisma.AudioMetadataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAudioMetadata>
+        }
+        groupBy: {
+          args: Prisma.AudioMetadataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioMetadataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AudioMetadataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
+    DocumentMetadata: {
+      payload: Prisma.$DocumentMetadataPayload<ExtArgs>
+      fields: Prisma.DocumentMetadataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DocumentMetadataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DocumentMetadataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        findFirst: {
+          args: Prisma.DocumentMetadataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DocumentMetadataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        findMany: {
+          args: Prisma.DocumentMetadataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>[]
+        }
+        create: {
+          args: Prisma.DocumentMetadataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        createMany: {
+          args: Prisma.DocumentMetadataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DocumentMetadataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>[]
+        }
+        delete: {
+          args: Prisma.DocumentMetadataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        update: {
+          args: Prisma.DocumentMetadataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        deleteMany: {
+          args: Prisma.DocumentMetadataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DocumentMetadataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DocumentMetadataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>[]
+        }
+        upsert: {
+          args: Prisma.DocumentMetadataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DocumentMetadataPayload>
+        }
+        aggregate: {
+          args: Prisma.DocumentMetadataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDocumentMetadata>
+        }
+        groupBy: {
+          args: Prisma.DocumentMetadataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DocumentMetadataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DocumentMetadataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DocumentMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
     VerificationToken: {
       payload: Prisma.$VerificationTokenPayload<ExtArgs>
       fields: Prisma.VerificationTokenFieldRefs
@@ -1498,12 +1723,14 @@ export const AttachmentScalarFieldEnum = {
   id: 'id',
   conversationId: 'conversationId',
   draftId: 'draftId',
+  batchId: 'batchId',
   userId: 'userId',
   messageId: 'messageId',
   s3ObjectId: 's3ObjectId',
   origin: 'origin',
   status: 'status',
   uploadMethod: 'uploadMethod',
+  assetType: 'assetType',
   uploadDuration: 'uploadDuration',
   cdnUrl: 'cdnUrl',
   sourceUrl: 'sourceUrl',
@@ -1559,6 +1786,73 @@ export const ImageMetadataScalarFieldEnum = {
 } as const
 
 export type ImageMetadataScalarFieldEnum = (typeof ImageMetadataScalarFieldEnum)[keyof typeof ImageMetadataScalarFieldEnum]
+
+
+export const VideoMetadataScalarFieldEnum = {
+  attachmentId: 'attachmentId',
+  format: 'format',
+  width: 'width',
+  height: 'height',
+  aspectRatio: 'aspectRatio',
+  duration: 'duration',
+  frameRate: 'frameRate',
+  bitrate: 'bitrate',
+  codec: 'codec',
+  hasAudio: 'hasAudio',
+  resolution: 'resolution',
+  orientation: 'orientation',
+  rotation: 'rotation',
+  thumbnailCount: 'thumbnailCount',
+  keyframeTimes: 'keyframeTimes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VideoMetadataScalarFieldEnum = (typeof VideoMetadataScalarFieldEnum)[keyof typeof VideoMetadataScalarFieldEnum]
+
+
+export const AudioMetadataScalarFieldEnum = {
+  attachmentId: 'attachmentId',
+  format: 'format',
+  duration: 'duration',
+  bitrate: 'bitrate',
+  sampleRate: 'sampleRate',
+  channels: 'channels',
+  codec: 'codec',
+  title: 'title',
+  artist: 'artist',
+  album: 'album',
+  year: 'year',
+  genre: 'genre',
+  waveformPeaks: 'waveformPeaks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AudioMetadataScalarFieldEnum = (typeof AudioMetadataScalarFieldEnum)[keyof typeof AudioMetadataScalarFieldEnum]
+
+
+export const DocumentMetadataScalarFieldEnum = {
+  attachmentId: 'attachmentId',
+  format: 'format',
+  pageCount: 'pageCount',
+  wordCount: 'wordCount',
+  language: 'language',
+  title: 'title',
+  author: 'author',
+  subject: 'subject',
+  keywords: 'keywords',
+  pdfVersion: 'pdfVersion',
+  isEncrypted: 'isEncrypted',
+  isSearchable: 'isSearchable',
+  encoding: 'encoding',
+  lineCount: 'lineCount',
+  textPreview: 'textPreview',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
 export const VerificationTokenScalarFieldEnum = {
@@ -1748,6 +2042,20 @@ export type ListEnumUploadMethodFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'AssetType'
+ */
+export type EnumAssetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssetType'>
+    
+
+
+/**
+ * Reference to a field of type 'AssetType[]'
+ */
+export type ListEnumAssetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssetType[]'>
+    
+
+
+/**
  * Reference to a field of type 'BigInt'
  */
 export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
@@ -1910,6 +2218,9 @@ export type GlobalOmitConfig = {
   message?: Prisma.MessageOmit
   attachment?: Prisma.AttachmentOmit
   imageMetadata?: Prisma.ImageMetadataOmit
+  videoMetadata?: Prisma.VideoMetadataOmit
+  audioMetadata?: Prisma.AudioMetadataOmit
+  documentMetadata?: Prisma.DocumentMetadataOmit
   verificationToken?: Prisma.VerificationTokenOmit
 }
 

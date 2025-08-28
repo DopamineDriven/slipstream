@@ -303,6 +303,13 @@ export type EnumUploadMethodFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel> | $Enums.UploadMethod
 }
 
+export type EnumAssetTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssetType | Prisma.EnumAssetTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel> | $Enums.AssetType
+}
+
 export type BigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -349,6 +356,16 @@ export type EnumUploadMethodWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel>
+}
+
+export type EnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssetType | Prisma.EnumAssetTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetTypeWithAggregatesFilter<$PrismaModel> | $Enums.AssetType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
 }
 
 export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -784,6 +801,13 @@ export type NestedEnumUploadMethodFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel> | $Enums.UploadMethod
 }
 
+export type NestedEnumAssetTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssetType | Prisma.EnumAssetTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel> | $Enums.AssetType
+}
+
 export type NestedBigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -830,6 +854,16 @@ export type NestedEnumUploadMethodWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUploadMethodFilter<$PrismaModel>
+}
+
+export type NestedEnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssetType | Prisma.EnumAssetTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssetType[] | Prisma.ListEnumAssetTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssetTypeWithAggregatesFilter<$PrismaModel> | $Enums.AssetType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
 }
 
 export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {

@@ -430,6 +430,9 @@ export type AssetUploadComplete = {
   draftId?: string;
   batchId?: string;
   publicUrl: string;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
   etag?: string;
   success: boolean;
   duration: number; //milliseconds
@@ -450,6 +453,9 @@ export type AssetUploadCompleteError = {
   etag?: string;
   duration?: number; //milliseconds
   bytesUploaded?: number;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
   error: string;
   success: false;
   code?: number;
