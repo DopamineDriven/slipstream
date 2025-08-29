@@ -12,6 +12,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useApiKeys } from "@/context/api-keys-context";
+import { useAssetUpload } from "@/context/asset-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
@@ -22,7 +23,10 @@ import type {
   EventTypeMap,
   Provider
 } from "@t3-chat-clone/types";
-import type { AIChatRequestUserMetadata } from "@t3-chat-clone/types/events";
+import type {
+  AIChatRequest,
+  AIChatRequestUserMetadata
+} from "@t3-chat-clone/types/events";
 
 interface StreamingMessage {
   id: string;
@@ -68,7 +72,6 @@ const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 // Active user streams tracking (prevents duplicate sends)
 const activeUserStreams = new Set<string>();
 
-
 export function AIChatProvider({
   children,
   userId
@@ -81,6 +84,7 @@ export function AIChatProvider({
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const { selectedModel } = useModelSelection();
   const { apiKeys } = useApiKeys();
+  const { getBatchId } = useAssetUpload();
 
   // Parse conversation ID from pathname
   const getConversationIdFromPath = useCallback((): string | null => {
@@ -362,6 +366,7 @@ export function AIChatProvider({
       locale
     } satisfies AIChatRequestUserMetadata;
   }, [city, country, latlng, postalCode, region, tz, locale]);
+
   const sendChat = useCallback(
     (prompt: string) => {
       if (!userId) {
@@ -452,10 +457,19 @@ export function AIChatProvider({
         maxTokens: undefined,
         systemPrompt: undefined,
         temperature: undefined,
-        topP: undefined
-      });
+        topP: undefined,
+        batchId: getBatchId() ?? undefined
+      } satisfies AIChatRequest);
     },
-    [sendEvent, metadata, userId, activeConversationId, selectedModel, apiKeys]
+    [
+      sendEvent,
+      metadata,
+      userId,
+      activeConversationId,
+      selectedModel,
+      apiKeys,
+      getBatchId
+    ]
   );
 
   const clearError = useCallback(() => setError(null), []);

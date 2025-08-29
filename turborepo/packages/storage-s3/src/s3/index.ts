@@ -28,6 +28,7 @@ import {
   S3ServiceException,
   waitUntilObjectExists
 } from "@aws-sdk/client-s3";
+import { fromIni } from "@aws-sdk/credential-providers";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Fs } from "@d0paminedriven/fs";
@@ -69,13 +70,10 @@ export class S3Storage extends S3Utils {
     super();
     this.cfg = {
       ...cfg,
-      defaultPresignExpiry: cfg.defaultPresignExpiry ?? 3600
+      defaultPresignExpiry: cfg.defaultPresignExpiry ?? 604800
     };
     this.client = new S3Client({
-      credentials: {
-        accessKeyId: cfg.accessKeyId,
-        secretAccessKey: cfg.secretAccessKey
-      },
+      credentials: fromIni(),
       region: cfg.region,
       requestHandler: this.requestHandler
     });
@@ -104,7 +102,10 @@ export class S3Storage extends S3Utils {
     PresignMeta["origin"],
     keyof StorageConfig["buckets"]
   >;
-  public async generatePresignedUpload(input: AssetMetadata, expiresIn = 3600) {
+  public async generatePresignedUpload(
+    input: AssetMetadata,
+    expiresIn = 604800
+  ) {
     const key = this.generateKey(input);
     const bucket = this.selectBucket(input.origin);
 
@@ -146,9 +147,19 @@ export class S3Storage extends S3Utils {
       s3Uri: `s3://${bucket}/${key}`
     } as const satisfies PresignedUploadResponse;
   }
-  public static getInstance(config: StorageConfig, fs: Fs) {
+  public static getInstance(
+    { defaultPresignExpiry, credentials: _credentials, ...rest }: StorageConfig,
+    fs: Fs
+  ) {
     if (this.#instance === null) {
-      this.#instance = new S3Storage(config, fs);
+      this.#instance = new S3Storage(
+        {
+          credentials: fromIni(),
+          defaultPresignExpiry: defaultPresignExpiry ?? 604800,
+          ...rest
+        },
+        fs
+      );
       return this.#instance;
     }
     return this.#instance;
@@ -478,6 +489,18 @@ export class S3Storage extends S3Utils {
     const expires = this.handleExpires(ExpiresString);
     const extension = this.contentTypeToExt(ContentType);
     const publicUrl = this.publicUrl(bucket, key);
+
+    const getCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      VersionId: v !== "nov" ? v : undefined
+    });
+
+    const presignedUrl = await getSignedUrl(
+      this.client,
+      getCommand,
+      { expiresIn: 604800 } // 7 days
+    );
     return {
       bucket,
       key,
@@ -487,6 +510,8 @@ export class S3Storage extends S3Utils {
       extension,
       expires,
       publicUrl,
+      presignedUrl,
+      presignedUrlExpiresAt: Date.now() + 604800 * 1000, // 7 days in ms
       storageClass: StorageClass,
       s3ObjectId,
       etag: this.stripQuotes(ETag),

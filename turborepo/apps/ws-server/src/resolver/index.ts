@@ -155,10 +155,12 @@ export class Resolver extends ModelService {
       hasProviderConfigured = event.hasProviderConfigured,
       isDefaultProvider = event.isDefaultProvider,
       prompt = event.prompt,
-      conversationIdInitial = event.conversationId;
-    // TODO handle batchId (string | undefined) for parseDraftId(draftId)->[userId,conversationId,batchId,ordinal] asset coupling on create/update
+      conversationIdInitial = event.conversationId,
+      batchId = event.batchId;
+
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
+      batchId,
       conversationId: conversationIdInitial,
       prompt,
       provider,
@@ -170,6 +172,10 @@ export class Resolver extends ModelService {
       topP,
       model
     });
+    const attachments = batchId
+      ? res.attachments.filter(t => t.batchId === batchId)
+      : undefined;
+
 
     const user_location = {
       type: "approximate",
@@ -267,7 +273,8 @@ export class Resolver extends ModelService {
       systemPrompt,
       temperature,
       title,
-      topP
+      topP,
+      attachments
     };
     try {
       if (provider === "gemini") {
@@ -566,13 +573,14 @@ export class Resolver extends ModelService {
           contentType: mimeType,
           origin: "UPLOAD"
         },
-        3600 // 1 hour expiry
+        604800  // 1 hour expiry
       );
       // Create attachment record in database
 
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
+        batchId,
         filename: properFilename,
         draftId,
         region: this.region,
@@ -600,6 +608,7 @@ export class Resolver extends ModelService {
         draftId: presignedData.draftId,
         key: presignedData.key,
         userId,
+        mimeType,
         uploadUrl: presignedData.uploadUrl,
         expiresIn: presignedData.expiresAt,
         method: "PUT",
@@ -722,6 +731,7 @@ export class Resolver extends ModelService {
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
+        batchId,
         filename: properFilename,
         region: this.region,
         mime: mimeType,
@@ -731,6 +741,7 @@ export class Resolver extends ModelService {
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
+
         size: BigInt(size),
         origin: "PASTED",
         status: "REQUESTED",
@@ -747,6 +758,7 @@ export class Resolver extends ModelService {
         bucket: presignedData.bucket,
         batchId,
         draftId,
+        mimeType,
         key: presignedData.key,
         userId,
         uploadUrl: presignedData.uploadUrl,
@@ -1096,10 +1108,10 @@ export class Resolver extends ModelService {
         contentDisposition,
         contentType,
         etag: finalEtag,
-        expires,
+        expires: expires,
         s3ObjectId: finalS3ObjectId,
         extension,
-        key: finalKey,
+        key: finalKey,presignedUrl,presignedUrlExpiresAt,
         lastModified,
         versionId: finalVersion,
         size,
@@ -1125,7 +1137,7 @@ export class Resolver extends ModelService {
         storageClass,
         conversationId,
         id: attachmentId,
-        key: finalKey,
+        key: finalKey,sourceUrl: presignedUrl,
         region: this.region,
         uploadDuration: duration,
         userId,
@@ -1167,7 +1179,7 @@ export class Resolver extends ModelService {
         key,
         versionId: versionId,
         downloadUrl: publicUrl,
-        downloadUrlExpiresAt: Date.now() + 3600000
+        downloadUrlExpiresAt: presignedUrlExpiresAt
       } satisfies EventTypeMap["asset_ready"];
 
       ws.send(JSON.stringify(assetReady));

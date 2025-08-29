@@ -5,7 +5,9 @@ import type {
   RawMessageStreamEvent,
   StopReason,
   TextBlockParam,
-  WebSearchResultBlock
+  WebSearchResultBlock,
+  ContentBlockParam,
+  ImageBlockParam
 } from "@anthropic-ai/sdk/resources/messages";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
@@ -16,6 +18,7 @@ import type {
   EventTypeMap
 } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { S3Storage } from "@t3-chat-clone/storage-s3";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
@@ -30,6 +33,7 @@ export class AnthropicService {
   private defaultClient: Anthropic;
 
   constructor(
+    private s3: S3Storage,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
@@ -69,12 +73,41 @@ export class AnthropicService {
     isNewChat: boolean,
     msgs: Message[],
     userPrompt: string,
-    systemPrompt?: string
+    systemPrompt?: string,
+    attachments?: ProviderChatRequestEntity['attachments']
   ) {
+
     if (!isNewChat) {
       const messages = msgs.map(msg => {
         if (msg.senderType === "USER") {
-          return { role: "user", content: msg.content } as const;
+          // Handle user messages with potential attachments
+         const content = Array.of<ContentBlockParam>();
+
+
+          // Add text content if present
+          if (msg.content) {
+            content.push({ type: "text", text: msg.content } as const);
+          }
+
+          // Add image attachments if present
+          if (attachments && attachments.length > 0) {
+            for (const attachment of attachments) {
+              if (attachment.sourceUrl ) {
+                // Use URL source for S3 presigned URLs
+                const imageUrl = attachment.sourceUrl ?? '';
+                const imageBlock = {
+                  type: "image",
+                  source: {
+                    type: "url",
+                    url: imageUrl
+                  }
+                } as const satisfies ImageBlockParam;
+                content.push(imageBlock);
+              }
+            }
+          }
+
+          return { role: "user", content: content.length > 0 ? content : msg.content } as const satisfies MessageParam;
         } else {
           const provider = msg.provider.toLowerCase();
           const model = msg.model ?? "";
@@ -96,9 +129,34 @@ export class AnthropicService {
         ] as const satisfies TextBlockParam[]
       };
     } else {
+      // Handle new chat with potential attachments
+      const content = Array.of<ContentBlockParam>();
+
+      // Add text prompt
+      content.push({ type: "text", text: userPrompt } as const);
+
+      // Add image attachments if present
+      if (attachments && attachments.length > 0) {
+        for (const attachment of attachments) {
+          if (attachment.sourceUrl) {
+            // Use URL source for S3 presigned URLs
+            const imageUrl = attachment.sourceUrl;
+            const imageBlock = {
+              type: "image",
+              source: {
+                type: "url",
+                url: imageUrl
+              }
+            } as const satisfies ImageBlockParam;
+            content.push(imageBlock);
+          }
+        }
+      }
+
       const messages = [
-        { role: "user", content: userPrompt }
+        { role: "user", content: content.length > 1 ? content : userPrompt }
       ] as const satisfies MessageParam[];
+
       if (systemPrompt) {
         return {
           messages,
@@ -160,7 +218,8 @@ export class AnthropicService {
     temperature,
     title,
     topP,
-    user_location
+    user_location,
+    attachments
   }: ProviderAnthropicChatRequestEntity) {
     const provider = "anthropic" as const;
     let anthropicThinkingStartTime: number | null = null;
@@ -175,7 +234,8 @@ export class AnthropicService {
       isNewChat,
       msgs,
       prompt,
-      systemPrompt
+      systemPrompt,
+      attachments
     );
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
@@ -197,7 +257,6 @@ export class AnthropicService {
           {
             type: "web_search_20250305",
             name: "web_search",
-            max_uses: 5,
             user_location
           }
         ]
@@ -208,9 +267,10 @@ export class AnthropicService {
     };
 
     for await (const chunk of stream) {
-      let text: string | undefined = undefined;
-      let thinkingText: string | undefined = undefined;
-      let done: StopReason | null = null;
+      let text: string | undefined = undefined,
+        thinkingText: string | undefined = undefined,
+        done: StopReason | null = null;
+
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "web_search_tool_result") {
           if ("error" in chunk.content_block.content) {
@@ -254,6 +314,7 @@ export class AnthropicService {
         }
       } else if (chunk.type === "message_delta") {
         done = chunk.delta.stop_reason;
+
       }
 
       // Handle thinking chunks

@@ -19,6 +19,10 @@ async function exe() {
       wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET,
       buckets = { pyGenAssets, wsAssets },
       config = {
+        credentials: {
+          accessKeyId,
+          secretAccessKey
+        },
         accessKeyId,
         secretAccessKey,
         buckets,
@@ -82,6 +86,7 @@ async function exe() {
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(
+      s3,
       prisma,
       redisInstance,
       cfg.ANTHROPIC_API_KEY

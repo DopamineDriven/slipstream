@@ -79,6 +79,8 @@ export { Zap } from "@/icons/zap";
 
 // lib
 export { cn } from "@/lib/utils";
+// ui/base
+export { UploadProgress } from "@/ui/base/progress";
 
 // ui
 export {

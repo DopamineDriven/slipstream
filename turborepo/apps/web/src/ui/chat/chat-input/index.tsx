@@ -1,14 +1,18 @@
 "use client";
 
+import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { Properties } from "csstype";
 import type { User } from "next-auth";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAssetUpload } from "@/context/asset-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { useAssets } from "@/hooks/use-assets";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentPopover } from "@/ui/chat/attachment-popover";
+import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
@@ -20,7 +24,8 @@ import {
   Mic,
   SendMessage,
   Textarea,
-  Tools
+  Tools,
+  UploadProgress
 } from "@t3-chat-clone/ui";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
@@ -55,6 +60,7 @@ export function ChatInput({
   className
 }: UnifiedChatInputProps) {
   const { selectedModel, openDrawer } = useModelSelection();
+  const assetUpload = useAssetUpload(); // Upload layer
   const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
@@ -67,6 +73,37 @@ export function ChatInput({
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
   const isMobile = useIsMobile();
   const isLockedRef = useRef(false);
+
+  // Use the assets hook for UI layer (previews, metadata)
+  const assets = useAssets({
+    max: 10,
+    allowedTypes: ["image/*", "application/pdf", "text/markdown", "text/plain"]
+  });
+
+  // Helper to get real status text for display
+  const attachmentsRef = useRef<AttachmentPreview[]>(assets.attachments);
+  useEffect(() => {
+    attachmentsRef.current = assets.attachments;
+  }, [assets.attachments]);
+
+  // Track upload status - keep simplified UI status for basic display
+  // Simple status text for previews (no per-item task map anymore)
+  const getStatusText = useCallback(
+    (attachment: AttachmentPreview): string => {
+      switch (attachment.status) {
+        case "uploading":
+          return `Uploading ${assetUpload.uploadProgress}%`;
+        case "uploaded":
+          return "Ready";
+        case "error":
+          return "Failed";
+        default:
+          return "Pending";
+      }
+    },
+    [assetUpload.uploadProgress]
+  );
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -176,6 +213,7 @@ export function ChatInput({
         // Clear message immediately for better UX
         setMessage("");
         setQuotes([]);
+        assets.clear();
 
         // Reset textarea height
         if (textareaRef.current) {
@@ -201,22 +239,80 @@ export function ChatInput({
       disabled,
       isConnected,
       activeConversationId,
-      conversationId
+      conversationId,
+      assets
     ]
   );
 
   const handleFullscreenSubmit = useCallback((fullText: string) => {
     setMessage(fullText);
     setIsFullScreenInputOpen(false);
-    // don't autosend, choppy UX
   }, []);
 
-  const handleAttachmentSelect = useCallback(
-    (type: "file" | "camera" | "photo") => {
-      console.log("Selected attachment type:", type);
-      // TODO: Implement attachment logic
+  const registerNewlyAdded = useCallback(
+    (
+      beforeIds: Set<string>,
+      origin: "UPLOAD" | "PASTED" | "SCREENSHOT" = "UPLOAD"
+    ) => {
+      const convId = activeConversationId ?? "new-chat";
+      // wait a tick for React state to flush
+      setTimeout(() => {
+        const after = attachmentsRef.current;
+        const newlyAdded = after.filter(a => !beforeIds.has(a.id));
+        if (newlyAdded.length > 0) {
+          assetUpload.registerAssets(newlyAdded, convId, origin);
+        }
+      }, 0);
     },
-    []
+    [assetUpload, activeConversationId]
+  );
+
+  // Enhanced paste handler that works with both layers
+  const handleEnhancedPaste = useCallback(
+    async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
+      await assets.handlePaste(e);
+      registerNewlyAdded(beforeIds, "PASTED");
+      // await assets.handlePaste(e);
+
+      // // Then register any new attachments with the upload layer
+      // if (assets.attachments.length > 0) {
+      //   const convId = activeConversationId ?? "new-chat";
+      //   // Just register - context handles everything
+      //   assetUpload.registerAssets(assets.attachments, convId, "PASTED");
+      // }
+    },
+    [assets, registerNewlyAdded]
+  );
+
+  // // Handle files selected from attachment popover
+  // const handleFilesFromPopover = useCallback(
+  //   async (files: File[]) => {
+  //     // Add files to the assets UI layer
+  //     for (const file of files) {
+  //       await assets.addFile(file);
+  //     }
+
+  //     // Register with upload layer if we have attachments
+  //     if (assets.attachments.length > 0) {
+  //       const convId = activeConversationId ?? "new-chat";
+  //       // Just register - context handles everything
+  //       assetUpload.registerAssets(assets.attachments, convId, "UPLOAD");
+  //     }
+  //   },
+  //   [assets, assetUpload, activeConversationId]
+  // );
+  // Popover files → add previews → register new ones with AssetProvider
+  const handleFilesFromPopover = useCallback(
+    async (files: File[]) => {
+      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
+      for (const file of files) {
+        // addFile likely sets state asynchronously; we diff after
+        await assets.addFile(file);
+      }
+      registerNewlyAdded(beforeIds, "UPLOAD");
+    },
+    [assets, registerNewlyAdded]
   );
 
   const handleScrollToBottom = () => {
@@ -233,6 +329,7 @@ export function ChatInput({
   const onKeydownCb = useCallback(
     (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
       if (isMobile) return;
+
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         formRef.current?.requestSubmit();
@@ -278,6 +375,31 @@ export function ChatInput({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mx-auto w-full max-w-3xl">
+          {/* Attachment previews */}
+          {assets.attachments.length > 0 && (
+            <div className="mb-1.5">
+              <div className="relative">
+                <AttachmentPreviewComponent
+                  attachments={assets.attachments}
+                  onRemove={assets.remove}
+                  thumbnails={assets.thumbnails}
+                  metadata={assets.metadata}
+                  getStatusText={getStatusText}
+                  getStatusColor={assets.getStatusColor}
+                  formatFileSize={assets.formatFileSize}
+                />
+                {assetUpload.isUploading && (
+                  <div className="bg-background absolute -top-2 -right-2 rounded-full border p-1 shadow-lg">
+                    <UploadProgress
+                      progress={assetUpload.uploadProgress}
+                      size="sm"
+                      showPercentage={false}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {/* Scroll to bottom button */}
           <div className="relative">
             <div className="pointer-events-none absolute top-[-40px] flex w-full items-center justify-center">
@@ -286,7 +408,7 @@ export function ChatInput({
                 size="icon"
                 onClick={handleScrollToBottom}
                 className={cn(
-                  "bg-background border-border pointer-events-auto h-7 w-7 rounded-full border shadow-lg hover:opacity-50 hover:shadow-xl",
+                  "bg-background border-border pointer-events-auto h-7 w-7 rounded-full border shadow-lg hover:opacity-75 hover:shadow-xl",
                   "transition-all duration-200 ease-[cubic-bezier(0.31,0.1,0.08,0.96)]",
                   showScrollButton
                     ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-100"
@@ -305,6 +427,7 @@ export function ChatInput({
                     ref={textareaRef}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
+                    onPaste={handleEnhancedPaste}
                     onKeyDown={onKeydownCb}
                     placeholder={effectivePlaceholder}
                     disabled={isDisabled}
@@ -336,7 +459,7 @@ export function ChatInput({
                 <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
                   <div className="flex items-center space-x-2">
                     <AttachmentPopover
-                      onSelectAttachment={handleAttachmentSelect}
+                      onFilesSelected={handleFilesFromPopover}
                     />
                     <Button
                       type="button"
@@ -390,7 +513,6 @@ export function ChatInput({
           </div>
         </motion.div>
       </div>
-
       <FullscreenTextInputDialog
         isOpen={isFullScreenInputOpen}
         onOpenChange={setIsFullScreenInputOpen}

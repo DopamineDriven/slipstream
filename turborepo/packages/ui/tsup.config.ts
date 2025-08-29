@@ -24,6 +24,7 @@ const tsupConfig = (
       "src/icons/*.tsx",
       "src/lib/*.ts",
       "src/ui/*.tsx",
+      "src/ui/base/*.tsx",
       "!src/services/icon-workup.ts",
       "!src/services/read.ts",
       "!src/services/postbuild.ts",

@@ -408,6 +408,7 @@ export type AssetUploadInstructions = {
   userId: string;
   conversationId: string;
   draftId?: string;
+  mimeType: string;
   batchId?: string;
   attachmentId: string;
   method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
