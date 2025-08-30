@@ -36,6 +36,7 @@ export const displayNameModelsByProvider = {
   ],
   grok: [
     "Grok 4",
+    "Grok Code Fast 1",
     "Grok 3",
     "Grok 3 Fast",
     "Grok 3 Mini",
