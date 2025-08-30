@@ -1,7 +1,12 @@
-import type { Message } from "@/generated/client/client.ts";
+import type {
+  Attachment,
+  DocumentMetadata,ImageMetadata,
+  Message
+} from "@/generated/client/client.ts";
 import { Provider } from "@/generated/client/enums.ts";
 import { WebSocket } from "ws";
-import type { EventTypeMap } from "@t3-chat-clone/types";
+import type { EventTypeMap} from "@t3-chat-clone/types";
+
 
 export interface WSServerOptions {
   port: number;
@@ -83,7 +88,13 @@ export interface ProviderChatRequestEntity {
   model?: string;
   chunks: string[];
   thinkingChunks: string[];
+  attachments?: ({
+    image: ImageMetadata | null;
+    document: DocumentMetadata | null;
+} & Attachment)[] | undefined
 }
+
+
 export type Signals =
   | "SIGABRT"
   | "SIGALRM"

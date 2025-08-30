@@ -408,6 +408,7 @@ export type AssetUploadInstructions = {
   userId: string;
   conversationId: string;
   draftId?: string;
+  mimeType: string;
   batchId?: string;
   attachmentId: string;
   method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
@@ -430,6 +431,9 @@ export type AssetUploadComplete = {
   draftId?: string;
   batchId?: string;
   publicUrl: string;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
   etag?: string;
   success: boolean;
   duration: number; //milliseconds
@@ -450,6 +454,9 @@ export type AssetUploadCompleteError = {
   etag?: string;
   duration?: number; //milliseconds
   bytesUploaded?: number;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
   error: string;
   success: false;
   code?: number;

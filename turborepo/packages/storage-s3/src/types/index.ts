@@ -1,5 +1,6 @@
 import type { StorageClass } from "@aws-sdk/client-s3";
 import { S3ObjectId } from "@t3-chat-clone/types";
+import type { AwsCredentialIdentity, AwsCredentialIdentityProvider } from "@aws-sdk/types";
 
 export interface StorageConfig {
   accessKeyId: string;
@@ -50,8 +51,7 @@ export type StreamOptions = {
 };
 
 export interface StorageConfig {
-  accessKeyId: string;
-  secretAccessKey: string;
+  credentials: AwsCredentialIdentity | AwsCredentialIdentityProvider | undefined
   region: string;
   buckets: {
     wsAssets: string;
@@ -148,6 +148,8 @@ export type FinalizeResult = {
   storageClass?: keyof typeof StorageClass;
   expires?: Date;
   checksum?: { algo: ChecksumAlgorithmType; value: string };
+  presignedUrl: string;
+  presignedUrlExpiresAt: number;
 };
 
 export type ImageProbe = {

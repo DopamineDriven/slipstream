@@ -20,6 +20,7 @@ import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
 import { SessionProvider } from "next-auth/react";
 import "./katex.css";
+import { AssetProvider } from "@/context/asset-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -135,15 +136,17 @@ export default async function RootLayout({
           <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
             <SessionProvider session={session}>
               <PathnameProvider>
-                <ChatWebSocketProvider user={session?.user}>
+                <ChatWebSocketProvider user={session.user}>
                   <ModelSelectionProvider>
-                    <ApiKeysProvider userId={session?.user?.id}>
-                      <AIChatProvider userId={session?.user?.id}>
-                        <Suspense fallback={null}>
-                          <PathnameSync />
-                        </Suspense>
-                        {children}
-                      </AIChatProvider>
+                    <ApiKeysProvider userId={session.user.id}>
+                      <AssetProvider userId={session.user.id}>
+                        <AIChatProvider userId={session.user.id}>
+                          <Suspense fallback={null}>
+                            <PathnameSync />
+                          </Suspense>
+                          {children}
+                        </AIChatProvider>
+                      </AssetProvider>
                     </ApiKeysProvider>
                   </ModelSelectionProvider>
                 </ChatWebSocketProvider>

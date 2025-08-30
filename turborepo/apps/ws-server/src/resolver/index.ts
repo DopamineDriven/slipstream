@@ -10,6 +10,7 @@ import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
+import { ImageSpecs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -37,6 +38,23 @@ export class Resolver extends ModelService {
     super();
   }
 
+  // Track high-resolution start times for upload progress per attachment
+  private uploadTimers = new Map<string, bigint>();
+
+  private makeProgressKey(
+    conversationId: string,
+    attachmentId?: string,
+    draftId?: string,
+    batchId?: string,
+    userId?: string
+  ) {
+    const att = attachmentId && attachmentId.length > 0 ? attachmentId : "no-att";
+    const d = draftId ?? "no-draft";
+    const b = batchId ?? "no-batch";
+    const u = userId ?? "no-user";
+    return `${conversationId}::${att}::${d}::${b}::${u}`;
+  }
+
   public registerAll() {
     this.wsServer.on("typing", this.handleTyping.bind(this));
     this.wsServer.on("ping", this.handlePing.bind(this));
@@ -51,6 +69,10 @@ export class Resolver extends ModelService {
       this.handleAssetUploadComplete.bind(this)
     );
     this.wsServer.on("asset_attached", this.handleAssetAttached.bind(this));
+    this.wsServer.on(
+      "asset_upload_progress",
+      this.handleAssetProgress.bind(this)
+    );
   }
 
   public safeErrMsg(err: unknown) {
@@ -98,6 +120,12 @@ export class Resolver extends ModelService {
           contentType as keyof typeof this.wsServer.prisma.fs.toExtObj
         )
       : undefined;
+  }
+
+  private extToContentType(metadata?: ImageSpecs) {
+    return metadata?.format && metadata.format !== "unknown"
+      ? this.s3Service.fs.getMimes(metadata.format)[0]
+      : "";
   }
 
   private resolveChannel(conversationId: string, userId: string) {
@@ -148,10 +176,12 @@ export class Resolver extends ModelService {
       hasProviderConfigured = event.hasProviderConfigured,
       isDefaultProvider = event.isDefaultProvider,
       prompt = event.prompt,
-      conversationIdInitial = event.conversationId;
-    // TODO handle batchId (string | undefined) for parseDraftId(draftId)->[userId,conversationId,batchId,ordinal] asset coupling on create/update
+      conversationIdInitial = event.conversationId,
+      batchId = event.batchId;
+
     const res = await this.wsServer.prisma.handleAiChatRequest({
       userId,
+      batchId,
       conversationId: conversationIdInitial,
       prompt,
       provider,
@@ -163,6 +193,9 @@ export class Resolver extends ModelService {
       topP,
       model
     });
+    const attachments = batchId
+      ? res.attachments.filter(t => t.batchId === batchId)
+      : undefined;
 
     const user_location = {
       type: "approximate",
@@ -260,7 +293,8 @@ export class Resolver extends ModelService {
       systemPrompt,
       temperature,
       title,
-      topP
+      topP,
+      attachments
     };
     try {
       if (provider === "gemini") {
@@ -372,6 +406,9 @@ export class Resolver extends ModelService {
         break;
       case "asset_upload_complete":
         await this.handleAssetUploadComplete(event, ws, userId, userData);
+        break;
+      case "asset_upload_progress":
+        await this.handleAssetProgress(event, ws, userId, userData);
         break;
       case "asset_attached":
         await this.handleAssetAttached(event, ws, userId, userData);
@@ -487,7 +524,9 @@ export class Resolver extends ModelService {
       }
       return msg as AnyEvent;
     } catch {
-      console.error("Invalid message received");
+      if (typeof msg === "object" && msg && "type" in msg) {
+        console.error("Invalid message received", msg.type ?? "no type");
+      }
       return null;
     }
   }
@@ -514,7 +553,7 @@ export class Resolver extends ModelService {
       filename,
       mime,
       size,
-      batchId,
+      batchId,type,
       draftId,
       // TODO implement this handling
       height: _height,
@@ -529,8 +568,6 @@ export class Resolver extends ModelService {
         this.s3Service.fs.getMimeTypeForPath(filename)
       ];
 
-      console.log({ cType, cTypePkg });
-      // Detect MIME type using fs utility
       const mimeType = cType ?? cTypePkg;
 
       const extension = this.contentTypeToExt(mime) ?? "bin";
@@ -546,7 +583,7 @@ export class Resolver extends ModelService {
       });
 
       console.log(
-        `[Asset Attached] User ${userId} pasting ${properFilename} (${sizeInfo})`
+        `[${type}] User ${userId} attached ${properFilename} (${sizeInfo})`
       );
 
       const presignedData = await this.s3Service.generatePresignedUpload(
@@ -559,13 +596,14 @@ export class Resolver extends ModelService {
           contentType: mimeType,
           origin: "UPLOAD"
         },
-        3600 // 1 hour expiry
+        604800 // 1 hour expiry
       );
       // Create attachment record in database
 
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
+        batchId,
         filename: properFilename,
         draftId,
         region: this.region,
@@ -585,7 +623,7 @@ export class Resolver extends ModelService {
       );
 
       const uploadInstructions = {
-        type: "asset_upload_instructions", // Changed event type
+        type: "asset_upload_instructions",
         conversationId,
         attachmentId: attachment.id,
         bucket: presignedData.bucket,
@@ -593,6 +631,7 @@ export class Resolver extends ModelService {
         draftId: presignedData.draftId,
         key: presignedData.key,
         userId,
+        mimeType,
         uploadUrl: presignedData.uploadUrl,
         expiresIn: presignedData.expiresAt,
         method: "PUT",
@@ -648,6 +687,7 @@ export class Resolver extends ModelService {
     userId: string,
     userData?: UserData
   ): Promise<void> {
+
     if (
       userData &&
       "city" in userData &&
@@ -715,6 +755,7 @@ export class Resolver extends ModelService {
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
+        batchId,
         filename: properFilename,
         region: this.region,
         mime: mimeType,
@@ -724,6 +765,7 @@ export class Resolver extends ModelService {
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
+
         size: BigInt(size),
         origin: "PASTED",
         status: "REQUESTED",
@@ -740,6 +782,7 @@ export class Resolver extends ModelService {
         bucket: presignedData.bucket,
         batchId,
         draftId,
+        mimeType,
         key: presignedData.key,
         userId,
         uploadUrl: presignedData.uploadUrl,
@@ -767,7 +810,7 @@ export class Resolver extends ModelService {
           totalBytes: size ?? 0
         } satisfies EventTypeMap["asset_upload_progress"]
       );
-      // TODO implement polling REQUESTED -> UPLOADING -> READY via a listener--alternatively have the client send an event
+
     } catch (error) {
       console.error("[Asset Paste] Error:", error);
 
@@ -1062,6 +1105,7 @@ export class Resolver extends ModelService {
     userId: string,
     _userData?: UserData
   ): Promise<void> {
+
     const {
       conversationId = "new-chat",
       attachmentId,
@@ -1070,6 +1114,9 @@ export class Resolver extends ModelService {
       batchId,
       draftId,
       key,
+      height,
+      metadata,
+      width,
       duration,
       bytesUploaded,
       versionId,
@@ -1085,19 +1132,25 @@ export class Resolver extends ModelService {
         checksum,
         contentDisposition,
         contentType,
-        etag,
-        expires,
-        s3ObjectId: _fromFinalize,
+        etag: finalEtag,
+        expires: expires,
+        s3ObjectId: finalS3ObjectId,
         extension,
         key: finalKey,
+        presignedUrl,
+        presignedUrlExpiresAt,
         lastModified,
-        versionId: v,
+        versionId: finalVersion,
         size,
         storageClass
       } = await this.s3Service.finalize(bucket, key, versionId);
 
-      const s3ObjectId = `s3://${finalBucket}/${finalKey}#${v}` as const;
-
+      const s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
+      console.log(
+        `final s3ObjectId and constructed s3ObjectId are equal: ` +
+          finalS3ObjectId ===
+          s3ObjectId
+      );
       // ✅ Update DB with real values
       const attachment = await this.wsServer.prisma.updateAttachment({
         bucket: finalBucket,
@@ -1112,13 +1165,15 @@ export class Resolver extends ModelService {
         conversationId,
         id: attachmentId,
         key: finalKey,
+        sourceUrl: presignedUrl,
         region: this.region,
         uploadDuration: duration,
         userId,
         cdnUrl: publicUrl,
-        versionId: v,
-        s3ObjectId,
-        etag: etag,
+        versionId: finalVersion,
+        s3ObjectId: finalS3ObjectId,
+        etag: finalEtag ?? etag,
+        status: "READY",
         ext: extension ?? this.contentTypeToExt(contentType),
         mime: contentType,
         size: size
@@ -1133,24 +1188,26 @@ export class Resolver extends ModelService {
         type: "asset_ready",
         conversationId,
         attachmentId,
-        s3ObjectId,
+        s3ObjectId: finalS3ObjectId,
         batchId,
         draftId,
         metadata: {
+          dimensions: width && height ? { width, height } : undefined,
           filename: attachment.filename ?? "",
+          uploadDuration: duration,
           uploadedAt: attachment.updatedAt.toISOString()
         },
-        mime: attachment.mime ?? "",
+        mime: attachment.mime ?? contentType ?? this.extToContentType(metadata),
         origin: attachment.origin,
-        size: bytesUploaded ?? 0,
+        size: size ?? bytesUploaded ?? 0,
         status: "READY",
-        etag: etag,
+        etag: attachment.etag ?? finalEtag ?? etag,
         bucket,
         userId,
         key,
-        versionId,
+        versionId: versionId,
         downloadUrl: publicUrl,
-        downloadUrlExpiresAt: Date.now() + 3600000
+        downloadUrlExpiresAt: presignedUrlExpiresAt
       } satisfies EventTypeMap["asset_ready"];
 
       ws.send(JSON.stringify(assetReady));
@@ -1168,6 +1225,9 @@ export class Resolver extends ModelService {
         batchId,
         draftId,
         attachmentId,
+        height,
+        metadata,
+        width,
         key,
         publicUrl: publicUrl.length > 1 ? publicUrl : undefined,
         bytesUploaded,
@@ -1293,6 +1353,83 @@ export class Resolver extends ModelService {
     userId: string
   ): Promise<void> {
     this.wsServer.broadcast("typing", { ...event, userId });
+  }
+
+  public async handleAssetProgress(
+    event: EventTypeMap["asset_upload_progress"],
+    ws: WebSocket,
+    userId: string,
+    _userData?: UserData
+  ) {
+    try {
+      const {
+        conversationId = "new-chat",
+        attachmentId,
+        batchId,
+        draftId,
+        progress,
+        bytesUploaded,
+        totalBytes
+      } = event;
+
+      const redisChannel = this.resolveChannel(conversationId, userId);
+
+      // Track active duration using high-resolution timer
+      const now = process.hrtime.bigint();
+      const timerKey = this.makeProgressKey(
+        conversationId,
+        attachmentId,
+        draftId,
+        batchId,
+        userId
+      );
+      let start = this.uploadTimers.get(timerKey);
+      if (!start) {
+        start = now;
+        this.uploadTimers.set(timerKey, start);
+      }
+      const elapsedMs = Number(now - start) / 1e6;
+
+      // Passive: accept client-provided payload; lightly sanitize numbers
+      const safeProgress = Number.isFinite(progress)
+        ? Math.max(0, Math.min(100, Math.round(progress)))
+        : 0;
+
+      const payload = {
+        type: "asset_upload_progress",
+        userId,
+        conversationId,
+        attachmentId,
+        batchId,
+        draftId,
+        progress: safeProgress,
+        bytesUploaded: Math.max(0, bytesUploaded ?? 0),
+        totalBytes: Math.max(0, totalBytes ?? 0)
+      } satisfies  EventTypeMap["asset_upload_progress"];
+
+      // Debug visibility: log the event with sanitized payload and active duration
+      console.log(event.type, {
+        ...payload,
+        elapsedMs: Number.isFinite(elapsedMs) ? +elapsedMs.toFixed(3) : 0
+      });
+
+      // Broadcast to all WS clients (passive relay; no direct echo)
+      this.wsServer.broadcast("asset_upload_progress", payload);
+
+      // Also publish to Redis so other services/consumers receive updates
+      void this.wsServer.redis.publishTypedEvent(
+        redisChannel,
+        "asset_upload_progress",
+        payload
+      );
+
+      // Cleanup timer when progress completes
+      if (safeProgress >= 100) {
+        this.uploadTimers.delete(timerKey);
+      }
+    } catch (err) {
+      console.error("[Asset Progress] Error:", err);
+    }
   }
 
   public async handlePing(

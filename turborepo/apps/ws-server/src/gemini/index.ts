@@ -1,3 +1,4 @@
+import { relative, resolve } from "node:path";
 import type { Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity, UserData } from "@/types/index.ts";
 import type {
@@ -5,10 +6,17 @@ import type {
   Content,
   ContentUnion,
   FinishReason,
-  GenerateContentResponse
+  GenerateContentResponse,
+  Part
 } from "@google/genai";
+import type { Logger } from "pino";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { GoogleGenAI } from "@google/genai";
+import {
+  createPartFromText,
+  createPartFromUri,
+  GoogleGenAI
+} from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
@@ -17,7 +25,9 @@ interface ProviderGeminiChatRequestEntity extends ProviderChatRequestEntity {
 }
 export class GeminiService {
   private defaultClient: GoogleGenAI;
+  private logger: Logger;
   constructor(
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
@@ -26,6 +36,12 @@ export class GeminiService {
       apiKey: this.apiKey,
       apiVersion: "v1alpha"
     });
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[gemini] " }
+      );
   }
 
   public getClient(overrideKey?: string) {
@@ -35,21 +51,63 @@ export class GeminiService {
     return this.defaultClient;
   }
 
-  private formatHistoryForSession(msgs: Message[]) {
-    return msgs.map((msg): Content => {
+  private async formatHistoryForSession(
+    msgs: Message[],
+    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
+    gemini: GoogleGenAI
+  ) {
+    const formatted: Content[] = [];
+    for (const msg of msgs) {
       if (msg.senderType === "USER") {
-        return { role: "user", parts: [{ text: msg.content }] };
+        const partArr = Array.of<Part>();
+        try {
+          if (attachments && attachments.length > 0) {
+            for (const attachment of attachments) {
+              if (
+                attachment?.sourceUrl &&
+                attachment.mime &&
+                attachment.filename
+              ) {
+                const path = await this.writeTmp(
+                  attachment.filename,
+                  attachment.sourceUrl
+                );
+                const file = await gemini.files.upload({
+                  file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
+                  config: { mimeType: attachment.mime }
+                });
+                if (file?.uri) {
+                  if (attachment.mime.includes("application/pdf")) {
+                    partArr.push(
+                      createPartFromUri(file.uri, "application/pdf")
+                    );
+                  } else if (attachment.mime.startsWith("image/")) {
+                    partArr.push(
+                      createPartFromUri(file.uri, attachment.mime)
+                    );
+                  }
+                }
+              }
+            }
+          }
+        } catch (err) {
+          this.logger.warn({ err }, "error in gemini history workup");
+        } finally {
+          partArr.push(createPartFromText(msg.content));
+        }
+        formatted.push({ role: "user", parts: partArr } as const);
       } else {
         // This is an assistant/model message. Prepend context.
         const provider = msg.provider.toLowerCase();
         const model = msg.model ?? "unknown";
         const modelIdentifier = `[${provider}/${model}]`;
-        return {
+        formatted.push({
           role: "model",
           parts: [{ text: `${modelIdentifier}\n${msg.content}` }]
-        };
+        } as const);
       }
-    }) satisfies Content[];
+    }
+    return formatted;
   }
 
   /**
@@ -68,10 +126,12 @@ export class GeminiService {
     ) satisfies ContentUnion;
   }
 
-  public getHistoryAndInstruction(
+  public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: Message[],
-    systemPrompt?: string
+    systemPrompt: string | undefined,
+    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
+    gemini: GoogleGenAI
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
@@ -85,7 +145,11 @@ export class GeminiService {
     } else {
       const historyMsgs = msgs.slice(0, -1);
       return {
-        history: this.formatHistoryForSession(historyMsgs),
+        history: await this.formatHistoryForSession(
+          historyMsgs,
+          attachments,
+          gemini
+        ),
         systemInstruction
       };
     }
@@ -99,7 +163,17 @@ export class GeminiService {
       : [47.7749, -122.4194];
     return [lat, lng] as const;
   }
+  private getFileName = (p: string) =>
+    p.split("?")[0]?.split("/").reverse()[0] ?? "";
 
+  private async writeTmp(filename: string, sourceUrl: string) {
+    const absPath = resolve(this.prisma.fs.tmpDir, filename);
+    return await this.prisma.fs
+      .fetchRemoteWriteLocalLargeFiles(sourceUrl, absPath, false)
+      .then(() => {
+        return absPath;
+      });
+  }
   public async handleGeminiAiChatRequest({
     chunks,
     conversationId,
@@ -116,6 +190,7 @@ export class GeminiService {
     systemPrompt,
     temperature,
     title,
+    attachments,
     topP,
     userData
   }: ProviderGeminiChatRequestEntity) {
@@ -128,17 +203,50 @@ export class GeminiService {
       geminiAgg = "",
       geminiDataPart: Blob | undefined = undefined;
 
-    const { history, systemInstruction } = this.getHistoryAndInstruction(
+    const gemini = this.getClient(apiKey);
+    const { history, systemInstruction } = await this.getHistoryAndInstruction(
       isNewChat,
       msgs,
-      systemPrompt
+      systemPrompt,
+      attachments,
+      gemini
     );
+    const currentPartArr = Array.of<Part>();
 
-    const gemini = this.getClient(apiKey);
-
+    try {
+      if (attachments && attachments.length > 0) {
+        for (const attachment of attachments) {
+          if (attachment?.sourceUrl && attachment.mime && attachment.filename) {
+            const path = await this.writeTmp(
+              attachment.filename,
+              attachment.sourceUrl
+            );
+            const file = await gemini.files.upload({
+              file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
+              config: { mimeType: attachment.mime }
+            });
+            if (file?.uri) {
+              if (attachment.mime.includes("application/pdf")) {
+                currentPartArr.push(
+                  createPartFromUri(file.uri, attachment.mime)
+                );
+              } else if (attachment.mime.startsWith("image/")) {
+                currentPartArr.push(
+                 createPartFromUri(file.uri, attachment.mime)
+                );
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      this.logger.warn({ err }, "error in gemini history workup");
+    } finally {
+      currentPartArr.push(createPartFromText(prompt));
+    }
     const fullContent = [
       ...(history ?? []),
-      { role: "user", parts: [{ text: prompt }] }
+      { role: "user", parts: currentPartArr }
     ] as const satisfies Content[];
 
     const stream = (await gemini.models.generateContentStream({

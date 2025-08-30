@@ -46,7 +46,7 @@ export class S3Utils {
   public handleExpires(expiresString?: string) {
     return expiresString
       ? new Date(expiresString)
-      : new Date(Date.now() + 3600 * 1000);
+      : new Date(Date.now() + 604800 * 1000);
   }
 }
 

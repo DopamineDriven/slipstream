@@ -1,7 +1,16 @@
+import type {
+  Attachment,
+  AudioMetadata,
+  DocumentMetadata,
+  ImageMetadata,
+  VideoMetadata
+} from "@/generated/client/client.ts";
+import type { AttachmentUncheckedCreateInput } from "@/generated/client/models/Attachment.ts";
 import type { UserData } from "@/types/index.ts";
-import { Attachment, PrismaClient } from "@/generated/client/client.ts";
+import { PrismaClient } from "@/generated/client/client.ts";
 import {
   AssetOrigin,
+  AssetType,
   SenderType
 } from "@/generated/client/enums.ts";
 import { ModelService } from "@/models/index.ts";
@@ -24,6 +33,32 @@ export const prismaClient = new PrismaClient().$extends(withAccelerate());
 
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
+
+export type AssetEnumType = keyof typeof AssetType;
+
+export type AssetMetadataObject = {
+  AUDIO: AudioMetadata;
+  DOCUMENT: DocumentMetadata;
+  IMAGE: ImageMetadata;
+  VIDEO: VideoMetadata;
+  UNKNOWN: never;
+};
+
+export type DocumentMetadataNarrowing<
+  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
+> = { [P in T]: AssetMetadataObject[P] }[T];
+
+export type CreatAttachmentUncheckInput<
+  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
+> = T extends "UNKNOWN"
+  ? AttachmentUncheckedCreateInput
+  : CTR<AttachmentUncheckedCreateInput, Lowercase<Exclude<T, "UNKNOWN">>>;
+export type CreateAttachmentProps<
+  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
+> = CTR<
+  Rm<RTC<Attachment>, "id">,
+  "bucket" | "key" | "userId" | "assetType"
+> & { type: T } & DocumentMetadataNarrowing<T>;
 
 export type PrismaClientWithAccelerate = typeof prismaClient;
 
@@ -146,17 +181,82 @@ export class PrismaService extends ModelService {
     }
   }
 
+  public parseDraftId(draftId: string) {
+    if (/^(?:[A-Za-z0-9_-]+~){3}(?:0|[1-9][0-9]*)$/.test(draftId) === false) {
+      throw new Error(`invalid draftId ${draftId}`);
+    }
+    const toArr = draftId.split("~");
+
+    return toArr.map((v, o) =>
+      o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
+    ) as [string, string, string, number];
+  }
+
   public async handleAiChatRequest({
     userId,
+    batchId,
     provider,
+    conversationId,
     ...data
   }: Rm<AIChatRequest, "type"> & {
     userId: string;
   }) {
     const { keyId, apiKey } = await this.handleApiKeyLookup(provider, userId);
-    if (data.conversationId === "new-chat") {
+    if (conversationId === "new-chat") {
+      if (typeof batchId !== "undefined") {
+        const batchIt = await this.prismaClient.$transaction(async pr => {
+          const attachments = await pr.attachment.findMany({
+            where: { batchId, userId },
+            take: 10,
+            orderBy: [{ createdAt: "desc" }],
+            include: { image: true, document: true }
+          });
+          const connectById = attachments.map(({ id }) => ({ id }));
+
+          return await pr.conversation.create({
+            include: {
+              messages: { orderBy: { createdAt: "asc" } },
+              conversationSettings: true,
+              attachments: {
+                where: { batchId },
+                include: { image: true, document: true }
+              }
+            },
+            data: {
+              attachments: { connect: connectById },
+              messages: {
+                create: {
+                  attachments: { connect: connectById },
+                  content: data.prompt,
+                  provider: this.providerToPrismaFormat(provider),
+                  senderType: SenderType.USER,
+                  model: data.model,
+                  userId,
+                  userKeyId: keyId
+                }
+              },
+              conversationSettings: {
+                create: {
+                  maxTokens: data.maxTokens,
+                  topP: data.topP,
+                  systemPrompt: data.systemPrompt,
+                  temperature: data.temperature
+                }
+              },
+              userKeyId: keyId,
+              userId
+            }
+          });
+        });
+        return { apiKey, ...batchIt };
+      }
+
       const p = await this.prismaClient.conversation.create({
-        include: { messages: true, conversationSettings: true },
+        include: {
+          messages: true,
+          conversationSettings: true,
+          attachments: { include: { image: true, document: true } }
+        },
         data: {
           messages: {
             create: {
@@ -183,12 +283,67 @@ export class PrismaService extends ModelService {
       const apiKeyAndRes = { apiKey, ...p };
       return apiKeyAndRes;
     } else {
+      if (typeof batchId !== "undefined") {
+        const batchIt = await this.prismaClient.$transaction(async pr => {
+          const attachments = await pr.attachment.findMany({
+            where: { batchId, userId, conversationId },
+            take: 10,
+            orderBy: [{ createdAt: "desc" }],
+            include: { image: true, document: true }
+          });
+
+          const connectById = attachments.map(({ id }) => ({ id }));
+
+          return await pr.conversation.update({
+            include: {
+              messages: {
+                orderBy: { createdAt: "asc" }
+              },
+              conversationSettings: true,
+              attachments: {
+                where: { batchId },
+                include: { image: true, document: true }
+              }
+            },
+            where: { id: conversationId },
+            data: {
+              attachments: { connect: connectById },
+              messages: {
+                create: {
+                  attachments: { connect: connectById },
+                  content: data.prompt,
+                  senderType: SenderType.USER,
+                  provider: this.providerToPrismaFormat(provider),
+                  model: data.model,
+                  userId,
+                  userKeyId: keyId
+                }
+              },
+              conversationSettings: {
+                update: {
+                  topP: data.topP,
+                  systemPrompt: data.systemPrompt,
+                  maxTokens: data.maxTokens,
+                  temperature: data.temperature
+                }
+              },
+              userId,
+              userKeyId: keyId
+            }
+          });
+        });
+        return { apiKey, ...batchIt };
+      }
       const pr = await this.prismaClient.conversation.update({
         include: {
           messages: { orderBy: { createdAt: "asc" } },
-          conversationSettings: true
+          conversationSettings: true,
+          attachments: {
+            where: { conversationId },
+            include: { image: true, document: true }
+          }
         },
-        where: { id: data.conversationId },
+        where: { id: conversationId },
         data: {
           messages: {
             create: {
@@ -245,15 +400,22 @@ export class PrismaService extends ModelService {
       }
     });
   }
-  
-  async createAttachment({
-    ...data
-  }: CTR<Rm<RTC<Attachment>, "id">, "bucket" | "key" | "userId"> & {}) {
+
+  public convoId(conversationId?: string | null) {
+    return conversationId && conversationId !== "new-chat"
+      ? conversationId
+      : null;
+  }
+
+  async createAttachment<
+    const T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
+  >({ conversationId, ...data }: CreatAttachmentUncheckInput<T>) {
     const mime = data.mime ?? "application/octet-stream";
     const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
     if (
       this.isSupportedImageType(extension) &&
       data.sourceUrl &&
+      data.assetType === "IMAGE" &&
       URL.canParse(data.sourceUrl)
     ) {
       const {
@@ -273,7 +435,8 @@ export class PrismaService extends ModelService {
         include: { image: true },
         data: {
           ...data,
-          conversationId: data.conversationId ?? "new-chat",
+          assetType: data.assetType,
+          conversationId: this.convoId(conversationId),
           image: {
             create: {
               aspectRatio,
@@ -294,7 +457,7 @@ export class PrismaService extends ModelService {
     }
     return await this.prismaClient.attachment.create({
       include: { image: true },
-      data: { ...data, conversationId: data.conversationId ?? "new-chat" }
+      data: { ...data, conversationId: this.convoId(conversationId) }
     });
   }
 
@@ -315,18 +478,20 @@ export class PrismaService extends ModelService {
    * Update an attachment record
    */
   async updateAttachment({
+    conversationId,
     ...data
   }: CTR<
     RTC<Attachment>,
     "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
   >): Promise<Attachment> {
+    console.log(data);
     return await this.prismaClient.attachment.update({
       where: {
-        s3ObjectId: `s3://${data.bucket}/${data.key}#${data.versionId}`,
         id: data.id
       },
 
       data: {
+        conversationId: this.convoId(conversationId),
         ...data
       }
     });

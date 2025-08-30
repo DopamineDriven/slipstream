@@ -1,9 +1,10 @@
-// src/ui/chat/empty-chat-shell/index.tsx
 "use client";
 
+import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
+import { useAssetUpload } from "@/context/asset-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { useAssets } from "@/hooks/use-assets";
 import { providerMetadata } from "@/lib/models";
@@ -26,7 +27,8 @@ import {
   SendMessage,
   Sparkles,
   Textarea,
-  Tools
+  Tools,
+  UploadProgress
 } from "@t3-chat-clone/ui";
 
 const suggestedPrompts = [
@@ -62,7 +64,9 @@ export function ChatEmptyState() {
   const { data: session } = useSession();
   const { isConnected } = useAIChatContext();
   const { selectedModel, openDrawer } = useModelSelection();
-  // Local state for the input
+  const assetUpload = useAssetUpload(); // clean upload layer
+
+  // Local input state
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -70,12 +74,36 @@ export function ChatEmptyState() {
   const [showExpandButton, setShowExpandButton] = useState(false);
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Use the new assets hook for all attachment management
+  // UI-only assets (previews, thumbnails, local metadata)
   const assets = useAssets({
     max: 10,
-    allowedTypes: ["image/*", "application/pdf"]
+    allowedTypes: ["image/*", "application/pdf", "text/markdown", "text/plain"]
   });
 
+  // Track latest attachments for pre/post diffs
+  const attachmentsRef = useRef<AttachmentPreview[]>(assets.attachments);
+  useEffect(() => {
+    attachmentsRef.current = assets.attachments;
+  }, [assets.attachments]);
+
+  // Simple status text for previews (global progress only)
+  const getStatusText = useCallback(
+    (attachment: AttachmentPreview): string => {
+      switch (attachment.status) {
+        case "uploading":
+          return `Uploading ${assetUpload.uploadProgress}%`;
+        case "uploaded":
+          return "Ready";
+        case "error":
+          return "Failed";
+        default:
+          return "Pending";
+      }
+    },
+    [assetUpload.uploadProgress]
+  );
+
+  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -97,24 +125,21 @@ export function ChatEmptyState() {
   const handleSendMessage = useCallback(
     (messageText: string) => {
       if (!messageText.trim() || isSubmitting || !isConnected) return;
-
       setIsSubmitting(true);
-
       try {
-        // Navigate to new chat with prompt as search param
         const params = new URLSearchParams({ prompt: messageText.trim() });
         router.push(`/chat/new-chat?${params.toString()}`);
-
-        // Reset submitting state after a short delay
+        assets.clear();
         submitTimeoutRef.current = setTimeout(() => {
           setIsSubmitting(false);
         }, 200);
-      } catch (error) {
-        console.error("Failed to navigate:", error);
+      } catch (err) {
+        console.error("Failed to navigate:", err);
         setIsSubmitting(false);
+        assets.clear();
       }
     },
-    [isSubmitting, router, isConnected]
+    [isSubmitting, isConnected, router, assets]
   );
 
   const handleSubmit = useCallback(
@@ -143,12 +168,42 @@ export function ChatEmptyState() {
     [handleSendMessage]
   );
 
-  const handleAttachmentSelect = useCallback(
-    (type: "file" | "camera" | "photo") => {
-      console.log("Selected attachment type:", type);
-      // TODO: Implement attachment logic here
+  // Helper: register only newly added attachments (origin-aware)
+  const registerNewlyAdded = useCallback(
+    (beforeIds: Set<string>, origin: "UPLOAD" | "PASTED" | "SCREENSHOT") => {
+      // Empty shell starts a new chat; use "new-chat"
+      const convId = "new-chat";
+      setTimeout(() => {
+        const after = attachmentsRef.current;
+        const newlyAdded = after.filter(a => !beforeIds.has(a.id));
+        if (newlyAdded.length > 0) {
+          assetUpload.registerAssets(newlyAdded, convId, origin);
+        }
+      }, 0);
     },
-    []
+    [assetUpload]
+  );
+
+  // Paste flow: add previews → register delta
+  const handleEnhancedPaste = useCallback(
+    async (e: React.ClipboardEvent) => {
+      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
+      await assets.handlePaste(e);
+      registerNewlyAdded(beforeIds, "PASTED");
+    },
+    [assets, registerNewlyAdded]
+  );
+
+  // Popover flow: add previews → register delta
+  const handleFilesFromPopover = useCallback(
+    async (files: File[]) => {
+      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
+      for (const file of files) {
+        await assets.addFile(file);
+      }
+      registerNewlyAdded(beforeIds, "UPLOAD");
+    },
+    [assets, registerNewlyAdded]
   );
 
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
@@ -203,15 +258,26 @@ export function ChatEmptyState() {
         className="w-full max-w-2xl">
         {assets.attachments.length > 0 && (
           <div className="mb-1.5">
-            <AttachmentPreviewComponent
-              attachments={assets.attachments}
-              onRemove={assets.remove}
-              thumbnails={assets.thumbnails}
-              metadata={assets.metadata}
-              getStatusText={assets.getStatusText}
-              getStatusColor={assets.getStatusColor}
-              formatFileSize={assets.formatFileSize}
-            />
+            <div className="relative">
+              <AttachmentPreviewComponent
+                attachments={assets.attachments}
+                onRemove={assets.remove}
+                thumbnails={assets.thumbnails}
+                metadata={assets.metadata}
+                getStatusText={getStatusText}
+                getStatusColor={assets.getStatusColor}
+                formatFileSize={assets.formatFileSize}
+              />
+              {assetUpload.isUploading && (
+                <div className="bg-background absolute -top-2 -right-2 rounded-full border p-1 shadow-lg">
+                  <UploadProgress
+                    progress={assetUpload.uploadProgress}
+                    size="sm"
+                    showPercentage={false}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
         <form onSubmit={handleSubmit}>
@@ -221,7 +287,7 @@ export function ChatEmptyState() {
                 ref={textareaRef}
                 value={message}
                 onChange={e => setMessage(e.target.value)}
-                onPaste={assets.handlePaste}
+                onPaste={handleEnhancedPaste}
                 onKeyDown={e => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -235,9 +301,7 @@ export function ChatEmptyState() {
                   !isConnected || isSubmitting ? "cursor-not-allowed" : ""
                 )}
                 rows={3}
-                style={{
-                  maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px`
-                }}
+                style={{ maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px` }}
               />
               {showExpandButton && (
                 <Button
@@ -255,9 +319,7 @@ export function ChatEmptyState() {
             </div>
             <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
               <div className="flex items-center space-x-2">
-                <AttachmentPopover
-                  onSelectAttachment={handleAttachmentSelect}
-                />
+                <AttachmentPopover onFilesSelected={handleFilesFromPopover} />
                 <Button
                   type="button"
                   variant="ghost"
@@ -284,7 +346,7 @@ export function ChatEmptyState() {
                   size="icon"
                   disabled={isSubmitting}
                   onClick={openDrawer}
-                  title={`Select model`}
+                  title="Select model"
                   className="text-muted-foreground hover:text-foreground hover:bg-accent h-8">
                   <CurrentIcon className="size-5" />
                   <span className="sr-only">{`Select model (current: ${selectedModel.displayName})`}</span>
@@ -297,7 +359,7 @@ export function ChatEmptyState() {
                   className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
                   disabled={!message.trim() || !isConnected || isSubmitting}>
                   <SendMessage className="size-5" />
-                  <span className="sr-only">{`Submit Prompt`}</span>
+                  <span className="sr-only">Submit Prompt</span>
                 </Button>
               </div>
             </div>

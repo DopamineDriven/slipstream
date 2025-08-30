@@ -37,6 +37,7 @@ export const displayNameToModelId = {
   },
   grok: {
     "Grok 4": "grok-4-0709",
+    "Grok Code Fast 1": "grok-code-fast-1",
     "Grok 3": "grok-3",
     "Grok 3 Fast": "grok-3-fast",
     "Grok 3 Mini": "grok-3-mini",

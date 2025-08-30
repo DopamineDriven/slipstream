@@ -36,6 +36,7 @@ export const modelIdsByProvider = {
   ],
   grok: [
     "grok-4-0709",
+    "grok-code-fast-1",
     "grok-3",
     "grok-3-fast",
     "grok-3-mini",

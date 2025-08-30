@@ -1,239 +1,68 @@
 "use client";
 
-import React, {
+import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
+import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useReducer,
-  useRef
+  useRef,
+  useState
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
-import { nanoid } from "nanoid";
-import type { EventTypeMap, ImageSpecs } from "@t3-chat-clone/types";
+import { usePathnameContext } from "@/context/pathname-context";
+import type { AssetOrigin, EventTypeMap } from "@t3-chat-clone/types";
+import { createDraftId } from "@t3-chat-clone/types";
 
-// Reuse your AttachmentPreview shape from your preview component
-export type UploadStatus = "pending" | "uploading" | "uploaded" | "error";
+/** Public context shape — intentionally small (mirrors AIChatContext vibe) */
+interface AssetContextValue {
+  activeConversationId: string | null;
+  currentBatchId: string | null;
+  uploadProgress: number; // avg percent across all tasks
+  isUploading: boolean;
+  error: string | null;
+  isConnected: boolean;
 
-export interface ClientAttachment {
-  cid: string; // client id
+  getBatchId: () => string;
+  registerAssets: (
+    attachments: AttachmentPreview[],
+    conversationId?: string,
+    origin?: Extract<AssetOrigin, "UPLOAD" | "PASTED" | "SCREENSHOT">,
+    batchId?: string
+  ) => void;
+
+  clearError: () => void;
+  resetUploads: () => void;
+}
+
+/** Internal, minimal task */
+type UploadTask = {
   draftId: string;
-  batchId: string; // composer-local bucket
-  conversationId: string; // often "new-chat" before message exists
+  batchId: string;
+  attachmentId?: string;
+
+  // object info
   file: File;
   filename: string;
   mime: string;
   size: number;
-  status: UploadStatus;
-  progress?: number; // 0-100
-  // server linkage
-  attachmentId?: string; // server id (after instructions)
+
+  // presign/instructions
   bucket?: string;
   key?: string;
+  uploadUrl?: string;
+  requiredHeaders?: Record<string, string>;
+
+  // status
+  progress: number; // 0..100
+  status: "REQUESTED" | "UPLOADING" | "READY" | "FAILED";
   versionId?: string;
   etag?: string;
-  // quick meta for UI
-  width?: number;
-  height?: number;
-  metadata?: ImageSpecs;
-  thumbnail?: string; // data URL
   error?: string;
-}
-
-// ---- State
-interface State {
-  // global registry by client id
-  byCid: Record<string, ClientAttachment>;
-  // per-batch list ordering
-  byBatch: Record<string, string[]>; // batchId -> cid[]
-  // FIFO queue for mapping instructions -> files within a batch
-  pendingQueue: Record<string, string[]>; // batchId -> cid[]
-  // preferred upload path (can be toggled per app or per batch later)
-  uploadStrategy: "xhr" | "server";
-}
-
-const initial: State = {
-  byCid: {},
-  byBatch: {},
-  pendingQueue: {},
-  uploadStrategy: "xhr"
 };
 
-// ---- Actions
-type Action =
-  | { type: "BEGIN_BATCH"; batchId: string }
-  | { type: "END_BATCH"; batchId: string }
-  | { type: "ADD_ATTACHMENT"; att: ClientAttachment }
-  | { type: "REMOVE_ATTACHMENT"; cid: string }
-  | { type: "SET_PROGRESS"; cid: string; progress: number }
-  | { type: "SET_STATUS"; cid: string; status: UploadStatus; error?: string }
-  | {
-      type: "SET_SERVER_LINK";
-      cid: string;
-      link: { attachmentId: string; bucket: string; key: string };
-    }
-  | { type: "SET_VERSION"; cid: string; versionId: string; etag?: string }
-  | { type: "SET_THUMBNAIL"; cid: string; dataUrl: string }
-  | { type: "SET_DIMENSIONS"; cid: string; width: number; height: number }
-  | { type: "PUSH_PENDING"; batchId: string; cid: string }
-  | { type: "SHIFT_PENDING"; batchId: string; expectCid?: string }
-  | { type: "CLEAR_BATCH"; batchId: string }
-  | { type: "SET_UPLOAD_STRATEGY"; strategy: "xhr" | "server" };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "BEGIN_BATCH": {
-      if (state.byBatch[action.batchId]) return state;
-      return {
-        ...state,
-        byBatch: { ...state.byBatch, [action.batchId]: [] },
-        pendingQueue: { ...state.pendingQueue, [action.batchId]: [] }
-      };
-    }
-    case "END_BATCH": {
-      return state; // placeholder for future logic
-    }
-    case "ADD_ATTACHMENT": {
-      const { att } = action;
-      const batchList = state.byBatch[att.batchId] ?? [];
-      const pending = state.pendingQueue[att.batchId] ?? [];
-      return {
-        ...state,
-        byCid: { ...state.byCid, [att.cid]: att },
-        byBatch: { ...state.byBatch, [att.batchId]: [...batchList, att.cid] },
-        pendingQueue: {
-          ...state.pendingQueue,
-          [att.batchId]: [...pending, att.cid]
-        }
-      };
-    }
-    case "REMOVE_ATTACHMENT": {
-      const { cid } = action;
-      const att = state.byCid[cid];
-      if (!att) return state;
-      const { batchId } = att;
-      const byBatch = {
-        ...state.byBatch,
-        [batchId]: (state.byBatch[batchId] ?? []).filter(x => x !== cid)
-      };
-      const pendingQueue = {
-        ...state.pendingQueue,
-        [batchId]: (state.pendingQueue[batchId] ?? []).filter(x => x !== cid)
-      };
-      const byCid = { ...state.byCid };
-      delete byCid[cid];
-      return { ...state, byCid, byBatch, pendingQueue };
-    }
-    case "SET_PROGRESS": {
-      const { cid, progress } = action;
-      const cur = state.byCid[cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: { ...state.byCid, [cid]: { ...cur, progress } }
-      };
-    }
-    case "SET_STATUS": {
-      const { cid, status, error } = action;
-      const cur = state.byCid[cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: { ...state.byCid, [cid]: { ...cur, status, error } }
-      };
-    }
-    case "SET_SERVER_LINK": {
-      const { cid, link } = action;
-      const cur = state.byCid[cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: { ...state.byCid, [cid]: { ...cur, ...link } }
-      };
-    }
-    case "SET_VERSION": {
-      const { cid, versionId, etag } = action;
-      const cur = state.byCid[cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: { ...state.byCid, [cid]: { ...cur, versionId, etag } }
-      };
-    }
-    case "SET_THUMBNAIL": {
-      const cur = state.byCid[action.cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: {
-          ...state.byCid,
-          [action.cid]: { ...cur, thumbnail: action.dataUrl }
-        }
-      };
-    }
-    case "SET_DIMENSIONS": {
-      const cur = state.byCid[action.cid];
-      if (!cur) return state;
-      return {
-        ...state,
-        byCid: {
-          ...state.byCid,
-          [action.cid]: { ...cur, width: action.width, height: action.height }
-        }
-      };
-    }
-    case "PUSH_PENDING": {
-      const list = state.pendingQueue[action.batchId] ?? [];
-      return {
-        ...state,
-        pendingQueue: {
-          ...state.pendingQueue,
-          [action.batchId]: [...list, action.cid]
-        }
-      };
-    }
-    case "SHIFT_PENDING": {
-      const list = [...(state.pendingQueue[action.batchId] ?? [])];
-      list.shift();
-      return {
-        ...state,
-        pendingQueue: { ...state.pendingQueue, [action.batchId]: list }
-      };
-    }
-    case "CLEAR_BATCH": {
-      const cids = state.byBatch[action.batchId] ?? [];
-      const byCid = { ...state.byCid };
-      cids.forEach(cid => delete byCid[cid]);
-      const byBatch = { ...state.byBatch };
-      delete byBatch[action.batchId];
-      const pendingQueue = { ...state.pendingQueue };
-      delete pendingQueue[action.batchId];
-      return { ...state, byCid, byBatch, pendingQueue };
-    }
-    case "SET_UPLOAD_STRATEGY": {
-      return { ...state, uploadStrategy: action.strategy };
-    }
-    default:
-      return state;
-  }
-}
-
-// ---- Context API
-interface AssetContextValue {
-  state: State;
-  beginBatch: (conversationId?: string) => string; // returns batchId
-  destroyBatch: (batchId: string) => void;
-  setUploadStrategy: (strategy: "xhr" | "server") => void;
-  stageFiles: (
-    batchId: string,
-    files: File[],
-    origin?: "PASTED" | "UPLOAD" | "SCREENSHOT"
-  ) => void;
-  remove: (cid: string) => void;
-}
-
-const AssetContext = createContext<AssetContextValue | null>(null);
+const AssetContext = createContext<AssetContextValue | undefined>(undefined);
 
 export function AssetProvider({
   children,
@@ -242,236 +71,345 @@ export function AssetProvider({
   children: React.ReactNode;
   userId: string;
 }) {
-  const [state, dispatch] = useReducer(reducer, initial);
-  const { sendEvent, on, isConnected } = useChatWebSocketContext();
-  const batchConvMap = useRef<Record<string, string>>({}).current;
-  const batchOrdinals = useRef<Record<string, number>>({}).current;
+  const { conversationId: pathConvId } = usePathnameContext();
+  const { client, sendEvent, isConnected } = useChatWebSocketContext();
 
-  // Generate a batch id and bootstrap batch state
-  const beginBatch = useCallback(
-    (conversationId = "new-chat") => {
-      const batchId = `batch_${nanoid(10)}`;
-      dispatch({ type: "BEGIN_BATCH", batchId });
-      // store a phantom placeholder to carry convId in the batch’s first item
-      batchConvMap[batchId] = conversationId;
-      batchOrdinals[batchId] = 0;
-      return batchId;
-    },
-    [batchConvMap, batchOrdinals]
-  );
+  // core state (same style as AIChat)
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(pathConvId ?? "new-chat");
+  const [currentBatchId, setCurrentBatchId] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const destroyBatch = useCallback(
-    (batchId: string) => {
-      dispatch({ type: "CLEAR_BATCH", batchId });
-      delete batchConvMap[batchId];
-    },
-    [batchConvMap]
-  );
+  // keep conv id in sync with PathnameContext (passive read, like AIChat)
+  useEffect(() => {
+    if (pathConvId && pathConvId !== activeConversationId) {
+      setActiveConversationId(pathConvId);
+    }
+  }, [pathConvId, activeConversationId]);
 
-  const setUploadStrategy = useCallback((strategy: "xhr" | "server") => {
-    dispatch({ type: "SET_UPLOAD_STRATEGY", strategy });
+  // task store: super simple
+  const tasksByDraftIdRef = useRef<Map<string, UploadTask>>(new Map());
+
+  const clearError = useCallback(() => setError(null), []);
+  const resetUploads = useCallback(() => {
+    tasksByDraftIdRef.current.clear();
+    setUploadProgress(0);
+    setIsUploading(false);
+    setError(null);
   }, []);
 
-  // Local map for batch -> conversationId (kept out of React state to avoid extra renders)
-
-  // Util: thumb + dimensions
-  const hydrateThumbAndDims = useCallback((cid: string, file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target?.result as string;
-      if (dataUrl) dispatch({ type: "SET_THUMBNAIL", cid, dataUrl });
-      const img = new Image();
-      img.onload = () => {
-        dispatch({
-          type: "SET_DIMENSIONS",
-          cid,
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        });
-      };
-      img.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
+  // recompute overall progress + flags
+  const recompute = useCallback(() => {
+    const tasks = Array.from(tasksByDraftIdRef.current.values());
+    if (tasks.length === 0) {
+      setUploadProgress(0);
+      setIsUploading(false);
+      return;
+    }
+    const avg = Math.round(
+      tasks.reduce((s, t) => s + (t.progress ?? 0), 0) / tasks.length
+    );
+    setUploadProgress(avg);
+    setIsUploading(
+      tasks.some(t => t.status === "REQUESTED" || t.status === "UPLOADING")
+    );
   }, []);
 
-  const stageFiles = useCallback(
-    (
-      batchId: string,
-      files: File[],
-      origin: "PASTED" | "UPLOAD" | "SCREENSHOT" = "UPLOAD"
-    ) => {
-      const conversationId = batchConvMap[batchId] ?? "new-chat";
+  const getBatchId = useCallback((): string => {
+    if (currentBatchId) return currentBatchId;
+    const b = `batch_${Date.now().toString(36)}`;
+    setCurrentBatchId(b);
+    return b;
+  }, [currentBatchId]);
 
-      files.forEach((file, i) => {
-        const cid = `cid_${nanoid(8)}`;
-        const att: ClientAttachment = {
-          cid,
-          batchId,
-          conversationId,draftId: `${userId}-${conversationId}-${batchId}-${i++}`,
-          file,
-          filename: file.name,
-          mime: file.type,
-          size: file.size,
-          status: "pending"
+  /** XHR uploader (progress + header parity) */
+  const uploadToS3 = useCallback(
+    async (opts: {
+      url: string;
+      file: File;
+      headers?: Record<string, string>;
+      onProgress?: (pct: number) => void;
+    }): Promise<{ versionId: string; etag?: string }> => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable) {
+            opts.onProgress?.(Math.round((e.loaded / e.total) * 100));
+          }
         };
-        dispatch({ type: "ADD_ATTACHMENT", att });
-        hydrateThumbAndDims(cid, file);
-
-        // ask server for presign
-        if (!isConnected) return; // don’t queue WS if offline
-
-        // Use dedicated event for paste vs generic prepare if you want; both lead to instructions
-        if (origin === "PASTED") {
-          sendEvent("asset_paste", {
-            type: "asset_paste",
-            conversationId,
-            batchId,
-            draftId: `${userId}~${conversationId}~${batchId}~${i++}` as const,
-            filename:
-              file.name ||
-              `paste-${Date.now()}.${file.type.split("/")[1] ?? "bin"}`,
-            mime: file.type,
-            size: file.size
-          } satisfies EventTypeMap["asset_paste"]);
-        } else {
-          sendEvent("asset_upload_prepare", {
-            type: "asset_upload_prepare",
-            conversationId,
-            filename: file.name,
-            batchId,
-            draftId: `${userId}~${conversationId}~${batchId}~${i++}` as const,
-            mime: file.type,
-            size: file.size,
-            origin
-          } satisfies EventTypeMap["asset_upload_prepare"]);
-        }
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const v = xhr.getResponseHeader("x-amz-version-id");
+            if (!v) return reject(new Error("Missing x-amz-version-id"));
+            const etag = xhr.getResponseHeader("ETag")?.replace(/"/g, "");
+            resolve({ versionId: v, etag });
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Network error during upload"));
+        xhr.open("PUT", opts.url);
+        if (opts.headers)
+          for (const [k, v] of Object.entries(opts.headers))
+            xhr.setRequestHeader(k, v);
+        xhr.send(opts.file);
       });
     },
-    [batchConvMap, hydrateThumbAndDims, isConnected, sendEvent, userId]
-  );
-
-  const remove = useCallback(
-    (cid: string) => dispatch({ type: "REMOVE_ATTACHMENT", cid }),
     []
   );
 
-  // ---- WS: handle instructions → perform upload → notify server
-  useEffect(() => {
-    return on("asset_upload_instructions", async evt => {
-      if (evt.type === "asset_upload_instructions") {
-        // FIFO mapping inside whichever batch queued next; this gets you e2e now
-        const {
-          conversationId,
-          attachmentId,
-          method,
-          uploadUrl,
-          requiredHeaders,
-          bucket,
-          key
-        } = evt;
+  /** Public action: register assets (C→S step 1) */
+  const registerAssets = useCallback(
+    (
+      attachments: AttachmentPreview[],
+      conversationId?: string,
+      origin: Extract<
+        AssetOrigin,
+        "UPLOAD" | "PASTED" | "SCREENSHOT"
+      > = "UPLOAD",
+      batchId?: string
+    ) => {
+      if (!userId) {
+        console.warn("[AssetContext] Cannot register without userId");
+        return;
+      }
+      const convId = conversationId ?? activeConversationId ?? "new-chat";
+      const bId = batchId ?? getBatchId();
 
-        // find a batch that matches the conversation and still has pending items
-        const batchId = Object.keys(state.pendingQueue).find(
-          b =>
-            state.pendingQueue[b]?.length && batchConvMap[b] === conversationId
-        );
-        if (!batchId) return;
-        const cid = state?.pendingQueue?.[batchId]?.[0];
-        if (!cid) return;
+      attachments.forEach((a, idx) => {
+        const draftId = createDraftId(userId, convId, bId, idx);
 
-        dispatch({
-          type: "SET_SERVER_LINK",
-          cid,
-          link: { attachmentId, bucket, key }
+        // record task
+        tasksByDraftIdRef.current.set(draftId, {
+          draftId,
+          batchId: bId,
+          file: a.file,
+          filename: a.filename,
+          mime: a.mime,
+          size: a.size,
+          progress: 0,
+          status: "REQUESTED"
         });
-        dispatch({ type: "SET_STATUS", cid, status: "uploading" });
 
-        const att = state.byCid[cid];
-        if (!att) return;
+        // fire initial event (C→S) with your canonical names
+        if (origin === "PASTED" || origin === "SCREENSHOT") {
+          sendEvent("asset_paste", {
+            type: "asset_paste",
+            conversationId: convId,
+            draftId,
+            batchId: bId,
+            filename: a.filename,
+            mime: a.mime,
+            size: a.size,
+            width: a.width,
+            height: a.height,
+            metadata: a.metadata
+          } satisfies EventTypeMap["asset_paste"]);
+        } else {
+          sendEvent("asset_attached", {
+            type: "asset_attached",
+            conversationId: convId,
+            draftId,
+            batchId: bId,
+            filename: a.filename,
+            mime: a.mime,
+            size: a.size,
+            width: a.width,
+            height: a.height,
+            metadata: a.metadata
+          } satisfies EventTypeMap["asset_attached"]);
+        }
+      });
 
-        try {
-          const startedAt = Date.now();
-          const { versionId, etag, bytesUploaded } = await uploadToS3(
-            {
-              method,
-              url: uploadUrl,
-              file: att.file,
-              headers: requiredHeaders
-            },
-            p => dispatch({ type: "SET_PROGRESS", cid, progress: p })
-          );
+      setIsUploading(true);
+      recompute();
+    },
+    [userId, activeConversationId, getBatchId, sendEvent, recompute]
+  );
 
-          dispatch({ type: "SET_VERSION", cid, versionId, etag });
+  /** WS subscriptions — single effect, like AIChat */
+  useEffect(() => {
+    // S→C: presigned upload instructions
+    const handleUploadInstructions = (
+      evt: EventTypeMap["asset_upload_instructions"]
+    ) => {
+      const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
+      if (!task) {
+        console.warn("[AssetContext] Missing task for draftId:", evt.draftId);
+        return;
+      }
 
-          const duration = Date.now() - startedAt;
-          const publicUrl = makePublicUrl(bucket, key, versionId);
+      task.attachmentId = evt.attachmentId;
+      task.uploadUrl = evt.uploadUrl;
+      task.requiredHeaders = evt.requiredHeaders;
+      task.bucket = evt.bucket;
+      task.key = evt.key;
+      task.status = "UPLOADING";
+      task.progress = 0;
+      recompute();
 
-          // notify server
+      // optional transitional event (C→S) to satisfy your vocabulary
+      sendEvent("asset_upload_prepare", {
+        type: "asset_upload_prepare",
+        conversationId: evt.conversationId,
+        filename: task.filename,
+        mime: task.mime,
+        size: task.size,
+        origin: "UPLOAD",
+        draftId: task.draftId,
+        batchId: task.batchId
+      } as EventTypeMap["asset_upload_prepare"]);
+
+      // start the PUT (C→S3)
+      const headers = {
+        ...(evt.requiredHeaders ?? {}),
+        "Content-Type": task.mime || evt.mimeType || "application/octet-stream"
+      };
+
+      uploadToS3({
+        url: evt.uploadUrl,
+        file: task.file,
+        headers,
+        onProgress: pct => {
+          task.progress = pct;
+          // (optional) echo to server so other clients see progress
+          sendEvent("asset_upload_progress", {
+            type: "asset_upload_progress",
+            userId,
+            draftId: task.draftId,
+            batchId: task.batchId,
+            conversationId: evt.conversationId,
+            attachmentId: task.attachmentId,
+            progress: pct,
+            bytesUploaded: Math.round((pct / 100) * task.size),
+            totalBytes: task.size
+          } as EventTypeMap["asset_upload_progress"]);
+          recompute();
+        }
+      })
+        .then(({ versionId, etag }) => {
+          task.versionId = versionId;
+          task.etag = etag;
+
+          // C→S: completion (server will finalize + emit asset_ready)
           sendEvent("asset_upload_complete", {
             type: "asset_upload_complete",
-            conversationId,
-            userId: "", // server can infer from ws auth; fill if you have it handy
-            bucket,
-            key,
-            attachmentId,
+            conversationId: evt.conversationId,
+            userId,
+            bucket: evt.bucket,
+            key: evt.key,
+            attachmentId: task.attachmentId,
+            draftId: task.draftId,
+            batchId: task.batchId,
             versionId,
-            publicUrl,
+            publicUrl: `https://${evt.bucket}.s3.amazonaws.com/${encodeURIComponent(evt.key)}?versionId=${encodeURIComponent(versionId)}`,
             etag,
             success: true,
-            duration,
-            bytesUploaded
-          } satisfies EventTypeMap["asset_upload_complete"]);
-        } catch (err) {
-          const _cur = state.byCid[cid];
-          dispatch({
-            type: "SET_STATUS",
-            cid,
-            status: "error",
-            error: String(err)
-          });
+            duration: 0,
+            bytesUploaded: task.size
+          } as EventTypeMap["asset_upload_complete"]);
+        })
+        .catch(err => {
+          task.status = "FAILED";
+          task.error = String(err);
+          setError(String(err));
+          recompute();
+
           sendEvent("asset_upload_complete_error", {
             type: "asset_upload_complete_error",
-            conversationId,
-            bucket,
-            batchId,
-            key,
-            userId: "",
-            attachmentId,
+            conversationId: evt.conversationId,
+            bucket: evt.bucket,
+            key: evt.key,
+            userId,
+            attachmentId: task.attachmentId,
+            draftId: task.draftId,
+            batchId: task.batchId,
             error: String(err),
             success: false
-          } satisfies EventTypeMap["asset_upload_complete_error"]);
-        } finally {
-          dispatch({ type: "SHIFT_PENDING", batchId });
-        }
-      }
-    });
-  }, [on, sendEvent, state.byCid, state.pendingQueue, batchConvMap]);
+          } as EventTypeMap["asset_upload_complete_error"]);
+        });
+    };
 
-  // When server says READY, mark uploaded
-  useEffect(() => {
-    return on("asset_ready", evt => {
-      if (evt.type === "asset_ready") {
-        const { attachmentId } = evt;
-        const cid = Object.values(state.byCid).find(
-          a => a.attachmentId === attachmentId
-        )?.cid;
-        if (!cid) return;
-        dispatch({ type: "SET_STATUS", cid, status: "uploaded" });
+    // (optional cross-client) progress mirrored from server
+    const handleUploadProgress = (
+      evt: EventTypeMap["asset_upload_progress"]
+    ) => {
+      const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
+      if (!task) return;
+      if (
+        typeof evt.progress === "number" &&
+        evt.progress > (task.progress ?? 0)
+      ) {
+        task.progress = evt.progress;
+        recompute();
       }
-    });
-  }, [on, state.byCid]);
+    };
+
+    // S→C: server finalized (authoritative)
+    const handleAssetReady = (evt: EventTypeMap["asset_ready"]) => {
+      const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
+      if (task) {
+        task.status = "READY";
+        task.progress = 100;
+        task.versionId = evt.versionId ?? task.versionId;
+        task.etag = evt.etag ?? task.etag;
+      }
+      recompute();
+    };
+
+    const handleUploadError = (
+      evt: EventTypeMap["asset_upload_complete_error"]
+    ) => {
+      const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
+      if (task) {
+        task.status = "FAILED";
+        task.error = evt.error ?? "unknown";
+      }
+      setError(evt.error ?? "Upload failed");
+      recompute();
+    };
+
+    client.on("asset_upload_instructions", handleUploadInstructions);
+    client.on("asset_upload_progress", handleUploadProgress);
+    client.on("asset_ready", handleAssetReady);
+    client.on("asset_upload_complete_error", handleUploadError);
+
+    return () => {
+      client.off("asset_upload_instructions");
+      client.off("asset_upload_progress");
+      client.off("asset_ready");
+      client.off("asset_upload_complete_error");
+    };
+  }, [client, sendEvent, uploadToS3, userId, recompute]);
 
   const value = useMemo<AssetContextValue>(
     () => ({
-      state,
-      beginBatch,
-      destroyBatch,
-      setUploadStrategy,
-      stageFiles,
-      remove
+      activeConversationId,
+      currentBatchId,
+      uploadProgress,
+      isUploading,
+      error,
+      isConnected,
+      getBatchId,
+      registerAssets,
+      clearError,
+      resetUploads
     }),
-    [state, beginBatch, destroyBatch, setUploadStrategy, stageFiles, remove]
+    [
+      activeConversationId,
+      currentBatchId,
+      uploadProgress,
+      isUploading,
+      error,
+      isConnected,
+      getBatchId,
+      registerAssets,
+      clearError,
+      resetUploads
+    ]
   );
 
   return (
@@ -479,95 +417,8 @@ export function AssetProvider({
   );
 }
 
-export function useAssetBatch(conversationId = "new-chat") {
+export function useAssetUpload() {
   const ctx = useContext(AssetContext);
-  if (!ctx)
-    throw new Error("useAssetBatch must be used within <AssetProvider/>");
-
-  // Lazily create a batch only once per hook usage
-  const batchRef = useRef<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-  if (!batchRef.current) {
-    batchRef.current = ctx.beginBatch(conversationId);
-  }
-  const batchId = batchRef.current;
-
-  const attachments = (ctx.state.byBatch[batchId] ?? []).map(
-    cid => ctx.state.byCid[cid]
-  );
-
-  const onPaste = useCallback(
-    (e: React.ClipboardEvent) => {
-      const items = Array.from(e.clipboardData.items);
-      const files: File[] = [];
-      for (const item of items) {
-        if (item.kind === "file") {
-          const f = item.getAsFile();
-          if (f) files.push(f);
-        }
-      }
-      if (files.length) {
-        e.preventDefault();
-        ctx.stageFiles(batchId, files, "PASTED");
-      }
-    },
-    [batchId, ctx]
-  );
-
-  const addFiles = useCallback(
-    (files: File[]) => ctx.stageFiles(batchId, files, "UPLOAD"),
-    [batchId, ctx]
-  );
-  const remove = useCallback((cid: string) => ctx.remove(cid), [ctx]);
-  const clear = useCallback(() => ctx.destroyBatch(batchId), [batchId, ctx]);
-
-  return { batchId, attachments, onPaste, addFiles, remove, clear };
-}
-
-// ---- upload helper(s)
-async function uploadToS3(
-  opts: {
-    method: "PUT" | "POST";
-    url: string;
-    file: File;
-    headers?: Record<string, string>;
-  },
-  onProgress?: (p: number) => void
-): Promise<{ versionId: string; etag?: string; bytesUploaded: number }> {
-  // XHR for progress + headers
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(opts.method, opts.url, true);
-    if (opts.headers) {
-      for (const [k, v] of Object.entries(opts.headers))
-        xhr.setRequestHeader(k, v);
-    }
-    xhr.upload.onprogress = ev => {
-      if (!ev.lengthComputable) return;
-      const p = Math.round((ev.loaded / ev.total) * 100);
-      onProgress?.(p);
-    };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const v = xhr.getResponseHeader("x-amz-version-id");
-        if (!v) return reject(new Error("Missing x-amz-version-id header"));
-        const etag = (xhr.getResponseHeader("ETag") ?? "").replaceAll('"', "");
-        resolve({
-          versionId: v,
-          etag: etag || undefined,
-          bytesUploaded: opts.file.size
-        });
-      } else {
-        reject(new Error(`S3 upload failed (${xhr.status})`));
-      }
-    };
-    xhr.onerror = () => reject(new Error("Network error during S3 upload"));
-    xhr.send(opts.file);
-  });
-}
-
-function makePublicUrl(bucket: string, key: string, versionId: string) {
-  // If you front with CF, swap this out
-  const base = `https://${bucket}.s3.amazonaws.com/${encodeURIComponent(key)}`;
-  return `${base}?versionId=${encodeURIComponent(versionId)}`;
+  if (!ctx) throw new Error("useAssetUpload must be used within AssetProvider");
+  return ctx;
 }

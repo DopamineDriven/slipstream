@@ -10,7 +10,7 @@ const data = async (env: string, id: string) => {
     prismaClient.$connect();
     return await prismaClient.conversation.findUnique({
       where: { id: id },
-      include: { messages: { orderBy: { createdAt: "asc" } } }
+      include: { messages: { orderBy: { createdAt: "asc" } }, attachments: true}
     });
   } catch (err) {
     console.error(err);
@@ -43,7 +43,7 @@ const fs = new Fs(process.cwd());
 
 if (process.argv[3] === "dev") {
   (async () => {
-    data(process.env.DATABASE_URL ?? "", "ya1rl2a1anw3h0d8mkfun2gb").then(s => {
+    data(process.env.DATABASE_URL ?? "", "tsc8ukfhxdddj4pykubzix1i").then(s => {
       if (!s) return;
       console.log(s);
       fs.withWs(
