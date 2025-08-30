@@ -28,9 +28,24 @@ async function exe() {
         buckets,
         region
       };
+    const { LoggerService } = await import("@/logger/index.ts");
 
     const { Fs } = await import("@d0paminedriven/fs");
     const fs = new Fs(process.cwd());
+
+    const isProd = typeof process.env.IS_PROD === "undefined",
+      loggerConfig = {
+        serviceName: "ws-server",
+        environment: isProd ? "production" : "development",
+        region,
+        taskArn: process.env.ECS_TASK_ARN,
+        taskDefinition: process.env.ECS_TASK_DEFINITION,
+        logLevel: isProd ? "info" : "debug",
+        isProd
+      };
+
+    const logger = LoggerService.getLoggerInstance(loggerConfig),
+      log = logger.getPinoInstance();
 
     const { S3Storage } = await import("@t3-chat-clone/storage-s3");
 
@@ -86,7 +101,7 @@ async function exe() {
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(
-      s3,
+      logger,
       prisma,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
@@ -96,7 +111,12 @@ async function exe() {
 
     const { GeminiService } = await import("@/gemini/index.ts");
 
-    const gemini = new GeminiService(prisma, redisInstance, cfg.GOOGLE_API_KEY);
+    const gemini = new GeminiService(
+      logger,
+      prisma,
+      redisInstance,
+      cfg.GOOGLE_API_KEY
+    );
 
     const resolver = new Resolver(
       wsServer,
@@ -117,32 +137,37 @@ async function exe() {
       try {
         await redisInstance.ping();
       } catch (err) {
-        console.error(
-          "Redis health check failed: ",
-          err instanceof Error ? err.message : ""
+        log.error(
+          "Redis health check failed: ".concat(
+            err instanceof Error ? err.message : ""
+          )
         );
       }
     }, 30000);
     await wsServer.start();
+
     let isShuttingDown = false;
 
     const gracefulShutdown = async <const T extends Signals>(signal: T) => {
       if (isShuttingDown) {
-        console.log(`Already shutting down, ignoring ${signal}`);
+        log.info(`Already shutting down, ignoring ${signal}`);
         return;
       }
 
       isShuttingDown = true;
-      console.log(`${signal} received, shutting down gracefully...`);
+      log.warn(`${signal} received, shutting down gracefully...`);
 
       try {
         await wsServer.stop();
-        console.log("Cleanup complete, exiting gracefully");
+        log.info("Cleanup complete, exiting gracefully");
         process.exitCode = 0;
       } catch (error) {
-        console.error("Error during shutdown:", error);
+        log.error(
+          `Error during shutdown: ` +
+            (typeof error === "string" ? error : JSON.stringify(error))
+        );
         if (error instanceof Error) {
-          console.error(error.stack);
+          log.error("Stacktrace: " + (error.stack ?? ""));
         }
         process.exitCode = 1;
       }

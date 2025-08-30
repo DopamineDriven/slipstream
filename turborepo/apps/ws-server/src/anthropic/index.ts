@@ -1,14 +1,16 @@
 import type { Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
+  ContentBlockParam,
+  DocumentBlockParam,
+  ImageBlockParam,
   MessageParam,
   RawMessageStreamEvent,
   StopReason,
-  TextBlockParam,
-  WebSearchResultBlock,
-  ContentBlockParam,
-  ImageBlockParam
+  TextBlockParam
 } from "@anthropic-ai/sdk/resources/messages";
+import type { Logger } from "pino";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
@@ -18,7 +20,6 @@ import type {
   EventTypeMap
 } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
-import { S3Storage } from "@t3-chat-clone/storage-s3";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
@@ -31,14 +32,20 @@ interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
 }
 export class AnthropicService {
   private defaultClient: Anthropic;
-
+  private logger: Logger;
   constructor(
-    private s3: S3Storage,
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
     this.defaultClient = new Anthropic({ apiKey: this.apiKey });
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[anthropic] " }
+      );
   }
 
   public getClient(overrideKey?: string) {
@@ -74,40 +81,54 @@ export class AnthropicService {
     msgs: Message[],
     userPrompt: string,
     systemPrompt?: string,
-    attachments?: ProviderChatRequestEntity['attachments']
+    attachments?: ProviderChatRequestEntity["attachments"]
   ) {
-
     if (!isNewChat) {
       const messages = msgs.map(msg => {
         if (msg.senderType === "USER") {
           // Handle user messages with potential attachments
-         const content = Array.of<ContentBlockParam>();
-
-
-          // Add text content if present
-          if (msg.content) {
+          const content = Array.of<ContentBlockParam>();
+          try {
+            // Add image attachments if present
+            if (attachments && attachments.length > 0) {
+              for (const attachment of attachments) {
+                if (attachment.sourceUrl && attachment.mime) {
+                  if (attachment.mime.includes("application/pdf")) {
+                    // Fetch and send as base64-encoded PDF document block
+                    // const data = await this.fetchAsBase64(attachment.sourceUrl);
+                    const docBlock = {
+                      type: "document",
+                      source: {
+                        type: "url",
+                        url: attachment.sourceUrl
+                      }
+                    } as const satisfies DocumentBlockParam;
+                    content.push(docBlock);
+                  } else if (attachment.mime.startsWith("image/")) {
+                    // Use URL source for images (works fine with S3 presigned URLs)
+                    const imageUrl = attachment.sourceUrl;
+                    const imageBlock = {
+                      type: "image",
+                      source: {
+                        type: "url",
+                        url: imageUrl
+                      }
+                    } as const satisfies ImageBlockParam;
+                    content.push(imageBlock);
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            this.logger.warn({ err }, "error in anthropic history workup");
+          } finally {
             content.push({ type: "text", text: msg.content } as const);
           }
 
-          // Add image attachments if present
-          if (attachments && attachments.length > 0) {
-            for (const attachment of attachments) {
-              if (attachment.sourceUrl ) {
-                // Use URL source for S3 presigned URLs
-                const imageUrl = attachment.sourceUrl ?? '';
-                const imageBlock = {
-                  type: "image",
-                  source: {
-                    type: "url",
-                    url: imageUrl
-                  }
-                } as const satisfies ImageBlockParam;
-                content.push(imageBlock);
-              }
-            }
-          }
-
-          return { role: "user", content: content.length > 0 ? content : msg.content } as const satisfies MessageParam;
+          return {
+            role: "user",
+            content: content.length > 0 ? content : msg.content
+          } as const satisfies MessageParam;
         } else {
           const provider = msg.provider.toLowerCase();
           const model = msg.model ?? "";
@@ -133,24 +154,42 @@ export class AnthropicService {
       const content = Array.of<ContentBlockParam>();
 
       // Add text prompt
-      content.push({ type: "text", text: userPrompt } as const);
 
-      // Add image attachments if present
-      if (attachments && attachments.length > 0) {
-        for (const attachment of attachments) {
-          if (attachment.sourceUrl) {
-            // Use URL source for S3 presigned URLs
-            const imageUrl = attachment.sourceUrl;
-            const imageBlock = {
-              type: "image",
-              source: {
-                type: "url",
-                url: imageUrl
+      try {
+        // Add image attachments if present
+        if (attachments && attachments.length > 0) {
+          for (const attachment of attachments) {
+            if (attachment.sourceUrl && attachment.mime) {
+              if (attachment.mime.includes("application/pdf")) {
+                // Fetch and send as base64-encoded PDF document block
+                // const data = await this.fetchAsBase64(attachment.sourceUrl);
+                const docBlock = {
+                  type: "document",
+                  source: {
+                    type: "url",
+                    url: attachment.sourceUrl
+                  }
+                } as const satisfies DocumentBlockParam;
+                content.push(docBlock);
+              } else if (attachment.mime.startsWith("image/")) {
+                // Use URL source for images (works fine with S3 presigned URLs)
+                const imageUrl = attachment.sourceUrl;
+                const imageBlock = {
+                  type: "image",
+                  source: {
+                    type: "url",
+                    url: imageUrl
+                  }
+                } as const satisfies ImageBlockParam;
+                content.push(imageBlock);
               }
-            } as const satisfies ImageBlockParam;
-            content.push(imageBlock);
+            }
           }
         }
+      } catch (err) {
+        this.logger.warn({ err }, "error in new chat anthropic history workup");
+      } finally {
+        content.push({ type: "text", text: userPrompt } as const);
       }
 
       const messages = [
@@ -171,6 +210,17 @@ export class AnthropicService {
         };
       }
     }
+  }
+
+  private async fetchAsBase64(url: string) {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch attachment: ${res.status} ${res.statusText}`
+      );
+    }
+    const ab = await res.arrayBuffer();
+    return Buffer.from(ab).toString("base64");
   }
 
   private handleMaxTokens(mod: AllModelsUnion, max_tokens?: number) {
@@ -201,6 +251,14 @@ export class AnthropicService {
     };
   }
 
+  private webSearchTool(
+    user_location: ProviderAnthropicChatRequestEntity["user_location"]
+  ) {
+    return [
+      { type: "web_search_20250305", name: "web_search", user_location }
+    ] satisfies Anthropic.Messages.ToolUnion[] | undefined;
+  }
+
   public async handleAnthropicAiChatRequest({
     chunks,
     conversationId,
@@ -227,6 +285,8 @@ export class AnthropicService {
     let anthropicIsCurrentlyThinking = false;
     let anthropicThinkingAgg = "";
     let anthropicAgg = "";
+    let anthropicWebsearchToolUse = false;
+    let anthropicCi = 0;
 
     const anthropic = this.getClient(apiKey ?? undefined);
 
@@ -243,6 +303,8 @@ export class AnthropicService {
       max_tokens
     );
 
+    const tools = this.webSearchTool(user_location);
+
     const stream = (await anthropic.messages.create(
       {
         max_tokens: maxTokens,
@@ -253,13 +315,7 @@ export class AnthropicService {
         system,
         model,
         messages,
-        tools: [
-          {
-            type: "web_search_20250305",
-            name: "web_search",
-            user_location
-          }
-        ]
+        tools
       },
       { stream: true }
     )) satisfies Stream<RawMessageStreamEvent> & {
@@ -269,16 +325,26 @@ export class AnthropicService {
     for await (const chunk of stream) {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
+        webSearchRes: Anthropic.WebSearchResultBlock | null = null,
         done: StopReason | null = null;
 
       if (chunk.type === "content_block_start") {
+        if (chunk.content_block.type === "server_tool_use") {
+          if (anthropicWebsearchToolUse === false) {
+            anthropicWebsearchToolUse = true;
+          }
+        }
+
         if (chunk.content_block.type === "web_search_tool_result") {
           if ("error" in chunk.content_block.content) {
-            console.log(chunk.content_block.content);
+            this.logger.info(chunk.content_block.content.error);
           }
-          (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
-            text = `[${v.title}](${v.url})`;
-          });
+          if (Array.isArray(chunk.content_block.content)) {
+            for (const subblock of chunk.content_block.content) {
+              webSearchRes = subblock;
+              anthropicWebsearchToolUse = false;
+            }
+          }
         }
       }
       if (chunk.type === "content_block_delta") {
@@ -310,18 +376,43 @@ export class AnthropicService {
           }
         }
         if (chunk.delta.type === "citations_delta") {
-          console.log(chunk.delta.citation);
+          this.logger.info(chunk.delta.citation);
+        }
+        if (chunk.delta.type === "input_json_delta") {
+          if (anthropicWebsearchToolUse === true) {
+            this.logger.info(
+              { chunk_delta_type: "input_json_delta" },
+              chunk.delta.partial_json
+            );
+          }
         }
       } else if (chunk.type === "message_delta") {
         done = chunk.delta.stop_reason;
-
       }
 
       // Handle thinking chunks
       if (thinkingText) {
-        anthropicThinkingAgg += thinkingText;
-        thinkingChunks.push(thinkingText);
+        if (webSearchRes) {
+          anthropicCi += 1;
 
+          const { url } = webSearchRes;
+
+          this.logger.info(
+            { ...webSearchRes },
+            `web-search-result ${anthropicCi}`
+          );
+
+          const formatIt = ` [\\(^{${anthropicCi}}\\)](${url})` as const;
+
+          anthropicThinkingAgg += thinkingText.concat(formatIt);
+
+          thinkingChunks.push(thinkingText.concat(formatIt));
+
+          webSearchRes = null;
+        } else {
+          anthropicThinkingAgg += thinkingText;
+          thinkingChunks.push(thinkingText);
+        }
         ws.send(
           JSON.stringify({
             type: "ai_chat_chunk",
@@ -363,8 +454,27 @@ export class AnthropicService {
 
       // Handle regular text chunks
       if (text) {
-        anthropicAgg += text;
-        chunks.push(text);
+        if (webSearchRes) {
+          anthropicCi += 1;
+
+          const { url } = webSearchRes;
+
+          this.logger.info(
+            { ...webSearchRes },
+            `web-search-result ${anthropicCi}`
+          );
+
+          const formatIt = ` [\\(^{${anthropicCi}}\\)](${url})` as const;
+
+          anthropicAgg += text.concat(formatIt);
+
+          chunks.push(text);
+
+          webSearchRes = null;
+        } else {
+          anthropicAgg += text;
+          chunks.push(text);
+        }
         ws.send(
           JSON.stringify({
             type: "ai_chat_chunk",
