@@ -26,6 +26,9 @@
       "generated": [
         "dist/generated/*.d.ts"
       ],
+      "logger": [
+        "dist/logger/index.d.ts"
+      ],
       "meta": [
         "dist/meta/index.d.ts"
       ],
@@ -75,10 +78,10 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.60.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.876.0",
-    "@aws-sdk/client-secrets-manager": "^3.876.0",
-    "@aws-sdk/credential-providers": "^3.876.0",
-    "@aws-sdk/s3-request-presigner": "^3.876.0",
+    "@aws-sdk/client-s3": "^3.879.0",
+    "@aws-sdk/client-secrets-manager": "^3.879.0",
+    "@aws-sdk/credential-providers": "^3.879.0",
+    "@aws-sdk/s3-request-presigner": "^3.879.0",
     "@aws-sdk/types": "^3.862.0",
     "@d0paminedriven/fs": "^7.5.0",
     "@google/genai": "^1.16.0",
@@ -94,7 +97,7 @@
     "@types/node": "^24.3.0",
     "@types/pg": "^8.15.5",
     "@types/ws": "^8.18.1",
-    "bullmq": "^5.58.2",
+    "bullmq": "^5.58.3",
     "dotenv": "^17.2.1",
     "dotenv-cli": "^10.0.0",
     "dotenv-expand": "^12.0.2",
@@ -102,7 +105,7 @@
     "llama-api-client": "^0.2.0",
     "node-html-parser": "^7.0.1",
     "openai": "^5.16.0",
-    "p-limit": "^7.1.0",
+    "p-limit": "^7.1.1",
     "pg": "^8.16.3",
     "pino": "^9.9.0",
     "pino-abstract-transport": "^2.0.0",

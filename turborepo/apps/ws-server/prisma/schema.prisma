@@ -281,7 +281,8 @@ model Attachment {
   assetType      AssetType    @default(UNKNOWN)
 
   uploadDuration Int? // milliseconds
-  cdnUrl         String? // publicUrl
+  cdnUrl         String? // Cloudfront Url
+  publicUrl      String? // for backwards compat (DONT USE AS CDN URL)
   sourceUrl      String? // uploadUrl
   thumbnailKey   String? // image/video thumbnails
 

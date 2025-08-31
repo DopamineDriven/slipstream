@@ -1,4 +1,4 @@
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import type { Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity, UserData } from "@/types/index.ts";
 import type {
@@ -12,11 +12,7 @@ import type {
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import {
-  createPartFromText,
-  createPartFromUri,
-  GoogleGenAI
-} from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
@@ -32,16 +28,16 @@ export class GeminiService {
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
-    this.defaultClient = new GoogleGenAI({
-      apiKey: this.apiKey,
-      apiVersion: "v1alpha"
-    });
     this.logger = logger
       .getPinoInstance()
       .child(
         { pid: process.pid, node_version: process.version },
         { msgPrefix: "[gemini] " }
       );
+    this.defaultClient = new GoogleGenAI({
+      apiKey: this.apiKey,
+      apiVersion: "v1alpha"
+    });
   }
 
   public getClient(overrideKey?: string) {
@@ -51,49 +47,123 @@ export class GeminiService {
     return this.defaultClient;
   }
 
+  private handleNumBigIntUnion(size: number | bigint) {
+    return typeof size === "bigint" ? 10n * 1024n * 1024n : 10 * 1024 * 1024;
+  }
+
+  public async fetchAssetForGenAI(
+    url: string,
+    knownSizeBytes: number | bigint,
+    mime: string | null
+  ) {
+    const TEN_MB = this.handleNumBigIntUnion(knownSizeBytes);
+
+    const mimeType = mime ?? "application/octet-stream";
+
+    const response = await fetch(url, { method: "GET" });
+    if (!response.ok || !response.body) {
+      throw new Error(`Failed to fetch asset: ${response.statusText}`);
+    }
+
+    let buffer: Buffer;
+
+    if (knownSizeBytes < TEN_MB) {
+      // For smaller files, buffer them into memory directly.
+      buffer = await this.streamToBuffer(response.body);
+    } else {
+      // For larger files, this approach is still memory-efficient.
+      // The logic is the same, but you could add progress indicators here if needed.
+      buffer = await this.streamToBuffer(response.body);
+    }
+
+    return { buffer, mimeType };
+  }
+
+  public async uploadRemoteAssetToGoogle(
+    url: string,
+    mimeType: string | null,
+    filename: string | null,
+    apiKey?: string
+  ) {
+    try {
+      // 1. Fetch the remote file and get its buffer
+      const response = await fetch(url, { method: "GET" });
+      if (!response.ok || !response.body) {
+        throw new Error(
+          `Failed to fetch asset from ${url}: ${response.statusText}`
+        );
+      }
+      const buffer = await this.streamToBuffer(response.body);
+
+      // 2. Upload the buffer to Google's File API
+      // The SDK handles streaming the buffer efficiently.
+      const ai = this.getClient(apiKey);
+      const uploadedFile = await ai.files.upload({
+        file: new Blob([buffer]), // The SDK works with Blob objects
+        config: {
+          mimeType: mimeType ?? "application/octet-stream",
+          name: filename ? `${filename.split(".")[0]}-${Date.now()}` : undefined
+        }
+      });
+
+      return uploadedFile;
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error in uploadRemoteAssetToGoogle for URL: ${url}`
+      );
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "something went wrong in upload remote asset to google..."
+      ); // Re-throw the error to be handled by the caller
+    }
+  }
+
+  private async streamToBuffer(stream: ReadableStream<Uint8Array>) {
+    // The logic from your `assetToBufferView` is already quite efficient
+    // for converting a stream to a single buffer in memory.
+    const reader = stream.getReader();
+    const chunks = Array.of<Uint8Array>();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+      }
+    }
+    return Buffer.concat(chunks);
+  }
+
   private async formatHistoryForSession(
     msgs: Message[],
-    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
-    gemini: GoogleGenAI
+    attachments?: ProviderGeminiChatRequestEntity["attachments"]
   ) {
-    const formatted: Content[] = [];
+    const formatted = Array.of<Content>();
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
         try {
           if (attachments && attachments.length > 0) {
             for (const attachment of attachments) {
-              if (
-                attachment?.sourceUrl &&
-                attachment.mime &&
-                attachment.filename
-              ) {
-                const path = await this.writeTmp(
-                  attachment.filename,
-                  attachment.sourceUrl
+              if (attachment?.cdnUrl && attachment?.mime) {
+                const { cdnUrl, mime, filename } = attachment;
+                const uploadedFile = await this.uploadRemoteAssetToGoogle(
+                  cdnUrl,
+                  mime,
+                  filename
                 );
-                const file = await gemini.files.upload({
-                  file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
-                  config: { mimeType: attachment.mime }
+                partArr.push({
+                  fileData: { fileUri: uploadedFile.uri, mimeType: mime }
                 });
-                if (file?.uri) {
-                  if (attachment.mime.includes("application/pdf")) {
-                    partArr.push(
-                      createPartFromUri(file.uri, "application/pdf")
-                    );
-                  } else if (attachment.mime.startsWith("image/")) {
-                    partArr.push(
-                      createPartFromUri(file.uri, attachment.mime)
-                    );
-                  }
-                }
               }
             }
           }
         } catch (err) {
           this.logger.warn({ err }, "error in gemini history workup");
         } finally {
-          partArr.push(createPartFromText(msg.content));
+          partArr.push({ text: msg.content });
         }
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
@@ -103,8 +173,12 @@ export class GeminiService {
         const modelIdentifier = `[${provider}/${model}]`;
         formatted.push({
           role: "model",
-          parts: [{ text: `${modelIdentifier}\n${msg.content}` }]
-        } as const);
+          parts: [
+            {
+              text: `${modelIdentifier}\n${msg.content}`
+            } as const satisfies Part
+          ]
+        } as const satisfies Content);
       }
     }
     return formatted;
@@ -129,15 +203,18 @@ export class GeminiService {
   public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: Message[],
-    systemPrompt: string | undefined,
-    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
-    gemini: GoogleGenAI
+    systemPrompt?: string,
+    attachments?: ProviderGeminiChatRequestEntity["attachments"]
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
     );
     if (isNewChat) {
+      this.logger.debug(
+        msgs,
+        `new chat msgs object in getHistoryAndInstruction has length ${msgs.length}`
+      );
       return {
         history: undefined,
         systemInstruction
@@ -145,11 +222,7 @@ export class GeminiService {
     } else {
       const historyMsgs = msgs.slice(0, -1);
       return {
-        history: await this.formatHistoryForSession(
-          historyMsgs,
-          attachments,
-          gemini
-        ),
+        history: await this.formatHistoryForSession(historyMsgs, attachments),
         systemInstruction
       };
     }
@@ -208,47 +281,39 @@ export class GeminiService {
       isNewChat,
       msgs,
       systemPrompt,
-      attachments,
-      gemini
+      attachments
     );
     const currentPartArr = Array.of<Part>();
 
     try {
       if (attachments && attachments.length > 0) {
         for (const attachment of attachments) {
-          if (attachment?.sourceUrl && attachment.mime && attachment.filename) {
-            const path = await this.writeTmp(
-              attachment.filename,
-              attachment.sourceUrl
+          if (attachment?.cdnUrl && attachment?.mime) {
+            const { cdnUrl, mime, filename } = attachment;
+            const uploadedFile = await this.uploadRemoteAssetToGoogle(
+              cdnUrl,
+              mime,
+              filename
             );
-            const file = await gemini.files.upload({
-              file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
-              config: { mimeType: attachment.mime }
+            currentPartArr.push({
+              fileData: { fileUri: uploadedFile.uri, mimeType: mime }
             });
-            if (file?.uri) {
-              if (attachment.mime.includes("application/pdf")) {
-                currentPartArr.push(
-                  createPartFromUri(file.uri, attachment.mime)
-                );
-              } else if (attachment.mime.startsWith("image/")) {
-                currentPartArr.push(
-                 createPartFromUri(file.uri, attachment.mime)
-                );
-              }
-            }
           }
         }
       }
     } catch (err) {
       this.logger.warn({ err }, "error in gemini history workup");
     } finally {
-      currentPartArr.push(createPartFromText(prompt));
+      currentPartArr.push({ text: prompt });
     }
     const fullContent = [
       ...(history ?? []),
       { role: "user", parts: currentPartArr }
     ] as const satisfies Content[];
-
+    this.logger.debug(
+      fullContent,
+      "debugging full content on first message to gemini"
+    );
     const stream = (await gemini.models.generateContentStream({
       contents: fullContent,
       model,

@@ -1733,6 +1733,7 @@ export const AttachmentScalarFieldEnum = {
   assetType: 'assetType',
   uploadDuration: 'uploadDuration',
   cdnUrl: 'cdnUrl',
+  publicUrl: 'publicUrl',
   sourceUrl: 'sourceUrl',
   thumbnailKey: 'thumbnailKey',
   bucket: 'bucket',

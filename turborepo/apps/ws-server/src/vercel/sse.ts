@@ -1,30 +1,18 @@
 // sse.ts - Updated for v0 API structure
+import { XOR } from "@t3-chat-clone/types";
 
 /**
- * Represents a parsed Server-Sent Event with v0 completion data
+ * a parsed Server-Sent Event (SSE)
  */
 export interface SSEEvent<T = unknown> {
   event?: string;
   data: T;
 }
-/**
- * helper workup for use in XOR type below
- * makes properties from U optional and undefined in T, and vice versa
- */
-export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 
-/**
- * enforces mutual exclusivity of T | U
- */
-// prettier-ignore
-export type XOR<T, U> =
-  [T, U] extends [object, object]
-    ? (Without<T, U> & U) | (Without<U, T> & T)
-    : T | U
 /**
  * v0 API type definitions
  */
-export type v0Delta = XOR<{ reasoning_content: string },{ content: string }>;
+export type v0Delta = XOR<{ reasoning_content: string }, { content: string }>;
 
 export type v0Choice = {
   index: number;
@@ -91,7 +79,7 @@ function v0SSETransformer(
   if (dataLines.length > 0) {
     try {
       const jsonStr = dataLines.join("\n");
-      const parsedData = JSON.parse(jsonStr) as v0ChatCompletionsRes;
+      const parsedData = JSON.parse<v0ChatCompletionsRes>(jsonStr);
       return { event: eventType, data: parsedData };
     } catch (error) {
       console.error("Failed to parse v0 SSE data:", error);
@@ -152,7 +140,11 @@ export class StreamParser<T> implements AsyncIterable<T> {
     this.readable = sourceStream.pipeThrough(transformStream);
   }
 
-  public async *[Symbol.asyncIterator](): AsyncGenerator<T> {
+  public async *[Symbol.asyncIterator](): AsyncGenerator<
+    Awaited<T>,
+    void,
+    unknown
+  > {
     const reader = this.readable.getReader();
     try {
       while (true) {
@@ -198,10 +190,7 @@ export function isContentDelta(delta: v0Delta): delta is { content: string } {
 }
 
 export function isFinished(chunk: v0ChatCompletionsRes) {
-  if (
-    "usage" in chunk &&
-    typeof chunk.usage !== "undefined"
-  ) {
+  if ("usage" in chunk && typeof chunk.usage !== "undefined") {
     return true;
   } else {
     return false;

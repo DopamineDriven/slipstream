@@ -49,6 +49,7 @@ export type AttachmentMinAggregateOutputType = {
   assetType: $Enums.AssetType | null
   uploadDuration: number | null
   cdnUrl: string | null
+  publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
   bucket: string | null
@@ -89,6 +90,7 @@ export type AttachmentMaxAggregateOutputType = {
   assetType: $Enums.AssetType | null
   uploadDuration: number | null
   cdnUrl: string | null
+  publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
   bucket: string | null
@@ -129,6 +131,7 @@ export type AttachmentCountAggregateOutputType = {
   assetType: number
   uploadDuration: number
   cdnUrl: number
+  publicUrl: number
   sourceUrl: number
   thumbnailKey: number
   bucket: number
@@ -181,6 +184,7 @@ export type AttachmentMinAggregateInputType = {
   assetType?: true
   uploadDuration?: true
   cdnUrl?: true
+  publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
   bucket?: true
@@ -221,6 +225,7 @@ export type AttachmentMaxAggregateInputType = {
   assetType?: true
   uploadDuration?: true
   cdnUrl?: true
+  publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
   bucket?: true
@@ -261,6 +266,7 @@ export type AttachmentCountAggregateInputType = {
   assetType?: true
   uploadDuration?: true
   cdnUrl?: true
+  publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
   bucket?: true
@@ -388,6 +394,7 @@ export type AttachmentGroupByOutputType = {
   assetType: $Enums.AssetType
   uploadDuration: number | null
   cdnUrl: string | null
+  publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
   bucket: string
@@ -451,6 +458,7 @@ export type AttachmentWhereInput = {
   assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
   uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
@@ -498,6 +506,7 @@ export type AttachmentOrderByWithRelationInput = {
   assetType?: Prisma.SortOrder
   uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder
   cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
@@ -548,6 +557,7 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
   uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
@@ -595,6 +605,7 @@ export type AttachmentOrderByWithAggregationInput = {
   assetType?: Prisma.SortOrder
   uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder
   cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
@@ -643,6 +654,7 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   assetType?: Prisma.EnumAssetTypeWithAggregatesFilter<"Attachment"> | $Enums.AssetType
   uploadDuration?: Prisma.IntNullableWithAggregatesFilter<"Attachment"> | number | null
   cdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  publicUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
@@ -680,6 +692,7 @@ export type AttachmentCreateInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -727,6 +740,7 @@ export type AttachmentUncheckedCreateInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -768,6 +782,7 @@ export type AttachmentUpdateInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -815,6 +830,7 @@ export type AttachmentUncheckedUpdateInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -859,6 +875,7 @@ export type AttachmentCreateManyInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -896,6 +913,7 @@ export type AttachmentUpdateManyMutationInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -936,6 +954,7 @@ export type AttachmentUncheckedUpdateManyInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -986,6 +1005,7 @@ export type AttachmentCountOrderByAggregateInput = {
   assetType?: Prisma.SortOrder
   uploadDuration?: Prisma.SortOrder
   cdnUrl?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
@@ -1031,6 +1051,7 @@ export type AttachmentMaxOrderByAggregateInput = {
   assetType?: Prisma.SortOrder
   uploadDuration?: Prisma.SortOrder
   cdnUrl?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
@@ -1071,6 +1092,7 @@ export type AttachmentMinOrderByAggregateInput = {
   assetType?: Prisma.SortOrder
   uploadDuration?: Prisma.SortOrder
   cdnUrl?: Prisma.SortOrder
+  publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
@@ -1328,6 +1350,7 @@ export type AttachmentCreateWithoutUserInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1373,6 +1396,7 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1446,6 +1470,7 @@ export type AttachmentScalarWhereInput = {
   assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
   uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
   cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
@@ -1483,6 +1508,7 @@ export type AttachmentCreateWithoutConversationInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1528,6 +1554,7 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1595,6 +1622,7 @@ export type AttachmentCreateWithoutMessageInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1640,6 +1668,7 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1707,6 +1736,7 @@ export type AttachmentCreateWithoutImageInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1753,6 +1783,7 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1809,6 +1840,7 @@ export type AttachmentUpdateWithoutImageInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1855,6 +1887,7 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1895,6 +1928,7 @@ export type AttachmentCreateWithoutVideoInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1941,6 +1975,7 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -1997,6 +2032,7 @@ export type AttachmentUpdateWithoutVideoInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2043,6 +2079,7 @@ export type AttachmentUncheckedUpdateWithoutVideoInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2083,6 +2120,7 @@ export type AttachmentCreateWithoutAudioInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2129,6 +2167,7 @@ export type AttachmentUncheckedCreateWithoutAudioInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2185,6 +2224,7 @@ export type AttachmentUpdateWithoutAudioInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2231,6 +2271,7 @@ export type AttachmentUncheckedUpdateWithoutAudioInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2271,6 +2312,7 @@ export type AttachmentCreateWithoutDocumentInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2317,6 +2359,7 @@ export type AttachmentUncheckedCreateWithoutDocumentInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2373,6 +2416,7 @@ export type AttachmentUpdateWithoutDocumentInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2419,6 +2463,7 @@ export type AttachmentUncheckedUpdateWithoutDocumentInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2461,6 +2506,7 @@ export type AttachmentCreateManyUserInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2498,6 +2544,7 @@ export type AttachmentUpdateWithoutUserInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2543,6 +2590,7 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2586,6 +2634,7 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2625,6 +2674,7 @@ export type AttachmentCreateManyConversationInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2662,6 +2712,7 @@ export type AttachmentUpdateWithoutConversationInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2707,6 +2758,7 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2750,6 +2802,7 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2789,6 +2842,7 @@ export type AttachmentCreateManyMessageInput = {
   assetType?: $Enums.AssetType
   uploadDuration?: number | null
   cdnUrl?: string | null
+  publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
   bucket: string
@@ -2826,6 +2880,7 @@ export type AttachmentUpdateWithoutMessageInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2871,6 +2926,7 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2914,6 +2970,7 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
   uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2956,6 +3013,7 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   assetType?: boolean
   uploadDuration?: boolean
   cdnUrl?: boolean
+  publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
   bucket?: boolean
@@ -3003,6 +3061,7 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   assetType?: boolean
   uploadDuration?: boolean
   cdnUrl?: boolean
+  publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
   bucket?: boolean
@@ -3046,6 +3105,7 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   assetType?: boolean
   uploadDuration?: boolean
   cdnUrl?: boolean
+  publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
   bucket?: boolean
@@ -3089,6 +3149,7 @@ export type AttachmentSelectScalar = {
   assetType?: boolean
   uploadDuration?: boolean
   cdnUrl?: boolean
+  publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
   bucket?: boolean
@@ -3115,7 +3176,7 @@ export type AttachmentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
@@ -3161,6 +3222,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     assetType: $Enums.AssetType
     uploadDuration: number | null
     cdnUrl: string | null
+    publicUrl: string | null
     sourceUrl: string | null
     thumbnailKey: string | null
     bucket: string
@@ -3628,6 +3690,7 @@ export interface AttachmentFieldRefs {
   readonly assetType: Prisma.FieldRef<"Attachment", 'AssetType'>
   readonly uploadDuration: Prisma.FieldRef<"Attachment", 'Int'>
   readonly cdnUrl: Prisma.FieldRef<"Attachment", 'String'>
+  readonly publicUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly sourceUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly thumbnailKey: Prisma.FieldRef<"Attachment", 'String'>
   readonly bucket: Prisma.FieldRef<"Attachment", 'String'>

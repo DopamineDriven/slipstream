@@ -55,6 +55,7 @@ export class xAIService {
       "grok-3-mini": 131072,
       "grok-3": 131072,
       "grok-3-fast": 131072,
+      "grok-code-fast-1": 256000,
       "grok-3-mini-fast": 131072
     } as const satisfies Record<GrokModelIdUnion, 256000 | 131072 | 32768>;
   }

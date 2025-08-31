@@ -73,7 +73,7 @@ export class S3Storage extends S3Utils {
       defaultPresignExpiry: cfg.defaultPresignExpiry ?? 604800
     };
     this.client = new S3Client({
-      credentials: fromIni(),
+      credentials: cfg.isProd ? {accessKeyId: cfg.accessKeyId,secretAccessKey: cfg.secretAccessKey} : fromIni(),
       region: cfg.region,
       requestHandler: this.requestHandler
     });
@@ -457,7 +457,19 @@ export class S3Storage extends S3Utils {
     return undefined; // Can't determine size of stream
   }
 
-  public async finalize(bucket: string, key: string, versionId = "nov") {
+  public getCfUrl(
+    isProd: boolean,
+key:string
+  ) {
+    return `https://assets${isProd ? "" : "-dev"}.d0paminedriven.com/${key}` as const;
+  }
+
+  public async finalize(
+    bucket: string,
+    key: string,
+    isProd: boolean,
+    versionId = "nov"
+  ) {
     const head = await this.client.send(
       new HeadObjectCommand({
         Bucket: bucket,
@@ -501,6 +513,7 @@ export class S3Storage extends S3Utils {
       getCommand,
       { expiresIn: 604800 } // 7 days
     );
+  const cdnUrl = this.getCfUrl(isProd, key);
     return {
       bucket,
       key,
@@ -509,6 +522,10 @@ export class S3Storage extends S3Utils {
       cacheControl: CacheControl,
       extension,
       expires,
+      /***
+       * the public url
+       */
+      cdnUrl,
       publicUrl,
       presignedUrl,
       presignedUrlExpiresAt: Date.now() + 604800 * 1000, // 7 days in ms

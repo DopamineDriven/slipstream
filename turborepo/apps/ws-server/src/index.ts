@@ -12,6 +12,7 @@ async function exe() {
   const cfg = await cred.getAll();
 
   try {
+    const isProd = typeof process.env.IS_PROD === "undefined";
     const accessKeyId = cfg.AWS_ACCESS_KEY,
       secretAccessKey = cfg.AWS_SECRET_ACCESS_KEY,
       region = cfg.AWS_REGION,
@@ -23,6 +24,7 @@ async function exe() {
           accessKeyId,
           secretAccessKey
         },
+        isProd,
         accessKeyId,
         secretAccessKey,
         buckets,
@@ -33,16 +35,18 @@ async function exe() {
     const { Fs } = await import("@d0paminedriven/fs");
     const fs = new Fs(process.cwd());
 
-    const isProd = typeof process.env.IS_PROD === "undefined",
-      loggerConfig = {
-        serviceName: "ws-server",
-        environment: isProd ? "production" : "development",
-        region,
-        taskArn: process.env.ECS_TASK_ARN,
-        taskDefinition: process.env.ECS_TASK_DEFINITION,
-        logLevel: isProd ? "info" : "debug",
-        isProd
-      };
+    const loggerConfig = {
+      serviceName: "ws-server",
+      environment:
+        typeof process.env.IS_PROD === "undefined"
+          ? "production"
+          : "development",
+      region,
+      taskArn: process.env.ECS_TASK_ARN,
+      taskDefinition: process.env.ECS_TASK_DEFINITION,
+      logLevel: typeof process.env.IS_PROD === "undefined" ? "info" : "debug",
+      isProd
+    };
 
     const logger = LoggerService.getLoggerInstance(loggerConfig),
       log = logger.getPinoInstance();
@@ -128,7 +132,8 @@ async function exe() {
       region,
       xai,
       v0,
-      meta
+      meta,
+      isProd
     );
 
     resolver.registerAll();
@@ -184,6 +189,15 @@ exe();
 declare module "ws" {
   interface WebSocket {
     _socket: Socket;
+  }
+}
+
+declare global {
+  interface JSON {
+    parse<T = unknown>(
+      text: string,
+      reviver?: (this: any, key: string, value: any) => any
+    ): T;
   }
 }
 // declare global {

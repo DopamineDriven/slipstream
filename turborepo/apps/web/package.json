@@ -23,7 +23,7 @@
   "dependencies": {
     "@auth/core": "^0.40.0",
     "@auth/prisma-adapter": "^2.10.0",
-    "@aws-sdk/client-secrets-manager": "^3.876.0",
+    "@aws-sdk/client-secrets-manager": "^3.879.0",
     "@base-ui-components/react": "^1.0.0-beta.2",
     "@prisma/adapter-pg": "^6.15.0",
     "@prisma/client": "^6.15.0",
@@ -98,7 +98,7 @@
     "@types/node": "^24.3.0",
     "@types/pg": "^8.15.5",
     "@types/react": "^19.1.12",
-    "@types/react-dom": "^19.1.8",
+    "@types/react-dom": "^19.1.9",
     "@types/unist": "^3.0.3",
     "@vercel/analytics": "^1.5.0",
     "@vercel/functions": "^2.2.13",

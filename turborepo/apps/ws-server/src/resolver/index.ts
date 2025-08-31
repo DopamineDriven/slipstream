@@ -33,7 +33,8 @@ export class Resolver extends ModelService {
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
-    private llamaService: LlamaService
+    private llamaService: LlamaService,
+    private isProd: boolean
   ) {
     super();
   }
@@ -48,7 +49,8 @@ export class Resolver extends ModelService {
     batchId?: string,
     userId?: string
   ) {
-    const att = attachmentId && attachmentId.length > 0 ? attachmentId : "no-att";
+    const att =
+      attachmentId && attachmentId.length > 0 ? attachmentId : "no-att";
     const d = draftId ?? "no-draft";
     const b = batchId ?? "no-batch";
     const u = userId ?? "no-user";
@@ -553,7 +555,8 @@ export class Resolver extends ModelService {
       filename,
       mime,
       size,
-      batchId,type,
+      batchId,
+      type,
       draftId,
       // TODO implement this handling
       height: _height,
@@ -687,7 +690,6 @@ export class Resolver extends ModelService {
     userId: string,
     userData?: UserData
   ): Promise<void> {
-
     if (
       userData &&
       "city" in userData &&
@@ -765,7 +767,6 @@ export class Resolver extends ModelService {
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
-
         size: BigInt(size),
         origin: "PASTED",
         status: "REQUESTED",
@@ -810,7 +811,6 @@ export class Resolver extends ModelService {
           totalBytes: size ?? 0
         } satisfies EventTypeMap["asset_upload_progress"]
       );
-
     } catch (error) {
       console.error("[Asset Paste] Error:", error);
 
@@ -1105,7 +1105,6 @@ export class Resolver extends ModelService {
     userId: string,
     _userData?: UserData
   ): Promise<void> {
-
     const {
       conversationId = "new-chat",
       attachmentId,
@@ -1138,12 +1137,13 @@ export class Resolver extends ModelService {
         extension,
         key: finalKey,
         presignedUrl,
+        cdnUrl,
         presignedUrlExpiresAt,
         lastModified,
         versionId: finalVersion,
         size,
         storageClass
-      } = await this.s3Service.finalize(bucket, key, versionId);
+      } = await this.s3Service.finalize(bucket, key, this.isProd, versionId);
 
       const s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
       console.log(
@@ -1169,7 +1169,8 @@ export class Resolver extends ModelService {
         region: this.region,
         uploadDuration: duration,
         userId,
-        cdnUrl: publicUrl,
+        publicUrl,
+        cdnUrl,
         versionId: finalVersion,
         s3ObjectId: finalS3ObjectId,
         etag: finalEtag ?? etag,
@@ -1183,7 +1184,6 @@ export class Resolver extends ModelService {
             : undefined
       });
 
-      // ✅ NOW send the real "asset_ready" event with actual values
       const assetReady = {
         type: "asset_ready",
         conversationId,
@@ -1206,7 +1206,7 @@ export class Resolver extends ModelService {
         userId,
         key,
         versionId: versionId,
-        downloadUrl: publicUrl,
+        downloadUrl: cdnUrl,
         downloadUrlExpiresAt: presignedUrlExpiresAt
       } satisfies EventTypeMap["asset_ready"];
 
@@ -1405,7 +1405,7 @@ export class Resolver extends ModelService {
         progress: safeProgress,
         bytesUploaded: Math.max(0, bytesUploaded ?? 0),
         totalBytes: Math.max(0, totalBytes ?? 0)
-      } satisfies  EventTypeMap["asset_upload_progress"];
+      } satisfies EventTypeMap["asset_upload_progress"];
 
       // Debug visibility: log the event with sanitized payload and active duration
       console.log(event.type, {
