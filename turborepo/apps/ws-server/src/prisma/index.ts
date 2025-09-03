@@ -1,22 +1,13 @@
-import type {
-  Attachment,
-  AudioMetadata,
-  DocumentMetadata,
-  ImageMetadata,
-  VideoMetadata
-} from "@/generated/client/client.ts";
+import type { Attachment } from "@/generated/client/client.ts";
 import type { AttachmentUncheckedCreateInput } from "@/generated/client/models/Attachment.ts";
 import type { UserData } from "@/types/index.ts";
 import { PrismaClient } from "@/generated/client/client.ts";
-import {
-  AssetOrigin,
-  AssetType,
-  SenderType
-} from "@/generated/client/enums.ts";
+import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
+import { GlobalOmitConfig } from "@/generated/client/internal/prismaNamespace.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { withAccelerate } from "@prisma/extension-accelerate";
-import * as dotenv from "dotenv";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { DefaultArgs } from "@prisma/client/runtime/client";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -28,48 +19,34 @@ import type {
 } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 
-dotenv.config({ quiet: true });
-export const prismaClient = new PrismaClient().$extends(withAccelerate());
+// new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
 
-export type AssetEnumType = keyof typeof AssetType;
-
-export type AssetMetadataObject = {
-  AUDIO: AudioMetadata;
-  DOCUMENT: DocumentMetadata;
-  IMAGE: ImageMetadata;
-  VIDEO: VideoMetadata;
-  UNKNOWN: never;
-};
-
-export type DocumentMetadataNarrowing<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = { [P in T]: AssetMetadataObject[P] }[T];
-
-export type CreatAttachmentUncheckInput<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = T extends "UNKNOWN"
-  ? AttachmentUncheckedCreateInput
-  : CTR<AttachmentUncheckedCreateInput, Lowercase<Exclude<T, "UNKNOWN">>>;
-export type CreateAttachmentProps<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = CTR<
-  Rm<RTC<Attachment>, "id">,
-  "bucket" | "key" | "userId" | "assetType"
-> & { type: T } & DocumentMetadataNarrowing<T>;
-
-export type PrismaClientWithAccelerate = typeof prismaClient;
-
 export class PrismaService extends ModelService {
+  readonly prismaClient: PrismaClient<
+    never,
+    GlobalOmitConfig | undefined,
+    DefaultArgs
+  >;
   private encryption: EncryptionService;
+  private adapter: PrismaPg;
   constructor(
-    public prismaClient: PrismaClientWithAccelerate,
+    connectionString: string,
+    poolMax = 10,
+    idleTimeoutMs = 30000,
     public fs: Fs
   ) {
     super();
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
+
+    this.adapter = new PrismaPg({
+      connectionString,
+      max: poolMax,
+      idleTimeoutMillis: idleTimeoutMs
+    });
+    this.prismaClient = new PrismaClient({ adapter: this.adapter });
   }
 
   public async getAndValidateUserSessionByEmail(email: string) {
@@ -407,9 +384,10 @@ export class PrismaService extends ModelService {
       : null;
   }
 
-  async createAttachment<
-    const T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-  >({ conversationId, ...data }: CreatAttachmentUncheckInput<T>) {
+  async createAttachment({
+    conversationId,
+    ...data
+  }: AttachmentUncheckedCreateInput) {
     const mime = data.mime ?? "application/octet-stream";
     const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
     if (
@@ -542,7 +520,6 @@ export class PrismaService extends ModelService {
   async purgeDeletedAttachments(daysOld = 30): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
-    prismaClient.$transaction;
     const result = await this.prismaClient.attachment.deleteMany({
       where: {
         deletedAt: {
@@ -971,5 +948,84 @@ export class PrismaService extends ModelService {
       oldestAttachment: attachments[0]?.createdAt,
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
+  }
+
+  public async findActiveGeminiAsset(
+    attachmentId: string,
+    keyFingerprint: string
+  ) {
+    return this.prismaClient.attachmentProvider.findFirst({
+      where: {
+        attachmentId,
+        provider: "GEMINI",
+        keyFingerprint,
+        state: "ACTIVE",
+        expiresAt: { gt: new Date() }
+      }
+    });
+  }
+
+  public async upsertGeminiAssetMapping(
+    attachmentId: string,
+    keyFingerprint: string,
+    mime: string,
+    keyId?: string
+  ) {
+    return this.prismaClient.attachmentProvider.upsert({
+      where: {
+        attachmentId_provider_keyFingerprint: {
+          attachmentId: attachmentId,
+          provider: "GEMINI",
+          keyFingerprint
+        }
+      },
+      update: {
+        state: "PENDING",
+        errorCode: null,
+        errorMessage: null,
+        lastCheckedAt: new Date(Date.now())
+      },
+      create: {
+        attachmentId: attachmentId,
+        provider: "GEMINI",
+        userKeyId: keyId,
+        keyFingerprint,
+        state: "PENDING",
+        mime
+      }
+    });
+  }
+
+  public async finalizeGeminiAsset(
+    mappingId: string,
+    providerUri: string,
+    providerRef: string,
+    expiresAt: Date
+  ) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "ACTIVE",
+        providerUri,
+        providerRef,
+        expiresAt,
+        readyAt: new Date(),
+        lastCheckedAt: new Date()
+      }
+    });
+  }
+
+  public async markGeminiAssetFailed(
+    mappingId: string,
+    errorMessage: string
+  ): Promise<void> {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "FAILED",
+        errorMessage,
+        lastCheckedAt: new Date()
+      }
+    });
   }
 }

@@ -73,9 +73,13 @@ async function exe() {
       host
     );
 
-    const { prismaClient, PrismaService } = await import("@/prisma/index.ts");
 
-    const prisma = new PrismaService(prismaClient, fs);
+
+    const { PrismaService } = await import("@/prisma/index.ts");
+    
+    const connectionString = process.env.DIRECT_URL ?? cfg.DIRECT_URL;
+
+    const prisma = new PrismaService(connectionString, 10, 30000, fs);
 
     const jwtSecret =
       cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";

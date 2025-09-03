@@ -290,6 +290,7 @@ export class Resolver extends ModelService {
       userId,
       ws,
       apiKey,
+      keyId,
       max_tokens,
       model,
       systemPrompt,

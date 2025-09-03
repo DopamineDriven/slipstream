@@ -4,7 +4,16 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["typedSql"]
+}
+
+enum ProviderAssetState {
+  PENDING
+  ACTIVE
+  EXPIRED
+  FAILED
+  DELETED
 }
 
 enum AssetType {
@@ -185,18 +194,19 @@ model Session {
 }
 
 model UserKey {
-  id        String    @id @default(cuid(2))
-  userId    String
-  provider  Provider
-  apiKey    String    @db.VarChar(512) // encrypted at rest
-  iv        String    @db.VarChar(32) // 16-byte IV (nonce)
-  authTag   String    @db.VarChar(32) // 16-byte auth-tag
-  label     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  Message[] @relation("MessageToUserKey")
-  isDefault Boolean   @default(false)
+  id                  String               @id @default(cuid(2))
+  userId              String
+  provider            Provider
+  apiKey              String               @db.VarChar(512) // encrypted at rest
+  iv                  String               @db.VarChar(32) // 16-byte IV (nonce)
+  authTag             String               @db.VarChar(32) // 16-byte auth-tag
+  label               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages            Message[]            @relation("MessageToUserKey")
+  attachmentProviders AttachmentProvider[]
+  isDefault           Boolean              @default(false)
 
   @@unique([userId, provider], name: "userId_provider")
   @@map("UserApiKey")
@@ -311,19 +321,53 @@ model Attachment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  conversation Conversation?     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message      Message?          @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  image        ImageMetadata?
-  video        VideoMetadata?
-  document     DocumentMetadata?
-  audio        AudioMetadata?
+  conversation  Conversation?        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message       Message?             @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  providerLinks AttachmentProvider[]
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image         ImageMetadata?
+  video         VideoMetadata?
+  document      DocumentMetadata?
+  audio         AudioMetadata?
 
+  @@index([checksumSha256])
   @@index([assetType, createdAt])
   @@index([conversationId, createdAt])
   @@index([draftId])
   @@index([batchId, conversationId])
   @@index([userId, createdAt])
+}
+
+model AttachmentProvider {
+  id             String             @id @default(cuid(2))
+  attachmentId   String
+  provider       Provider
+  userKeyId      String?
+  keyFingerprint String             @db.VarChar(128) // "server" or real userKeyId if defined
+  state          ProviderAssetState @default(PENDING)
+
+  // provider-specific refs
+  providerUri   String?
+  providerRef   String?
+  mime          String?
+  size          BigInt?
+  readyAt       DateTime?
+  expiresAt     DateTime? // ~48h TTL minus safety margin for gemini
+  lastCheckedAt DateTime?
+  errorCode     String?
+  errorMessage  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userKey    UserKey?   @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
+
+  @@unique([attachmentId, provider, keyFingerprint], name: "attachmentId_provider_keyFingerprint")
+  @@index([provider, keyFingerprint, expiresAt])
+  @@index([provider, providerRef])
+  @@index([attachmentId, provider])
+  @@index([provider, state, expiresAt])
 }
 
 model ImageMetadata {

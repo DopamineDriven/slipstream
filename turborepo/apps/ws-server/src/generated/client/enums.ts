@@ -8,6 +8,17 @@
 * 🟢 You can import this file directly.
 */
 
+export const ProviderAssetState = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+  FAILED: 'FAILED',
+  DELETED: 'DELETED'
+} as const
+
+export type ProviderAssetState = (typeof ProviderAssetState)[keyof typeof ProviderAssetState]
+
+
 export const AssetType = {
   DOCUMENT: 'DOCUMENT',
   IMAGE: 'IMAGE',

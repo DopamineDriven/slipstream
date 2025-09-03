@@ -80,6 +80,7 @@ export interface ProviderChatRequestEntity {
   systemPrompt?: string;
   userId: string;
   prompt: string;
+  keyId: string | null;
   topP?: number;
   streamChannel: `stream:${string}`;
   temperature?: number;

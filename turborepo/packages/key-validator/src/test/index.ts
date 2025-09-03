@@ -53,9 +53,11 @@ async function grokFetcher() {
 }
 
 async function geminiFetcher() {
-  return await fetch(
+  const gemini = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
   );
+  console.log(gemini.status);
+  return gemini;
 }
 
 const fs = new Fs(process.cwd());
@@ -72,6 +74,7 @@ const fs = new Fs(process.cwd());
   const parseOpenAi = JSON.parse(await openAiData.text()) as OpenAiResponse;
   const parseGrok = JSON.parse(await grokData.text()) as GrokModelsResponse;
   const parseIt = JSON.parse(await data.text()) as AnthropicResponse;
+
   fs.withWs(
     "src/test/__out__/llama-results.json",
     JSON.stringify(parseLlama, null, 2)
@@ -91,12 +94,7 @@ const fs = new Fs(process.cwd());
   fs.withWs(
     "src/test/__out__/gemini-results.json",
     JSON.stringify(
-      parseGemini.models?.filter(
-        t =>
-          t.name.startsWith("models/gemini") ||
-          t.name.startsWith("models/veo") ||
-          t.name.startsWith("models/imagen")
-      ),
+      parseGemini,
       null,
       2
     )

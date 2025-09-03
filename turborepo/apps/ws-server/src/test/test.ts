@@ -10,7 +10,7 @@ const data = async (env: string, id: string) => {
     prismaClient.$connect();
     return await prismaClient.conversation.findUnique({
       where: { id: id },
-      include: { messages: { orderBy: { createdAt: "asc" } }, attachments: true}
+      include: { messages: { orderBy: { createdAt: "asc" } }}
     });
   } catch (err) {
     console.error(err);
@@ -24,7 +24,7 @@ const fs = new Fs(process.cwd());
   const { Credentials } = await import("@t3-chat-clone/credentials");
   const cred = new Credentials();
   const env = await cred.get("DATABASE_URL");
-  data(env, "u5swpsjcvqdtr5e8bhel2uv6").then(s => {
+  data(env, "e7imrkcwuoib4lui7l057h56").then(s => {
     if (!s) return;
 
     // for (const ss of s.messages) {

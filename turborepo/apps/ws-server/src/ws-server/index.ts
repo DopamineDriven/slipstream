@@ -277,11 +277,20 @@ export class WSServer {
   }
 
   private broadcastRawErrorCb(err?: Error) {
-    if (err) {
-      console.error(err.message);
-    } else {
-      console.error("broadcastRaw error");
-    }
+    // Only log when there is an actual send error
+    if (err) console.error("broadcast send error:", err.message);
+  }
+
+  // Safely stringify events, handling BigInt values gracefully
+  private safeStringify(data: unknown): string {
+    const replacer = (_key: string, value: unknown) => {
+      if (typeof value === "bigint") {
+        const asNumber = Number(value);
+        return Number.isSafeInteger(asNumber) ? asNumber : value.toString();
+      }
+      return value as unknown;
+    };
+    return JSON.stringify(data, replacer);
   }
 
   /** Broadcast a raw JSON message string to all connected clients */
@@ -298,7 +307,7 @@ export class WSServer {
     event: T,
     data: EventTypeMap[T]
   ): void {
-    const msg = JSON.stringify({ ...data, type: event });
+    const msg = this.safeStringify({ ...data, type: event });
     this.broadcastRaw(msg);
   }
 
