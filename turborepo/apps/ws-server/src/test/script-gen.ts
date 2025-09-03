@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import { Provider } from "@t3-chat-clone/types";
-import conversation from "../__out__/conversations/A Day in the Life of Grokina Grokamole: A Catullan Ode/u5swpsjcvqdtr5e8bhel2uv6.json" with { type: "json" };
+import conversation from "../__out__/conversations/Geminxplicable Wonders: Unraveling the Unusual/e7imrkcwuoib4lui7l057h56.json" with { type: "json" };
 
 class ScriptGen extends Fs {
   constructor(
@@ -63,9 +63,9 @@ class ScriptGen extends Fs {
       const agg =
         p.sender === "AI"
           ? p.thinking
-            ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.thinking}\n${p.content}\n${d}\n`
-            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n${d}\n`
-          : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n${d}\n`;
+            ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
+            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
+          : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n${d}\n`;
       arr.push(agg);
     }
 

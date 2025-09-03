@@ -7,7 +7,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import * as runtime from "@prisma/client/runtime/library"
+import * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums.ts"
 import type * as Prisma from "../internal/prismaNamespace.ts"
 
@@ -223,6 +223,7 @@ export type UserKeyWhereInput = {
   isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
+  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }
 
 export type UserKeyOrderByWithRelationInput = {
@@ -238,6 +239,7 @@ export type UserKeyOrderByWithRelationInput = {
   isDefault?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
+  attachmentProviders?: Prisma.AttachmentProviderOrderByRelationAggregateInput
 }
 
 export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
@@ -257,6 +259,7 @@ export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
   isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
+  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }, "id" | "userId_provider">
 
 export type UserKeyOrderByWithAggregationInput = {
@@ -303,6 +306,7 @@ export type UserKeyCreateInput = {
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateInput = {
@@ -317,6 +321,7 @@ export type UserKeyUncheckedCreateInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUpdateInput = {
@@ -331,6 +336,7 @@ export type UserKeyUpdateInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateInput = {
@@ -345,6 +351,7 @@ export type UserKeyUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateManyInput = {
@@ -510,6 +517,22 @@ export type UserKeyUpdateOneWithoutMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserKeyUpdateWithoutMessagesInput>, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
 }
 
+export type UserKeyCreateNestedOneWithoutAttachmentProvidersInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutAttachmentProvidersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  upsert?: Prisma.UserKeyUpsertWithoutAttachmentProvidersInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
+}
+
 export type UserKeyCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
@@ -521,6 +544,7 @@ export type UserKeyCreateWithoutUserInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutUserInput = {
@@ -534,6 +558,7 @@ export type UserKeyUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutUserInput = {
@@ -589,6 +614,7 @@ export type UserKeyCreateWithoutMessagesInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutMessagesInput = {
@@ -602,6 +628,7 @@ export type UserKeyUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isDefault?: boolean
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutMessagesInput = {
@@ -631,6 +658,7 @@ export type UserKeyUpdateWithoutMessagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutMessagesInput = {
@@ -644,6 +672,79 @@ export type UserKeyUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
+}
+
+export type UserKeyCreateWithoutAttachmentProvidersInput = {
+  id?: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  user: Prisma.UserCreateNestedOneWithoutKeysInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
+  id?: string
+  userId: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyCreateOrConnectWithoutAttachmentProvidersInput = {
+  where: Prisma.UserKeyWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+}
+
+export type UserKeyUpsertWithoutAttachmentProvidersInput = {
+  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  where?: Prisma.UserKeyWhereInput
+}
+
+export type UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput = {
+  where?: Prisma.UserKeyWhereInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
+}
+
+export type UserKeyUpdateWithoutAttachmentProvidersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+}
+
+export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateManyUserInput = {
@@ -669,6 +770,7 @@ export type UserKeyUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutUserInput = {
@@ -682,6 +784,7 @@ export type UserKeyUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateManyWithoutUserInput = {
@@ -703,10 +806,12 @@ export type UserKeyUncheckedUpdateManyWithoutUserInput = {
 
 export type UserKeyCountOutputType = {
   messages: number
+  attachmentProviders: number
 }
 
 export type UserKeyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | UserKeyCountOutputTypeCountMessagesArgs
+  attachmentProviders?: boolean | UserKeyCountOutputTypeCountAttachmentProvidersArgs
 }
 
 /**
@@ -726,6 +831,13 @@ export type UserKeyCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Type
   where?: Prisma.MessageWhereInput
 }
 
+/**
+ * UserKeyCountOutputType without action
+ */
+export type UserKeyCountOutputTypeCountAttachmentProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttachmentProviderWhereInput
+}
+
 
 export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -740,6 +852,7 @@ export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
@@ -788,6 +901,7 @@ export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type UserKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserKeyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -802,6 +916,7 @@ export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     messages: Prisma.$MessagePayload<ExtArgs>[]
+    attachmentProviders: Prisma.$AttachmentProviderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1210,6 +1325,7 @@ export interface Prisma__UserKeyClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   messages<T extends Prisma.UserKey$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attachmentProviders<T extends Prisma.UserKey$attachmentProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$attachmentProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1666,6 +1782,30 @@ export type UserKey$messagesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * UserKey.attachmentProviders
+ */
+export type UserKey$attachmentProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AttachmentProvider
+   */
+  select?: Prisma.AttachmentProviderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AttachmentProvider
+   */
+  omit?: Prisma.AttachmentProviderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttachmentProviderInclude<ExtArgs> | null
+  where?: Prisma.AttachmentProviderWhereInput
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
 }
 
 /**

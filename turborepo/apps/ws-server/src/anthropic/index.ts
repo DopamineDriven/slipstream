@@ -39,13 +39,16 @@ export class AnthropicService {
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
-    this.defaultClient = new Anthropic({ apiKey: this.apiKey });
     this.logger = logger
       .getPinoInstance()
       .child(
         { pid: process.pid, node_version: process.version },
         { msgPrefix: "[anthropic] " }
       );
+    this.defaultClient = new Anthropic({
+      apiKey: this.apiKey,
+      logger: this.logger
+    });
   }
 
   public getClient(overrideKey?: string) {
@@ -92,7 +95,8 @@ export class AnthropicService {
             // Add image attachments if present
             if (attachments && attachments.length > 0) {
               for (const attachment of attachments) {
-                if (attachment.sourceUrl && attachment.mime) {
+                const url = attachment.cdnUrl ?? attachment.sourceUrl;
+                if (url && attachment.mime) {
                   if (attachment.mime.includes("application/pdf")) {
                     // Fetch and send as base64-encoded PDF document block
                     // const data = await this.fetchAsBase64(attachment.sourceUrl);
@@ -100,18 +104,17 @@ export class AnthropicService {
                       type: "document",
                       source: {
                         type: "url",
-                        url: attachment.sourceUrl
+                        url
                       }
                     } as const satisfies DocumentBlockParam;
                     content.push(docBlock);
                   } else if (attachment.mime.startsWith("image/")) {
                     // Use URL source for images (works fine with S3 presigned URLs)
-                    const imageUrl = attachment.sourceUrl;
                     const imageBlock = {
                       type: "image",
                       source: {
                         type: "url",
-                        url: imageUrl
+                        url
                       }
                     } as const satisfies ImageBlockParam;
                     content.push(imageBlock);
@@ -159,7 +162,8 @@ export class AnthropicService {
         // Add image attachments if present
         if (attachments && attachments.length > 0) {
           for (const attachment of attachments) {
-            if (attachment.sourceUrl && attachment.mime) {
+            const url = attachment.cdnUrl ?? attachment.sourceUrl;
+            if (url && attachment.mime) {
               if (attachment.mime.includes("application/pdf")) {
                 // Fetch and send as base64-encoded PDF document block
                 // const data = await this.fetchAsBase64(attachment.sourceUrl);
@@ -167,18 +171,16 @@ export class AnthropicService {
                   type: "document",
                   source: {
                     type: "url",
-                    url: attachment.sourceUrl
+                    url
                   }
                 } as const satisfies DocumentBlockParam;
                 content.push(docBlock);
               } else if (attachment.mime.startsWith("image/")) {
-                // Use URL source for images (works fine with S3 presigned URLs)
-                const imageUrl = attachment.sourceUrl;
                 const imageBlock = {
                   type: "image",
                   source: {
                     type: "url",
-                    url: imageUrl
+                    url
                   }
                 } as const satisfies ImageBlockParam;
                 content.push(imageBlock);

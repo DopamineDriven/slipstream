@@ -7,7 +7,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import * as runtime from "@prisma/client/runtime/library"
+import * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums.ts"
 import type * as Prisma from "../internal/prismaNamespace.ts"
 
@@ -28,7 +28,7 @@ export type AggregateVideoMetadata = {
 export type VideoMetadataAvgAggregateOutputType = {
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   duration: number | null
   frameRate: runtime.Decimal | null
   bitrate: number | null
@@ -41,7 +41,7 @@ export type VideoMetadataAvgAggregateOutputType = {
 export type VideoMetadataSumAggregateOutputType = {
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   duration: number | null
   frameRate: runtime.Decimal | null
   bitrate: number | null
@@ -56,7 +56,7 @@ export type VideoMetadataMinAggregateOutputType = {
   format: string | null
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   duration: number | null
   frameRate: runtime.Decimal | null
   bitrate: number | null
@@ -75,7 +75,7 @@ export type VideoMetadataMaxAggregateOutputType = {
   format: string | null
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   duration: number | null
   frameRate: runtime.Decimal | null
   bitrate: number | null
@@ -287,7 +287,7 @@ export type VideoMetadataGroupByOutputType = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal
+  aspectRatio: number | null
   duration: number
   frameRate: runtime.Decimal | null
   bitrate: number | null
@@ -330,7 +330,7 @@ export type VideoMetadataWhereInput = {
   format?: Prisma.StringFilter<"VideoMetadata"> | string
   width?: Prisma.IntFilter<"VideoMetadata"> | number
   height?: Prisma.IntFilter<"VideoMetadata"> | number
-  aspectRatio?: Prisma.DecimalFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntFilter<"VideoMetadata"> | number
   frameRate?: Prisma.DecimalNullableFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
@@ -351,7 +351,7 @@ export type VideoMetadataOrderByWithRelationInput = {
   format?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
-  aspectRatio?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
   duration?: Prisma.SortOrder
   frameRate?: Prisma.SortOrderInput | Prisma.SortOrder
   bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -375,7 +375,7 @@ export type VideoMetadataWhereUniqueInput = Prisma.AtLeast<{
   format?: Prisma.StringFilter<"VideoMetadata"> | string
   width?: Prisma.IntFilter<"VideoMetadata"> | number
   height?: Prisma.IntFilter<"VideoMetadata"> | number
-  aspectRatio?: Prisma.DecimalFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntFilter<"VideoMetadata"> | number
   frameRate?: Prisma.DecimalNullableFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
@@ -396,7 +396,7 @@ export type VideoMetadataOrderByWithAggregationInput = {
   format?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
-  aspectRatio?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
   duration?: Prisma.SortOrder
   frameRate?: Prisma.SortOrderInput | Prisma.SortOrder
   bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -424,7 +424,7 @@ export type VideoMetadataScalarWhereWithAggregatesInput = {
   format?: Prisma.StringWithAggregatesFilter<"VideoMetadata"> | string
   width?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
   height?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
-  aspectRatio?: Prisma.DecimalWithAggregatesFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
   frameRate?: Prisma.DecimalNullableWithAggregatesFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
@@ -443,7 +443,7 @@ export type VideoMetadataCreateInput = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   duration: number
   frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: number | null
@@ -464,7 +464,7 @@ export type VideoMetadataUncheckedCreateInput = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   duration: number
   frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: number | null
@@ -483,7 +483,7 @@ export type VideoMetadataUpdateInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -504,7 +504,7 @@ export type VideoMetadataUncheckedUpdateInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -524,7 +524,7 @@ export type VideoMetadataCreateManyInput = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   duration: number
   frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: number | null
@@ -543,7 +543,7 @@ export type VideoMetadataUpdateManyMutationInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -563,7 +563,7 @@ export type VideoMetadataUncheckedUpdateManyInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -720,7 +720,7 @@ export type VideoMetadataCreateWithoutAttachmentInput = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   duration: number
   frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: number | null
@@ -739,7 +739,7 @@ export type VideoMetadataUncheckedCreateWithoutAttachmentInput = {
   format: string
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   duration: number
   frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: number | null
@@ -774,7 +774,7 @@ export type VideoMetadataUpdateWithoutAttachmentInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -793,7 +793,7 @@ export type VideoMetadataUncheckedUpdateWithoutAttachmentInput = {
   format?: Prisma.StringFieldUpdateOperationsInput | string
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -914,7 +914,7 @@ export type $VideoMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
     format: string
     width: number
     height: number
-    aspectRatio: runtime.Decimal
+    aspectRatio: number | null
     duration: number
     frameRate: runtime.Decimal | null
     bitrate: number | null
@@ -1355,7 +1355,7 @@ export interface VideoMetadataFieldRefs {
   readonly format: Prisma.FieldRef<"VideoMetadata", 'String'>
   readonly width: Prisma.FieldRef<"VideoMetadata", 'Int'>
   readonly height: Prisma.FieldRef<"VideoMetadata", 'Int'>
-  readonly aspectRatio: Prisma.FieldRef<"VideoMetadata", 'Decimal'>
+  readonly aspectRatio: Prisma.FieldRef<"VideoMetadata", 'Float'>
   readonly duration: Prisma.FieldRef<"VideoMetadata", 'Int'>
   readonly frameRate: Prisma.FieldRef<"VideoMetadata", 'Decimal'>
   readonly bitrate: Prisma.FieldRef<"VideoMetadata", 'Int'>

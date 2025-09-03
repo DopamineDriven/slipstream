@@ -5,18 +5,14 @@ import type {
   ImageMetadata,
   VideoMetadata
 } from "@/generated/client/client.ts";
-import type { AttachmentUncheckedCreateInput } from "@/generated/client/models/Attachment.ts";
 import type { UserData } from "@/types/index.ts";
 import { PrismaClient } from "@/generated/client/client.ts";
-import {
-  AssetOrigin,
-  AssetType,
-  SenderType
-} from "@/generated/client/enums.ts";
+import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
+import { GlobalOmitConfig } from "@/generated/client/internal/prismaNamespace.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { withAccelerate } from "@prisma/extension-accelerate";
-import * as dotenv from "dotenv";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { DefaultArgs } from "@prisma/client/runtime/client";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -28,48 +24,34 @@ import type {
 } from "@t3-chat-clone/types";
 import { EncryptionService } from "@t3-chat-clone/encryption";
 
-dotenv.config({ quiet: true });
-export const prismaClient = new PrismaClient().$extends(withAccelerate());
+// new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
 
-export type AssetEnumType = keyof typeof AssetType;
-
-export type AssetMetadataObject = {
-  AUDIO: AudioMetadata;
-  DOCUMENT: DocumentMetadata;
-  IMAGE: ImageMetadata;
-  VIDEO: VideoMetadata;
-  UNKNOWN: never;
-};
-
-export type DocumentMetadataNarrowing<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = { [P in T]: AssetMetadataObject[P] }[T];
-
-export type CreatAttachmentUncheckInput<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = T extends "UNKNOWN"
-  ? AttachmentUncheckedCreateInput
-  : CTR<AttachmentUncheckedCreateInput, Lowercase<Exclude<T, "UNKNOWN">>>;
-export type CreateAttachmentProps<
-  T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-> = CTR<
-  Rm<RTC<Attachment>, "id">,
-  "bucket" | "key" | "userId" | "assetType"
-> & { type: T } & DocumentMetadataNarrowing<T>;
-
-export type PrismaClientWithAccelerate = typeof prismaClient;
-
 export class PrismaService extends ModelService {
+  readonly prismaClient: PrismaClient<
+    never,
+    GlobalOmitConfig | undefined,
+    DefaultArgs
+  >;
   private encryption: EncryptionService;
+  private adapter: PrismaPg;
   constructor(
-    public prismaClient: PrismaClientWithAccelerate,
+    connectionString: string,
+    poolMax = 10,
+    idleTimeoutMs = 30000,
     public fs: Fs
   ) {
     super();
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
+
+    this.adapter = new PrismaPg({
+      connectionString,
+      max: poolMax,
+      idleTimeoutMillis: idleTimeoutMs
+    });
+    this.prismaClient = new PrismaClient({ adapter: this.adapter });
   }
 
   public async getAndValidateUserSessionByEmail(email: string) {
@@ -407,65 +389,125 @@ export class PrismaService extends ModelService {
       : null;
   }
 
-  async createAttachment<
-    const T extends "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN"
-  >({ conversationId, ...data }: CreatAttachmentUncheckInput<T>) {
+  async createAttachment({
+    conversationId,
+    ...data
+  }: CTR<Partial<Attachment>, "userId" | "bucket" | "key"> &
+    XOR<
+      XOR<
+        { image?: Partial<ImageMetadata> },
+        { document?: Partial<DocumentMetadata> }
+      >,
+      XOR<
+        { audio?: Partial<AudioMetadata> },
+        { video?: Partial<VideoMetadata> }
+      >
+    >) {
     const mime = data.mime ?? "application/octet-stream";
+    const assetType = data.assetType ?? "UNKNOWN";
     const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
-    if (
-      this.isSupportedImageType(extension) &&
-      data.sourceUrl &&
-      data.assetType === "IMAGE" &&
-      URL.canParse(data.sourceUrl)
-    ) {
-      const {
-        animated,
-        aspectRatio,
-        colorSpace,
-        exifDateTimeOriginal,
-        format,
-        frames,
-        hasAlpha,
-        height,
-        iccProfile,
-        orientation,
-        width
-      } = await this.fs.getImageSpecs(data.sourceUrl, 4096 * 6);
-      return await this.prismaClient.attachment.create({
-        include: { image: true },
-        data: {
-          ...data,
-          assetType: data.assetType,
-          conversationId: this.convoId(conversationId),
-          image: {
-            create: {
-              aspectRatio,
-              format,
-              height,
-              width,
-              animated,
-              colorSpace,
-              exifDateTimeOriginal,
-              frames,
-              hasAlpha,
-              iccProfile,
-              orientation
+    if (this.isSupportedType(assetType, extension)) {
+      if (assetType === "IMAGE" && data.image) {
+        const { image } = data;
+        return await this.prismaClient.attachment.create({
+          include: { image: true },
+          data: {
+            ...data,
+            assetType,
+            document: undefined,
+            audio: undefined,
+            video: undefined,
+            conversationId: this.convoId(conversationId),
+            image: {
+              create: {
+                ...image,
+                aspectRatio: image.width ?? 1 / (image?.height ?? 1),
+                width: image.width ?? 0,
+                height: image.height ?? 0
+              }
             }
           }
-        }
-      });
+        });
+      } else if (assetType === "DOCUMENT" && data.document) {
+        const { document, image: _image } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            video: undefined,
+            audio: undefined,
+            conversationId: this.convoId(conversationId),
+            document: {
+              create: {
+                format: document?.format ?? "application/pdf",
+                ...document
+              }
+            }
+          }
+        });
+      } else if (assetType === "AUDIO" && data.audio) {
+        const {
+          audio,
+          video: _video,
+          document: _document,
+          image: _image
+        } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            video: undefined,
+            document: undefined,
+            conversationId: this.convoId(conversationId),
+            audio: {
+              create: {
+                format: audio?.format ?? "application/pdf",
+                duration: audio?.duration ?? 0,
+                ...data.audio
+              }
+            }
+          }
+        });
+      } else if (assetType === "VIDEO" && data.video) {
+        const {
+          video,
+          audio: _audio,
+          document: _document,
+          image: _image
+        } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            audio: undefined,
+            document: undefined,
+            conversationId: this.convoId(conversationId),
+            video: {
+              create: {
+                format: video?.format ?? "application/pdf",
+                duration: video?.duration ?? 0,
+                width: video.width ?? 0,
+                height: video.height ?? 0,
+                ...data.video
+              }
+            }
+          }
+        });
+      }
     }
     return await this.prismaClient.attachment.create({
-      include: { image: true },
-      data: { ...data, conversationId: this.convoId(conversationId) }
+      data: {
+        ...data,
+        document: undefined,
+        video: undefined,
+        audio: undefined,
+        image: undefined,
+        conversationId: this.convoId(conversationId)
+      }
     });
-  }
-
-  public isSupportedImageType(ext: string) {
-    const x = ["apng", "png", "jpeg", "jpg", "gif", "bmp", "webp", "avif"];
-    if (x.includes(ext)) {
-      return true;
-    } else return false;
   }
 
   public contentTypeToExt(contentType?: string) {
@@ -542,7 +584,6 @@ export class PrismaService extends ModelService {
   async purgeDeletedAttachments(daysOld = 30): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
-    prismaClient.$transaction;
     const result = await this.prismaClient.attachment.deleteMany({
       where: {
         deletedAt: {
@@ -613,27 +654,6 @@ export class PrismaService extends ModelService {
   }
 
   /**
-   * Update attachment upload progress
-   */
-  // async updateUploadProgress(
-  //   attachmentId: string,
-  //   progress: {
-  //     bytesUploaded: number;
-  //     totalBytes: number;
-  //     percentage: number;
-  //   }
-  // ): Promise<void> {
-  //   await this.prismaClient.attachment.update({
-  //     where: { id: attachmentId },
-  //     data: {
-  //       meta: {
-  //         uploadProgress: progress
-  //       }
-  //     }
-  //   });
-  // }
-
-  /**
    * Mark attachment as virus scanned
    */
   async markAsScanned(
@@ -700,42 +720,6 @@ export class PrismaService extends ModelService {
     };
   }
 
-  /**
-   * Batch create attachments
-   */
-  // async createBatchAttachments(
-  //   attachments: Array<{
-  //     conversationId: string;
-  //     userId: string;
-  //     filename: string;
-  //     contentType: string;
-  //     size?: number;
-  //     origin?: keyof typeof AssetOrigin;
-  //   }>
-  // ): Promise<Attachment[]> {
-  //   return this.prismaClient.$transaction(
-  //     this.prismaClient.m.map(data =>
-  //       this.prismaClient.attachment.create({
-  //         data: {
-  //           conversationId: data.conversationId,
-  //           userId: data.userId,
-  //           bucket: process.env.S3_BUCKET_ASSETS || "ws-assets",
-  //           key: "",
-  //           region: process.env.AWS_REGION || "us-east-1",
-  //           origin: data.origin || "UPLOAD",
-  //           status: "REQUESTED",
-  //           uploadMethod: "SERVER",
-  //           size: data.size ? BigInt(data.size) : null,
-  //           mime: data.contentType,
-  //           meta: {
-  //             filename: data.filename,
-  //             batchUpload: true
-  //           }
-  //         }
-  //       })
-  //     )
-  //   );
-  // }
 
   async createBatchedAttachments({
     conversationId,
@@ -971,5 +955,95 @@ export class PrismaService extends ModelService {
       oldestAttachment: attachments[0]?.createdAt,
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
+  }
+
+  public async findActiveGeminiAsset(
+    attachmentId: string,
+    keyFingerprint: string
+  ) {
+    return this.prismaClient.attachmentProvider.findFirst({
+      where: {
+        attachmentId,
+        provider: "GEMINI",
+        keyFingerprint,
+        state: "ACTIVE",
+        expiresAt: { gt: new Date() }
+      }
+    });
+  }
+
+  public async upsertGeminiAssetMapping(
+    attachmentId: string,
+    keyFingerprint: string,
+    mime: string,
+    keyId?: string
+  ) {
+    return this.prismaClient.attachmentProvider.upsert({
+      where: {
+        attachmentId_provider_keyFingerprint: {
+          attachmentId: attachmentId,
+          provider: "GEMINI",
+          keyFingerprint
+        }
+      },
+      update: {
+        state: "PENDING",
+        errorCode: null,
+        errorMessage: null,
+        lastCheckedAt: new Date(Date.now())
+      },
+      create: {
+        attachmentId: attachmentId,
+        provider: "GEMINI",
+        userKeyId: keyId,
+        keyFingerprint,
+        state: "PENDING",
+        mime
+      }
+    });
+  }
+
+  public async finalizeGeminiAsset(
+    mappingId: string,
+    providerUri: string,
+    providerRef: string,
+    expiresAt: Date
+  ) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "ACTIVE",
+        providerUri,
+        providerRef,
+        expiresAt,
+        readyAt: new Date(),
+        lastCheckedAt: new Date()
+      }
+    });
+  }
+
+  public async markGeminiAssetFailed(
+    mappingId: string,
+    errorMessage: string
+  ): Promise<void> {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "FAILED",
+        errorMessage,
+        lastCheckedAt: new Date()
+      }
+    });
+  }
+
+  public async getNestedAssets(conversationId: string) {
+    return await this.prismaClient.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        attachments: { where: { conversationId } },
+        messages: { orderBy: { createdAt: "asc" } },
+        conversationSettings: true
+      }
+    });
   }
 }

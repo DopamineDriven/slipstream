@@ -14,7 +14,7 @@
  * model files in the `model` directory!
  */
 
-import * as runtime from "@prisma/client/runtime/library"
+import * as runtime from "@prisma/client/runtime/client"
 import type * as Prisma from "../models.ts"
 import { type PrismaClient } from "./class.ts"
 
@@ -404,6 +404,7 @@ export const ModelName = {
   ConversationSettings: 'ConversationSettings',
   Message: 'Message',
   Attachment: 'Attachment',
+  AttachmentProvider: 'AttachmentProvider',
   ImageMetadata: 'ImageMetadata',
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "verificationToken"
+    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "verificationToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1168,6 +1169,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AttachmentProvider: {
+      payload: Prisma.$AttachmentProviderPayload<ExtArgs>
+      fields: Prisma.AttachmentProviderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AttachmentProviderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AttachmentProviderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        findFirst: {
+          args: Prisma.AttachmentProviderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AttachmentProviderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        findMany: {
+          args: Prisma.AttachmentProviderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>[]
+        }
+        create: {
+          args: Prisma.AttachmentProviderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        createMany: {
+          args: Prisma.AttachmentProviderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AttachmentProviderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>[]
+        }
+        delete: {
+          args: Prisma.AttachmentProviderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        update: {
+          args: Prisma.AttachmentProviderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        deleteMany: {
+          args: Prisma.AttachmentProviderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AttachmentProviderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AttachmentProviderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>[]
+        }
+        upsert: {
+          args: Prisma.AttachmentProviderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentProviderPayload>
+        }
+        aggregate: {
+          args: Prisma.AttachmentProviderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAttachmentProvider>
+        }
+        groupBy: {
+          args: Prisma.AttachmentProviderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttachmentProviderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AttachmentProviderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttachmentProviderCountAggregateOutputType> | number
+        }
+      }
+    }
     ImageMetadata: {
       payload: Prisma.$ImageMetadataPayload<ExtArgs>
       fields: Prisma.ImageMetadataFieldRefs
@@ -1559,6 +1634,10 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         args: [query: string, ...values: any[]],
         result: any
       }
+      $queryRawTyped: {
+        args: runtime.UnknownTypedSql,
+        result: JsonObject
+      }
     }
   }
 }
@@ -1733,6 +1812,7 @@ export const AttachmentScalarFieldEnum = {
   assetType: 'assetType',
   uploadDuration: 'uploadDuration',
   cdnUrl: 'cdnUrl',
+  publicUrl: 'publicUrl',
   sourceUrl: 'sourceUrl',
   thumbnailKey: 'thumbnailKey',
   bucket: 'bucket',
@@ -1760,6 +1840,29 @@ export const AttachmentScalarFieldEnum = {
 } as const
 
 export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
+
+
+export const AttachmentProviderScalarFieldEnum = {
+  id: 'id',
+  attachmentId: 'attachmentId',
+  provider: 'provider',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  state: 'state',
+  providerUri: 'providerUri',
+  providerRef: 'providerRef',
+  mime: 'mime',
+  size: 'size',
+  readyAt: 'readyAt',
+  expiresAt: 'expiresAt',
+  lastCheckedAt: 'lastCheckedAt',
+  errorCode: 'errorCode',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AttachmentProviderScalarFieldEnum = (typeof AttachmentProviderScalarFieldEnum)[keyof typeof AttachmentProviderScalarFieldEnum]
 
 
 export const ImageMetadataScalarFieldEnum = {
@@ -2084,6 +2187,20 @@ export type ListEnumChecksumAlgoFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'ProviderAssetState'
+ */
+export type EnumProviderAssetStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProviderAssetState'>
+    
+
+
+/**
+ * Reference to a field of type 'ProviderAssetState[]'
+ */
+export type ListEnumProviderAssetStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProviderAssetState[]'>
+    
+
+
+/**
  * Reference to a field of type 'ImageFormat'
  */
 export type EnumImageFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageFormat'>
@@ -2098,20 +2215,6 @@ export type ListEnumImageFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'Decimal'
- */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal[]'
- */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
-    
-
-
-/**
  * Reference to a field of type 'ColorSpace'
  */
 export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace'>
@@ -2122,6 +2225,20 @@ export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'ColorSpace[]'
  */
 export type ListEnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 /**
@@ -2191,6 +2308,10 @@ export interface PrismaClientOptions {
     isolationLevel?: TransactionIsolationLevel
   }
   /**
+   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+   */
+  adapter?: runtime.SqlDriverAdapterFactory | null
+  /**
    * Global configuration for omitting model fields by default.
    * 
    * @example
@@ -2217,6 +2338,7 @@ export type GlobalOmitConfig = {
   conversationSettings?: Prisma.ConversationSettingsOmit
   message?: Prisma.MessageOmit
   attachment?: Prisma.AttachmentOmit
+  attachmentProvider?: Prisma.AttachmentProviderOmit
   imageMetadata?: Prisma.ImageMetadataOmit
   videoMetadata?: Prisma.VideoMetadataOmit
   audioMetadata?: Prisma.AudioMetadataOmit

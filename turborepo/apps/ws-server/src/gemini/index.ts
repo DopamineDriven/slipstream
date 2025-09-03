@@ -1,5 +1,5 @@
-import { relative, resolve } from "node:path";
-import type { Message } from "@/generated/client/client.ts";
+import { resolve } from "node:path";
+import type { Attachment, Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity, UserData } from "@/types/index.ts";
 import type {
   Blob,
@@ -12,36 +12,35 @@ import type {
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import {
-  createPartFromText,
-  createPartFromUri,
-  GoogleGenAI
-} from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
-interface ProviderGeminiChatRequestEntity extends ProviderChatRequestEntity {
+export interface ProviderGeminiChatRequestEntity
+  extends ProviderChatRequestEntity {
   userData?: UserData;
 }
 export class GeminiService {
   private defaultClient: GoogleGenAI;
   private logger: Logger;
+  // Simple in-memory cache for the session/lifecycle
+  private assetCache = new Map<string, { fileUri: string; expiresAt: Date }>();
   constructor(
     logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
-    this.defaultClient = new GoogleGenAI({
-      apiKey: this.apiKey,
-      apiVersion: "v1alpha"
-    });
     this.logger = logger
       .getPinoInstance()
       .child(
         { pid: process.pid, node_version: process.version },
         { msgPrefix: "[gemini] " }
       );
+    this.defaultClient = new GoogleGenAI({
+      apiKey: this.apiKey,
+      apiVersion: "v1alpha"
+    });
   }
 
   public getClient(overrideKey?: string) {
@@ -51,59 +50,146 @@ export class GeminiService {
     return this.defaultClient;
   }
 
+  private handleNumBigIntUnion(size: number | bigint) {
+    return typeof size === "bigint" ? 10n * 1024n * 1024n : 10 * 1024 * 1024;
+  }
+
+  public async fetchAssetForGenAI(
+    url: string,
+    knownSizeBytes: number | bigint,
+    mime: string | null
+  ) {
+    const TEN_MB = this.handleNumBigIntUnion(knownSizeBytes);
+
+    const mimeType = mime ?? "application/octet-stream";
+
+    const response = await fetch(url, { method: "GET" });
+    if (!response.ok || !response.body) {
+      throw new Error(`Failed to fetch asset: ${response.statusText}`);
+    }
+
+    let buffer: Buffer;
+
+    if (knownSizeBytes < TEN_MB) {
+      // For smaller files, buffer them into memory directly.
+      buffer = await this.streamToBuffer(response.body);
+    } else {
+      // For larger files, this approach is still memory-efficient.
+      // The logic is the same, but you could add progress indicators here if needed.
+      buffer = await this.streamToBuffer(response.body);
+    }
+
+    return { buffer, mimeType };
+  }
+
+  // Build a Google-compliant file ID (<= 40 chars, [a-z0-9-], no leading/trailing dash)
+  private getGoogleFileName(attachmentId: string) {
+    let out = (attachmentId || "").toLowerCase();
+    out = out.replace(/[^a-z0-9-]/g, "-");
+    out = out.replace(/^-+/, "").replace(/-+$/, "");
+    if (!out) out = "x";
+    if (out.length > 40) out = out.slice(0, 40);
+    return out;
+  }
+
+  public async uploadRemoteAssetToGoogle(
+    attachment: Pick<Attachment, "id" | "cdnUrl" | "mime" | "filename">,
+    apiKey?: string
+  ) {
+    try {
+      // 1. Fetch the remote file and get its buffer
+      const response = await fetch(attachment.cdnUrl ?? "", { method: "GET" });
+      if (!response.ok || !response.body) {
+        throw new Error(
+          `Failed to fetch asset from ${attachment.cdnUrl}: ${response.statusText}`
+        );
+      }
+      const buffer = await this.streamToBuffer(response.body);
+
+      // 2. Upload the buffer to Google's File API
+      const ai = this.getClient(apiKey);
+      const deterministicName = this.getGoogleFileName(attachment.id);
+
+      // Preflight: if file already exists, reuse it
+      try {
+        const existing = await ai.files.get({ name: deterministicName });
+        if (existing?.state?.includes("ACTIVE") && existing.uri) {
+          return existing;
+        }
+      } catch {
+        // 404 / not found is expected here, proceed to upload
+      }
+
+      const uploadedFile = await ai.files.upload({
+        file: new Blob([buffer]),
+        config: {
+          mimeType: attachment.mime ?? "application/octet-stream",
+          name: deterministicName,
+          displayName: attachment.filename ?? undefined
+        }
+      });
+
+      return uploadedFile;
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error in uploadRemoteAssetToGoogle for attachment: ${attachment.id}`
+      );
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "something went wrong in upload remote asset to google..."
+      );
+    }
+  }
+
+  private async streamToBuffer(stream: ReadableStream<Uint8Array>) {
+    // The logic from your `assetToBufferView` is already quite efficient
+    // for converting a stream to a single buffer in memory.
+    const reader = stream.getReader();
+    const chunks = Array.of<Uint8Array>();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+      }
+    }
+    return Buffer.concat(chunks);
+  }
+
   private async formatHistoryForSession(
     msgs: Message[],
-    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
-    gemini: GoogleGenAI
+    attachments?: ProviderGeminiChatRequestEntity["attachments"],
+    keyId?: string,
+    apiKey?: string
   ) {
-    const formatted: Content[] = [];
+    const formatted = Array.of<Content>();
+    const _client = this.getClient(apiKey);
+    const _keyFingerprint = keyId ?? "server";
+
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
-        try {
-          if (attachments && attachments.length > 0) {
-            for (const attachment of attachments) {
-              if (
-                attachment?.sourceUrl &&
-                attachment.mime &&
-                attachment.filename
-              ) {
-                const path = await this.writeTmp(
-                  attachment.filename,
-                  attachment.sourceUrl
-                );
-                const file = await gemini.files.upload({
-                  file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
-                  config: { mimeType: attachment.mime }
-                });
-                if (file?.uri) {
-                  if (attachment.mime.includes("application/pdf")) {
-                    partArr.push(
-                      createPartFromUri(file.uri, "application/pdf")
-                    );
-                  } else if (attachment.mime.startsWith("image/")) {
-                    partArr.push(
-                      createPartFromUri(file.uri, attachment.mime)
-                    );
-                  }
-                }
-              }
-            }
-          }
-        } catch (err) {
-          this.logger.warn({ err }, "error in gemini history workup");
-        } finally {
-          partArr.push(createPartFromText(msg.content));
-        }
+
+        // Important: do NOT inject request attachments into history.
+        // Only the current prompt should include its attachments.
+        // Historical attachments, if needed, should be fetched per-message from DB.
+        partArr.push({ text: msg.content });
+
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
-        // This is an assistant/model message. Prepend context.
         const provider = msg.provider.toLowerCase();
         const model = msg.model ?? "unknown";
         const modelIdentifier = `[${provider}/${model}]`;
         formatted.push({
           role: "model",
-          parts: [{ text: `${modelIdentifier}\n${msg.content}` }]
+          parts: [
+            {
+              text: `${modelIdentifier}\n${msg.content}`
+            }
+          ]
         } as const);
       }
     }
@@ -129,15 +215,20 @@ export class GeminiService {
   public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: Message[],
-    systemPrompt: string | undefined,
-    attachments: ProviderGeminiChatRequestEntity["attachments"] | undefined,
-    gemini: GoogleGenAI
+    systemPrompt?: string,
+    attachments?: ProviderGeminiChatRequestEntity["attachments"],
+    keyId?: string,
+    apiKey?: string
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
     );
     if (isNewChat) {
+      this.logger.debug(
+        msgs,
+        `new chat msgs object in getHistoryAndInstruction has length ${msgs.length}`
+      );
       return {
         history: undefined,
         systemInstruction
@@ -148,10 +239,148 @@ export class GeminiService {
         history: await this.formatHistoryForSession(
           historyMsgs,
           attachments,
-          gemini
+          keyId,
+          apiKey
         ),
         systemInstruction
       };
+    }
+  }
+
+  private async pollForActiveState(
+    fileName: string,
+    client: GoogleGenAI,
+    maxRetries = 5
+  ): Promise<void> {
+    for (let i = 0; i < maxRetries; i++) {
+      const file = await client.files.get({ name: fileName });
+      if (file.state?.includes("ACTIVE")) return;
+
+      // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, i)));
+    }
+    throw new Error(`File ${fileName} not active after ${maxRetries} retries`);
+  }
+  private async ensureAssetUploaded(
+    attachment: Pick<Attachment, "id" | "cdnUrl" | "mime" | "filename">,
+    client: GoogleGenAI,
+    keyFingerprint: string,
+    keyId?: string,
+    apiKey?: string
+  ): Promise<{ fileUri: string; mimeType: string }> {
+    const cacheKey = `${keyFingerprint}:${attachment.id}`;
+    const now = new Date();
+
+    // 0. Check in-memory cache first
+    const cached = this.assetCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      this.logger.debug(`Reusing cached Gemini asset: ${attachment.id}`);
+      return {
+        fileUri: cached.fileUri,
+        mimeType: attachment.mime ?? "application/octet-stream"
+      };
+    }
+
+    // Check if already uploaded
+    const existing = await this.prisma.findActiveGeminiAsset(
+      attachment.id,
+      keyFingerprint
+    );
+
+    if (existing?.providerUri) {
+      this.logger.debug(`Reusing Gemini asset: ${attachment.id}`);
+      // hydrate cache from DB
+      if (existing.expiresAt) {
+        this.assetCache.set(cacheKey, {
+          fileUri: existing.providerUri,
+          expiresAt: existing.expiresAt
+        });
+      }
+      return {
+        fileUri: existing.providerUri,
+        mimeType: existing.mime ?? "application/octet-stream"
+      };
+    }
+
+    // Create or update mapping to PENDING (acts as lock)
+    const mapping = await this.prisma.upsertGeminiAssetMapping(
+      attachment.id,
+      keyFingerprint,
+      attachment.mime ?? "application/octet-stream",
+      keyId
+    );
+
+    try {
+      // Preflight: attempt to find on Google before uploading
+      try {
+        const name = this.getGoogleFileName(attachment.id);
+        const existing = await client.files.get({ name });
+        if (existing?.state?.includes("ACTIVE") && existing.uri) {
+          const expiresAt = new Date(Date.now() + 47 * 60 * 60 * 1000);
+          await this.prisma.finalizeGeminiAsset(
+            mapping.id,
+            existing.uri,
+            name,
+            expiresAt
+          );
+          this.assetCache.set(cacheKey, { fileUri: existing.uri, expiresAt });
+          return {
+            fileUri: existing.uri,
+            mimeType: attachment.mime ?? "application/octet-stream"
+          };
+        }
+      } catch {
+        // Not found, continue to upload
+      }
+
+      // Upload using deterministic naming (attachment.id only)
+      let uploadedFile;
+      try {
+        uploadedFile = await this.uploadRemoteAssetToGoogle(attachment, apiKey);
+      } catch (e) {
+        const msg = (e as Error)?.message || "";
+        // If Google complains the file already exists, try to fetch it and proceed
+        if (/ALREADY_EXISTS|exists/i.test(msg) || /already\s+exists/i.test(msg)) {
+          const name = this.getGoogleFileName(attachment.id);
+          const existing = await client.files.get({ name });
+          if (existing?.uri) {
+            uploadedFile = existing;
+          } else {
+            throw e;
+          }
+        } else {
+          throw e;
+        }
+      }
+
+      // Wait for file to be active
+      await this.pollForActiveState(uploadedFile.name ?? "", client);
+
+      // Mark as active with 47-hour expiry
+      const expiresAt = new Date(Date.now() + 47 * 60 * 60 * 1000);
+      await this.prisma.finalizeGeminiAsset(
+        mapping.id,
+        uploadedFile.uri ?? "",
+        uploadedFile.name ?? "",
+        expiresAt
+      );
+
+      // Update in-memory cache
+      this.assetCache.set(cacheKey, {
+        fileUri: uploadedFile.uri ?? "",
+        expiresAt
+      });
+
+      return {
+        fileUri: uploadedFile.uri ?? "",
+        mimeType: attachment.mime ?? "application/octet-stream"
+      };
+    } catch (error) {
+      await this.prisma.markGeminiAssetFailed(
+        mapping.id,
+        (error as Error).message
+      );
+      throw error;
     }
   }
 
@@ -184,6 +413,7 @@ export class GeminiService {
     thinkingChunks,
     userId,
     ws,
+    keyId,
     apiKey,
     max_tokens,
     model = "gemini-2.5-pro" satisfies GeminiModelIdUnion,
@@ -195,6 +425,7 @@ export class GeminiService {
     userData
   }: ProviderGeminiChatRequestEntity) {
     const provider = "gemini" as const;
+    const keyFingerprint = keyId ?? "server";
     const [lat, lng] = this.handleLatLng(userData?.latlng);
     let geminiThinkingStartTime: number | null = null,
       geminiThinkingDuration = 0,
@@ -209,46 +440,42 @@ export class GeminiService {
       msgs,
       systemPrompt,
       attachments,
-      gemini
+      keyId ?? undefined,
+      apiKey
     );
     const currentPartArr = Array.of<Part>();
 
     try {
       if (attachments && attachments.length > 0) {
         for (const attachment of attachments) {
-          if (attachment?.sourceUrl && attachment.mime && attachment.filename) {
-            const path = await this.writeTmp(
-              attachment.filename,
-              attachment.sourceUrl
+          if (attachment?.cdnUrl && attachment?.mime) {
+            // Use the new ensureAssetUploaded method
+            const { fileUri, mimeType } = await this.ensureAssetUploaded(
+              attachment,
+              gemini,
+              keyFingerprint,
+              keyId ?? undefined,
+              apiKey
             );
-            const file = await gemini.files.upload({
-              file: relative(process.cwd(),resolve(this.prisma.fs.tmpDir,path)),
-              config: { mimeType: attachment.mime }
+            currentPartArr.push({
+              fileData: { fileUri, mimeType }
             });
-            if (file?.uri) {
-              if (attachment.mime.includes("application/pdf")) {
-                currentPartArr.push(
-                  createPartFromUri(file.uri, attachment.mime)
-                );
-              } else if (attachment.mime.startsWith("image/")) {
-                currentPartArr.push(
-                 createPartFromUri(file.uri, attachment.mime)
-                );
-              }
-            }
           }
         }
       }
     } catch (err) {
-      this.logger.warn({ err }, "error in gemini history workup");
+      this.logger.warn({ err }, "error in gemini attachment upload");
     } finally {
-      currentPartArr.push(createPartFromText(prompt));
+      currentPartArr.push({ text: prompt });
     }
     const fullContent = [
       ...(history ?? []),
       { role: "user", parts: currentPartArr }
     ] as const satisfies Content[];
-
+    this.logger.debug(
+      fullContent,
+      "debugging full content on first message to gemini"
+    );
     const stream = (await gemini.models.generateContentStream({
       contents: fullContent,
       model,

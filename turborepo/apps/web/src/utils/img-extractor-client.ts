@@ -1,9 +1,22 @@
+import { ImgMetadataExtractorWorkup } from "@/utils/img-extractor-client-workup";
 import { inflateSync } from "fflate";
 
 export interface ImageSpecs {
   width: number;
   height: number;
-  format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "unknown";
+  format:
+    | "apng"
+    | "png"
+    | "jpeg"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "heic"
+    | "tiff"
+    | "unknown";
   frames: number;
   animated: boolean;
   hasAlpha: boolean | null;
@@ -18,6 +31,8 @@ export interface ImageSpecs {
     | "cmyk"
     | "ycbcr"
     | "ycck"
+    | "vector"
+    | "lab"
     | "unknown";
   colorSpace:
     | "unknown"
@@ -41,565 +56,11 @@ export interface BoxInfo {
   size: number;
 }
 
-export class ImgMetadataExtractor {
-  private parseExif(
-    buffer: Buffer,
-    app1Pos: number,
-    app1Size: number
-  ): { orientation: number | null; dateTimeOriginal: string | null } {
-    // APP1 segment structure:
-    // - 2 bytes: 0xFF 0xE1 (marker - already read)
-    // - 2 bytes: segment size (includes these 2 bytes but not marker)
-    // - 6 bytes: "Exif\0\0" identifier
-    // - Rest: TIFF data structure
-
-    const segmentStart = app1Pos + 4; // Skip marker (2) and size (2)
-    const segmentEnd = app1Pos + 2 + app1Size; // Marker not included in size
-
-    // Minimum viable EXIF: 6 (header) + 8 (TIFF header) + 2 (IFD count) = 16 bytes
-    if (segmentEnd - segmentStart < 16 || segmentEnd > buffer.length) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // Verify EXIF header
-    const headerEnd = Math.min(segmentStart + 6, segmentEnd, buffer.length);
-    if (headerEnd - segmentStart < 6) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    const exifHeader = buffer.toString("ascii", segmentStart, headerEnd);
-    if (exifHeader !== "Exif\0\0") {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // TIFF data starts after EXIF header
-    const tiffStart = segmentStart + 6;
-    const tiffEnd = segmentEnd;
-
-    // Need at least 8 bytes for TIFF header
-    if (tiffEnd - tiffStart < 8) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // Read byte order (2 bytes)
-    const byteOrder = buffer.toString("ascii", tiffStart, tiffStart + 2);
-    const littleEndian = byteOrder === "II";
-    const bigEndian = byteOrder === "MM";
-
-    if (!littleEndian && !bigEndian) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // Create bounded read functions
-    const readUInt16 = (pos: number): number | null => {
-      if (pos < 0 || pos + 2 > tiffEnd || pos + 2 > buffer.length) return null;
-      return littleEndian ? buffer.readUInt16LE(pos) : buffer.readUInt16BE(pos);
-    };
-
-    const readUInt32 = (pos: number): number | null => {
-      if (pos < 0 || pos + 4 > tiffEnd || pos + 4 > buffer.length) return null;
-      return littleEndian ? buffer.readUInt32LE(pos) : buffer.readUInt32BE(pos);
-    };
-
-    // Verify TIFF magic number (0x002A)
-    const magic = readUInt16(tiffStart + 2);
-    if (magic !== 0x002a) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // Get IFD0 offset (relative to TIFF start)
-    const ifd0Offset = readUInt32(tiffStart + 4);
-    if (ifd0Offset === null || ifd0Offset < 8) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    // IFD0 position (absolute in buffer)
-    const ifd0Pos = tiffStart + ifd0Offset;
-
-    // Need at least 2 bytes for entry count
-    if (ifd0Pos + 2 > tiffEnd) {
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    const numEntries = readUInt16(ifd0Pos);
-    if (numEntries === null || numEntries === 0 || numEntries > 500) {
-      // 500 is a sanity check - no valid IFD should have that many entries
-      return { orientation: null, dateTimeOriginal: null };
-    }
-
-    let orientation: number | null = null;
-    let dateTimeOriginal: string | null = null;
-
-    // Each IFD entry is 12 bytes
-    const ifdDataStart = ifd0Pos + 2;
-    const ifdDataEnd = ifdDataStart + numEntries * 12;
-
-    if (ifdDataEnd > tiffEnd) {
-      // IFD extends beyond segment - process what's possible
-      const maxEntries = Math.floor((tiffEnd - ifdDataStart) / 12);
-      if (maxEntries <= 0) {
-        return { orientation, dateTimeOriginal };
-      }
-      // Process only complete entries that fit
-      for (let i = 0; i < maxEntries; i++) {
-        const entryPos = ifdDataStart + i * 12;
-
-        const tag = readUInt16(entryPos);
-        const type = readUInt16(entryPos + 2);
-        const count = readUInt32(entryPos + 4);
-
-        if (tag === null || type === null || count === null) continue;
-
-        // Tag 0x0112: Orientation (SHORT type=3, count=1)
-        if (tag === 0x0112 && type === 3 && count === 1) {
-          // SHORT (2 bytes) with count=1 fits in the 4-byte value field
-          orientation = readUInt16(entryPos + 8);
-          if (orientation && (orientation < 1 || orientation > 8)) {
-            orientation = null; // Invalid orientation value
-          }
-        }
-
-        // Tag 0x9003: DateTimeOriginal (ASCII type=2, count=20)
-        if (tag === 0x9003 && type === 2 && count === 20) {
-          // ASCII strings > 4 bytes use offset pointer
-          const offset = readUInt32(entryPos + 8);
-          if (offset !== null) {
-            const stringPos = tiffStart + offset;
-            const stringEnd = stringPos + 19; // 19 chars + null terminator
-
-            if (stringEnd <= tiffEnd && stringEnd <= buffer.length) {
-              try {
-                dateTimeOriginal = buffer.toString(
-                  "ascii",
-                  stringPos,
-                  stringEnd
-                );
-                // Validate format: "YYYY:MM:DD HH:MM:SS"
-                if (
-                  !/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(dateTimeOriginal)
-                ) {
-                  dateTimeOriginal = null;
-                }
-              } catch {
-                dateTimeOriginal = null;
-              }
-            }
-          }
-        }
-
-        // Could also look for EXIF IFD pointer (tag 0x8769) for more data
-        // but orientation and date are usually in IFD0
-      }
-    } else {
-      // Normal case - all entries fit
-      for (let i = 0; i < numEntries; i++) {
-        const entryPos = ifdDataStart + i * 12;
-
-        const tag = readUInt16(entryPos);
-        const type = readUInt16(entryPos + 2);
-        const count = readUInt32(entryPos + 4);
-
-        if (tag === null || type === null || count === null) continue;
-
-        if (tag === 0x0112 && type === 3 && count === 1) {
-          orientation = readUInt16(entryPos + 8);
-          if (orientation && (orientation < 1 || orientation > 8)) {
-            orientation = null;
-          }
-        } else if (tag === 0x9003 && type === 2 && count === 20) {
-          const offset = readUInt32(entryPos + 8);
-          if (offset !== null) {
-            const stringPos = tiffStart + offset;
-            const stringEnd = stringPos + 19;
-
-            if (stringEnd <= tiffEnd && stringEnd <= buffer.length) {
-              try {
-                const extracted = buffer.toString(
-                  "ascii",
-                  stringPos,
-                  stringEnd
-                );
-                if (/^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(extracted)) {
-                  dateTimeOriginal = extracted;
-                }
-              } catch {
-                console.warn("invalid ascii data");
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return { orientation, dateTimeOriginal };
-  }
-  private parseXmpFromAvif(
-    buffer: Buffer,
-    meta: BoxInfo,
-    _ipco: BoxInfo
-  ): string | null {
-    // Find iinf (Item Info Box)
-    const iinf = this.findBox(
-      buffer,
-      "iinf",
-      meta.pos + 4,
-      meta.pos + meta.size
-    );
-    if (!iinf) return null;
-
-    // Parse iinf: version/flags (skip), then item_count (u16 or u32 based on version)
-    let pos = iinf.pos;
-
-    const version = buffer[pos++];
-    // const flags = (buffer[pos++]  << 16) | (buffer[pos++] << 8) | buffer[pos++]; // Skip flags
-    const itemCount =
-      version === 0 ? buffer.readUInt16BE(pos) : buffer.readUInt32BE(pos);
-    pos += version === 0 ? 2 : 4;
-
-    let xmpItemId: number | undefined;
-    for (let i = 0; i < itemCount; i++) {
-      // Each infe (Item Info Entry)
-      const infeStart = pos;
-      const infeSize = buffer.readUInt32BE(pos);
-      if (buffer.toString("ascii", pos + 4, pos + 8) !== "infe") break; // Not infe
-      pos += 8; // size + type
-      const infeVersion = buffer?.[pos++];
-
-      // const infeFlags = (buffer[pos++] << 16) | (buffer[pos++] << 8) | buffer[pos++]; // Skip
-      if (!infeVersion) return null;
-      const itemId =
-        infeVersion < 2 ? buffer.readUInt16BE(pos) : buffer.readUInt32BE(pos);
-      pos += infeVersion < 2 ? 2 : 4;
-      pos += 2; // item_protection_index (u16, skip)
-      const itemType = buffer.toString("ascii", pos, pos + 4);
-      pos += 4;
-      // item_name (null-terminated string) - skip over it
-      let nameEnd = pos;
-      while (buffer[nameEnd] !== 0 && nameEnd < infeStart + infeSize) nameEnd++;
-      pos = nameEnd + 1;
-      if (itemType === "mime") {
-        // content_type (null-terminated)
-        let ctEnd = pos;
-        while (buffer[ctEnd] !== 0 && ctEnd < infeStart + infeSize) ctEnd++;
-        const contentType = buffer.toString("ascii", pos, ctEnd);
-        if (contentType === "application/rdf+xml") {
-          xmpItemId = itemId;
-          break; // Found XMP item
-        }
-        pos = ctEnd + 1; // Skip optional content_encoding if present
-      }
-      pos = infeStart + infeSize; // Jump to next infe
-    }
-
-    if (!xmpItemId) return null;
-
-    // Find iloc (Item Location Box)
-    const iloc = this.findBox(
-      buffer,
-      "iloc",
-      meta.pos + 4,
-      meta.pos + meta.size
-    );
-    if (!iloc) return null;
-
-    // Parse iloc: version, flags (skip), offset_size (4bits), length_size (4bits), base_offset_size (4bits), etc.
-    pos = iloc.pos;
-    const ilocVersion = buffer[pos++];
-    // const ilocFlags = (buffer[pos++] << 16) | (buffer[pos++] << 8) | buffer[pos++]; // Skip
-    const sizes = buffer?.[pos++];
-    if (!sizes) return null;
-    const offsetSize = (sizes >> 4) & 0xf;
-    const lengthSize = sizes & 0xf;
-    let indexSize = 0;
-    if (ilocVersion === 1 || ilocVersion === 2) {
-      const indexSizes = buffer?.[pos++];
-      if (!indexSizes) return null;
-      // index_size (4bits), reserved (4bits) - but simplified, assume no construction_method
-      indexSize = (indexSizes >> 4) & 0xf;
-    }
-    if (!ilocVersion) return null;
-    const buffpos = buffer?.[pos++];
-    if (!buffpos) return null;
-    const baseOffsetSize = ilocVersion < 2 ? 0 : (buffpos >> 4) & 0xf; // Simplified
-    const itemCountIloc =
-      ilocVersion < 2 ? buffer.readUInt16BE(pos) : buffer.readUInt32BE(pos);
-    pos += ilocVersion < 2 ? 2 : 4;
-
-    let xmpOffset = 0;
-    let xmpLength = 0;
-    for (let i = 0; i < itemCountIloc; i++) {
-      const curItemId =
-        ilocVersion < 2 ? buffer.readUInt16BE(pos) : buffer.readUInt32BE(pos);
-      pos += ilocVersion < 2 ? 2 : 4;
-      if (curItemId !== xmpItemId) {
-        // Skip this item: construction_method (u16 if v1+), data_reference_index (u16), base_offset, extent_count (u16), then per extent: [index] offset length
-        if (ilocVersion === 1 || ilocVersion === 2) pos += 2; // construction_method (assume 0: file offset)
-        pos += 2; // data_reference_index (u16, assume 0: this file)
-        pos += baseOffsetSize; // base_offset
-        const extentCount = buffer.readUInt16BE(pos);
-        pos += 2;
-        for (let e = 0; e < extentCount; e++) {
-          if (indexSize > 0) pos += indexSize; // extent_index if present
-          pos += offsetSize + lengthSize; // Skip offset + length
-        }
-        continue;
-      }
-      // Found XMP item: Assume construction_method=0 (file offset), data_ref=0, extent_count=1 (common for XMP)
-      if (ilocVersion === 1 || ilocVersion === 2) {
-        const constructionMethod = buffer.readUInt16BE(pos);
-        pos += 2;
-        if (constructionMethod !== 0) return null; // Unsupported (e.g., idat or item)
-      }
-      pos += 2; // data_reference_index (assume 0)
-      const baseOffset = this.readVarSize(buffer, pos, baseOffsetSize);
-      pos += baseOffsetSize;
-      const extentCount = buffer.readUInt16BE(pos);
-      pos += 2;
-      if (extentCount !== 1) return null; // Multi-extent rare, handle single for simplicity
-      if (indexSize > 0) pos += indexSize; // Skip index if present
-      const extentOffset = this.readVarSize(buffer, pos, offsetSize);
-      pos += offsetSize;
-      const extentLength = this.readVarSize(buffer, pos, lengthSize);
-      xmpOffset = baseOffset + extentOffset;
-      xmpLength = extentLength;
-      break;
-    }
-
-    if (
-      xmpOffset === 0 ||
-      xmpLength === 0 ||
-      xmpOffset + xmpLength > buffer.length
-    )
-      return null;
-
-    // Extract XMP XML string (UTF-8 assumed)
-    return buffer.toString("utf8", xmpOffset, xmpOffset + xmpLength);
-  }
-  private readVarSize(buffer: Buffer, pos: number, size: number) {
-    if (size === 0) return 0;
-    if (size === 1 && buffer?.[pos]) return buffer?.[pos];
-    if (size === 2) return buffer.readUInt16BE(pos);
-    if (size === 3) {
-      const pos1 = buffer?.[pos + 1],
-        pos2 = buffer?.[pos + 2];
-      if (buffer?.[pos] && pos1 && pos2) {
-        return (buffer[pos] << 16) | (pos1 << 8) | pos2;
-      }
-      throw new Error("Invalid var size");
-    }
-    if (size === 4) return buffer.readUInt32BE(pos);
-    if (size === 8) return Number(buffer.readBigUInt64BE(pos));
-    throw new Error("Invalid var size");
-  }
-  private findBox(
-    buffer: Buffer,
-    type: string,
-    start = 0,
-    end: number = buffer.length
-  ): BoxInfo | null {
-    let pos = start;
-    while (pos < end) {
-      let boxSize = buffer.readUInt32BE(pos);
-      const boxType = buffer.toString("ascii", pos + 4, pos + 8);
-      let hdrSize = 8;
-      if (boxSize === 1) {
-        boxSize = Number(buffer.readBigUInt64BE(pos + 8));
-        hdrSize = 16;
-      } else if (boxSize === 0) {
-        boxSize = end - pos;
-      }
-      if (boxType === type) {
-        return { pos: pos + hdrSize, size: boxSize - hdrSize };
-      }
-      pos += boxSize;
-    }
-    return null;
-  }
-  private mapChrmToColorSpace(
-    chrm: {
-      white_x: number;
-      white_y: number;
-      red_x: number;
-      red_y: number;
-      green_x: number;
-      green_y: number;
-      blue_x: number;
-      blue_y: number;
-    },
-    fallback: ImageSpecs["colorSpace"]
+export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
+  public getImageSpecsWorkup(
+    rawbuffer: Buffer<ArrayBufferLike>,
+    size = 4096 * 6
   ) {
-    const tol = 100; // Small tolerance for int rounding (out of 100000)
-    // sRGB / Rec.709
-    if (
-      Math.abs(chrm.white_x - 31270) < tol &&
-      Math.abs(chrm.white_y - 32900) < tol &&
-      Math.abs(chrm.red_x - 64000) < tol &&
-      Math.abs(chrm.red_y - 33000) < tol &&
-      Math.abs(chrm.green_x - 30000) < tol &&
-      Math.abs(chrm.green_y - 60000) < tol &&
-      Math.abs(chrm.blue_x - 15000) < tol &&
-      Math.abs(chrm.blue_y - 6000) < tol
-    )
-      return "srgb";
-    // Adobe RGB
-    if (
-      Math.abs(chrm.white_x - 31270) < tol &&
-      Math.abs(chrm.white_y - 32900) < tol &&
-      Math.abs(chrm.red_x - 64000) < tol &&
-      Math.abs(chrm.red_y - 33000) < tol &&
-      Math.abs(chrm.green_x - 21000) < tol &&
-      Math.abs(chrm.green_y - 71000) < tol &&
-      Math.abs(chrm.blue_x - 15000) < tol &&
-      Math.abs(chrm.blue_y - 6000) < tol
-    )
-      return "adobe_rgb";
-    // Display P3
-    if (
-      Math.abs(chrm.white_x - 31270) < tol &&
-      Math.abs(chrm.white_y - 32900) < tol &&
-      Math.abs(chrm.red_x - 68000) < tol &&
-      Math.abs(chrm.red_y - 32000) < tol &&
-      Math.abs(chrm.green_x - 26500) < tol &&
-      Math.abs(chrm.green_y - 69000) < tol &&
-      Math.abs(chrm.blue_x - 15000) < tol &&
-      Math.abs(chrm.blue_y - 6000) < tol
-    )
-      return "display_p3";
-    // ProPhoto RGB
-    if (
-      Math.abs(chrm.white_x - 34590) < tol &&
-      Math.abs(chrm.white_y - 35850) < tol && // D50 white point
-      Math.abs(chrm.red_x - 73470) < tol &&
-      Math.abs(chrm.red_y - 26530) < tol &&
-      Math.abs(chrm.green_x - 15960) < tol &&
-      Math.abs(chrm.green_y - 85040) < tol &&
-      Math.abs(chrm.blue_x - 3600) < tol &&
-      Math.abs(chrm.blue_y - 1000) < tol
-    )
-      return "prophoto_rgb";
-    // Rec.2020
-    if (
-      Math.abs(chrm.white_x - 31270) < tol &&
-      Math.abs(chrm.white_y - 32900) < tol &&
-      Math.abs(chrm.red_x - 70800) < tol &&
-      Math.abs(chrm.red_y - 29200) < tol &&
-      Math.abs(chrm.green_x - 17000) < tol &&
-      Math.abs(chrm.green_y - 79700) < tol &&
-      Math.abs(chrm.blue_x - 13100) < tol &&
-      Math.abs(chrm.blue_y - 4600) < tol
-    )
-      return "rec2020";
-    return fallback; // No match, keep default
-  }
-  private xmpToColorSpaceWorkup<
-    const T extends
-      | ImageSpecs["colorSpace"]
-      | "prophoto rgb"
-      | "display p3"
-      | "adobe rgb (1998)"
-      | "rgb"
-      | "grayscale",
-    const V extends "iccprofile" | "colormode"
-  >(space: T, target: V) {
-    return `<photoshop:${target}>${space}</photoshop:${target}>` as const;
-  }
-  private mapXmpToColorSpace(
-    xmpText: string,
-    fallback: ImageSpecs["colorSpace"]
-  ) {
-    const lower = xmpText.toLowerCase();
-    // Look for common tags like <photoshop:ICCProfile> or <xmpG:icc-profile-name>
-    if (lower.includes(this.xmpToColorSpaceWorkup("srgb", "iccprofile")))
-      return "srgb";
-    if (
-      lower.includes(
-        this.xmpToColorSpaceWorkup("adobe rgb (1998)", "iccprofile")
-      )
-    )
-      return "adobe_rgb";
-    if (lower.includes(this.xmpToColorSpaceWorkup("display p3", "iccprofile")))
-      return "display_p3";
-    if (
-      lower.includes(this.xmpToColorSpaceWorkup("prophoto rgb", "iccprofile"))
-    )
-      return "prophoto_rgb";
-    // Or color mode hints
-    if (
-      lower.includes(this.xmpToColorSpaceWorkup("rgb", "colormode")) &&
-      lower.includes("adobe rgb")
-    )
-      return "adobe_rgb";
-    if (lower.includes(this.xmpToColorSpaceWorkup("grayscale", "colormode")))
-      return "gray";
-    return fallback;
-  }
-  private mapProfileToColorSpace(
-    profileName: string | null,
-    fallback: ImageSpecs["colorSpace"]
-  ) {
-    if (
-      !profileName ||
-      profileName === "embedded" ||
-      profileName.toLowerCase().includes("icc profile")
-    )
-      return fallback; // Generic names preserve default
-    const lower = profileName.toLowerCase();
-    if (
-      lower.includes("srgb") ||
-      lower.includes("iec61966") ||
-      lower.includes("srgb2014")
-    )
-      return "srgb";
-    if (
-      lower.includes("display p3") ||
-      lower.includes("display-p3") ||
-      lower.includes("dci-p3") ||
-      lower.includes("p3")
-    )
-      return "display_p3";
-    if (
-      lower.includes("adobe rgb") ||
-      lower.includes("adobergb") ||
-      lower.includes("adobe rgb (1998)")
-    )
-      return "adobe_rgb";
-    if (
-      lower.includes("prophoto rgb") ||
-      lower.includes("prophoto") ||
-      lower.includes("romm rgb") ||
-      lower.includes("romm") ||
-      lower.includes("iso 22028")
-    )
-      return "prophoto_rgb";
-    if (
-      lower.includes("rec2020") ||
-      lower.includes("bt.2020") ||
-      lower.includes("bt2020") ||
-      lower.includes("bt.2100") ||
-      lower.includes("itur_2100")
-    )
-      return "rec2020";
-    if (
-      lower.includes("rec709") ||
-      lower.includes("bt.709") ||
-      lower.includes("bt709")
-    )
-      return "rec709";
-    if (lower.includes("cmyk")) return "cmyk";
-    if (lower.includes("lab")) return "lab";
-    if (lower.includes("xyz")) return "xyz";
-    if (
-      lower.includes("gray") ||
-      lower.includes("grey") ||
-      lower.includes("monochrome") ||
-      lower.includes("gamma") ||
-      lower.includes("gamma 2.2") ||
-      lower.includes("dot gain")
-    )
-      return "gray";
-    return fallback; // Preserve d
-  }
-  public getImageSpecsWorkup(rawbuffer: Buffer<ArrayBufferLike>, size = 4096*6) {
     // 8KB handles most JPEGs with metadata while minimizing memory usage
     // Professional photos with EXIF + Photoshop data typically need 6-7KB
     const MAX_HEADER_SIZE = size;
@@ -1208,6 +669,585 @@ export class ImgMetadataExtractor {
         colorSpace,
         iccProfile,
         exifDateTimeOriginal // Can have 'XMP' box, but parse XMP for date if needed
+      } satisfies ImageSpecs;
+    }
+    // Add HEIC parsing (after AVIF check, before SVG)
+    // HEIC/HEIF: Similar to AVIF, ISOBMFF with ftyp heic/heix/etc.
+    if (buffer.length >= 32 && buffer.toString("ascii", 4, 8) === "ftyp") {
+      const ftyp = this.findBox(buffer, "ftyp");
+      if (!ftyp) throw new Error("Invalid HEIC: No ftyp");
+      const brands = buffer
+        .toString("ascii", ftyp.pos, ftyp.pos + ftyp.size)
+        .toLowerCase();
+      const isHeic =
+        brands.includes("heic") ||
+        brands.includes("heix") ||
+        brands.includes("heim") ||
+        brands.includes("heis") ||
+        brands.includes("hevc") ||
+        brands.includes("hevx") ||
+        brands.includes("mif1"); // Common HEIF brands, focusing on HEVC-based (HEIC)
+      if (!isHeic) throw new Error("Not a HEIC file");
+
+      const meta = this.findBox(buffer, "meta");
+      if (!meta) throw new Error("Invalid HEIC: No meta");
+      const metaSubStart = meta.pos + 4; // Skip version + flags
+      const metaSubEnd = meta.pos + meta.size;
+
+      const iprp = this.findBox(buffer, "iprp", metaSubStart, metaSubEnd);
+      if (!iprp) throw new Error("Invalid HEIC: No iprp");
+      const ipco = this.findBox(buffer, "ipco", iprp.pos, iprp.pos + iprp.size);
+      if (!ipco) throw new Error("Invalid HEIC: No ipco");
+      const ispe = this.findBox(buffer, "ispe", ipco.pos, ipco.pos + ipco.size);
+      if (!ispe) throw new Error("Invalid HEIC: No ispe");
+
+      if (buffer[ispe.pos] !== 0) throw new Error("Invalid ispe version");
+      const width = buffer.readUInt32BE(ispe.pos + 4);
+      const height = buffer.readUInt32BE(ispe.pos + 8);
+
+      // For color space, look for 'colr' box in ipco (simple color info) or assume RGB if no ICC
+      let colorSpace = "rgb" as ImageSpecs["colorSpace"],
+        colorModel = "rgb" as ImageSpecs["colorModel"],
+        hasAlpha = false,
+        iccProfile: string | null = null;
+      const colr = this.findBox(buffer, "colr", ipco.pos, ipco.pos + ipco.size);
+      if (colr) {
+        const colrType = buffer.toString("ascii", colr.pos, colr.pos + 4);
+        if (colrType === "nclx") {
+          // nclx profile: color primaries, transfer, matrix
+          // Simplified: We can check matrix coefficient for YUV vs RGB, but for now, flag as ycbcr if not RGB
+          const matrix = buffer.readUInt16BE(colr.pos + 6);
+          colorModel = matrix === 2 ? "rgb" : "ycbcr"; // 2 is RGB identity
+        } else if (colrType === "rICC" || colrType === "prof") {
+          colorSpace = "unknown"; // ICC profile present
+          iccProfile = "embedded";
+        }
+      }
+      // Check for alpha: Look for 'auxC' box with alpha URI
+      const auxC = this.findBox(buffer, "auxC", ipco.pos, ipco.pos + ipco.size);
+      if (
+        auxC &&
+        buffer
+          .toString("ascii", auxC.pos, auxC.pos + auxC.size)
+          .includes("alpha")
+      ) {
+        hasAlpha = true;
+        if (colorModel === "rgb") {
+          colorModel = "rgba";
+        } else if (colorModel === "ycbcr") {
+          colorModel = "ycck";
+        } else if (colorModel === "grayscale" || colorModel === "unknown") {
+          colorModel = "grayscale-alpha";
+        }
+      }
+      const xmpXml = this.parseXmpFromAvif(buffer, meta, ipco); // Reuse AVIF XMP parser, as structure is identical
+      let exifDateTimeOriginal: string | null = null;
+      if (xmpXml) {
+        // Simple native parse: Find xmp:CreateDate or photoshop:DateCreated (common for original date)
+        // This is regex-free; use string search for robustness
+        let dateStart = xmpXml.indexOf('xmp:CreateDate="');
+        if (dateStart === -1)
+          dateStart = xmpXml.indexOf('photoshop:DateCreated="');
+        if (dateStart !== -1) {
+          dateStart += 16; // Skip to value
+          const dateEnd = xmpXml.indexOf('"', dateStart);
+          if (dateEnd !== -1) {
+            exifDateTimeOriginal = xmpXml.substring(dateStart, dateEnd);
+          }
+        }
+        // If needed, add more tags like dc:date, but this covers basics
+      }
+      // Animated/frames: For HEIF sequences (e.g., bursts), check brands like 'heim'/'heis' for multi-image
+      let frames = 1;
+      const animated = brands.includes("heim") || brands.includes("heis");
+      if (animated) {
+        const iloc = this.findBox(buffer, "iloc", metaSubStart, metaSubEnd);
+        if (iloc) {
+          // Simplified: Count items (full parse complex, assume frames = item count / 2 if alpha)
+          const version = buffer?.[iloc.pos] ?? 0;
+          const itemCountPos = iloc.pos + (version < 2 ? 4 : 6);
+          let itemCount = buffer?.readUInt16BE(itemCountPos) ?? 0;
+          if (version >= 2) itemCount = buffer?.readUInt32BE(itemCountPos) ?? 0; // Override for v2+
+          frames = Math.max(1, Math.floor(itemCount / (hasAlpha ? 2 : 1))); // Approx: Divide by 2 if alpha layers
+        }
+      }
+
+      return {
+        width,
+        height,
+        format: "heic",
+        frames,
+        animated,
+        colorModel,
+        hasAlpha: hasAlpha ? true : null,
+        orientation: null, // Can have 'irot' or 'imir' transforms, or EXIF; add parsing if needed
+        aspectRatio: width / height,
+        colorSpace,
+        iccProfile,
+        exifDateTimeOriginal // Can have dedicated 'Exif' item; add parser similar to XMP if required
+      } satisfies ImageSpecs;
+    }
+    const headerText = buffer
+      .toString("utf-8", 0, Math.min(1024, buffer.length))
+      .trim();
+    if (
+      headerText.startsWith("<svg") ||
+      (headerText.startsWith("<?xml") && headerText.includes("<svg"))
+    ) {
+      const widthMatch = headerText.match(
+        /width\s*=\s*["']?(\d+(?:\.\d+)?)(?:px)?["']?/i
+      );
+      const heightMatch = headerText.match(
+        /height\s*=\s*["']?(\d+(?:\.\d+)?)(?:px)?["']?/i
+      );
+      const viewBoxMatch = headerText.match(
+        /viewBox\s*=\s*["']?(\d+(?:\.\d+)?\s+\d+(?:\.\d+)?\s+\d+(?:\.\d+)?\s+\d+(?:\.\d+)?)["']?/i
+      );
+      let width = 0;
+      let height = 0;
+
+      if (widthMatch?.[1] && heightMatch?.[1]) {
+        width = parseFloat(widthMatch[1]);
+        height = parseFloat(heightMatch[1]);
+      } else if (viewBoxMatch) {
+        const [_x0, _y0, vbWidth, vbHeight] = viewBoxMatch?.[1]
+          ?.split(/\s+/)
+          .map(t => Number.parseFloat(t)) as [number, number, number, number];
+        width = vbWidth;
+        height = vbHeight;
+      } else {
+        // Default to intrinsic size if not specified (e.g., 100% but for metadata, assume 0 or fallback)
+        width = 0; // Or throw if no dims
+        height = 0;
+        throw new Error("SVG has no defined width/height or viewBox");
+      }
+      const animated =
+        headerText.includes("<animate") ||
+        headerText.includes("<animation") ||
+        headerText.includes("<motion."); // Rough check for SMIL
+      const frames = 1;
+
+      return {
+        width,
+        height,
+        format: "svg",
+        frames,
+        animated,
+        hasAlpha: true, // SVG supports transparency
+        orientation: null,
+        aspectRatio: width / height || 1, // Fallback if 0
+        colorModel: "vector",
+        colorSpace: "srgb", // Typically sRGB for web SVGs
+        iccProfile: null, // Rare, but can embed ICC in <color-profile>
+        exifDateTimeOriginal: null // No standard EXIF
+      } satisfies ImageSpecs;
+    }
+    // Add ICO parsing (after SVG check)
+    // ICO: Starts with 00 00 01 00 (reserved + type=1), then numImages (u16LE)
+    if (
+      buffer.length >= 6 &&
+      buffer[0] === 0x00 &&
+      buffer[1] === 0x00 &&
+      buffer[2] === 0x01 &&
+      buffer[3] === 0x00
+    ) {
+      const frames = buffer.readUInt16LE(4); // Number of icons
+      if (frames === 0) throw new Error("Invalid ICO: No images");
+
+      // Each entry: width (u8, 0=256), height (u8, 0=256), colors (u8), reserved (u8), planes/hotspotX (u16), bpp/hotspotY (u16), size (u32), offset (u32)
+      let maxWidth = 0;
+      let maxHeight = 0;
+      let hasAlpha: boolean | null = null;
+      let colorModel = "unknown" as ImageSpecs["colorModel"];
+
+      for (let i = 0; i < frames; i++) {
+        const entryPos = 6 + i * 16;
+        if (entryPos + 16 > buffer.length) break; // Truncated
+
+        let entryWidth = buffer[entryPos];
+        let entryHeight = buffer[entryPos + 1];
+        entryWidth = entryWidth === 0 ? 256 : entryWidth;
+        entryHeight = entryHeight === 0 ? 256 : entryHeight;
+
+        const bpp = buffer.readUInt16LE(entryPos + 6); // Bits per pixel
+        const _size = buffer.readUInt32LE(entryPos + 8);
+        const offset = buffer.readUInt32LE(entryPos + 12);
+
+        // Rough color model based on bpp (common: 1,4,8 indexed; 24 rgb; 32 rgba)
+        if (bpp <= 8) colorModel = "indexed";
+        else if (bpp === 24) colorModel = "rgb";
+        else if (bpp === 32) {
+          colorModel = "rgba";
+          hasAlpha = true;
+        }
+
+        // To detect embedded PNG: If data at offset starts with PNG sig
+        if (
+          offset + 8 <= rawbuffer.length && // Use full buffer for data
+          rawbuffer[offset] === 0x89 &&
+          rawbuffer[offset + 1] === 0x50 &&
+          rawbuffer[offset + 2] === 0x4e &&
+          rawbuffer[offset + 3] === 0x47 &&
+          rawbuffer[offset + 4] === 0x0d &&
+          rawbuffer[offset + 5] === 0x0a &&
+          rawbuffer[offset + 6] === 0x1a &&
+          rawbuffer[offset + 7] === 0x0a
+        ) {
+          // Embedded PNG: Could have alpha
+          hasAlpha = true;
+          colorModel = "rgba"; // Assume possible
+        }
+
+        // Track largest size
+        if (entryWidth && entryWidth > maxWidth) maxWidth = entryWidth;
+        if (entryHeight && entryHeight > maxHeight) maxHeight = entryHeight;
+      }
+
+      return {
+        width: maxWidth,
+        height: maxHeight,
+        format: "ico",
+        frames,
+        animated: false, // ICO not animated
+        hasAlpha,
+        orientation: null,
+        aspectRatio: maxWidth / maxHeight,
+        colorModel,
+        colorSpace: "srgb", // Typically
+        iccProfile: null,
+        exifDateTimeOriginal: null
+      } satisfies ImageSpecs;
+    }
+    // TIFF/TIF (classic TIFF only; BigTIFF is detected and rejected)
+    if (
+      buffer.length >= 8 &&
+      // "II*\0" (little-endian classic TIFF)
+      ((buffer[0] === 0x49 &&
+        buffer[1] === 0x49 &&
+        buffer[2] === 0x2a &&
+        buffer[3] === 0x00) ||
+        // "MM\0*" (big-endian classic TIFF)
+        (buffer[0] === 0x4d &&
+          buffer[1] === 0x4d &&
+          buffer[2] === 0x00 &&
+          buffer[3] === 0x2a) ||
+        // BigTIFF magic "II+\0" or "MM\0+"
+        (buffer[0] === 0x49 &&
+          buffer[1] === 0x49 &&
+          buffer[2] === 0x2b &&
+          buffer[3] === 0x00) ||
+        (buffer[0] === 0x4d &&
+          buffer[1] === 0x4d &&
+          buffer[2] === 0x00 &&
+          buffer[3] === 0x2b))
+    ) {
+      const little = buffer[0] === 0x49; // "II" vs "MM"
+      const isBigTiff = buffer[2] === 0x2b || buffer[3] === 0x2b;
+
+      // We intentionally don't parse BigTIFF (64-bit offsets). Fail loudly so you can bump your reader when you hit one.
+      if (isBigTiff) {
+        throw new Error(
+          "BigTIFF (0x2B) detected — not supported in lightweight header parser."
+        );
+      }
+
+      // Use the *full* raw buffer here (IFDs can sit beyond your header window).
+      const src = rawbuffer;
+      const readU16 = (off: number) =>
+        little ? src.readUInt16LE(off) : src.readUInt16BE(off);
+      const readU32 = (off: number) =>
+        little ? src.readUInt32LE(off) : src.readUInt32BE(off);
+
+      const TIFF_START = 0;
+      const firstIFDOff = readU32(4);
+      let ifdOff = TIFF_START + firstIFDOff;
+
+      let frames = 0;
+      let width: number | null = null;
+      let height: number | null = null;
+      let samplesPerPixel: number | null = null;
+      let extraSamples: number[] = [];
+      let photometric: number | null = null;
+      let orientation: number | null = null;
+      let iccPresent = false;
+      let exifIFDOffset: number | null = null;
+
+      const TAG = {
+        ImageWidth: 256,
+        ImageLength: 257,
+        BitsPerSample: 258, // not strictly needed here
+        Compression: 259, // not strictly needed here
+        PhotometricInterpretation: 262,
+        StripOffsets: 273, // not needed for metadata
+        Orientation: 274,
+        SamplesPerPixel: 277,
+        RowsPerStrip: 278, // not needed for metadata
+        PlanarConfiguration: 284, // not needed for metadata
+        ExtraSamples: 338,
+        ICCProfile: 34675,
+        ExifIFDPointer: 34665,
+        // EXIF IFD:
+        DateTimeOriginal: 0x9003
+      } as const;
+
+      // TIFF field types (classic)
+      const TYPE = {
+        BYTE: 1,
+        ASCII: 2,
+        SHORT: 3,
+        LONG: 4,
+        RATIONAL: 5,
+        SBYTE: 6,
+        UNDEFINED: 7,
+        SSHORT: 8,
+        SLONG: 9,
+        SRATIONAL: 10,
+        FLOAT: 11,
+        DOUBLE: 12
+      } as const;
+
+      // Helper to extract values from an IFD entry (classic TIFF 12-byte entries)
+      function readIFDValue(
+        entryOff: number,
+        type: number,
+        count: number
+      ): number | number[] | string | null {
+        // For classic TIFF, the "value or offset" is 4 bytes at entryOff+8
+        const valueOrOff = readU32(entryOff + 8);
+
+        // Inline-value size threshold is 4 bytes
+        const valueFitsInline =
+          ((type === TYPE.BYTE ||
+            type === TYPE.SBYTE ||
+            type === TYPE.UNDEFINED ||
+            type === TYPE.ASCII) &&
+            count <= 4) ||
+          (type === TYPE.SHORT && count <= 2) ||
+          (type === TYPE.LONG && count <= 1);
+
+        let dataOff = valueOrOff;
+        if (valueFitsInline) {
+          dataOff = entryOff + 8;
+        } else {
+          dataOff = TIFF_START + valueOrOff;
+        }
+
+        // Bounds guard
+        if (dataOff < 0 || dataOff >= src.length) return null;
+
+        const readShortN = (o: number) => readU16(o);
+        const readLongN = (o: number) => readU32(o);
+
+        switch (type) {
+          case TYPE.ASCII: {
+            const end = Math.min(
+              src.indexOf(0, dataOff) === -1
+                ? dataOff + count
+                : src.indexOf(0, dataOff),
+              src.length
+            );
+            try {
+              return src.toString("ascii", dataOff, end);
+            } catch {
+              return null;
+            }
+          }
+          case TYPE.BYTE:
+          case TYPE.SBYTE:
+          case TYPE.UNDEFINED: {
+            const out: number[] = [];
+            for (let i = 0; i < count; i++) {
+              const off = dataOff + i;
+              if (off >= src.length || !src[off]) break;
+              out.push(src[off]);
+            }
+            return count === 1 ? (out[0] ?? null) : out;
+          }
+          case TYPE.SHORT: {
+            const out: number[] = [];
+            for (let i = 0; i < count; i++) {
+              const off = dataOff + i * 2;
+              if (off + 2 > src.length) break;
+              out.push(readShortN(off));
+            }
+            return count === 1 ? (out[0] ?? null) : out;
+          }
+          case TYPE.LONG: {
+            const out: number[] = [];
+            for (let i = 0; i < count; i++) {
+              const off = dataOff + i * 4;
+              if (off + 4 > src.length) break;
+              out.push(readLongN(off));
+            }
+            return count === 1 ? (out[0] ?? null) : out;
+          }
+          case TYPE.RATIONAL: {
+            // two LONGs per value (num/den)
+            const out: number[] = [];
+            for (let i = 0; i < count; i++) {
+              const off = dataOff + i * 8;
+              if (off + 8 > src.length) break;
+              const num = readLongN(off);
+              const den = readLongN(off + 4);
+              out.push(den ? num / den : 0);
+            }
+            return count === 1 ? (out[0] ?? null) : out;
+          }
+          default:
+            return null; // Unsupported type; fine for our metadata use
+        }
+      }
+
+      // Traverse IFD chain, record metadata from the first page, count frames
+      const MAX_IFDS = 32; // sanity ceiling
+      while (ifdOff > 0 && ifdOff + 2 <= src.length && frames < MAX_IFDS) {
+        const numEntries = readU16(ifdOff);
+        const entriesBase = ifdOff + 2;
+
+        for (let i = 0; i < numEntries; i++) {
+          const entry = entriesBase + i * 12;
+          if (entry + 12 > src.length) break;
+
+          const tag = readU16(entry);
+          const type = readU16(entry + 2);
+          const count = readU32(entry + 4);
+
+          // Narrow to tags we care about
+          if (tag === TAG.ImageWidth && width == null) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") width = v;
+            if (Array.isArray(v) && typeof v[0] === "number") width = v[0];
+          } else if (tag === TAG.ImageLength && height == null) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") height = v;
+            if (Array.isArray(v) && typeof v[0] === "number") height = v[0];
+          } else if (tag === TAG.SamplesPerPixel && samplesPerPixel == null) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") samplesPerPixel = v;
+          } else if (tag === TAG.ExtraSamples) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") extraSamples = [v];
+            else if (Array.isArray(v))
+              extraSamples = v.filter(n => typeof n === "number") as number[];
+          } else if (
+            tag === TAG.PhotometricInterpretation &&
+            photometric == null
+          ) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") photometric = v;
+          } else if (tag === TAG.Orientation && orientation == null) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") orientation = v;
+          } else if (tag === TAG.ICCProfile) {
+            iccPresent = true;
+          } else if (tag === TAG.ExifIFDPointer && exifIFDOffset == null) {
+            const v = readIFDValue(entry, type, count);
+            if (typeof v === "number") exifIFDOffset = TIFF_START + v;
+          }
+        }
+
+        frames++;
+
+        // Next IFD offset is 4 bytes right after the entries
+        const nextPtrOff = entriesBase + numEntries * 12;
+        if (nextPtrOff + 4 > src.length) break;
+        const nextRel = readU32(nextPtrOff);
+        ifdOff = nextRel ? TIFF_START + nextRel : 0;
+      }
+
+      // Basic EXIF DateTimeOriginal if EXIF IFD is present (classic TIFF)
+      let exifDateTimeOriginal: string | null = null;
+      if (exifIFDOffset && exifIFDOffset + 2 <= src.length) {
+        try {
+          const num = readU16(exifIFDOffset);
+          const base = exifIFDOffset + 2;
+          for (let i = 0; i < num; i++) {
+            const entry = base + i * 12;
+            if (entry + 12 > src.length) break;
+            const tag = readU16(entry);
+            if (tag === TAG.DateTimeOriginal) {
+              const type = readU16(entry + 2);
+              const count = readU32(entry + 4);
+              const val = readIFDValue(entry, type, count);
+              if (
+                typeof val === "string" &&
+                /^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}/.test(val)
+              ) {
+                exifDateTimeOriginal = val;
+              }
+              break;
+            }
+          }
+        } catch {
+          // ignore EXIF parse failures
+        }
+      }
+
+      if (!width || !height) {
+        throw new Error(
+          "Invalid TIFF: missing ImageWidth/ImageLength in first IFD (consider reading more than header)."
+        );
+      }
+
+      // Map color model/space
+      let colorModel = "unknown" as ImageSpecs["colorModel"];
+      let colorSpace = "unknown" as ImageSpecs["colorSpace"];
+
+      // PhotometricInterpretation common values:
+      // 0=WhiteIsZero (gray), 1=BlackIsZero (gray), 2=RGB, 3=Palette, 5=CMYK, 6=YCbCr, 8=CIELab
+      switch (photometric) {
+        case 0:
+        case 1:
+          colorModel =
+            samplesPerPixel === 2 || extraSamples.length
+              ? "grayscale-alpha"
+              : "grayscale";
+          colorSpace = "gray";
+          break;
+        case 2:
+          colorModel =
+            samplesPerPixel === 4 || extraSamples.length ? "rgba" : "rgb";
+          colorSpace = "srgb"; // sane default unless we parse the ICC "desc"
+          break;
+        case 3:
+          colorModel = "indexed";
+          colorSpace = "srgb";
+          break;
+        case 5:
+          colorModel = "cmyk";
+          colorSpace = "cmyk";
+          break;
+        case 6:
+          colorModel = "ycbcr"; // matches your JPEG branch semantics
+          colorSpace = "srgb"; // typical working space assumption
+          break;
+        case 8:
+          colorModel = "lab";
+          colorSpace = "lab";
+          break;
+        default:
+          // unknown photometric; leave defaults
+          break;
+      }
+
+      const hasAlpha =
+        extraSamples.some(v => v === 1 || v === 2) || // 1: associated alpha, 2: unassociated
+        (photometric === 2 && samplesPerPixel === 4) ||
+        ((photometric === 0 || photometric === 1) && samplesPerPixel === 2);
+
+      return {
+        width,
+        height,
+        format: "tiff",
+        frames,
+        animated: false,
+        hasAlpha,
+        orientation: orientation ?? null,
+        aspectRatio: width / height,
+        colorModel,
+        colorSpace,
+        iccProfile: iccPresent ? "embedded" : null,
+        exifDateTimeOriginal
       } satisfies ImageSpecs;
     }
 

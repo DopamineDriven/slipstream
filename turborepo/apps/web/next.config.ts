@@ -25,19 +25,11 @@ export default {
         protocol: "https"
       },
       {
-        hostname: `ws-server-assets-dev.s3.us-east-1.amazonaws.com`,
+        hostname: `assets.d0paminedriven.com`,
         protocol: "https"
       },
       {
-        hostname: `py-gen-assets-dev.s3.us-east-1.amazonaws.com`,
-        protocol: "https"
-      },
-      {
-        hostname: `ws-server-assets-prod.s3.us-east-1.amazonaws.com`,
-        protocol: "https"
-      },
-      {
-        hostname: `py-gen-assets-prod.s3.us-east-1.amazonaws.com`,
+        hostname: `assets-dev.d0paminedriven.com`,
         protocol: "https"
       },
       { hostname: "images.unsplash.com", protocol: "https" },

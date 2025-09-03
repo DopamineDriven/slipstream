@@ -33,7 +33,8 @@ export class Resolver extends ModelService {
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
-    private llamaService: LlamaService
+    private llamaService: LlamaService,
+    private isProd: boolean
   ) {
     super();
   }
@@ -48,7 +49,8 @@ export class Resolver extends ModelService {
     batchId?: string,
     userId?: string
   ) {
-    const att = attachmentId && attachmentId.length > 0 ? attachmentId : "no-att";
+    const att =
+      attachmentId && attachmentId.length > 0 ? attachmentId : "no-att";
     const d = draftId ?? "no-draft";
     const b = batchId ?? "no-batch";
     const u = userId ?? "no-user";
@@ -288,6 +290,7 @@ export class Resolver extends ModelService {
       userId,
       ws,
       apiKey,
+      keyId,
       max_tokens,
       model,
       systemPrompt,
@@ -553,12 +556,13 @@ export class Resolver extends ModelService {
       filename,
       mime,
       size,
-      batchId,type,
+      batchId,
+      type,
       draftId,
       // TODO implement this handling
-      height: _height,
-      width: _width,
-      metadata: _metadata
+      height,
+      width,
+      metadata: metadata
     } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
@@ -607,7 +611,38 @@ export class Resolver extends ModelService {
         filename: properFilename,
         draftId,
         region: this.region,
+        image: {
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: metadata?.colorSpace ?? null,
+          dominantColorHex: null,
+          format: metadata?.format ?? "unknown",
+          frames: metadata?.frames ?? 1,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: metadata?.hasAlpha ?? false,
+          iccProfile: metadata?.iccProfile ?? undefined,
+          lensModel: null,
+          orientation: metadata?.orientation ?? null,
+          updatedAt: undefined,
+          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+            ? new Date(metadata.exifDateTimeOriginal)
+            : null,
+          animated: metadata?.animated ?? false,
+          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+          width: width ?? 0,
+          height: height ?? 0
+        },
         mime: mimeType,
+        assetType: mimeType.startsWith("image/")
+          ? "IMAGE"
+          : mimeType.startsWith("application/")
+            ? "DOCUMENT"
+            : mimeType.startsWith("audio/")
+              ? "AUDIO"
+              : mimeType.startsWith("video/")
+                ? "VIDEO"
+                : "UNKNOWN",
         ext: extension,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
@@ -687,7 +722,6 @@ export class Resolver extends ModelService {
     userId: string,
     userData?: UserData
   ): Promise<void> {
-
     if (
       userData &&
       "city" in userData &&
@@ -707,9 +741,9 @@ export class Resolver extends ModelService {
       batchId,
       draftId,
       // TODO address integrating these fields
-      height: _height,
-      width: _width,
-      metadata: _metadata
+      height,
+      width,
+      metadata
     } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
@@ -758,14 +792,44 @@ export class Resolver extends ModelService {
         batchId,
         filename: properFilename,
         region: this.region,
+        image: {
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: metadata?.colorSpace ?? null,
+          dominantColorHex: null,
+          format: metadata?.format ?? "unknown",
+          frames: metadata?.frames ?? 1,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: metadata?.hasAlpha ?? false,
+          iccProfile: metadata?.iccProfile ?? undefined,
+          lensModel: null,
+          orientation: metadata?.orientation ?? null,
+          updatedAt: undefined,
+          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+            ? new Date(metadata.exifDateTimeOriginal)
+            : null,
+          animated: metadata?.animated ?? false,
+          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+          width: width ?? 0,
+          height: height ?? 0
+        },
         mime: mimeType,
+        assetType: mimeType.startsWith("image/")
+          ? "IMAGE"
+          : mimeType.startsWith("application/")
+            ? "DOCUMENT"
+            : mimeType.startsWith("audio/")
+              ? "AUDIO"
+              : mimeType.startsWith("video/")
+                ? "VIDEO"
+                : "UNKNOWN",
         ext: extension,
         draftId,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
         key: presignedData.key,
-
         size: BigInt(size),
         origin: "PASTED",
         status: "REQUESTED",
@@ -810,7 +874,6 @@ export class Resolver extends ModelService {
           totalBytes: size ?? 0
         } satisfies EventTypeMap["asset_upload_progress"]
       );
-
     } catch (error) {
       console.error("[Asset Paste] Error:", error);
 
@@ -1105,7 +1168,6 @@ export class Resolver extends ModelService {
     userId: string,
     _userData?: UserData
   ): Promise<void> {
-
     const {
       conversationId = "new-chat",
       attachmentId,
@@ -1138,12 +1200,13 @@ export class Resolver extends ModelService {
         extension,
         key: finalKey,
         presignedUrl,
+        cdnUrl,
         presignedUrlExpiresAt,
         lastModified,
         versionId: finalVersion,
         size,
         storageClass
-      } = await this.s3Service.finalize(bucket, key, versionId);
+      } = await this.s3Service.finalize(bucket, key, this.isProd, versionId);
 
       const s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
       console.log(
@@ -1169,7 +1232,8 @@ export class Resolver extends ModelService {
         region: this.region,
         uploadDuration: duration,
         userId,
-        cdnUrl: publicUrl,
+        publicUrl,
+        cdnUrl,
         versionId: finalVersion,
         s3ObjectId: finalS3ObjectId,
         etag: finalEtag ?? etag,
@@ -1183,7 +1247,6 @@ export class Resolver extends ModelService {
             : undefined
       });
 
-      // ✅ NOW send the real "asset_ready" event with actual values
       const assetReady = {
         type: "asset_ready",
         conversationId,
@@ -1206,7 +1269,7 @@ export class Resolver extends ModelService {
         userId,
         key,
         versionId: versionId,
-        downloadUrl: publicUrl,
+        downloadUrl: cdnUrl,
         downloadUrlExpiresAt: presignedUrlExpiresAt
       } satisfies EventTypeMap["asset_ready"];
 
@@ -1405,7 +1468,7 @@ export class Resolver extends ModelService {
         progress: safeProgress,
         bytesUploaded: Math.max(0, bytesUploaded ?? 0),
         totalBytes: Math.max(0, totalBytes ?? 0)
-      } satisfies  EventTypeMap["asset_upload_progress"];
+      } satisfies EventTypeMap["asset_upload_progress"];
 
       // Debug visibility: log the event with sanitized payload and active duration
       console.log(event.type, {

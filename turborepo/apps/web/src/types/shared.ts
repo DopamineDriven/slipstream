@@ -1,38 +1,18 @@
-import { Message as MessagePrisma } from "@prisma/client";
-import { Providers, RTC } from "@t3-chat-clone/types";
-
-export type ProviderCountsProps = {
-  openai: number;
-  grok: number;
-  gemini: number;
-  anthropic: number;
-};
-
-export type RecordCountsProps = {
-  isSet: ProviderCountsProps;
-  isDefault: ProviderCountsProps;
-};
+import type { Attachment, Message as MessagePrisma } from "@prisma/client";
+import type { Providers, RTC } from "@t3-chat-clone/types";
 
 export type ClientWorkupProps = {
   isSet: Record<Providers, boolean>;
   isDefault: Record<Providers, boolean>;
 };
-export type UIMessage = RTC<MessagePrisma, "conversationId">;
-export interface MessageClient
-  extends Omit<MessagePrisma, "createdAt" | "updatedAt" | "provider"> {
-  provider: "grok" | "openai" | "gemini" | "anthropic" | "meta" | "vercel";
-  createdAt: string;
-  updatedAt: string;
-  text: string | React.ReactNode;
 
-  originalText?: string;
-
-  timestamp: string;
-
-  avatar?: string;
-
-  isEditing?: boolean;
-}
+export type UIMessage =
+  RTC<MessagePrisma, "conversationId"> & {
+    attachments?: Pick<
+      RTC<Attachment, "filename">,
+      "id" | "filename" | "mime" | "size" | "cdnUrl" | "assetType" | "ext"
+    >[];
+  }
 
 export type RxnUnion =
   | "liked"
@@ -40,4 +20,4 @@ export type RxnUnion =
   | "unliked"
   | "undisliked"
   | "switch-to-liked"
-  | "switch-to-disliked"
+  | "switch-to-disliked";

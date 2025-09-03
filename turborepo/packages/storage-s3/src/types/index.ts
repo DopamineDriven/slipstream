@@ -10,6 +10,7 @@ export interface StorageConfig {
     wsAssets: string;
     pyGenAssets: string;
   };
+  isProd:boolean;
   kmsKeyId?: string;
   defaultPresignExpiry?: number;
 }
@@ -137,6 +138,7 @@ export type FinalizeResult = {
    * s3://bucket/key#<version|nov>
    */
   s3ObjectId: S3ObjectId;
+  cdnUrl: string;
   extension?: string;
   etag?: string;
   size?: number;
