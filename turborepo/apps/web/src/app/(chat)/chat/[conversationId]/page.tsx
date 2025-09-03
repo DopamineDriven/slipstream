@@ -13,8 +13,6 @@ const { prismaConversationService } = ormHandler(prismaClient);
 
 export const dynamicParams = true;
 
-
-
 export async function generateStaticParams() {
   return [{ conversationId: "new-chat" }];
 }
@@ -45,7 +43,6 @@ export default async function ChatPage({
   // Fetch data directly on the server
   let messages = null;
   let conversationTitle = null;
-
   if (conversationId !== "new-chat") {
     const data =
       await prismaConversationService.getMessagesByConversationId(
@@ -53,8 +50,11 @@ export default async function ChatPage({
       );
 
     if (data) {
-      messages = data.messages;
+      messages = data.messages.map((t)=>{
+        return {attachments: undefined,...t}
+      });
       conversationTitle = data.title;
+      console.log(data);
     }
   }
 

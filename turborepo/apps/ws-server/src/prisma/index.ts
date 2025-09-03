@@ -1,5 +1,10 @@
-import type { Attachment } from "@/generated/client/client.ts";
-import type { AttachmentUncheckedCreateInput } from "@/generated/client/models/Attachment.ts";
+import type {
+  Attachment,
+  AudioMetadata,
+  DocumentMetadata,
+  ImageMetadata,
+  VideoMetadata
+} from "@/generated/client/client.ts";
 import type { UserData } from "@/types/index.ts";
 import { PrismaClient } from "@/generated/client/client.ts";
 import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
@@ -387,63 +392,122 @@ export class PrismaService extends ModelService {
   async createAttachment({
     conversationId,
     ...data
-  }: AttachmentUncheckedCreateInput) {
+  }: CTR<Partial<Attachment>, "userId" | "bucket" | "key"> &
+    XOR<
+      XOR<
+        { image?: Partial<ImageMetadata> },
+        { document?: Partial<DocumentMetadata> }
+      >,
+      XOR<
+        { audio?: Partial<AudioMetadata> },
+        { video?: Partial<VideoMetadata> }
+      >
+    >) {
     const mime = data.mime ?? "application/octet-stream";
+    const assetType = data.assetType ?? "UNKNOWN";
     const extension = this.contentTypeToExt(mime) ?? data.ext ?? "bin";
-    if (
-      this.isSupportedImageType(extension) &&
-      data.sourceUrl &&
-      data.assetType === "IMAGE" &&
-      URL.canParse(data.sourceUrl)
-    ) {
-      const {
-        animated,
-        aspectRatio,
-        colorSpace,
-        exifDateTimeOriginal,
-        format,
-        frames,
-        hasAlpha,
-        height,
-        iccProfile,
-        orientation,
-        width
-      } = await this.fs.getImageSpecs(data.sourceUrl, 4096 * 6);
-      return await this.prismaClient.attachment.create({
-        include: { image: true },
-        data: {
-          ...data,
-          assetType: data.assetType,
-          conversationId: this.convoId(conversationId),
-          image: {
-            create: {
-              aspectRatio,
-              format,
-              height,
-              width,
-              animated,
-              colorSpace,
-              exifDateTimeOriginal,
-              frames,
-              hasAlpha,
-              iccProfile,
-              orientation
+    if (this.isSupportedType(assetType, extension)) {
+      if (assetType === "IMAGE" && data.image) {
+        const { image } = data;
+        return await this.prismaClient.attachment.create({
+          include: { image: true },
+          data: {
+            ...data,
+            assetType,
+            document: undefined,
+            audio: undefined,
+            video: undefined,
+            conversationId: this.convoId(conversationId),
+            image: {
+              create: {
+                ...image,
+                aspectRatio: image.width ?? 1 / (image?.height ?? 1),
+                width: image.width ?? 0,
+                height: image.height ?? 0
+              }
             }
           }
-        }
-      });
+        });
+      } else if (assetType === "DOCUMENT" && data.document) {
+        const { document, image: _image } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            video: undefined,
+            audio: undefined,
+            conversationId: this.convoId(conversationId),
+            document: {
+              create: {
+                format: document?.format ?? "application/pdf",
+                ...document
+              }
+            }
+          }
+        });
+      } else if (assetType === "AUDIO" && data.audio) {
+        const {
+          audio,
+          video: _video,
+          document: _document,
+          image: _image
+        } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            video: undefined,
+            document: undefined,
+            conversationId: this.convoId(conversationId),
+            audio: {
+              create: {
+                format: audio?.format ?? "application/pdf",
+                duration: audio?.duration ?? 0,
+                ...data.audio
+              }
+            }
+          }
+        });
+      } else if (assetType === "VIDEO" && data.video) {
+        const {
+          video,
+          audio: _audio,
+          document: _document,
+          image: _image
+        } = data;
+        return await this.prismaClient.attachment.create({
+          data: {
+            ...data,
+            assetType,
+            image: undefined,
+            audio: undefined,
+            document: undefined,
+            conversationId: this.convoId(conversationId),
+            video: {
+              create: {
+                format: video?.format ?? "application/pdf",
+                duration: video?.duration ?? 0,
+                width: video.width ?? 0,
+                height: video.height ?? 0,
+                ...data.video
+              }
+            }
+          }
+        });
+      }
     }
     return await this.prismaClient.attachment.create({
-      include: { image: true },
-      data: { ...data, conversationId: this.convoId(conversationId) }
+      data: {
+        ...data,
+        document: undefined,
+        video: undefined,
+        audio: undefined,
+        image: undefined,
+        conversationId: this.convoId(conversationId)
+      }
     });
-  }
-
-  public isSupportedImageType(ext: string) {
-    const x = ["apng", "png", "jpeg", "jpg", "gif", "bmp", "webp", "avif"];
-    if (x.includes(ext)) {
-      return true;
-    } else return false;
   }
 
   public contentTypeToExt(contentType?: string) {
@@ -590,27 +654,6 @@ export class PrismaService extends ModelService {
   }
 
   /**
-   * Update attachment upload progress
-   */
-  // async updateUploadProgress(
-  //   attachmentId: string,
-  //   progress: {
-  //     bytesUploaded: number;
-  //     totalBytes: number;
-  //     percentage: number;
-  //   }
-  // ): Promise<void> {
-  //   await this.prismaClient.attachment.update({
-  //     where: { id: attachmentId },
-  //     data: {
-  //       meta: {
-  //         uploadProgress: progress
-  //       }
-  //     }
-  //   });
-  // }
-
-  /**
    * Mark attachment as virus scanned
    */
   async markAsScanned(
@@ -677,42 +720,6 @@ export class PrismaService extends ModelService {
     };
   }
 
-  /**
-   * Batch create attachments
-   */
-  // async createBatchAttachments(
-  //   attachments: Array<{
-  //     conversationId: string;
-  //     userId: string;
-  //     filename: string;
-  //     contentType: string;
-  //     size?: number;
-  //     origin?: keyof typeof AssetOrigin;
-  //   }>
-  // ): Promise<Attachment[]> {
-  //   return this.prismaClient.$transaction(
-  //     this.prismaClient.m.map(data =>
-  //       this.prismaClient.attachment.create({
-  //         data: {
-  //           conversationId: data.conversationId,
-  //           userId: data.userId,
-  //           bucket: process.env.S3_BUCKET_ASSETS || "ws-assets",
-  //           key: "",
-  //           region: process.env.AWS_REGION || "us-east-1",
-  //           origin: data.origin || "UPLOAD",
-  //           status: "REQUESTED",
-  //           uploadMethod: "SERVER",
-  //           size: data.size ? BigInt(data.size) : null,
-  //           mime: data.contentType,
-  //           meta: {
-  //             filename: data.filename,
-  //             batchUpload: true
-  //           }
-  //         }
-  //       })
-  //     )
-  //   );
-  // }
 
   async createBatchedAttachments({
     conversationId,
@@ -1025,6 +1032,17 @@ export class PrismaService extends ModelService {
         state: "FAILED",
         errorMessage,
         lastCheckedAt: new Date()
+      }
+    });
+  }
+
+  public async getNestedAssets(conversationId: string) {
+    return await this.prismaClient.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        attachments: { where: { conversationId } },
+        messages: { orderBy: { createdAt: "asc" } },
+        conversationSettings: true
       }
     });
   }

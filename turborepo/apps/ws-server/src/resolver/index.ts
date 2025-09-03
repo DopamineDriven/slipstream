@@ -560,9 +560,9 @@ export class Resolver extends ModelService {
       type,
       draftId,
       // TODO implement this handling
-      height: _height,
-      width: _width,
-      metadata: _metadata
+      height,
+      width,
+      metadata: metadata
     } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
@@ -611,7 +611,38 @@ export class Resolver extends ModelService {
         filename: properFilename,
         draftId,
         region: this.region,
+        image: {
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: metadata?.colorSpace ?? null,
+          dominantColorHex: null,
+          format: metadata?.format ?? "unknown",
+          frames: metadata?.frames ?? 1,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: metadata?.hasAlpha ?? false,
+          iccProfile: metadata?.iccProfile ?? undefined,
+          lensModel: null,
+          orientation: metadata?.orientation ?? null,
+          updatedAt: undefined,
+          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+            ? new Date(metadata.exifDateTimeOriginal)
+            : null,
+          animated: metadata?.animated ?? false,
+          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+          width: width ?? 0,
+          height: height ?? 0
+        },
         mime: mimeType,
+        assetType: mimeType.startsWith("image/")
+          ? "IMAGE"
+          : mimeType.startsWith("application/")
+            ? "DOCUMENT"
+            : mimeType.startsWith("audio/")
+              ? "AUDIO"
+              : mimeType.startsWith("video/")
+                ? "VIDEO"
+                : "UNKNOWN",
         ext: extension,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
@@ -710,9 +741,9 @@ export class Resolver extends ModelService {
       batchId,
       draftId,
       // TODO address integrating these fields
-      height: _height,
-      width: _width,
-      metadata: _metadata
+      height,
+      width,
+      metadata
     } = event;
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
@@ -761,7 +792,38 @@ export class Resolver extends ModelService {
         batchId,
         filename: properFilename,
         region: this.region,
+        image: {
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: metadata?.colorSpace ?? null,
+          dominantColorHex: null,
+          format: metadata?.format ?? "unknown",
+          frames: metadata?.frames ?? 1,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: metadata?.hasAlpha ?? false,
+          iccProfile: metadata?.iccProfile ?? undefined,
+          lensModel: null,
+          orientation: metadata?.orientation ?? null,
+          updatedAt: undefined,
+          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+            ? new Date(metadata.exifDateTimeOriginal)
+            : null,
+          animated: metadata?.animated ?? false,
+          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+          width: width ?? 0,
+          height: height ?? 0
+        },
         mime: mimeType,
+        assetType: mimeType.startsWith("image/")
+          ? "IMAGE"
+          : mimeType.startsWith("application/")
+            ? "DOCUMENT"
+            : mimeType.startsWith("audio/")
+              ? "AUDIO"
+              : mimeType.startsWith("video/")
+                ? "VIDEO"
+                : "UNKNOWN",
         ext: extension,
         draftId,
         bucket: presignedData.bucket,

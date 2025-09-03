@@ -192,4 +192,139 @@ export class ModelService {
     "video/3gpp2": ["3g2"],
     "application/x-7z-compressed": ["7z"]
   } as const;
+
+    public isSupportedType(
+    type: "IMAGE" | "DOCUMENT" | "VIDEO" | "AUDIO" | "UNKNOWN",
+    ext: string
+  ) {
+    switch (type) {
+      case "IMAGE": {
+        if (
+          [
+            "apng",
+            "png",
+            "jpeg",
+            "jpg",
+            "heic",
+            "svg",
+            "ico",
+            "gif",
+            "bmp",
+            "webp",
+            "avif",
+            "tiff",
+            "tif"
+          ].includes(ext)
+        ) {
+          return true;
+        } else return false;
+      }
+      case "DOCUMENT": {
+        if (
+          [
+            "pdf",
+            "docx",
+            "doc",
+            "md",
+            "txt",
+            "csv",
+            "tsv",
+            "json",
+            "ndjson",
+            "jsonl",
+            "yaml",
+            "htm",
+            "html",
+            "mhtml",
+            "pages",
+            "numbers",
+            "keynote",
+            "xps",
+            "yml",
+            "xml",
+            "tex",
+            "rtf",
+            "odt",
+            "pptx",
+            "ppt",
+            "xlsx",
+            "xls",
+            "ods",
+            "odp",
+            "epub",
+            "mobi",
+            "azw",
+            "fb2",
+            "js",
+            "jsx",
+            "mjs",
+            "cjs",
+            "ts",
+            "tsx",
+            "mts",
+            "cts",
+            "py",
+            "java",
+            "cpp",
+            "c",
+            "cs",
+            "go",
+            "rs",
+            "rb",
+            "swift",
+            "sql",
+            "php",
+            "sh",
+            "toml"
+          ].includes(ext)
+        ) {
+          return true;
+        } else return false;
+      }
+      case "AUDIO": {
+        if (
+          [
+            "mp3",
+            "aac",
+            "ogg",
+            "opus",
+            "wma",
+            "m4a", // music/general audio
+            "m4b", // audiobooks
+            "m4p", // protected/DRM audio (iTunes Store)
+            "m4r", // iPhone ringtones
+            "amr",
+            "flac",
+            "alac",
+            "ape",
+            "wv",
+            "tta",
+            "wav",
+            "aiff",
+            "pcm",
+            "dsd",
+            "mka",
+            "ac3",
+            "dts",
+            "webm",
+            "m3u8",
+            "weba",
+            "oga"
+          ].includes(ext)
+        ) {
+          return true;
+        } else return false;
+      }
+      case "VIDEO": {
+        if (["mp4", "mkv", "webm", "mov", "ogv", "avi"].includes(ext)) {
+          return true;
+        } else return false;
+      }
+      case "UNKNOWN":
+      default: {
+        return false;
+      }
+    }
+  }
+
 }

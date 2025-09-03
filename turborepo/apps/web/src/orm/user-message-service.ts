@@ -46,11 +46,26 @@ export class PrismaUserMessageService extends ErrorHelperService {
 
   public async getMessagesByConversationId(
     conversationId: string
-  ): Promise<GetMessagesByConversationIdRT> {
+  ) {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
-        messages: { orderBy: { createdAt: "asc" } },
+
+        messages: { orderBy: { createdAt: "asc" }},
+        conversationSettings: true
+      }
+    });
+  }
+
+
+    public async getMessagesByConversationIdWithAsset(
+    conversationId: string
+  ) {
+    return await this.prismaClient.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+
+        messages: { orderBy: { createdAt: "asc" }},
         conversationSettings: true
       }
     });

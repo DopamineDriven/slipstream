@@ -149,7 +149,7 @@ export function ChatFeed({
         ref={scrollRef}
         data-chat-feed
         className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
-        {messages.map(message => (
+        {messages?.map(message => (
           <MessageBubble
             key={message.id}
             message={message}

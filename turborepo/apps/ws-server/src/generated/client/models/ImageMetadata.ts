@@ -28,7 +28,7 @@ export type AggregateImageMetadata = {
 export type ImageMetadataAvgAggregateOutputType = {
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   frames: number | null
   orientation: number | null
   gpsLat: runtime.Decimal | null
@@ -38,7 +38,7 @@ export type ImageMetadataAvgAggregateOutputType = {
 export type ImageMetadataSumAggregateOutputType = {
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   frames: number | null
   orientation: number | null
   gpsLat: runtime.Decimal | null
@@ -50,7 +50,7 @@ export type ImageMetadataMinAggregateOutputType = {
   format: $Enums.ImageFormat | null
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   frames: number | null
   hasAlpha: boolean | null
   animated: boolean | null
@@ -73,7 +73,7 @@ export type ImageMetadataMaxAggregateOutputType = {
   format: $Enums.ImageFormat | null
   width: number | null
   height: number | null
-  aspectRatio: runtime.Decimal | null
+  aspectRatio: number | null
   frames: number | null
   hasAlpha: boolean | null
   animated: boolean | null
@@ -297,7 +297,7 @@ export type ImageMetadataGroupByOutputType = {
   format: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal
+  aspectRatio: number | null
   frames: number
   hasAlpha: boolean | null
   animated: boolean
@@ -343,7 +343,7 @@ export type ImageMetadataWhereInput = {
   format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat
   width?: Prisma.IntFilter<"ImageMetadata"> | number
   height?: Prisma.IntFilter<"ImageMetadata"> | number
-  aspectRatio?: Prisma.DecimalFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
   frames?: Prisma.IntFilter<"ImageMetadata"> | number
   hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null
   animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
@@ -367,7 +367,7 @@ export type ImageMetadataOrderByWithRelationInput = {
   format?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
-  aspectRatio?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
   frames?: Prisma.SortOrder
   hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder
   animated?: Prisma.SortOrder
@@ -394,7 +394,7 @@ export type ImageMetadataWhereUniqueInput = Prisma.AtLeast<{
   format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat
   width?: Prisma.IntFilter<"ImageMetadata"> | number
   height?: Prisma.IntFilter<"ImageMetadata"> | number
-  aspectRatio?: Prisma.DecimalFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
   frames?: Prisma.IntFilter<"ImageMetadata"> | number
   hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null
   animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
@@ -418,7 +418,7 @@ export type ImageMetadataOrderByWithAggregationInput = {
   format?: Prisma.SortOrder
   width?: Prisma.SortOrder
   height?: Prisma.SortOrder
-  aspectRatio?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
   frames?: Prisma.SortOrder
   hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder
   animated?: Prisma.SortOrder
@@ -449,7 +449,7 @@ export type ImageMetadataScalarWhereWithAggregatesInput = {
   format?: Prisma.EnumImageFormatWithAggregatesFilter<"ImageMetadata"> | $Enums.ImageFormat
   width?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
   height?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
-  aspectRatio?: Prisma.DecimalWithAggregatesFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
   frames?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
   hasAlpha?: Prisma.BoolNullableWithAggregatesFilter<"ImageMetadata"> | boolean | null
   animated?: Prisma.BoolWithAggregatesFilter<"ImageMetadata"> | boolean
@@ -471,7 +471,7 @@ export type ImageMetadataCreateInput = {
   format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   frames?: number
   hasAlpha?: boolean | null
   animated?: boolean
@@ -495,7 +495,7 @@ export type ImageMetadataUncheckedCreateInput = {
   format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   frames?: number
   hasAlpha?: boolean | null
   animated?: boolean
@@ -517,7 +517,7 @@ export type ImageMetadataUpdateInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -541,7 +541,7 @@ export type ImageMetadataUncheckedUpdateInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -564,7 +564,7 @@ export type ImageMetadataCreateManyInput = {
   format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   frames?: number
   hasAlpha?: boolean | null
   animated?: boolean
@@ -586,7 +586,7 @@ export type ImageMetadataUpdateManyMutationInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -609,7 +609,7 @@ export type ImageMetadataUncheckedUpdateManyInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -765,14 +765,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
   set?: $Enums.ColorSpace | null
 }
@@ -789,7 +781,7 @@ export type ImageMetadataCreateWithoutAttachmentInput = {
   format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   frames?: number
   hasAlpha?: boolean | null
   animated?: boolean
@@ -811,7 +803,7 @@ export type ImageMetadataUncheckedCreateWithoutAttachmentInput = {
   format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: number | null
   frames?: number
   hasAlpha?: boolean | null
   animated?: boolean
@@ -849,7 +841,7 @@ export type ImageMetadataUpdateWithoutAttachmentInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -871,7 +863,7 @@ export type ImageMetadataUncheckedUpdateWithoutAttachmentInput = {
   format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
   width?: Prisma.IntFieldUpdateOperationsInput | number
   height?: Prisma.IntFieldUpdateOperationsInput | number
-  aspectRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   frames?: Prisma.IntFieldUpdateOperationsInput | number
   hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1007,7 +999,7 @@ export type $ImageMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
     format: $Enums.ImageFormat
     width: number
     height: number
-    aspectRatio: runtime.Decimal
+    aspectRatio: number | null
     frames: number
     hasAlpha: boolean | null
     animated: boolean
@@ -1451,7 +1443,7 @@ export interface ImageMetadataFieldRefs {
   readonly format: Prisma.FieldRef<"ImageMetadata", 'ImageFormat'>
   readonly width: Prisma.FieldRef<"ImageMetadata", 'Int'>
   readonly height: Prisma.FieldRef<"ImageMetadata", 'Int'>
-  readonly aspectRatio: Prisma.FieldRef<"ImageMetadata", 'Decimal'>
+  readonly aspectRatio: Prisma.FieldRef<"ImageMetadata", 'Float'>
   readonly frames: Prisma.FieldRef<"ImageMetadata", 'Int'>
   readonly hasAlpha: Prisma.FieldRef<"ImageMetadata", 'Boolean'>
   readonly animated: Prisma.FieldRef<"ImageMetadata", 'Boolean'>

@@ -62,7 +62,7 @@
     "build": "tsup",
     "prebuild": "pnpm db:generate",
     "postinstall": "pnpm db:generate",
-    "db:generate": "prisma generate --no-engine",
+    "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
     "db:deploy": "prisma migrate deploy",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" --ignore-unknown --cache",

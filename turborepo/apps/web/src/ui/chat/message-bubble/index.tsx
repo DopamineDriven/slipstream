@@ -29,16 +29,17 @@ import {
   ThumbsDown,
   ThumbsUp
 } from "@t3-chat-clone/ui";
+import { MessageAttachments } from "../message-attachments";
 
 // Note: processMarkdownToReact is dynamically imported in the useEffect to reduce bundle size
 
 interface ChatMessageProps {
   message: UIMessage;
   onUpdateMessage?: (messageId: string, newText: string) => void;
+  attachments?: MessageAttachment[]
   className?: string;
   user?: User;
   isStreaming?: boolean;
-  // Optional live thinking data for real-time updates
   liveThinkingText?: string;
   liveIsThinking?: boolean;
   liveThinkingDuration?: number;
@@ -52,7 +53,7 @@ export function MessageBubble({
   className,
   user,
   isStreaming = false,
-  liveThinkingText,
+  liveThinkingText,attachments,
   liveIsThinking,
   liveThinkingDuration
 }: ChatMessageProps) {
@@ -308,6 +309,7 @@ export function MessageBubble({
           <div className="leading-relaxed text-pretty whitespace-pre-wrap">
             {renderedContent ?? message.content}
           </div>
+                   {message.senderType ==="USER" && attachments && <MessageAttachments attachments={attachments} isUser={isUser} />}
           <div
             className={cn(
               "mt-2 flex items-center justify-between pt-1 text-xs",
@@ -331,7 +333,7 @@ export function MessageBubble({
                   />
                   {RxnIcons.map(action => (
                     <Button
-                      key={action.id}
+                      key={message.id+"-"+action.id}
                       variant="ghost"
                       size="icon"
                       disabled={isStreaming === true || isPending}
@@ -348,7 +350,7 @@ export function MessageBubble({
                   ))}
                   {IconMap.map(action => (
                     <Button
-                      key={action.id}
+                      key={message.id+"-"+action.id}
                       variant="ghost"
                       size="icon"
                       disabled={isStreaming === true || isPending}

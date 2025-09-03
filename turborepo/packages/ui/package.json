@@ -1,6 +1,6 @@
 {
   "name": "@t3-chat-clone/ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "convenient ui components",
   "files": [
     "dist/**/*.{js,mjs,cjs,d.mts,d.ts,d.cts,css}"

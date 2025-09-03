@@ -2215,20 +2215,6 @@ export type ListEnumImageFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'Decimal'
- */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal[]'
- */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
-    
-
-
-/**
  * Reference to a field of type 'ColorSpace'
  */
 export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace'>
@@ -2239,6 +2225,20 @@ export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'ColorSpace[]'
  */
 export type ListEnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 /**

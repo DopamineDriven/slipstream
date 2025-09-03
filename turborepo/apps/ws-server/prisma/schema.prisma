@@ -379,7 +379,7 @@ model ImageMetadata {
   format      ImageFormat @default(unknown)
   width       Int
   height      Int
-  aspectRatio Decimal     @db.Decimal(6, 4) // store precomputed (e.g., 1.778)
+  aspectRatio Float?      @default(1.0)
   frames      Int         @default(1) // >1 => animated
   hasAlpha    Boolean?
   animated    Boolean     @default(false)
@@ -415,7 +415,7 @@ model VideoMetadata {
   format       String
   width        Int
   height       Int
-  aspectRatio  Decimal    @db.Decimal(6, 4)
+  aspectRatio  Float? @default(1.0)
   duration     Int // milliseconds
   frameRate    Decimal?   @db.Decimal(5, 2)
   bitrate      Int? // kbps
