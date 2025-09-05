@@ -1,6 +1,7 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
+import type { ImageSpecs } from "@/utils/img-extractor-client";
 import {
   createContext,
   useCallback,
@@ -25,6 +26,41 @@ interface AssetContextValue {
   isConnected: boolean;
 
   getBatchId: () => string;
+  startNewBatch: () => string;
+  finalizeCurrentBatch: () => void;
+  // Lookup helpers for optimistic UI
+  getUploadsByBatchId: (
+    batchId: string
+  ) => Pick<
+    UploadTask,
+    | "draftId"
+    | "batchId"
+    | "status"
+    | "progress"
+    | "cdnUrl"
+    | "publicUrl"
+    | "filename"
+    | "mime"
+    | "size"
+    | "previewId"
+  >[];
+  getByPreviewId: (
+    previewId: string
+  ) =>
+    | Pick<
+        UploadTask,
+        | "draftId"
+        | "batchId"
+        | "status"
+        | "progress"
+        | "cdnUrl"
+        | "publicUrl"
+        | "filename"
+        | "mime"
+        | "size"
+        | "previewId"
+      >
+    | undefined;
   registerAssets: (
     attachments: AttachmentPreview[],
     conversationId?: string,
@@ -40,6 +76,7 @@ interface AssetContextValue {
 type UploadTask = {
   draftId: string;
   batchId: string;
+  previewId?: string;
   attachmentId?: string;
 
   // object info
@@ -47,6 +84,9 @@ type UploadTask = {
   filename: string;
   mime: string;
   size: number;
+  width?: number;
+  height?: number;
+  metadata?: ImageSpecs;
 
   // presign/instructions
   bucket?: string;
@@ -60,6 +100,10 @@ type UploadTask = {
   versionId?: string;
   etag?: string;
   error?: string;
+  // resolved urls
+  cdnUrl?: string | null;
+  publicUrl?: string | null;
+  uploadStartedAt?: number;
 };
 
 const AssetContext = createContext<AssetContextValue | undefined>(undefined);
@@ -92,6 +136,7 @@ export function AssetProvider({
 
   // task store: super simple
   const tasksByDraftIdRef = useRef<Map<string, UploadTask>>(new Map());
+  const previewIdToDraftIdRef = useRef<Map<string, string>>(new Map());
 
   const clearError = useCallback(() => setError(null), []);
   const resetUploads = useCallback(() => {
@@ -124,6 +169,16 @@ export function AssetProvider({
     setCurrentBatchId(b);
     return b;
   }, [currentBatchId]);
+
+  const startNewBatch = useCallback((): string => {
+    const b = `batch_${Date.now().toString(36)}`;
+    setCurrentBatchId(b);
+    return b;
+  }, []);
+
+  const finalizeCurrentBatch = useCallback(() => {
+    setCurrentBatchId(null);
+  }, []);
 
   /** XHR uploader (progress + header parity) */
   const uploadToS3 = useCallback(
@@ -178,18 +233,23 @@ export function AssetProvider({
       }
       const convId = conversationId ?? activeConversationId ?? "new-chat";
       const bId = batchId ?? getBatchId();
-
       attachments.forEach((a, idx) => {
         const draftId = createDraftId(userId, convId, bId, idx);
+        const previewId = a.id;
+        if (previewId) previewIdToDraftIdRef.current.set(previewId, draftId);
 
         // record task
         tasksByDraftIdRef.current.set(draftId, {
           draftId,
           batchId: bId,
+          previewId,
           file: a.file,
           filename: a.filename,
           mime: a.mime,
           size: a.size,
+          width: a.width,
+          height: a.height,
+          metadata: a.metadata,
           progress: 0,
           status: "REQUESTED"
         });
@@ -248,10 +308,14 @@ export function AssetProvider({
       task.bucket = evt.bucket;
       task.key = evt.key;
       task.status = "UPLOADING";
+      task.uploadStartedAt =
+        typeof performance !== "undefined" && performance.now
+          ? performance.now()
+          : Date.now();
       task.progress = 0;
       recompute();
 
-      // optional transitional event (C→S) to satisfy your vocabulary
+      // optional transitional event (C→S)
       sendEvent("asset_upload_prepare", {
         type: "asset_upload_prepare",
         conversationId: evt.conversationId,
@@ -293,6 +357,14 @@ export function AssetProvider({
         .then(({ versionId, etag }) => {
           task.versionId = versionId;
           task.etag = etag;
+          const end =
+            typeof performance !== "undefined" && performance.now
+              ? performance.now()
+              : Date.now();
+          const duration = Math.max(
+            0,
+            Math.round(end - (task.uploadStartedAt ?? end))
+          );
 
           // C→S: completion (server will finalize + emit asset_ready)
           sendEvent("asset_upload_complete", {
@@ -308,14 +380,18 @@ export function AssetProvider({
             publicUrl: `https://${evt.bucket}.s3.amazonaws.com/${encodeURIComponent(evt.key)}?versionId=${encodeURIComponent(versionId)}`,
             etag,
             success: true,
-            duration: 0,
-            bytesUploaded: task.size
+            duration,
+            bytesUploaded: task.size,
+            width: task.width,
+            height: task.height,
+            metadata: task?.metadata
           } as EventTypeMap["asset_upload_complete"]);
         })
         .catch(err => {
           task.status = "FAILED";
-          task.error = String(err);
-          setError(String(err));
+          task.error =
+            typeof err !== "string" ? JSON.stringify(err, null, 2) : err;
+          setError(task.error);
           recompute();
 
           sendEvent("asset_upload_complete_error", {
@@ -323,9 +399,14 @@ export function AssetProvider({
             conversationId: evt.conversationId,
             bucket: evt.bucket,
             key: evt.key,
+            metadata: task.metadata,
+            versionId: task.versionId,
             userId,
             attachmentId: task.attachmentId,
             draftId: task.draftId,
+            width: task.width,
+            height: task.height,
+
             batchId: task.batchId,
             error: String(err),
             success: false
@@ -356,6 +437,16 @@ export function AssetProvider({
         task.progress = 100;
         task.versionId = evt.versionId ?? task.versionId;
         task.etag = evt.etag ?? task.etag;
+        // capture resolved urls (prefer cdn)
+        task.cdnUrl = evt.cdnUrl ?? evt.downloadUrl ?? task.cdnUrl ?? null;
+        task.publicUrl = evt.publicUrl ?? task.publicUrl ?? null;
+        // keep width/height/metadata if provided
+        if (evt.metadata?.dimensions && task.metadata?.aspectRatio) {
+          task.metadata.aspectRatio =
+            evt.metadata.dimensions.width / evt.metadata.dimensions.height;
+          task.metadata.width = evt.metadata.dimensions.width;
+          task.metadata.height = evt.metadata.dimensions.height;
+        }
       }
       recompute();
     };
@@ -377,13 +468,57 @@ export function AssetProvider({
     client.on("asset_ready", handleAssetReady);
     client.on("asset_upload_complete_error", handleUploadError);
 
+    // When a user message is dispatched, proactively rotate to a NEW batch
+    // so the next compose session cannot reuse the prior batchId.
+    client.on("ai_chat_request", () => {
+      setCurrentBatchId(() => `batch_${Date.now().toString(36)}`);
+    });
+
     return () => {
       client.off("asset_upload_instructions");
       client.off("asset_upload_progress");
       client.off("asset_ready");
       client.off("asset_upload_complete_error");
+      client.off("ai_chat_request");
     };
   }, [client, sendEvent, uploadToS3, userId, recompute]);
+
+  // Lookup helpers exposed to UI
+  const getUploadsByBatchId = useCallback((batchId: string) => {
+    return Array.from(tasksByDraftIdRef.current.values())
+      .filter(t => t.batchId === batchId)
+      .map(t => ({
+        draftId: t.draftId,
+        batchId: t.batchId,
+        status: t.status,
+        progress: t.progress,
+        cdnUrl: t.cdnUrl ?? null,
+        publicUrl: t.publicUrl ?? null,
+        filename: t.filename,
+        mime: t.mime,
+        size: t.size,
+        previewId: t.previewId
+      }));
+  }, []);
+
+  const getByPreviewId = useCallback((previewId: string) => {
+    const draft = previewIdToDraftIdRef.current.get(previewId);
+    if (!draft) return undefined;
+    const t = tasksByDraftIdRef.current.get(draft);
+    if (!t) return undefined;
+    return {
+      draftId: t.draftId,
+      batchId: t.batchId,
+      status: t.status,
+      progress: t.progress,
+      cdnUrl: t.cdnUrl ?? null,
+      publicUrl: t.publicUrl ?? null,
+      filename: t.filename,
+      mime: t.mime,
+      size: t.size,
+      previewId: t.previewId
+    } as const;
+  }, []);
 
   const value = useMemo<AssetContextValue>(
     () => ({
@@ -394,6 +529,10 @@ export function AssetProvider({
       error,
       isConnected,
       getBatchId,
+      startNewBatch,
+      finalizeCurrentBatch,
+      getUploadsByBatchId,
+      getByPreviewId,
       registerAssets,
       clearError,
       resetUploads
@@ -406,6 +545,10 @@ export function AssetProvider({
       error,
       isConnected,
       getBatchId,
+      startNewBatch,
+      finalizeCurrentBatch,
+      getUploadsByBatchId,
+      getByPreviewId,
       registerAssets,
       clearError,
       resetUploads

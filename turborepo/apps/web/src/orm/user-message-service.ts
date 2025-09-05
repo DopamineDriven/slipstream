@@ -44,28 +44,43 @@ export class PrismaUserMessageService extends ErrorHelperService {
       });
   }
 
-  public async getMessagesByConversationId(
-    conversationId: string
-  ) {
+  public async getMessagesByConversationId(conversationId: string) {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
-
-        messages: { orderBy: { createdAt: "asc" }},
+        messages: { orderBy: { createdAt: "asc" } },
         conversationSettings: true
       }
     });
   }
 
-
-    public async getMessagesByConversationIdWithAsset(
-    conversationId: string
-  ) {
+  public async getMessagesByConversationIdWithAssets(conversationId: string) {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
-
-        messages: { orderBy: { createdAt: "asc" }},
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              select: {
+                messageId: true,
+                conversationId: true,
+                versionId: true,
+                createdAt: true,
+                id: true,
+                filename: true,
+                mime: true,
+                size: true,
+                cdnUrl: true,
+                publicUrl: true,
+                assetType: true,
+                ext: true,
+                draftId: true
+              }
+            }
+          }
+        },
         conversationSettings: true
       }
     });
@@ -91,7 +106,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
       data: { title: updatedTitle }
     });
   }
-
 
   public async deleteConversation(conversationId: string) {
     return await this.prismaClient.conversation.delete({

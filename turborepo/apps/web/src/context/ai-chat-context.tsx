@@ -57,7 +57,8 @@ interface AIChatContextValue {
   currentStreamingMessage: StreamingMessage | null;
 
   // Actions
-  sendChat: (prompt: string) => void;
+  // Optionally accept an explicit batchId to associate attachments deterministically
+  sendChat: (prompt: string, explicitBatchId?: string) => void;
   setActiveConversationId: (id: string | null) => void;
   clearError: () => void;
   resetStreamingState: () => void;
@@ -84,7 +85,8 @@ export function AIChatProvider({
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const { selectedModel } = useModelSelection();
   const { apiKeys } = useApiKeys();
-  const { getBatchId } = useAssetUpload();
+  const { startNewBatch, currentBatchId, getUploadsByBatchId } =
+    useAssetUpload();
 
   // Parse conversation ID from pathname
   const getConversationIdFromPath = useCallback((): string | null => {
@@ -368,7 +370,7 @@ export function AIChatProvider({
   }, [city, country, latlng, postalCode, region, tz, locale]);
 
   const sendChat = useCallback(
-    (prompt: string) => {
+    (prompt: string, explicitBatchId?: string) => {
       if (!userId) {
         console.warn("[AIChatContext] Cannot send chat without userId");
         return;
@@ -442,6 +444,19 @@ export function AIChatProvider({
         originalConversationIdRef.current = "new-chat";
       }
 
+      // Determine which batchId to send:
+      // - Prefer explicit (ChatInput provided because there were attachments)
+      // - Otherwise, only include the current batch if it actually has uploads
+      let batchIdUsed: string | undefined = explicitBatchId ?? undefined;
+      if (!batchIdUsed) {
+        const cur = currentBatchId ?? undefined;
+        const hasUploads = cur
+          ? (getUploadsByBatchId(cur)?.length ?? 0) > 0
+          : false;
+        batchIdUsed = hasUploads ? cur : undefined;
+      }
+      // intentionally not logging batchId in production
+
       sendEvent("ai_chat_request", {
         metadata,
         type: "ai_chat_request",
@@ -458,8 +473,19 @@ export function AIChatProvider({
         systemPrompt: undefined,
         temperature: undefined,
         topP: undefined,
-        batchId: getBatchId() ?? undefined
+        // Use the explicit batchId from the input when provided so that
+        // the message uses the same batch as the registered attachments.
+        batchId: batchIdUsed
       } satisfies AIChatRequest);
+
+      // Immediately rotate to a fresh batch for the NEXT message.
+      // This covers all send paths (including initialPrompt/new-chat) so
+      // we never accidentally reuse the previous batch for subsequent uploads.
+      try {
+        startNewBatch();
+      } catch (err) {
+        console.log(err);
+      }
     },
     [
       sendEvent,
@@ -468,7 +494,9 @@ export function AIChatProvider({
       activeConversationId,
       selectedModel,
       apiKeys,
-      getBatchId
+      startNewBatch,
+      currentBatchId,
+      getUploadsByBatchId
     ]
   );
 

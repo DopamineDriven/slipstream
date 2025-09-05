@@ -34,20 +34,21 @@ import {
 const suggestedPrompts = [
   {
     icon: Code,
-    title: "Code Review",
+    title: "AI Coding Starter",
     prompt:
-      "Review this code and suggest improvements for better performance and readability."
+      "What's the best way to get started with AI-assisted programming? Suggest tools, languages, and simple projects."
   },
   {
     icon: FileText,
-    title: "Write Content",
+    title: "Templatize",
     prompt:
-      "Help me write a professional email to a client about project updates."
+      "Help me draft up a professional email template that I can send to clients about project updates."
   },
   {
     icon: MessageSquare,
     title: "Brainstorm Ideas",
-    prompt: "Generate creative marketing ideas for a new mobile app launch."
+    prompt:
+      "Generate creative marketing ideas for novel AI integrations into everyday products."
   },
   {
     icon: Sparkles,
@@ -86,9 +87,24 @@ export function ChatEmptyState() {
     attachmentsRef.current = assets.attachments;
   }, [assets.attachments]);
 
-  // Simple status text for previews (global progress only)
+  // Track upload status for previews using AssetProvider as source of truth
   const getStatusText = useCallback(
     (attachment: AttachmentPreview): string => {
+      const t = assetUpload.getByPreviewId(attachment.id);
+      if (t) {
+        switch (t.status) {
+          case "UPLOADING":
+            return `Uploading ${Math.max(0, t.progress ?? 0)}%`;
+          case "READY":
+            return "Ready";
+          case "FAILED":
+            return "Failed";
+          case "REQUESTED":
+          default:
+            return "Pending";
+        }
+      }
+      // Fallback to local preview status if not tracked yet
       switch (attachment.status) {
         case "uploading":
           return `Uploading ${assetUpload.uploadProgress}%`;
@@ -100,7 +116,7 @@ export function ChatEmptyState() {
           return "Pending";
       }
     },
-    [assetUpload.uploadProgress]
+    [assetUpload]
   );
 
   // Auto-resize textarea
@@ -128,7 +144,9 @@ export function ChatEmptyState() {
       setIsSubmitting(true);
       try {
         const params = new URLSearchParams({ prompt: messageText.trim() });
-        router.push(`/chat/new-chat?${params.toString()}`);
+        router.replace(`/chat/new-chat?${params.toString()}`, {
+          scroll: false
+        });
         assets.clear();
         submitTimeoutRef.current = setTimeout(() => {
           setIsSubmitting(false);
@@ -186,7 +204,7 @@ export function ChatEmptyState() {
 
   // Paste flow: add previews → register delta
   const handleEnhancedPaste = useCallback(
-    async (e: React.ClipboardEvent) => {
+    async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
       await assets.handlePaste(e);
       registerNewlyAdded(beforeIds, "PASTED");

@@ -10,13 +10,12 @@ import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
-import { ImageSpecs } from "@d0paminedriven/fs";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
-  EventTypeMap,
+  EventTypeMap,ImageSpecs,
   Provider
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
@@ -126,7 +125,7 @@ export class Resolver extends ModelService {
 
   private extToContentType(metadata?: ImageSpecs) {
     return metadata?.format && metadata.format !== "unknown"
-      ? this.s3Service.fs.getMimes(metadata.format)[0]
+      ? this.s3Service.fs.getMimes(metadata.format ==="heic" ? "avif" : metadata.format)[0]
       : "";
   }
 
@@ -1249,7 +1248,7 @@ export class Resolver extends ModelService {
 
       const assetReady = {
         type: "asset_ready",
-        conversationId,
+        conversationId,cdnUrl: attachment.cdnUrl ?? undefined,publicUrl: attachment.publicUrl ?? undefined,
         attachmentId,
         s3ObjectId: finalS3ObjectId,
         batchId,
@@ -1262,7 +1261,7 @@ export class Resolver extends ModelService {
         },
         mime: attachment.mime ?? contentType ?? this.extToContentType(metadata),
         origin: attachment.origin,
-        size: size ?? bytesUploaded ?? 0,
+        size: attachment.size  ? Number(attachment.size) : bytesUploaded ?? 0,
         status: "READY",
         etag: attachment.etag ?? finalEtag ?? etag,
         bucket,

@@ -9,7 +9,18 @@ import type { CTR, DX, Rm } from "@/utils.ts";
 export interface ImageSpecs {
   width: number;
   height: number;
-  format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "unknown";
+  format:     | "apng"
+    | "png"
+    | "jpeg"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "heic"
+    | "tiff"
+    | "unknown";
   frames: number;
   animated: boolean;
   hasAlpha: boolean | null;
@@ -24,6 +35,8 @@ export interface ImageSpecs {
     | "cmyk"
     | "ycbcr"
     | "ycck"
+    | "vector"
+    | "lab"
     | "unknown";
   colorSpace:
     | "unknown"
@@ -231,6 +244,8 @@ export type AssetReady = DX<
     key: string;
     draftId?: string;
     batchId?: string;
+    publicUrl?: string;
+    cdnUrl?: string;
     versionId?: string;
     s3ObjectId: S3ObjectId; // eg, "s3://bucket/key#<versionId|nov>"
     etag?: string;

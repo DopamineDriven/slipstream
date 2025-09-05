@@ -35,9 +35,9 @@ export function AttachmentDisplay({
     return null;
   }
 
-  const formatFileSize = (bytes?: bigint): string => {
+  const formatFileSize = (bytes?: bigint | number): string => {
     if (!bytes) return "Unknown size";
-    const size = Number(bytes);
+    const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
     const units = ["B", "KB", "MB", "GB"];
     let unitIndex = 0;
     let fileSize = size;
@@ -51,18 +51,22 @@ export function AttachmentDisplay({
   };
 
   const getFileIcon = (attachment: MessageAttachment) => {
-    switch (attachment.assetType) {
+    switch (attachment?.assetType) {
       case "IMAGE":
         return <ImageIcon className="h-4 w-4" />;
       case "DOCUMENT":
         return <FileText className="h-4 w-4" />;
+      case "AUDIO":
+      case "UNKNOWN":
+      case "VIDEO":
       default:
         return <FileText className="h-4 w-4" />;
     }
   };
 
+  // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
   const getDisplayUrl = (attachment: MessageAttachment): string | null => {
-    return attachment.cdnUrl ?? null;
+    return attachment?.cdnUrl ?? null;
   };
 
   const handleImageClick = (url: string) => {
@@ -74,7 +78,9 @@ export function AttachmentDisplay({
     if (url) {
       const link = document.createElement("a");
       link.href = url;
-      link.download = attachment.filename ?? "download";
+      link.target ="_blank";
+      link.rel ="noreferrer noopener"
+      link.download = attachment?.filename ?? "download";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -86,16 +92,16 @@ export function AttachmentDisplay({
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
           const displayUrl = getDisplayUrl(attachment);
-          const isImage = attachment.assetType === "IMAGE" && displayUrl;
+          const isImage = attachment.assetType === "IMAGE" && Boolean(displayUrl);
 
-          if (isImage && !compact) {
+          // Full image preview only when we have a real URL
+          if (attachment.mime?.startsWith("image/") && !compact && displayUrl) {
             return (
               <div key={attachment.id} className="relative">
                 <Image
-                  src={
-                    displayUrl ??
-                    "/placeholder.svg?height=200&width=300&query=attachment"
-                  }
+                  src={displayUrl}
+                  width={300}
+                  height={200}
                   alt={attachment.filename ?? "Attachment"}
                   className="max-h-64 max-w-sm cursor-pointer rounded-lg border transition-opacity hover:opacity-90"
                   onClick={() => handleImageClick(displayUrl)}
@@ -131,7 +137,7 @@ export function AttachmentDisplay({
                     {attachment.filename ?? "Untitled"}
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {formatFileSize(attachment.size)}
+                    {formatFileSize(attachment?.size ?? undefined)}
                     {attachment.ext && ` • ${attachment.ext.toUpperCase()}`}
                   </div>
                 </div>
@@ -141,7 +147,9 @@ export function AttachmentDisplay({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => handleImageClick(displayUrl)}>
+                      onClick={() => displayUrl && handleImageClick(displayUrl)}
+                      disabled={!displayUrl}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                   )}
@@ -149,7 +157,9 @@ export function AttachmentDisplay({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => handleDownload(attachment)}>
+                    onClick={() => handleDownload(attachment)}
+                    disabled={!displayUrl}
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
@@ -170,6 +180,9 @@ export function AttachmentDisplay({
                 expandedImage ||
                 "/placeholder.svg?height=400&width=600&query=expanded attachment"
               }
+              style={{ objectFit: "cover" }}
+              width={1200}
+              height={900}
               alt="Expanded attachment"
               className="max-h-full max-w-full object-contain"
               onClick={e => e.stopPropagation()}

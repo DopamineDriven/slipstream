@@ -419,13 +419,7 @@ export class ChatWebSocketClient {
     };
     const msg = JSON.stringify(payload);
 
-    // Debug logging for ai_chat_request events
-    if (data.type === "ai_chat_request") {
-      const prompt = data.prompt;
-      console.log(
-        `[WebSocketClient] Sending ${event} - prompt: "${prompt.substring(0, 50)}${prompt.length > 50 ? "..." : ""}" (${prompt.length} chars)`
-      );
-    }
+    // Intentionally suppress verbose ai_chat_request payload logs in production
 
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       console.log(`[WebSocketClient] Message sent immediately via WebSocket`);

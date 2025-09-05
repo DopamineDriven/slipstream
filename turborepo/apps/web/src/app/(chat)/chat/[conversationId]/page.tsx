@@ -1,3 +1,4 @@
+import type { DynamicChatRouteProps } from "@/types/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -14,18 +15,22 @@ const { prismaConversationService } = ormHandler(prismaClient);
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return [{ conversationId: "new-chat" }];
+  return [{ conversationId: "new-chat" }, { conversationId: "home" }];
 }
 
 export async function generateMetadata({
   params
 }: InferGSPRT<typeof generateStaticParams>): Promise<Metadata> {
   const { conversationId } = await params;
-  if (conversationId !== "new-chat") {
+  if (conversationId !== "new-chat" && conversationId !== "home") {
     const title =
       await prismaConversationService.getTitleByConversationId(conversationId);
     return {
       title
+    };
+  } else if (conversationId === "home") {
+    return {
+      title: "Home"
     };
   }
   return {
@@ -41,20 +46,24 @@ export default async function ChatPage({
   if (!session?.user?.id) redirect("/api/auth/signin");
 
   // Fetch data directly on the server
-  let messages = null;
-  let conversationTitle = null;
-  if (conversationId !== "new-chat") {
+  let messages: DynamicChatRouteProps | null = null;
+  let conversationTitle: string | null = null;
+  if (conversationId !== "new-chat" && conversationId !=="home") {
     const data =
-      await prismaConversationService.getMessagesByConversationId(
+      await prismaConversationService.getMessagesByConversationIdWithAssets(
         conversationId
       );
 
     if (data) {
-      messages = data.messages.map((t)=>{
-        return {attachments: undefined,...t}
+      messages = data.messages.map(t => {
+        const { attachments, ...rest } = t;
+        const cleanAttachments = attachments.map(att => ({
+          ...att,
+          size: att.size ? Number(att.size) : null
+        }));
+        return { ...rest, attachments: cleanAttachments };
       });
       conversationTitle = data.title;
-      console.log(data);
     }
   }
 

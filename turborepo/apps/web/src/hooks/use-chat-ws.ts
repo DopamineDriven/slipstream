@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 import type { MessageHandler } from "@/types/chat-ws";
@@ -11,108 +11,70 @@ export function useChatWebSocket(email?: string | null) {
   const [lastEvent, setLastEvent] = useState<ChatWsEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Use ref to maintain stable client reference
-  const clientRef = useRef<ChatWebSocketClient | null>(null);
-  const emailRef = useRef(email);
+  // Build a stable URL and client instance per email
+  const wsUrl = useMemo(
+    () => (email ? `${WS_BASE}?email=${encodeURIComponent(email)}` : WS_BASE),
+    [email]
+  );
 
-  // Track if we need to recreate the client due to email change
-  const shouldRecreateClient = emailRef.current !== email;
+  const client = useMemo(() => new ChatWebSocketClient(wsUrl), [wsUrl]);
 
-  // Initialize or recreate client when needed
-  if (!clientRef.current || shouldRecreateClient) {
-    // Clean up existing client before creating new one
-    if (clientRef.current) {
-      clientRef.current.close();
-    }
-
-    // Create new client with current email
-    const wsUrl = email ? `${WS_BASE}?email=${encodeURIComponent(email)}` : WS_BASE;
-    clientRef.current = new ChatWebSocketClient(wsUrl);
-    emailRef.current = email;
-  }
-
-  const client = clientRef.current;
+  // Track the most recent event without forcing re-renders on noisy events
+  const lastEventRef = useRef<ChatWsEvent | null>(null);
 
   useEffect(() => {
-    // Event listener for all events
-    const handleEvent = (event: ChatWsEvent) => {
-      setLastEvent(event);
-    };
+    // Connect once per client instance
+    client.connect();
 
-    // Connection status listener
-    const handleConnectionChange = (event: ChatWsEvent) => {
-      // Update connection status based on events
-      if (event.type === "ping") {
+    // Generic listener for all events (ignore noisy pings for lastEvent state)
+    const handleEvent = (event: ChatWsEvent) => {
+      lastEventRef.current = event;
+      if (event.type !== "ping") {
+        setLastEvent(event);
+      } else {
+        // ping also serves as a heartbeat to confirm connectivity
         setIsConnected(true);
       }
     };
 
-    // Add listeners
     client.addListener(handleEvent);
-    client.addListener(handleConnectionChange);
 
-    // Connect
-    client.connect();
+    // Lightweight connectivity polling as a fallback to pings
+    const intervalId = setInterval(() => {
+      setIsConnected(prev => (prev !== client.isConnected ? client.isConnected : prev));
+    }, 1000);
 
-    // More efficient connection status monitoring
-    // Check immediately and after potential state changes
-    const checkConnection = () => {
-      setIsConnected(client.isConnected);
-    };
+    // Initial connectivity snapshot
+    setIsConnected(client.isConnected);
 
-    // Initial check
-    checkConnection();
-
-    const intervalId = setInterval(checkConnection, 1000);
-
-    // Cleanup
     return () => {
       clearInterval(intervalId);
       client.removeListener(handleEvent);
-      client.removeListener(handleConnectionChange);
+      client.close();
     };
   }, [client]);
 
   // Stable send function
   const sendEvent = useCallback(
-    <T extends keyof EventTypeMap>(
-      event: T,
-      data: EventTypeMap[T]
-    ) => {
+    <T extends keyof EventTypeMap>(event: T, data: EventTypeMap[T]) => {
       client.send(event, data);
     },
     [client]
   );
 
-  // Register handlers for specific events
-  const on = useCallback((
-      event: keyof EventTypeMap,
-      handler: MessageHandler<typeof event>
-    ) => {
+  // Register handlers for specific typed events
+  const on = useCallback(
+    (event: keyof EventTypeMap, handler: MessageHandler<typeof event>) => {
       client.on(event, handler);
-
-      // Return cleanup function
-      return () => {
-        client.off(event);
-      };
+      return () => client.off(event);
     },
     [client]
   );
 
-  // Manual cleanup function
+  // Manual cleanup helper (rarely needed since we clean up on client change/unmount)
   const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      clientRef.current.close();
-      clientRef.current = null;
-    }
-  }, []);
+    client.close();
+  }, [client]);
 
-  return {
-    lastEvent,
-    isConnected,
-    sendEvent,
-    client,
-    on,
-    disconnect
-  };
+  return { lastEvent, isConnected, sendEvent, client, on, disconnect };
 }

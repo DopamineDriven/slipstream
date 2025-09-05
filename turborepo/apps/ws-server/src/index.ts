@@ -73,10 +73,8 @@ async function exe() {
       host
     );
 
-
-
     const { PrismaService } = await import("@/prisma/index.ts");
-    
+
     const connectionString = process.env.DIRECT_URL ?? cfg.DIRECT_URL;
 
     const prisma = new PrismaService(connectionString, 10, 30000, fs);
@@ -197,6 +195,9 @@ declare module "ws" {
 }
 
 declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
   interface JSON {
     parse<T = unknown>(
       text: string,
@@ -204,6 +205,10 @@ declare global {
     ): T;
   }
 }
+
+// BigInt.prototype.toJSON = function () {
+//   return this.toJSON(); // Convert to string for serialization
+// };
 // declare global {
 //  namespace NodeJS {
 //     interface ProcessEnv {

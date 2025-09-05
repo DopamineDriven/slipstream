@@ -268,7 +268,7 @@ export class PrismaService extends ModelService {
       if (typeof batchId !== "undefined") {
         const batchIt = await this.prismaClient.$transaction(async pr => {
           const attachments = await pr.attachment.findMany({
-            where: { batchId, userId, conversationId },
+            where: { batchId, userId, conversationId,messageId: null },
             take: 10,
             orderBy: [{ createdAt: "desc" }],
             include: { image: true, document: true }
