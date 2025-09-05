@@ -82,9 +82,9 @@ export function useAssets(options: UseAssetsOptions = {}) {
   );
 
   const handlePaste = useCallback(
-    async (e: React.ClipboardEvent) => {
+    async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const items = Array.from(e.clipboardData.items);
-      const files: File[] = [];
+      const files = Array.of<File>();
 
       for (const item of items) {
         if (item.kind === "file") {
@@ -95,7 +95,9 @@ export function useAssets(options: UseAssetsOptions = {}) {
         }
       }
 
+      const created=Array.of<AttachmentPreview>();
       if (files.length > 0) {
+        // Block default paste (e.g., image data into textarea) only when files are present
         e.preventDefault();
 
         for (const file of files) {
@@ -103,11 +105,12 @@ export function useAssets(options: UseAssetsOptions = {}) {
           const extension = file.type.split("/")[1] ?? "png";
           const filename = file.name || `pasted-${Date.now()}.${extension}`;
 
-          await addFile(
-            new File([file], filename, { type: file.type })
-          );
+          const added = await addFile(new File([file], filename, { type: file.type }));
+          if (added) created.push(added);
         }
       }
+
+      return created;
     },
     [addFile]
   );

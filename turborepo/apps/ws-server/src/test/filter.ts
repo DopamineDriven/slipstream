@@ -4,13 +4,16 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
 
-const data = async (env: string, _id: string) => {
+const data = async (env: string) => {
   const prismaClient = new PrismaClient({ datasourceUrl: env });
   try {
     prismaClient.$connect();
     return await prismaClient.conversation.findMany({
+      where: {
+        messages: { some: { attachments: { some: { NOT: undefined } } } }
+      },
       include: {
-        messages: { where: { liked: true } }
+        messages: { include: { attachments: true } }
       }
     });
   } catch (err) {
@@ -19,29 +22,34 @@ const data = async (env: string, _id: string) => {
     prismaClient.$disconnect();
   }
 };
+
 const fs = new Fs(process.cwd());
 
 (async () => {
-  const { Credentials } = await import("@t3-chat-clone/credentials");
-  const cred = new Credentials();
-  const env = await cred.get("DATABASE_URL");
-  data(env, "v34lpnqafg9yr6elx5wksn3e").then(s => {
+  data(process.env.DATABASE_URL ?? "").then(s => {
     if (!s) return;
+    function processNesting(props: typeof s) {
+      return props
+        ?.map(t => {
+          const { messages, ...rest } = t;
 
-    // for (const ss of s.messages) {
-    //   ss.senderType === "AI"
-    //     ? console.log({ thinkingText: ss.thinkingText ?? "" })
-    //     : ss;
-    // }
-    for (const ss of s) {
-      console.log(ss.id)
-
-      fs.withWs(
-        `src/__out__/conversations/${ss.title}/${ss.id}.json`,
-        JSON.stringify(s, null, 2)
-      );
+          const msgs = messages.map(v => {
+            const { attachments, ...rest } = v;
+            const cleanedAttachments = attachments.map(att => ({
+              ...att,
+              size: Number(att.size)
+            }));
+            return { ...rest, attachments: cleanedAttachments };
+          });
+          return { ...rest, messages: msgs };
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
 
+    fs.withWs(
+      "src/__out__/attachments/conversations-to-messages-to-attachments/bulk.json",
+      JSON.stringify(processNesting(s), null, 2)
+    );
     return s;
   });
 })();

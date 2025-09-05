@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse, userAgent } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse, userAgent } from "next/server";
 
 export { authConfig } from "@/lib/auth.config";
 export const config = {
@@ -10,9 +11,7 @@ function detectDeviceAndSetCookies(
   response: NextResponse
 ) {
   const domain =
-    process.env.NODE_ENV !== "development"
-      ? ".d0paminedriven.com"
-      : undefined;
+    process.env.NODE_ENV !== "development" ? ".d0paminedriven.com" : undefined;
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
   const region =
     request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
@@ -109,11 +108,14 @@ function detectDeviceAndSetCookies(
   response.cookies.set("region", region, config);
   response.cookies.set("postalCode", postalCode, config);
   response.headers.set("Access-Control-Allow-Origin", "*");
-
   return response;
 }
 
 export default async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  return detectDeviceAndSetCookies(req, res);
+  if (req.nextUrl.pathname === "/") {
+    return detectDeviceAndSetCookies(
+      req,
+      NextResponse.rewrite(new URL("/chat/home", req.url))
+    );
+  } else return detectDeviceAndSetCookies(req, NextResponse.next());
 }

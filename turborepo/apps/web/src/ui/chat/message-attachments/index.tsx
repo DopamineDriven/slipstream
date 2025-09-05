@@ -1,11 +1,11 @@
 "use client";
 
-import type { MessageAttachment } from "@/ui/chat/attachment-display/index";
 import { cn } from "@/lib/utils";
+import { UIMessage } from "@/types/shared";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display/index";
 
 interface MessageAttachmentsProps {
-  attachments?: MessageAttachment[];
+  attachments?: UIMessage["attachments"];
   className?: string;
   isUser?: boolean;
 }

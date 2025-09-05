@@ -2,6 +2,7 @@
 
 import type { UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useScrollObserver } from "@/hooks/use-scroll-observer";
 import { useSelectionQuote } from "@/hooks/use-selection-quote";
@@ -12,6 +13,7 @@ import { motion } from "motion/react";
 
 interface ChatFeedProps {
   messages: UIMessage[];
+  isHome: boolean;
   user?: User;
   className?: string;
   onUpdateMessage?: (messageId: string, newText: string) => void;
@@ -21,6 +23,7 @@ interface ChatFeedProps {
   thinkingDuration?: number;
   streamedText?: string;
   isStreaming?: boolean;
+  children?: ReactNode;
 }
 
 export function ChatFeed({
@@ -32,8 +35,9 @@ export function ChatFeed({
   isStreaming,
   streamedText,
   thinkingText,
-  isThinking,
-  thinkingDuration
+  isThinking,isHome,
+  thinkingDuration,
+  children
 }: ChatFeedProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -145,69 +149,74 @@ export function ChatFeed({
 
   return (
     <>
-      <div
-        ref={scrollRef}
-        data-chat-feed
-        className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
-        {messages?.map(message => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            user={user}
-            onUpdateMessage={onUpdateMessage}
-            isStreaming={isStreaming && message.id.startsWith("streaming-")}
-            // Pass live thinking data for the currently streaming message
-            liveThinkingText={
-              isStreaming && message.id.startsWith("streaming-")
-                ? thinkingText
-                : undefined
-            }
-            liveIsThinking={
-              isStreaming && message.id.startsWith("streaming-")
-                ? isThinking
-                : undefined
-            }
-            liveThinkingDuration={
-              isStreaming && message.id.startsWith("streaming-")
-                ? thinkingDuration
-                : undefined
-            }
-          />
-        ))}
-        {isStreaming && isAwaitingFirstChunk === true && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="mx-auto flex w-full max-w-[100dvw] justify-start gap-3 sm:max-w-3xl md:max-w-4xl">
-            <div className="flex items-center gap-3">
-              {/* AI Avatar */}
-              <div className="mt-1 shrink-0">
-                <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full sm:size-8">
-                  <div className="border-primary-foreground/20 border-t-primary-foreground/40 size-4 animate-spin rounded-full border-2" />
+      {isHome ? (
+        children
+      ) : (
+        <div
+          ref={scrollRef}
+          data-chat-feed
+          className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
+          {messages?.map(message => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              attachments={message.attachments}
+              user={user}
+              onUpdateMessage={onUpdateMessage}
+              isStreaming={isStreaming && message.id.startsWith("streaming-")}
+              // Pass live thinking data for the currently streaming message
+              liveThinkingText={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? thinkingText
+                  : undefined
+              }
+              liveIsThinking={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? isThinking
+                  : undefined
+              }
+              liveThinkingDuration={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? thinkingDuration
+                  : undefined
+              }
+            />
+          ))}
+          {isStreaming && isAwaitingFirstChunk === true && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="mx-auto flex w-full max-w-[100dvw] justify-start gap-3 sm:max-w-3xl md:max-w-4xl">
+              <div className="flex items-center gap-3">
+                {/* AI Avatar */}
+                <div className="mt-1 shrink-0">
+                  <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full sm:size-8">
+                    <div className="border-primary-foreground/20 border-t-primary-foreground/40 size-4 animate-spin rounded-full border-2" />
+                  </div>
+                </div>
+                <div className="bg-muted rounded-2xl px-4 py-3">
+                  <div className="flex gap-1">
+                    <span
+                      className="bg-muted-foreground/70 size-2 animate-bounce rounded-full"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <span
+                      className="bg-muted-foreground/60 size-2 animate-bounce rounded-full"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <span
+                      className="bg-muted-foreground/50 size-2 animate-bounce rounded-full"
+                      style={{ animationDelay: "300ms" }}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="bg-muted rounded-2xl px-4 py-3">
-                <div className="flex gap-1">
-                  <span
-                    className="bg-muted-foreground/70 size-2 animate-bounce rounded-full"
-                    style={{ animationDelay: "0ms" }}
-                  />
-                  <span
-                    className="bg-muted-foreground/60 size-2 animate-bounce rounded-full"
-                    style={{ animationDelay: "150ms" }}
-                  />
-                  <span
-                    className="bg-muted-foreground/50 size-2 animate-bounce rounded-full"
-                    style={{ animationDelay: "300ms" }}
-                  />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </div>
+      )}
       {rect && quote && (
         <SelectionToolbar
           rect={rect}

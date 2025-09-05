@@ -36,7 +36,7 @@ import { MessageAttachments } from "../message-attachments";
 interface ChatMessageProps {
   message: UIMessage;
   onUpdateMessage?: (messageId: string, newText: string) => void;
-  attachments?: MessageAttachment[]
+  attachments?: UIMessage["attachments"];
   className?: string;
   user?: User;
   isStreaming?: boolean;
@@ -53,7 +53,8 @@ export function MessageBubble({
   className,
   user,
   isStreaming = false,
-  liveThinkingText,attachments,
+  liveThinkingText,
+  attachments,
   liveIsThinking,
   liveThinkingDuration
 }: ChatMessageProps) {
@@ -309,7 +310,7 @@ export function MessageBubble({
           <div className="leading-relaxed text-pretty whitespace-pre-wrap">
             {renderedContent ?? message.content}
           </div>
-                   {message.senderType ==="USER" && attachments && <MessageAttachments attachments={attachments} isUser={isUser} />}
+ <MessageAttachments attachments={attachments} isUser={isUser} />
           <div
             className={cn(
               "mt-2 flex items-center justify-between pt-1 text-xs",
@@ -333,7 +334,7 @@ export function MessageBubble({
                   />
                   {RxnIcons.map(action => (
                     <Button
-                      key={message.id+"-"+action.id}
+                      key={action.id}
                       variant="ghost"
                       size="icon"
                       disabled={isStreaming === true || isPending}
@@ -350,7 +351,7 @@ export function MessageBubble({
                   ))}
                   {IconMap.map(action => (
                     <Button
-                      key={message.id+"-"+action.id}
+                      key={action.id}
                       variant="ghost"
                       size="icon"
                       disabled={isStreaming === true || isPending}

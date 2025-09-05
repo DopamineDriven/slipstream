@@ -5,8 +5,10 @@ import type { Properties } from "csstype";
 import type { User } from "next-auth";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAssetUpload } from "@/context/asset-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { usePathnameContext } from "@/context/pathname-context";
 import { useAssets } from "@/hooks/use-assets";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
@@ -41,12 +43,19 @@ type QuoteDraft = {
 interface UnifiedChatInputProps {
   user?: User;
   conversationId?: string;
-  onUserMessage?: (content: string) => void;
+  onUserMessage?: (payload: {
+    content: string;
+    attachments?: AttachmentPreview[];
+    batchId?: string;
+  }) => void;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
   isConnected: boolean;
   activeConversationId: string | null;
+  handlePromptConsumed: () => void;
+  initialPrompt?: string | null;
+  autoSubmitInitialPrompt?: boolean;
 }
 
 export function ChatInput({
@@ -57,39 +66,72 @@ export function ChatInput({
   activeConversationId,
   isConnected,
   placeholder,
-  className
+  className,
+  handlePromptConsumed,
+  initialPrompt,
+  autoSubmitInitialPrompt = true
 }: UnifiedChatInputProps) {
+  const router = useRouter();
+
   const { selectedModel, openDrawer } = useModelSelection();
+
   const assetUpload = useAssetUpload(); // Upload layer
+
   const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [showExpandButton, setShowExpandButton] = useState(false);
+
   const [showScrollButton, setShowScrollButton] = useState(false);
+
   const [message, setMessage] = useState("");
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const [isFullScreenInputOpen, setIsFullScreenInputOpen] = useState(false);
+
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const formRef = useRef<HTMLFormElement>(null);
+
   const CurrentIcon = providerMetadata[selectedModel.provider].icon;
+
   const isMobile = useIsMobile();
+
   const isLockedRef = useRef(false);
 
-  // Use the assets hook for UI layer (previews, metadata)
+  const { isHome } = usePathnameContext();
+
   const assets = useAssets({
     max: 10,
     allowedTypes: ["image/*", "application/pdf", "text/markdown", "text/plain"]
   });
 
-  // Helper to get real status text for display
   const attachmentsRef = useRef<AttachmentPreview[]>(assets.attachments);
+
   useEffect(() => {
     attachmentsRef.current = assets.attachments;
   }, [assets.attachments]);
 
-  // Track upload status - keep simplified UI status for basic display
-  // Simple status text for previews (no per-item task map anymore)
+  // Track upload status for previews using AssetProvider as source of truth
   const getStatusText = useCallback(
     (attachment: AttachmentPreview): string => {
+      const t = assetUpload.getByPreviewId(attachment.id);
+      if (t) {
+        switch (t.status) {
+          case "UPLOADING":
+            return `Uploading ${Math.max(0, t.progress ?? 0)}%`;
+          case "READY":
+            return "Ready";
+          case "FAILED":
+            return "Failed";
+          case "REQUESTED":
+          default:
+            return "Pending";
+        }
+      }
+      // Fallback to local preview status if not tracked yet
       switch (attachment.status) {
         case "uploading":
           return `Uploading ${assetUpload.uploadProgress}%`;
@@ -101,10 +143,9 @@ export function ChatInput({
           return "Pending";
       }
     },
-    [assetUpload.uploadProgress]
+    [assetUpload]
   );
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (submitTimeoutRef.current) {
@@ -112,6 +153,33 @@ export function ChatInput({
       }
     };
   }, []);
+
+  // Consume an initial prompt passed from parent (or recovered from sessionStorage)
+  useEffect(() => {
+    const propPrompt = initialPrompt?.trim();
+    let prompt: string | null = propPrompt ?? null;
+    if (!prompt) {
+      try {
+        const stored = sessionStorage.getItem("chat.initialPrompt");
+        if (stored) prompt = stored.trim();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (!prompt) return;
+    setMessage(prompt);
+    if (autoSubmitInitialPrompt) {
+      if (isHome) router.replace("/chat/new-chat", { scroll: false });
+      requestAnimationFrame(() => formRef.current?.requestSubmit());
+    }
+    try {
+      sessionStorage.removeItem("chat.initialPrompt");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      handlePromptConsumed();
+    } // eslint-disable-next-line
+  }, [initialPrompt]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -195,33 +263,51 @@ export function ChatInput({
       if (isLockedRef.current === true) return;
 
       const trimmedMessage = message.trim();
+
       if (!trimmedMessage || disabled || isSubmitting || !isConnected) return;
+
       isLockedRef.current = true;
       setIsSubmitting(true);
       const quotedMarkdown = quotes.map(formatAsMarkdown).join("\n\n");
       const composed = quotedMarkdown
         ? `${quotedMarkdown}\n\n${trimmedMessage}`
         : trimmedMessage;
+      if (isHome) {
+        try {
+          sessionStorage.setItem("chat.initialPrompt", composed);
+        } catch (err) {
+          console.log(err);
+        }
+        router.push(`/chat/new-chat`, { scroll: false });
+        setIsSubmitting(false);
+        isLockedRef.current = false;
+        return;
+      }
       try {
         console.log(
           `[ChatInput] Sending message in conversation: ${activeConversationId ?? conversationId}`
         );
 
-        // Call parent's handler if provided
-        onUserMessage?.(composed);
+        const optimistic = attachmentsRef.current;
+        const batchId =
+          optimistic.length > 0 ? assetUpload.getBatchId() : undefined;
+        onUserMessage?.({
+          content: composed,
+          attachments: optimistic,
+          batchId
+        });
 
-        // Clear message immediately for better UX
         setMessage("");
         setQuotes([]);
         assets.clear();
 
-        // Reset textarea height
+        assetUpload.finalizeCurrentBatch();
+
         if (textareaRef.current) {
           textareaRef.current.style.height = `${INITIAL_TEXTAREA_HEIGHT_PX}px`;
         }
         setShowExpandButton(false);
 
-        // Reset submitting state after a short delay
         submitTimeoutRef.current = setTimeout(() => {
           setIsSubmitting(false);
           isLockedRef.current = false;
@@ -235,6 +321,9 @@ export function ChatInput({
       quotes,
       isSubmitting,
       message,
+      router,
+      isHome,
+      assetUpload,
       onUserMessage,
       disabled,
       isConnected,
@@ -267,47 +356,21 @@ export function ChatInput({
     [assetUpload, activeConversationId]
   );
 
-  // Enhanced paste handler that works with both layers
   const handleEnhancedPaste = useCallback(
     async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
-      await assets.handlePaste(e);
-      registerNewlyAdded(beforeIds, "PASTED");
-      // await assets.handlePaste(e);
-
-      // // Then register any new attachments with the upload layer
-      // if (assets.attachments.length > 0) {
-      //   const convId = activeConversationId ?? "new-chat";
-      //   // Just register - context handles everything
-      //   assetUpload.registerAssets(assets.attachments, convId, "PASTED");
-      // }
+      const created = await assets.handlePaste(e);
+      if (created && created.length > 0) {
+        const convId = activeConversationId ?? "new-chat";
+        assetUpload.registerAssets(created, convId, "PASTED");
+      }
     },
-    [assets, registerNewlyAdded]
+    [assets, assetUpload, activeConversationId]
   );
 
-  // // Handle files selected from attachment popover
-  // const handleFilesFromPopover = useCallback(
-  //   async (files: File[]) => {
-  //     // Add files to the assets UI layer
-  //     for (const file of files) {
-  //       await assets.addFile(file);
-  //     }
-
-  //     // Register with upload layer if we have attachments
-  //     if (assets.attachments.length > 0) {
-  //       const convId = activeConversationId ?? "new-chat";
-  //       // Just register - context handles everything
-  //       assetUpload.registerAssets(assets.attachments, convId, "UPLOAD");
-  //     }
-  //   },
-  //   [assets, assetUpload, activeConversationId]
-  // );
-  // Popover files → add previews → register new ones with AssetProvider
   const handleFilesFromPopover = useCallback(
     async (files: File[]) => {
       const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
       for (const file of files) {
-        // addFile likely sets state asynchronously; we diff after
         await assets.addFile(file);
       }
       registerNewlyAdded(beforeIds, "UPLOAD");
@@ -340,7 +403,7 @@ export function ChatInput({
 
   return (
     <>
-      <div className={cn("bg-background border-t px-4", className)}>
+      <div className={cn("w-full px-4", className)}>
         {quotes.length > 0 && (
           <div className="mx-auto w-full max-w-3xl pt-3">
             <div className="bg-muted/40 rounded-lg border p-2">
@@ -374,7 +437,7 @@ export function ChatInput({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mx-auto w-full max-w-3xl">
+          className="mx-auto w-full max-w-2xl">
           {/* Attachment previews */}
           {assets.attachments.length > 0 && (
             <div className="mb-1.5">
@@ -411,7 +474,7 @@ export function ChatInput({
                   "bg-background border-border pointer-events-auto h-7 w-7 rounded-full border shadow-lg hover:opacity-75 hover:shadow-xl",
                   "transition-all duration-200 ease-[cubic-bezier(0.31,0.1,0.08,0.96)]",
                   showScrollButton
-                    ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-100"
+                    ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-50"
                     : "pointer-events-none translate-y-2 opacity-0"
                 )}
                 style={{ "--bob-multiplier": 0.7 }}

@@ -1,17 +1,10 @@
-// sse.ts - Updated for v0 API structure
-import { XOR } from "@t3-chat-clone/types";
+import type { XOR } from "@t3-chat-clone/types";
 
-/**
- * a parsed Server-Sent Event (SSE)
- */
 export interface SSEEvent<T = unknown> {
   event?: string;
   data: T;
 }
 
-/**
- * v0 API type definitions
- */
 export type v0Delta = XOR<{ reasoning_content: string }, { content: string }>;
 
 export type v0Choice = {
@@ -51,9 +44,7 @@ function v0SSETransformer(
   let eventType: string | undefined = undefined;
   const dataLines = Array.of<string>();
 
-  // Process each line of the chunk
   for (const line of chunk.split(/\r?\n/)) {
-    // Ignore empty lines and comments
     if (!line.trim() || line.startsWith(":")) {
       continue;
     }
@@ -71,11 +62,9 @@ function v0SSETransformer(
       case "data":
         dataLines.push(fieldValue);
         break;
-      // Ignore 'id', 'retry' fields
     }
   }
 
-  // Parse the JSON data if present
   if (dataLines.length > 0) {
     try {
       const jsonStr = dataLines.join("\n");
@@ -105,20 +94,15 @@ export class StreamParser<T> implements AsyncIterable<T> {
 
     const transformStream = new TransformStream<Uint8Array, T>({
       transform(chunk, controller) {
-        // Decode and append to buffer
         buffer += decoder.decode(chunk, { stream: true });
 
-        // SSE messages are separated by double newlines
         const boundaryRegex = /\r?\n\r?\n/;
         let match: RegExpExecArray | null;
 
-        // Process all complete messages in the buffer
         while ((match = boundaryRegex.exec(buffer)) !== null) {
           const rawChunk = buffer.slice(0, match.index);
-          // Move buffer forward past this chunk and boundary
           buffer = buffer.slice(match.index + match[0].length);
 
-          // Parse the chunk
           const parsed = transformer(rawChunk);
           if (parsed) {
             controller.enqueue(parsed);
@@ -127,7 +111,6 @@ export class StreamParser<T> implements AsyncIterable<T> {
       },
 
       flush(controller) {
-        // Handle any remaining data in buffer
         if (buffer.trim()) {
           const parsed = transformer(buffer);
           if (parsed) {
@@ -158,9 +141,7 @@ export class StreamParser<T> implements AsyncIterable<T> {
   }
 }
 
-/**
- * Factory function to create a v0-specific SSE parser
- */
+
 export function createV0SSEParser(
   response: Response
 ): StreamParser<SSEEvent<v0ChatCompletionsRes>> {
@@ -170,9 +151,6 @@ export function createV0SSEParser(
   return new StreamParser(response.body, v0SSETransformer);
 }
 
-/**
- * Helper to check if delta contains reasoning content
- */
 export function isReasoningDelta(
   delta: v0Delta
 ): delta is { reasoning_content: string } {
@@ -182,9 +160,6 @@ export function isReasoningDelta(
   );
 }
 
-/**
- * Helper to check if delta contains regular content
- */
 export function isContentDelta(delta: v0Delta): delta is { content: string } {
   return "content" in delta && typeof delta.content !== "undefined";
 }

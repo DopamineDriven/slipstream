@@ -1,19 +1,25 @@
 // src/ui/chat/dynamic/index.tsx
 "use client";
 
-import type { UIMessage } from "@/types/shared";
+import type { AttachmentSingleton, UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
+import { useAssetUpload } from "@/context/asset-context";
+import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
+import { usePathnameContext } from "@/context/pathname-context";
 import {
   createAIMessage,
   createUserMessage,
   finalizeStreamingMessage
 } from "@/lib/ui-message-helpers";
-import { ChatFeed } from "../chat-feed";
-import { ChatInput } from "../chat-input";
+import { cn } from "@/lib/utils";
+import { ChatFeed } from "@/ui/chat/chat-feed";
+import { ChatHero } from "@/ui/chat/chat-hero";
+import { ChatInput } from "@/ui/chat/chat-input";
+import { buildOptimisticAttachment } from "@/lib/attachment-mapper";
 
 interface ChatInterfaceProps {
   initialMessages?: UIMessage[] | null;
@@ -27,8 +33,7 @@ export function ChatInterface({
   conversationId, // From route - not used, we rely on context
   user
 }: ChatInterfaceProps) {
-  const searchParams = useSearchParams();
-  const initialPrompt = searchParams.get("prompt");
+  const [queuedPrompt, setQueuedPrompt] = useState<string | null>(null);
 
   const {
     activeConversationId,
@@ -43,29 +48,49 @@ export function ChatInterface({
     isThinking,
     thinkingDuration
   } = useAIChatContext();
-
+  const router = useRouter();
   const { selectedModel } = useModelSelection();
-
+  const assetUpload = useAssetUpload();
+  const { isHome } = usePathnameContext();
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
   const lastUserMessageRef = useRef<string>("");
+  const { get } = useCookiesCtx();
+  const tz = get("tz");
 
+  const handlePromptClick = useCallback(
+    (prompt: string) => {
+      if (isHome) {
+        try {
+          sessionStorage.setItem("chat.initialPrompt", prompt.trim());
+        } catch (err){
+          console.log(err);
+        } finally {
+        router.push("/chat/new-chat", { scroll: false });
+      }
+    }
+      setQueuedPrompt(prompt.trim());
+    },
+    [router, isHome]
+  );
+  const handlePromptConsumed = useCallback(() => setQueuedPrompt(null), []);
   // Handle initial prompt for new chats
   useEffect(() => {
     if (
       activeConversationId === "new-chat" &&
-      initialPrompt &&
+      queuedPrompt &&
       !processedRef.current &&
       !isWaitingForRealId
     ) {
       processedRef.current = true;
       setIsAwaitingFirstChunk(true);
+      redirect
 
       // Add optimistic user message
       const userMsg = createUserMessage({
         id: `new-chat-user-${Date.now()}`,
-        content: initialPrompt,
+        content: queuedPrompt,
         userId: user.id,
         provider: selectedModel.provider,
         model: selectedModel.modelId,
@@ -73,14 +98,14 @@ export function ChatInterface({
       });
 
       setMessages([userMsg]);
-      lastUserMessageRef.current = initialPrompt;
+      lastUserMessageRef.current = queuedPrompt;
 
       // Send to AI
-      sendChat(initialPrompt);
+      sendChat(queuedPrompt);
     }
   }, [
     activeConversationId,
-    initialPrompt,
+    queuedPrompt,
     selectedModel,
     sendChat,
     user,
@@ -182,12 +207,28 @@ export function ChatInterface({
     }
   }, [activeConversationId]);
 
+  // Derive the payload type from ChatInput prop to ensure consistency
+  type OnUserMessagePayload = Parameters<NonNullable<React.ComponentProps<typeof ChatInput>["onUserMessage"]>>[0];
+
   // Callback to handle new user messages from the input component
-  const handleUserMessage = useCallback(
-    (content: string) => {
+  const handleUserMessage = useCallback((payload: OnUserMessagePayload) => {
+      const content = payload.content;
       if (!activeConversationId || !content.trim()) return;
 
-      // Add optimistic user message immediately
+      // Build optimistic attachments for the bubble if provided
+      const optimisticAttachments = (payload.attachments ?? []).map(a => {
+        const info = assetUpload.getByPreviewId(a.id);
+        return buildOptimisticAttachment(a, activeConversationId ?? "new-chat", {
+          draftId: info?.draftId ?? undefined,
+          cdnUrl: info?.cdnUrl ?? undefined,
+          publicUrl: info?.publicUrl ?? undefined,
+          filename: info?.filename ?? undefined,
+          mime: info?.mime ?? undefined,
+          size: info?.size ?? undefined
+        });
+      }) as AttachmentSingleton[];
+
+      // Add optimistic user message with optional attachments
       const userMsg = createUserMessage({
         id: `user-${Date.now()}-${Math.random()}`,
         content: content.trim(),
@@ -197,29 +238,51 @@ export function ChatInterface({
         conversationId: activeConversationId
       });
 
-      setMessages(prev => [...prev, userMsg]);
+      const userMsgWithAttachments = {
+        ...userMsg,
+        attachments: optimisticAttachments.length
+          ? optimisticAttachments
+          : undefined
+      } satisfies UIMessage;
+
+      setMessages(prev => [...prev, userMsgWithAttachments]);
       lastUserMessageRef.current = content.trim();
       setIsAwaitingFirstChunk(true);
 
-      // Send to AI - ensure content is trimmed
-      sendChat(content.trim());
-    },
-    [activeConversationId, selectedModel, sendChat, user]
-  );
+      // Send to AI - pass through the batchId from the input so the
+      // server associates the correct attachments to this message
+      sendChat(content.trim(), payload.batchId);
+    }, [activeConversationId, selectedModel, sendChat, user, assetUpload]);
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div
+      className={cn(
+        "flex h-full flex-col",
+        isHome
+          ? "mx-auto items-center justify-center p-4"
+          : "overflow-y-auto"
+      )}>
       <ChatFeed
         messages={messages}
         streamedText={isStreaming ? streamedText : ""}
         isAwaitingFirstChunk={isAwaitingFirstChunk}
         isStreaming={isStreaming}
         isThinking={isThinking}
+        isHome={isHome}
         thinkingText={thinkingText}
         thinkingDuration={thinkingDuration ?? undefined}
-        user={user}
-      />
+        user={user}>
+        <ChatHero
+          user={user}
+          selectedModel={selectedModel}
+          tz={tz}
+          onPromptClickAction={handlePromptClick}
+        />
+      </ChatFeed>
       <ChatInput
+        handlePromptConsumed={handlePromptConsumed}
+        initialPrompt={queuedPrompt}
+        autoSubmitInitialPrompt
         onUserMessage={handleUserMessage}
         user={user}
         isConnected={isConnected}
