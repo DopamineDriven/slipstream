@@ -28,7 +28,6 @@ import {
   S3ServiceException,
   waitUntilObjectExists
 } from "@aws-sdk/client-s3";
-import { fromIni } from "@aws-sdk/credential-providers";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Fs } from "@d0paminedriven/fs";
@@ -73,7 +72,10 @@ export class S3Storage extends S3Utils {
       defaultPresignExpiry: cfg.defaultPresignExpiry ?? 604800
     };
     this.client = new S3Client({
-      credentials: cfg.isProd ? {accessKeyId: cfg.accessKeyId,secretAccessKey: cfg.secretAccessKey} : fromIni(),
+      credentials: {
+        accessKeyId: cfg.accessKeyId,
+        secretAccessKey: cfg.secretAccessKey
+      },
       region: cfg.region,
       requestHandler: this.requestHandler
     });
@@ -148,13 +150,21 @@ export class S3Storage extends S3Utils {
     } as const satisfies PresignedUploadResponse;
   }
   public static getInstance(
-    { defaultPresignExpiry, credentials: _credentials, ...rest }: StorageConfig,
+    {
+      defaultPresignExpiry,
+      accessKeyId,
+      secretAccessKey,
+      credentials,
+      ...rest
+    }: StorageConfig,
     fs: Fs
   ) {
     if (this.#instance === null) {
       this.#instance = new S3Storage(
         {
-          credentials: fromIni(),
+          credentials,
+          accessKeyId,
+          secretAccessKey,
           defaultPresignExpiry: defaultPresignExpiry ?? 604800,
           ...rest
         },
@@ -457,10 +467,7 @@ export class S3Storage extends S3Utils {
     return undefined; // Can't determine size of stream
   }
 
-  public getCfUrl(
-    isProd: boolean,
-key:string
-  ) {
+  public getCfUrl(isProd: boolean, key: string) {
     return `https://assets${isProd ? "" : "-dev"}.d0paminedriven.com/${key}` as const;
   }
 
@@ -513,7 +520,7 @@ key:string
       getCommand,
       { expiresIn: 604800 } // 7 days
     );
-  const cdnUrl = this.getCfUrl(isProd, key);
+    const cdnUrl = this.getCfUrl(isProd, key);
     return {
       bucket,
       key,
