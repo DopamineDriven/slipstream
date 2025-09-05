@@ -58,6 +58,8 @@ export interface CredentialEntity {
   LLAMA_API_KEY?: string;
   NOTATION_FLAG?: string;
   SAFETY_ID_SECRET?: string;
+  AWS_SECRET_ACCESS_KEY_S3?: string;
+  AWS_ACCESS_KEY_S3?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

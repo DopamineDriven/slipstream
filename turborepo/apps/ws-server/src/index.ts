@@ -13,20 +13,18 @@ async function exe() {
 
   try {
     const isProd = typeof process.env.IS_PROD === "undefined";
-    const accessKeyId = cfg.AWS_ACCESS_KEY,
-      secretAccessKey = cfg.AWS_SECRET_ACCESS_KEY,
-      region = cfg.AWS_REGION,
+    const region = cfg.AWS_REGION,
       pyGenAssets = process.env.GEN_BUCKET ?? cfg.GEN_BUCKET,
       wsAssets = process.env.ASSETS_BUCKET ?? cfg.ASSETS_BUCKET,
       buckets = { pyGenAssets, wsAssets },
       config = {
         credentials: {
-          accessKeyId,
-          secretAccessKey
+          accessKeyId: cfg.AWS_ACCESS_KEY_S3,
+          secretAccessKey: cfg.AWS_SECRET_ACCESS_KEY_S3
         },
         isProd,
-        accessKeyId,
-        secretAccessKey,
+        accessKeyId: cfg.AWS_ACCESS_KEY_S3,
+        secretAccessKey: cfg.AWS_SECRET_ACCESS_KEY_S3,
         buckets,
         region
       };
