@@ -96,11 +96,9 @@ async function exe() {
 
     const meta = new LlamaService(prisma, redisInstance, cfg.LLAMA_API_KEY);
 
-    const { xAIService } = await import("@/xai/index.ts");
+    const { xAIFeatureService } = await import("@/xai/feature.ts");
 
-    const xai = new xAIService(cfg.X_AI_KEY, prisma, redisInstance);
-
-    const { OpenAIService } = await import("@/openai/index.ts");
+    const xai = new xAIFeatureService(prisma, redisInstance, cfg.X_AI_KEY);
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
@@ -111,7 +109,14 @@ async function exe() {
       cfg.ANTHROPIC_API_KEY
     );
 
-    const openai = new OpenAIService(prisma, redisInstance, cfg.OPENAI_API_KEY);
+    const { OpenAIService } = await import("@/openai/index.ts");
+
+    const openai = new OpenAIService(
+      logger,
+      prisma,
+      redisInstance,
+      cfg.OPENAI_API_KEY
+    );
 
     const { GeminiService } = await import("@/gemini/index.ts");
 
