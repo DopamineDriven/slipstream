@@ -29,7 +29,10 @@ export function AttachmentDisplay({
   className,
   compact = false
 }: AttachmentDisplayProps) {
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<
+    | { url: string; kind: "image" | "pdf" }
+    | null
+  >(null);
 
   if (!attachments || attachments.length === 0) {
     return null;
@@ -69,8 +72,8 @@ export function AttachmentDisplay({
     return attachment?.cdnUrl ?? null;
   };
 
-  const handleImageClick = (url: string) => {
-    setExpandedImage(url);
+  const handlePreview = (url: string, kind: "image" | "pdf") => {
+    setExpanded({ url, kind });
   };
 
   const handleDownload = (attachment: MessageAttachment) => {
@@ -92,33 +95,46 @@ export function AttachmentDisplay({
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
           const displayUrl = getDisplayUrl(attachment);
-          const isImage = attachment.assetType === "IMAGE" && Boolean(displayUrl);
+          const isImage =
+            (attachment.mime?.startsWith("image/") ??
+              attachment.assetType === "IMAGE") && Boolean(displayUrl);
+          const isPdf =
+            (attachment.mime?.toLowerCase().includes("application/pdf") ??
+              attachment.ext?.toLowerCase() === "pdf") && Boolean(displayUrl);
 
           // Full image preview only when we have a real URL
-          if (attachment.mime?.startsWith("image/") && !compact && displayUrl) {
+          if (isImage && !compact && displayUrl) {
             return (
-              <div key={attachment.id} className="relative">
+              <div
+                key={attachment.id}
+                className="relative inline-block h-64 w-full max-w-[90dvw] cursor-pointer rounded-lg border md:max-w-sm"
+                onClick={() => handlePreview(displayUrl, "image")}>
                 <Image
                   src={displayUrl}
-                  width={300}
-                  height={200}
                   alt={attachment.filename ?? "Attachment"}
-                  className="max-h-64 max-w-sm cursor-pointer rounded-lg border transition-opacity hover:opacity-90"
-                  onClick={() => handleImageClick(displayUrl)}
+                  fill
+                  sizes="(max-width: 768px) 90dvw, 24rem"
+                  className="rounded-lg object-contain transition-opacity hover:opacity-90"
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
                   <Button
                     variant="secondary"
                     size="icon"
                     className="h-6 w-6 border-none bg-black/50 text-white hover:bg-black/70"
-                    onClick={() => handleImageClick(displayUrl)}>
+                    onClick={e => {
+                      e.stopPropagation();
+                      handlePreview(displayUrl, "image");
+                    }}>
                     <Eye className="h-3 w-3" />
                   </Button>
                   <Button
                     variant="secondary"
                     size="icon"
                     className="h-6 w-6 border-none bg-black/50 text-white hover:bg-black/70"
-                    onClick={() => handleDownload(attachment)}>
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleDownload(attachment);
+                    }}>
                     <Download className="h-3 w-3" />
                   </Button>
                 </div>
@@ -142,12 +158,15 @@ export function AttachmentDisplay({
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  {isImage && (
+                  {(isImage || isPdf) && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => displayUrl && handleImageClick(displayUrl)}
+                      onClick={() =>
+                        displayUrl &&
+                        handlePreview(displayUrl, isPdf ? "pdf" : "image")
+                      }
                       disabled={!displayUrl}
                     >
                       <Eye className="h-4 w-4" />
@@ -169,31 +188,57 @@ export function AttachmentDisplay({
         })}
       </div>
 
-      {/* Image modal */}
-      {expandedImage && (
+      {/* Modal (image/pdf) */}
+      {expanded && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setExpandedImage(null)}>
-          <div className="relative max-h-screen max-w-full overflow-auto">
-            <Image
-              src={
-                expandedImage ||
-                "/placeholder.svg?height=400&width=600&query=expanded attachment"
-              }
-              style={{ objectFit: "cover" }}
-              width={1200}
-              height={900}
-              alt="Expanded attachment"
-              className="max-h-full max-w-full object-contain"
-              onClick={e => e.stopPropagation()}
-            />
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute top-4 right-4 border-none bg-black/50 text-white hover:bg-black/70"
-              onClick={() => setExpandedImage(null)}>
-              <X className="h-4 w-4" />
-            </Button>
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6"
+          onClick={() => setExpanded(null)}
+          style={{
+            // Improve safe-area tap targets on iOS
+            paddingTop: "max(1rem, env(safe-area-inset-top))",
+            paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+            paddingLeft: "max(1rem, env(safe-area-inset-left))",
+            paddingRight: "max(1rem, env(safe-area-inset-right))"
+          }}>
+          {/* Close button anchored to viewport so it stays accessible */}
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute right-4 top-4 border-none bg-black/60 text-white hover:bg-black/70"
+            onClick={e => {
+              e.stopPropagation();
+              setExpanded(null);
+            }}
+            aria-label="Close preview">
+            <X className="h-4 w-4" />
+          </Button>
+
+          {/* Content container */}
+          <div className="relative flex h-[92dvh] w-[96dvw] items-center justify-center">
+            {expanded.kind === "image" ? (
+              <div className="pointer-events-auto relative h-full w-full select-none" onClick={e => e.stopPropagation()}>
+                <Image
+                  src={
+                    expanded.url ||
+                    "/placeholder.svg?height=400&width=600&query=expanded attachment"
+                  }
+                  alt="Expanded attachment"
+                  fill
+                  sizes="96dvw"
+                  className="rounded-md object-contain"
+                />
+              </div>
+            ) : (
+              <div
+                className="pointer-events-auto relative h-[92dvh] w-[96dvw]"
+                onClick={e => e.stopPropagation()}>
+                <iframe
+                  src={`${expanded.url}#toolbar=1&navpanes=0&statusbar=0&view=FitH`}
+                  className="h-full w-full rounded-md bg-white"
+                  title="PDF preview"
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
