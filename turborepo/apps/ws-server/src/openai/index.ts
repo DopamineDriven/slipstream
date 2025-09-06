@@ -1,9 +1,12 @@
 import type { Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
+import type { Reasoning } from "openai/resources/shared.mjs";
+import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import type { EventTypeMap } from "@t3-chat-clone/types";
+import type { EventTypeMap, OpenAiModelIdUnion } from "@t3-chat-clone/types";
 import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
@@ -18,13 +21,24 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
 
 export class OpenAIService {
   private defaultClient: OpenAI;
-
+  private logger: PinoLogger;
   constructor(
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
-    this.defaultClient = new OpenAI({ apiKey: this.apiKey });
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[openai] " }
+      );
+    this.defaultClient = new OpenAI({
+      logLevel: "info",
+      apiKey: this.apiKey,
+      logger: this.logger
+    });
   }
 
   public getClient(overrideKey?: string) {
@@ -58,6 +72,43 @@ export class OpenAIService {
       : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
 
+  private buildAttachmentContent(
+    attachments?: ProviderChatRequestEntity["attachments"]
+  ) {
+    const content = Array.of<
+      | {
+          type: "input_image";
+          image_url: string;
+          detail: "auto" | "low" | "high";
+        }
+      | {
+          type: "input_file";
+          file_url?: string;
+          filename?: string;
+          file_id?: string | null;
+          file_data?: string;
+        }
+    >();
+    if (!attachments || attachments.length === 0) return content;
+
+    for (const att of attachments) {
+      const url = att.cdnUrl ?? att.sourceUrl;
+      const mime = att.mime ?? "";
+      if (!url || url.length === 0) continue;
+
+      if (mime.startsWith("image/")) {
+        content.push({ type: "input_image", image_url: url, detail: "auto" });
+      } else {
+        content.push({
+          type: "input_file",
+          file_url: url,
+          filename: att.filename ?? undefined
+        });
+      }
+    }
+    return content;
+  }
+
   private formatMsgs(
     msgs: (
       | {
@@ -73,15 +124,79 @@ export class OpenAIService {
     return [...msgs] as const satisfies ResponseInput;
   }
 
-  public formatOpenAi(isNewChat: boolean, msgs: Message[], userPrompt: string) {
+  public formatOpenAi(
+    isNewChat: boolean,
+    msgs: Message[],
+    userPrompt: string,
+    attachments?: ProviderChatRequestEntity["attachments"]
+  ) {
     if (isNewChat) {
+      const attContent = this.buildAttachmentContent(attachments);
+      if (attContent.length > 0) {
+        return [
+          {
+            role: "user",
+            content: [...attContent, { type: "input_text", text: userPrompt }]
+          }
+        ] as const satisfies ResponseInput;
+      }
       return [
         { role: "user", content: userPrompt }
       ] as const satisfies ResponseInput;
     } else {
-      return this.formatMsgs(
-        this.prependProviderModelTag(msgs)
-      ) satisfies ResponseInput;
+      const history = this.prependProviderModelTag(msgs.slice(0, -1));
+      const last = msgs.at(-1);
+      if (last && last.senderType === "USER") {
+        const attContent = this.buildAttachmentContent(attachments);
+        if (attContent.length > 0) {
+          return [
+            ...history,
+            {
+              role: "user",
+              content: [
+                ...attContent,
+                { type: "input_text", text: last.content }
+              ]
+            }
+          ] as const satisfies ResponseInput;
+        } else {
+          return [
+            ...history,
+            { role: "user", content: last.content }
+          ] as const satisfies ResponseInput;
+        }
+      }
+      return this.formatMsgs(this.prependProviderModelTag(msgs));
+    }
+  }
+
+  private openaiReasoning(
+    model: OpenAiModelIdUnion,
+    effort: Reasoning["effort"] = "low",
+    summary: Reasoning["summary"] = "auto"
+  ) {
+    switch (model) {
+      case "gpt-5":
+      case "gpt-5-mini":
+      case "gpt-5-nano":
+      case "o3":
+      case "o3-mini":
+      case "o3-pro":
+      case "o4-mini": {
+        return { effort, summary } satisfies Reasoning;
+      }
+      case "gpt-3.5-turbo":
+      case "gpt-3.5-turbo-16k":
+      case "gpt-4":
+      case "gpt-4-turbo":
+      case "gpt-4.1":
+      case "gpt-4.1-mini":
+      case "gpt-4.1-nano":
+      case "gpt-4o":
+      case "gpt-4o-mini":
+      default: {
+        return undefined;
+      }
     }
   }
 
@@ -97,12 +212,13 @@ export class OpenAIService {
     ws,
     apiKey,
     max_tokens,
-    model = "gpt-5-mini",
+    model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
     title,
     topP,
-    user_location
+    user_location,
+    attachments
   }: ProviderOpenaiRequestEntity) {
     const provider = "openai" as const;
     let openaiThinkingStartTime: number | null = null,
@@ -112,10 +228,10 @@ export class OpenAIService {
       openaiAgg = "";
 
     const client = this.getClient(apiKey ?? undefined);
-
+    const reasoning = this.openaiReasoning(model as OpenAiModelIdUnion);
     const responsesStream = await client.responses.create({
       stream: true,
-      input: this.formatOpenAi(isNewChat, msgs, prompt),
+      input: this.formatOpenAi(isNewChat, msgs, prompt, attachments),
       instructions: this.buildInstructions(systemPrompt),
       store: false,
       model,
@@ -123,6 +239,7 @@ export class OpenAIService {
       max_output_tokens: max_tokens,
       top_p: topP,
       truncation: "auto",
+      ...(reasoning ? { reasoning } : {}),
       parallel_tool_calls: true,
       tools: [
         {
@@ -133,9 +250,9 @@ export class OpenAIService {
     });
 
     for await (const s of responsesStream) {
-      let text: string | undefined = undefined;
-      let thinkingText: string | undefined = undefined;
-      let done = false;
+      let text: string | undefined = undefined,
+        thinkingText: string | undefined = undefined,
+        done = false;
       // s.type as ResponseStreamEvent['type'];
       if (
         s.type === "response.reasoning_text.delta" ||

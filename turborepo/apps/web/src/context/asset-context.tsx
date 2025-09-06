@@ -339,18 +339,6 @@ export function AssetProvider({
         headers,
         onProgress: pct => {
           task.progress = pct;
-          // (optional) echo to server so other clients see progress
-          sendEvent("asset_upload_progress", {
-            type: "asset_upload_progress",
-            userId,
-            draftId: task.draftId,
-            batchId: task.batchId,
-            conversationId: evt.conversationId,
-            attachmentId: task.attachmentId,
-            progress: pct,
-            bytesUploaded: Math.round((pct / 100) * task.size),
-            totalBytes: task.size
-          } as EventTypeMap["asset_upload_progress"]);
           recompute();
         }
       })
@@ -414,21 +402,6 @@ export function AssetProvider({
         });
     };
 
-    // (optional cross-client) progress mirrored from server
-    const handleUploadProgress = (
-      evt: EventTypeMap["asset_upload_progress"]
-    ) => {
-      const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
-      if (!task) return;
-      if (
-        typeof evt.progress === "number" &&
-        evt.progress > (task.progress ?? 0)
-      ) {
-        task.progress = evt.progress;
-        recompute();
-      }
-    };
-
     // S→C: server finalized (authoritative)
     const handleAssetReady = (evt: EventTypeMap["asset_ready"]) => {
       const task = tasksByDraftIdRef.current.get(evt.draftId ?? "");
@@ -464,7 +437,6 @@ export function AssetProvider({
     };
 
     client.on("asset_upload_instructions", handleUploadInstructions);
-    client.on("asset_upload_progress", handleUploadProgress);
     client.on("asset_ready", handleAssetReady);
     client.on("asset_upload_complete_error", handleUploadError);
 
@@ -476,7 +448,6 @@ export function AssetProvider({
 
     return () => {
       client.off("asset_upload_instructions");
-      client.off("asset_upload_progress");
       client.off("asset_ready");
       client.off("asset_upload_complete_error");
       client.off("ai_chat_request");

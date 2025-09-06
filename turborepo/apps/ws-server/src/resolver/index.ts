@@ -9,7 +9,7 @@ import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import { xAIService } from "@/xai/index.ts";
+import { xAIFeatureService } from "@/xai/feature.ts";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -30,7 +30,7 @@ export class Resolver extends ModelService {
     private s3Service: S3Storage,
     private fastApiUrl: string,
     private region: string,
-    private xAIService: xAIService,
+    private xAIService: xAIFeatureService,
     private v0Service: v0Service,
     private llamaService: LlamaService,
     private isProd: boolean
@@ -318,7 +318,7 @@ export class Resolver extends ModelService {
           ...commonProps
         });
       } else if (provider === "grok") {
-        await this.xAIService.handleGrokAiChatRequest({
+        await this.xAIService.handleXAIAiChatRequest({
           ...commonProps
         });
       } else {

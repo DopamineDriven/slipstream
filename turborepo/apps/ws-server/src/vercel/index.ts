@@ -84,14 +84,14 @@ export class v0Service {
                 delta: { reasoning_content: choice.delta.reasoning_content },
                 index: choice.index,
                 logprobs: choice.logprobs,
-                finish_reason: null as null
+                finish_reason: null
               };
             } else {
               return {
                 delta: { content: choice.delta.content },
                 index: choice.index,
                 logprobs: choice.logprobs,
-                finish_reason: null as null
+                finish_reason: null
               };
             }
           }),

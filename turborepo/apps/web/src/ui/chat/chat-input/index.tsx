@@ -75,7 +75,8 @@ export function ChatInput({
 
   const { selectedModel, openDrawer } = useModelSelection();
 
-  const assetUpload = useAssetUpload(); // Upload layer
+  const assetUpload = useAssetUpload();
+  
 
   const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
 
@@ -236,7 +237,7 @@ export function ChatInput({
     const chatFeed = document.querySelector("[data-chat-feed]");
     if (chatFeed) {
       chatFeed.addEventListener("scroll", checkScrollState, { passive: true });
-      checkScrollState(); // Initial check
+      checkScrollState();
     }
 
     return () => {
