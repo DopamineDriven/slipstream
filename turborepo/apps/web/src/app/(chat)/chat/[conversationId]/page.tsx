@@ -13,6 +13,7 @@ import type { InferGSPRT } from "@t3-chat-clone/types";
 const { prismaConversationService } = ormHandler(prismaClient);
 
 export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return [{ conversationId: "new-chat" }, { conversationId: "home" }];
@@ -48,7 +49,7 @@ export default async function ChatPage({
   // Fetch data directly on the server
   let messages: DynamicChatRouteProps | null = null;
   let conversationTitle: string | null = null;
-  if (conversationId !== "new-chat" && conversationId !=="home") {
+  if (conversationId !== "new-chat" && conversationId !== "home") {
     const data =
       await prismaConversationService.getMessagesByConversationIdWithAssets(
         conversationId
