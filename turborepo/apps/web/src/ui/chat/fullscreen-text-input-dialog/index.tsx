@@ -40,7 +40,7 @@ export function FullscreenTextInputDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-brand-component border-brand-border text-brand-text flex h-[90vh] w-[95vw] flex-col p-0 sm:h-[80vh] sm:max-w-2xl">
+      <DialogContent className="bg-brand-component border-brand-border text-brand-text flex h-[90svh] w-[95vw] flex-col p-0 sm:h-[80svh] sm:max-w-2xl">
         <DialogHeader className="border-brand-border flex flex-row items-center justify-between border-b p-4">
           <DialogTitle className="text-brand-text-emphasis">
             Compose Message
