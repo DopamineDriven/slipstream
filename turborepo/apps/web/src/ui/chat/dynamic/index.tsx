@@ -10,6 +10,7 @@ import { useAssetUpload } from "@/context/asset-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import { buildOptimisticAttachment } from "@/lib/attachment-mapper";
 import {
   createAIMessage,
   createUserMessage,
@@ -19,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
-import { buildOptimisticAttachment } from "@/lib/attachment-mapper";
 
 interface ChatInterfaceProps {
   initialMessages?: UIMessage[] | null;
@@ -64,17 +64,59 @@ export function ChatInterface({
       if (isHome) {
         try {
           sessionStorage.setItem("chat.initialPrompt", prompt.trim());
-        } catch (err){
+        } catch (err) {
           console.log(err);
         } finally {
-        router.push("/chat/new-chat", { scroll: false });
+          router.push("/chat/new-chat", { scroll: false });
+        }
       }
-    }
       setQueuedPrompt(prompt.trim());
     },
     [router, isHome]
   );
   const handlePromptConsumed = useCallback(() => setQueuedPrompt(null), []);
+  // Read any persisted attachments/batch from sessionStorage for first send
+  const [initialPersistedAttachments, setInitialPersistedAttachments] =
+    useState<
+      | null
+      | {
+          id: string;
+          filename: string;
+          mime: string;
+          size: number;
+          width?: number;
+          height?: number;
+          draftId?: string | null;
+          cdnUrl?: string | null;
+          publicUrl?: string | null;
+        }[]
+    >(null);
+  const initialBatchIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("chat.initialAttachments");
+      const bid = sessionStorage.getItem("chat.initialAttachmentsBatchId");
+      if (raw)
+        setInitialPersistedAttachments(
+          JSON.parse(raw) as
+            | {
+                id: string;
+                filename: string;
+                mime: string;
+                size: number;
+                width?: number;
+                height?: number;
+                draftId?: string | null;
+                cdnUrl?: string | null;
+                publicUrl?: string | null;
+              }[]
+            | null
+        );
+      if (bid) initialBatchIdRef.current = bid;
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
   // Handle initial prompt for new chats
   useEffect(() => {
     if (
@@ -85,7 +127,34 @@ export function ChatInterface({
     ) {
       processedRef.current = true;
       setIsAwaitingFirstChunk(true);
-      redirect
+      redirect;
+
+      // Build optimistic attachments from any persisted previews
+      const optimisticAttachments = (initialPersistedAttachments ?? []).map(
+        a => {
+          const current = assetUpload.getByPreviewId(a.id) ?? undefined;
+          return buildOptimisticAttachment(
+            {
+              // minimal fields used by builder
+              id: a.id,
+              file: new File([new Blob()], a.filename || "file"), // placeholder, not used downstream
+              filename: a.filename,
+              mime: a.mime,
+              size: a.size,
+              status: "pending"
+            },
+            activeConversationId ?? "new-chat",
+            {
+              draftId: current?.draftId ?? a.draftId ?? null,
+              cdnUrl: current?.cdnUrl ?? a.cdnUrl ?? null,
+              publicUrl: current?.publicUrl ?? a.publicUrl ?? null,
+              filename: a.filename,
+              mime: a.mime,
+              size: a.size
+            }
+          );
+        }
+      );
 
       // Add optimistic user message
       const userMsg = createUserMessage({
@@ -97,11 +166,29 @@ export function ChatInterface({
         conversationId: activeConversationId
       });
 
-      setMessages([userMsg]);
+      const withAttachments = {
+        ...userMsg,
+        attachments: optimisticAttachments.length
+          ? optimisticAttachments
+          : undefined
+      } as typeof userMsg & {
+        attachments?: ReturnType<typeof buildOptimisticAttachment>[];
+      };
+
+      setMessages([withAttachments]);
       lastUserMessageRef.current = queuedPrompt;
 
       // Send to AI
-      sendChat(queuedPrompt);
+      const explicitBatchId = initialBatchIdRef.current ?? undefined;
+      sendChat(queuedPrompt, explicitBatchId);
+
+      // Clear persisted attachments after consuming
+      try {
+        sessionStorage.removeItem("chat.initialAttachments");
+        sessionStorage.removeItem("chat.initialAttachmentsBatchId");
+      } catch (err) {
+        console.log(err);
+      }
     }
   }, [
     activeConversationId,
@@ -109,8 +196,58 @@ export function ChatInterface({
     selectedModel,
     sendChat,
     user,
-    isWaitingForRealId
+    isWaitingForRealId,
+    assetUpload,
+    initialPersistedAttachments
   ]);
+
+  // While streaming, update optimistic attachments with latest cdnUrl/publicUrl
+  useEffect(() => {
+    const bId = initialBatchIdRef.current;
+    if (!bId) return;
+    const uploads = assetUpload.getUploadsByBatchId(bId) ?? [];
+    if (uploads.length === 0) return;
+
+    setMessages(prev => {
+      if (prev.length === 0) return prev;
+      // update only the latest user message with attachments
+      const idx = [...prev]
+        .reverse()
+        .findIndex(
+          m => m.senderType === "USER" && (m.attachments?.length ?? 0) > 0
+        );
+      if (idx === -1) return prev;
+      const realIndex = prev.length - 1 - idx;
+      const msg = prev[realIndex];
+      if (!msg || !msg.attachments || msg.attachments.length === 0) return prev;
+
+      const byDraft = new Map(uploads.map(u => [u.draftId, u] as const));
+      const updatedAttachments = msg.attachments.map(att => {
+        const draft = att?.draftId ?? null;
+        if (!draft) return att;
+        const u = byDraft.get(draft);
+        if (!u) return att;
+        // Only update if we have new URLs
+        const nextCdn = u.cdnUrl ?? null;
+        const nextPub = u.publicUrl ?? null;
+        if (
+          (att.cdnUrl ?? null) === nextCdn &&
+          (att.publicUrl ?? null) === nextPub
+        )
+          return att;
+        return { ...att, cdnUrl: nextCdn, publicUrl: nextPub } as typeof att;
+      });
+
+      // if nothing changed, avoid re-render
+      const changed = updatedAttachments.some(
+        (a, i) => a !== msg.attachments?.[i]
+      );
+      if (!changed) return prev;
+      const next = [...prev];
+      next[realIndex] = { ...msg, attachments: updatedAttachments };
+      return next;
+    });
+  }, [assetUpload, assetUpload.uploadProgress, assetUpload.isUploading]);
 
   // Update messages with streaming content
   useEffect(() => {
@@ -208,24 +345,31 @@ export function ChatInterface({
   }, [activeConversationId]);
 
   // Derive the payload type from ChatInput prop to ensure consistency
-  type OnUserMessagePayload = Parameters<NonNullable<React.ComponentProps<typeof ChatInput>["onUserMessage"]>>[0];
+  type OnUserMessagePayload = Parameters<
+    NonNullable<React.ComponentProps<typeof ChatInput>["onUserMessage"]>
+  >[0];
 
   // Callback to handle new user messages from the input component
-  const handleUserMessage = useCallback((payload: OnUserMessagePayload) => {
+  const handleUserMessage = useCallback(
+    (payload: OnUserMessagePayload) => {
       const content = payload.content;
       if (!activeConversationId || !content.trim()) return;
 
       // Build optimistic attachments for the bubble if provided
       const optimisticAttachments = (payload.attachments ?? []).map(a => {
         const info = assetUpload.getByPreviewId(a.id);
-        return buildOptimisticAttachment(a, activeConversationId ?? "new-chat", {
-          draftId: info?.draftId ?? undefined,
-          cdnUrl: info?.cdnUrl ?? undefined,
-          publicUrl: info?.publicUrl ?? undefined,
-          filename: info?.filename ?? undefined,
-          mime: info?.mime ?? undefined,
-          size: info?.size ?? undefined
-        });
+        return buildOptimisticAttachment(
+          a,
+          activeConversationId ?? "new-chat",
+          {
+            draftId: info?.draftId ?? undefined,
+            cdnUrl: info?.cdnUrl ?? undefined,
+            publicUrl: info?.publicUrl ?? undefined,
+            filename: info?.filename ?? undefined,
+            mime: info?.mime ?? undefined,
+            size: info?.size ?? undefined
+          }
+        );
       }) as AttachmentSingleton[];
 
       // Add optimistic user message with optional attachments
@@ -252,15 +396,15 @@ export function ChatInterface({
       // Send to AI - pass through the batchId from the input so the
       // server associates the correct attachments to this message
       sendChat(content.trim(), payload.batchId);
-    }, [activeConversationId, selectedModel, sendChat, user, assetUpload]);
+    },
+    [activeConversationId, selectedModel, sendChat, user, assetUpload]
+  );
 
   return (
     <div
       className={cn(
         "flex h-full flex-col",
-        isHome
-          ? "mx-auto items-center justify-center p-4"
-          : "overflow-y-auto"
+        isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
       )}>
       <ChatFeed
         messages={messages}

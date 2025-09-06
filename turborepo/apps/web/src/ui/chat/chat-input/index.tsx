@@ -276,6 +276,35 @@ export function ChatInput({
       if (isHome) {
         try {
           sessionStorage.setItem("chat.initialPrompt", composed);
+          // Persist any current attachments for optimistic display across navigation
+          const optimistic = attachmentsRef.current;
+          if (optimistic.length > 0) {
+            const batchId = assetUpload.getBatchId();
+            const payload = optimistic.map(a => {
+              const info = assetUpload.getByPreviewId(a.id);
+              return {
+                id: a.id,
+                filename: a.filename,
+                mime: a.mime,
+                size: a.size,
+                width: a.width,
+                height: a.height,
+                draftId: info?.draftId ?? null,
+                cdnUrl: info?.cdnUrl ?? null,
+                publicUrl: info?.publicUrl ?? null
+              };
+            });
+            sessionStorage.setItem(
+              "chat.initialAttachments",
+              JSON.stringify(payload)
+            );
+            if (batchId) {
+              sessionStorage.setItem(
+                "chat.initialAttachmentsBatchId",
+                batchId
+              );
+            }
+          }
         } catch (err) {
           console.log(err);
         }
