@@ -1,7 +1,6 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
-import type { Message } from "@/generated/client/client.ts";
-import type { BufferLike, UserData } from "@/types/index.ts";
+import type { BufferLike, MessageSingleton, UserData } from "@/types/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -15,7 +14,8 @@ import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
-  EventTypeMap,ImageSpecs,
+  EventTypeMap,
+  ImageSpecs,
   Provider
 } from "@t3-chat-clone/types";
 import { RedisChannels } from "@t3-chat-clone/redis-service";
@@ -125,7 +125,9 @@ export class Resolver extends ModelService {
 
   private extToContentType(metadata?: ImageSpecs) {
     return metadata?.format && metadata.format !== "unknown"
-      ? this.s3Service.fs.getMimes(metadata.format ==="heic" ? "avif" : metadata.format)[0]
+      ? this.s3Service.fs.getMimes(
+          metadata.format === "heic" ? "avif" : metadata.format
+        )[0]
       : "";
   }
 
@@ -194,9 +196,6 @@ export class Resolver extends ModelService {
       topP,
       model
     });
-    const attachments = batchId
-      ? res.attachments.filter(t => t.batchId === batchId)
-      : undefined;
 
     const user_location = {
       type: "approximate",
@@ -207,7 +206,7 @@ export class Resolver extends ModelService {
     } as const;
 
     const isNewChat = conversationIdInitial.startsWith("new-chat"),
-      msgs = res.messages satisfies Message[],
+      msgs = res.messages satisfies MessageSingleton<true>[],
       conversationId = res.id,
       apiKey = res.apiKey ?? undefined,
       keyId = res.userKeyId,
@@ -283,7 +282,6 @@ export class Resolver extends ModelService {
       conversationId,
       isNewChat,
       msgs,
-      prompt,
       streamChannel,
       thinkingChunks,
       userId,
@@ -295,8 +293,7 @@ export class Resolver extends ModelService {
       systemPrompt,
       temperature,
       title,
-      topP,
-      attachments
+      topP
     };
     try {
       if (provider === "gemini") {
@@ -1248,7 +1245,9 @@ export class Resolver extends ModelService {
 
       const assetReady = {
         type: "asset_ready",
-        conversationId,cdnUrl: attachment.cdnUrl ?? undefined,publicUrl: attachment.publicUrl ?? undefined,
+        conversationId,
+        cdnUrl: attachment.cdnUrl ?? undefined,
+        publicUrl: attachment.publicUrl ?? undefined,
         attachmentId,
         s3ObjectId: finalS3ObjectId,
         batchId,
@@ -1261,7 +1260,7 @@ export class Resolver extends ModelService {
         },
         mime: attachment.mime ?? contentType ?? this.extToContentType(metadata),
         origin: attachment.origin,
-        size: attachment.size  ? Number(attachment.size) : bytesUploaded ?? 0,
+        size: attachment.size ? Number(attachment.size) : (bytesUploaded ?? 0),
         status: "READY",
         etag: attachment.etag ?? finalEtag ?? etag,
         bucket,

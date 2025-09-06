@@ -1,18 +1,16 @@
 import type {
+  $Enums,
   Attachment,
   AudioMetadata,
   DocumentMetadata,
   ImageMetadata,
   VideoMetadata
 } from "@/generated/client/client.ts";
-import type { UserData } from "@/types/index.ts";
+import type { ConversationSingleton, UserData } from "@/types/index.ts";
 import { PrismaClient } from "@/generated/client/client.ts";
-import { AssetOrigin, SenderType } from "@/generated/client/enums.ts";
-import { GlobalOmitConfig } from "@/generated/client/internal/prismaNamespace.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { DefaultArgs } from "@prisma/client/runtime/client";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -30,11 +28,7 @@ export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
 
 export class PrismaService extends ModelService {
-  readonly prismaClient: PrismaClient<
-    never,
-    GlobalOmitConfig | undefined,
-    DefaultArgs
-  >;
+  readonly prismaClient: PrismaClient;
   private encryption: EncryptionService;
   private adapter: PrismaPg;
   constructor(
@@ -173,6 +167,21 @@ export class PrismaService extends ModelService {
       o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
     ) as [string, string, string, number];
   }
+  public bigintToNumber(
+    props: ConversationSingleton<false>
+  ): ConversationSingleton<true> {
+    const { messages, ...rest } = props;
+    const msgArr = messages.map(t => {
+      const { attachments, ...rest } = t;
+      const cleanAttachments = attachments.map(att => {
+        const size = typeof att.size === "bigint" ? att.size === 0n ?  0 :  Number(att.size) : null;
+        const cleaned = { ...att, size };
+        return cleaned;
+      });
+      return { attachments: cleanAttachments, ...rest };
+    });
+    return { messages: msgArr, ...rest } satisfies ConversationSingleton<true>;
+  }
 
   public async handleAiChatRequest({
     userId,
@@ -182,7 +191,7 @@ export class PrismaService extends ModelService {
     ...data
   }: Rm<AIChatRequest, "type"> & {
     userId: string;
-  }) {
+  }): Promise<ConversationSingleton<true>> {
     const { keyId, apiKey } = await this.handleApiKeyLookup(provider, userId);
     if (conversationId === "new-chat") {
       if (typeof batchId !== "undefined") {
@@ -197,11 +206,18 @@ export class PrismaService extends ModelService {
 
           return await pr.conversation.create({
             include: {
-              messages: { orderBy: { createdAt: "asc" } },
               conversationSettings: true,
-              attachments: {
-                where: { batchId },
-                include: { image: true, document: true }
+              messages: {
+                orderBy: { createdAt: "asc" },
+                include: {
+                  attachments: {
+                    orderBy: { createdAt: "asc" },
+                    include: {
+                      image: true,
+                      document: true
+                    }
+                  }
+                }
               }
             },
             data: {
@@ -211,7 +227,7 @@ export class PrismaService extends ModelService {
                   attachments: { connect: connectById },
                   content: data.prompt,
                   provider: this.providerToPrismaFormat(provider),
-                  senderType: SenderType.USER,
+                  senderType: "USER",
                   model: data.model,
                   userId,
                   userKeyId: keyId
@@ -230,21 +246,34 @@ export class PrismaService extends ModelService {
             }
           });
         });
-        return { apiKey, ...batchIt };
+        return this.bigintToNumber({
+          apiKey,
+          ...batchIt
+        }) satisfies ConversationSingleton<true>;
       }
 
       const p = await this.prismaClient.conversation.create({
         include: {
-          messages: true,
           conversationSettings: true,
-          attachments: { include: { image: true, document: true } }
+          messages: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              attachments: {
+                orderBy: { createdAt: "asc" },
+                include: {
+                  image: true,
+                  document: true
+                }
+              }
+            }
+          }
         },
         data: {
           messages: {
             create: {
               content: data.prompt,
               provider: this.providerToPrismaFormat(provider),
-              senderType: SenderType.USER,
+              senderType: "USER",
               model: data.model,
               userId,
               userKeyId: keyId
@@ -263,12 +292,14 @@ export class PrismaService extends ModelService {
         }
       });
       const apiKeyAndRes = { apiKey, ...p };
-      return apiKeyAndRes;
+      return this.bigintToNumber(
+        apiKeyAndRes
+      ) satisfies ConversationSingleton<true>;
     } else {
       if (typeof batchId !== "undefined") {
         const batchIt = await this.prismaClient.$transaction(async pr => {
           const attachments = await pr.attachment.findMany({
-            where: { batchId, userId, conversationId,messageId: null },
+            where: { batchId, userId, conversationId, messageId: null },
             take: 10,
             orderBy: [{ createdAt: "desc" }],
             include: { image: true, document: true }
@@ -278,13 +309,18 @@ export class PrismaService extends ModelService {
 
           return await pr.conversation.update({
             include: {
-              messages: {
-                orderBy: { createdAt: "asc" }
-              },
               conversationSettings: true,
-              attachments: {
-                where: { batchId },
-                include: { image: true, document: true }
+              messages: {
+                orderBy: { createdAt: "asc" },
+                include: {
+                  attachments: {
+                    orderBy: { createdAt: "asc" },
+                    include: {
+                      image: true,
+                      document: true
+                    }
+                  }
+                }
               }
             },
             where: { id: conversationId },
@@ -294,7 +330,7 @@ export class PrismaService extends ModelService {
                 create: {
                   attachments: { connect: connectById },
                   content: data.prompt,
-                  senderType: SenderType.USER,
+                  senderType: "USER",
                   provider: this.providerToPrismaFormat(provider),
                   model: data.model,
                   userId,
@@ -314,15 +350,25 @@ export class PrismaService extends ModelService {
             }
           });
         });
-        return { apiKey, ...batchIt };
+        return this.bigintToNumber({
+          apiKey,
+          ...batchIt
+        }) satisfies ConversationSingleton<true>;
       }
       const pr = await this.prismaClient.conversation.update({
         include: {
-          messages: { orderBy: { createdAt: "asc" } },
           conversationSettings: true,
-          attachments: {
-            where: { conversationId },
-            include: { image: true, document: true }
+          messages: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              attachments: {
+                orderBy: { createdAt: "asc" },
+                include: {
+                  image: true,
+                  document: true
+                }
+              }
+            }
           }
         },
         where: { id: conversationId },
@@ -330,7 +376,7 @@ export class PrismaService extends ModelService {
           messages: {
             create: {
               content: data.prompt,
-              senderType: SenderType.USER,
+              senderType: "USER",
               provider: this.providerToPrismaFormat(provider),
               model: data.model,
               userId,
@@ -350,7 +396,9 @@ export class PrismaService extends ModelService {
         }
       });
       const apiKeyAndRes = { apiKey, ...pr };
-      return apiKeyAndRes;
+      return this.bigintToNumber(
+        apiKeyAndRes
+      ) satisfies ConversationSingleton<true>;
     }
   }
 
@@ -367,7 +415,7 @@ export class PrismaService extends ModelService {
         messages: {
           create: {
             content: data.chunk,
-            senderType: SenderType.AI,
+            senderType: "AI",
             provider: this.providerToPrismaFormat(provider),
             model: data.model,
             thinkingDuration: data.thinkingDuration,
@@ -689,7 +737,7 @@ export class PrismaService extends ModelService {
     });
 
     const byOrigin: Record<
-      keyof typeof AssetOrigin,
+      $Enums.AssetOrigin,
       { size: bigint; count: number }
     > = {
       GENERATED: { size: 0n, count: 0 },
@@ -719,7 +767,6 @@ export class PrismaService extends ModelService {
       byOrigin
     };
   }
-
 
   async createBatchedAttachments({
     conversationId,
@@ -899,7 +946,7 @@ export class PrismaService extends ModelService {
   public async getConversationStorageStats(conversationId: string): Promise<{
     totalSize: bigint;
     fileCount: number;
-    byType: Record<keyof typeof AssetOrigin, { size: bigint; count: number }>;
+    byType: Record<$Enums.AssetOrigin, { size: bigint; count: number }>;
     oldestAttachment?: Date;
     newestAttachment?: Date;
   }> {

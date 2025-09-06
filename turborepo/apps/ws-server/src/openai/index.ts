@@ -1,5 +1,4 @@
-import type { Message } from "@/generated/client/client.ts";
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { MessageSingleton, ProviderChatRequestEntity } from "@/types/index.ts";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import type { Reasoning } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
@@ -50,7 +49,12 @@ export class OpenAIService {
     return client;
   }
 
-  private prependProviderModelTag(msgs: Message[]) {
+  private prependProviderModelTag(
+    msgs: Pick<
+      MessageSingleton<true>,
+      "senderType" | "provider" | "model" | "content"
+    >[]
+  ) {
     return msgs.map(msg => {
       if (msg.senderType === "USER") {
         return { role: "user", content: msg.content } as const;
@@ -66,14 +70,14 @@ export class OpenAIService {
     }) satisfies ResponseInput;
   }
 
-  public buildInstructions(systemPrompt?: string) {
+  private buildInstructions(systemPrompt?: string) {
     return systemPrompt
       ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
       : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
 
   private buildAttachmentContent(
-    attachments?: ProviderChatRequestEntity["attachments"]
+    attachments?: MessageSingleton<true>["attachments"]
   ) {
     const content = Array.of<
       | {
@@ -126,28 +130,33 @@ export class OpenAIService {
 
   public formatOpenAi(
     isNewChat: boolean,
-    msgs: Message[],
-    userPrompt: string,
-    attachments?: ProviderChatRequestEntity["attachments"]
+    msgs: MessageSingleton<true>[]
   ) {
     if (isNewChat) {
-      const attContent = this.buildAttachmentContent(attachments);
+      const first = msgs[0];
+      if (!first) {
+        return [{ role: "user", content: "" }] as const satisfies ResponseInput;
+      }
+      const attContent = this.buildAttachmentContent(first.attachments);
       if (attContent.length > 0) {
         return [
           {
             role: "user",
-            content: [...attContent, { type: "input_text", text: userPrompt }]
+            content: [
+              ...attContent,
+              { type: "input_text", text: first.content }
+            ]
           }
         ] as const satisfies ResponseInput;
       }
       return [
-        { role: "user", content: userPrompt }
+        { role: "user", content: first.content }
       ] as const satisfies ResponseInput;
     } else {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const last = msgs.at(-1);
       if (last && last.senderType === "USER") {
-        const attContent = this.buildAttachmentContent(attachments);
+        const attContent = this.buildAttachmentContent(last.attachments);
         if (attContent.length > 0) {
           return [
             ...history,
@@ -205,7 +214,6 @@ export class OpenAIService {
     conversationId,
     isNewChat,
     msgs,
-    prompt,
     streamChannel,
     thinkingChunks,
     userId,
@@ -217,8 +225,7 @@ export class OpenAIService {
     temperature,
     title,
     topP,
-    user_location,
-    attachments
+    user_location
   }: ProviderOpenaiRequestEntity) {
     const provider = "openai" as const;
     let openaiThinkingStartTime: number | null = null,
@@ -231,7 +238,7 @@ export class OpenAIService {
     const reasoning = this.openaiReasoning(model as OpenAiModelIdUnion);
     const responsesStream = await client.responses.create({
       stream: true,
-      input: this.formatOpenAi(isNewChat, msgs, prompt, attachments),
+      input: this.formatOpenAi(isNewChat, msgs),
       instructions: this.buildInstructions(systemPrompt),
       store: false,
       model,

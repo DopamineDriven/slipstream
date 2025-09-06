@@ -1,4 +1,4 @@
-import type { Message } from "@/generated/client/client.ts";
+import type { MessageSingleton } from "@/types/index.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { ProviderChatRequestEntity } from "@/types/index.ts";
@@ -28,7 +28,12 @@ export class LlamaService {
     return client;
   }
 
-  private prependProviderModelTag(msgs: Message[]) {
+  private prependProviderModelTag(
+    msgs: Pick<
+      MessageSingleton<true>,
+      "senderType" | "provider" | "model" | "content"
+    >[]
+  ) {
     return msgs.map(msg => {
       if (msg.senderType === "USER") {
         return { role: "user", content: msg.content } as const;
@@ -78,19 +83,20 @@ export class LlamaService {
 
   public llamaFormat(
     isNewChat: boolean,
-    msgs: Message[],
-    userPrompt: string,
-    systemPrompt?: string
+    msgs: ProviderChatRequestEntity["msgs"],
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
     if (isNewChat) {
+      const first = msgs[0];
+      const userContent = first ? first.content : "";
       if (systemPrompt) {
         return [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userContent }
         ] as const satisfies ChatCompletionMessageParam[];
       } else {
         return [
-          { role: "user", content: userPrompt }
+          { role: "user", content: userContent }
         ] as const satisfies ChatCompletionMessageParam[];
       }
     } else {
@@ -107,7 +113,6 @@ export class LlamaService {
     isNewChat,
     msgs,
     thinkingChunks,
-    prompt,
     streamChannel,
     userId,
     ws,
@@ -129,7 +134,7 @@ export class LlamaService {
         temperature,
         model,
         max_completion_tokens: max_tokens,
-        messages: this.llamaFormat(isNewChat, msgs, prompt, systemPrompt),
+        messages: this.llamaFormat(isNewChat, msgs, systemPrompt),
         stream: true
       },
       { stream: true }

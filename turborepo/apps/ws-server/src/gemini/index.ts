@@ -1,6 +1,9 @@
 import { resolve } from "node:path";
-import type { Attachment, Message } from "@/generated/client/client.ts";
-import type { ProviderChatRequestEntity, UserData } from "@/types/index.ts";
+import type {
+  MessageSingleton,
+  ProviderChatRequestEntity,
+  UserData
+} from "@/types/index.ts";
 import type {
   Blob,
   Content,
@@ -93,7 +96,12 @@ export class GeminiService {
   }
 
   public async uploadRemoteAssetToGoogle(
-    attachment: Pick<Attachment, "id" | "cdnUrl" | "mime" | "filename">,
+    attachment: {
+      cdnUrl: string | null;
+      filename: string | null;
+      mime: string | null;
+      id: string;
+    },
     apiKey?: string
   ) {
     try {
@@ -160,8 +168,7 @@ export class GeminiService {
   }
 
   private async formatHistoryForSession(
-    msgs: Message[],
-    attachments?: ProviderGeminiChatRequestEntity["attachments"],
+    msgs: MessageSingleton<true>[],
     keyId?: string,
     apiKey?: string
   ) {
@@ -214,9 +221,8 @@ export class GeminiService {
 
   public async getHistoryAndInstruction(
     isNewChat: boolean,
-    msgs: Message[],
+    msgs: MessageSingleton<true>[],
     systemPrompt?: string,
-    attachments?: ProviderGeminiChatRequestEntity["attachments"],
     keyId?: string,
     apiKey?: string
   ) {
@@ -236,12 +242,7 @@ export class GeminiService {
     } else {
       const historyMsgs = msgs.slice(0, -1);
       return {
-        history: await this.formatHistoryForSession(
-          historyMsgs,
-          attachments,
-          keyId,
-          apiKey
-        ),
+        history: await this.formatHistoryForSession(historyMsgs, keyId, apiKey),
         systemInstruction
       };
     }
@@ -261,8 +262,14 @@ export class GeminiService {
     }
     throw new Error(`File ${fileName} not active after ${maxRetries} retries`);
   }
+
   private async ensureAssetUploaded(
-    attachment: Pick<Attachment, "id" | "cdnUrl" | "mime" | "filename">,
+    attachment: {
+      cdnUrl: string | null;
+      filename: string | null;
+      mime: string | null;
+      id: string;
+    },
     client: GoogleGenAI,
     keyFingerprint: string,
     keyId?: string,
@@ -340,7 +347,10 @@ export class GeminiService {
       } catch (e) {
         const msg = (e as Error)?.message || "";
         // If Google complains the file already exists, try to fetch it and proceed
-        if (/ALREADY_EXISTS|exists/i.test(msg) || /already\s+exists/i.test(msg)) {
+        if (
+          /ALREADY_EXISTS|exists/i.test(msg) ||
+          /already\s+exists/i.test(msg)
+        ) {
           const name = this.getGoogleFileName(attachment.id);
           const existing = await client.files.get({ name });
           if (existing?.uri) {
@@ -408,7 +418,6 @@ export class GeminiService {
     conversationId,
     isNewChat,
     msgs,
-    prompt,
     streamChannel,
     thinkingChunks,
     userId,
@@ -420,7 +429,6 @@ export class GeminiService {
     systemPrompt,
     temperature,
     title,
-    attachments,
     topP,
     userData
   }: ProviderGeminiChatRequestEntity) {
@@ -439,35 +447,36 @@ export class GeminiService {
       isNewChat,
       msgs,
       systemPrompt,
-      attachments,
       keyId ?? undefined,
       apiKey
     );
     const currentPartArr = Array.of<Part>();
-
+      for (const msg of msgs) {
     try {
-      if (attachments && attachments.length > 0) {
-        for (const attachment of attachments) {
-          if (attachment?.cdnUrl && attachment?.mime) {
-            // Use the new ensureAssetUploaded method
-            const { fileUri, mimeType } = await this.ensureAssetUploaded(
-              attachment,
-              gemini,
-              keyFingerprint,
-              keyId ?? undefined,
-              apiKey
-            );
-            currentPartArr.push({
-              fileData: { fileUri, mimeType }
-            });
+
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const attachment of msg.attachments) {
+            if (attachment?.cdnUrl && attachment?.mime) {
+              // Use the new ensureAssetUploaded method
+              const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                attachment,
+                gemini,
+                keyFingerprint,
+                keyId ?? undefined,
+                apiKey
+              );
+              currentPartArr.push({
+                fileData: { fileUri, mimeType }
+              });
+            }
           }
         }
       }
-    } catch (err) {
+     catch (err) {
       this.logger.warn({ err }, "error in gemini attachment upload");
     } finally {
-      currentPartArr.push({ text: prompt });
-    }
+      currentPartArr.push({ text: msg.content });
+    }}
     const fullContent = [
       ...(history ?? []),
       { role: "user", parts: currentPartArr }

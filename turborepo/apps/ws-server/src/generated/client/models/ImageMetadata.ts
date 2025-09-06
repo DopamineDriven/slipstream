@@ -31,8 +31,8 @@ export type ImageMetadataAvgAggregateOutputType = {
   aspectRatio: number | null
   frames: number | null
   orientation: number | null
-  gpsLat: runtime.Decimal | null
-  gpsLon: runtime.Decimal | null
+  gpsLat: number | null
+  gpsLon: number | null
 }
 
 export type ImageMetadataSumAggregateOutputType = {
@@ -41,8 +41,8 @@ export type ImageMetadataSumAggregateOutputType = {
   aspectRatio: number | null
   frames: number | null
   orientation: number | null
-  gpsLat: runtime.Decimal | null
-  gpsLon: runtime.Decimal | null
+  gpsLat: number | null
+  gpsLon: number | null
 }
 
 export type ImageMetadataMinAggregateOutputType = {
@@ -60,8 +60,8 @@ export type ImageMetadataMinAggregateOutputType = {
   cameraMake: string | null
   cameraModel: string | null
   lensModel: string | null
-  gpsLat: runtime.Decimal | null
-  gpsLon: runtime.Decimal | null
+  gpsLat: number | null
+  gpsLon: number | null
   dominantColorHex: string | null
   iccProfile: string | null
   createdAt: Date | null
@@ -83,8 +83,8 @@ export type ImageMetadataMaxAggregateOutputType = {
   cameraMake: string | null
   cameraModel: string | null
   lensModel: string | null
-  gpsLat: runtime.Decimal | null
-  gpsLon: runtime.Decimal | null
+  gpsLat: number | null
+  gpsLon: number | null
   dominantColorHex: string | null
   iccProfile: string | null
   createdAt: Date | null
@@ -307,8 +307,8 @@ export type ImageMetadataGroupByOutputType = {
   cameraMake: string | null
   cameraModel: string | null
   lensModel: string | null
-  gpsLat: runtime.Decimal | null
-  gpsLon: runtime.Decimal | null
+  gpsLat: number | null
+  gpsLon: number | null
   dominantColorHex: string | null
   iccProfile: string | null
   createdAt: Date
@@ -353,8 +353,8 @@ export type ImageMetadataWhereInput = {
   cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
-  gpsLat?: Prisma.DecimalNullableFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.DecimalNullableFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
   dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
@@ -404,8 +404,8 @@ export type ImageMetadataWhereUniqueInput = Prisma.AtLeast<{
   cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
-  gpsLat?: Prisma.DecimalNullableFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.DecimalNullableFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
   dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
@@ -459,8 +459,8 @@ export type ImageMetadataScalarWhereWithAggregatesInput = {
   cameraMake?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
   lensModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
-  gpsLat?: Prisma.DecimalNullableWithAggregatesFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.DecimalNullableWithAggregatesFilter<"ImageMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
   dominantColorHex?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
   iccProfile?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageMetadata"> | Date | string
@@ -481,8 +481,8 @@ export type ImageMetadataCreateInput = {
   cameraMake?: string | null
   cameraModel?: string | null
   lensModel?: string | null
-  gpsLat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
   dominantColorHex?: string | null
   iccProfile?: string | null
   createdAt?: Date | string
@@ -505,8 +505,8 @@ export type ImageMetadataUncheckedCreateInput = {
   cameraMake?: string | null
   cameraModel?: string | null
   lensModel?: string | null
-  gpsLat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
   dominantColorHex?: string | null
   iccProfile?: string | null
   createdAt?: Date | string
@@ -527,8 +527,8 @@ export type ImageMetadataUpdateInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -551,8 +551,8 @@ export type ImageMetadataUncheckedUpdateInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -574,8 +574,8 @@ export type ImageMetadataCreateManyInput = {
   cameraMake?: string | null
   cameraModel?: string | null
   lensModel?: string | null
-  gpsLat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
   dominantColorHex?: string | null
   iccProfile?: string | null
   createdAt?: Date | string
@@ -596,8 +596,8 @@ export type ImageMetadataUpdateManyMutationInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -619,8 +619,8 @@ export type ImageMetadataUncheckedUpdateManyInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -769,14 +769,6 @@ export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
   set?: $Enums.ColorSpace | null
 }
 
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type ImageMetadataCreateWithoutAttachmentInput = {
   format?: $Enums.ImageFormat
   width: number
@@ -791,8 +783,8 @@ export type ImageMetadataCreateWithoutAttachmentInput = {
   cameraMake?: string | null
   cameraModel?: string | null
   lensModel?: string | null
-  gpsLat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
   dominantColorHex?: string | null
   iccProfile?: string | null
   createdAt?: Date | string
@@ -813,8 +805,8 @@ export type ImageMetadataUncheckedCreateWithoutAttachmentInput = {
   cameraMake?: string | null
   cameraModel?: string | null
   lensModel?: string | null
-  gpsLat?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
   dominantColorHex?: string | null
   iccProfile?: string | null
   createdAt?: Date | string
@@ -851,8 +843,8 @@ export type ImageMetadataUpdateWithoutAttachmentInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -873,8 +865,8 @@ export type ImageMetadataUncheckedUpdateWithoutAttachmentInput = {
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gpsLat?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  gpsLon?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1009,8 +1001,8 @@ export type $ImageMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
     cameraMake: string | null
     cameraModel: string | null
     lensModel: string | null
-    gpsLat: runtime.Decimal | null
-    gpsLon: runtime.Decimal | null
+    gpsLat: number | null
+    gpsLon: number | null
     dominantColorHex: string | null
     iccProfile: string | null
     createdAt: Date
@@ -1453,8 +1445,8 @@ export interface ImageMetadataFieldRefs {
   readonly cameraMake: Prisma.FieldRef<"ImageMetadata", 'String'>
   readonly cameraModel: Prisma.FieldRef<"ImageMetadata", 'String'>
   readonly lensModel: Prisma.FieldRef<"ImageMetadata", 'String'>
-  readonly gpsLat: Prisma.FieldRef<"ImageMetadata", 'Decimal'>
-  readonly gpsLon: Prisma.FieldRef<"ImageMetadata", 'Decimal'>
+  readonly gpsLat: Prisma.FieldRef<"ImageMetadata", 'Float'>
+  readonly gpsLon: Prisma.FieldRef<"ImageMetadata", 'Float'>
   readonly dominantColorHex: Prisma.FieldRef<"ImageMetadata", 'String'>
   readonly iccProfile: Prisma.FieldRef<"ImageMetadata", 'String'>
   readonly createdAt: Prisma.FieldRef<"ImageMetadata", 'DateTime'>
