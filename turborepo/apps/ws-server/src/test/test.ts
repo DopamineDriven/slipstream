@@ -4,6 +4,25 @@ import { Provider } from "@t3-chat-clone/types";
 
 dotenv.config({ quiet: true });
 
+type MapItRT =
+  | {
+      thinking: string | null;
+      msgNumber: number;
+      content: string;
+      timestamp: Date;
+      id: string;
+      provider: "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel";
+      model: string;
+      sender: "USER" | "AI" | "SYSTEM";
+      assetUrl: {
+        cdnUrl: string;
+        msgId: string;
+        filename: string;
+        batchId: string;
+      }[];
+    }[]
+  | undefined;
+
 class ScriptGen extends Fs {
   constructor(public override cwd: string) {
     super(process.cwd() ?? cwd);
@@ -83,7 +102,12 @@ class ScriptGen extends Fs {
   private async mapIt(target: "dev" | "prod", id?: string) {
     return (await this.targeted(target, id))?.messages.map((msg, i) => {
       ++i;
-      const assetUrl = Array.of<{ cdnUrl: string; msgId: string; filename: string; batchId: string; }>();
+      const assetUrl = Array.of<{
+        cdnUrl: string;
+        msgId: string;
+        filename: string;
+        batchId: string;
+      }>();
       const content = msg.content,
         timestamp = new Date(msg.createdAt),
         id = msg.id,
@@ -94,8 +118,12 @@ class ScriptGen extends Fs {
       msg.attachments.length > 0
         ? msg.attachments.map(t => {
             if (t.cdnUrl && t.filename && t.batchId) {
-
-              assetUrl.push({ cdnUrl: t.cdnUrl, msgId: id, filename: t.filename, batchId: t.batchId });
+              assetUrl.push({
+                cdnUrl: t.cdnUrl,
+                msgId: id,
+                filename: t.filename,
+                batchId: t.batchId
+              });
             }
           })
         : null;
@@ -110,7 +138,7 @@ class ScriptGen extends Fs {
         sender,
         assetUrl
       };
-    });
+    }) satisfies MapItRT;
   }
 
   private async out(env: "dev" | "prod", id?: string) {
@@ -137,7 +165,9 @@ class ScriptGen extends Fs {
           ? p.thinking
             ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n\n${p.thinking}\n\n${p.content}\n\n${d}\n`
             : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
-          : p.assetUrl.length >0 ? `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\nbatchId: ${p.assetUrl[0]?.batchId}\n\n${d}\n` : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n${d}\n`;
+          : p.assetUrl.length > 0
+            ? `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\nbatchId: ${p.assetUrl[0]?.batchId}\n\n${d}\n`
+            : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n${d}\n`;
       arr.push(agg);
     }
 

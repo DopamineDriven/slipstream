@@ -392,8 +392,8 @@ model ImageMetadata {
   lensModel            String?
 
   // optional GPS
-  gpsLat Decimal? @db.Decimal(10, 7)
-  gpsLon Decimal? @db.Decimal(10, 7)
+  gpsLat Float?
+  gpsLon Float?
 
   // display sugar
   dominantColorHex String? @db.VarChar(7) // "#RRGGBB"
@@ -415,7 +415,7 @@ model VideoMetadata {
   height       Int
   aspectRatio  Float? @default(1.0)
   duration     Int // milliseconds
-  frameRate    Decimal?   @db.Decimal(5, 2)
+  frameRate    Float?
   bitrate      Int? // kbps
   codec        String? // h264, h265, av1, etc.
   hasAudio     Boolean    @default(false)

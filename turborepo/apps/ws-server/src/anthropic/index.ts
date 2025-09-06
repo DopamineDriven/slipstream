@@ -1,5 +1,7 @@
-import type { Message } from "@/generated/client/client.ts";
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type {
+  MessageSingleton,
+  ProviderChatRequestEntity
+} from "@/types/index.ts";
 import type {
   ContentBlockParam,
   DocumentBlockParam,
@@ -9,7 +11,7 @@ import type {
   StopReason,
   TextBlockParam
 } from "@anthropic-ai/sdk/resources/messages";
-import type { Logger } from "pino";
+import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
@@ -30,9 +32,10 @@ interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
     tz?: string;
   };
 }
+
 export class AnthropicService {
   private defaultClient: Anthropic;
-  private logger: Logger;
+  private logger: PinoLogger;
   constructor(
     logger: LoggerService,
     private prisma: PrismaService,
@@ -47,6 +50,7 @@ export class AnthropicService {
       );
     this.defaultClient = new Anthropic({
       apiKey: this.apiKey,
+      logLevel: "info",
       logger: this.logger
     });
   }
@@ -81,25 +85,20 @@ export class AnthropicService {
 
   public formatAnthropicHistory(
     isNewChat: boolean,
-    msgs: Message[],
-    userPrompt: string,
-    systemPrompt?: string,
-    attachments?: ProviderChatRequestEntity["attachments"]
+    msgs: MessageSingleton<true>[],
+    systemPrompt?: string
   ) {
     if (!isNewChat) {
       const messages = msgs.map(msg => {
         if (msg.senderType === "USER") {
-          // Handle user messages with potential attachments
           const content = Array.of<ContentBlockParam>();
           try {
             // Add image attachments if present
-            if (attachments && attachments.length > 0) {
-              for (const attachment of attachments) {
-                const url = attachment.cdnUrl ?? attachment.sourceUrl;
-                if (url && attachment.mime) {
-                  if (attachment.mime.includes("application/pdf")) {
-                    // Fetch and send as base64-encoded PDF document block
-                    // const data = await this.fetchAsBase64(attachment.sourceUrl);
+            if (msg.attachments && msg.attachments.length > 0) {
+              for (const attachment of msg.attachments) {
+                const { cdnUrl: url, mime } = attachment;
+                if (url && mime) {
+                  if (mime.includes("application/pdf")) {
                     const docBlock = {
                       type: "document",
                       source: {
@@ -108,8 +107,7 @@ export class AnthropicService {
                       }
                     } as const satisfies DocumentBlockParam;
                     content.push(docBlock);
-                  } else if (attachment.mime.startsWith("image/")) {
-                    // Use URL source for images (works fine with S3 presigned URLs)
+                  } else if (mime.startsWith("image/")) {
                     const imageBlock = {
                       type: "image",
                       source: {
@@ -153,49 +151,54 @@ export class AnthropicService {
         ] as const satisfies TextBlockParam[]
       };
     } else {
-      // Handle new chat with potential attachments
+      // new chat means only one message exists period -> the first user message
+      const userMsg = msgs[0];
       const content = Array.of<ContentBlockParam>();
 
-      // Add text prompt
-
-      try {
-        // Add image attachments if present
-        if (attachments && attachments.length > 0) {
-          for (const attachment of attachments) {
-            const url = attachment.cdnUrl ?? attachment.sourceUrl;
-            if (url && attachment.mime) {
-              if (attachment.mime.includes("application/pdf")) {
-                // Fetch and send as base64-encoded PDF document block
-                // const data = await this.fetchAsBase64(attachment.sourceUrl);
-                const docBlock = {
-                  type: "document",
-                  source: {
-                    type: "url",
-                    url
-                  }
-                } as const satisfies DocumentBlockParam;
-                content.push(docBlock);
-              } else if (attachment.mime.startsWith("image/")) {
-                const imageBlock = {
-                  type: "image",
-                  source: {
-                    type: "url",
-                    url
-                  }
-                } as const satisfies ImageBlockParam;
-                content.push(imageBlock);
+      if (userMsg) {
+        try {
+          if (userMsg.attachments && userMsg.attachments.length > 0) {
+            for (const attachment of userMsg.attachments) {
+              const { cdnUrl: url, mime } = attachment;
+              if (url && mime) {
+                if (mime.includes("application/pdf")) {
+                  const docBlock = {
+                    type: "document",
+                    source: {
+                      type: "url",
+                      url
+                    }
+                  } as const satisfies DocumentBlockParam;
+                  content.push(docBlock);
+                } else if (mime.startsWith("image/")) {
+                  const imageBlock = {
+                    type: "image",
+                    source: {
+                      type: "url",
+                      url
+                    }
+                  } as const satisfies ImageBlockParam;
+                  content.push(imageBlock);
+                }
               }
             }
           }
+        } catch (err) {
+          this.logger.warn(
+            { err },
+            "error in new chat anthropic history workup"
+          );
+        } finally {
+          content.push({ type: "text", text: userMsg.content } as const);
         }
-      } catch (err) {
-        this.logger.warn({ err }, "error in new chat anthropic history workup");
-      } finally {
-        content.push({ type: "text", text: userPrompt } as const);
       }
 
+      // never pass the already database persisted user prompt
       const messages = [
-        { role: "user", content: content.length > 1 ? content : userPrompt }
+        {
+          role: "user",
+          content: content.length >= 1 ? content : "no user message found"
+        }
       ] as const satisfies MessageParam[];
 
       if (systemPrompt) {
@@ -212,17 +215,6 @@ export class AnthropicService {
         };
       }
     }
-  }
-
-  private async fetchAsBase64(url: string) {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(
-        `Failed to fetch attachment: ${res.status} ${res.statusText}`
-      );
-    }
-    const ab = await res.arrayBuffer();
-    return Buffer.from(ab).toString("base64");
   }
 
   private handleMaxTokens(mod: AllModelsUnion, max_tokens?: number) {
@@ -266,7 +258,6 @@ export class AnthropicService {
     conversationId,
     isNewChat,
     msgs,
-    prompt,
     streamChannel,
     thinkingChunks,
     userId,
@@ -278,8 +269,7 @@ export class AnthropicService {
     temperature,
     title,
     topP,
-    user_location,
-    attachments
+    user_location
   }: ProviderAnthropicChatRequestEntity) {
     const provider = "anthropic" as const;
     let anthropicThinkingStartTime: number | null = null;
@@ -295,9 +285,7 @@ export class AnthropicService {
     const { messages, system } = this.formatAnthropicHistory(
       isNewChat,
       msgs,
-      prompt,
-      systemPrompt,
-      attachments
+      systemPrompt
     );
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(

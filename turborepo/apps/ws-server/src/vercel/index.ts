@@ -1,5 +1,4 @@
-import type { Message } from "@/generated/client/client.ts";
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { MessageSingleton, ProviderChatRequestEntity } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
@@ -109,7 +108,12 @@ export class v0Service {
     }
   }
 
-  private prependProviderModelTag(msgs: Message[]) {
+  private prependProviderModelTag(
+    msgs: Pick<
+      MessageSingleton<true>,
+      "senderType" | "provider" | "model" | "content"
+    >[]
+  ) {
     return msgs.map(msg => {
       if (msg.senderType === "USER") {
         return { role: "user", content: msg.content } as const;
@@ -160,19 +164,20 @@ export class v0Service {
 
   public v0Format(
     isNewChat: boolean,
-    msgs: Message[],
-    userPrompt: string,
-    systemPrompt?: string
+    msgs: ProviderChatRequestEntity["msgs"],
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
     if (isNewChat) {
+      const first = msgs[0];
+      const userContent = first ? first.content : "";
       if (systemPrompt) {
         return [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userContent }
         ] as const satisfies ChatCompletionMessageParam[];
       } else {
         return [
-          { role: "user", content: userPrompt }
+          { role: "user", content: userContent }
         ] as const satisfies ChatCompletionMessageParam[];
       }
     } else {
@@ -190,7 +195,6 @@ export class v0Service {
     msgs,
     thinkingChunks,
     apiKey,
-    prompt,
     ws,
     userId,
     isNewChat,
@@ -212,7 +216,7 @@ export class v0Service {
 
     const streamer = this.stream(
       model,
-      this.v0Format(isNewChat, msgs, prompt, systemPrompt),
+      this.v0Format(isNewChat, msgs, systemPrompt),
       apiKey ?? undefined,
       { max_tokens, top_p: topP, temperature }
     );

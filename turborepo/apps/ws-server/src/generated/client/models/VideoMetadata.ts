@@ -30,7 +30,7 @@ export type VideoMetadataAvgAggregateOutputType = {
   height: number | null
   aspectRatio: number | null
   duration: number | null
-  frameRate: runtime.Decimal | null
+  frameRate: number | null
   bitrate: number | null
   orientation: number | null
   rotation: number | null
@@ -43,7 +43,7 @@ export type VideoMetadataSumAggregateOutputType = {
   height: number | null
   aspectRatio: number | null
   duration: number | null
-  frameRate: runtime.Decimal | null
+  frameRate: number | null
   bitrate: number | null
   orientation: number | null
   rotation: number | null
@@ -58,7 +58,7 @@ export type VideoMetadataMinAggregateOutputType = {
   height: number | null
   aspectRatio: number | null
   duration: number | null
-  frameRate: runtime.Decimal | null
+  frameRate: number | null
   bitrate: number | null
   codec: string | null
   hasAudio: boolean | null
@@ -77,7 +77,7 @@ export type VideoMetadataMaxAggregateOutputType = {
   height: number | null
   aspectRatio: number | null
   duration: number | null
-  frameRate: runtime.Decimal | null
+  frameRate: number | null
   bitrate: number | null
   codec: string | null
   hasAudio: boolean | null
@@ -289,7 +289,7 @@ export type VideoMetadataGroupByOutputType = {
   height: number
   aspectRatio: number | null
   duration: number
-  frameRate: runtime.Decimal | null
+  frameRate: number | null
   bitrate: number | null
   codec: string | null
   hasAudio: boolean
@@ -332,7 +332,7 @@ export type VideoMetadataWhereInput = {
   height?: Prisma.IntFilter<"VideoMetadata"> | number
   aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntFilter<"VideoMetadata"> | number
-  frameRate?: Prisma.DecimalNullableFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
   codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
   hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean
@@ -377,7 +377,7 @@ export type VideoMetadataWhereUniqueInput = Prisma.AtLeast<{
   height?: Prisma.IntFilter<"VideoMetadata"> | number
   aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntFilter<"VideoMetadata"> | number
-  frameRate?: Prisma.DecimalNullableFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
   bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
   codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
   hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean
@@ -426,7 +426,7 @@ export type VideoMetadataScalarWhereWithAggregatesInput = {
   height?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
   aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null
   duration?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
-  frameRate?: Prisma.DecimalNullableWithAggregatesFilter<"VideoMetadata"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null
   bitrate?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
   codec?: Prisma.StringNullableWithAggregatesFilter<"VideoMetadata"> | string | null
   hasAudio?: Prisma.BoolWithAggregatesFilter<"VideoMetadata"> | boolean
@@ -445,7 +445,7 @@ export type VideoMetadataCreateInput = {
   height: number
   aspectRatio?: number | null
   duration: number
-  frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: number | null
   bitrate?: number | null
   codec?: string | null
   hasAudio?: boolean
@@ -466,7 +466,7 @@ export type VideoMetadataUncheckedCreateInput = {
   height: number
   aspectRatio?: number | null
   duration: number
-  frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: number | null
   bitrate?: number | null
   codec?: string | null
   hasAudio?: boolean
@@ -485,7 +485,7 @@ export type VideoMetadataUpdateInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -506,7 +506,7 @@ export type VideoMetadataUncheckedUpdateInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -526,7 +526,7 @@ export type VideoMetadataCreateManyInput = {
   height: number
   aspectRatio?: number | null
   duration: number
-  frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: number | null
   bitrate?: number | null
   codec?: string | null
   hasAudio?: boolean
@@ -545,7 +545,7 @@ export type VideoMetadataUpdateManyMutationInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -565,7 +565,7 @@ export type VideoMetadataUncheckedUpdateManyInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -722,7 +722,7 @@ export type VideoMetadataCreateWithoutAttachmentInput = {
   height: number
   aspectRatio?: number | null
   duration: number
-  frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: number | null
   bitrate?: number | null
   codec?: string | null
   hasAudio?: boolean
@@ -741,7 +741,7 @@ export type VideoMetadataUncheckedCreateWithoutAttachmentInput = {
   height: number
   aspectRatio?: number | null
   duration: number
-  frameRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: number | null
   bitrate?: number | null
   codec?: string | null
   hasAudio?: boolean
@@ -776,7 +776,7 @@ export type VideoMetadataUpdateWithoutAttachmentInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -795,7 +795,7 @@ export type VideoMetadataUncheckedUpdateWithoutAttachmentInput = {
   height?: Prisma.IntFieldUpdateOperationsInput | number
   aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   duration?: Prisma.IntFieldUpdateOperationsInput | number
-  frameRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -916,7 +916,7 @@ export type $VideoMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
     height: number
     aspectRatio: number | null
     duration: number
-    frameRate: runtime.Decimal | null
+    frameRate: number | null
     bitrate: number | null
     codec: string | null
     hasAudio: boolean
@@ -1357,7 +1357,7 @@ export interface VideoMetadataFieldRefs {
   readonly height: Prisma.FieldRef<"VideoMetadata", 'Int'>
   readonly aspectRatio: Prisma.FieldRef<"VideoMetadata", 'Float'>
   readonly duration: Prisma.FieldRef<"VideoMetadata", 'Int'>
-  readonly frameRate: Prisma.FieldRef<"VideoMetadata", 'Decimal'>
+  readonly frameRate: Prisma.FieldRef<"VideoMetadata", 'Float'>
   readonly bitrate: Prisma.FieldRef<"VideoMetadata", 'Int'>
   readonly codec: Prisma.FieldRef<"VideoMetadata", 'String'>
   readonly hasAudio: Prisma.FieldRef<"VideoMetadata", 'Boolean'>

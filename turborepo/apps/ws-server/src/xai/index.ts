@@ -1,4 +1,3 @@
-import type { Message } from "@/generated/client/client.ts";
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   MessageParam,
@@ -66,8 +65,7 @@ export class xAIService {
 
   public xAiFormatHistory(
     isNewChat: boolean,
-    msgs: Message[],
-    userPrompt: string,
+    msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: string
   ) {
     if (!isNewChat) {
@@ -96,8 +94,9 @@ export class xAIService {
         ] as const satisfies TextBlockParam[]
       };
     } else {
+      const first = msgs[0];
       const messages = [
-        { role: "user", content: userPrompt }
+        { role: "user", content: first ? first.content : "" }
       ] as const satisfies MessageParam[];
       if (systemPrompt) {
         return {
@@ -154,7 +153,6 @@ export class xAIService {
     conversationId,
     isNewChat,
     msgs,
-    prompt,
     streamChannel,
     thinkingChunks,
     userId,
@@ -179,7 +177,6 @@ export class xAIService {
     const { messages, system } = this.xAiFormatHistory(
       isNewChat,
       msgs,
-      prompt,
       systemPrompt
     );
 
