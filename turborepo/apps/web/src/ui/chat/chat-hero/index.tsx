@@ -50,14 +50,14 @@ function getTimeOfDay(tz = "america/chicago", username?: string | null) {
   });
   const u = username ? username.split(" ")?.[0] : "User";
   const [hour, _min, _sec] = time.split(/:/).map(t => Number.parseInt(t));
-  if (!hour) return `How may I help you today, ${u}?`;
+  if (!hour) return `What's on your mind, ${u}?`;
   else if (hour >= 5 && hour < 12)
-    return `Good Morning! How may I help you today ${u}?`;
+    return `What's on your mind this morning,${u}?`;
   else if (hour >= 12 && hour < 17)
-    return `Good Afternoon! How may I help you today, ${u}?`;
+    return `What's on your mind today, ${u}?`;
   else if (hour >= 17 && hour <= 23)
-    return `Good Evening! How may I help you tonight, ${u}?`;
-  else return `Hello ${u}! How may I help you tonight, Nightowl?`;
+    return `What's on your mind tonight, ${u}?`;
+  else return `Hello Nightowl!`;
 }
 export function ChatHero({
   user,
@@ -78,7 +78,7 @@ export function ChatHero({
         transition={{ duration: 0.5 }}
         className="mb-8 text-center">
         <Logo className="mx-auto mb-4 size-12 stroke-current text-current [&_path]:stroke-current" />
-        <h1 className="text-foreground mb-2 text-3xl font-bold">
+        <h1 className="text-foreground/90 mb-2 text-xl font-bold">
           {getTimeOfDay(tz, user.name)}
         </h1>
         <p className="text-muted-foreground text-lg">
