@@ -160,7 +160,7 @@ const components = {
   ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
     <ol
       className={cn(
-        "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2",
+        "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-6",
         props.className
       )}
       {...props}>
@@ -170,7 +170,7 @@ const components = {
   ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
     <ul
       className={cn(
-        "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2",
+        "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-6",
         props.className
       )}
       {...props}>
