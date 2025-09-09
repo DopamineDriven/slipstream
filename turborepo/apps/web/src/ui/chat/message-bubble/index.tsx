@@ -16,6 +16,7 @@ import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
 import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { AllModelsUnion } from "@t3-chat-clone/types";
+import {useTheme} from "next-themes";
 import {
   Avatar,
   AvatarFallback,
@@ -108,6 +109,8 @@ export function MessageBubble({
   const thinkingProcessingRef = useRef(false);
   const isUser = message.senderType === "USER";
   const isAI = message.senderType === "AI";
+
+  const {resolvedTheme} = useTheme();
 
   const providerInfo = useMemo(
     () => providerMetadata[message.provider.toLowerCase() as Provider],
@@ -245,7 +248,7 @@ export function MessageBubble({
       "size-3 sm:h-4 sm:w-4 p-0 bg-transparent hover:bg-transparent",
       isUser
         ? "text-primary-foreground/70 hover:text-primary-foreground/90"
-        : ""
+        : resolvedTheme === "light" ? "text-[#fafafa] hover:text-[#f2f2f2]" :""
     )
   };
 
@@ -261,7 +264,7 @@ export function MessageBubble({
         )}>
         {isAI && (
           <div className="mt-1 shrink-0">
-            <div className="text-foreground bg-background dark:bg-foreground dark:text-background flex size-6 items-center justify-center rounded-full sm:size-8">
+            <div className="bg-[#fafafa] text-[#0a0a0a] flex size-6 items-center justify-center rounded-full sm:size-8">
               <providerInfo.icon className="size-3 sm:size-4" />
             </div>
           </div>
@@ -269,7 +272,7 @@ export function MessageBubble({
         <div
           className={cn(
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
-            isUser ? "bg-muted text-foreground" : "bg-primary/50 text-background dark:bg-primary/40 dark:text-foreground"
+            isUser ? "bg-muted text-forground" : resolvedTheme === "light" ?"text-[#fefefe] bg-[#2252ba] ": "bg-[#0d2a6b] text-[#fafafa]"
           )}>
           {isMobile && (
             <Button
@@ -316,7 +319,7 @@ export function MessageBubble({
               "mt-2 flex items-center justify-between pt-1 text-xs",
               isUser
                 ? "text-foreground/90 [&_svg]:text-foreground/90"
-                : "text-muted-foreground"
+                : resolvedTheme === "light" ?"text-[#f2f2f2] hover:text-[#fafafa]":"text-muted-foreground hover:text-foreground"
             )}>
             {isAI ? (
               <>
@@ -325,7 +328,7 @@ export function MessageBubble({
                     textToCopy={contentToCopy ?? ""}
                     className={cn(
                       actionButtonVariants.default,
-                      "text-muted-foreground hover:text-foreground"
+                      resolvedTheme === "light" ? "text-[#f2f2f2] hover:text-[#fafafa]":"text-muted-foreground hover:text-foreground"
                     )}
                     iconClassName="text-xs"
                     disabled={isStreaming === true}
@@ -343,7 +346,8 @@ export function MessageBubble({
                         `transition-colors`,
                         action.isActive
                           ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                          resolvedTheme === "light" && action.isActive ? "text-[#ffffff]" : resolvedTheme ==="light" ? "text-[#f2f2f2] hover:text-[#fafafa]":"text-muted-foreground hover:text-foreground"
                       )}
                       onClick={action.onClick}>
                       <action.icon className="size-3" />
@@ -357,7 +361,7 @@ export function MessageBubble({
                       disabled={isStreaming === true || isPending}
                       className={cn(
                         actionButtonVariants.default,
-                        `text-muted-foreground hover:text-foreground transition-colors`
+                        resolvedTheme === "light" && action.isActive ? "text-[#ffffff]" : resolvedTheme ==="light" ? "text-[#f2f2f2] hover:text-[#fafafa]":"text-muted-foreground hover:text-foreground"
                       )}
                       onClick={action.onClick}>
                       <action.icon className="size-3" />
