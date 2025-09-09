@@ -14,6 +14,7 @@ import {
   AccordionTrigger,
   Sparkles
 } from "@t3-chat-clone/ui";
+import {useTheme} from "next-themes";
 
 interface ThinkingSectionProps {
   thinkingContent?: ReactNode;
@@ -82,13 +83,13 @@ export function ThinkingSection({
       }
     };
   }, [isThinking, duration]);
-
+const {resolvedTheme} = useTheme();
   const { get } = useCookiesCtx();
 
   const locale = get("locale") ?? "en-US";
 
   return (
-    <div className={cn("border-foreground/80 my-3 border-l-2 pl-4", className)}>
+    <div className={cn(resolvedTheme === "light" ? "border-[#fafafa]/90":"border-foreground/80","my-3 border-l-2 pl-4", className)}>
       <Accordion
         type="single"
         value={value}
@@ -96,7 +97,7 @@ export function ThinkingSection({
         collapsible
         className="w-full">
         <AccordionItem value="thinking" className="border-none">
-          <AccordionTrigger className="text-foreground/80 hover:text-foreground justify-start px-0 py-2 text-left hover:no-underline [&>svg]:hidden">
+          <AccordionTrigger className={cn(resolvedTheme ==="light" ?"text-[#fafafa]/95 hover:text-[#fafafa]" :"text-foreground/80 hover:text-foreground", " justify-start px-0 py-2 text-left hover:no-underline [&>svg]:hidden")}>
             <div className="flex items-center gap-2">
               <motion.svg
                 width="16"
@@ -161,7 +162,7 @@ export function ThinkingSection({
           </AccordionTrigger>
           <AccordionContent className="pb-0">
             <div className="mt-3 text-sm whitespace-pre-wrap">
-              <div className="text-foreground/85 leading-relaxed">
+              <div className={cn(resolvedTheme === "light" ?"text-[#fafafa] leading-relaxed": "text-foreground/85 leading-relaxed")}>
                 {typeof thinkingContent === "string" ? (
                   <span className="whitespace-pre-wrap">{thinkingContent}</span>
                 ) : (
