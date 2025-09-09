@@ -261,7 +261,7 @@ export function MessageBubble({
         )}>
         {isAI && (
           <div className="mt-1 shrink-0">
-            <div className="bg-foreground text-background flex size-6 items-center justify-center rounded-full sm:size-8">
+            <div className="text-foreground bg-background dark:bg-foreground dark:text-background flex size-6 items-center justify-center rounded-full sm:size-8">
               <providerInfo.icon className="size-3 sm:size-4" />
             </div>
           </div>
@@ -269,7 +269,7 @@ export function MessageBubble({
         <div
           className={cn(
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
-            isUser ? "bg-muted text-forground" : "bg-primary/40 text-foreground"
+            isUser ? "bg-muted text-foreground" : "bg-primary/50 text-background dark:bg-primary/40 dark:text-foreground"
           )}>
           {isMobile && (
             <Button
@@ -310,7 +310,7 @@ export function MessageBubble({
           <div className="leading-relaxed text-pretty whitespace-pre-wrap">
             {renderedContent ?? message.content}
           </div>
- <MessageAttachments attachments={attachments} isUser={isUser} />
+          <MessageAttachments attachments={attachments} isUser={isUser} />
           <div
             className={cn(
               "mt-2 flex items-center justify-between pt-1 text-xs",
