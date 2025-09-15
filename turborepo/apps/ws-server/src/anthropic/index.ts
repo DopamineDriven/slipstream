@@ -272,13 +272,13 @@ export class AnthropicService {
     user_location
   }: ProviderAnthropicChatRequestEntity) {
     const provider = "anthropic" as const;
-    let anthropicThinkingStartTime: number | null = null;
-    let anthropicThinkingDuration = 0;
-    let anthropicIsCurrentlyThinking = false;
-    let anthropicThinkingAgg = "";
-    let anthropicAgg = "";
-    let anthropicWebsearchToolUse = false;
-    let anthropicCi = 0;
+    let anthropicThinkingStartTime: number | null = null,
+      anthropicThinkingDuration = 0,
+      anthropicIsCurrentlyThinking = false,
+      anthropicThinkingAgg = "",
+      anthropicAgg = "",
+      anthropicWebsearchToolUse = false,
+      anthropicCi = 0;
 
     const anthropic = this.getClient(apiKey ?? undefined);
 
@@ -340,8 +340,6 @@ export class AnthropicService {
       if (chunk.type === "content_block_delta") {
         if (chunk.delta.type === "thinking_delta") {
           thinkingText = chunk.delta.thinking;
-
-          // Track thinking start
           if (
             !anthropicIsCurrentlyThinking &&
             anthropicThinkingStartTime === null
@@ -352,8 +350,6 @@ export class AnthropicService {
         }
         if (chunk.delta.type === "text_delta") {
           text = chunk.delta.text;
-
-          // Track thinking end when switching to regular text
           if (
             anthropicIsCurrentlyThinking &&
             anthropicThinkingStartTime !== null
@@ -379,8 +375,6 @@ export class AnthropicService {
       } else if (chunk.type === "message_delta") {
         done = chunk.delta.stop_reason;
       }
-
-      // Handle thinking chunks
       if (thinkingText) {
         if (webSearchRes) {
           anthropicCi += 1;
@@ -441,8 +435,6 @@ export class AnthropicService {
           done: false
         });
       }
-
-      // Handle regular text chunks
       if (text) {
         if (webSearchRes) {
           anthropicCi += 1;
@@ -581,7 +573,6 @@ export class AnthropicService {
           chunk: anthropicAgg,
           done: true
         });
-        // Clear saved state on successful completion
         void this.redis.del(`stream:state:${conversationId}`);
         break;
       }
