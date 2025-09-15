@@ -7,10 +7,6 @@ import type {
   VideoMetadata
 } from "@/generated/client/client.ts";
 import type { ConversationSingleton, UserData } from "@/types/index.ts";
-import { PrismaClient } from "@/generated/client/client.ts";
-import { ModelService } from "@/models/index.ts";
-import { Fs } from "@d0paminedriven/fs";
-import { PrismaPg } from "@prisma/adapter-pg";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -19,8 +15,12 @@ import type {
   Rm,
   RTC,
   XOR
-} from "@t3-chat-clone/types";
-import { EncryptionService } from "@t3-chat-clone/encryption";
+} from "@slipstream/types";
+import { PrismaClient } from "@/generated/client/client.ts";
+import { ModelService } from "@/models/index.ts";
+import { Fs } from "@d0paminedriven/fs";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { EncryptionService } from "@slipstream/encryption";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 
@@ -174,7 +174,12 @@ export class PrismaService extends ModelService {
     const msgArr = messages.map(t => {
       const { attachments, ...rest } = t;
       const cleanAttachments = attachments.map(att => {
-        const size = typeof att.size === "bigint" ? att.size === 0n ?  0 :  Number(att.size) : null;
+        const size =
+          typeof att.size === "bigint"
+            ? att.size === 0n
+              ? 0
+              : Number(att.size)
+            : null;
         const cleaned = { ...att, size };
         return cleaned;
       });

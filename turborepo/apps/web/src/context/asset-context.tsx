@@ -2,6 +2,7 @@
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { ImageSpecs } from "@/utils/img-extractor-client";
+import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
 import {
   createContext,
   useCallback,
@@ -13,8 +14,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
-import type { AssetOrigin, EventTypeMap } from "@t3-chat-clone/types";
-import { createDraftId } from "@t3-chat-clone/types";
+import { createDraftId } from "@slipstream/types";
 
 /** Public context shape — intentionally small (mirrors AIChatContext vibe) */
 interface AssetContextValue {

@@ -1,5 +1,6 @@
 "use client";
 
+import type { AllModelsUnion, Provider } from "@slipstream/types";
 import {
   createContext,
   ReactNode,
@@ -11,17 +12,23 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { defaultModelSelection, ModelSelection } from "@/lib/models";
-import type { AllModelsUnion, Provider } from "@t3-chat-clone/types";
 import {
   displayNameToModelId,
-  getModelIdByDisplayName,
-  getAllProviders
-} from "@t3-chat-clone/types";
+  getAllProviders,
+  getModelIdByDisplayName
+} from "@slipstream/types";
 
 interface ModelSelectionContextType {
   selectedModel: ModelSelection;
   isDrawerOpen: boolean;
-  providers: readonly ["anthropic", "gemini", "grok", "openai", "meta", "vercel"]
+  providers: readonly [
+    "anthropic",
+    "gemini",
+    "grok",
+    "openai",
+    "meta",
+    "vercel"
+  ];
   setSelectedModel: (m: ModelSelection) => void;
   updateProvider: (p: Provider) => void;
   updateModel: (name: string, id: AllModelsUnion) => void;
@@ -111,7 +118,7 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
     [closeDrawer, updateModel, updateProvider]
   );
 
-  const providers = useMemo(() => getAllProviders(),[]);
+  const providers = useMemo(() => getAllProviders(), []);
 
   return (
     <ModelSelectionContext.Provider

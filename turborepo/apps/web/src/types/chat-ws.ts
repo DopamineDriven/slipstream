@@ -1,5 +1,5 @@
+import type { EventTypeMap } from "@slipstream/types";
 import type { WithImplicitCoercion } from "buffer";
-import type { EventTypeMap } from "@t3-chat-clone/types";
 
 export type RawData = WithImplicitCoercion<string | ArrayLike<number>>;
 

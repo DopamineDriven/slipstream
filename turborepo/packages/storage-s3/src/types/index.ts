@@ -1,6 +1,9 @@
 import type { StorageClass } from "@aws-sdk/client-s3";
-import { S3ObjectId } from "@t3-chat-clone/types";
-import type { AwsCredentialIdentity, AwsCredentialIdentityProvider } from "@aws-sdk/types";
+import type {
+  AwsCredentialIdentity,
+  AwsCredentialIdentityProvider
+} from "@aws-sdk/types";
+import { S3ObjectId } from "@slipstream/types";
 
 export interface StorageConfig {
   accessKeyId: string;
@@ -10,7 +13,7 @@ export interface StorageConfig {
     wsAssets: string;
     pyGenAssets: string;
   };
-  isProd:boolean;
+  isProd: boolean;
   kmsKeyId?: string;
   defaultPresignExpiry?: number;
 }
@@ -52,7 +55,10 @@ export type StreamOptions = {
 };
 
 export interface StorageConfig {
-  credentials: AwsCredentialIdentity | AwsCredentialIdentityProvider | undefined
+  credentials:
+    | AwsCredentialIdentity
+    | AwsCredentialIdentityProvider
+    | undefined;
   region: string;
   buckets: {
     wsAssets: string;
@@ -89,14 +95,13 @@ export interface AssetMetadata {
   origin: AssetOriginType; // Using literal union type
 }
 
-
 export type PresignedDownloadOptions = {
   versionId?: string | null;
-  expiresIn?: number;                     // seconds (default 3600)
-  asAttachment?: boolean;                 // true => download; false => inline
-  filename?: string;                      // suggest a name to the browser
-  contentTypeOverride?: string;           // e.g., "image/png" if you want to force it
-  cacheControl?: string;                  // e.g., "private, max-age=60"
+  expiresIn?: number; // seconds (default 3600)
+  asAttachment?: boolean; // true => download; false => inline
+  filename?: string; // suggest a name to the browser
+  contentTypeOverride?: string; // e.g., "image/png" if you want to force it
+  cacheControl?: string; // e.g., "private, max-age=60"
 };
 
 export interface PresignMeta {

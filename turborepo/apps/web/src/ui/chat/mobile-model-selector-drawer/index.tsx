@@ -1,5 +1,6 @@
 "use client";
 
+import type { Provider } from "@slipstream/types";
 import { useEffect, useMemo, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { providerMetadata } from "@/lib/models";
@@ -14,18 +15,17 @@ import {
   DrawerTitle
 } from "@/ui/atoms/drawer";
 import { ModelUI } from "@/ui/chat/mobile-model-selector-drawer/model-badges";
-import type { Provider } from "@t3-chat-clone/types";
 import {
   displayNameToModelId,
   getDisplayNamesForProvider
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 import {
   Button,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 export function MobileModelSelectorDrawer() {
   const {

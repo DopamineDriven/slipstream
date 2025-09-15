@@ -1,6 +1,7 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
+import type { ImageSpecs } from "@slipstream/types";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
@@ -11,8 +12,7 @@ import {
   FileText,
   ImageIcon,
   X
-} from "@t3-chat-clone/ui";
-import type { ImageSpecs } from "@t3-chat-clone/types";
+} from "@slipstream/ui";
 
 interface AttachmentPreviewProps {
   attachments: AttachmentPreview[];
@@ -38,7 +38,7 @@ export function AttachmentPreviewComponent({
 }: AttachmentPreviewProps) {
   // Always call hook (React rules) but only use if external props not provided
   const internalData = useAssetMetadata({ attachments });
-  
+
   // Use external props if provided, otherwise fall back to hook data
   const thumbnails = externalThumbnails ?? internalData.thumbnails;
   const metadata = externalMetadata ?? internalData.metadata;

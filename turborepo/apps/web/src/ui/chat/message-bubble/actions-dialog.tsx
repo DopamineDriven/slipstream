@@ -10,7 +10,7 @@ import {
   DialogTitle,
   EllipsisHorizontal,
   ShareIcon as Share
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 interface MessageActionsDialogProps {
   open: boolean;

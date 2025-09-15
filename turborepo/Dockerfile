@@ -22,7 +22,7 @@ COPY . .
 # silence turbo telemetry banner
 ENV TURBO_TELEMETRY=0
 
-RUN turbo prune --scope=@t3-chat-clone/ws-server --docker
+RUN turbo prune --scope=@slipstream/ws-server --docker
 
 # install deps for pruned app
 FROM builder AS installer

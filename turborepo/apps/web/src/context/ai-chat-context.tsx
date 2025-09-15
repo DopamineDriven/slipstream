@@ -1,6 +1,11 @@
 // src/context/ai-chat-context.tsx
 "use client";
 
+import type { AllModelsUnion, EventTypeMap, Provider } from "@slipstream/types";
+import type {
+  AIChatRequest,
+  AIChatRequestUserMetadata
+} from "@slipstream/types/events";
 import {
   createContext,
   useCallback,
@@ -18,15 +23,6 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { getModel } from "@/lib/get-model";
 import { pathParser } from "@/lib/path-parser";
-import type {
-  AllModelsUnion,
-  EventTypeMap,
-  Provider
-} from "@t3-chat-clone/types";
-import type {
-  AIChatRequest,
-  AIChatRequestUserMetadata
-} from "@t3-chat-clone/types/events";
 
 interface StreamingMessage {
   id: string;

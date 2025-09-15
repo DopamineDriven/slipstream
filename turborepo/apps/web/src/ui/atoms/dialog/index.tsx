@@ -1,9 +1,9 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import { X } from "@t3-chat-clone/ui";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "@slipstream/ui";
 
 const Dialog = DialogPrimitive.Root;
 

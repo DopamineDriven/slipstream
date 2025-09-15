@@ -1,7 +1,6 @@
 "use client";
 
 // import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
-import { motion } from "motion/react";
 // import { useSession } from "next-auth/react";
 import {
   Button,
@@ -13,17 +12,15 @@ import {
   CardTitle,
   CirclePlus,
   Input
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
 
 interface ApiKeysTabPropss {
   isProUser?: boolean; // To control the Pro feature display
   className?: string;
 }
 
-
-export function ApiKeysTab({
-  className = ""
-}: ApiKeysTabPropss) {
+export function ApiKeysTab({ className = "" }: ApiKeysTabPropss) {
   // const { data: session } = useSession();
 
   return (
@@ -41,55 +38,54 @@ export function ApiKeysTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-       <>
-              <div className="space-y-2">
-                <label
-                  htmlFor="openai-key"
-                  className="text-brand-text-muted text-sm font-medium">
-                  OpenAI API Key
-                </label>
-                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                  <Input
-                    id="openai-key"
-                    type="password"
-                    inputMode="text"
-                    placeholder="sk-************************************************"
-                    className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-                  />
-                  <Button
-                    variant="outline"
-                    className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text">
-                    Save
-                  </Button>
-                </div>
+          <>
+            <div className="space-y-2">
+              <label
+                htmlFor="openai-key"
+                className="text-brand-text-muted text-sm font-medium">
+                OpenAI API Key
+              </label>
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                <Input
+                  id="openai-key"
+                  type="password"
+                  inputMode="text"
+                  placeholder="sk-************************************************"
+                  className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
+                />
+                <Button
+                  variant="outline"
+                  className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text">
+                  Save
+                </Button>
               </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="anthropic-key"
-                  className="text-brand-text-muted text-sm font-medium">
-                  Anthropic API Key
-                </label>
-                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                  <Input
-                    id="anthropic-key"
-                    type="password"
-                    placeholder="sk-ant-*******************************************"
-                    className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
-                  />
-                  <Button
-                    variant="outline"
-                    className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text">
-                    Save
-                  </Button>
-                </div>
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="anthropic-key"
+                className="text-brand-text-muted text-sm font-medium">
+                Anthropic API Key
+              </label>
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                <Input
+                  id="anthropic-key"
+                  type="password"
+                  placeholder="sk-ant-*******************************************"
+                  className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
+                />
+                <Button
+                  variant="outline"
+                  className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text">
+                  Save
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text w-full">
-                <CirclePlus className="mr-2 h-4 w-4" /> Add another model
-                key
-              </Button>
-            </>
+            </div>
+            <Button
+              variant="outline"
+              className="bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text w-full">
+              <CirclePlus className="mr-2 h-4 w-4" /> Add another model key
+            </Button>
+          </>
         </CardContent>
         <CardFooter className="text-brand-text-muted text-xs">
           Your API keys are stored securely and only used to communicate with

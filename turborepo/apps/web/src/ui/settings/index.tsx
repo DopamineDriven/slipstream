@@ -3,6 +3,20 @@
 import type { ValueKeyframesDefinition } from "motion-dom";
 import type { User as UserProps } from "next-auth";
 import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useElementDimensions } from "@/hooks/use-element-dimensions";
+import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have this hook
+import { cn } from "@/lib/utils";
+import { ClientWorkupProps } from "@/types/shared";
+// import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
+import { ApiKeysTab } from "@/ui/api-key-settings";
+import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
+import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
+import { ContactUsSettingsSection } from "@/ui/settings/sections/contact-us-settings-section";
+import { CustomizationSettingsSection } from "@/ui/settings/sections/customization-settings-section";
+import { SettingsNavigation } from "@/ui/settings/settings-navigation";
 import {
   ArrowLeft,
   Avatar,
@@ -16,23 +30,9 @@ import {
   PanelLeftClose,
   PanelRightClose,
   User
-} from "@t3-chat-clone/ui";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import dynamic from "next/dynamic";
-import Link from "next/link";
+} from "@slipstream/ui";
 import { AnimatePresence, motion, MotionStyle } from "motion/react";
 import { useTheme } from "next-themes";
-import { useElementDimensions } from "@/hooks/use-element-dimensions";
-import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have this hook
-import { cn } from "@/lib/utils";
-import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
-import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
-// import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
-import {ApiKeysTab} from "@/ui/api-key-settings";
-import { ContactUsSettingsSection } from "@/ui/settings/sections/contact-us-settings-section";
-import { CustomizationSettingsSection } from "@/ui/settings/sections/customization-settings-section";
-import { SettingsNavigation } from "@/ui/settings/settings-navigation";
-import { ClientWorkupProps } from "@/types/shared";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -85,7 +85,13 @@ const SECTION_TITLES = {
 
 type SectionId = keyof typeof SECTION_TITLES;
 
-export default function SettingsScaffold({ user, initialData }: { user?: UserProps;   initialData?: ClientWorkupProps }) {
+export default function SettingsScaffold({
+  user,
+  initialData
+}: {
+  user?: UserProps;
+  initialData?: ClientWorkupProps;
+}) {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
@@ -321,11 +327,9 @@ export default function SettingsScaffold({ user, initialData }: { user?: UserPro
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 sm:p-4 transition-all ease-in-out",
+              "bg-brand-sidebar border-brand-border z-20 flex h-full shrink-0 flex-col border-r p-3 transition-all ease-in-out sm:p-4",
               isSmallScreen ? "fixed" : "relative", // Fixed on small screens to overlay
-              isLeftSidebarEffectivelyCollapsed
-                ? "w-[5dvw]"
-                : "w-[20dvw]"
+              isLeftSidebarEffectivelyCollapsed ? "w-[5dvw]" : "w-[20dvw]"
             )}>
             <div
               className="mb-4 flex items-center"
@@ -407,7 +411,7 @@ export default function SettingsScaffold({ user, initialData }: { user?: UserPro
 
         <main
           ref={scrollContainerRef}
-          className="relative flex-1 space-y-8 overflow-y-auto p-2 sm:space-y-10 sm:p-6 mx-auto sm:max-w-8xl">
+          className="sm:max-w-8xl relative mx-auto flex-1 space-y-8 overflow-y-auto p-2 sm:space-y-10 sm:p-6">
           {settingsSectionsConfig.map(section => {
             const SectionComponent = section.component;
             return (
@@ -420,7 +424,11 @@ export default function SettingsScaffold({ user, initialData }: { user?: UserPro
                 <h2 className="text-brand-text-emphasis mb-4 text-2xl font-semibold sm:mb-6 sm:text-3xl">
                   {section.title}
                 </h2>
-                {section.title === "API Keys" ? <SectionComponent user={user} initialData={initialData} />  : <SectionComponent user={user} />}
+                {section.title === "API Keys" ? (
+                  <SectionComponent user={user} initialData={initialData} />
+                ) : (
+                  <SectionComponent user={user} />
+                )}
               </div>
             );
           })}

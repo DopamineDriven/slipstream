@@ -1,5 +1,5 @@
 import type { $Enums, Message as MessagePrisma } from "@prisma/client";
-import type { Providers, RTC } from "@t3-chat-clone/types";
+import type { Providers, RTC } from "@slipstream/types";
 
 export type ClientWorkupProps = {
   isSet: Record<Providers, boolean>;

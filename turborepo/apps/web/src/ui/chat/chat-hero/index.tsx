@@ -4,7 +4,6 @@
 import type { ModelSelection } from "@/lib/models";
 import type { User } from "next-auth";
 import { Logo } from "@/ui/logo";
-import { motion } from "motion/react";
 import {
   Card,
   CardContent,
@@ -12,7 +11,8 @@ import {
   FileText,
   MessageSquare,
   Sparkles
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
 
 const suggestedPrompts = [
   {
@@ -53,8 +53,7 @@ function getTimeOfDay(tz = "america/chicago", username?: string | null) {
   if (!hour) return `What's on your mind, ${u}?`;
   else if (hour >= 5 && hour < 12)
     return `What's on your mind this morning,${u}?`;
-  else if (hour >= 12 && hour < 17)
-    return `What's on your mind today, ${u}?`;
+  else if (hour >= 12 && hour < 17) return `What's on your mind today, ${u}?`;
   else if (hour >= 17 && hour <= 23)
     return `What's on your mind tonight, ${u}?`;
   else return `Hello Nightowl!`;

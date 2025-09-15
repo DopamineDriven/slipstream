@@ -1,5 +1,5 @@
 {
-  "name": "@t3-chat-clone/types",
+  "name": "@slipstream/types",
   "version": "1.0.0",
   "description": "convenient type definitions",
   "publishConfig": {
@@ -79,9 +79,9 @@
     "@d0paminedriven/fs": "^7.5.0"
   },
   "devDependencies": {
-    "@t3-chat-clone/eslint-config": "workspace:*",
-    "@t3-chat-clone/prettier-config": "workspace:*",
-    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.4.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.2",
@@ -96,5 +96,5 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   },
-  "prettier": "@t3-chat-clone/prettier-config"
+  "prettier": "@slipstream/prettier-config"
 }

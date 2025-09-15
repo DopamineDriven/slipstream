@@ -3,6 +3,7 @@
 import type { ClientWorkupProps } from "@/types/shared";
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
+import type { Providers as Provider } from "@slipstream/types";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
@@ -13,8 +14,6 @@ import {
 } from "@/ui/api-key-settings/constants";
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
-import { AnimatePresence, motion } from "motion/react";
-import type { Providers as Provider } from "@t3-chat-clone/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +39,8 @@ import {
   Switch,
   Trash,
   X
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { AnimatePresence, motion } from "motion/react";
 
 interface ApiKeysTabProps {
   className?: string;

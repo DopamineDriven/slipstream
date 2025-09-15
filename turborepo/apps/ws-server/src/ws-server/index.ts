@@ -7,12 +7,12 @@ import type {
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
+import type { EventTypeMap } from "@slipstream/types";
 import type { IncomingMessage } from "http";
 import type { RawData } from "ws";
 import { PrismaService } from "@/prisma/index.ts";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { WebSocket, WebSocketServer } from "ws";
-import type { EventTypeMap } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
 export class WSServer {
   private wss: WebSocketServer;

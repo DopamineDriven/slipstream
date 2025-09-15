@@ -1,10 +1,10 @@
 "use client";
 
-import type { ButtonProps } from "@t3-chat-clone/ui";
-import { Button, Copy } from "@t3-chat-clone/ui";
+import type { ButtonProps } from "@slipstream/ui";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Button, Copy } from "@slipstream/ui";
+import { motion } from "motion/react";
 
 export interface AnimatedCopyButtonProps
   extends Omit<ButtonProps, "onClick" | "children"> {
@@ -75,7 +75,11 @@ export function AnimatedCopyButton({
             : { opacity: 0, scale: 0.8, y: -5, pointerEvents: "none" }
         }
         transition={{ duration: 0.2, ease: "easeOut" }}>
-        <Copy width={initialIconSize*1.2} height={initialIconSize*1.2} className="size-3.5" />
+        <Copy
+          width={initialIconSize * 1.2}
+          height={initialIconSize * 1.2}
+          className="size-3.5"
+        />
       </motion.div>
       <motion.div
         className={iconContainerClasses}

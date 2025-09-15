@@ -1,9 +1,9 @@
 // src/context/api-keys-context.tsx
 "use client";
 
+import type { ClientContextWorkupProps } from "@slipstream/types";
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { ClientContextWorkupProps } from "@t3-chat-clone/types";
 
 interface ApiKeysContextValue {
   apiKeys: ClientContextWorkupProps;
@@ -17,7 +17,7 @@ const ApiKeysContext = createContext<ApiKeysContextValue | undefined>(
 export function ApiKeysProvider({
   children,
   userId
-}: Readonly<{ children: ReactNode; userId?: string; }>) {
+}: Readonly<{ children: ReactNode; userId?: string }>) {
   const [apiKeys, setApiKeys] = useState<ClientContextWorkupProps>();
   const [_isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +29,6 @@ export function ApiKeysProvider({
       }
 
       try {
-
         const response = await fetch(`/api/users/${userId}/api-keys`);
         console.log("fetching user api key data");
         if (response.ok) {

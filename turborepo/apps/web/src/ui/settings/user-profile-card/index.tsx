@@ -3,14 +3,14 @@
 import type { KeyboardShortcut } from "@/types/ui";
 import type { User } from "next-auth";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
   Button,
   Progress
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
 
 export interface UserProfileCardProps {
   user?: User;

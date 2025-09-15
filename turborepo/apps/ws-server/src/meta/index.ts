@@ -1,10 +1,10 @@
 import type { MessageSingleton } from "@/types/index.ts";
+import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { ProviderChatRequestEntity } from "@/types/index.ts";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { LlamaAPIClient } from "llama-api-client";
-import type { EventTypeMap, MetaModelIdUnion } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
 
 export class LlamaService {
   private defaultClient: LlamaAPIClient;

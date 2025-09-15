@@ -1,5 +1,5 @@
-import baseConfig from "@t3-chat-clone/eslint-config/base";
-import reactConfig from "@t3-chat-clone/eslint-config/react";
+import baseConfig from "@slipstream/eslint-config/base";
+import reactConfig from "@slipstream/eslint-config/react";
 
 /** @type {import('typescript-eslint').Config} */
 export default [

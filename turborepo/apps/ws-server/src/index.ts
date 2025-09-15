@@ -1,8 +1,8 @@
 import process from "node:process";
 import type { Signals } from "@/types/index.ts";
 import type { Socket } from "net";
+import { Credentials } from "@slipstream/credentials";
 import * as dotenv from "dotenv";
-import { Credentials } from "@t3-chat-clone/credentials";
 
 dotenv.config({ quiet: true });
 
@@ -49,7 +49,7 @@ async function exe() {
     const logger = LoggerService.getLoggerInstance(loggerConfig),
       log = logger.getPinoInstance();
 
-    const { S3Storage } = await import("@t3-chat-clone/storage-s3");
+    const { S3Storage } = await import("@slipstream/storage-s3");
 
     const s3 = S3Storage.getInstance(config, fs);
 
@@ -59,9 +59,7 @@ async function exe() {
       key = cred.unflattenNewlines(cfg.REDIS_CLIENT_KEY),
       host = cfg.REDIS_HOST;
 
-    const { EnhancedRedisPubSub } = await import(
-      "@t3-chat-clone/redis-service"
-    );
+    const { EnhancedRedisPubSub } = await import("@slipstream/redis-service");
 
     const redisInstance = new EnhancedRedisPubSub(
       redisUrl,

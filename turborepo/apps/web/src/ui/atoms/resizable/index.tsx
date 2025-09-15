@@ -2,8 +2,8 @@
 
 import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
+import { GripVertical } from "@slipstream/ui";
 import * as ResizablePrimitive from "react-resizable-panels";
-import { GripVertical } from "@t3-chat-clone/ui";
 
 type ResizablePanelProps<
   T extends "PanelResizeHandle" | "PanelGroup" | "Panel"

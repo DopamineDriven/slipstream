@@ -1,5 +1,5 @@
 {
-  "name": "@t3-chat-clone/ui",
+  "name": "@slipstream/ui",
   "version": "1.0.1",
   "description": "convenient ui components",
   "files": [
@@ -126,9 +126,9 @@
   "devDependencies": {
     "@d0paminedriven/fs": "^7.5.0",
     "@microsoft/api-extractor": "^7.52.13",
-    "@t3-chat-clone/eslint-config": "workspace:*",
-    "@t3-chat-clone/prettier-config": "workspace:*",
-    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^24.4.0",
     "@types/react": "^19.1.13",
@@ -152,5 +152,5 @@
     "tw-animate-css": "^1.3.8",
     "typescript": "^5.9.2"
   },
-  "prettier": "@t3-chat-clone/prettier-config"
+  "prettier": "@slipstream/prettier-config"
 }

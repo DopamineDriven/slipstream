@@ -1,11 +1,3 @@
-import {
-  AnthropicIcon,
-  GeminiIcon,
-  MetaIcon,
-  OpenAiIcon,
-  v0Icon,
-  XAiIcon
-} from "@/ui/icons";
 import type {
   AllModelsUnion,
   AnthropicDisplayNameUnion,
@@ -20,14 +12,22 @@ import type {
   OpenAiModelIdUnion,
   VercelDisplayNameUnion,
   VercelModelIdUnion
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
+import {
+  AnthropicIcon,
+  GeminiIcon,
+  MetaIcon,
+  OpenAiIcon,
+  v0Icon,
+  XAiIcon
+} from "@/ui/icons";
 import {
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
   displayNameToModelId,
   getDisplayNameByModelId,
   getModelIdByDisplayName
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 
 export type Provider = keyof typeof displayNameToModelId;
 

@@ -11,7 +11,6 @@ import {
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab"; // Example tab
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import { useSession } from "next-auth/react";
 import {
   Button,
   History,
@@ -19,7 +18,8 @@ import {
   Palette,
   User as UserIcon,
   X
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { useSession } from "next-auth/react";
 
 interface SettingsDrawerProps {
   isOpen: boolean;

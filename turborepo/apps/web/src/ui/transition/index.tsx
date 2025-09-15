@@ -12,8 +12,8 @@ import {
   v0Icon,
   XAiIcon
 } from "@/ui/icons";
+import { Provider } from "@slipstream/types";
 import * as motion from "motion/react-client";
-import { Provider } from "@t3-chat-clone/types";
 
 const PROVIDERS = [
   {

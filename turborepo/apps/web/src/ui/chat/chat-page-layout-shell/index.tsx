@@ -16,14 +16,14 @@ import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawe
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
-import { useTheme } from "next-themes";
 import {
   Button,
   PanelLeftClose as PanelLeft,
   Separator,
   Settings,
   ShareIcon as Share2
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { useTheme } from "next-themes";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -120,7 +120,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
             <div className="flex h-[100dvh] flex-col">
               <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex items-center">
-                  <SidebarTrigger className="-ml-2 z-30">
+                  <SidebarTrigger className="z-30 -ml-2">
                     <PanelLeft className="size-5" />
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>

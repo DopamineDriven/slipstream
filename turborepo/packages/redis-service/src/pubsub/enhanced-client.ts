@@ -8,8 +8,8 @@ import type {
   RedisArg,
   RedisClientEntity
 } from "@/service/types.ts";
+import type { EventTypeMap } from "@slipstream/types";
 import { RedisInstance } from "@/service/index.ts";
-import type { EventTypeMap } from "@t3-chat-clone/types";
 
 export class EnhancedRedisPubSub extends RedisInstance {
   private subscribers = new Map<

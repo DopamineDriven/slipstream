@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 export default {
   reactStrictMode: true,
   eslint: { ignoreDuringBuilds: false },
-  experimental: { optimizePackageImports: ["@t3-chat-clone/ui"] },
+  experimental: { optimizePackageImports: ["@slipstream/ui"] },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     loader: "default",

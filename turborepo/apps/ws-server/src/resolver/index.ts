@@ -1,6 +1,14 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import type { BufferLike, MessageSingleton, UserData } from "@/types/index.ts";
+import type {
+  AllModelsUnion,
+  AnyEvent,
+  AnyEventTypeUnion,
+  EventTypeMap,
+  ImageSpecs,
+  Provider
+} from "@slipstream/types";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -9,17 +17,9 @@ import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIFeatureService } from "@/xai/feature.ts";
+import { RedisChannels } from "@slipstream/redis-service";
+import { S3Storage } from "@slipstream/storage-s3";
 import { WebSocket } from "ws";
-import type {
-  AllModelsUnion,
-  AnyEvent,
-  AnyEventTypeUnion,
-  EventTypeMap,
-  ImageSpecs,
-  Provider
-} from "@t3-chat-clone/types";
-import { RedisChannels } from "@t3-chat-clone/redis-service";
-import { S3Storage } from "@t3-chat-clone/storage-s3";
 
 export class Resolver extends ModelService {
   constructor(

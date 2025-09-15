@@ -5,13 +5,13 @@ import type {
   ModelDisplayNameToModelId,
   ModelIdToModelDisplayName,
   Provider
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 import {
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
   getDisplayNamesForProvider,
   getModelsForProvider
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 
 // Re-export the strong typed ModelSelection interface
 export interface ModelSelection<T extends Provider = Provider> {
@@ -19,7 +19,6 @@ export interface ModelSelection<T extends Provider = Provider> {
   displayName: ModelDisplayNameToModelId<T>;
   modelId: ModelIdToModelDisplayName<T>;
 }
-
 
 // Type-safe default model selection
 export const defaultModelSelection = {

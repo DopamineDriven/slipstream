@@ -73,539 +73,539 @@ that's Sonnet's response
 but here are the complete logs:
 
 ```bash
-@t3-chat-clone/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached doge-404.jpg (55.29 KB)
-@t3-chat-clone/ws-server:dev: [Asset Attached] Created attachment pyk9zxpeqb4y6z7e23twctz7 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: asset_upload_progress {
-@t3-chat-clone/ws-server:dev:   type: 'asset_upload_progress',
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   conversationId: 'm66xxf9fxsou0mu1qjs7hqmi',
-@t3-chat-clone/ws-server:dev:   attachmentId: 'pyk9zxpeqb4y6z7e23twctz7',
-@t3-chat-clone/ws-server:dev:   batchId: 'batch_mf0l9n60',
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   progress: 100,
-@t3-chat-clone/ws-server:dev:   bytesUploaded: 56617,
-@t3-chat-clone/ws-server:dev:   totalBytes: 56617,
-@t3-chat-clone/ws-server:dev:   elapsedMs: 0
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: false
-@t3-chat-clone/ws-server:dev: {
-@t3-chat-clone/ws-server:dev:   bucket: 'ws-server-assets-dev',
-@t3-chat-clone/ws-server:dev:   cacheControl: undefined,
-@t3-chat-clone/ws-server:dev:   checksumAlgo: 'CRC64NVME',
-@t3-chat-clone/ws-server:dev:   checksumSha256: '8QOWFQolIhI=',
-@t3-chat-clone/ws-server:dev:   contentDisposition: undefined,
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   expiresAt: 2025-09-08T04:03:58.728Z,
-@t3-chat-clone/ws-server:dev:   s3LastModified: 2025-09-01T04:03:58.000Z,
-@t3-chat-clone/ws-server:dev:   storageClass: undefined,
-@t3-chat-clone/ws-server:dev:   id: 'pyk9zxpeqb4y6z7e23twctz7',
-@t3-chat-clone/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040358Z&X-Amz-Expires=604800&X-Amz-Signature=1521cc29f827a15fee12611d21791fc19c8e0753e682511af927a059d2dc9333&X-Amz-SignedHeaders=host&versionId=UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM&x-amz-checksum-mode=ENABLED&x-id=GetObject',
-@t3-chat-clone/ws-server:dev:   region: 'us-east-1',
-@t3-chat-clone/ws-server:dev:   uploadDuration: 0,
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   versionId: 'UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM',
-@t3-chat-clone/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg#UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM',
-@t3-chat-clone/ws-server:dev:   etag: '41bece198cb3498b2d1a343bd2a915f9',
-@t3-chat-clone/ws-server:dev:   status: 'READY',
-@t3-chat-clone/ws-server:dev:   ext: 'jpg',
-@t3-chat-clone/ws-server:dev:   mime: 'image/jpeg',
-@t3-chat-clone/ws-server:dev:   size: 56617n
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:04:09.570 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: ERROR [2025-08-31 23:04:10.075 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "ApiError",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:       "name": "ApiError",
-@t3-chat-clone/ws-server:dev:       "status": 400
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: WARN [2025-08-31 23:04:10.146 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "Error",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:04:10.182 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: ERROR [2025-08-31 23:04:10.354 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "ApiError",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\\n\",\"status\":\"INVALID_ARGUMENT\"}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           ApiError: {"error":{"code":400,"message":"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\n","status":"INVALID_ARGUMENT"}}
-@t3-chat-clone/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:388:43)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
-@t3-chat-clone/ws-server:dev:       "name": "ApiError",
-@t3-chat-clone/ws-server:dev:       "status": 400
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: WARN [2025-08-31 23:04:10.386 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "Error",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\\n\",\"status\":\"INVALID_ARGUMENT\"}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           Error: {"error":{"code":400,"message":"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\n","status":"INVALID_ARGUMENT"}}
-@t3-chat-clone/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:388:43)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:04:10.386 -0500]:  15005
-@t3-chat-clone/ws-server:dev:     0: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "Gemini what do you see in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     1: {
-@t3-chat-clone/ws-server:dev:       "role": "model",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn image of a five-pointed star, but it's not just any star. It's an \"impossible object\" or an optical illusion. Here's a breakdown of what I see:\n\n*   **Geometric Shape:** The main subject is a classic five-pointed star.\n*   **Impossible Construction:** The arms of the star are interwoven in a way that couldn't exist in three-dimensional space. Each arm seems to pass over and under the others in a continuous loop, creating a paradox that is fascinating to look at. This is similar to other famous impossible objects like the Penrose triangle.\n*   **Artistic Style:** The image is a black and white drawing, likely done with pencil or ink. The shading and lines are used to create a sense of depth and volume, which enhances the illusion of it being a solid, three-dimensional object. The visible texture from the drawing medium gives it a hand-crafted feel.\n\nIn essence, you're looking at a clever piece of art that plays with perception and geometry to create a visually engaging and thought-provoking image."
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     2: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "and what do you see in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: [nodemon] restarting due to changes...
-@t3-chat-clone/ws-server:dev: [nodemon] starting `tsx src/index.ts --exit-child`
-@t3-chat-clone/ws-server:dev: Redis connected
-@t3-chat-clone/ws-server:dev: Redis ready to accept commands
-@t3-chat-clone/ws-server:dev: HTTP+WebSocket server listening on port 4000
-@t3-chat-clone/ws-server:dev: User nrr6h4r4480f6kviycyo1zhf connected from Chicago, US (Illinois region) having postal code 60010 in the America/Chicago timezone with an approx location of 41.8338486,-87.8966849
-@t3-chat-clone/ws-server:dev: [nodemon] restarting due to changes...
-@t3-chat-clone/ws-server:dev: [nodemon] starting `tsx src/index.ts --exit-child`
-@t3-chat-clone/ws-server:dev: Redis connected
-@t3-chat-clone/ws-server:dev: Redis ready to accept commands
-@t3-chat-clone/ws-server:dev: HTTP+WebSocket server listening on port 4000
-@t3-chat-clone/ws-server:dev: User nrr6h4r4480f6kviycyo1zhf connected from Chicago, US (Illinois region) having postal code 60010 in the America/Chicago timezone with an approx location of 41.8338486,-87.8966849
-@t3-chat-clone/ws-server:dev: user nrr6h4r4480f6kviycyo1zhf from Chicago, Illinois 60010 US pasted an asset in chat driving this event.
-@t3-chat-clone/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached doge-404.jpg (55.29 KB)
-@t3-chat-clone/ws-server:dev: [Asset Attached] Created attachment vcnita3ywd5emzbln36l0xz4 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: asset_upload_progress {
-@t3-chat-clone/ws-server:dev:   type: 'asset_upload_progress',
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   conversationId: 'm66xxf9fxsou0mu1qjs7hqmi',
-@t3-chat-clone/ws-server:dev:   attachmentId: 'vcnita3ywd5emzbln36l0xz4',
-@t3-chat-clone/ws-server:dev:   batchId: 'batch_mf0l9n60',
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   progress: 100,
-@t3-chat-clone/ws-server:dev:   bytesUploaded: 56617,
-@t3-chat-clone/ws-server:dev:   totalBytes: 56617,
-@t3-chat-clone/ws-server:dev:   elapsedMs: 0
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: false
-@t3-chat-clone/ws-server:dev: {
-@t3-chat-clone/ws-server:dev:   bucket: 'ws-server-assets-dev',
-@t3-chat-clone/ws-server:dev:   cacheControl: undefined,
-@t3-chat-clone/ws-server:dev:   checksumAlgo: 'CRC64NVME',
-@t3-chat-clone/ws-server:dev:   checksumSha256: '8QOWFQolIhI=',
-@t3-chat-clone/ws-server:dev:   contentDisposition: undefined,
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   expiresAt: 2025-09-08T04:05:45.697Z,
-@t3-chat-clone/ws-server:dev:   s3LastModified: 2025-09-01T04:05:45.000Z,
-@t3-chat-clone/ws-server:dev:   storageClass: undefined,
-@t3-chat-clone/ws-server:dev:   id: 'vcnita3ywd5emzbln36l0xz4',
-@t3-chat-clone/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040545Z&X-Amz-Expires=604800&X-Amz-Signature=9405a4cc6e0195c39b11929da0f8c831666c24aaddff6459bedf139e8c051e71&X-Amz-SignedHeaders=host&versionId=.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb&x-amz-checksum-mode=ENABLED&x-id=GetObject',
-@t3-chat-clone/ws-server:dev:   region: 'us-east-1',
-@t3-chat-clone/ws-server:dev:   uploadDuration: 0,
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
-@t3-chat-clone/ws-server:dev:   versionId: '.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb',
-@t3-chat-clone/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg#.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb',
-@t3-chat-clone/ws-server:dev:   etag: '41bece198cb3498b2d1a343bd2a915f9',
-@t3-chat-clone/ws-server:dev:   status: 'READY',
-@t3-chat-clone/ws-server:dev:   ext: 'jpg',
-@t3-chat-clone/ws-server:dev:   mime: 'image/jpeg',
-@t3-chat-clone/ws-server:dev:   size: 56617n
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:05:52.060 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: ERROR [2025-08-31 23:05:52.587 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "ApiError",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:       "name": "ApiError",
-@t3-chat-clone/ws-server:dev:       "status": 400
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: WARN [2025-08-31 23:05:52.656 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "Error",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:05:52.691 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: ERROR [2025-08-31 23:05:52.886 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "ApiError",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
-@t3-chat-clone/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:       "name": "ApiError",
-@t3-chat-clone/ws-server:dev:       "status": 400
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: WARN [2025-08-31 23:05:52.918 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev:     err: {
-@t3-chat-clone/ws-server:dev:       "type": "Error",
-@t3-chat-clone/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
-@t3-chat-clone/ws-server:dev:       "stack":
-@t3-chat-clone/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
-@t3-chat-clone/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
-@t3-chat-clone/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
-@t3-chat-clone/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:05:52.952 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:05:55.814 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     0: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "Gemini what do you see in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     1: {
-@t3-chat-clone/ws-server:dev:       "role": "model",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn image of a five-pointed star, but it's not just any star. It's an \"impossible object\" or an optical illusion. Here's a breakdown of what I see:\n\n*   **Geometric Shape:** The main subject is a classic five-pointed star.\n*   **Impossible Construction:** The arms of the star are interwoven in a way that couldn't exist in three-dimensional space. Each arm seems to pass over and under the others in a continuous loop, creating a paradox that is fascinating to look at. This is similar to other famous impossible objects like the Penrose triangle.\n*   **Artistic Style:** The image is a black and white drawing, likely done with pencil or ink. The shading and lines are used to create a sense of depth and volume, which enhances the illusion of it being a solid, three-dimensional object. The visible texture from the drawing medium gives it a hand-crafted feel.\n\nIn essence, you're looking at a clever piece of art that plays with perception and geometry to create a visually engaging and thought-provoking image."
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     2: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "and what do you see in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     3: {
-@t3-chat-clone/ws-server:dev:       "role": "model",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn illustration of a five-pointed star that is designed as an impossible object, also known as an optical illusion. Here's a breakdown of what's depicted:\n\n*   **Central Object:** The image's subject is a five-pointed star.\n*   **Impossible Geometry:** The arms of the star are drawn to appear interwoven in a way that could not exist in three-dimensional reality. Each arm seems to simultaneously be over and under the arms it crosses, creating a visual paradox. This is conceptually similar to other impossible figures like the Penrose triangle or the impossible staircase.\n*   **Artistic Style:** It's a black and white drawing, likely created with pencil or charcoal on paper. The artist used shading to give the star a sense of depth and a three-dimensional quality, which reinforces the optical illusion. The visible texture of the pencil strokes gives it a hand-crafted, sketch-like feel."
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     4: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/nl5mykhkyxnw",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/egbkrkz6w3cu",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "and how about in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: user nrr6h4r4480f6kviycyo1zhf from Chicago, Illinois 60010 US pasted an asset in chat driving this event.
-@t3-chat-clone/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached danger.gif (513.97 KB)
-@t3-chat-clone/ws-server:dev: [Asset Attached] Created attachment gbqc3zsp8crqli55ytknwab6 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: asset_upload_progress {
-@t3-chat-clone/ws-server:dev:   type: 'asset_upload_progress',
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   conversationId: 'new-chat',
-@t3-chat-clone/ws-server:dev:   attachmentId: 'gbqc3zsp8crqli55ytknwab6',
-@t3-chat-clone/ws-server:dev:   batchId: 'batch_mf0l9n60',
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~new-chat~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   progress: 100,
-@t3-chat-clone/ws-server:dev:   bytesUploaded: 526309,
-@t3-chat-clone/ws-server:dev:   totalBytes: 526309,
-@t3-chat-clone/ws-server:dev:   elapsedMs: 0
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: broadcastRaw error
-@t3-chat-clone/ws-server:dev: false
-@t3-chat-clone/ws-server:dev: {
-@t3-chat-clone/ws-server:dev:   bucket: 'ws-server-assets-dev',
-@t3-chat-clone/ws-server:dev:   cacheControl: undefined,
-@t3-chat-clone/ws-server:dev:   checksumAlgo: 'CRC64NVME',
-@t3-chat-clone/ws-server:dev:   checksumSha256: 'Y7PHYN7+WSQ=',
-@t3-chat-clone/ws-server:dev:   contentDisposition: undefined,
-@t3-chat-clone/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~new-chat~batch_mf0l9n60~0',
-@t3-chat-clone/ws-server:dev:   expiresAt: 2025-09-08T04:09:37.098Z,
-@t3-chat-clone/ws-server:dev:   s3LastModified: 2025-09-01T04:09:36.000Z,
-@t3-chat-clone/ws-server:dev:   storageClass: undefined,
-@t3-chat-clone/ws-server:dev:   id: 'gbqc3zsp8crqli55ytknwab6',
-@t3-chat-clone/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
-@t3-chat-clone/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040937Z&X-Amz-Expires=604800&X-Amz-Signature=0d20b8272716c8d75b1c2f85b8cd1376323dfd6242dc5e0d3a6150b3f9d9f1a5&X-Amz-SignedHeaders=host&versionId=8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm&x-amz-checksum-mode=ENABLED&x-id=GetObject',
-@t3-chat-clone/ws-server:dev:   region: 'us-east-1',
-@t3-chat-clone/ws-server:dev:   uploadDuration: 0,
-@t3-chat-clone/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
-@t3-chat-clone/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
-@t3-chat-clone/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
-@t3-chat-clone/ws-server:dev:   versionId: '8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm',
-@t3-chat-clone/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif#8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm',
-@t3-chat-clone/ws-server:dev:   etag: '2457ce2c335af8bc28db06b7039eef98',
-@t3-chat-clone/ws-server:dev:   status: 'READY',
-@t3-chat-clone/ws-server:dev:   ext: 'gif',
-@t3-chat-clone/ws-server:dev:   mime: 'image/gif',
-@t3-chat-clone/ws-server:dev:   size: 526309n
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:10:16.241 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     0: {
-@t3-chat-clone/ws-server:dev:       "id": "epu92fyoxd8l6mm6xtnivk4d",
-@t3-chat-clone/ws-server:dev:       "conversationId": "ik10zyp788b8v91ekawb2e62",
-@t3-chat-clone/ws-server:dev:       "userId": "nrr6h4r4480f6kviycyo1zhf",
-@t3-chat-clone/ws-server:dev:       "senderType": "USER",
-@t3-chat-clone/ws-server:dev:       "provider": "GEMINI",
-@t3-chat-clone/ws-server:dev:       "model": "gemini-2.5-pro",
-@t3-chat-clone/ws-server:dev:       "userKeyId": "w77r6tefzhojljoys7wuxpvs",
-@t3-chat-clone/ws-server:dev:       "content": "Gemini what  do you see in this image?",
-@t3-chat-clone/ws-server:dev:       "thinkingText": null,
-@t3-chat-clone/ws-server:dev:       "thinkingDuration": null,
-@t3-chat-clone/ws-server:dev:       "liked": false,
-@t3-chat-clone/ws-server:dev:       "disliked": false,
-@t3-chat-clone/ws-server:dev:       "tryAgain": false,
-@t3-chat-clone/ws-server:dev:       "createdAt": "2025-09-01T04:10:14.353Z",
-@t3-chat-clone/ws-server:dev:       "updatedAt": "2025-09-01T04:10:14.353Z"
-@t3-chat-clone/ws-server:dev:     }
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: AI Stream Error ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Request contains an invalid argument.\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n","code":400,"status":"Bad Request"}}
-@t3-chat-clone/ws-server:dev:     at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
-@t3-chat-clone/ws-server:dev:     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-@t3-chat-clone/ws-server:dev:     at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:512:9)
-@t3-chat-clone/ws-server:dev:     at async Models.Models.generateContentStream (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/models.ts:204:14)
-@t3-chat-clone/ws-server:dev:     at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:415:21)
-@t3-chat-clone/ws-server:dev:     at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
-@t3-chat-clone/ws-server:dev:     at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9) {
-@t3-chat-clone/ws-server:dev:   status: 400
-@t3-chat-clone/ws-server:dev: }
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:10:18.112 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:10:18.146 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:10:18.180 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     service: "ws-server"
-@t3-chat-clone/ws-server:dev:     environment: false
-@t3-chat-clone/ws-server:dev:     region: "us-east-1"
-@t3-chat-clone/ws-server:dev:     node_version: "v24.7.0"
-@t3-chat-clone/ws-server:dev: DEBUG [2025-08-31 23:10:18.180 -0500]:  16927
-@t3-chat-clone/ws-server:dev:     0: {
-@t3-chat-clone/ws-server:dev:       "role": "user",
-@t3-chat-clone/ws-server:dev:       "parts": [
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/a8fk8sgll2k6",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/gif"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/nl5mykhkyxnw",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "fileData": {
-@t3-chat-clone/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/egbkrkz6w3cu",
-@t3-chat-clone/ws-server:dev:             "mimeType": "image/jpeg"
-@t3-chat-clone/ws-server:dev:           }
-@t3-chat-clone/ws-server:dev:         },
-@t3-chat-clone/ws-server:dev:         {
-@t3-chat-clone/ws-server:dev:           "text": "Gemini what  do you see in this image?"
-@t3-chat-clone/ws-server:dev:         }
-@t3-chat-clone/ws-server:dev:       ]
-@t3-chat-clone/ws-server:dev:     }
+@slipstream/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached doge-404.jpg (55.29 KB)
+@slipstream/ws-server:dev: [Asset Attached] Created attachment pyk9zxpeqb4y6z7e23twctz7 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: asset_upload_progress {
+@slipstream/ws-server:dev:   type: 'asset_upload_progress',
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   conversationId: 'm66xxf9fxsou0mu1qjs7hqmi',
+@slipstream/ws-server:dev:   attachmentId: 'pyk9zxpeqb4y6z7e23twctz7',
+@slipstream/ws-server:dev:   batchId: 'batch_mf0l9n60',
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   progress: 100,
+@slipstream/ws-server:dev:   bytesUploaded: 56617,
+@slipstream/ws-server:dev:   totalBytes: 56617,
+@slipstream/ws-server:dev:   elapsedMs: 0
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: false
+@slipstream/ws-server:dev: {
+@slipstream/ws-server:dev:   bucket: 'ws-server-assets-dev',
+@slipstream/ws-server:dev:   cacheControl: undefined,
+@slipstream/ws-server:dev:   checksumAlgo: 'CRC64NVME',
+@slipstream/ws-server:dev:   checksumSha256: '8QOWFQolIhI=',
+@slipstream/ws-server:dev:   contentDisposition: undefined,
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   expiresAt: 2025-09-08T04:03:58.728Z,
+@slipstream/ws-server:dev:   s3LastModified: 2025-09-01T04:03:58.000Z,
+@slipstream/ws-server:dev:   storageClass: undefined,
+@slipstream/ws-server:dev:   id: 'pyk9zxpeqb4y6z7e23twctz7',
+@slipstream/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
+@slipstream/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040358Z&X-Amz-Expires=604800&X-Amz-Signature=1521cc29f827a15fee12611d21791fc19c8e0753e682511af927a059d2dc9333&X-Amz-SignedHeaders=host&versionId=UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM&x-amz-checksum-mode=ENABLED&x-id=GetObject',
+@slipstream/ws-server:dev:   region: 'us-east-1',
+@slipstream/ws-server:dev:   uploadDuration: 0,
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
+@slipstream/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg',
+@slipstream/ws-server:dev:   versionId: 'UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM',
+@slipstream/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699437786-doge-404.jpg#UX9L2WllxaU5XgS2QDDXhHF5V9E._OMM',
+@slipstream/ws-server:dev:   etag: '41bece198cb3498b2d1a343bd2a915f9',
+@slipstream/ws-server:dev:   status: 'READY',
+@slipstream/ws-server:dev:   ext: 'jpg',
+@slipstream/ws-server:dev:   mime: 'image/jpeg',
+@slipstream/ws-server:dev:   size: 56617n
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:04:09.570 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: ERROR [2025-08-31 23:04:10.075 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "ApiError",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
+@slipstream/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
+@slipstream/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
+@slipstream/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:       "name": "ApiError",
+@slipstream/ws-server:dev:       "status": 400
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: WARN [2025-08-31 23:04:10.146 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "Error",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:04:10.182 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: ERROR [2025-08-31 23:04:10.354 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "ApiError",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\\n\",\"status\":\"INVALID_ARGUMENT\"}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           ApiError: {"error":{"code":400,"message":"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\n","status":"INVALID_ARGUMENT"}}
+@slipstream/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
+@slipstream/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
+@slipstream/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
+@slipstream/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:388:43)
+@slipstream/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
+@slipstream/ws-server:dev:       "name": "ApiError",
+@slipstream/ws-server:dev:       "status": 400
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: WARN [2025-08-31 23:04:10.386 -0500]:  15005
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "Error",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\\n\",\"status\":\"INVALID_ARGUMENT\"}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           Error: {"error":{"code":400,"message":"* CreateFileRequest.file.name: File resource name may only contain lowercase alphanumeric characters or dashes (-) and cannot begin or end with a dash. You can set the display_name which is not constrained by this format.\n","status":"INVALID_ARGUMENT"}}
+@slipstream/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:388:43)
+@slipstream/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:04:10.386 -0500]:  15005
+@slipstream/ws-server:dev:     0: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "Gemini what do you see in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     1: {
+@slipstream/ws-server:dev:       "role": "model",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn image of a five-pointed star, but it's not just any star. It's an \"impossible object\" or an optical illusion. Here's a breakdown of what I see:\n\n*   **Geometric Shape:** The main subject is a classic five-pointed star.\n*   **Impossible Construction:** The arms of the star are interwoven in a way that couldn't exist in three-dimensional space. Each arm seems to pass over and under the others in a continuous loop, creating a paradox that is fascinating to look at. This is similar to other famous impossible objects like the Penrose triangle.\n*   **Artistic Style:** The image is a black and white drawing, likely done with pencil or ink. The shading and lines are used to create a sense of depth and volume, which enhances the illusion of it being a solid, three-dimensional object. The visible texture from the drawing medium gives it a hand-crafted feel.\n\nIn essence, you're looking at a clever piece of art that plays with perception and geometry to create a visually engaging and thought-provoking image."
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     2: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "and what do you see in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: [nodemon] restarting due to changes...
+@slipstream/ws-server:dev: [nodemon] starting `tsx src/index.ts --exit-child`
+@slipstream/ws-server:dev: Redis connected
+@slipstream/ws-server:dev: Redis ready to accept commands
+@slipstream/ws-server:dev: HTTP+WebSocket server listening on port 4000
+@slipstream/ws-server:dev: User nrr6h4r4480f6kviycyo1zhf connected from Chicago, US (Illinois region) having postal code 60010 in the America/Chicago timezone with an approx location of 41.8338486,-87.8966849
+@slipstream/ws-server:dev: [nodemon] restarting due to changes...
+@slipstream/ws-server:dev: [nodemon] starting `tsx src/index.ts --exit-child`
+@slipstream/ws-server:dev: Redis connected
+@slipstream/ws-server:dev: Redis ready to accept commands
+@slipstream/ws-server:dev: HTTP+WebSocket server listening on port 4000
+@slipstream/ws-server:dev: User nrr6h4r4480f6kviycyo1zhf connected from Chicago, US (Illinois region) having postal code 60010 in the America/Chicago timezone with an approx location of 41.8338486,-87.8966849
+@slipstream/ws-server:dev: user nrr6h4r4480f6kviycyo1zhf from Chicago, Illinois 60010 US pasted an asset in chat driving this event.
+@slipstream/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached doge-404.jpg (55.29 KB)
+@slipstream/ws-server:dev: [Asset Attached] Created attachment vcnita3ywd5emzbln36l0xz4 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: asset_upload_progress {
+@slipstream/ws-server:dev:   type: 'asset_upload_progress',
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   conversationId: 'm66xxf9fxsou0mu1qjs7hqmi',
+@slipstream/ws-server:dev:   attachmentId: 'vcnita3ywd5emzbln36l0xz4',
+@slipstream/ws-server:dev:   batchId: 'batch_mf0l9n60',
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   progress: 100,
+@slipstream/ws-server:dev:   bytesUploaded: 56617,
+@slipstream/ws-server:dev:   totalBytes: 56617,
+@slipstream/ws-server:dev:   elapsedMs: 0
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: false
+@slipstream/ws-server:dev: {
+@slipstream/ws-server:dev:   bucket: 'ws-server-assets-dev',
+@slipstream/ws-server:dev:   cacheControl: undefined,
+@slipstream/ws-server:dev:   checksumAlgo: 'CRC64NVME',
+@slipstream/ws-server:dev:   checksumSha256: '8QOWFQolIhI=',
+@slipstream/ws-server:dev:   contentDisposition: undefined,
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~m66xxf9fxsou0mu1qjs7hqmi~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   expiresAt: 2025-09-08T04:05:45.697Z,
+@slipstream/ws-server:dev:   s3LastModified: 2025-09-01T04:05:45.000Z,
+@slipstream/ws-server:dev:   storageClass: undefined,
+@slipstream/ws-server:dev:   id: 'vcnita3ywd5emzbln36l0xz4',
+@slipstream/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
+@slipstream/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040545Z&X-Amz-Expires=604800&X-Amz-Signature=9405a4cc6e0195c39b11929da0f8c831666c24aaddff6459bedf139e8c051e71&X-Amz-SignedHeaders=host&versionId=.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb&x-amz-checksum-mode=ENABLED&x-id=GetObject',
+@slipstream/ws-server:dev:   region: 'us-east-1',
+@slipstream/ws-server:dev:   uploadDuration: 0,
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
+@slipstream/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg',
+@slipstream/ws-server:dev:   versionId: '.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb',
+@slipstream/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699544367-doge-404.jpg#.TIiJW1ER39cyW6B.XP0b2kZFQzmIHsb',
+@slipstream/ws-server:dev:   etag: '41bece198cb3498b2d1a343bd2a915f9',
+@slipstream/ws-server:dev:   status: 'READY',
+@slipstream/ws-server:dev:   ext: 'jpg',
+@slipstream/ws-server:dev:   mime: 'image/jpeg',
+@slipstream/ws-server:dev:   size: 56617n
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:05:52.060 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: ERROR [2025-08-31 23:05:52.587 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "ApiError",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
+@slipstream/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
+@slipstream/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
+@slipstream/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:       "name": "ApiError",
+@slipstream/ws-server:dev:       "status": 400
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: WARN [2025-08-31 23:05:52.656 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "Error",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:05:52.691 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: ERROR [2025-08-31 23:05:52.886 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "ApiError",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           ApiError: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:490:9)
+@slipstream/ws-server:dev:               at async ApiClient.fetchUploadUrl (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:713:26)
+@slipstream/ws-server:dev:               at async ApiClient.uploadFile (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:675:23)
+@slipstream/ws-server:dev:               at async GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:101:28)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:       "name": "ApiError",
+@slipstream/ws-server:dev:       "status": 400
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: WARN [2025-08-31 23:05:52.918 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev:     err: {
+@slipstream/ws-server:dev:       "type": "Error",
+@slipstream/ws-server:dev:       "message": "{\"error\":{\"code\":400,\"message\":\"API key not valid. Please pass a valid API key.\",\"status\":\"INVALID_ARGUMENT\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"API_KEY_INVALID\",\"domain\":\"googleapis.com\",\"metadata\":{\"service\":\"generativelanguage.googleapis.com\"}},{\"@type\":\"type.googleapis.com/google.rpc.LocalizedMessage\",\"locale\":\"en-US\",\"message\":\"API key not valid. Please pass a valid API key.\"}]}}",
+@slipstream/ws-server:dev:       "stack":
+@slipstream/ws-server:dev:           Error: {"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]}}
+@slipstream/ws-server:dev:               at GeminiService.uploadRemoteAssetToGoogle (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:115:13)
+@slipstream/ws-server:dev:               at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:               at async GeminiService.ensureAssetUploaded (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:290:28)
+@slipstream/ws-server:dev:               at async GeminiService.formatHistoryForSession (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:157:47)
+@slipstream/ws-server:dev:               at async GeminiService.getHistoryAndInstruction (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:234:18)
+@slipstream/ws-server:dev:               at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:373:44)
+@slipstream/ws-server:dev:               at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:               at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9)
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:05:52.952 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:05:55.814 -0500]:  16927
+@slipstream/ws-server:dev:     0: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "Gemini what do you see in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     1: {
+@slipstream/ws-server:dev:       "role": "model",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn image of a five-pointed star, but it's not just any star. It's an \"impossible object\" or an optical illusion. Here's a breakdown of what I see:\n\n*   **Geometric Shape:** The main subject is a classic five-pointed star.\n*   **Impossible Construction:** The arms of the star are interwoven in a way that couldn't exist in three-dimensional space. Each arm seems to pass over and under the others in a continuous loop, creating a paradox that is fascinating to look at. This is similar to other famous impossible objects like the Penrose triangle.\n*   **Artistic Style:** The image is a black and white drawing, likely done with pencil or ink. The shading and lines are used to create a sense of depth and volume, which enhances the illusion of it being a solid, three-dimensional object. The visible texture from the drawing medium gives it a hand-crafted feel.\n\nIn essence, you're looking at a clever piece of art that plays with perception and geometry to create a visually engaging and thought-provoking image."
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     2: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "and what do you see in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     3: {
+@slipstream/ws-server:dev:       "role": "model",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "[gemini/gemini-2.5-pro]\nThis is a hand-drawn illustration of a five-pointed star that is designed as an impossible object, also known as an optical illusion. Here's a breakdown of what's depicted:\n\n*   **Central Object:** The image's subject is a five-pointed star.\n*   **Impossible Geometry:** The arms of the star are drawn to appear interwoven in a way that could not exist in three-dimensional reality. Each arm seems to simultaneously be over and under the arms it crosses, creating a visual paradox. This is conceptually similar to other impossible figures like the Penrose triangle or the impossible staircase.\n*   **Artistic Style:** It's a black and white drawing, likely created with pencil or charcoal on paper. The artist used shading to give the star a sense of depth and a three-dimensional quality, which reinforces the optical illusion. The visible texture of the pencil strokes gives it a hand-crafted, sketch-like feel."
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     4: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/nl5mykhkyxnw",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/egbkrkz6w3cu",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "and how about in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: user nrr6h4r4480f6kviycyo1zhf from Chicago, Illinois 60010 US pasted an asset in chat driving this event.
+@slipstream/ws-server:dev: [asset_attached] User nrr6h4r4480f6kviycyo1zhf attached danger.gif (513.97 KB)
+@slipstream/ws-server:dev: [Asset Attached] Created attachment gbqc3zsp8crqli55ytknwab6 with key: upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: asset_upload_progress {
+@slipstream/ws-server:dev:   type: 'asset_upload_progress',
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   conversationId: 'new-chat',
+@slipstream/ws-server:dev:   attachmentId: 'gbqc3zsp8crqli55ytknwab6',
+@slipstream/ws-server:dev:   batchId: 'batch_mf0l9n60',
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~new-chat~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   progress: 100,
+@slipstream/ws-server:dev:   bytesUploaded: 526309,
+@slipstream/ws-server:dev:   totalBytes: 526309,
+@slipstream/ws-server:dev:   elapsedMs: 0
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: broadcastRaw error
+@slipstream/ws-server:dev: false
+@slipstream/ws-server:dev: {
+@slipstream/ws-server:dev:   bucket: 'ws-server-assets-dev',
+@slipstream/ws-server:dev:   cacheControl: undefined,
+@slipstream/ws-server:dev:   checksumAlgo: 'CRC64NVME',
+@slipstream/ws-server:dev:   checksumSha256: 'Y7PHYN7+WSQ=',
+@slipstream/ws-server:dev:   contentDisposition: undefined,
+@slipstream/ws-server:dev:   draftId: 'nrr6h4r4480f6kviycyo1zhf~new-chat~batch_mf0l9n60~0',
+@slipstream/ws-server:dev:   expiresAt: 2025-09-08T04:09:37.098Z,
+@slipstream/ws-server:dev:   s3LastModified: 2025-09-01T04:09:36.000Z,
+@slipstream/ws-server:dev:   storageClass: undefined,
+@slipstream/ws-server:dev:   id: 'gbqc3zsp8crqli55ytknwab6',
+@slipstream/ws-server:dev:   key: 'upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
+@slipstream/ws-server:dev:   sourceUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20250901%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250901T040937Z&X-Amz-Expires=604800&X-Amz-Signature=0d20b8272716c8d75b1c2f85b8cd1376323dfd6242dc5e0d3a6150b3f9d9f1a5&X-Amz-SignedHeaders=host&versionId=8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm&x-amz-checksum-mode=ENABLED&x-id=GetObject',
+@slipstream/ws-server:dev:   region: 'us-east-1',
+@slipstream/ws-server:dev:   uploadDuration: 0,
+@slipstream/ws-server:dev:   userId: 'nrr6h4r4480f6kviycyo1zhf',
+@slipstream/ws-server:dev:   publicUrl: 'https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
+@slipstream/ws-server:dev:   cdnUrl: 'https://assets-dev.d0paminedriven.com/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif',
+@slipstream/ws-server:dev:   versionId: '8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm',
+@slipstream/ws-server:dev:   s3ObjectId: 's3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1756699775687-danger.gif#8Ck57SRgaS4f7APDo7Jyahs5hKxk8Ylm',
+@slipstream/ws-server:dev:   etag: '2457ce2c335af8bc28db06b7039eef98',
+@slipstream/ws-server:dev:   status: 'READY',
+@slipstream/ws-server:dev:   ext: 'gif',
+@slipstream/ws-server:dev:   mime: 'image/gif',
+@slipstream/ws-server:dev:   size: 526309n
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: key looked up for gemini, w77r6tefzhojljoys7wuxpvs
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:10:16.241 -0500]:  16927
+@slipstream/ws-server:dev:     0: {
+@slipstream/ws-server:dev:       "id": "epu92fyoxd8l6mm6xtnivk4d",
+@slipstream/ws-server:dev:       "conversationId": "ik10zyp788b8v91ekawb2e62",
+@slipstream/ws-server:dev:       "userId": "nrr6h4r4480f6kviycyo1zhf",
+@slipstream/ws-server:dev:       "senderType": "USER",
+@slipstream/ws-server:dev:       "provider": "GEMINI",
+@slipstream/ws-server:dev:       "model": "gemini-2.5-pro",
+@slipstream/ws-server:dev:       "userKeyId": "w77r6tefzhojljoys7wuxpvs",
+@slipstream/ws-server:dev:       "content": "Gemini what  do you see in this image?",
+@slipstream/ws-server:dev:       "thinkingText": null,
+@slipstream/ws-server:dev:       "thinkingDuration": null,
+@slipstream/ws-server:dev:       "liked": false,
+@slipstream/ws-server:dev:       "disliked": false,
+@slipstream/ws-server:dev:       "tryAgain": false,
+@slipstream/ws-server:dev:       "createdAt": "2025-09-01T04:10:14.353Z",
+@slipstream/ws-server:dev:       "updatedAt": "2025-09-01T04:10:14.353Z"
+@slipstream/ws-server:dev:     }
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: AI Stream Error ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Request contains an invalid argument.\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n","code":400,"status":"Bad Request"}}
+@slipstream/ws-server:dev:     at throwErrorIfNotOK (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:760:24)
+@slipstream/ws-server:dev:     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+@slipstream/ws-server:dev:     at async <anonymous> (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/_api_client.ts:512:9)
+@slipstream/ws-server:dev:     at async Models.Models.generateContentStream (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/node_modules/@google/genai/src/models.ts:204:14)
+@slipstream/ws-server:dev:     at async GeminiService.handleGeminiAiChatRequest (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/gemini/index.ts:415:21)
+@slipstream/ws-server:dev:     at async Resolver.handleAIChat (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:304:9)
+@slipstream/ws-server:dev:     at async Resolver.handleRawMessage (/home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/resolver/index.ts:402:9) {
+@slipstream/ws-server:dev:   status: 400
+@slipstream/ws-server:dev: }
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:10:18.112 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:10:18.146 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:10:18.180 -0500]:  16927
+@slipstream/ws-server:dev:     service: "ws-server"
+@slipstream/ws-server:dev:     environment: false
+@slipstream/ws-server:dev:     region: "us-east-1"
+@slipstream/ws-server:dev:     node_version: "v24.7.0"
+@slipstream/ws-server:dev: DEBUG [2025-08-31 23:10:18.180 -0500]:  16927
+@slipstream/ws-server:dev:     0: {
+@slipstream/ws-server:dev:       "role": "user",
+@slipstream/ws-server:dev:       "parts": [
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/a8fk8sgll2k6",
+@slipstream/ws-server:dev:             "mimeType": "image/gif"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/impossible-star-1756699085294",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/nl5mykhkyxnw",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "fileData": {
+@slipstream/ws-server:dev:             "fileUri": "https://generativelanguage.googleapis.com/v1beta/files/egbkrkz6w3cu",
+@slipstream/ws-server:dev:             "mimeType": "image/jpeg"
+@slipstream/ws-server:dev:           }
+@slipstream/ws-server:dev:         },
+@slipstream/ws-server:dev:         {
+@slipstream/ws-server:dev:           "text": "Gemini what  do you see in this image?"
+@slipstream/ws-server:dev:         }
+@slipstream/ws-server:dev:       ]
+@slipstream/ws-server:dev:     }
 ```
 
 I'm not sure why it's saying api key invalid, I must be accidentally passing userKeyId where it expects api key or something...also not sure what to make of this seemingly cross-conversation-asset context persistence

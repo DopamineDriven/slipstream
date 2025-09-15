@@ -1,5 +1,6 @@
+import { Credentials } from "@slipstream/credentials";
 import { jwtVerify } from "jose";
-import { Credentials } from "@t3-chat-clone/credentials";
+
 // hardcoded-string for local dev fallback only as it's truly useless -- generated with openssl rand -base64 32
 // the production secret is generated with openssl rand -base64 64 (64 bit random secret as opposed to the 32 bit secret shown below)
 

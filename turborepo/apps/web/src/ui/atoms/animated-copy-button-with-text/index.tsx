@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import type { ButtonProps } from "@t3-chat-clone/ui";
-import { Button, Copy } from "@t3-chat-clone/ui";
+import type { ButtonProps } from "@slipstream/ui";
+import type React from "react";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Button, Copy } from "@slipstream/ui";
+import { motion } from "motion/react";
 
-export interface AnimatedCopyButtonWithTextProps extends Omit<ButtonProps, "onClick"> {
-  textToCopy: string
-  children: React.ReactNode
-  iconSize?: number
-  className?: string
-  copiedDuration?: number
-  onCopyComplete?: () => void
+export interface AnimatedCopyButtonWithTextProps
+  extends Omit<ButtonProps, "onClick"> {
+  textToCopy: string;
+  children: React.ReactNode;
+  iconSize?: number;
+  className?: string;
+  copiedDuration?: number;
+  onCopyComplete?: () => void;
 }
 
 export function AnimatedCopyButtonWithText({
@@ -27,32 +27,32 @@ export function AnimatedCopyButtonWithText({
   onCopyComplete,
   ...props
 }: AnimatedCopyButtonWithTextProps) {
-  const [isCopied, setIsCopied] = useState(false)
-  const checkmarkPath = "M4 12.75L9 17.75L20 6.75"
+  const [isCopied, setIsCopied] = useState(false);
+  const checkmarkPath = "M4 12.75L9 17.75L20 6.75";
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout;
     if (isCopied) {
       timeoutId = setTimeout(() => {
-        setIsCopied(false)
-        onCopyComplete?.()
-      }, copiedDuration)
+        setIsCopied(false);
+        onCopyComplete?.();
+      }, copiedDuration);
     }
-    return () => clearTimeout(timeoutId)
-  }, [isCopied, copiedDuration, onCopyComplete])
+    return () => clearTimeout(timeoutId);
+  }, [isCopied, copiedDuration, onCopyComplete]);
 
   const handleCopy = () => {
-    if (!textToCopy || isCopied) return
+    if (!textToCopy || isCopied) return;
 
     navigator.clipboard
       .writeText(textToCopy)
       .then(() => {
-        setIsCopied(true)
+        setIsCopied(true);
       })
-      .catch((err) => {
-        console.error("Failed to copy:", err)
-      })
-  }
+      .catch(err => {
+        console.error("Failed to copy:", err);
+      });
+  };
 
   return (
     <Button
@@ -60,10 +60,9 @@ export function AnimatedCopyButtonWithText({
       className={cn("relative", className)}
       onClick={handleCopy}
       aria-label={isCopied ? "Copied!" : "Copy to clipboard"}
-      {...props}
-    >
+      {...props}>
       {/* Icon Container */}
-      <div className="flex items-center justify-center w-5 h-5 mr-3 relative">
+      <div className="relative mr-3 flex h-5 w-5 items-center justify-center">
         {/* Copy Icon */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
@@ -73,8 +72,7 @@ export function AnimatedCopyButtonWithText({
               ? { opacity: 1, scale: 1, y: 0, pointerEvents: "auto" }
               : { opacity: 0, scale: 0.8, y: -5, pointerEvents: "none" }
           }
-          transition={{ duration: 0.2, ease: "easeOut" }}
-        >
+          transition={{ duration: 0.2, ease: "easeOut" }}>
           <Copy width={iconSize} height={iconSize} />
         </motion.div>
 
@@ -87,8 +85,7 @@ export function AnimatedCopyButtonWithText({
               ? { opacity: 1, scale: 1, y: 0, pointerEvents: "auto" }
               : { opacity: 0, scale: 0.8, y: 5, pointerEvents: "none" }
           }
-          transition={{ duration: 0.2, ease: "easeOut" }}
-        >
+          transition={{ duration: 0.2, ease: "easeOut" }}>
           <svg
             width={iconSize}
             height={iconSize}
@@ -97,8 +94,7 @@ export function AnimatedCopyButtonWithText({
             stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap={isCopied ? "round" : "butt"}
-            strokeLinejoin="round"
-          >
+            strokeLinejoin="round">
             <motion.path
               d={checkmarkPath}
               initial={{ pathLength: 0 }}
@@ -108,8 +104,8 @@ export function AnimatedCopyButtonWithText({
                   type: "spring",
                   stiffness: 300,
                   damping: 25,
-                  duration: isCopied ? 0.4 : 0.25,
-                },
+                  duration: isCopied ? 0.4 : 0.25
+                }
               }}
             />
           </svg>
@@ -119,5 +115,5 @@ export function AnimatedCopyButtonWithText({
       {/* Text Content */}
       {children}
     </Button>
-  )
+  );
 }

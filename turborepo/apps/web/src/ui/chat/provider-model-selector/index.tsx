@@ -1,10 +1,6 @@
 // src/ui/provider-model-selector.tsx
 "use client";
 
-import React from "react";
-import { useModelSelection } from "@/context/model-selection-context";
-import { defaultModelByProvider, providerMetadata } from "@/lib/models";
-import { cn } from "@/lib/utils";
 import type {
   AnthropicDisplayNameUnion,
   GeminiDisplayNameUnion,
@@ -13,11 +9,15 @@ import type {
   OpenAiDisplayNameUnion,
   Provider,
   VercelDisplayNameUnion
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
+import React from "react";
+import { useModelSelection } from "@/context/model-selection-context";
+import { defaultModelByProvider, providerMetadata } from "@/lib/models";
+import { cn } from "@/lib/utils";
 import {
   getModelIdByDisplayName,
   getModelsForProvider
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 import {
   Button,
   ChevronDown,
@@ -26,7 +26,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 interface ProviderModelSelectorProps {
   className?: string;

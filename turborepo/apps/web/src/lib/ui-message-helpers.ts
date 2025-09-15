@@ -1,7 +1,7 @@
 // src/lib/ui-message-helpers.ts
 import type { UIMessage } from "@/types/shared";
-import type { Provider } from "@t3-chat-clone/types";
-import { toPrismaFormat } from "@t3-chat-clone/types";
+import type { Provider } from "@slipstream/types";
+import { toPrismaFormat } from "@slipstream/types";
 
 /**
  * Creates a properly typed UIMessage for user messages

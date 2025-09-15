@@ -12,12 +12,12 @@ import type {
   GenerateContentResponse,
   Part
 } from "@google/genai";
+import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
-import type { EventTypeMap, GeminiModelIdUnion } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderGeminiChatRequestEntity
   extends ProviderChatRequestEntity {
@@ -451,9 +451,8 @@ export class GeminiService {
       apiKey
     );
     const currentPartArr = Array.of<Part>();
-      for (const msg of msgs) {
-    try {
-
+    for (const msg of msgs) {
+      try {
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
             if (attachment?.cdnUrl && attachment?.mime) {
@@ -471,12 +470,12 @@ export class GeminiService {
             }
           }
         }
+      } catch (err) {
+        this.logger.warn({ err }, "error in gemini attachment upload");
+      } finally {
+        currentPartArr.push({ text: msg.content });
       }
-     catch (err) {
-      this.logger.warn({ err }, "error in gemini attachment upload");
-    } finally {
-      currentPartArr.push({ text: msg.content });
-    }}
+    }
     const fullContent = [
       ...(history ?? []),
       { role: "user", parts: currentPartArr }

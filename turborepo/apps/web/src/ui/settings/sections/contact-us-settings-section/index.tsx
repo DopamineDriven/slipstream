@@ -9,12 +9,12 @@ import {
   CardHeader,
   CardTitle,
   Input,
-  Mail,
   Label,
+  Mail,
   MessageSquare as MessageSquareQuestion,
   Send,
   Textarea
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 export function ContactUsSettingsSection({ user }: { user?: User }) {
   return (

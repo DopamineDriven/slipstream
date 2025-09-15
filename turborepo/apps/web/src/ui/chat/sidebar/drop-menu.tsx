@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
   LogOut,
   Settings
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
   const { state: sidebarState, isMobile } = useSidebar();
@@ -33,7 +33,7 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
           className={cn(
             "mt-auto w-full text-left",
             effectiveState === "collapsed" && "h-12 w-12 justify-start p-0",
-            effectiveState ==="collapsed" ? "justify-center" : "justify-start"
+            effectiveState === "collapsed" ? "justify-center" : "justify-start"
           )}>
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
