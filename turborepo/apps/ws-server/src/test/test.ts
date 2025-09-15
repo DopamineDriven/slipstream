@@ -49,7 +49,7 @@ class ScriptGen extends Fs {
     }
   };
 
-  public async Prod(id = "a13m4v5zc7792tci9epltfy2") {
+  public async Prod(id = "gmj835g3xfgw9bft2ui0bblx") {
     const { Credentials } = await import("@t3-chat-clone/credentials");
     const cred = new Credentials();
     const env = await cred.get("DATABASE_URL");

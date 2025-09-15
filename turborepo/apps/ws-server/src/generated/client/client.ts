@@ -4,7 +4,8 @@
 // @ts-nocheck 
 /*
  * This file should be your main import to use Prisma. Through it you get access to all the models, enums, and input types.
- *
+ * If you're looking for something you can import in the client-side of your application, please refer to the `browser.ts` file instead.
+ * 
  * 🟢 You can import this file directly.
  */
 
@@ -13,12 +14,13 @@ import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
-import * as runtime from "@prisma/client/runtime/client"
+import * as runtime from "@prisma/client/runtime/library"
 import * as $Enums from "./enums.ts"
 import * as $Class from "./internal/class.ts"
 import * as Prisma from "./internal/prismaNamespace.ts"
 
 export * as $Enums from './enums.ts'
+export * from "./enums.ts"
 /**
  * ## Prisma Client
  * 
@@ -37,6 +39,9 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node")
+path.join(process.cwd(), "src/generated/client/libquery_engine-debian-openssl-3.0.x.so.node")
 
 /**
  * Model User
@@ -118,36 +123,3 @@ export type DocumentMetadata = Prisma.DocumentMetadataModel
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
-
-export type ProviderAssetState = $Enums.ProviderAssetState
-export const ProviderAssetState = $Enums.ProviderAssetState
-
-export type AssetType = $Enums.AssetType
-export const AssetType = $Enums.AssetType
-
-export type ChecksumAlgo = $Enums.ChecksumAlgo
-export const ChecksumAlgo = $Enums.ChecksumAlgo
-
-export type ImageFormat = $Enums.ImageFormat
-export const ImageFormat = $Enums.ImageFormat
-
-export type ColorSpace = $Enums.ColorSpace
-export const ColorSpace = $Enums.ColorSpace
-
-export type SenderType = $Enums.SenderType
-export const SenderType = $Enums.SenderType
-
-export type ThemePreference = $Enums.ThemePreference
-export const ThemePreference = $Enums.ThemePreference
-
-export type Provider = $Enums.Provider
-export const Provider = $Enums.Provider
-
-export type UploadMethod = $Enums.UploadMethod
-export const UploadMethod = $Enums.UploadMethod
-
-export type AssetOrigin = $Enums.AssetOrigin
-export const AssetOrigin = $Enums.AssetOrigin
-
-export type AssetStatus = $Enums.AssetStatus
-export const AssetStatus = $Enums.AssetStatus
