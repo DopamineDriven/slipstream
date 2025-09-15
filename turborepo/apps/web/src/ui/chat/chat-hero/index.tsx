@@ -52,7 +52,7 @@ function getTimeOfDay(tz = "america/chicago", username?: string | null) {
   const [hour, _min, _sec] = time.split(/:/).map(t => Number.parseInt(t));
   if (!hour) return `What's on your mind, ${u}?`;
   else if (hour >= 5 && hour < 12)
-    return `What's on your mind this morning,${u}?`;
+    return `What's on your mind this morning, ${u}?`;
   else if (hour >= 12 && hour < 17) return `What's on your mind today, ${u}?`;
   else if (hour >= 17 && hour <= 23)
     return `What's on your mind tonight, ${u}?`;
