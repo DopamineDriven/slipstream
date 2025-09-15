@@ -402,6 +402,25 @@ export class PrismaService extends ModelService {
     }
   }
 
+  /**
+   * Count user messages sent in the past window that used fallback (no user key).
+   * Default window is last 24 hours and only counts USER-sent messages.
+   */
+  public async countFallbackUserMessages(
+    userId: string,
+    windowMs = 24 * 60 * 60 * 1000
+  ): Promise<number> {
+    const since = new Date(Date.now() - windowMs);
+    return this.prismaClient.message.count({
+      where: {
+        userId,
+        senderType: "USER",
+        userKeyId: null,
+        createdAt: { gte: since }
+      }
+    });
+  }
+
   public async handleAiChatResponse({
     userId,
     provider,

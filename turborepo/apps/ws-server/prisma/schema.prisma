@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider        = "prisma-client"
-  previewFeatures = ["typedSql", "driverAdapters", "queryCompiler"]
+  previewFeatures = ["typedSql"]
   output          = "../src/generated/client"
   runtime         = "nodejs"
 }
@@ -417,7 +417,7 @@ model VideoMetadata {
   height       Int
   aspectRatio  Float? @default(1.0)
   duration     Int // milliseconds
-  frameRate    Float? 
+  frameRate    Float?
   bitrate      Int? // kbps
   codec        String? // h264, h265, av1, etc.
   hasAudio     Boolean    @default(false)
