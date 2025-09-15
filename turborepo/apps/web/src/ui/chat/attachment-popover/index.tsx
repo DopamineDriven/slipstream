@@ -10,7 +10,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 interface AttachmentPopoverProps {
   onFilesSelected?: (files: File[]) => void;
@@ -106,9 +106,7 @@ export function AttachmentPopover({ onFilesSelected }: AttachmentPopoverProps) {
                 key={opt.id}
                 variant="ghost"
                 className="hover:bg-accent w-full justify-start"
-                onClick={() =>
-                  handleAttachmentClick(opt.id)
-                }>
+                onClick={() => handleAttachmentClick(opt.id)}>
                 <opt.icon className="mr-2 size-4" />
                 {opt.label}
               </Button>

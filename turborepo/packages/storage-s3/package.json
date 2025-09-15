@@ -1,5 +1,5 @@
 {
-  "name": "@t3-chat-clone/storage-s3",
+  "name": "@slipstream/storage-s3",
   "version": "1.0.0",
   "description": "convenient s3 storage helpers",
   "publishConfig": {
@@ -70,14 +70,14 @@
     "@aws-sdk/lib-storage": "^3.888.0",
     "@aws-sdk/s3-request-presigner": "^3.888.0",
     "@aws-sdk/types": "^3.887.0",
-    "@t3-chat-clone/types": "workspace:*",
+    "@slipstream/types": "workspace:*",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^7.5.0",
-    "@t3-chat-clone/eslint-config": "workspace:*",
-    "@t3-chat-clone/prettier-config": "workspace:*",
-    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.4.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.2",
@@ -91,5 +91,5 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   },
-  "prettier": "@t3-chat-clone/prettier-config"
+  "prettier": "@slipstream/prettier-config"
 }

@@ -2,7 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
-import { motion } from "motion/react";
 import {
   Bot,
   Card,
@@ -12,7 +11,8 @@ import {
   Palette,
   Paperclip,
   User as UserIcon
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
 
 const settingsTabs = [
   { value: "account", label: "Account", icon: UserIcon },

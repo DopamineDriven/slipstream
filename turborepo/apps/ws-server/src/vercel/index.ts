@@ -1,10 +1,13 @@
-import type { MessageSingleton, ProviderChatRequestEntity } from "@/types/index.ts";
+import type {
+  MessageSingleton,
+  ProviderChatRequestEntity
+} from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
+import type { EventTypeMap, VercelModelIdUnion } from "@slipstream/types";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { createV0SSEParser, isReasoningDelta } from "@/vercel/sse.ts";
-import type { EventTypeMap, VercelModelIdUnion } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class v0Service {
   private readonly baseUrl = "https://api.v0.dev/v1/chat/completions";

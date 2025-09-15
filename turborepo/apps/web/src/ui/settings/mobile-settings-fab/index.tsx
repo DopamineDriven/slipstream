@@ -1,7 +1,12 @@
 "use client";
 
+import type { BaseSVGProps } from "@slipstream/ui";
 import type { JSX } from "react";
-import type { BaseSVGProps } from "@t3-chat-clone/ui";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/ui/atoms/tooltip";
 import {
   ArrowLeft,
   Avatar,
@@ -12,15 +17,10 @@ import {
   Menu,
   Settings,
   X
-} from "@t3-chat-clone/ui";
-import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
-import Link from "next/link";
+} from "@slipstream/ui";
 import { AnimatePresence, motion } from "motion/react";
 import { User } from "next-auth";
 import { useTheme } from "next-themes";
-import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/ui/atoms/tooltip";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -29,11 +29,7 @@ const ThemeToggle = dynamic(
 
 type UtilityIds = "back" | "theme" | "signout" | "sections";
 
-type SectionIds =
-  | "account"
-  | "apiKeys"
-  | "customization"
-  | "contactUs";
+type SectionIds = "account" | "apiKeys" | "customization" | "contactUs";
 interface SettingsSectionConfigForFAB {
   id: SectionIds;
   type: "section";

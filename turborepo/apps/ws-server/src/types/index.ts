@@ -1,6 +1,6 @@
 import type { $Enums } from "@/generated/client/client.ts";
+import type { EventTypeMap } from "@slipstream/types";
 import { WebSocket } from "ws";
-import type { EventTypeMap } from "@t3-chat-clone/types";
 
 export interface WSServerOptions {
   port: number;

@@ -1,4 +1,4 @@
-# T3 Chat Clone — Turborepo
+# Slipstream — Turborepo
 
 Monorepo for a multi‑provider AI chat application with streaming over WebSockets, resumable streams via Redis, and asset uploads to S3. Built with Next.js (web), a Node `ws` server, and shared TypeScript packages.
 
@@ -98,9 +98,9 @@ pnpm run:ws-server  # WS server dev
 ### Database (Web app)
 
 ```bash
-pnpm --filter=@t3-chat-clone/web db:generate  # prisma generate
-pnpm --filter=@t3-chat-clone/web db:migrate   # dev migrations
-pnpm --filter=@t3-chat-clone/web db:deploy    # deploy migrations
+pnpm --filter=@slipstream/web db:generate  # prisma generate
+pnpm --filter=@slipstream/web db:migrate   # dev migrations
+pnpm --filter=@slipstream/web db:deploy    # deploy migrations
 ```
 
 ### Build Targets

@@ -1,12 +1,12 @@
 "use server";
 
+import type { Providers } from "@slipstream/types";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
-import type { Providers } from "@t3-chat-clone/types";
-import { EncryptionService } from "@t3-chat-clone/encryption";
-import { KeyValidator } from "@t3-chat-clone/key-validator";
-import { toPrismaFormat } from "@t3-chat-clone/types";
+import { EncryptionService } from "@slipstream/encryption";
+import { KeyValidator } from "@slipstream/key-validator";
+import { toPrismaFormat } from "@slipstream/types";
 
 function handleAsDefault(asDefault: FormDataEntryValue | null) {
   if (asDefault && typeof asDefault === "string") {

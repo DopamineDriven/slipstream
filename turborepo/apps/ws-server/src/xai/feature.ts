@@ -3,6 +3,7 @@ import type {
   ProviderChatRequestEntity
 } from "@/types/index.ts";
 import type { xAIChatCompletionsRes, xAIChoiceActive } from "@/xai/sse.ts";
+import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   createXAISSEParser,
@@ -11,8 +12,7 @@ import {
   isReasoningDelta,
   isStartDelta
 } from "@/xai/sse.ts";
-import type { EventTypeMap, GrokModelIdUnion } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class xAIFeatureService {
   private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
@@ -243,11 +243,7 @@ export class xAIFeatureService {
     try {
       const streamer = this.stream(
         model as GrokModelIdUnion,
-        this.xAiFormat(
-          isNewChat,
-          msgs,
-          systemPrompt,"medium"
-        ),
+        this.xAiFormat(isNewChat, msgs, systemPrompt, "medium"),
         apiKey ?? undefined,
         { max_tokens, top_p: topP, temperature }
       );

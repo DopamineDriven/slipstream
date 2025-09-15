@@ -2,8 +2,8 @@
 
 import type { ComponentPropsWithRef } from "react";
 import { useEffect, useState } from "react";
+import { Button, Moon, Sun } from "@slipstream/ui";
 import { useTheme } from "next-themes";
-import { Button, Moon, Sun } from "@t3-chat-clone/ui";
 
 export function ThemeToggle({
   className,

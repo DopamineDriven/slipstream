@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { ChatWebSocketClient } from "@/utils/chat-ws-client";
-import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 import type { MessageHandler } from "@/types/chat-ws";
+import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
@@ -41,7 +41,9 @@ export function useChatWebSocket(email?: string | null) {
 
     // Lightweight connectivity polling as a fallback to pings
     const intervalId = setInterval(() => {
-      setIsConnected(prev => (prev !== client.isConnected ? client.isConnected : prev));
+      setIsConnected(prev =>
+        prev !== client.isConnected ? client.isConnected : prev
+      );
     }, 1000);
 
     // Initial connectivity snapshot

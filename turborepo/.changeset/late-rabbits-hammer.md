@@ -1,5 +1,5 @@
 ---
-"@t3-chat-clone/ui": minor
+"@slipstream/ui": minor
 ---
 
 latest releae

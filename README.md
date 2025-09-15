@@ -1,4 +1,4 @@
-## T3 Chat Clone — Polyrepo Overview
+## Slipstream — Polyrepo Overview
 
 Monorepo + microservice setup for a realtime, multi‑model AI chat app. The web client and Node WebSocket server live in a Turborepo workspace. A separate Python FastAPI microservice handles generative asset tasks. Infra scripts support AWS ECS Fargate deployments.
 

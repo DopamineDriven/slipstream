@@ -1,6 +1,7 @@
 "use client";
 
 import type { User } from "next-auth";
+import { UserProfileCard } from "@/ui/settings/user-profile-card";
 import {
   Button,
   Card,
@@ -10,8 +11,7 @@ import {
   CardTitle,
   Input,
   Label
-} from "@t3-chat-clone/ui";
-import { UserProfileCard } from "@/ui/settings/user-profile-card";
+} from "@slipstream/ui";
 
 export function AccountSettingsSection({ user }: { user?: User }) {
   return (

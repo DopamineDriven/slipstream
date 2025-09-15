@@ -15,6 +15,7 @@ import type {
   UploadResult
 } from "@/types/index.ts";
 import type { GetObjectCommandInput } from "@aws-sdk/client-s3";
+import type { CTR, XOR } from "@slipstream/types";
 import { S3Utils } from "@/utils/index.ts";
 import {
   CopyObjectCommand,
@@ -32,7 +33,6 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Fs } from "@d0paminedriven/fs";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
-import type { CTR, XOR } from "@t3-chat-clone/types";
 
 export class S3Storage extends S3Utils {
   // Cache for frequently used commands (optional optimization)

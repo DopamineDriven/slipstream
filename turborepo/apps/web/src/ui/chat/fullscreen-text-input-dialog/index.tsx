@@ -10,7 +10,7 @@ import {
   DialogTitle,
   Textarea,
   X
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 interface FullscreenTextInputDialogProps {
   isOpen: boolean;

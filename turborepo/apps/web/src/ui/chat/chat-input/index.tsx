@@ -17,7 +17,6 @@ import { AttachmentPopover } from "@/ui/chat/attachment-popover";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
-import { motion } from "motion/react";
 import {
   Button,
   ChevronDown,
@@ -28,7 +27,8 @@ import {
   Textarea,
   Tools,
   UploadProgress
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 const INITIAL_TEXTAREA_HEIGHT_PX = 24;
@@ -76,7 +76,6 @@ export function ChatInput({
   const { selectedModel, openDrawer } = useModelSelection();
 
   const assetUpload = useAssetUpload();
-  
 
   const [quotes, setQuotes] = useState<QuoteDraft[]>([]);
 
@@ -299,10 +298,7 @@ export function ChatInput({
               JSON.stringify(payload)
             );
             if (batchId) {
-              sessionStorage.setItem(
-                "chat.initialAttachmentsBatchId",
-                batchId
-              );
+              sessionStorage.setItem("chat.initialAttachmentsBatchId", batchId);
             }
           }
         } catch (err) {

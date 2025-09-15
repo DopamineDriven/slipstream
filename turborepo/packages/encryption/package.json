@@ -1,5 +1,5 @@
 {
-  "name": "@t3-chat-clone/encryption",
+  "name": "@slipstream/encryption",
   "version": "1.0.0",
   "description": "convenient encryption util",
   "publishConfig": {
@@ -59,15 +59,15 @@
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.888.0",
     "@aws-sdk/credential-providers": "^3.888.0",
-    "@t3-chat-clone/credentials": "workspace:*",
+    "@slipstream/credentials": "workspace:*",
     "dotenv": "^17.2.2",
     "dotenv-expand": "^12.0.3"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^7.5.0",
-    "@t3-chat-clone/eslint-config": "workspace:*",
-    "@t3-chat-clone/prettier-config": "workspace:*",
-    "@t3-chat-clone/tsconfig": "workspace:*",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.4.0",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^10.0.0",
@@ -81,5 +81,5 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   },
-  "prettier": "@t3-chat-clone/prettier-config"
+  "prettier": "@slipstream/prettier-config"
 }

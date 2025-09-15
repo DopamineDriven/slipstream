@@ -3,7 +3,7 @@ import type {
   ChatWsEvent,
   ChatWsEventTypeUnion,
   EventTypeMap
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
 
 export type ChatEventListener = (event: ChatWsEvent) => void;
 

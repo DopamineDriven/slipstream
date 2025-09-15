@@ -130,14 +130,14 @@ clean_house() {
 # Function to build specific packages
 build_targeted() {
     local build_order=(
-        "@t3-chat-clone/ui"
-        "@t3-chat-clone/redis-service"
-        "@t3-chat-clone/credentials"
-        "@t3-chat-clone/encryption"
-        "@t3-chat-clone/key-validator"
-        "@t3-chat-clone/types"
-        "@t3-chat-clone/storage-s3"
-        "@t3-chat-clone/ws-server"
+        "@slipstream/ui"
+        "@slipstream/redis-service"
+        "@slipstream/credentials"
+        "@slipstream/encryption"
+        "@slipstream/key-validator"
+        "@slipstream/types"
+        "@slipstream/storage-s3"
+        "@slipstream/ws-server"
     )
 
     for package in "${build_order[@]}"; do

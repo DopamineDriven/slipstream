@@ -1,9 +1,7 @@
 "use client";
-import type {
-  GetDisplayNamesForProviderRT,
-  Provider
-} from "@t3-chat-clone/types";
-import { Badge, Check } from "@t3-chat-clone/ui";
+
+import type { GetDisplayNamesForProviderRT, Provider } from "@slipstream/types";
+import { Badge, Check } from "@slipstream/ui";
 
 type ModelBadgesProps<T extends Provider> = GetDisplayNamesForProviderRT<T>;
 

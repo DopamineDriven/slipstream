@@ -1,11 +1,11 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
-import type { UserKey, $Enums } from "@prisma/client";
-import { ErrorHelperService } from "@/orm/err-helper";
+import type { $Enums, UserKey } from "@prisma/client";
 import type {
   ClientContextWorkupProps,
   Provider,
   RecordCountsProps
-} from "@t3-chat-clone/types";
+} from "@slipstream/types";
+import { ErrorHelperService } from "@/orm/err-helper";
 
 export class PrismaUserKeyService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
@@ -52,7 +52,7 @@ export class PrismaUserKeyService extends ErrorHelperService {
     return this.formatProps(initialProps) satisfies ClientContextWorkupProps;
   }
 
-  public apiKeysCacheTag(userId: string){
+  public apiKeysCacheTag(userId: string) {
     return [`user_api_keys_${userId}`] as const;
   }
 

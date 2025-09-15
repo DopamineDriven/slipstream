@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
+import { Provider } from "@slipstream/types";
 import * as dotenv from "dotenv";
-import { Provider } from "@t3-chat-clone/types";
 
 dotenv.config({ quiet: true });
 
@@ -50,7 +50,7 @@ class ScriptGen extends Fs {
   };
 
   public async Prod(id = "gmj835g3xfgw9bft2ui0bblx") {
-    const { Credentials } = await import("@t3-chat-clone/credentials");
+    const { Credentials } = await import("@slipstream/credentials");
     const cred = new Credentials();
     const env = await cred.get("DATABASE_URL");
     return await this.data(env, id).then(s => {

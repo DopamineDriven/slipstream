@@ -1,4 +1,4 @@
-import type { Providers } from "@t3-chat-clone/types";
+import type { Providers } from "@slipstream/types";
 import type { ComponentPropsWithRef, JSX } from "react";
 
 export interface ApiKeyData {

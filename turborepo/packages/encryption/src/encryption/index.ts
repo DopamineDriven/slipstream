@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { EncryptedPayload } from "@/types/index.ts";
+import { Credentials } from "@slipstream/credentials";
 import * as dotenv from "dotenv";
-import { Credentials } from "@t3-chat-clone/credentials";
 
 dotenv.config({ quiet: true });
 

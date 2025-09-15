@@ -9,12 +9,9 @@ import { useConversations } from "@/hooks/use-conversations";
 import { cn } from "@/lib/utils";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { useSidebar } from "@/ui/atoms/sidebar";
-import { Logo } from "@/ui/logo";
 import { SidebarDropdownMenu } from "@/ui/chat/sidebar/drop-menu";
 import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
+import { Logo } from "@/ui/logo";
 import {
   Button,
   Check,
@@ -30,7 +27,10 @@ import {
   Search,
   Trash as Trash2,
   X
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 
 interface EnhancedSidebarProps {
   className?: string;
@@ -39,8 +39,14 @@ interface EnhancedSidebarProps {
 export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const { conversations, updateCache, deleteConversation, updateTitle, isLoading,isValidating } =
-    useConversations(userId);
+  const {
+    conversations,
+    updateCache,
+    deleteConversation,
+    updateTitle,
+    isLoading,
+    isValidating
+  } = useConversations(userId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -312,7 +318,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
                               if (e.key === "Enter") handleEditSave();
                               if (e.key === "Escape") handleEditCancel();
                             }}
-                            className="h-8 flex-1 text-sm "
+                            className="h-8 flex-1 text-sm"
                             autoFocus
                           />
                           <Button

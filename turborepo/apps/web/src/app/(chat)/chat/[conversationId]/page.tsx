@@ -1,4 +1,5 @@
 import type { DynamicChatRouteProps } from "@/types/shared";
+import type { InferGSPRT } from "@slipstream/types";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -7,7 +8,6 @@ import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatInterface } from "@/ui/chat/dynamic";
-import type { InferGSPRT } from "@t3-chat-clone/types";
 
 // Create once at module level
 const { prismaConversationService } = ormHandler(prismaClient);

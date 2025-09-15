@@ -1,5 +1,5 @@
 {
-  "extends": "@t3-chat-clone/tsconfig/next.json",
+  "extends": "@slipstream/tsconfig/next.json",
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {

@@ -1,5 +1,5 @@
-import type { GetModelUtilRT, Provider } from "@t3-chat-clone/types";
-import { providerModelChatApi } from "@t3-chat-clone/types";
+import type { GetModelUtilRT, Provider } from "@slipstream/types";
+import { providerModelChatApi } from "@slipstream/types";
 
 export class ModelService {
   constructor() {}
@@ -193,7 +193,7 @@ export class ModelService {
     "application/x-7z-compressed": ["7z"]
   } as const;
 
-    public isSupportedType(
+  public isSupportedType(
     type: "IMAGE" | "DOCUMENT" | "VIDEO" | "AUDIO" | "UNKNOWN",
     ext: string
   ) {
@@ -326,5 +326,4 @@ export class ModelService {
       }
     }
   }
-
 }

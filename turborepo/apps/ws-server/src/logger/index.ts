@@ -5,8 +5,8 @@ import type {
 } from "pino";
 import type { PrettyOptions } from "pino-pretty";
 import { UserData } from "@/types/index.ts";
+import { EventTypeMap } from "@slipstream/types";
 import pino, { stdTimeFunctions } from "pino";
-import { EventTypeMap } from "@t3-chat-clone/types";
 
 export interface EventLogContext<T extends keyof EventTypeMap> {
   type: T;
@@ -108,7 +108,6 @@ export class LoggerService {
       },
       ...customOptions
     } satisfies LoggerOptions;
-
 
     // Development: pretty transport
     const prettyOptions = {

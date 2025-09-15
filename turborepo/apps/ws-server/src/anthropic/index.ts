@@ -11,17 +11,17 @@ import type {
   StopReason,
   TextBlockParam
 } from "@anthropic-ai/sdk/resources/messages";
+import type {
+  AllModelsUnion,
+  AnthropicModelIdUnion,
+  EventTypeMap
+} from "@slipstream/types";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import type {
-  AllModelsUnion,
-  AnthropicModelIdUnion,
-  EventTypeMap
-} from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
   user_location?: {

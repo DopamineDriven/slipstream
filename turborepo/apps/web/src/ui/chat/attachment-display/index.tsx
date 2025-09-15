@@ -1,10 +1,10 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
+import type { Unenumerate } from "@slipstream/types";
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import type { Unenumerate } from "@t3-chat-clone/types";
 import {
   Button,
   Card,
@@ -13,7 +13,7 @@ import {
   FileText,
   ImageIcon,
   X
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
 
 // Define attachment types based on the Prisma schema
 export type MessageAttachment = Unenumerate<UIMessage["attachments"]>;
@@ -29,10 +29,10 @@ export function AttachmentDisplay({
   className,
   compact = false
 }: AttachmentDisplayProps) {
-  const [expanded, setExpanded] = useState<
-    | { url: string; kind: "image" | "pdf" }
-    | null
-  >(null);
+  const [expanded, setExpanded] = useState<{
+    url: string;
+    kind: "image" | "pdf";
+  } | null>(null);
 
   if (!attachments || attachments.length === 0) {
     return null;
@@ -81,8 +81,8 @@ export function AttachmentDisplay({
     if (url) {
       const link = document.createElement("a");
       link.href = url;
-      link.target ="_blank";
-      link.rel ="noreferrer noopener"
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
       link.download = attachment?.filename ?? "download";
       document.body.appendChild(link);
       link.click();
@@ -97,10 +97,12 @@ export function AttachmentDisplay({
           const displayUrl = getDisplayUrl(attachment);
           const isImage =
             (attachment.mime?.startsWith("image/") ??
-              attachment.assetType === "IMAGE") && Boolean(displayUrl);
+              attachment.assetType === "IMAGE") &&
+            Boolean(displayUrl);
           const isPdf =
             (attachment.mime?.toLowerCase().includes("application/pdf") ??
-              attachment.ext?.toLowerCase() === "pdf") && Boolean(displayUrl);
+              attachment.ext?.toLowerCase() === "pdf") &&
+            Boolean(displayUrl);
 
           // Full image preview only when we have a real URL
           if (isImage && !compact && displayUrl) {
@@ -167,8 +169,7 @@ export function AttachmentDisplay({
                         displayUrl &&
                         handlePreview(displayUrl, isPdf ? "pdf" : "image")
                       }
-                      disabled={!displayUrl}
-                    >
+                      disabled={!displayUrl}>
                       <Eye className="h-4 w-4" />
                     </Button>
                   )}
@@ -177,8 +178,7 @@ export function AttachmentDisplay({
                     size="icon"
                     className="h-8 w-8"
                     onClick={() => handleDownload(attachment)}
-                    disabled={!displayUrl}
-                  >
+                    disabled={!displayUrl}>
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
@@ -204,7 +204,7 @@ export function AttachmentDisplay({
           <Button
             variant="secondary"
             size="icon"
-            className="absolute right-4 top-4 border-none bg-black/60 text-white hover:bg-black/70"
+            className="absolute top-4 right-4 border-none bg-black/60 text-white hover:bg-black/70"
             onClick={e => {
               e.stopPropagation();
               setExpanded(null);
@@ -216,7 +216,9 @@ export function AttachmentDisplay({
           {/* Content container */}
           <div className="relative flex h-[92dvh] w-[96dvw] items-center justify-center">
             {expanded.kind === "image" ? (
-              <div className="pointer-events-auto relative h-full w-full select-none" onClick={e => e.stopPropagation()}>
+              <div
+                className="pointer-events-auto relative h-full w-full select-none"
+                onClick={e => e.stopPropagation()}>
                 <Image
                   src={
                     expanded.url ||

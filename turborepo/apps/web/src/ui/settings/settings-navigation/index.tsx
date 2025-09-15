@@ -1,10 +1,8 @@
 "use client";
 
+import type { BaseSVGProps } from "@slipstream/ui";
 import type { JSX } from "react";
-import type { BaseSVGProps } from "@t3-chat-clone/ui";
-import { Button } from "@t3-chat-clone/ui";
 import { memo, useCallback } from "react";
-import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -12,6 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/ui/atoms/tooltip";
+import { Button } from "@slipstream/ui";
+import { motion } from "motion/react";
 
 type SectionIds =
   | "account"

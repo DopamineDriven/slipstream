@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import "@t3-chat-clone/ui/globals.css";
+import "@slipstream/ui/globals.css";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Script from "next/script";

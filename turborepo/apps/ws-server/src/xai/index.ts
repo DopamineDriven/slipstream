@@ -6,15 +6,15 @@ import type {
   TextBlockParam,
   WebSearchResultBlock
 } from "@anthropic-ai/sdk/resources/messages";
-import { PrismaService } from "@/prisma/index.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
-import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type {
   AllModelsUnion,
   EventTypeMap,
   GrokModelIdUnion
-} from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+} from "@slipstream/types";
+import { PrismaService } from "@/prisma/index.ts";
+import { Anthropic } from "@anthropic-ai/sdk";
+import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class xAIService {
   private defaultClient: Anthropic;

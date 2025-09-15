@@ -1,16 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   Card,
   CardContent,
   CardDescription,
-  Label,
-  Switch,
   CardHeader,
-  CardTitle
-} from "@t3-chat-clone/ui";
-import dynamic from "next/dynamic";
-
+  CardTitle,
+  Label,
+  Switch
+} from "@slipstream/ui";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),

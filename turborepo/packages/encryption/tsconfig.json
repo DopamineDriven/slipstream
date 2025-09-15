@@ -1,6 +1,6 @@
 {
-  "extends": "@t3-chat-clone/tsconfig/node-pkg.json",
-    "compilerOptions": {
+  "extends": "@slipstream/tsconfig/node-pkg.json",
+  "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
     },

@@ -13,8 +13,6 @@ import { AttachmentPopover } from "@/ui/chat/attachment-popover";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { Logo } from "@/ui/logo";
-import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
 import {
   Button,
   Card,
@@ -29,7 +27,9 @@ import {
   Textarea,
   Tools,
   UploadProgress
-} from "@t3-chat-clone/ui";
+} from "@slipstream/ui";
+import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 
 const suggestedPrompts = [
   {

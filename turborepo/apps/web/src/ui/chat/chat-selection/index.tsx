@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Button, Copy, QuoteIcon } from "@slipstream/ui";
 import { createPortal } from "react-dom";
-import { Button, Copy, QuoteIcon } from "@t3-chat-clone/ui";
 
 type Props = {
   rect: DOMRect;
@@ -19,7 +19,7 @@ export function SelectionToolbar({
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     setMounted(true);
 

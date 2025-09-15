@@ -4,6 +4,7 @@ import type { Easing } from "motion-utils";
 import type { Transition } from "motion/react";
 import type { ComponentPropsWithRef } from "react";
 import { useEffect, useRef, useState } from "react";
+import { Save } from "@slipstream/ui";
 import {
   animate,
   AnimatePresence,
@@ -11,7 +12,6 @@ import {
   useTime,
   useTransform
 } from "motion/react";
-import { Save } from "@t3-chat-clone/ui";
 
 type ApiKeySubmissionState = "idle" | "processing" | "success" | "error";
 type ApiKeySubmissionActions = "add" | "update";

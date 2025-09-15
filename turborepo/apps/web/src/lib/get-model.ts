@@ -1,5 +1,5 @@
-import type { GetModelUtilRT, Provider, Providers } from "@t3-chat-clone/types";
-import { providerModelChatApi } from "@t3-chat-clone/types";
+import type { GetModelUtilRT, Provider, Providers } from "@slipstream/types";
+import { providerModelChatApi } from "@slipstream/types";
 
 export const getModel = <
   const V extends Providers,

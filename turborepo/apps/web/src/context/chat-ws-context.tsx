@@ -1,12 +1,12 @@
 "use client";
 
 import type { MessageHandler } from "@/types/chat-ws";
+import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
+import type { User } from "next-auth";
 import type { Context, ReactNode } from "react";
 import { createContext, useContext, useEffect, useRef } from "react";
 import { useChatWebSocket } from "@/hooks/use-chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
-import type { User } from "next-auth";
-import type { ChatWsEvent, EventTypeMap } from "@t3-chat-clone/types";
 
 export interface ChatWsContextProps {
   lastEvent: ChatWsEvent | null;

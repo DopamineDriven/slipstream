@@ -1,4 +1,4 @@
-import type { XOR } from "@t3-chat-clone/types";
+import type { XOR } from "@slipstream/types";
 
 export interface SSEEvent<T = unknown> {
   event?: string;
@@ -140,7 +140,6 @@ export class StreamParser<T> implements AsyncIterable<T> {
     }
   }
 }
-
 
 export function createV0SSEParser(
   response: Response

@@ -1,5 +1,5 @@
 import { Fs } from "@d0paminedriven/fs";
-import { Provider } from "@t3-chat-clone/types";
+import { Provider } from "@slipstream/types";
 import conversation from "../__out__/conversations/Geminxplicable Wonders: Unraveling the Unusual/e7imrkcwuoib4lui7l057h56.json" with { type: "json" };
 
 class ScriptGen extends Fs {

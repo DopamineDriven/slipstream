@@ -1,12 +1,15 @@
-import type { MessageSingleton, ProviderChatRequestEntity } from "@/types/index.ts";
+import type {
+  MessageSingleton,
+  ProviderChatRequestEntity
+} from "@/types/index.ts";
+import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import type { Reasoning } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import type { EventTypeMap, OpenAiModelIdUnion } from "@t3-chat-clone/types";
-import { EnhancedRedisPubSub } from "@t3-chat-clone/redis-service";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
@@ -128,10 +131,7 @@ export class OpenAIService {
     return [...msgs] as const satisfies ResponseInput;
   }
 
-  public formatOpenAi(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[]
-  ) {
+  public formatOpenAi(isNewChat: boolean, msgs: MessageSingleton<true>[]) {
     if (isNewChat) {
       const first = msgs[0];
       if (!first) {
