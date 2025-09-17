@@ -1,6 +1,5 @@
 "use client";
 
-import type { SidebarProps } from "@/types/ui";
 import type React from "react";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -33,7 +32,6 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
-  sidebarData?: SidebarProps[];
 }
 
 function HeaderActions() {
@@ -88,8 +86,7 @@ function HeaderActions() {
 }
 
 export function ChatLayoutShell({
-  children,
-  sidebarData
+  children
 }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -118,7 +115,7 @@ export function ChatLayoutShell({
         <div className="flex h-full w-full overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
             <Suspense>
-              <EnhancedSidebar fallbackData={sidebarData} />
+              <EnhancedSidebar/>
             </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">

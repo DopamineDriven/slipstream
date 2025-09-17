@@ -6,7 +6,6 @@ import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
-import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
 import { ChatInterface } from "@/ui/chat/dynamic";
 import type { InferGSPRT } from "@slipstream/types";
 
@@ -50,9 +49,6 @@ export default async function ChatPage({
   // Fetch data directly on the server
   let messages: DynamicChatRouteProps | null = null;
   let conversationTitle: string | null = null;
-  const sidebarData = await prismaConversationService.getSidebarData(
-    session.user.id
-  );
   if (conversationId !== "new-chat" && conversationId !== "home") {
     const data =
       await prismaConversationService.getMessagesByConversationIdWithAssets(
@@ -74,14 +70,12 @@ export default async function ChatPage({
 
   return (
     <Suspense fallback={<ChatAreaSkeleton />}>
-      <ChatLayoutShell sidebarData={sidebarData}>
         <ChatInterface
           initialMessages={messages}
           conversationTitle={conversationTitle}
           conversationId={conversationId}
           user={session.user}
         />
-      </ChatLayoutShell>
     </Suspense>
   );
 }
