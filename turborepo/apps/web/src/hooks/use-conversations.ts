@@ -28,10 +28,7 @@ const fetcher = async (url: string): Promise<SidebarProps[]> => {
   }
   return response.json() as Promise<SidebarProps[]>;
 };
-export function useConversations(
-  userId?: string,
-  initialData?: SidebarProps[]
-): UseConversationsReturn {
+export function useConversations(userId?: string): UseConversationsReturn {
   const router = useRouter();
   const {
     data: conversations,
@@ -51,7 +48,6 @@ export function useConversations(
       dedupingInterval: 60000, // Cache requests for 1 minute to prevent duplicate calls
       errorRetryCount: 2,
       errorRetryInterval: 5000,
-      fallbackData: initialData,
       fetcher
     }
   );
