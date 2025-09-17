@@ -37,7 +37,7 @@ export default {
         protocol: "https"
       },
       {
-        hostname: `py.coalesce.com`,
+        hostname: `py.aicoalesce.com`,
         protocol: "https"
       },
       {

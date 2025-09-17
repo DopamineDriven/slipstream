@@ -16,7 +16,8 @@ export default [
       "@typescript-eslint/no-floating-promises": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/prefer-regexp-exec": "off",
-      "@typescript-eslint/no-unused-vars": "warn"
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/triple-slash-reference": "off"
     }
   }
 ];
