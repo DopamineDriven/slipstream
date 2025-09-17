@@ -16,7 +16,7 @@ export default async function Image(request: NextRequest) {
   const fontRegular = fs.fileToBuffer("public/BasisGrotesquePro-Regular.ttf");
   const fontLight = fs.fileToBuffer("public/BasisGrotesquePro-Light.ttf");
 
-  const logo = fs.fileToBuffer("public/dd-logo.svg");
+  const logo = fs.fileToBuffer("public/aic-logo.svg");
   const fontRegularSrc = Uint8Array.from(fontRegular).buffer;
   const fontLightSrc = Uint8Array.from(fontLight).buffer;
   const logoSrc = Uint8Array.from(logo).buffer;
@@ -115,7 +115,7 @@ export default async function Image(request: NextRequest) {
                 letterSpacing: "-0.02em",
                 fontFamily: '"Basis Grotesque Pro Light", sans-serif'
               }}>
-              d0paminedriven
+              aicoalesce
             </div>
           </div>
 
@@ -250,7 +250,7 @@ export default async function Image(request: NextRequest) {
             fontSize: "48px",
             fontFamily: "system-ui"
           }}>
-          <div>d0paminedriven</div>
+          <div>aicoalesce</div>
           <div style={{ fontSize: "32px", marginTop: "20px", opacity: 0.8 }}>
             AI Chat Platform
           </div>

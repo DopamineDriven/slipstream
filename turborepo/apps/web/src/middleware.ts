@@ -11,7 +11,7 @@ function detectDeviceAndSetCookies(
   response: NextResponse
 ) {
   const domain =
-    process.env.NODE_ENV !== "development" ? ".d0paminedriven.com" : undefined;
+    process.env.NODE_ENV !== "development" ? ".aicoalesce.com" : undefined;
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
   const region =
     request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
