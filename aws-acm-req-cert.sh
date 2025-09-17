@@ -3,9 +3,10 @@ set -euo pipefail
 
 REGION=us-east-1
 SUBDOMAIN=assets-dev
+DOMAIN=aicoalesce
 
 aws acm request-certificate \
-  --domain-name "$SUBDOMAIN".d0paminedriven.com \
+  --domain-name "$SUBDOMAIN"."$DOMAIN".com \
   --validation-method DNS \
   --region "$REGION" \
-  >remote/describe/acm/"$SUBDOMAIN".json
+  >remote/describe/acm/"$SUBDOMAIN"-"$DOMAIN".json

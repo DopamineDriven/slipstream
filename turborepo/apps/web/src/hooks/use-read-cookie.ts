@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 
 interface KnownCookies {
   userId?: string; // set cookie with server (stores userId in memory), parse, read, set with middleware after handshake ?
-  hostname?: string; // "chat.d0paminedriven.com"
+  hostname?: string; // "chat.aicoalesce.com"
   latlng?: string; // "41.8338486,-87.8966849"
   city?: string; // "Chicago"
   country?: string; // "US" -> 2-leter iso-3166-1 notaton

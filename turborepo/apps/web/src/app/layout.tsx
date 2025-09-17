@@ -40,8 +40,8 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl(process.env.NODE_ENV)),
   title: {
-    default: "AI Chat",
-    template: "%s | d0paminedriven"
+    default: "AI Coalesce",
+    template: "%s | aicoalesce"
   },
   authors: [{ name: "Andrew Ross", url: "https://github.com/DopamineDriven" }],
   twitter: {
@@ -50,21 +50,22 @@ export const metadata: Metadata = {
     creator: "@Dopamine_Driven",
     creatorId: "989610823105568769",
     description:
-      "Chat with models offered by Gemini, OpenAI, Anthropic, and xAI"
+      "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI"
   },
   appleWebApp: {
     startupImage: "/apple-icon.png",
     statusBarStyle: "black-translucent",
-    title: "AI Chat"
+    title: "AI Coalesce"
   },
   creator: "Andrew Ross",
-  description: "Chat with models offered by Gemini, OpenAI, Anthropic, and xAI",
+  description:
+    "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
   openGraph: {
     title: "AI Chat",
     description:
-      "Chat with models offered by Gemini, OpenAI, Anthropic, and xAI",
+      "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
     url: getSiteUrl(process.env.NODE_ENV),
-    siteName: "AI Chat | d0paminedriven",
+    siteName: "AI Coalesce | aicoalesce",
     locale: "en_US",
     type: "website",
     countryName: "US",

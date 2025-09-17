@@ -468,7 +468,7 @@ export class S3Storage extends S3Utils {
   }
 
   public getCfUrl(isProd: boolean, key: string) {
-    return `https://assets${isProd ? "" : "-dev"}.d0paminedriven.com/${key}` as const;
+    return `https://assets${isProd ? "" : "-dev"}.aicoalesce.com/${key}` as const;
   }
 
   public async finalize(
