@@ -28,7 +28,10 @@ const fetcher = async (url: string): Promise<SidebarProps[]> => {
   }
   return response.json() as Promise<SidebarProps[]>;
 };
-export function useConversations(userId?: string): UseConversationsReturn {
+export function useConversations(
+  userId?: string,
+  initialData?: SidebarProps[]
+): UseConversationsReturn {
   const router = useRouter();
   const {
     data: conversations,
@@ -40,6 +43,15 @@ export function useConversations(userId?: string): UseConversationsReturn {
     userId ? `/api/users/${userId}/conversations` : null,
     fetcher,
     {
+      revalidateOnFocus: false, // Don't revalidate when window gains focus (tab switching)
+      revalidateOnReconnect: false, // Don't revalidate on network reconnect
+      revalidateOnMount: true, // Keep initial load on mount
+      revalidateIfStale: false, // Don't revalidate if data is considered stale
+      refreshInterval: 0, // Disable automatic polling
+      dedupingInterval: 60000, // Cache requests for 1 minute to prevent duplicate calls
+      errorRetryCount: 2,
+      errorRetryInterval: 5000,
+      fallbackData: initialData,
       fetcher
     }
   );

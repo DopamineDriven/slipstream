@@ -33,10 +33,11 @@ import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 
 interface EnhancedSidebarProps {
+  fallbackData?: SidebarProps[];
   className?: string;
 }
 
-export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
+export function EnhancedSidebar({ className = "", fallbackData }: EnhancedSidebarProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const {
@@ -46,7 +47,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     updateTitle,
     isLoading,
     isValidating
-  } = useConversations(userId);
+  } = useConversations(userId, fallbackData);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");

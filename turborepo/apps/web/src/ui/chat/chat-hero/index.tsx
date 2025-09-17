@@ -4,6 +4,7 @@
 import type { ModelSelection } from "@/lib/models";
 import type { User } from "next-auth";
 import { Logo } from "@/ui/logo";
+import { motion } from "motion/react";
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import {
   MessageSquare,
   Sparkles
 } from "@slipstream/ui";
-import { motion } from "motion/react";
 
 const suggestedPrompts = [
   {
@@ -76,7 +76,7 @@ export function ChatHero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="mb-8 text-center">
-        <Logo className="mx-auto mb-4 size-12 stroke-current text-current [&_path]:stroke-current" />
+        <Logo className="mx-auto mb-4 size-12 stroke-current text-current sm:size-16 [&_path]:stroke-current" />
         <h1 className="text-foreground/90 mb-2 text-xl font-bold">
           {getTimeOfDay(tz, user.name)}
         </h1>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { SidebarProps } from "@/types/ui";
 import type React from "react";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -16,6 +17,7 @@ import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawe
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
+import { useTheme } from "next-themes";
 import {
   Button,
   PanelLeftClose as PanelLeft,
@@ -23,7 +25,6 @@ import {
   Settings,
   ShareIcon as Share2
 } from "@slipstream/ui";
-import { useTheme } from "next-themes";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -32,6 +33,7 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
+  sidebarData?: SidebarProps[];
 }
 
 function HeaderActions() {
@@ -85,7 +87,10 @@ function HeaderActions() {
   );
 }
 
-export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
+export function ChatLayoutShell({
+  children,
+  sidebarData
+}: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
@@ -113,7 +118,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
         <div className="flex h-full w-full overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
             <Suspense>
-              <EnhancedSidebar />
+              <EnhancedSidebar fallbackData={sidebarData} />
             </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">

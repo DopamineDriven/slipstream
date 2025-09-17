@@ -1,6 +1,10 @@
 // src/ui/provider-model-selector.tsx
 "use client";
 
+import React from "react";
+import { useModelSelection } from "@/context/model-selection-context";
+import { defaultModelByProvider, providerMetadata } from "@/lib/models";
+import { cn } from "@/lib/utils";
 import type {
   AnthropicDisplayNameUnion,
   GeminiDisplayNameUnion,
@@ -10,10 +14,6 @@ import type {
   Provider,
   VercelDisplayNameUnion
 } from "@slipstream/types";
-import React from "react";
-import { useModelSelection } from "@/context/model-selection-context";
-import { defaultModelByProvider, providerMetadata } from "@/lib/models";
-import { cn } from "@/lib/utils";
 import {
   getModelIdByDisplayName,
   getModelsForProvider
@@ -143,7 +143,7 @@ export function ProviderModelSelector({
           <SelectTrigger className="bg-brand-component border-brand-border w-[140px]">
             <div className="flex items-center">
               {React.createElement(currentMeta.icon, {
-                className: "mr-2 w-4 h-4"
+                className: "mr-2 size-4"
               })}
               <SelectValue />
             </div>
@@ -154,7 +154,7 @@ export function ProviderModelSelector({
               return (
                 <SelectItem key={prov} value={prov}>
                   <div className="flex items-center">
-                    <Icon className="mr-2 h-4 w-4" />
+                    <Icon className="mr-2 size-4" />
                     {providerMetadata[prov].name}
                   </div>
                 </SelectItem>
@@ -189,9 +189,9 @@ export function ProviderModelSelector({
         "text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base",
         className
       )}>
-      <currentMeta.icon className="mr-2 h-4 w-4 flex-shrink-0" />
-      {selectedModel.displayName}
-      <ChevronDown className="ml-1 h-4 w-4" />
+      <currentMeta.icon className="mr-2 size-4 flex-shrink-0" />
+      <span className="max-w-[15ch] truncate">{selectedModel.displayName}</span>
+      <ChevronDown className="ml-1 size-4" />
     </Button>
   );
 }
