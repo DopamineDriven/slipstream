@@ -17,7 +17,6 @@
   https://tailwindcss.com/docs/dark-mode#using-a-data-attribute
 
   Using a data-attribute instead of a dark theme selector
-
 */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
