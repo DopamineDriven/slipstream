@@ -25,7 +25,7 @@ const tsupConfig = (
       "src/icons/providers/*.tsx",
       "src/lib/*.ts",
       "src/ui/*.tsx",
-      "src/ui/base/*.tsx",
+      "src/ui/base/progress.tsx",
       "!src/services/icon-workup.ts",
       "!src/services/read.ts",
       "!src/services/postbuild.ts",
@@ -37,6 +37,7 @@ const tsupConfig = (
     keepNames: true,
     target: ["esnext"],
     format: ["esm"],
+
     sourcemap: true,
     tsconfig: relative(process.cwd(), "tsconfig.json"),
     clean: true,

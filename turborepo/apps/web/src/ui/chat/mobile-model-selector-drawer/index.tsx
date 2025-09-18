@@ -13,19 +13,14 @@ import {
   DrawerHeader,
   DrawerTitle
 } from "@/ui/atoms/drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
 import { ModelUI } from "@/ui/chat/mobile-model-selector-drawer/model-badges";
 import type { Provider } from "@slipstream/types";
 import {
   displayNameToModelId,
   getDisplayNamesForProvider
 } from "@slipstream/types";
-import {
-  Button,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "@slipstream/ui";
+import { Button } from "@slipstream/ui";
 
 export function MobileModelSelectorDrawer() {
   const {

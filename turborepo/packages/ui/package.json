@@ -21,7 +21,7 @@
         "dist/globals.d.ts"
       ],
       "icons/providers": [
-          "dist/icons/providers/index.d.ts"
+        "dist/icons/providers/index.d.ts"
       ],
       "icons": [
         "dist/icons/index.d.ts",
@@ -80,7 +80,7 @@
     "./icons/providers/*": "./dist/icons/providers/*.js",
     "./lib/*": "./dist/lib/*.js",
     "./ui/*": "./dist/ui/*.js",
-    "./ui/base/*": "./dist/ui/base/*.js"
+    "./ui/base/progress": "./dist/ui/base/progress.js"
   },
   "scripts": {
     "lint": "eslint",

@@ -3,6 +3,12 @@
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/ui/atoms/tooltip";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
 import {
@@ -15,11 +21,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
+  Skeleton
 } from "@slipstream/ui";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
