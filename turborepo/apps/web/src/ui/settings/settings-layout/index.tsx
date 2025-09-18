@@ -1,5 +1,6 @@
 "use client";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/atoms/tabs";
 import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
 import { motion } from "motion/react";
 import {
@@ -10,10 +11,6 @@ import {
   MessageCircleQuestion,
   Palette,
   Paperclip,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
   User as UserIcon
 } from "@slipstream/ui";
 
