@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "./highlight.css";
 
-@config "../../tailwind.config.ts";
 @plugin "tailwindcss-motion";
 @plugin "@tailwindcss/typography";
 
@@ -18,7 +17,6 @@
   https://tailwindcss.com/docs/dark-mode#using-a-data-attribute
 
   Using a data-attribute instead of a dark theme selector
-
 */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
