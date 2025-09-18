@@ -14,20 +14,20 @@ import type {
   VercelModelIdUnion
 } from "@slipstream/types";
 import {
-  AnthropicIcon,
-  GeminiIcon,
-  MetaIcon,
-  OpenAiIcon,
-  v0Icon,
-  XAiIcon
-} from "@/ui/icons";
-import {
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
   displayNameToModelId,
   getDisplayNameByModelId,
   getModelIdByDisplayName
 } from "@slipstream/types";
+import {
+  AnthropicIcon,
+  GeminiIcon,
+  MetaIcon,
+  OpenAiIcon,
+  v0Icon,
+  XAiIcon
+} from "@slipstream/ui";
 
 export type Provider = keyof typeof displayNameToModelId;
 

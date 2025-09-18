@@ -4,6 +4,7 @@ import * as React from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
+import { cva, VariantProps } from "class-variance-authority";
 import {
   Button,
   Input,
@@ -20,7 +21,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@slipstream/ui";
-import { cva, VariantProps } from "class-variance-authority";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

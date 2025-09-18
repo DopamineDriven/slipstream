@@ -208,7 +208,7 @@ export class LlamaService {
       }
 
       if (finish_reason != null) {
-        void this.prisma.handleAiChatResponse({
+        await this.prisma.handleAiChatResponse({
           chunk: metaAgg,
           systemPrompt,
           temperature,

@@ -1,403 +1,541 @@
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
-  MessageParam,
-  RawMessageStreamEvent,
-  StopReason,
-  TextBlockParam,
-  WebSearchResultBlock
-} from "@anthropic-ai/sdk/resources/messages";
-import type {
-  AllModelsUnion,
-  EventTypeMap,
-  GrokModelIdUnion
-} from "@slipstream/types";
+  MessageSingleton,
+  ProviderChatRequestEntity
+} from "@/types/index.ts";
+import type { xAIChatCompletionsRes, xAIChoiceActive } from "@/xai/sse.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
-import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import {
+  createXAISSEParser,
+  isContentDelta,
+  isFinishChoice,
+  isReasoningDelta,
+  isStartDelta
+} from "@/xai/sse.ts";
+import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class xAIService {
-  private defaultClient: Anthropic;
+  private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
 
   constructor(
-    private apiKey: string,
     private prisma: PrismaService,
-    private redis: EnhancedRedisPubSub
+    private redis: EnhancedRedisPubSub,
+    private apiKey?: string
+  ) {}
+
+  public async *stream(
+    model = "grok-4-0709" satisfies GrokModelIdUnion,
+    messages: readonly (
+      | {
+          role: "user";
+          content:
+            | string
+            | readonly (
+                | { type: "text"; text: string }
+                | {
+                    type: "image_url";
+                    image_url: {
+                      url: string;
+                      detail?: "low" | "medium" | "high";
+                    };
+                  }
+              )[];
+        }
+      | { role: "system" | "assistant"; content: string }
+    )[],
+    apiKey?: string,
+    options?: {
+      temperature?: number;
+      top_p?: number;
+      max_tokens?: number;
+    }
+  ): AsyncGenerator<xAIChatCompletionsRes, void, unknown> {
+    const key = apiKey ?? this.apiKey;
+    const response = await fetch(this.baseUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: true,
+        ...(options && {
+          temperature: options.temperature,
+          top_p: options.top_p,
+          max_tokens: options.max_tokens
+        })
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `xAI API error (${response.status}, ${response.statusText}): ${errorText}`
+      );
+    }
+
+    const parser = createXAISSEParser(response);
+    for await (const event of parser) {
+      yield event.data;
+    }
+  }
+
+  private prependProviderModelTag(
+    msgs: Pick<
+      MessageSingleton<true>,
+      "senderType" | "provider" | "model" | "content"
+    >[]
   ) {
-    this.defaultClient = new Anthropic({
-      apiKey: this.apiKey,
-      baseURL: "https://api.x.ai",
-      defaultHeaders: {
-        Authorization: `Bearer ${this.apiKey}`
+    return msgs.map(msg => {
+      if (msg.senderType === "USER") {
+        return { role: "user", content: msg.content } as const;
+      } else {
+        const provider = msg.provider.toLowerCase();
+        const model = msg.model ?? "";
+        const modelIdentifier = `[${provider}/${model}]`;
+        return {
+          role: "assistant",
+          content: `${modelIdentifier} \n` + msg.content
+        } as const;
       }
     });
   }
 
-  public xAIClient(overrideKey?: string) {
-    const client = this.defaultClient;
-    if (overrideKey) {
-      return client.withOptions({
-        apiKey: overrideKey,
-        defaultHeaders: {
-          Authorization: `Bearer ${overrideKey}`
-        }
-      });
-    }
-    return client;
+  private formatMsgs(
+    msgs: readonly (
+      | { readonly role: "user"; readonly content: string }
+      | { readonly role: "assistant"; readonly content: string }
+    )[],
+    systemPrompt?: string
+  ): readonly (
+    | { readonly role: "system"; readonly content: string }
+    | { readonly role: "user"; readonly content: string }
+    | { readonly role: "assistant"; readonly content: string }
+  )[] {
+    const basePrompt =
+      "Note: previous responses in this conversation may be tagged with their source model in [PROVIDER/MODEL] notation for context.";
+    const enhancedSystemPrompt = systemPrompt
+      ? `${systemPrompt}\n\n${basePrompt}`
+      : basePrompt;
+    return [
+      { role: "system", content: enhancedSystemPrompt } as const,
+      ...msgs
+    ] as const;
   }
 
-  private get outputTokensByModel() {
-    return {
-      "grok-4-0709": 256000,
-      "grok-2-image-1212": 32768,
-      "grok-2-vision-1212": 32768,
-      "grok-3-mini": 131072,
-      "grok-3": 131072,
-      "grok-3-fast": 131072,
-      "grok-code-fast-1": 256000,
-      "grok-3-mini-fast": 131072
-    } as const satisfies Record<GrokModelIdUnion, 256000 | 131072 | 32768>;
-  }
-
-  private getMaxTokens = <const T extends GrokModelIdUnion>(model: T) => {
-    return this.outputTokensByModel[model];
-  };
-
-  public xAiFormatHistory(
+  public xAiFormat(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
-    systemPrompt?: string
-  ) {
-    if (!isNewChat) {
-      const messages = msgs.map(msg => {
-        if (msg.senderType === "USER") {
-          return { role: "user", content: msg.content } as const;
-        } else {
-          const provider = msg.provider.toLowerCase();
-          const model = msg.model ?? "";
-          const tag = `[${provider}/${model}]`;
-          return {
-            role: "assistant",
-            content: `${tag}\n\n${msg.content}`
-          } as const;
-        }
-      }) satisfies MessageParam[];
-
-      const enhancedSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model in [PROVIDER/MODEL] notation for context.`
-        : "Previous responses in this conversation may be tagged with their source model in [PROVIDER/MODEL] notation for context.";
-
-      return {
-        messages,
-        system: [
-          { type: "text", text: enhancedSystemPrompt }
-        ] as const satisfies TextBlockParam[]
-      };
-    } else {
-      const first = msgs[0];
-      const messages = [
-        { role: "user", content: first ? first.content : "" }
-      ] as const satisfies MessageParam[];
-      if (systemPrompt) {
-        return {
-          messages,
-          system: [
-            { type: "text", text: systemPrompt }
-          ] as const satisfies TextBlockParam[]
-        };
-      } else {
-        return {
-          messages,
-          system: undefined
-        };
+    systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
+    detail: "low" | "medium" | "high" = "medium"
+  ): readonly (
+    | { role: "system"; content: string }
+    | {
+        role: "user";
+        content:
+          | string
+          | readonly (
+              | { type: "text"; text: string }
+              | {
+                  type: "image_url";
+                  image_url: {
+                    url: string;
+                    detail?: "low" | "medium" | "high";
+                  };
+                }
+            )[];
       }
-    }
-  }
-
-  private handleMaxTokens(mod: AllModelsUnion, max_tokens?: number) {
-    const model = mod as GrokModelIdUnion;
-    if (max_tokens && max_tokens <= this.getMaxTokens(model)) {
-      return max_tokens;
-    } else {
-      return this.getMaxTokens(model);
-    }
-  }
-
-  private handleThinking(mod: AllModelsUnion, max_tokens?: number) {
-    const model = mod as GrokModelIdUnion;
-    if (
-      this.handleMaxTokens(mod, max_tokens) >= 1024 &&
-      model !== "grok-2-image-1212" &&
-      model !== "grok-3" &&
-      model !== "grok-3-fast" &&
-      model !== "grok-2-vision-1212"
-    ) {
-      return {
-        type: "enabled",
-        budget_tokens: this.getMaxTokens(model) - 1024
-      } as const;
-    } else {
-      return { type: "disabled" } as const;
-    }
-  }
-
-  public handleMaxTokensAndThinking(mod: AllModelsUnion, max_tokens?: number) {
-    return {
-      thinking: this.handleThinking(mod, max_tokens),
-      max_tokens: this.handleMaxTokens(mod, max_tokens)
+    | { role: "assistant"; content: string }
+  )[] {
+    // Helper to build content parts from a message's attachments + text
+    const buildUserContent = (m: MessageSingleton<true>) => {
+      const parts: (
+        | { type: "text"; text: string }
+        | {
+            type: "image_url";
+            image_url: { url: string; detail?: "low" | "medium" | "high" };
+          }
+      )[] = [];
+      if (m.attachments && m.attachments.length > 0) {
+        for (const att of m.attachments) {
+          const url = att.cdnUrl ?? att.sourceUrl;
+          if (url && att.mime?.startsWith("image/")) {
+            parts.push({ type: "image_url", image_url: { url, detail } });
+          }
+        }
+      }
+      parts.push({ type: "text", text: m.content });
+      return parts;
     };
+
+    if (isNewChat) {
+      const first = msgs[0];
+      if (!first) {
+        // Fallback: include system prompt if present and an empty user turn
+        return systemPrompt
+          ? ([
+              { role: "system", content: systemPrompt },
+              { role: "user", content: "" }
+            ] as const)
+          : ([{ role: "user", content: "" }] as const);
+      }
+      const parts = buildUserContent(first);
+      const userMsg =
+        parts.length === 1 && parts?.[0] && parts?.[0].type === "text"
+          ? ({ role: "user", content: parts?.[0]?.text } as const)
+          : ({ role: "user", content: parts } as const);
+      if (systemPrompt) {
+        return [{ role: "system", content: systemPrompt }, userMsg] as const;
+      }
+      return [userMsg] as const;
+    }
+
+    // Existing chat: include history (assistant tags), and for the last
+    // user turn, include its attachments inline, if any.
+    const last = msgs.at(-1);
+    if (last && last.senderType === "USER") {
+      const history = this.prependProviderModelTag(msgs.slice(0, -1));
+      const base = this.formatMsgs(history, systemPrompt);
+      const parts = buildUserContent(last);
+      const userMsg =
+        parts.length === 1 && parts?.[0] && parts[0].type === "text"
+          ? ({ role: "user", content: parts?.[0].text } as const)
+          : ({ role: "user", content: parts } as const);
+      return [...base, userMsg] as const;
+    }
+
+    // If last is assistant or not present, just map entire history
+    const formatted = this.formatMsgs(
+      this.prependProviderModelTag(msgs),
+      systemPrompt
+    );
+    return formatted;
   }
 
-  public async handleGrokAiChatRequest({
+  public async handleXAIAiChatRequest({
     chunks,
     conversationId,
-    isNewChat,
-    msgs,
     streamChannel,
+    msgs,
     thinkingChunks,
-    userId,
-    ws,
     apiKey,
+    ws,
+    userId,
+    isNewChat,
     max_tokens,
-    model = "grok-4-0709",
+    model = "grok-4-0709" satisfies GrokModelIdUnion,
     systemPrompt,
     temperature,
     title,
     topP
   }: ProviderChatRequestEntity) {
     const provider = "grok" as const;
-    let xAiThinkingStartTime: number | null = null,
-      xAiThinkingDuration = 0,
-      xAiIsCurrentlyThinking = false,
-      xAiThinkingAgg = "",
-      xaiAgg = "";
+    let grokThinkingStartTime: number | null = null,
+      grokThinkingDuration = 0,
+      grokIsCurrentlyThinking = false,
+      grokThinkingAgg = "",
+      grokAgg = "",
+      iThink = 0,
+      hasAggregateFinal = false;
 
-    const xAi = this.xAIClient(apiKey ?? undefined);
+    try {
+      const streamer = this.stream(
+        model as GrokModelIdUnion,
+        this.xAiFormat(isNewChat, msgs, systemPrompt, "medium"),
+        apiKey ?? undefined,
+        { max_tokens, top_p: topP, temperature }
+      );
 
-    const { messages, system } = this.xAiFormatHistory(
-      isNewChat,
-      msgs,
-      systemPrompt
-    );
+      for await (const chunk of streamer) {
+        let text: string | undefined = undefined,
+          thinkingText: string | undefined = undefined,
+          done: boolean | undefined = undefined,
+          finalThinkingChunk = "";
 
-    const { max_tokens: max_tokes, thinking } = this.handleMaxTokensAndThinking(
-      (model ?? "grok-4-0709") as AllModelsUnion,
-      max_tokens
-    );
+        // Final usage-only chunk
+        if ("usage" in chunk && chunk.usage !== undefined) {
+          done = true;
+        }
 
-    const stream = (await xAi.messages.create(
-      {
-        max_tokens: max_tokes,
-        stream: true,
-        thinking,
-        top_p: topP,
-        temperature,
-        system,
-        model,
-        messages
-      },
-      { stream: true }
-    )) satisfies Stream<RawMessageStreamEvent> & {
-      _request_id?: string | null;
-    };
+        if (chunk.choices) {
+          for (const choice of chunk.choices) {
+            // Check for finish reason
+            if (isFinishChoice(choice)) {
+              done = true;
+              continue;
+            }
 
-    for await (const chunk of stream) {
-      let text: string | undefined = undefined;
-      let thinkingText: string | undefined = undefined;
-      let done: StopReason | null = null;
-      if (chunk.type === "content_block_start") {
-        if (chunk.content_block.type === "web_search_tool_result") {
-          if ("error" in chunk.content_block.content) {
-            console.log(chunk.content_block.content);
+            const delta = (choice as xAIChoiceActive).delta;
+
+            // Handle grok-4 initial role-only delta
+            if (
+              isStartDelta(delta) &&
+              !isContentDelta(delta) &&
+              !isReasoningDelta(delta)
+            ) {
+              // grok-4 behavior: initial role only; ignore for content/think
+              continue;
+            }
+
+            if (isReasoningDelta(delta)) {
+              if (typeof grokThinkingStartTime !== "number") {
+                grokThinkingStartTime = performance.now();
+              }
+              if (grokIsCurrentlyThinking === false) {
+                grokIsCurrentlyThinking = true;
+              }
+              thinkingText = delta.reasoning_content;
+            }
+            if (isContentDelta(delta)) {
+              if (grokIsCurrentlyThinking === true && grokThinkingStartTime) {
+                grokIsCurrentlyThinking = false;
+                const endThinkingTime = performance.now();
+                grokThinkingDuration = Math.round(
+                  endThinkingTime - grokThinkingStartTime
+                );
+              }
+              text = delta.content;
+            }
           }
-          (chunk.content_block.content as WebSearchResultBlock[]).map(v => {
-            text = `[${v.title}](${v.url})`;
-          });
         }
-      }
-      if (chunk.type === "content_block_delta") {
-        if (chunk.delta.type === "thinking_delta") {
-          thinkingText = chunk.delta.thinking;
 
-          // Track thinking start
-          if (!xAiIsCurrentlyThinking && xAiThinkingStartTime === null) {
-            xAiThinkingStartTime = performance.now();
-            xAiIsCurrentlyThinking = true;
+        // Special handling for grok-code-fast-1 aggregate reasoning behavior (similar to v0)
+        if (
+          thinkingText &&
+          grokIsCurrentlyThinking &&
+          (model === "grok-code-fast-1" ||
+            model === "grok-3-mini-fast" ||
+            model === "grok-3-mini")
+        ) {
+          iThink++;
+          if (
+            model === "grok-code-fast-1" &&
+            iThink > 3 &&
+            Math.abs(grokThinkingAgg.length - thinkingText.length) <= 4 * iThink
+          ) {
+            hasAggregateFinal = true;
+            const prependNew = `\n` + thinkingText;
+            finalThinkingChunk =
+              grokThinkingAgg.length < prependNew.length
+                ? prependNew.substring(grokThinkingAgg.length)
+                : "";
           }
-        }
-        if (chunk.delta.type === "text_delta") {
-          text = chunk.delta.text;
 
-          // Track thinking end when switching to regular text
-          if (xAiIsCurrentlyThinking && xAiThinkingStartTime !== null) {
-            const endTime = performance.now();
-            xAiThinkingDuration = Math.round(endTime - xAiThinkingStartTime);
-            xAiIsCurrentlyThinking = false;
+          if (hasAggregateFinal) {
+            grokThinkingAgg += finalThinkingChunk;
+            if (finalThinkingChunk) thinkingChunks.push(finalThinkingChunk);
+          } else {
+            grokThinkingAgg += thinkingText;
+            thinkingChunks.push(thinkingText);
           }
-        }
-        if (chunk.delta.type === "citations_delta") {
-          console.log(chunk.delta.citation);
-        }
-      } else if (chunk.type === "message_delta") {
-        done = chunk.delta.stop_reason;
-      }
 
-      // Handle thinking chunks
-      if (thinkingText) {
-        xAiThinkingAgg += thinkingText;
-        thinkingChunks.push(thinkingText);
-
-        ws.send(
-          JSON.stringify({
-            type: "ai_chat_chunk",
-            conversationId,
-            userId,
-            provider,
-            title,
-            model,
-            systemPrompt,
-            temperature,
-            topP,
-            thinkingText: thinkingText,
-            thinkingDuration: xAiThinkingStartTime
-              ? performance.now() - xAiThinkingStartTime
-              : undefined,
-            isThinking: true,
-            done: false
-          } satisfies EventTypeMap["ai_chat_chunk"])
-        );
-
-        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
-          type: "ai_chat_chunk",
-          conversationId,
-          userId,
-          model,
-          thinkingDuration: xAiThinkingStartTime
-            ? performance.now() - xAiThinkingStartTime
-            : undefined,
-          title,
-          systemPrompt,
-          temperature,
-          topP,
-          provider,
-          thinkingText: thinkingText,
-          isThinking: true,
-          done: false
-        });
-      }
-
-      // Handle regular text chunks
-      if (text) {
-        xaiAgg += text;
-        chunks.push(text);
-        ws.send(
-          JSON.stringify({
-            type: "ai_chat_chunk",
-            conversationId,
-            userId,
-            provider,
-            title,
-            model,
-            systemPrompt,
-            temperature,
-            topP,
-            chunk: text,
-            isThinking: xAiIsCurrentlyThinking,
-            thinkingDuration:
-              xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-            done: false
-          } satisfies EventTypeMap["ai_chat_chunk"])
-        );
-        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
-          type: "ai_chat_chunk",
-          conversationId,
-          userId,
-          model,
-          title,
-          systemPrompt,
-          temperature,
-          isThinking: xAiIsCurrentlyThinking,
-          topP,
-          provider,
-          thinkingText: xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
-          thinkingDuration:
-            xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-
-          chunk: text,
-          done: false
-        });
-        if (thinkingChunks.length % 10 === 0) {
-          void this.redis.saveStreamState(
-            conversationId,
-            chunks,
-            {
-              model,
-              provider,
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_chunk",
+              conversationId,
+              userId,
               title,
-              totalChunks: chunks.length,
-              completed: false,
+              provider,
               systemPrompt,
               temperature,
-              topP
-            },
-            thinkingChunks
+              thinkingText: hasAggregateFinal
+                ? finalThinkingChunk
+                : thinkingText,
+              isThinking: grokIsCurrentlyThinking,
+              thinkingDuration: grokThinkingStartTime
+                ? performance.now() - grokThinkingStartTime
+                : undefined,
+              topP,
+              model,
+              done: false
+            } satisfies EventTypeMap["ai_chat_chunk"])
           );
-        }
-      }
 
-      if (done) {
-        void this.prisma.handleAiChatResponse({
-          chunk: xaiAgg,
-          conversationId,
-          done: true,
-          title,
-          temperature,
-          topP,
-          provider,
-          userId,
-          systemPrompt,
-          model,
-          thinkingText: xAiThinkingAgg.length > 0 ? xAiThinkingAgg : undefined,
-          thinkingDuration:
-            xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined
-        });
-        ws.send(
-          JSON.stringify({
+          void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            model,
+            title,
+            isThinking: grokIsCurrentlyThinking,
+            thinkingDuration: grokThinkingStartTime
+              ? performance.now() - grokThinkingStartTime
+              : undefined,
+            thinkingText: hasAggregateFinal ? finalThinkingChunk : thinkingText,
+            systemPrompt,
+            temperature,
+            topP,
+            provider,
+            chunk: text,
+            done: false
+          });
+        }
+
+        if (text) {
+          chunks.push(text);
+          grokAgg += text;
+
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_chunk",
+              conversationId,
+              userId,
+              title,
+              provider,
+              systemPrompt,
+              temperature,
+              thinkingDuration:
+                grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+              isThinking: false,
+              topP,
+              model,
+              chunk: text,
+              done: false
+            } satisfies EventTypeMap["ai_chat_chunk"])
+          );
+
+          void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+            type: "ai_chat_chunk",
+            conversationId,
+            userId,
+            model,
+            title,
+            thinkingDuration:
+              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+            isThinking: false,
+            thinkingText: grokThinkingAgg,
+            systemPrompt,
+            temperature,
+            topP,
+            provider,
+            chunk: text,
+            done: false
+          });
+
+          if (chunks.length % 10 === 0) {
+            void this.redis.saveStreamState(
+              conversationId,
+              chunks,
+              {
+                model,
+                provider,
+                title,
+                totalChunks: chunks.length,
+                completed: false,
+                systemPrompt,
+                temperature,
+                topP
+              },
+              thinkingChunks
+            );
+          }
+        }
+
+        if (done) {
+          await this.prisma.handleAiChatResponse({
+            chunk: grokAgg,
+            conversationId,
+            done,
+            provider,
+            title,
+            userId,
+            model,
+            systemPrompt,
+            thinkingDuration:
+              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+            thinkingText: grokThinkingAgg,
+            temperature,
+            topP
+          });
+
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_response",
+              conversationId,
+              userId,
+              provider,
+              systemPrompt,
+              thinkingDuration:
+                grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+              thinkingText: grokThinkingAgg,
+              title,
+              temperature,
+              topP,
+              model,
+              chunk: grokAgg,
+              done
+            } satisfies EventTypeMap["ai_chat_response"])
+          );
+
+          void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
             conversationId,
             userId,
-            provider,
-            model,
-            title,
             systemPrompt,
             temperature,
-            topP,
-            chunk: xaiAgg,
-            thinkingText: xAiThinkingAgg || undefined,
+            title,
             thinkingDuration:
-              xAiThinkingDuration > 0 ? xAiThinkingDuration : undefined,
-            done: true
-          } satisfies EventTypeMap["ai_chat_response"])
-        );
-        void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
-          type: "ai_chat_response",
+              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+            thinkingText: grokThinkingAgg,
+            topP,
+            provider,
+            model,
+            chunk: grokAgg,
+            done
+          });
+
+          // Clear saved state on successful completion
+          void this.redis.del(`stream:state:${conversationId}`);
+          break;
+        }
+      }
+    } catch (err) {
+      // Surface error as stream error
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_error",
+          provider: provider,
           conversationId,
-          userId,
+          model,
           systemPrompt,
           temperature,
-          thinkingText: xAiThinkingAgg,
-          thinkingDuration: xAiThinkingDuration,
-          title,
           topP,
-          provider,
+          title,
+          userId,
+          done: true,
+          message: err instanceof Error ? err.message : String(err)
+        } satisfies EventTypeMap["ai_chat_error"])
+      );
+      void this.redis.publishTypedEvent(streamChannel, "ai_chat_error", {
+        type: "ai_chat_error",
+        provider,
+        conversationId,
+        model,
+        title,
+        systemPrompt,
+        temperature,
+        topP,
+        userId,
+        done: true,
+        message: err instanceof Error ? err.message : String(err)
+      });
+      void this.redis.saveStreamState(
+        conversationId,
+        chunks,
+        {
           model,
-          chunk: xaiAgg,
-          done: true
-        });
-        // Clear saved state on successful completion
-        void this.redis.del(`stream:state:${conversationId}`);
-        break;
-      }
+          provider,
+          title,
+          totalChunks: chunks.length,
+          completed: false,
+          systemPrompt,
+          temperature,
+          topP
+        },
+        thinkingChunks
+      );
     }
   }
 }

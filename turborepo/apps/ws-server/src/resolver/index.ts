@@ -16,7 +16,7 @@ import { ModelService } from "@/models/index.ts";
 import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import { xAIFeatureService } from "@/xai/feature.ts";
+import { xAIService } from "@/xai/index.ts";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 import { WebSocket } from "ws";
@@ -30,7 +30,7 @@ export class Resolver extends ModelService {
     private s3Service: S3Storage,
     private fastApiUrl: string,
     private region: string,
-    private xAIService: xAIFeatureService,
+    private xAIService: xAIService,
     private v0Service: v0Service,
     private llamaService: LlamaService,
     private isProd: boolean

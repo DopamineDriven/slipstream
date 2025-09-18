@@ -1,12 +1,14 @@
 "use client";
 
-import type { BaseSVGProps } from "@slipstream/ui";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/ui/atoms/tooltip";
+import { AnimatePresence, motion } from "motion/react";
+import { User } from "next-auth";
+import { useTheme } from "next-themes";
+import type { BaseSVGProps } from "@slipstream/ui";
 import {
   ArrowLeft,
   Avatar,
@@ -16,11 +18,9 @@ import {
   LogOut,
   Menu,
   Settings,
+  TooltipProvider,
   X
 } from "@slipstream/ui";
-import { AnimatePresence, motion } from "motion/react";
-import { User } from "next-auth";
-import { useTheme } from "next-themes";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),

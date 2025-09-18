@@ -1,7 +1,7 @@
 "use client";
 
+import type { UIMessage } from "@/types/shared";
 import { cn } from "@/lib/utils";
-import { UIMessage } from "@/types/shared";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display/index";
 
 interface MessageAttachmentsProps {

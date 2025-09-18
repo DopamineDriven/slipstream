@@ -1,17 +1,17 @@
 "use client";
 
-import type { BaseSVGProps } from "@slipstream/ui";
 import type { JSX } from "react";
 import { memo, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
+import type { BaseSVGProps } from "@slipstream/ui";
 import {
+  Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from "@/ui/atoms/tooltip";
-import { Button } from "@slipstream/ui";
-import { motion } from "motion/react";
+} from "@slipstream/ui";
 
 type SectionIds =
   | "account"

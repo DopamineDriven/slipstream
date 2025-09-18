@@ -4,6 +4,8 @@ import type { Transition } from "motion/react";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { providerMetadata } from "@/lib/models";
+import * as motion from "motion/react-client";
+import { Provider } from "@slipstream/types";
 import {
   AnthropicIcon,
   GeminiIcon,
@@ -11,9 +13,7 @@ import {
   OpenAiIcon,
   v0Icon,
   XAiIcon
-} from "@/ui/icons";
-import { Provider } from "@slipstream/types";
-import * as motion from "motion/react-client";
+} from "@slipstream/ui";
 
 const PROVIDERS = [
   {
@@ -34,14 +34,14 @@ const PROVIDERS = [
   }
 ] as const;
 
-const initialOrder: Provider[] = [
+const initialOrder = [
   "anthropic",
   "gemini",
   "openai",
   "grok",
   "meta",
   "vercel"
-];
+] satisfies Provider[];
 
 export function Reordering() {
   const [order, setOrder] = useState<Provider[]>(initialOrder);
@@ -101,13 +101,13 @@ function shuffle([...array]: Provider[]) {
  * ==============   Styles   ================
  */
 
-const spring: Transition = {
+const spring = {
   type: "spring",
   damping: 20,
   stiffness: 300
-};
+} satisfies Transition;
 
-const container: React.CSSProperties = {
+const container = {
   listStyle: "none",
   padding: 0,
   margin: 0,
@@ -119,13 +119,13 @@ const container: React.CSSProperties = {
   flexDirection: "row",
   justifyContent: "center",
   alignItems: "center"
-};
+} satisfies React.CSSProperties;
 
-const item: React.CSSProperties = {
+const item = {
   width: 100,
   height: 100,
   borderRadius: "10px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center"
-};
+} satisfies React.CSSProperties;

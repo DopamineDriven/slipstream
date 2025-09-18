@@ -517,7 +517,7 @@ export class AnthropicService {
       }
 
       if (done) {
-        void this.prisma.handleAiChatResponse({
+        await this.prisma.handleAiChatResponse({
           chunk: anthropicAgg,
           conversationId,
           done: true,

@@ -19,8 +19,10 @@ const tsupConfig = (options: Options) =>
       "src/resolver/index.ts",
       "src/types/index.ts",
       "src/vercel/index.ts",
+      "src/vercel/sse.ts",
       "src/ws-server/index.ts",
       "src/xai/index.ts",
+      "src/xai/sse.ts",
       "!src/__out__/**/*",
       "!src/test/**/*",
       "!public/**/*"

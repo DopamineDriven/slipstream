@@ -6,7 +6,7 @@ import {
   OpenAiIcon,
   v0Icon,
   XAiIcon
-} from "@/ui/icons";
+} from "@slipstream/ui";
 
 export const providerObj = [
   {

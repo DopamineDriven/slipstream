@@ -409,7 +409,7 @@ export class v0Service {
 
       // Check if stream is finished
       if (done) {
-        void this.prisma.handleAiChatResponse({
+        await this.prisma.handleAiChatResponse({
           chunk: v0Agg,
           conversationId,
           done,

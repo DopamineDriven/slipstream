@@ -1,22 +1,24 @@
 "use client";
 
 import type { ValueKeyframesDefinition } from "motion-dom";
+import type { MotionStyle } from "motion/react";
 import type { User as UserProps } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useElementDimensions } from "@/hooks/use-element-dimensions";
-import { useMediaQuery } from "@/hooks/use-media-query"; // Assuming you have this hook
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { ClientWorkupProps } from "@/types/shared";
-// import { ApiKeysSettingsSection } from "@/ui/settings/sections/api-keys-tab";
 import { ApiKeysTab } from "@/ui/api-key-settings";
 import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
 import { ContactUsSettingsSection } from "@/ui/settings/sections/contact-us-settings-section";
 import { CustomizationSettingsSection } from "@/ui/settings/sections/customization-settings-section";
 import { SettingsNavigation } from "@/ui/settings/settings-navigation";
+import { AnimatePresence, motion } from "motion/react";
+import { useTheme } from "next-themes";
 import {
   ArrowLeft,
   Avatar,
@@ -31,8 +33,6 @@ import {
   PanelRightClose,
   User
 } from "@slipstream/ui";
-import { AnimatePresence, motion, MotionStyle } from "motion/react";
-import { useTheme } from "next-themes";
 
 const ThemeToggle = dynamic(
   () => import("@/ui/theme-toggle").then(d => d.ThemeToggle),
@@ -99,7 +99,6 @@ export default function SettingsScaffold({
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    // Apply theme based on system preference during initial load
     if (!resolvedTheme) {
       if (prefersDark) {
         document.documentElement.classList.add("dark");
