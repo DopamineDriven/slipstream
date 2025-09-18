@@ -4,6 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle
+} from "@/ui/atoms/drawer";
 import { ModelUI } from "@/ui/chat/mobile-model-selector-drawer/model-badges";
 import type { Provider } from "@slipstream/types";
 import {
@@ -12,13 +21,6 @@ import {
 } from "@slipstream/types";
 import {
   Button,
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
   Tabs,
   TabsContent,
   TabsList,
