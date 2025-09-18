@@ -1,19 +1,17 @@
 "use client";
 
-import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
-import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import { useSession } from "next-auth/react";
 import {
-  Button,
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
-  DrawerTitle,
-  ScrollArea,
-  X
-} from "@slipstream/ui";
+  DrawerTitle
+} from "@/ui/atoms/drawer";
+import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
+import { UserProfileCard } from "@/ui/settings/user-profile-card";
+import { useSession } from "next-auth/react";
+import { Button, ScrollArea, X } from "@slipstream/ui";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
