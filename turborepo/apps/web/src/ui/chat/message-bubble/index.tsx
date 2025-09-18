@@ -13,9 +13,11 @@ import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { getModelDisplayName, providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
+import { MessageAttachments } from "@/ui/chat/message-attachments";
 import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { ThinkingSection } from "@/ui/chat/thinking";
-import { AllModelsUnion } from "@slipstream/types";
+import { useTheme } from "next-themes";
+import type { AllModelsUnion } from "@slipstream/types";
 import {
   Avatar,
   AvatarFallback,
@@ -29,8 +31,6 @@ import {
   ThumbsDown,
   ThumbsUp
 } from "@slipstream/ui";
-import { useTheme } from "next-themes";
-import { MessageAttachments } from "../message-attachments";
 
 // Note: processMarkdownToReact is dynamically imported in the useEffect to reduce bundle size
 

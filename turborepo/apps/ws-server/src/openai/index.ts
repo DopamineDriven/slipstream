@@ -392,7 +392,7 @@ export class OpenAIService {
         }
       }
       if (done) {
-        void this.prisma.handleAiChatResponse({
+        await this.prisma.handleAiChatResponse({
           chunk: openaiAgg,
           conversationId,
           done: true,

@@ -76,7 +76,15 @@ export { TrashSimple } from "@/icons/trash-simple";
 export { User } from "@/icons/user";
 export { X } from "@/icons/x";
 export { Zap } from "@/icons/zap";
-
+export {
+  AnthropicIcon,
+  GeminiIcon,
+  MetaIcon,
+  OpenAiIcon,
+  XAiIcon,
+  v0Icon
+} from "@/icons/providers";
+export type { ProviderIconProps } from "@/icons/providers";
 // lib
 export { cn } from "@/lib/utils";
 // ui/base
@@ -135,6 +143,19 @@ export {
 } from "@/ui/dialog";
 export type { DialogProps } from "@/ui/dialog";
 export {
+  Drawer,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription
+} from "@/ui/drawer";
+export type { DrawerProps } from "@/ui/drawer";
+export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -164,6 +185,12 @@ export {
 export type { PopoverProps } from "@/ui/popover";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";
+export {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle
+} from "@/ui/resizable";
+export type { ResizablePanelProps } from "@/ui/resizable";
 export { ScrollArea, ScrollBar } from "@/ui/scroll-area";
 export type { ScrollAreaProps } from "@/ui/scroll-area";
 export {

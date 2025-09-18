@@ -1,58 +1,24 @@
 "use client";
 
+import { ApiKeysTab } from "@/ui/settings/api-keys-tab";
+import { UserProfileCard } from "@/ui/settings/user-profile-card";
+import { useSession } from "next-auth/react";
 import {
+  Button,
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
-  DrawerTitle
-} from "@/ui/atoms/drawer";
-import { ScrollArea } from "@/ui/atoms/scroll-area";
-import { ApiKeysTab } from "@/ui/settings/api-keys-tab"; // Example tab
-import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import {
-  Button,
-  History,
-  KeyRound,
-  Palette,
-  User as UserIcon,
+  DrawerTitle,
+  ScrollArea,
   X
 } from "@slipstream/ui";
-import { useSession } from "next-auth/react";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
-
-const _settingsOptions = [
-  {
-    id: "profile",
-    label: "Profile",
-    icon: UserIcon,
-    component: UserProfileCard
-  },
-  {
-    id: "apiKeys",
-    label: "API Keys",
-    icon: KeyRound,
-    component: ApiKeysTab
-  },
-  // Add more settings options here
-  {
-    id: "customization",
-    label: "Customization",
-    icon: Palette,
-    component: () => <p>Customization (TODO)</p>
-  },
-  {
-    id: "history",
-    label: "History & Sync",
-    icon: History,
-    component: () => <p>History & Sync (TODO)</p>
-  }
-];
 
 export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
   const { data: session, status } = useSession();

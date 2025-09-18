@@ -688,7 +688,7 @@ export class GeminiService {
         );
       }
       if (done) {
-        void this.prisma.handleAiChatResponse({
+        await this.prisma.handleAiChatResponse({
           chunk: geminiAgg,
           conversationId,
           done: true,

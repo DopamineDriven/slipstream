@@ -1,8 +1,8 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
+import { GripVertical } from "@/icons/grip-vertical";
 import { cn } from "@/lib/utils";
-import { GripVertical } from "@slipstream/ui";
 import * as ResizablePrimitive from "react-resizable-panels";
 
 type ResizablePanelProps<

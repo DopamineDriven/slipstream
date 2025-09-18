@@ -1,7 +1,5 @@
 "use client";
 
-// import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
-// import { useSession } from "next-auth/react";
 import {
   Button,
   Card,
@@ -16,12 +14,11 @@ import {
 import { motion } from "motion/react";
 
 interface ApiKeysTabPropss {
-  isProUser?: boolean; // To control the Pro feature display
+  isProUser?: boolean;
   className?: string;
 }
 
 export function ApiKeysTab({ className = "" }: ApiKeysTabPropss) {
-  // const { data: session } = useSession();
 
   return (
     <motion.div

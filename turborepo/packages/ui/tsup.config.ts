@@ -22,6 +22,7 @@ const tsupConfig = (
       "src/globals.css",
       "src/index.ts",
       "src/icons/*.tsx",
+      "src/icons/providers/*.tsx",
       "src/lib/*.ts",
       "src/ui/*.tsx",
       "src/ui/base/*.tsx",

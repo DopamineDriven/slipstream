@@ -50,11 +50,17 @@
       "vercel": [
         "dist/vercel/index.d.ts"
       ],
+      "vercel/sse": [
+        "dist/vercel/sse.d.ts"
+      ],
       "ws-server": [
         "dist/ws-server/index.d.ts"
       ],
       "xai": [
         "dist/xai/index.d.ts"
+      ],
+      "xai/sse": [
+        "dist/xai/sse.d.ts"
       ]
     }
   },
@@ -76,17 +82,17 @@
   },
   "prettier": "@slipstream/prettier-config",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.62.0",
+    "@anthropic-ai/sdk": "^0.63.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.888.0",
-    "@aws-sdk/client-secrets-manager": "^3.888.0",
-    "@aws-sdk/credential-providers": "^3.888.0",
-    "@aws-sdk/s3-request-presigner": "^3.888.0",
+    "@aws-sdk/client-s3": "^3.891.0",
+    "@aws-sdk/client-secrets-manager": "^3.891.0",
+    "@aws-sdk/credential-providers": "^3.891.0",
+    "@aws-sdk/s3-request-presigner": "^3.891.0",
     "@aws-sdk/types": "^3.887.0",
-    "@d0paminedriven/fs": "^7.5.0",
-    "@google/genai": "^1.19.0",
-    "@prisma/adapter-pg": "^6.16.1",
-    "@prisma/client": "^6.16.1",
+    "@d0paminedriven/fs": "^7.6.0",
+    "@google/genai": "^1.20.0",
+    "@prisma/adapter-pg": "^6.16.2",
+    "@prisma/client": "^6.16.2",
     "@prisma/extension-accelerate": "^2.0.2",
     "@slipstream/credentials": "workspace:*",
     "@slipstream/encryption": "workspace:*",
@@ -94,7 +100,7 @@
     "@slipstream/redis-service": "workspace:*",
     "@slipstream/storage-s3": "workspace:*",
     "@slipstream/types": "workspace:*",
-    "@types/node": "^24.4.0",
+    "@types/node": "^24.5.2",
     "@types/pg": "^8.15.5",
     "@types/ws": "^8.18.1",
     "bullmq": "^5.58.5",
@@ -102,12 +108,12 @@
     "dotenv-cli": "^10.0.0",
     "dotenv-expand": "^12.0.3",
     "jose": "^6.1.0",
-    "llama-api-client": "^0.2.1",
+    "llama-api-client": "^0.2.2",
     "node-html-parser": "^7.0.1",
-    "openai": "^5.20.2",
+    "openai": "^5.21.0",
     "p-limit": "^7.1.1",
     "pg": "^8.16.3",
-    "pino": "^9.9.5",
+    "pino": "^9.10.0",
     "pino-abstract-transport": "^2.0.0",
     "pino-pretty": "^13.1.1",
     "redis": "^5.8.2",
@@ -126,10 +132,10 @@
     "jiti": "^2.5.1",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "prisma": "^6.16.1",
+    "prisma": "^6.16.2",
     "terser": "^5.44.0",
     "tsup": "^8.5.0",
     "tsx": "^4.20.5",
-    "typescript-eslint": "^8.43.0"
+    "typescript-eslint": "^8.44.0"
   }
 }

@@ -1,8 +1,8 @@
 import process from "node:process";
 import type { Signals } from "@/types/index.ts";
 import type { Socket } from "net";
-import { Credentials } from "@slipstream/credentials";
 import * as dotenv from "dotenv";
+import { Credentials } from "@slipstream/credentials";
 
 dotenv.config({ quiet: true });
 
@@ -28,9 +28,11 @@ async function exe() {
         buckets,
         region
       };
+
     const { LoggerService } = await import("@/logger/index.ts");
 
     const { Fs } = await import("@d0paminedriven/fs");
+
     const fs = new Fs(process.cwd());
 
     const loggerConfig = {
@@ -94,9 +96,9 @@ async function exe() {
 
     const meta = new LlamaService(prisma, redisInstance, cfg.LLAMA_API_KEY);
 
-    const { xAIFeatureService } = await import("@/xai/feature.ts");
+    const { xAIService } = await import("@/xai/index.ts");
 
-    const xai = new xAIFeatureService(prisma, redisInstance, cfg.X_AI_KEY);
+    const xai = new xAIService(prisma, redisInstance, cfg.X_AI_KEY);
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
