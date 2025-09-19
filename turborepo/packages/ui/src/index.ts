@@ -4,6 +4,7 @@ import "./globals.css";
 // icons
 export { Icon } from "@/icons/index";
 export type { BaseSVGProps, IconName } from "@/icons/index";
+export { AnthropicIcon } from "@/icons/anthropic";
 export { ArrowDownCircle } from "@/icons/arrow-down-circle";
 export { ArrowLeft } from "@/icons/arrow-left";
 export { ArrowRight } from "@/icons/arrow-right";
@@ -28,6 +29,7 @@ export { EyeClosed } from "@/icons/eye-closed";
 export { EyeOff } from "@/icons/eye-off";
 export { Eye } from "@/icons/eye";
 export { FileText } from "@/icons/file-text";
+export { GeminiIcon } from "@/icons/gemini";
 export { Github } from "@/icons/github";
 export { GripVertical } from "@/icons/grip-vertical";
 export { History } from "@/icons/history";
@@ -44,8 +46,10 @@ export { Menu } from "@/icons/menu";
 export { MessageCircleQuestion } from "@/icons/message-circle-question";
 export { MessageSquare } from "@/icons/message-square";
 export { MessageSquareText } from "@/icons/message-square-text";
+export { MetaIcon } from "@/icons/meta";
 export { Mic } from "@/icons/mic";
 export { Moon } from "@/icons/moon";
+export { OpenAiIcon } from "@/icons/openai";
 export { Package } from "@/icons/package";
 export { Palette } from "@/icons/palette";
 export { PanelLeft } from "@/icons/panel-left";
@@ -74,17 +78,10 @@ export { Tools } from "@/icons/tools";
 export { Trash } from "@/icons/trash";
 export { TrashSimple } from "@/icons/trash-simple";
 export { User } from "@/icons/user";
+export { VercelIcon } from "@/icons/vercel";
 export { X } from "@/icons/x";
+export { XAiIcon } from "@/icons/xai";
 export { Zap } from "@/icons/zap";
-export {
-  AnthropicIcon,
-  GeminiIcon,
-  MetaIcon,
-  OpenAiIcon,
-  XAiIcon,
-  v0Icon
-} from "@/icons/providers";
-export type { ProviderIconProps } from "@/icons/providers";
 // lib
 export { cn } from "@/lib/utils";
 // ui/base
@@ -142,19 +139,6 @@ export {
   DialogDescription
 } from "@/ui/dialog";
 export type { DialogProps } from "@/ui/dialog";
-export {
-  Drawer,
-  DrawerPortal,
-  DrawerOverlay,
-  DrawerTrigger,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerFooter,
-  DrawerTitle,
-  DrawerDescription
-} from "@/ui/drawer";
-export type { DrawerProps } from "@/ui/drawer";
 export {
   DropdownMenu,
   DropdownMenuTrigger,

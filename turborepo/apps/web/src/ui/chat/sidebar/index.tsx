@@ -207,7 +207,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
             <Logo
               className={cn(
                 "text-foreground",
-                effectiveState === "collapsed" ? "size-10" : "size-12"
+                effectiveState === "collapsed" ? "size-8" : "size-10"
               )}
             />
             <span

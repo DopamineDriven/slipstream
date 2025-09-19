@@ -12,5 +12,9 @@ export default function ChatLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  return <ChatLayoutClient>      <ChatLayoutShell>{children}</ChatLayoutShell></ChatLayoutClient>;
+  return (
+    <ChatLayoutClient>
+      <ChatLayoutShell>{children}</ChatLayoutShell>
+    </ChatLayoutClient>
+  );
 }
