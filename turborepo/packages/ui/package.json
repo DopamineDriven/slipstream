@@ -20,9 +20,6 @@
       "globals.css": [
         "dist/globals.d.ts"
       ],
-      "icons/providers": [
-        "dist/icons/providers/index.d.ts"
-      ],
       "icons": [
         "dist/icons/index.d.ts",
         "dist/icons/*.d.ts"
@@ -54,9 +51,6 @@
           "dist/icons/index.d.ts",
           "dist/icons/*.d.ts"
         ],
-        "icons/providers": [
-          "dist/icons/providers/index.d.ts"
-        ],
         "lib": [
           "dist/lib/*.d.ts"
         ],
@@ -77,7 +71,6 @@
     "./icons": "./dist/icons/index.js",
     "./globals.css": "./dist/globals.css",
     "./icons/*": "./dist/icons/*.js",
-    "./icons/providers/*": "./dist/icons/providers/*.js",
     "./lib/*": "./dist/lib/*.js",
     "./ui/*": "./dist/ui/*.js",
     "./ui/base/progress": "./dist/ui/base/progress.js"

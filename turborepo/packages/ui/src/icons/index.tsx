@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
+import { AnthropicIcon } from "@/icons/anthropic";
 import { ArrowDownCircle } from "@/icons/arrow-down-circle";
 import { ArrowLeft } from "@/icons/arrow-left";
 import { ArrowRight } from "@/icons/arrow-right";
@@ -25,6 +26,7 @@ import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
 import { FileText } from "@/icons/file-text";
+import {GeminiIcon  } from "@/icons/gemini";
 import { Github } from "@/icons/github";
 import { GripVertical } from "@/icons/grip-vertical";
 import { History } from "@/icons/history";
@@ -41,8 +43,10 @@ import { Menu } from "@/icons/menu";
 import { MessageCircleQuestion } from "@/icons/message-circle-question";
 import { MessageSquare } from "@/icons/message-square";
 import { MessageSquareText } from "@/icons/message-square-text";
+import { MetaIcon } from "@/icons/meta";
 import { Mic } from "@/icons/mic";
 import { Moon } from "@/icons/moon";
+import {OpenAiIcon  } from "@/icons/openai";
 import { Package } from "@/icons/package";
 import { Palette } from "@/icons/palette";
 import { PanelLeft } from "@/icons/panel-left";
@@ -71,10 +75,13 @@ import { Tools } from "@/icons/tools";
 import { Trash } from "@/icons/trash";
 import { TrashSimple } from "@/icons/trash-simple";
 import { User } from "@/icons/user";
+import { VercelIcon } from "@/icons/vercel";
 import { X } from "@/icons/x";
+import { XAiIcon } from "@/icons/xai";
 import { Zap } from "@/icons/zap";
 
 const IconComponents = {
+  AnthropicIcon,
   ArrowDownCircle,
   ArrowLeft,
   ArrowRight,
@@ -99,6 +106,7 @@ const IconComponents = {
   EyeClosed,
   EyeOff,
   FileText,
+  GeminiIcon,
   Github,
   GripVertical,
   History,
@@ -115,8 +123,10 @@ const IconComponents = {
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,
+  MetaIcon,
   Mic,
   Moon,
+  OpenAiIcon,
   Package,
   Palette,
   PanelLeft,
@@ -145,7 +155,9 @@ const IconComponents = {
   Trash,
   TrashSimple,
   User,
+  VercelIcon,
   X,
+  XAiIcon,
   Zap
 } as const;
 
@@ -183,6 +195,7 @@ export const Icon = Object.assign(
 );
 
 export {
+  AnthropicIcon,
   ArrowDownCircle,
   ArrowLeft,
   ArrowRight,
@@ -207,6 +220,7 @@ export {
   EyeClosed,
   EyeOff,
   FileText,
+  GeminiIcon,
   Github,
   GripVertical,
   History,
@@ -223,8 +237,10 @@ export {
   MessageCircleQuestion,
   MessageSquare,
   MessageSquareText,
+  MetaIcon,
   Mic,
   Moon,
+  OpenAiIcon,
   Package,
   Palette,
   PanelLeft,
@@ -253,6 +269,8 @@ export {
   Trash,
   TrashSimple,
   User,
+  VercelIcon,
   X,
+  XAiIcon,
   Zap
 };

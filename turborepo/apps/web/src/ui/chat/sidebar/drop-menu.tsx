@@ -46,7 +46,7 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
             <div
               className={cn(
                 "flex flex-col",
-                effectiveState === "collapsed" && "hidden"
+                effectiveState === "collapsed" && "sr-only"
               )}>
               <span className="text-sm font-medium">{userProfile?.name}</span>
               <span className="text-muted-foreground text-xs">
