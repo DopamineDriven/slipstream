@@ -12,9 +12,6 @@ import { useSidebar } from "@/ui/atoms/sidebar";
 import { SidebarDropdownMenu } from "@/ui/chat/sidebar/drop-menu";
 import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
 import { Logo } from "@/ui/logo";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
 import {
   Button,
   Check,
@@ -31,6 +28,9 @@ import {
   Trash as Trash2,
   X
 } from "@slipstream/ui";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
 
 interface EnhancedSidebarProps {
   className?: string;

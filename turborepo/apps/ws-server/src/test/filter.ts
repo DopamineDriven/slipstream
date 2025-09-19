@@ -100,7 +100,7 @@ const data = async (env: string) => {
 (async () => {
   const { Fs } = await import("@d0paminedriven/fs");
   const fs = new Fs(process.cwd());
-  data(process.env.DATABASE_URL ?? "").then(s => {
+  data(process.env.DIRECT_URL ?? "").then(s => {
     if (!s) return;
     function processNesting(props: DataRT) {
       return props

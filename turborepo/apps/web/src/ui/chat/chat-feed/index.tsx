@@ -219,6 +219,7 @@ export function ChatFeed({
       )}
       {rect && quote && (
         <SelectionToolbar
+        
           rect={rect}
           onQuoteAction={handleQuote}
           onCopyAction={handleCopy}
