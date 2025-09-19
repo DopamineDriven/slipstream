@@ -4,7 +4,7 @@ import {
   GeminiIcon,
   MetaIcon,
   OpenAiIcon,
-  v0Icon,
+  VercelIcon as v0Icon,
   XAiIcon
 } from "@slipstream/ui";
 
