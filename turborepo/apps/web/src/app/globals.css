@@ -1,7 +1,8 @@
-@import "tailwindcss" source("../../src");
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "./highlight.css";
 
+@config "../../tailwind.config.ts";
 @plugin "tailwindcss-motion";
 @plugin "@tailwindcss/typography";
 
@@ -397,7 +398,7 @@
   .text-balance {
     text-wrap: balance;
   }
-  .prose-quoteless li code::before,
+  /* .prose-quoteless li code::before,
   .prose-quoteless li code::after {
     content: none;
   }
@@ -415,7 +416,7 @@
   .prose-quoteless blockquote p:first-of-type::before,
   .prose-quoteless blockquote p:first-of-type::after {
     content: none;
-  }
+  } */
 }
 *,
 *::before,
