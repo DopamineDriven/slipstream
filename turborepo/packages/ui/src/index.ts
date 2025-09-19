@@ -185,12 +185,6 @@ export {
 export type { PopoverProps } from "@/ui/popover";
 export { Progress } from "@/ui/progress";
 export type { ProgressProps } from "@/ui/progress";
-export {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle
-} from "@/ui/resizable";
-export type { ResizablePanelProps } from "@/ui/resizable";
 export { ScrollArea, ScrollBar } from "@/ui/scroll-area";
 export type { ScrollAreaProps } from "@/ui/scroll-area";
 export {
