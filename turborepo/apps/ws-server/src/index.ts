@@ -73,7 +73,7 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const connectionString = process.env.DIRECT_URL ?? cfg.DIRECT_URL;
+    const connectionString = process.env.DATABASE_URL ?? cfg.DATABASE_URL;
 
     const prisma = new PrismaService(connectionString, 10, 30000, fs);
 

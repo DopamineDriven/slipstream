@@ -139,5 +139,6 @@ export const {
       ).toISOString() as unknown as Date & string;
       return session;
     }
-  }
+  },
+  trustHost: true
 });

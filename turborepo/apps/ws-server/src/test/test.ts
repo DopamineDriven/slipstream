@@ -52,7 +52,7 @@ class ScriptGen extends Fs {
   public async Prod(id = "gmj835g3xfgw9bft2ui0bblx") {
     const { Credentials } = await import("@slipstream/credentials");
     const cred = new Credentials();
-    const env = await cred.get("DATABASE_URL");
+    const env = await cred.get("DIRECT_URL");
     return await this.data(env, id).then(s => {
       if (!s) return;
       const { messages, ...rest } = s;
@@ -73,7 +73,7 @@ class ScriptGen extends Fs {
   }
 
   public async Dev(id = "tsc8ukfhxdddj4pykubzix1i") {
-    return await this.data(process.env.DATABASE_URL ?? "", id).then(s => {
+    return await this.data(process.env.DIRECT_URL ?? "", id).then(s => {
       if (!s) return;
 
       const { messages, ...rest } = s;
