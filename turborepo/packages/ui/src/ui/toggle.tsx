@@ -3,6 +3,7 @@
 import type { VariantProps } from "class-variance-authority";
 import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
+import { Slot } from "@radix-ui/react-slot";
 import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva } from "class-variance-authority";
 
@@ -30,11 +31,14 @@ const toggleVariants = cva(
 
 interface ToggleProps
   extends ComponentPropsWithRef<typeof TogglePrimitive.Root>,
-    VariantProps<typeof toggleVariants> {}
+    VariantProps<typeof toggleVariants> {
+  asChild?: boolean;
+}
 
-function Toggle({ className, variant, size, ...props }: ToggleProps) {
+function Toggle({ className, variant, size, asChild, ...props }: ToggleProps) {
+  const Comp = asChild ? Slot : TogglePrimitive.Root;
   return (
-    <TogglePrimitive.Root
+    <Comp
       data-slot="toggle"
       className={cn(toggleVariants({ variant, size, className }))}
       {...props}

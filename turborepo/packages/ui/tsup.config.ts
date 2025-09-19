@@ -37,7 +37,6 @@ const tsupConfig = (
     keepNames: true,
     target: ["esnext"],
     format: ["esm"],
-
     sourcemap: true,
     tsconfig: relative(process.cwd(), "tsconfig.json"),
     clean: true,
