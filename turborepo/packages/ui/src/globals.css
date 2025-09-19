@@ -3,6 +3,7 @@
 
 @custom-variant dark (&:where([data-theme=dark], .dark, [data-theme=dark] *));
 
+@import "tw-animate-css";
 @font-face {
   font-family: "CalSans";
   src: url("https://raw.githubusercontent.com/DopamineDriven/d0paminedriven/refs/heads/master/packages/turbogen/public/CalSans-SemiBold.woff2")
