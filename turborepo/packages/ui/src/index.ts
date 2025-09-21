@@ -140,6 +140,19 @@ export {
 } from "@/ui/dialog";
 export type { DialogProps } from "@/ui/dialog";
 export {
+  Drawer,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription
+} from "@/ui/drawer";
+export type { DrawerProps } from "@/ui/drawer";
+export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
