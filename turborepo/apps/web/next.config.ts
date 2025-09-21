@@ -20,6 +20,10 @@ export default {
         protocol: "https"
       },
       {
+        hostname: `dev.chat.d0paminedriven.com`,
+        protocol: "https"
+      },
+      {
         hostname: `py.d0paminedriven.com`,
         protocol: "https"
       },
@@ -31,8 +35,12 @@ export default {
         hostname: `assets-dev.d0paminedriven.com`,
         protocol: "https"
       },
-            {
+      {
         hostname: `chat.aicoalesce.com`,
+        protocol: "https"
+      },
+      {
+        hostname: `dev.chat.aicoalesce.com`,
         protocol: "https"
       },
       {
