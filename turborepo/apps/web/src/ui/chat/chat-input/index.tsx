@@ -459,6 +459,8 @@ export function ChatInput({
         multiple
         className="hidden"
         hidden={true}
+        aria-hidden="true"
+        tabIndex={-1}
         accept=".pdf,application/*,text/*"
         onChange={e => {
           onInputChange(e.target.files);
@@ -470,6 +472,8 @@ export function ChatInput({
         type="file"
         multiple
         hidden={true}
+        aria-hidden="true"
+        tabIndex={-1}
         className="hidden"
         accept="image/*"
         onChange={e => {
@@ -482,6 +486,8 @@ export function ChatInput({
         ref={camRef}
         type="file"
         className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
         accept="image/*"
         capture="environment"
         onChange={e => {
