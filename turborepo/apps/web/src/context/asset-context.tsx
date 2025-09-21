@@ -2,7 +2,6 @@
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { ImageSpecs } from "@/utils/img-extractor-client";
-import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
 import {
   createContext,
   useCallback,
@@ -14,6 +13,7 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
 import { createDraftId } from "@slipstream/types";
 
 /** Public context shape — intentionally small (mirrors AIChatContext vibe) */
@@ -127,7 +127,21 @@ export function AssetProvider({
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // keep conv id in sync with PathnameContext (passive read, like AIChat)
+  const batchOrdinalRef = useRef<Map<string, number>>(
+    new Map<string, number>()
+  );
+
+  const seedBatch = (bId: string) => {
+    if (!batchOrdinalRef.current.has(bId)) batchOrdinalRef.current.set(bId, 0);
+  };
+
+  const nextOrdinal = (bId: string) => {
+    const n = batchOrdinalRef.current.get(bId) ?? 0;
+    batchOrdinalRef.current.set(bId, n + 1);
+    return n;
+  };
+
+  // keep conv id in sync with PathnameContext (passive read mirroring AIChat context workup)
   useEffect(() => {
     if (pathConvId && pathConvId !== activeConversationId) {
       setActiveConversationId(pathConvId);
@@ -167,6 +181,7 @@ export function AssetProvider({
     if (currentBatchId) return currentBatchId;
     const b = `batch_${Date.now().toString(36)}`;
     setCurrentBatchId(b);
+    seedBatch(b);
     return b;
   }, [currentBatchId]);
 
@@ -177,8 +192,9 @@ export function AssetProvider({
   }, []);
 
   const finalizeCurrentBatch = useCallback(() => {
+    if (currentBatchId) batchOrdinalRef.current.delete(currentBatchId);
     setCurrentBatchId(null);
-  }, []);
+  }, [batchOrdinalRef, currentBatchId]);
 
   /** XHR uploader (progress + header parity) */
   const uploadToS3 = useCallback(
@@ -232,17 +248,24 @@ export function AssetProvider({
         return;
       }
       const convId = conversationId ?? activeConversationId ?? "new-chat";
-      const bId = batchId ?? getBatchId();
-      attachments.forEach((a, idx) => {
-        const draftId = createDraftId(userId, convId, bId, idx);
-        const previewId = a.id;
-        if (previewId) previewIdToDraftIdRef.current.set(previewId, draftId);
 
-        // record task
+      const bId = batchId ?? getBatchId();
+
+      seedBatch(bId);
+
+      attachments.forEach(a => {
+        if (a.id && previewIdToDraftIdRef.current.has(a.id)) return;
+
+        const ordinal = nextOrdinal(bId);
+
+        const draftId = createDraftId(userId, convId, bId, ordinal);
+
+        if (a.id) previewIdToDraftIdRef.current.set(a.id, draftId);
+
         tasksByDraftIdRef.current.set(draftId, {
           draftId,
           batchId: bId,
-          previewId,
+          previewId: a.id,
           file: a.file,
           filename: a.filename,
           mime: a.mime,
