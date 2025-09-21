@@ -1009,9 +1009,6 @@ importers:
       '@tailwindcss/cli':
         specifier: ^4.1.13
         version: 4.1.13
-      '@tailwindcss/postcss':
-        specifier: ^4.1.13
-        version: 4.1.13
       '@types/node':
         specifier: ^24.5.2
         version: 24.5.2
