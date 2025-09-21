@@ -13,22 +13,28 @@ import { useAssets } from "@/hooks/use-assets";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { AttachmentPopover } from "@/ui/chat/attachment-popover";
 import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
+import { motion } from "motion/react";
 import {
   Button,
+  Camera,
   ChevronDown,
   Expand,
+  FileText,
+  ImageIcon,
   Loader,
   Mic,
+  Plus,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SendMessage,
   Textarea,
   Tools,
   UploadProgress
 } from "@slipstream/ui";
-import { motion } from "motion/react";
 
 const MAX_TEXTAREA_HEIGHT_PX = 120;
 const INITIAL_TEXTAREA_HEIGHT_PX = 24;
@@ -58,6 +64,11 @@ interface UnifiedChatInputProps {
   autoSubmitInitialPrompt?: boolean;
 }
 
+const ATTACHMENT_OPTIONS = [
+  { id: "file", label: "Files", icon: FileText },
+  { id: "camera", label: "Camera", icon: Camera },
+  { id: "photo", label: "Photos", icon: ImageIcon }
+] as const;
 export function ChatInput({
   user: _user,
   conversationId,
@@ -72,6 +83,8 @@ export function ChatInput({
   autoSubmitInitialPrompt = true
 }: UnifiedChatInputProps) {
   const router = useRouter();
+
+  const [openAttach, setOpenAttach] = useState(false);
 
   const { selectedModel, openDrawer } = useModelSelection();
 
@@ -109,6 +122,12 @@ export function ChatInput({
   });
 
   const attachmentsRef = useRef<AttachmentPreview[]>(assets.attachments);
+
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const photoRef = useRef<HTMLInputElement | null>(null);
+
+  const camRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     attachmentsRef.current = assets.attachments;
@@ -364,24 +383,6 @@ export function ChatInput({
     setIsFullScreenInputOpen(false);
   }, []);
 
-  const registerNewlyAdded = useCallback(
-    (
-      beforeIds: Set<string>,
-      origin: "UPLOAD" | "PASTED" | "SCREENSHOT" = "UPLOAD"
-    ) => {
-      const convId = activeConversationId ?? "new-chat";
-      // wait a tick for React state to flush
-      setTimeout(() => {
-        const after = attachmentsRef.current;
-        const newlyAdded = after.filter(a => !beforeIds.has(a.id));
-        if (newlyAdded.length > 0) {
-          assetUpload.registerAssets(newlyAdded, convId, origin);
-        }
-      }, 0);
-    },
-    [assetUpload, activeConversationId]
-  );
-
   const handleEnhancedPaste = useCallback(
     async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const created = await assets.handlePaste(e);
@@ -395,14 +396,37 @@ export function ChatInput({
 
   const handleFilesFromPopover = useCallback(
     async (files: File[]) => {
-      const beforeIds = new Set(attachmentsRef.current.map(a => a.id));
-      for (const file of files) {
-        await assets.addFile(file);
+      if (!files.length) return;
+      const convId = activeConversationId ?? "new-chat";
+      const batchId = assetUpload.getBatchId();
+
+      const created: AttachmentPreview[] = [];
+      for (const f of files) {
+        const added = await assets.addFile(f);
+        if (added) created.push(added);
       }
-      registerNewlyAdded(beforeIds, "UPLOAD");
+      if (created.length) {
+        assetUpload.registerAssets(created, convId, "UPLOAD", batchId);
+      }
+      setOpenAttach(false);
     },
-    [assets, registerNewlyAdded]
+    [assets, assetUpload, activeConversationId]
   );
+
+  const onInputChange = useCallback(
+    (list: FileList | null) => {
+      if (!list?.length) return;
+      handleFilesFromPopover(Array.from(list));
+    },
+    [handleFilesFromPopover]
+  );
+
+  const clickAndReset = (ref: React.RefObject<HTMLInputElement | null>) => {
+    const el = ref.current;
+    if (!el) return;
+    el.value = "";
+    el.click();
+  };
 
   const handleScrollToBottom = () => {
     window.chatScrollToBottom?.();
@@ -429,6 +453,48 @@ export function ChatInput({
 
   return (
     <>
+      <input
+        ref={fileRef}
+        type="file"
+        multiple
+        className="hidden"
+        hidden={true}
+        aria-hidden="true"
+        tabIndex={-1}
+        accept=".pdf,application/*,text/*"
+        onChange={e => {
+          onInputChange(e.target.files);
+          e.currentTarget.value = "";
+        }}
+      />
+      <input
+        ref={photoRef}
+        type="file"
+        multiple
+        hidden={true}
+        aria-hidden="true"
+        tabIndex={-1}
+        className="hidden"
+        accept="image/*"
+        onChange={e => {
+          onInputChange(e.target.files);
+          e.currentTarget.value = "";
+        }}
+      />
+      <input
+        hidden={true}
+        ref={camRef}
+        type="file"
+        className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
+        accept="image/*"
+        capture="environment"
+        onChange={e => {
+          onInputChange(e.target.files);
+          e.currentTarget.value = "";
+        }}
+      />
       <div className={cn("w-full px-4", className)}>
         {quotes.length > 0 && (
           <div className="mx-auto w-full max-w-3xl pt-3">
@@ -508,7 +574,6 @@ export function ChatInput({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </div>
-
             <form onSubmit={handleSend} ref={formRef}>
               <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
                 <div className="p-3 pb-2">
@@ -547,9 +612,44 @@ export function ChatInput({
                 {/* Controls Row - matching empty-chat-shell exactly */}
                 <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
                   <div className="flex items-center space-x-2">
-                    <AttachmentPopover
-                      onFilesSelected={handleFilesFromPopover}
-                    />
+                    <Popover open={openAttach} onOpenChange={setOpenAttach}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Attach"
+                          className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 sm:h-auto sm:w-auto">
+                          <Plus className="size-4" />
+                          <span className="sr-only">Attach</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-48 p-2"
+                        side="top"
+                        align="center">
+                        <div className="space-y-1">
+                          {ATTACHMENT_OPTIONS.map(opt => (
+                            <Button
+                              key={opt.id}
+                              variant="ghost"
+                              className="hover:bg-accent w-full justify-start"
+                              onClick={() => {
+                                setOpenAttach(false);
+                                requestAnimationFrame(() => {
+                                  if (opt.id === "file") clickAndReset(fileRef);
+                                  if (opt.id === "photo")
+                                    clickAndReset(photoRef);
+                                  if (opt.id === "camera")
+                                    clickAndReset(camRef);
+                                });
+                              }}>
+                              <opt.icon className="mr-2 size-4" />
+                              {opt.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <Button
                       type="button"
                       variant="ghost"
