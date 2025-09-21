@@ -141,7 +141,7 @@ class ScriptGen extends Fs {
     }) satisfies MapItRT;
   }
 
-  private async out(env: "dev" | "prod", id?: string) {
+  private async out(env: "dev" | "prod", id?: string, withThinking = "false") {
     const arr = Array.of<string>();
     const data = await this.mapIt(env, id);
     if (!data) return;
@@ -162,9 +162,9 @@ class ScriptGen extends Fs {
       console.log(p.assetUrl);
       const agg =
         p.sender === "AI"
-          ? p.thinking
+          ? withThinking ==="true" ? p.thinking
             ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n\n${p.thinking}\n\n${p.content}\n\n${d}\n`
-            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
+            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n` : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
           : p.assetUrl.length > 0
             ? `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\nbatchId: ${p.assetUrl[0]?.batchId}\n\n${d}\n`
             : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n${d}\n`;
@@ -174,9 +174,9 @@ class ScriptGen extends Fs {
     return arr;
   }
 
-  public async gen(target: "dev" | "prod", id?: string) {
+  public async gen(target: "dev" | "prod", id?: string, withThinking="false") {
     const [data, raw] = await Promise.all([
-      this.out(target, id),
+      this.out(target, id, withThinking),
       this.targeted(target, id)
     ]);
     if (!data) return;
@@ -190,6 +190,7 @@ const scriptGen = new ScriptGen(process.cwd());
 (async () => {
   return await scriptGen.gen(
     (process.argv?.[3] as "dev" | "prod") ?? "dev",
-    process.argv[5]
+    process.argv[5],
+    process.argv[7]
   );
 })();
