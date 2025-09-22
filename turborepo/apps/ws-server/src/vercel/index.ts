@@ -3,10 +3,10 @@ import type {
   ProviderChatRequestEntity
 } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
-import type { EventTypeMap, VercelModelIdUnion } from "@slipstream/types";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { createV0SSEParser, isReasoningDelta } from "@/vercel/sse.ts";
+import type { EventTypeMap, VercelModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class v0Service {
@@ -17,7 +17,7 @@ export class v0Service {
     private apiKey?: string
   ) {}
 
-  public async *stream(
+  private async *stream(
     model = "v0-1.5-md" satisfies VercelModelIdUnion,
     messages: readonly ChatCompletionMessageParam[],
     apiKey?: string,
@@ -165,7 +165,7 @@ export class v0Service {
     }
   }
 
-  public v0Format(
+  private v0Format(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"]

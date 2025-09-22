@@ -2,13 +2,13 @@ import type {
   MessageSingleton,
   ProviderChatRequestEntity
 } from "@/types/index.ts";
-import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import type { Reasoning } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
-import { OpenAI } from "openai";
+import { OpenAI, toFile } from "openai";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
@@ -21,9 +21,14 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   };
 }
 
+export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
+
 export class OpenAIService {
   private defaultClient: OpenAI;
   private logger: PinoLogger;
+  /** key: storename; val: storeId; */
+  private vsCache = new Map<string, string>();
+  private inflightVS = new Map<string, Promise<string>>();
   constructor(
     logger: LoggerService,
     private prisma: PrismaService,
@@ -78,6 +83,121 @@ export class OpenAIService {
       ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
       : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
+private async ensureAssetUploadedToOpenAI(
+  attachment: {
+    id: string;
+    cdnUrl: string | null;
+    filename: string | null;
+    mime: string | null;
+  },
+  client: OpenAI,
+  keyFingerprint = "server",
+  keyId?: string
+): Promise<{ file_id: string }> {
+  if (!attachment.cdnUrl) throw new Error("Attachment has no CDN URL");
+
+  // 1) Reuse if we already uploaded this asset for this key fingerprint
+  const existing = await this.prisma.findActiveOpenAIAsset(
+    attachment.id,
+    keyFingerprint
+  );
+  if (existing?.providerRef) {
+    // IMPORTANT: return ONLY file_id; do NOT include filename alongside file_id
+    return { file_id: existing.providerRef };
+  }
+
+  // 2) Create mapping (PENDING)
+  const mapping = await this.prisma.upsertOpenAIAssetMapping(
+    attachment.id,
+    keyFingerprint,
+    attachment.mime ?? "application/octet-stream",
+    keyId // must be a real FK if set; otherwise omit in upsert
+  );
+
+  try {
+    // 3) Fetch remote asset
+    const resp = await fetch(attachment.cdnUrl, { method: "GET" });
+    if (!resp.ok) {
+      throw new Error(`Failed to fetch ${attachment.cdnUrl}: ${resp.status} ${resp.statusText}`);
+    }
+
+    // 4) Wrap for SDK (blob() when available; otherwise ArrayBuffer)
+    const blob = await resp.blob();
+    const file = await toFile(blob, attachment.filename ?? "upload.bin");
+
+    // 5) Upload to OpenAI Files — purpose MUST be "assistants" for Responses/File Search/Vector Stores
+    const uploaded = await client.files.create({
+      file,
+      purpose: "assistants",
+    });
+
+    // 6) Finalize mapping
+    await this.prisma.finalizeOpenAIAsset(
+      mapping.id,
+      uploaded.id,
+      BigInt(uploaded.bytes ?? 0)
+    );
+
+    // 7) Return ONLY file_id (no filename here)
+    return { file_id: uploaded.id };
+  } catch (err) {
+    await this.prisma.markOpenAIAssetFailed(
+      mapping.id,
+      err instanceof Error ? err.message : String(err)
+    );
+    throw err;
+  }
+}
+
+  private ensureUserVectorStoreId(
+    client: OpenAI,
+    workspaceId: string | null | undefined,
+    userId: string
+  ) {
+    const name = `slipstream:${workspaceId ?? "global"}:${userId}`;
+
+    const cached = this.vsCache.get(name);
+    if (cached) return Promise.resolve(cached);
+
+    const inflight = this.inflightVS.get(name);
+    if (inflight) return inflight;
+
+    const p = (async () => {
+      try {
+        // 1) Scan existing stores (auto-paginates)
+        for await (const store of client.vectorStores.list({ limit: 100 })) {
+          if (store.name === name) {
+            this.vsCache.set(name, store.id);
+            return store.id;
+          }
+        }
+
+        // 2) Create once and cache
+        const created = await client.vectorStores.create({ name });
+        this.vsCache.set(name, created.id);
+        return created.id;
+      } finally {
+        this.inflightVS.delete(name);
+      }
+    })();
+
+    this.inflightVS.set(name, p);
+    return p;
+  }
+
+  private async addFileToVectorStoreFromUrl(
+    client: OpenAI,
+    vectorStoreId: string,
+    url: string,
+    filename = "upload.bin"
+  ) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`Fetch failed ${r.status}: ${url}`);
+    const file = await toFile(await r.blob(), filename);
+    return client.vectorStores.files.createAndPoll(vectorStoreId, {
+      file_id: (await client.files.create({ file, purpose: "assistants" })).id
+    });
+  }
 
   private buildAttachmentContent(
     attachments?: MessageSingleton<true>["attachments"]
@@ -111,6 +231,48 @@ export class OpenAIService {
           file_url: url,
           filename: att.filename ?? undefined
         });
+      }
+    }
+    return content;
+  }
+
+  private async buildAttachmentContentAsync(
+    attachments?: MessageSingleton<true>["attachments"],
+    client?: OpenAI,
+    keyFingerprint = "server",
+    keyId?: string
+  ) {
+    const content = Array.of<
+      | {
+          type: "input_image";
+          image_url: string;
+          detail: "auto" | "low" | "high";
+        }
+      | {
+          type: "input_file";
+          file_id?: string;
+          filename?: string;
+          file_data?: string;
+        }
+    >();
+    if (!attachments || attachments.length === 0) return content;
+    if (!client) return content;
+
+    for (const att of attachments) {
+      const url = att.cdnUrl ?? att.sourceUrl;
+      const mime = att.mime ?? "";
+      if (!url) continue;
+
+      if (mime.startsWith("image/")) {
+        content.push({ type: "input_image", image_url: url, detail: "auto" });
+      } else {
+        const { file_id } = await this.ensureAssetUploadedToOpenAI(
+          { id: att.id, cdnUrl: url, filename: att.filename, mime: att.mime },
+          client,
+          keyFingerprint,
+          keyId ?? undefined
+        );
+        content.push({ type: "input_file", file_id });
       }
     }
     return content;
@@ -195,7 +357,6 @@ export class OpenAIService {
         return { effort, summary } satisfies Reasoning;
       }
       case "gpt-3.5-turbo":
-      case "gpt-3.5-turbo-16k":
       case "gpt-4":
       case "gpt-4-turbo":
       case "gpt-4.1":
@@ -207,6 +368,142 @@ export class OpenAIService {
         return undefined;
       }
     }
+  }
+  // openai/index.ts
+  private async formatOpenAiWithUploads(
+    isNewChat: boolean,
+    msgs: MessageSingleton<true>[],
+    client: OpenAI,
+    keyFingerprint = "server",
+    keyId?: string
+  ) {
+    if (isNewChat) {
+      const first = msgs[0];
+      if (!first)
+        return [{ role: "user", content: "" }] as const satisfies ResponseInput;
+      const attContent = await this.buildAttachmentContentAsync(
+        first.attachments,
+        client,
+        keyFingerprint,
+        keyId
+      );
+      return attContent.length
+        ? ([
+            {
+              role: "user",
+              content: [
+                ...attContent,
+                { type: "input_text", text: first.content }
+              ]
+            }
+          ] as const satisfies ResponseInput)
+        : ([
+            { role: "user", content: first.content }
+          ] as const satisfies ResponseInput);
+    } else {
+      const history = this.prependProviderModelTag(msgs.slice(0, -1));
+      const last = msgs.at(-1);
+      if (last && last.senderType === "USER") {
+        const attContent = await this.buildAttachmentContentAsync(
+          last.attachments,
+          client,
+          keyFingerprint,
+          keyId
+        );
+        return attContent.length
+          ? ([
+              ...history,
+              {
+                role: "user",
+                content: [
+                  ...attContent,
+                  { type: "input_text", text: last.content }
+                ]
+              }
+            ] as const satisfies ResponseInput)
+          : ([
+              ...history,
+              { role: "user", content: last.content }
+            ] as const satisfies ResponseInput);
+      }
+      return this.formatMsgs(this.prependProviderModelTag(msgs));
+    }
+  }
+
+  private handleTooling(
+    hasFiles: boolean,
+    user_location?: {
+      type: "approximate";
+      city?: string | null;
+      country?: string | null;
+      region?: string | null;
+      timezone?: string | null;
+    },
+    vector_store_ids?: string[]
+  ) {
+    if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
+      return [
+        { type: "file_search", vector_store_ids },
+        {
+          type: "web_search_preview",
+          user_location
+        }
+      ] satisfies OpenAI.Responses.Tool[];
+    } else {
+      return [
+        {
+          type: "web_search_preview",
+          user_location
+        }
+      ] satisfies OpenAI.Responses.Tool[];
+    }
+  }
+
+  private hasFiles(
+    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
+  ) {
+    return formatted.some(m => {
+      if (typeof m.content === "string") return false;
+      if (m.role !== "user") return false;
+      return m.content.some(
+        t =>
+          t.type === "input_file" &&
+          (typeof t?.file_id !== "undefined" ||
+            typeof t?.file_data !== "undefined")
+      );
+    });
+  }
+
+  private fileIds(
+    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
+  ) {
+    const fileIdArr = Array.of<string>();
+    try {
+      for (const m of formatted) {
+        if (m.role !== "user") continue;
+        const c = m.content;
+        if (typeof c === "string") continue;
+        for (const p of c) {
+          if (p.type === "input_file" && p.file_id) fileIdArr.push(p.file_id);
+        }
+      }
+    } finally {
+      return fileIdArr;
+    }
+  }
+
+  private normalizeLocation(
+    user_location: ProviderOpenaiRequestEntity["user_location"]
+  ) {
+    return user_location
+      ? {
+          type: "approximate" as const,
+          city: user_location.city ?? null,
+          country: user_location.country ?? null,
+          region: user_location.region ?? null,
+          timezone: user_location.tz ?? null
+        }
+      : undefined;
   }
 
   public async handleOpenaiAiChatRequest({
@@ -220,6 +517,7 @@ export class OpenAIService {
     ws,
     apiKey,
     max_tokens,
+    keyId,
     model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
@@ -235,10 +533,43 @@ export class OpenAIService {
       openaiAgg = "";
 
     const client = this.getClient(apiKey ?? undefined);
-    const reasoning = this.openaiReasoning(model as OpenAiModelIdUnion);
+
+    const formatted = await this.formatOpenAiWithUploads(
+      isNewChat,
+      msgs,
+      client,
+      userId,
+      keyId ?? undefined
+    );
+
+    const loc = this.normalizeLocation(user_location);
+
+    const hasFiles = this.hasFiles(formatted);
+
+    const fileIds = this.fileIds(formatted);
+
+    let vectorStoreId: string | undefined;
+    if (fileIds.length > 0) {
+      vectorStoreId = await this.ensureUserVectorStoreId(client, null, userId);
+      await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
+        file_ids: fileIds
+      });
+    }
+
+    const tools = this.handleTooling(
+      hasFiles,
+      loc,
+      vectorStoreId ? [vectorStoreId] : undefined
+    );
+
+    const reasoning = this.openaiReasoning(
+      model as OpenAiModelIdUnion,
+      "medium",
+      "auto"
+    );
     const responsesStream = await client.responses.create({
       stream: true,
-      input: this.formatOpenAi(isNewChat, msgs),
+      input: formatted,
       instructions: this.buildInstructions(systemPrompt),
       store: false,
       model,
@@ -248,12 +579,7 @@ export class OpenAIService {
       truncation: "auto",
       ...(reasoning ? { reasoning } : {}),
       parallel_tool_calls: true,
-      tools: [
-        {
-          type: "web_search_preview",
-          user_location
-        }
-      ]
+      tools
     });
 
     for await (const s of responsesStream) {

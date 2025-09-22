@@ -9,7 +9,8 @@ import type { CTR, DX, Rm } from "@/utils.ts";
 export interface ImageSpecs {
   width: number;
   height: number;
-  format:     | "apng"
+  format:
+    | "apng"
     | "png"
     | "jpeg"
     | "gif"

@@ -1,14 +1,12 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
-import type { BufferLike, MessageSingleton, UserData } from "@/types/index.ts";
 import type {
-  AllModelsUnion,
-  AnyEvent,
-  AnyEventTypeUnion,
-  EventTypeMap,
-  ImageSpecs,
-  Provider
-} from "@slipstream/types";
+  BufferLike,
+  DocumentSingleton,
+  ImageSingleton,
+  MessageSingleton,
+  UserData
+} from "@/types/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -17,9 +15,18 @@ import { OpenAIService } from "@/openai/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { xAIService } from "@/xai/index.ts";
+import { WebSocket } from "ws";
+import type {
+  AllModelsUnion,
+  AnyEvent,
+  AnyEventTypeUnion,
+  EventTypeMap,
+  ImageSpecs,
+  Provider,
+  RTC
+} from "@slipstream/types";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-import { WebSocket } from "ws";
 
 export class Resolver extends ModelService {
   constructor(
@@ -645,6 +652,59 @@ export class Resolver extends ModelService {
       );
       // Create attachment record in database
 
+      const docOrImg = mimeType.startsWith("image")
+        ? {
+            image: {
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: metadata?.colorSpace ?? null,
+              dominantColorHex: null,
+              format: metadata?.format ?? "unknown",
+              frames: metadata?.frames ?? 1,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: metadata?.hasAlpha ?? false,
+              iccProfile: metadata?.iccProfile ?? null,
+              lensModel: null,
+              orientation: metadata?.orientation ?? null,
+              updatedAt: undefined,
+              exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+                ? new Date(metadata.exifDateTimeOriginal)
+                : null,
+              animated: metadata?.animated ?? false,
+              aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+              width: width ?? 0,
+              height: height ?? 0
+            } satisfies RTC<
+              ImageSingleton,
+              "attachmentId" | "createdAt" | "updatedAt"
+            >
+          }
+        : mimeType.startsWith("application") || mimeType.startsWith("text")
+          ? {
+              document: {
+                title: filename,
+                attachmentId: undefined,
+                format: extension,
+                pageCount: null,
+                wordCount: null,
+                language: null,
+                author: null,
+                subject: null,
+                keywords: [""],
+                pdfVersion: null,
+                isEncrypted: false,
+                isSearchable: false,
+                encoding: null,
+                lineCount: null,
+                textPreview: null
+              } satisfies RTC<
+                DocumentSingleton,
+                "attachmentId" | "createdAt" | "updatedAt"
+              >
+            }
+          : {};
+
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
         userId,
@@ -652,32 +712,18 @@ export class Resolver extends ModelService {
         filename: properFilename,
         draftId,
         region: this.region,
-        image: {
-          cameraMake: null,
-          cameraModel: null,
-          colorSpace: metadata?.colorSpace ?? null,
-          dominantColorHex: null,
-          format: metadata?.format ?? "unknown",
-          frames: metadata?.frames ?? 1,
-          gpsLat: null,
-          gpsLon: null,
-          hasAlpha: metadata?.hasAlpha ?? false,
-          iccProfile: metadata?.iccProfile ?? undefined,
-          lensModel: null,
-          orientation: metadata?.orientation ?? null,
-          updatedAt: undefined,
-          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
-            ? new Date(metadata.exifDateTimeOriginal)
-            : null,
-          animated: metadata?.animated ?? false,
-          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
-          width: width ?? 0,
-          height: height ?? 0
-        },
+        ...(mimeType.startsWith("image") &&
+        typeof docOrImg.image !== "undefined"
+          ? { image: docOrImg.image }
+          : (mimeType.startsWith("text") ||
+                mimeType.startsWith("application")) &&
+              typeof docOrImg.document !== "undefined"
+            ? { document: docOrImg?.document }
+            : {}),
         mime: mimeType,
         assetType: mimeType.startsWith("image/")
           ? "IMAGE"
-          : mimeType.startsWith("application/")
+          : mimeType.startsWith("application/") || mimeType.startsWith("text/")
             ? "DOCUMENT"
             : mimeType.startsWith("audio/")
               ? "AUDIO"
@@ -826,6 +872,60 @@ export class Resolver extends ModelService {
         },
         3600 // 1 hour expiry
       );
+
+      const docOrImg = mimeType.startsWith("image")
+        ? {
+            image: {
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: metadata?.colorSpace ?? null,
+              dominantColorHex: null,
+              format: metadata?.format ?? "unknown",
+              frames: metadata?.frames ?? 1,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: metadata?.hasAlpha ?? false,
+              iccProfile: metadata?.iccProfile ?? null,
+              lensModel: null,
+              orientation: metadata?.orientation ?? null,
+              updatedAt: undefined,
+              exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+                ? new Date(metadata.exifDateTimeOriginal)
+                : null,
+              animated: metadata?.animated ?? false,
+              aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+              width: width ?? 0,
+              height: height ?? 0
+            } satisfies RTC<
+              ImageSingleton,
+              "attachmentId" | "createdAt" | "updatedAt"
+            >
+          }
+        : mimeType.startsWith("application") || mimeType.startsWith("text")
+          ? {
+              document: {
+                title: filename,
+                attachmentId: undefined,
+                format: extension,
+                pageCount: null,
+                wordCount: null,
+                language: null,
+                author: null,
+                subject: null,
+                keywords: [""],
+                pdfVersion: null,
+                isEncrypted: false,
+                isSearchable: false,
+                encoding: null,
+                lineCount: null,
+                textPreview: null
+              } satisfies RTC<
+                DocumentSingleton,
+                "attachmentId" | "createdAt" | "updatedAt"
+              >
+            }
+          : {};
+
       // Create attachment record in database
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
@@ -833,28 +933,14 @@ export class Resolver extends ModelService {
         batchId,
         filename: properFilename,
         region: this.region,
-        image: {
-          cameraMake: null,
-          cameraModel: null,
-          colorSpace: metadata?.colorSpace ?? null,
-          dominantColorHex: null,
-          format: metadata?.format ?? "unknown",
-          frames: metadata?.frames ?? 1,
-          gpsLat: null,
-          gpsLon: null,
-          hasAlpha: metadata?.hasAlpha ?? false,
-          iccProfile: metadata?.iccProfile ?? undefined,
-          lensModel: null,
-          orientation: metadata?.orientation ?? null,
-          updatedAt: undefined,
-          exifDateTimeOriginal: metadata?.exifDateTimeOriginal
-            ? new Date(metadata.exifDateTimeOriginal)
-            : null,
-          animated: metadata?.animated ?? false,
-          aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
-          width: width ?? 0,
-          height: height ?? 0
-        },
+        ...(mimeType.startsWith("image") &&
+        typeof docOrImg.image !== "undefined"
+          ? { image: docOrImg.image }
+          : (mimeType.startsWith("text") ||
+                mimeType.startsWith("application")) &&
+              typeof docOrImg.document !== "undefined"
+            ? { document: docOrImg?.document }
+            : {}),
         mime: mimeType,
         assetType: mimeType.startsWith("image/")
           ? "IMAGE"

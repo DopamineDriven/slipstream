@@ -1,5 +1,5 @@
 export const modelIdsByProvider = {
-  openai: [
+  "openai": [
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
@@ -14,10 +14,9 @@ export const modelIdsByProvider = {
     "gpt-4o-mini",
     "gpt-4",
     "gpt-4-turbo",
-    "gpt-3.5-turbo",
-    "gpt-3.5-turbo-16k"
+    "gpt-3.5-turbo"
   ],
-  gemini: [
+  "gemini": [
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -34,9 +33,11 @@ export const modelIdsByProvider = {
     "veo-3.0-fast-generate-preview",
     "veo-2.0-generate-001"
   ],
-  grok: [
+  "grok": [
     "grok-4-0709",
     "grok-code-fast-1",
+    "grok-4-fast-reasoning",
+    "grok-4-fast-non-reasoning",
     "grok-3",
     "grok-3-fast",
     "grok-3-mini",
@@ -44,7 +45,7 @@ export const modelIdsByProvider = {
     "grok-2-image-1212",
     "grok-2-vision-1212"
   ],
-  anthropic: [
+  "anthropic": [
     "claude-opus-4-1-20250805",
     "claude-opus-4-20250514",
     "claude-sonnet-4-20250514",
@@ -54,7 +55,7 @@ export const modelIdsByProvider = {
     "claude-3-5-sonnet-20240620",
     "claude-3-haiku-20240307"
   ],
-  meta: [
+  "meta": [
     "Llama-4-Maverick-17B-128E-Instruct-FP8",
     "Llama-4-Scout-17B-16E-Instruct-FP8",
     "Llama-3.3-70B-Instruct",
@@ -63,5 +64,9 @@ export const modelIdsByProvider = {
     "Cerebras-Llama-4-Scout-17B-16E-Instruct",
     "Groq-Llama-4-Maverick-17B-128E-Instruct"
   ],
-  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
+  "vercel": [
+    "v0-1.5-md",
+    "v0-1.5-lg",
+    "v0-1.0-md"
+  ]
 } as const;
