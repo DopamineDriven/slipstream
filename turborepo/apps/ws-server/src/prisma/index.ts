@@ -7,6 +7,10 @@ import type {
   VideoMetadata
 } from "@/generated/client/client.ts";
 import type { ConversationSingleton, UserData } from "@/types/index.ts";
+import { PrismaClient } from "@/generated/client/client.ts";
+import { ModelService } from "@/models/index.ts";
+import { Fs } from "@d0paminedriven/fs";
+import { PrismaPg } from "@prisma/adapter-pg";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -16,10 +20,6 @@ import type {
   RTC,
   XOR
 } from "@slipstream/types";
-import { PrismaClient } from "@/generated/client/client.ts";
-import { ModelService } from "@/models/index.ts";
-import { Fs } from "@d0paminedriven/fs";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { EncryptionService } from "@slipstream/encryption";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
@@ -1027,6 +1027,20 @@ export class PrismaService extends ModelService {
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
   }
+  public async findActiveOpenAIAsset(
+    attachmentId: string,
+    keyFingerprint="server"
+  ) {
+    return this.prismaClient.attachmentProvider.findFirst({
+      where: {
+        attachmentId,
+        provider: "OPENAI",
+        keyFingerprint,
+        state: "ACTIVE"
+        // no TTL for OpenAI files; they persist until you delete them
+      }
+    });
+  }
 
   public async findActiveGeminiAsset(
     attachmentId: string,
@@ -1043,9 +1057,40 @@ export class PrismaService extends ModelService {
     });
   }
 
+  public async upsertOpenAIAssetMapping(
+    attachmentId: string,
+    keyFingerprint="server",
+    mime: string,
+    keyId?: string
+  ) {
+    return this.prismaClient.attachmentProvider.upsert({
+      where: {
+        attachmentId_provider_keyFingerprint: {
+          attachmentId,
+          provider: "OPENAI",
+          keyFingerprint
+        }
+      },
+      update: {
+        state: "PENDING",
+        errorCode: null,
+        errorMessage: null,
+        lastCheckedAt: new Date(Date.now())
+      },
+      create: {
+        attachmentId,
+        provider: "OPENAI",
+        userKeyId: keyId,
+        keyFingerprint,
+        state: "PENDING",
+        mime
+      }
+    });
+  }
+
   public async upsertGeminiAssetMapping(
     attachmentId: string,
-    keyFingerprint: string,
+    keyFingerprint="server",
     mime: string,
     keyId?: string
   ) {
@@ -1074,6 +1119,23 @@ export class PrismaService extends ModelService {
     });
   }
 
+  public async finalizeOpenAIAsset(
+    mappingId: string,
+    providerRef: string,
+    size?: bigint
+  ) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "ACTIVE",
+        providerRef, // store openai file_id here
+        size,
+        readyAt: new Date(Date.now()),
+        lastCheckedAt: new Date(Date.now())
+      }
+    });
+  }
+
   public async finalizeGeminiAsset(
     mappingId: string,
     providerUri: string,
@@ -1087,22 +1149,30 @@ export class PrismaService extends ModelService {
         providerUri,
         providerRef,
         expiresAt,
-        readyAt: new Date(),
-        lastCheckedAt: new Date()
+        readyAt: new Date(Date.now()),
+        lastCheckedAt: new Date(Date.now())
       }
     });
   }
 
-  public async markGeminiAssetFailed(
-    mappingId: string,
-    errorMessage: string
-  ): Promise<void> {
+  public async markOpenAIAssetFailed(mappingId: string, errorMessage: string) {
     await this.prismaClient.attachmentProvider.update({
       where: { id: mappingId },
       data: {
         state: "FAILED",
         errorMessage,
-        lastCheckedAt: new Date()
+        lastCheckedAt: new Date(Date.now())
+      }
+    });
+  }
+
+  public async markGeminiAssetFailed(mappingId: string, errorMessage: string) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "FAILED",
+        errorMessage,
+        lastCheckedAt: new Date(Date.now())
       }
     });
   }

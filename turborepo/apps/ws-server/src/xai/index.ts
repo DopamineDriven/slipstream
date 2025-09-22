@@ -23,7 +23,7 @@ export class xAIService {
     private apiKey?: string
   ) {}
 
-  public async *stream(
+  private async *stream(
     model = "grok-4-0709" satisfies GrokModelIdUnion,
     messages: readonly (
       | {
@@ -125,7 +125,7 @@ export class xAIService {
     ] as const;
   }
 
-  public xAiFormat(
+  private xAiFormat(
     isNewChat: boolean,
     msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
