@@ -14,8 +14,7 @@ export const displayNameModelsByProvider = {
     "GPT-4o mini",
     "GPT-4",
     "GPT-4 turbo",
-    "GPT-3.5 turbo",
-    "GPT-3.5 turbo 16k"
+    "GPT-3.5 turbo"
   ],
   gemini: [
     "Gemini 2.5 Pro",
@@ -37,6 +36,8 @@ export const displayNameModelsByProvider = {
   grok: [
     "Grok 4",
     "Grok Code Fast 1",
+    "Grok 4 Fast Reasoning",
+    "Grok 4 Fast Non-Reasoning",
     "Grok 3",
     "Grok 3 Fast",
     "Grok 3 Mini",

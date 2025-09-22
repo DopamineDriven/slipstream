@@ -14,8 +14,7 @@ export const modelIdToDisplayName = {
     "gpt-4o-mini": "GPT-4o mini",
     "gpt-4": "GPT-4",
     "gpt-4-turbo": "GPT-4 turbo",
-    "gpt-3.5-turbo": "GPT-3.5 turbo",
-    "gpt-3.5-turbo-16k": "GPT-3.5 turbo 16k"
+    "gpt-3.5-turbo": "GPT-3.5 turbo"
   },
   gemini: {
     "gemini-2.5-pro": "Gemini 2.5 Pro",
@@ -38,6 +37,8 @@ export const modelIdToDisplayName = {
   grok: {
     "grok-4-0709": "Grok 4",
     "grok-code-fast-1": "Grok Code Fast 1",
+    "grok-4-fast-reasoning": "Grok 4 Fast Reasoning",
+    "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
     "grok-3": "Grok 3",
     "grok-3-fast": "Grok 3 Fast",
     "grok-3-mini": "Grok 3 Mini",

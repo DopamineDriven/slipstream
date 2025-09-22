@@ -26,8 +26,7 @@ const providerModelChatApi = {
     "gpt-4o-mini",
     "gpt-4",
     "gpt-4-turbo",
-    "gpt-3.5-turbo",
-    "gpt-3.5-turbo-16k"
+    "gpt-3.5-turbo"
   ],
   gemini: [
     "gemini-2.5-pro",
@@ -49,6 +48,8 @@ const providerModelChatApi = {
   grok: [
     "grok-4-0709",
     "grok-code-fast-1",
+    "grok-4-fast-reasoning",
+    "grok-4-fast-non-reasoning",
     "grok-3",
     "grok-3-fast",
     "grok-3-mini",
@@ -111,6 +112,26 @@ async function geminiFetcher() {
   return await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
   );
+}
+
+
+/**
+ * one-offs here for when xAI ships odd labels
+ */
+const GROK_NAME_OVERRIDES = {
+  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
+} satisfies Record<string, string>;
+
+function grokDisplayName(id: string) {
+  // Start from your generic formatter (already fixes 4-digit suffix dates etc.)
+  let s = prettyModelName(id, "grok");
+
+  // Opinionated cleanup: "Non Reasoning" -> "Non-Reasoning"
+  s = s.replace(/\bNon Reasoning\b/i, "Non-Reasoning");
+
+  // Explicit model-specific overrides take ultimate precedence
+
+  return id=== "grok-4-fast-non-reasoning" ? GROK_NAME_OVERRIDES[id] : s;
 }
 
 function displayNameV0(id: string): string {
@@ -224,7 +245,7 @@ function normalizeGrokSegments(segments: string[]): string[] {
   return segments;
 }
 
-function prettyModelName(id: string, provider: Provider = "openai"): string {
+function prettyModelName(id: string, provider: Provider = "openai") {
   let segments = id.split(/[-_]/);
 
   segments = normalizeGrokSegments(segments);
@@ -262,7 +283,7 @@ function formattedGrok(props: GrokModelsResponse) {
   return props.data.map(t => {
     const { id, ...rest } = t;
     const displayName = prettyModelName(id, "grok");
-    return { id, displayName, ...rest };
+    return { id, ...rest, displayName };
   });
 }
 
@@ -297,7 +318,7 @@ const modelMapper = async (modelKeys = true) => {
   const parseOpenAi = formattedOpenAi(
     JSON.parse(await openAiData.text()) as OpenAiResponse
   );
-  const parseGrok = formattedGrok(
+  const _parseGrok = formattedGrok(
     JSON.parse(await grokData.text()) as GrokModelsResponse
   );
   const parseIt = formattedAnthropic(
@@ -361,13 +382,14 @@ const modelMapper = async (modelKeys = true) => {
       case "grok": {
         let helper = Array.of<[string, string]>();
         models.forEach(function (model) {
+          const name = grokDisplayName(model);
           modelKeys === true
             ? helper.push([
                 model,
-                parseGrok.find(t => t.id === model)?.displayName ?? model
+                name
               ])
             : helper.push([
-                parseGrok.find(t => t.id === model)?.displayName ?? model,
+                name,
                 model
               ]);
         });
