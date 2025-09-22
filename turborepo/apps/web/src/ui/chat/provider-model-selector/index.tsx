@@ -190,7 +190,11 @@ export function ProviderModelSelector({
         className
       )}>
       <currentMeta.icon className="mr-2 size-4 flex-shrink-0" />
-      <span className="max-w-[15ch] truncate">{selectedModel.displayName}</span>
+      <div className="flex">
+        <span className="max-w-[20ch] truncate sm:max-w-fit">
+          {selectedModel.displayName}
+        </span>
+      </div>
       <ChevronDown className="ml-1 size-4" />
     </Button>
   );

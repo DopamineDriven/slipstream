@@ -118,7 +118,13 @@ export function ChatInput({
 
   const assets = useAssets({
     max: 10,
-    allowedTypes: ["image/*", "application/pdf", "text/markdown", "text/plain"]
+    allowedTypes: [
+      "image/*",
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/markdown",
+      "text/plain"
+    ]
   });
 
   const attachmentsRef = useRef<AttachmentPreview[]>(assets.attachments);
@@ -427,7 +433,13 @@ export function ChatInput({
     el.value = "";
     el.click();
   };
-
+  const fileMemo = useMemo(
+    () =>
+      selectedModel.provider === "openai"
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,application/*,text/*"
+        : ".pdf,.docx,application/*,text/*",
+    [selectedModel.provider]
+  );
   const handleScrollToBottom = () => {
     window.chatScrollToBottom?.();
   };
@@ -461,7 +473,7 @@ export function ChatInput({
         hidden={true}
         aria-hidden="true"
         tabIndex={-1}
-        accept=".pdf,application/*,text/*"
+        accept={fileMemo}
         onChange={e => {
           onInputChange(e.target.files);
           e.currentTarget.value = "";
