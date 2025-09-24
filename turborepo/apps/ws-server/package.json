@@ -38,6 +38,9 @@
       "openai": [
         "dist/openai/index.d.ts"
       ],
+      "pdf": [
+        "dist/pdf/index.d.ts"
+      ],
       "prisma": [
         "dist/prisma/index.d.ts"
       ],
@@ -69,7 +72,7 @@
     "prebuild": "pnpm db:generate",
     "postinstall": "pnpm db:generate",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" --ignore-unknown --cache",
     "prisma:studio": "prisma studio --browser none --port 7777",

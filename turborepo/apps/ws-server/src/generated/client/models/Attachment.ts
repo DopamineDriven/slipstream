@@ -52,6 +52,14 @@ export type AttachmentMinAggregateOutputType = {
   publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
+  compatMime: string | null
+  compatExt: string | null
+  compatVersionId: string | null
+  compatKey: string | null
+  compatS3ObjectId: string | null
+  compatStatus: $Enums.CompatStatus | null
+  compatReadyAt: Date | null
+  compatCdnUrl: string | null
   bucket: string | null
   key: string | null
   versionId: string | null
@@ -93,6 +101,14 @@ export type AttachmentMaxAggregateOutputType = {
   publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
+  compatMime: string | null
+  compatExt: string | null
+  compatVersionId: string | null
+  compatKey: string | null
+  compatS3ObjectId: string | null
+  compatStatus: $Enums.CompatStatus | null
+  compatReadyAt: Date | null
+  compatCdnUrl: string | null
   bucket: string | null
   key: string | null
   versionId: string | null
@@ -134,6 +150,14 @@ export type AttachmentCountAggregateOutputType = {
   publicUrl: number
   sourceUrl: number
   thumbnailKey: number
+  compatMime: number
+  compatExt: number
+  compatVersionId: number
+  compatKey: number
+  compatS3ObjectId: number
+  compatStatus: number
+  compatReadyAt: number
+  compatCdnUrl: number
   bucket: number
   key: number
   versionId: number
@@ -187,6 +211,14 @@ export type AttachmentMinAggregateInputType = {
   publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
+  compatMime?: true
+  compatExt?: true
+  compatVersionId?: true
+  compatKey?: true
+  compatS3ObjectId?: true
+  compatStatus?: true
+  compatReadyAt?: true
+  compatCdnUrl?: true
   bucket?: true
   key?: true
   versionId?: true
@@ -228,6 +260,14 @@ export type AttachmentMaxAggregateInputType = {
   publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
+  compatMime?: true
+  compatExt?: true
+  compatVersionId?: true
+  compatKey?: true
+  compatS3ObjectId?: true
+  compatStatus?: true
+  compatReadyAt?: true
+  compatCdnUrl?: true
   bucket?: true
   key?: true
   versionId?: true
@@ -269,6 +309,14 @@ export type AttachmentCountAggregateInputType = {
   publicUrl?: true
   sourceUrl?: true
   thumbnailKey?: true
+  compatMime?: true
+  compatExt?: true
+  compatVersionId?: true
+  compatKey?: true
+  compatS3ObjectId?: true
+  compatStatus?: true
+  compatReadyAt?: true
+  compatCdnUrl?: true
   bucket?: true
   key?: true
   versionId?: true
@@ -397,6 +445,14 @@ export type AttachmentGroupByOutputType = {
   publicUrl: string | null
   sourceUrl: string | null
   thumbnailKey: string | null
+  compatMime: string | null
+  compatExt: string | null
+  compatVersionId: string | null
+  compatKey: string | null
+  compatS3ObjectId: string | null
+  compatStatus: $Enums.CompatStatus | null
+  compatReadyAt: Date | null
+  compatCdnUrl: string | null
   bucket: string
   key: string
   versionId: string | null
@@ -461,6 +517,14 @@ export type AttachmentWhereInput = {
   publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -510,6 +574,14 @@ export type AttachmentOrderByWithRelationInput = {
   publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   versionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -562,6 +634,14 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -611,6 +691,14 @@ export type AttachmentOrderByWithAggregationInput = {
   publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   versionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -660,6 +748,14 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   publicUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatMime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatExt?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatVersionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatS3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
+  compatStatus?: Prisma.EnumCompatStatusNullableWithAggregatesFilter<"Attachment"> | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
+  compatCdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
   bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   versionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
@@ -698,6 +794,14 @@ export type AttachmentCreateInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -747,6 +851,14 @@ export type AttachmentUncheckedCreateInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -790,6 +902,14 @@ export type AttachmentUpdateInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -839,6 +959,14 @@ export type AttachmentUncheckedUpdateInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,6 +1013,14 @@ export type AttachmentCreateManyInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -923,6 +1059,14 @@ export type AttachmentUpdateManyMutationInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -964,6 +1108,14 @@ export type AttachmentUncheckedUpdateManyInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1015,6 +1167,14 @@ export type AttachmentCountOrderByAggregateInput = {
   publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
+  compatMime?: Prisma.SortOrder
+  compatExt?: Prisma.SortOrder
+  compatVersionId?: Prisma.SortOrder
+  compatKey?: Prisma.SortOrder
+  compatS3ObjectId?: Prisma.SortOrder
+  compatStatus?: Prisma.SortOrder
+  compatReadyAt?: Prisma.SortOrder
+  compatCdnUrl?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   versionId?: Prisma.SortOrder
@@ -1061,6 +1221,14 @@ export type AttachmentMaxOrderByAggregateInput = {
   publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
+  compatMime?: Prisma.SortOrder
+  compatExt?: Prisma.SortOrder
+  compatVersionId?: Prisma.SortOrder
+  compatKey?: Prisma.SortOrder
+  compatS3ObjectId?: Prisma.SortOrder
+  compatStatus?: Prisma.SortOrder
+  compatReadyAt?: Prisma.SortOrder
+  compatCdnUrl?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   versionId?: Prisma.SortOrder
@@ -1102,6 +1270,14 @@ export type AttachmentMinOrderByAggregateInput = {
   publicUrl?: Prisma.SortOrder
   sourceUrl?: Prisma.SortOrder
   thumbnailKey?: Prisma.SortOrder
+  compatMime?: Prisma.SortOrder
+  compatExt?: Prisma.SortOrder
+  compatVersionId?: Prisma.SortOrder
+  compatKey?: Prisma.SortOrder
+  compatS3ObjectId?: Prisma.SortOrder
+  compatStatus?: Prisma.SortOrder
+  compatReadyAt?: Prisma.SortOrder
+  compatCdnUrl?: Prisma.SortOrder
   bucket?: Prisma.SortOrder
   key?: Prisma.SortOrder
   versionId?: Prisma.SortOrder
@@ -1278,6 +1454,10 @@ export type EnumAssetTypeFieldUpdateOperationsInput = {
   set?: $Enums.AssetType
 }
 
+export type NullableEnumCompatStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CompatStatus | null
+}
+
 export type NullableBigIntFieldUpdateOperationsInput = {
   set?: bigint | number | null
   increment?: bigint | number
@@ -1374,6 +1554,14 @@ export type AttachmentCreateWithoutUserInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1421,6 +1609,14 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1496,6 +1692,14 @@ export type AttachmentScalarWhereInput = {
   publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
   bucket?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
   versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
@@ -1534,6 +1738,14 @@ export type AttachmentCreateWithoutConversationInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1581,6 +1793,14 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1650,6 +1870,14 @@ export type AttachmentCreateWithoutMessageInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1697,6 +1925,14 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1766,6 +2002,14 @@ export type AttachmentCreateWithoutProviderLinksInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1814,6 +2058,14 @@ export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -1872,6 +2124,14 @@ export type AttachmentUpdateWithoutProviderLinksInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1920,6 +2180,14 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1962,6 +2230,14 @@ export type AttachmentCreateWithoutImageInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2010,6 +2286,14 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2068,6 +2352,14 @@ export type AttachmentUpdateWithoutImageInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2116,6 +2408,14 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2158,6 +2458,14 @@ export type AttachmentCreateWithoutVideoInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2206,6 +2514,14 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2264,6 +2580,14 @@ export type AttachmentUpdateWithoutVideoInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2312,6 +2636,14 @@ export type AttachmentUncheckedUpdateWithoutVideoInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2354,6 +2686,14 @@ export type AttachmentCreateWithoutAudioInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2402,6 +2742,14 @@ export type AttachmentUncheckedCreateWithoutAudioInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2460,6 +2808,14 @@ export type AttachmentUpdateWithoutAudioInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2508,6 +2864,14 @@ export type AttachmentUncheckedUpdateWithoutAudioInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2550,6 +2914,14 @@ export type AttachmentCreateWithoutDocumentInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2598,6 +2970,14 @@ export type AttachmentUncheckedCreateWithoutDocumentInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2656,6 +3036,14 @@ export type AttachmentUpdateWithoutDocumentInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2704,6 +3092,14 @@ export type AttachmentUncheckedUpdateWithoutDocumentInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2748,6 +3144,14 @@ export type AttachmentCreateManyUserInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2786,6 +3190,14 @@ export type AttachmentUpdateWithoutUserInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2833,6 +3245,14 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2878,6 +3298,14 @@ export type AttachmentUncheckedUpdateManyWithoutUserInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2918,6 +3346,14 @@ export type AttachmentCreateManyConversationInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -2956,6 +3392,14 @@ export type AttachmentUpdateWithoutConversationInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3003,6 +3447,14 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3048,6 +3500,14 @@ export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3088,6 +3548,14 @@ export type AttachmentCreateManyMessageInput = {
   publicUrl?: string | null
   sourceUrl?: string | null
   thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
   bucket: string
   key: string
   versionId?: string | null
@@ -3126,6 +3594,14 @@ export type AttachmentUpdateWithoutMessageInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3173,6 +3649,14 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3218,6 +3702,14 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
   publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bucket?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3290,6 +3782,14 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
+  compatMime?: boolean
+  compatExt?: boolean
+  compatVersionId?: boolean
+  compatKey?: boolean
+  compatS3ObjectId?: boolean
+  compatStatus?: boolean
+  compatReadyAt?: boolean
+  compatCdnUrl?: boolean
   bucket?: boolean
   key?: boolean
   versionId?: boolean
@@ -3340,6 +3840,14 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
+  compatMime?: boolean
+  compatExt?: boolean
+  compatVersionId?: boolean
+  compatKey?: boolean
+  compatS3ObjectId?: boolean
+  compatStatus?: boolean
+  compatReadyAt?: boolean
+  compatCdnUrl?: boolean
   bucket?: boolean
   key?: boolean
   versionId?: boolean
@@ -3384,6 +3892,14 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
+  compatMime?: boolean
+  compatExt?: boolean
+  compatVersionId?: boolean
+  compatKey?: boolean
+  compatS3ObjectId?: boolean
+  compatStatus?: boolean
+  compatReadyAt?: boolean
+  compatCdnUrl?: boolean
   bucket?: boolean
   key?: boolean
   versionId?: boolean
@@ -3428,6 +3944,14 @@ export type AttachmentSelectScalar = {
   publicUrl?: boolean
   sourceUrl?: boolean
   thumbnailKey?: boolean
+  compatMime?: boolean
+  compatExt?: boolean
+  compatVersionId?: boolean
+  compatKey?: boolean
+  compatS3ObjectId?: boolean
+  compatStatus?: boolean
+  compatReadyAt?: boolean
+  compatCdnUrl?: boolean
   bucket?: boolean
   key?: boolean
   versionId?: boolean
@@ -3452,7 +3976,7 @@ export type AttachmentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "compatMime" | "compatExt" | "compatVersionId" | "compatKey" | "compatS3ObjectId" | "compatStatus" | "compatReadyAt" | "compatCdnUrl" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
@@ -3504,6 +4028,14 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     publicUrl: string | null
     sourceUrl: string | null
     thumbnailKey: string | null
+    compatMime: string | null
+    compatExt: string | null
+    compatVersionId: string | null
+    compatKey: string | null
+    compatS3ObjectId: string | null
+    compatStatus: $Enums.CompatStatus | null
+    compatReadyAt: Date | null
+    compatCdnUrl: string | null
     bucket: string
     key: string
     versionId: string | null
@@ -3973,6 +4505,14 @@ export interface AttachmentFieldRefs {
   readonly publicUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly sourceUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly thumbnailKey: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatMime: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatExt: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatVersionId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatKey: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatS3ObjectId: Prisma.FieldRef<"Attachment", 'String'>
+  readonly compatStatus: Prisma.FieldRef<"Attachment", 'CompatStatus'>
+  readonly compatReadyAt: Prisma.FieldRef<"Attachment", 'DateTime'>
+  readonly compatCdnUrl: Prisma.FieldRef<"Attachment", 'String'>
   readonly bucket: Prisma.FieldRef<"Attachment", 'String'>
   readonly key: Prisma.FieldRef<"Attachment", 'String'>
   readonly versionId: Prisma.FieldRef<"Attachment", 'String'>

@@ -60,6 +60,10 @@ export interface CredentialEntity {
   SAFETY_ID_SECRET?: string;
   AWS_SECRET_ACCESS_KEY_S3?: string;
   AWS_ACCESS_KEY_S3?: string;
+  PDF_SERVICES_CLIENT_ID?: string;
+  PDF_SERVICES_CLIENT_SECRET?: string;
+  PDF_SERVICES_ORGANIZATION_ID?: string;
+  ADOBE_WEBHOOK_SECRET?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

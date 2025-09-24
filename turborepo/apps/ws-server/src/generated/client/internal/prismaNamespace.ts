@@ -1810,6 +1810,14 @@ export const AttachmentScalarFieldEnum = {
   publicUrl: 'publicUrl',
   sourceUrl: 'sourceUrl',
   thumbnailKey: 'thumbnailKey',
+  compatMime: 'compatMime',
+  compatExt: 'compatExt',
+  compatVersionId: 'compatVersionId',
+  compatKey: 'compatKey',
+  compatS3ObjectId: 'compatS3ObjectId',
+  compatStatus: 'compatStatus',
+  compatReadyAt: 'compatReadyAt',
+  compatCdnUrl: 'compatCdnUrl',
   bucket: 'bucket',
   key: 'key',
   versionId: 'versionId',
@@ -2150,6 +2158,20 @@ export type EnumAssetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'AssetType[]'
  */
 export type ListEnumAssetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssetType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CompatStatus'
+ */
+export type EnumCompatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompatStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CompatStatus[]'
+ */
+export type ListEnumCompatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompatStatus[]'>
     
 
 

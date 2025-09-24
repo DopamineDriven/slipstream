@@ -20,6 +20,7 @@ import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
+  DocSpecs,
   EventTypeMap,
   ImageSpecs,
   Provider,
@@ -130,11 +131,15 @@ export class Resolver extends ModelService {
       : undefined;
   }
 
-  private extToContentType(metadata?: ImageSpecs) {
+  private extToContentType(metadata?: ImageSpecs | DocSpecs) {
     return metadata?.format && metadata.format !== "unknown"
-      ? this.s3Service.fs.getMimes(
-          metadata.format === "heic" ? "avif" : metadata.format
-        )[0]
+      ? metadata.type === "IMAGE"
+        ? this.s3Service.fs.getMimes(
+            metadata.format === "heic" ? "avif" : metadata.format
+          )[0]
+        : metadata.type === "DOCUMENT"
+          ? (metadata.mimeType ?? "")
+          : ""
       : "";
   }
 
@@ -582,6 +587,18 @@ export class Resolver extends ModelService {
     }
   }
 
+  private handleAssetType(mimeType: string) {
+    return mimeType.startsWith("image/")
+      ? ("IMAGE" as const)
+      : mimeType.startsWith("application/") || mimeType.startsWith("text/")
+        ? ("DOCUMENT" as const)
+        : mimeType.startsWith("audio/")
+          ? ("AUDIO" as const)
+          : mimeType.startsWith("video/")
+            ? ("VIDEO" as const)
+            : ("UNKNOWN" as const);
+  }
+
   public async handleAssetAttached(
     event: EventTypeMap["asset_attached"],
     ws: WebSocket,
@@ -652,58 +669,61 @@ export class Resolver extends ModelService {
       );
       // Create attachment record in database
 
-      const docOrImg = mimeType.startsWith("image")
-        ? {
-            image: {
-              cameraMake: null,
-              cameraModel: null,
-              colorSpace: metadata?.colorSpace ?? null,
-              dominantColorHex: null,
-              format: metadata?.format ?? "unknown",
-              frames: metadata?.frames ?? 1,
-              gpsLat: null,
-              gpsLon: null,
-              hasAlpha: metadata?.hasAlpha ?? false,
-              iccProfile: metadata?.iccProfile ?? null,
-              lensModel: null,
-              orientation: metadata?.orientation ?? null,
-              updatedAt: undefined,
-              exifDateTimeOriginal: metadata?.exifDateTimeOriginal
-                ? new Date(metadata.exifDateTimeOriginal)
-                : null,
-              animated: metadata?.animated ?? false,
-              aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
-              width: width ?? 0,
-              height: height ?? 0
-            } satisfies RTC<
-              ImageSingleton,
-              "attachmentId" | "createdAt" | "updatedAt"
-            >
-          }
-        : mimeType.startsWith("application") || mimeType.startsWith("text")
+      const docOrImg =
+        mimeType.startsWith("image") && metadata?.type === "IMAGE"
           ? {
-              document: {
-                title: filename,
-                attachmentId: undefined,
-                format: extension,
-                pageCount: null,
-                wordCount: null,
-                language: null,
-                author: null,
-                subject: null,
-                keywords: [""],
-                pdfVersion: null,
-                isEncrypted: false,
-                isSearchable: false,
-                encoding: null,
-                lineCount: null,
-                textPreview: null
+              image: {
+                cameraMake: null,
+                cameraModel: null,
+                colorSpace: metadata?.colorSpace ?? null,
+                dominantColorHex: null,
+                format: metadata?.format ?? "unknown",
+                frames: metadata?.frames ?? 1,
+                gpsLat: null,
+                gpsLon: null,
+                hasAlpha: metadata?.hasAlpha ?? false,
+                iccProfile: metadata?.iccProfile ?? null,
+                lensModel: null,
+                orientation: metadata?.orientation ?? null,
+                updatedAt: undefined,
+                exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+                  ? new Date(metadata.exifDateTimeOriginal)
+                  : null,
+                animated: metadata?.animated ?? false,
+                aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+                width: width ?? 0,
+                height: height ?? 0
               } satisfies RTC<
-                DocumentSingleton,
+                ImageSingleton,
                 "attachmentId" | "createdAt" | "updatedAt"
               >
             }
-          : {};
+          : (metadata?.type === "DOCUMENT" &&
+                mimeType.startsWith("application")) ||
+              mimeType.startsWith("text")
+            ? {
+                document: {
+                  title: filename,
+                  attachmentId: undefined,
+                  format: extension,
+                  pageCount: null,
+                  wordCount: null,
+                  language: null,
+                  author: null,
+                  subject: null,
+                  keywords: [""],
+                  pdfVersion: null,
+                  isEncrypted: false,
+                  isSearchable: false,
+                  encoding: null,
+                  lineCount: null,
+                  textPreview: null
+                } satisfies RTC<
+                  DocumentSingleton,
+                  "attachmentId" | "createdAt" | "updatedAt"
+                >
+              }
+            : {};
 
       const attachment = await this.wsServer.prisma.createAttachment({
         conversationId,
@@ -721,15 +741,7 @@ export class Resolver extends ModelService {
             ? { document: docOrImg?.document }
             : {}),
         mime: mimeType,
-        assetType: mimeType.startsWith("image/")
-          ? "IMAGE"
-          : mimeType.startsWith("application/") || mimeType.startsWith("text/")
-            ? "DOCUMENT"
-            : mimeType.startsWith("audio/")
-              ? "AUDIO"
-              : mimeType.startsWith("video/")
-                ? "VIDEO"
-                : "UNKNOWN",
+        assetType: this.handleAssetType(mimeType),
         ext: extension,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
@@ -873,58 +885,61 @@ export class Resolver extends ModelService {
         3600 // 1 hour expiry
       );
 
-      const docOrImg = mimeType.startsWith("image")
-        ? {
-            image: {
-              cameraMake: null,
-              cameraModel: null,
-              colorSpace: metadata?.colorSpace ?? null,
-              dominantColorHex: null,
-              format: metadata?.format ?? "unknown",
-              frames: metadata?.frames ?? 1,
-              gpsLat: null,
-              gpsLon: null,
-              hasAlpha: metadata?.hasAlpha ?? false,
-              iccProfile: metadata?.iccProfile ?? null,
-              lensModel: null,
-              orientation: metadata?.orientation ?? null,
-              updatedAt: undefined,
-              exifDateTimeOriginal: metadata?.exifDateTimeOriginal
-                ? new Date(metadata.exifDateTimeOriginal)
-                : null,
-              animated: metadata?.animated ?? false,
-              aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
-              width: width ?? 0,
-              height: height ?? 0
-            } satisfies RTC<
-              ImageSingleton,
-              "attachmentId" | "createdAt" | "updatedAt"
-            >
-          }
-        : mimeType.startsWith("application") || mimeType.startsWith("text")
+      const docOrImg =
+        mimeType.startsWith("image") && metadata?.type === "IMAGE"
           ? {
-              document: {
-                title: filename,
-                attachmentId: undefined,
-                format: extension,
-                pageCount: null,
-                wordCount: null,
-                language: null,
-                author: null,
-                subject: null,
-                keywords: [""],
-                pdfVersion: null,
-                isEncrypted: false,
-                isSearchable: false,
-                encoding: null,
-                lineCount: null,
-                textPreview: null
+              image: {
+                cameraMake: null,
+                cameraModel: null,
+                colorSpace: metadata?.colorSpace ?? null,
+                dominantColorHex: null,
+                format: metadata?.format,
+                frames: metadata?.frames ?? 1,
+                gpsLat: null,
+                gpsLon: null,
+                hasAlpha: metadata?.hasAlpha ?? false,
+                iccProfile: metadata?.iccProfile ?? null,
+                lensModel: null,
+                orientation: metadata?.orientation ?? null,
+                updatedAt: undefined,
+                exifDateTimeOriginal: metadata?.exifDateTimeOriginal
+                  ? new Date(metadata.exifDateTimeOriginal)
+                  : null,
+                animated: metadata?.animated ?? false,
+                aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
+                width: width ?? 0,
+                height: height ?? 0
               } satisfies RTC<
-                DocumentSingleton,
+                ImageSingleton,
                 "attachmentId" | "createdAt" | "updatedAt"
               >
             }
-          : {};
+          : metadata?.type === "DOCUMENT" &&
+              (mimeType.startsWith("application") ||
+                mimeType.startsWith("text"))
+            ? {
+                document: {
+                  title: filename,
+                  attachmentId: undefined,
+                  format: metadata?.format ?? extension,
+                  pageCount: null,
+                  wordCount: null,
+                  language: null,
+                  author: null,
+                  subject: null,
+                  keywords: [""],
+                  pdfVersion: null,
+                  isEncrypted: false,
+                  isSearchable: false,
+                  encoding: null,
+                  lineCount: null,
+                  textPreview: null
+                } satisfies RTC<
+                  DocumentSingleton,
+                  "attachmentId" | "createdAt" | "updatedAt"
+                >
+              }
+            : {};
 
       // Create attachment record in database
       const attachment = await this.wsServer.prisma.createAttachment({
@@ -942,15 +957,7 @@ export class Resolver extends ModelService {
             ? { document: docOrImg?.document }
             : {}),
         mime: mimeType,
-        assetType: mimeType.startsWith("image/")
-          ? "IMAGE"
-          : mimeType.startsWith("application/")
-            ? "DOCUMENT"
-            : mimeType.startsWith("audio/")
-              ? "AUDIO"
-              : mimeType.startsWith("video/")
-                ? "VIDEO"
-                : "UNKNOWN",
+        assetType: this.handleAssetType(mimeType),
         ext: extension,
         draftId,
         bucket: presignedData.bucket,
@@ -1289,12 +1296,28 @@ export class Resolver extends ModelService {
     }
   }
 
+  private toBigInt(size?: number, bytesUploaded?: number) {
+    return size
+      ? size === 0
+        ? 0n
+        : BigInt(size)
+      : bytesUploaded
+        ? bytesUploaded === 0
+          ? 0n
+          : BigInt(bytesUploaded)
+        : undefined;
+  }
+
+  private fromBigInt(size: bigint | null) {
+    return size ? (size === 0n ? 0 : Number(size)) : undefined;
+  }
+
   public async handleAssetUploadComplete(
     event: EventTypeMap["asset_upload_complete"],
     ws: WebSocket,
     userId: string,
     _userData?: UserData
-  ): Promise<void> {
+  ) {
     const {
       conversationId = "new-chat",
       attachmentId,
@@ -1311,9 +1334,9 @@ export class Resolver extends ModelService {
       versionId,
       etag
     } = event;
+
     const redisChannel = this.resolveChannel(conversationId, userId);
     try {
-      // ✅ HEAD request to S3 to get full metadata
       const {
         publicUrl,
         bucket: finalBucket,
@@ -1335,13 +1358,17 @@ export class Resolver extends ModelService {
         storageClass
       } = await this.s3Service.finalize(bucket, key, this.isProd, versionId);
 
-      const s3ObjectId = `s3://${bucket}/${key}#${versionId}` as const;
-      console.log(
-        `final s3ObjectId and constructed s3ObjectId are equal: ` +
-          finalS3ObjectId ===
-          s3ObjectId
-      );
-      // ✅ Update DB with real values
+      const compatStatus =
+        extension === "pdf"
+          ? "ALIASED"
+          : extension === "jpg"
+            ? "ALIASED"
+            : extension === "png"
+              ? "ALIASED"
+              : extension === "webp"
+                ? "ALIASED"
+                : "PENDING";
+
       const attachment = await this.wsServer.prisma.updateAttachment({
         bucket: finalBucket,
         cacheControl,
@@ -1349,6 +1376,7 @@ export class Resolver extends ModelService {
         checksumSha256: checksum?.value,
         contentDisposition,
         draftId,
+        compatStatus,
         expiresAt: expires,
         s3LastModified: lastModified ? new Date(lastModified) : undefined,
         storageClass,
@@ -1360,6 +1388,22 @@ export class Resolver extends ModelService {
         uploadDuration: duration,
         userId,
         publicUrl,
+        compatCdnUrl: compatStatus === "ALIASED" ? cdnUrl : undefined,
+        compatExt:
+          compatStatus === "ALIASED"
+            ? (extension ?? this.contentTypeToExt(contentType))
+            : undefined,
+        compatKey: compatStatus === "ALIASED" ? key : undefined,
+        compatMime: compatStatus === "ALIASED" ? contentType : undefined,
+        compatReadyAt:
+          compatStatus === "ALIASED"
+            ? lastModified
+              ? new Date(lastModified)
+              : new Date()
+            : undefined,
+        compatS3ObjectId:
+          compatStatus === "ALIASED" ? finalS3ObjectId : undefined,
+        compatVersionId: compatStatus === "ALIASED" ? versionId : undefined,
         cdnUrl,
         versionId: finalVersion,
         s3ObjectId: finalS3ObjectId,
@@ -1367,12 +1411,30 @@ export class Resolver extends ModelService {
         status: "READY",
         ext: extension ?? this.contentTypeToExt(contentType),
         mime: contentType,
-        size: size
-          ? BigInt(size)
-          : bytesUploaded
-            ? BigInt(bytesUploaded)
-            : undefined
+        size: this.toBigInt(size, bytesUploaded)
       });
+
+      const meta =
+        metadata?.type === "DOCUMENT"
+          ? {
+              filename: attachment.filename ?? "",
+              uploadedAt: attachment.updatedAt.toISOString()
+            }
+          : metadata?.type === "IMAGE"
+            ? {
+                duration: duration,
+                dimensions:
+                  attachment.assetType === "IMAGE" ||
+                  attachment.assetType === "VIDEO"
+                    ? width && height
+                      ? { width, height }
+                      : undefined
+                    : undefined,
+                filename: attachment.filename ?? "",
+                uploadDuration: duration,
+                uploadedAt: attachment.updatedAt.toISOString()
+              }
+            : undefined;
 
       const assetReady = {
         type: "asset_ready",
@@ -1383,15 +1445,15 @@ export class Resolver extends ModelService {
         s3ObjectId: finalS3ObjectId,
         batchId,
         draftId,
-        metadata: {
-          dimensions: width && height ? { width, height } : undefined,
-          filename: attachment.filename ?? "",
-          uploadDuration: duration,
-          uploadedAt: attachment.updatedAt.toISOString()
-        },
-        mime: attachment.mime ?? contentType ?? this.extToContentType(metadata),
+        metadata: meta,
+        mime:
+          attachment.mime ??
+          contentType ??
+          (metadata?.type === "IMAGE" || metadata?.type === "DOCUMENT"
+            ? this.extToContentType(metadata)
+            : ""),
         origin: attachment.origin,
-        size: attachment.size ? Number(attachment.size) : (bytesUploaded ?? 0),
+        size: this.fromBigInt(attachment.size) ?? bytesUploaded ?? 0,
         status: "READY",
         etag: attachment.etag ?? finalEtag ?? etag,
         bucket,
@@ -1403,10 +1465,34 @@ export class Resolver extends ModelService {
       } satisfies EventTypeMap["asset_ready"];
 
       ws.send(JSON.stringify(assetReady));
-
-      void this.wsServer.redis.publishTypedEvent(redisChannel, "asset_ready", {
-        ...assetReady
-      });
+      // TODO implement image conversion pipeline with sharp (for all non-png/jpg/webp images)
+      if (compatStatus === "PENDING" && attachment.assetType === "DOCUMENT") {
+        void this.wsServer.pdfService.convertToPdf({
+          assetType: attachment.assetType,
+          bucket: attachment.bucket,
+          cdnUrl: attachment.cdnUrl ?? "",
+          filename: attachment.filename,
+          id: attachment.id,
+          key: attachment.key,
+          mime: attachment.mime,
+          origin: attachment.origin
+        });
+        void this.wsServer.redis.publishTypedEvent(
+          redisChannel,
+          "asset_ready",
+          {
+            ...assetReady
+          }
+        );
+      } else {
+        void this.wsServer.redis.publishTypedEvent(
+          redisChannel,
+          "asset_ready",
+          {
+            ...assetReady
+          }
+        );
+      }
     } catch (error) {
       console.error("[Asset Upload Complete] Error:", error);
 

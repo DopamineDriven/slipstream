@@ -310,6 +310,13 @@ export type EnumAssetTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel> | $Enums.AssetType
 }
 
+export type EnumCompatStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompatStatus | Prisma.EnumCompatStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel> | $Enums.CompatStatus | null
+}
+
 export type BigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -366,6 +373,16 @@ export type EnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
+}
+
+export type EnumCompatStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompatStatus | Prisma.EnumCompatStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompatStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompatStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel>
 }
 
 export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -771,6 +788,13 @@ export type NestedEnumAssetTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel> | $Enums.AssetType
 }
 
+export type NestedEnumCompatStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompatStatus | Prisma.EnumCompatStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel> | $Enums.CompatStatus | null
+}
+
 export type NestedBigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -827,6 +851,16 @@ export type NestedEnumAssetTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAssetTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumCompatStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompatStatus | Prisma.EnumCompatStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.CompatStatus[] | Prisma.ListEnumCompatStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumCompatStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.CompatStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompatStatusNullableFilter<$PrismaModel>
 }
 
 export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {

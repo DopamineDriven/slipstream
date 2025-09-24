@@ -114,6 +114,12 @@ export interface PresignMeta {
   size?: number;
 }
 
+export interface PresignCompatMeta {
+  attachmentId: string;
+  target: "pdf" | "jpg" | "mp4" | "mp3";
+  origin: AssetOriginType;
+}
+
 export type PresignResult = {
   uploadUrl: string;
   key: string;

@@ -10,6 +10,7 @@ export type {
   FinalizeResult,
   ImageFormatType,
   ImageProbe,
+  PresignCompatMeta,
   PresignMeta,
   PresignResult,
   PresignedDownloadOptions,

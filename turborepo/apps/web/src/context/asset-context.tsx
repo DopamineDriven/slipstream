@@ -290,6 +290,29 @@ export function AssetProvider({
             width: a.width,
             height: a.height,
             metadata: a.metadata
+              ? a.mime.startsWith("image") && a.metadata?.type === "IMAGE"
+                ? { ...a.metadata }
+                : {
+                    type: "DOCUMENT",
+                    format: a.metadata?.format,
+                    author: null,
+                    createdDate: null,
+                    encoding: null,
+                    isEncrypted: null,
+                    isLinearized: null,
+                    isSearchable: null,
+                    keywords: null,
+                    language: null,
+                    lineCount: null,
+                    mimeType: a.mime,
+                    modifiedDate: null,
+                    pageCount: null,
+                    pdfVersion: null,
+                    subject: null,
+                    textPreview: null,
+                    wordCount: null
+                  }
+              : undefined
           } satisfies EventTypeMap["asset_paste"]);
         } else {
           sendEvent("asset_attached", {
@@ -303,6 +326,29 @@ export function AssetProvider({
             width: a.width,
             height: a.height,
             metadata: a.metadata
+              ? a.mime.startsWith("image") && a.metadata?.type === "IMAGE"
+                ? { ...a.metadata }
+                : {
+                    type: "DOCUMENT",
+                    format: a.metadata?.format,
+                    author: null,
+                    createdDate: null,
+                    encoding: null,
+                    isEncrypted: null,
+                    isLinearized: null,
+                    isSearchable: null,
+                    keywords: null,
+                    language: null,
+                    lineCount: null,
+                    mimeType: a.mime,
+                    modifiedDate: null,
+                    pageCount: null,
+                    pdfVersion: null,
+                    subject: null,
+                    textPreview: null,
+                    wordCount: null
+                  }
+              : undefined
           } satisfies EventTypeMap["asset_attached"]);
         }
       });

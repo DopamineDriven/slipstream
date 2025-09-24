@@ -3,9 +3,11 @@ import { Agent as HttpsAgent } from "node:https";
 import { Readable } from "node:stream";
 import type {
   AssetMetadata,
+  AssetOriginType,
   CopyOptions,
   DeleteResult,
   FinalizeResult,
+  PresignCompatMeta,
   PresignedDownloadOptions,
   PresignedUploadResponse,
   PresignMeta,
@@ -15,7 +17,6 @@ import type {
   UploadResult
 } from "@/types/index.ts";
 import type { GetObjectCommandInput } from "@aws-sdk/client-s3";
-import type { CTR, XOR } from "@slipstream/types";
 import { S3Utils } from "@/utils/index.ts";
 import {
   CopyObjectCommand,
@@ -33,6 +34,8 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Fs } from "@d0paminedriven/fs";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
+// import { WaiterState } from "@smithy/util-waiter";
+import type { CTR, XOR } from "@slipstream/types";
 
 export class S3Storage extends S3Utils {
   // Cache for frequently used commands (optional optimization)
@@ -149,6 +152,84 @@ export class S3Storage extends S3Utils {
       s3Uri: `s3://${bucket}/${key}`
     } as const satisfies PresignedUploadResponse;
   }
+
+  private compatContentType(t: "pdf" | "jpg" | "mp4" | "mp3") {
+    switch (t) {
+      case "pdf":
+        return "application/pdf";
+      case "jpg":
+        return "image/jpeg";
+      case "mp4":
+        return "video/mp4";
+      case "mp3":
+        return "audio/mpeg";
+      default:
+        return "application/pdf";
+    }
+  }
+
+  public async generatePresignedUploadCompat(
+    input: PresignCompatMeta,
+    expiresIn = 3600
+  ) {
+    const bucket = this.selectBucket(input.origin);
+    const key = this.generateCompatKey(input);
+    const contentType = this.compatContentType(input.target);
+
+    const cmd = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType
+    });
+
+    // const exists = await waitUntilObjectExists(
+    //   { client: this.client, maxWaitTime: 5 },
+    //   cmd.input
+    // );
+
+    // exists.state === WaiterState.SUCCESS ? "" : "";
+    const uploadUrl = await getSignedUrl(this.client, cmd, { expiresIn });
+
+    return {
+      uploadUrl,
+      key,
+      bucket,
+      requiredHeaders: { "Content-Type": contentType },
+      expiresAt: Date.now() + expiresIn * 1000,
+      publicUrl: this.publicUrl(bucket, key),
+      s3Uri: `s3://${bucket}/${key}`
+    } as const;
+  }
+
+  public async generatePresignedDownloadCompat(
+    bucket: string,
+    key: string,
+    expiresIn = 3600
+  ) {
+    const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const url = await getSignedUrl(this.client, cmd, { expiresIn });
+    return { url, expiresAt: Date.now() + expiresIn * 1000 } as const;
+  }
+  public async finalizeCompatObject(args: {
+    origin: AssetOriginType;
+    key: string;
+    isProd: boolean;
+  }) {
+    const bucket = this.selectBucket(args.origin);
+    const head = await this.client.send(
+      new HeadObjectCommand({
+        Bucket: bucket,
+        Key: args.key
+      })
+    );
+
+    const versionId = head.VersionId ?? "";
+    const s3ObjectId = `s3://${bucket}/${args.key}#${versionId}`;
+    const cdnUrlCompat = this.getCfUrl(args.isProd, args.key);
+
+    return { versionId, s3ObjectId, cdnUrlCompat } as const;
+  }
+
   public static getInstance(
     {
       defaultPresignExpiry,
@@ -585,8 +666,15 @@ export class S3Storage extends S3Utils {
     const name = this.extractCleanFilename(meta.filename);
     return [meta.origin.toLowerCase(), meta.userId, `${ts}-${name}`].join("/");
   }
+
   public publicUrl(bucket: string, key: string) {
     return `https://${bucket}.s3.${this.cfg.region}.amazonaws.com/${key}`;
+  }
+
+  public generateCompatKey(meta: PresignCompatMeta) {
+    const filename = `att_${meta.attachmentId}.${meta.target}` as const;
+
+    return [meta.origin.toLowerCase(), `converted`, filename].join("/");
   }
 
   public async objectExists(bucket: string, key: string, versionId?: string) {

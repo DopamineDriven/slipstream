@@ -6,7 +6,16 @@ import type {
 } from "@/models.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 
+
+export type SpreadSheetExtensions =  "xlsx" | "xls" | "ods" | "csv";
+export type PresentationExtensions = "pptx" | "ppt" | "odp";
+export  type DocExtensions = "pdf" | "docx" | "doc" | "odt" | "rtf";
+export type TextExtensions = "txt" | "tex";
+export type EbookExtensions = "epub" | "mobi";
+
+
 export interface ImageSpecs {
+  type: "IMAGE";
   width: number;
   height: number;
   format:
@@ -54,6 +63,65 @@ export interface ImageSpecs {
   iccProfile: string | null; // Profile name/description if available, or 'embedded' if present but unnamed, null otherwise
   exifDateTimeOriginal: string | null; // ISO-like string or null
 }
+
+export interface PdfDocSpecs {
+  pdfVersion: string | null;
+  isEncrypted: boolean | null;
+  isSearchable: boolean | null;
+  isLinearized: boolean | null;
+  hasForm: boolean | null;
+  hasSignatures: boolean | null;
+  hasAttachments: boolean | null;
+  hasJavaScript: boolean | null;
+  permissions: {
+    printing: boolean;
+    modifying: boolean;
+    copying: boolean;
+    annotating: boolean;
+  } | null;
+}
+
+export interface SpreadSheetDocSpecs {
+  sheetCount: number | null;
+  sheetNames: string[] | null;
+  hasFormulas: boolean | null;
+  hasMacros: boolean | null;
+  hasPivotTables: boolean | null;
+  hasCharts: boolean | null;
+  activeSheet: number | null;
+}
+
+export interface PresentationDocSpecs {
+  slideCount: number | null;
+  hasAnimations: boolean | null;
+  hasTransitions: boolean | null;
+  hasNotes: boolean | null;
+  hasMasterSlides: boolean | null;
+  presentationFormat: "standard" | "widescreen" | null;
+}
+
+export interface DocSpecs {
+  type: "DOCUMENT";
+  format: string | null;
+  mimeType: string | null;
+  pageCount: number | null;
+  wordCount: number | null;
+  lineCount: number | null;
+  language: string | null;
+  encoding: string | null;
+  author: string | null;
+  subject: string | null;
+  keywords: string[] | null;
+  pdfVersion: string | null;
+  isEncrypted: boolean | null;
+  isSearchable: boolean | null;
+  isLinearized: boolean | null;
+  textPreview: string | null;
+  createdDate: string | null;
+  modifiedDate: string | null;
+}
+
+export type MetadataUnion = ImageSpecs | DocSpecs;
 
 export type AttachmentMetadata = {
   filename: string;
@@ -232,7 +300,7 @@ export type AssetPasteEvent = {
   size: number;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: MetadataUnion;
 };
 
 export type AssetReady = DX<
@@ -281,7 +349,7 @@ export type AssetAttachedToMessage = {
   batchId: string;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: MetadataUnion;
 };
 
 export type AssetDeleted = {
@@ -449,7 +517,7 @@ export type AssetUploadComplete = {
   publicUrl: string;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: MetadataUnion;
   etag?: string;
   success: boolean;
   duration: number; //milliseconds
@@ -472,7 +540,7 @@ export type AssetUploadCompleteError = {
   bytesUploaded?: number;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: MetadataUnion;
   error: string;
   success: false;
   code?: number;

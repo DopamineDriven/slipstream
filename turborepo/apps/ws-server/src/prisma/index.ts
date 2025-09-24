@@ -27,6 +27,18 @@ import { EncryptionService } from "@slipstream/encryption";
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
 
+export type UpdateAttachmentCompatProps = {
+  attachmentId: string;
+  compatKey: string;
+  compatStatus: $Enums.CompatStatus;
+  compatCdnUrl: string;
+  compatReadyAt: Date;
+  compatVersionId?: string;
+  compatS3ObjectId?: string;
+  compatMime?: string;
+  compatExt?: string;
+};
+
 export class PrismaService extends ModelService {
   readonly prismaClient: PrismaClient;
   private encryption: EncryptionService;
@@ -167,8 +179,9 @@ export class PrismaService extends ModelService {
       o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
     ) as [string, string, string, number];
   }
+
   public bigintToNumber(
-    props: ConversationSingleton<false>
+    props: ConversationSingleton
   ): ConversationSingleton<true> {
     const { messages, ...rest } = props;
     const msgArr = messages.map(t => {
@@ -535,7 +548,7 @@ export class PrismaService extends ModelService {
             conversationId: this.convoId(conversationId),
             audio: {
               create: {
-                format: audio?.format ?? "application/pdf",
+                format: audio?.format ?? "audio/mpeg",
                 duration: audio?.duration ?? 0,
                 ...data.audio
               }
@@ -559,7 +572,7 @@ export class PrismaService extends ModelService {
             conversationId: this.convoId(conversationId),
             video: {
               create: {
-                format: video?.format ?? "application/pdf",
+                format: video?.format ?? "video/mp4",
                 duration: video?.duration ?? 0,
                 width: video.width ?? 0,
                 height: video.height ?? 0,
@@ -668,79 +681,6 @@ export class PrismaService extends ModelService {
   }
 
   /**
-   * Attach an asset to a message
-   */
-  async attachExistingToMessage(
-    attachmentId: string,
-    messageId: string,
-    userId: string
-  ) {
-    const attachments = await this.prismaClient.$transaction(async t => {
-      const attachment = await this.getAttachment(attachmentId);
-
-      if (!attachment) {
-        throw new Error("Attachment not found");
-      }
-
-      if (attachment.userId !== userId) {
-        throw new Error("Unauthorized to attach this asset");
-      }
-
-      const {
-        bucket,
-        conversationId,
-        s3ObjectId,
-        key,
-        versionId,
-        status: _oldStatus,
-        messageId: _oldId,
-        ...rest
-      } = attachment;
-
-      return await t.message.update({
-        where: { id: messageId },
-        select: { attachments: true, id: true },
-        data: {
-          attachments: {
-            connectOrCreate: [
-              {
-                where: s3ObjectId
-                  ? { s3ObjectId: s3ObjectId }
-                  : { id: rest.id },
-                create: {
-                  status: "ATTACHED",
-                  s3ObjectId,
-                  ...rest,
-                  bucket,
-                  key,
-                  versionId,
-                  conversationId
-                }
-              }
-            ]
-          }
-        }
-      });
-    });
-    return attachments;
-  }
-
-  /**
-   * Mark attachment as virus scanned
-   */
-  async markAsScanned(
-    attachmentId: string,
-    scanResult: "clean" | "infected"
-  ): Promise<Attachment> {
-    return this.prismaClient.attachment.update({
-      where: { id: attachmentId },
-      data: {
-        status: scanResult === "clean" ? "READY" : "QUARANTINED"
-      }
-    });
-  }
-
-  /**
    * Get user's total storage usage
    */
   async getUserStorageUsage(userId: string): Promise<{
@@ -820,19 +760,6 @@ export class PrismaService extends ModelService {
         messageId: true,
         userId: true
       }
-    });
-  }
-
-  /**
-   * Get attachments pending virus scan
-   */
-  async getPendingScanAttachments(limit = 10): Promise<Attachment[]> {
-    return await this.prismaClient.attachment.findMany({
-      where: {
-        status: "SCANNING"
-      },
-      take: limit,
-      orderBy: { createdAt: "asc" }
     });
   }
 
@@ -1029,7 +956,7 @@ export class PrismaService extends ModelService {
   }
   public async findActiveOpenAIAsset(
     attachmentId: string,
-    keyFingerprint="server"
+    keyFingerprint = "server"
   ) {
     return this.prismaClient.attachmentProvider.findFirst({
       where: {
@@ -1038,6 +965,38 @@ export class PrismaService extends ModelService {
         keyFingerprint,
         state: "ACTIVE"
         // no TTL for OpenAI files; they persist until you delete them
+      }
+    });
+  }
+
+  public async findUniqueAttachment(attachmentId: string) {
+    return await this.prismaClient.attachment.findUnique({
+      where: { id: attachmentId }
+    });
+  }
+
+  public async updateAttachmentCompat({
+    attachmentId,
+    compatCdnUrl,
+    compatKey,
+    compatReadyAt,
+    compatStatus,
+    compatExt,
+    compatMime,
+    compatS3ObjectId,
+    compatVersionId
+  }: UpdateAttachmentCompatProps) {
+    return await this.prismaClient.attachment.update({
+      where: { id: attachmentId },
+      data: {
+        compatCdnUrl,
+        compatStatus,
+        compatReadyAt,
+        compatKey,
+        compatExt,
+        compatMime,
+        compatVersionId,
+        compatS3ObjectId
       }
     });
   }
@@ -1059,7 +1018,7 @@ export class PrismaService extends ModelService {
 
   public async upsertOpenAIAssetMapping(
     attachmentId: string,
-    keyFingerprint="server",
+    keyFingerprint = "server",
     mime: string,
     keyId?: string
   ) {
@@ -1090,7 +1049,7 @@ export class PrismaService extends ModelService {
 
   public async upsertGeminiAssetMapping(
     attachmentId: string,
-    keyFingerprint="server",
+    keyFingerprint = "server",
     mime: string,
     keyId?: string
   ) {

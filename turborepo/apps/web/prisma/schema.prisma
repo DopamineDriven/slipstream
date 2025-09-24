@@ -1,11 +1,20 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["typedSql"]
+}
+
+
+enum CompatStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  ALIASED
 }
 
 enum ProviderAssetState {
@@ -295,6 +304,15 @@ model Attachment {
   sourceUrl      String? // uploadUrl
   thumbnailKey   String? // image/video thumbnails
 
+  compatMime       String?
+  compatExt        String?
+  compatVersionId  String?
+  compatKey        String?
+  compatS3ObjectId String?
+  compatStatus     CompatStatus?
+  compatReadyAt    DateTime?
+  compatCdnUrl     String?
+
   bucket    String
   key       String
   versionId String?
@@ -336,6 +354,7 @@ model Attachment {
   @@index([draftId])
   @@index([batchId, conversationId])
   @@index([userId, createdAt])
+  @@index([compatStatus])
 }
 
 model AttachmentProvider {
