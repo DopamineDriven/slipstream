@@ -27,6 +27,7 @@
   },
   "ui": "stream",
   "globalEnv": [
+    "ADOBE_WEBHOOK_SECRET",
     "ANTHROPIC_API_KEY",
     "ASSETS_BUCKET",
     "AUTH_GITHUB_ID",
@@ -75,6 +76,9 @@
     "NOTATION_FLAG",
     "OPEN_AI_KEY",
     "OPENAI_API_KEY",
+    "PDF_SERVICES_CLIENT_ID",
+    "PDF_SERVICES_CLIENT_SECRET",
+    "PDF_SERVICES_ORGANIZATION_ID",
     "PGDATABASE",
     "PGHOST",
     "PGHOST_UNPOOLED",

@@ -219,8 +219,8 @@ private async ensureAssetUploadedToOpenAI(
     if (!attachments || attachments.length === 0) return content;
 
     for (const att of attachments) {
-      const url = att.cdnUrl ?? att.sourceUrl;
-      const mime = att.mime ?? "";
+      const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
+      const mime = att.compatMime ?? att.mime ?? "";
       if (!url || url.length === 0) continue;
 
       if (mime.startsWith("image/")) {
@@ -259,8 +259,8 @@ private async ensureAssetUploadedToOpenAI(
     if (!client) return content;
 
     for (const att of attachments) {
-      const url = att.cdnUrl ?? att.sourceUrl;
-      const mime = att.mime ?? "";
+      const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
+      const mime = att.compatMime ?? att.mime ?? "";
       if (!url) continue;
 
       if (mime.startsWith("image/")) {

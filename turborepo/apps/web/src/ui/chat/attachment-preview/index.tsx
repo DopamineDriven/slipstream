@@ -1,10 +1,10 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
-import type { ImageSpecs } from "@slipstream/types";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
+import type { DocSpecs, ImageSpecs } from "@slipstream/types";
 import {
   Button,
   Card,
@@ -20,7 +20,7 @@ interface AttachmentPreviewProps {
   className?: string;
   // Optional: if provided, component won't run useAssetMetadata
   thumbnails?: Record<string, string>;
-  metadata?: Record<string, ImageSpecs>;
+  metadata?: Record<string, ImageSpecs | DocSpecs>;
   getStatusText?: (attachment: AttachmentPreview) => string;
   getStatusColor?: (status: AttachmentPreview["status"]) => string;
   formatFileSize?: (bytes: number) => string;
@@ -61,7 +61,9 @@ export function AttachmentPreviewComponent({
           <Card key={attachment.id} className="border-border/50 bg-muted/30">
             <CardContent className="flex items-center gap-3 p-1.5">
               <div className="flex-shrink-0">
-                {attachment.mime.startsWith("image/") && thumbnail ? (
+                {attachment.mime.startsWith("image/") &&
+                meta?.type === "IMAGE" &&
+                thumbnail ? (
                   <div className="relative">
                     <NextImage
                       src={thumbnail || "/dd-logo.svg"}
@@ -106,42 +108,43 @@ export function AttachmentPreviewComponent({
                   <span className="text-muted-foreground">
                     {formatFileSize(attachment.size)}
                   </span>
-                  {attachment.mime.startsWith("image/") && meta && (
-                    <>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground">
-                        {meta.width} × {meta.height}
-                      </span>
-                      {meta.hasAlpha && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">Alpha</span>
-                        </>
-                      )}
-                      {meta.format && meta.format !== "unknown" && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">
-                            {meta.format.toUpperCase()}
-                          </span>
-                        </>
-                      )}
-                      {meta.colorSpace && meta.colorSpace !== "unknown" && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">
-                            {meta.colorSpace.toUpperCase()}
-                          </span>
-                        </>
-                      )}
-                      {meta.iccProfile && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">ICC</span>
-                        </>
-                      )}
-                    </>
-                  )}
+                  {attachment.mime.startsWith("image/") &&
+                    meta?.type === "IMAGE" && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">
+                          {meta.width} × {meta.height}
+                        </span>
+                        {meta.hasAlpha && (
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-muted-foreground">Alpha</span>
+                          </>
+                        )}
+                        {meta.format && meta.format !== "unknown" && (
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-muted-foreground">
+                              {meta.format.toUpperCase()}
+                            </span>
+                          </>
+                        )}
+                        {meta.colorSpace && meta.colorSpace !== "unknown" && (
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-muted-foreground">
+                              {meta.colorSpace.toUpperCase()}
+                            </span>
+                          </>
+                        )}
+                        {meta.iccProfile && (
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-muted-foreground">ICC</span>
+                          </>
+                        )}
+                      </>
+                    )}
                 </div>
                 <div className="text-xs md:hidden">
                   <span className={getStatusColor(attachment.status)}>

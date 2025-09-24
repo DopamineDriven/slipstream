@@ -1,8 +1,8 @@
 "use client";
 
-import type { ImageSpecs } from "@/utils/img-extractor-client";
 import { useCallback, useEffect, useState } from "react";
 import { ImgMetadataExtractor } from "@/utils/img-extractor-client";
+import { DocSpecs, ImageSpecs } from "@slipstream/types";
 
 export interface AttachmentPreview {
   id: string;
@@ -25,7 +25,9 @@ export interface AttachmentPreviewProps {
 
 export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
-  const [metadata, setMetadata] = useState<Record<string, ImageSpecs>>({});
+  const [metadata, setMetadata] = useState<
+    Record<string, ImageSpecs | DocSpecs>
+  >({});
   const [size, setSize] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -33,7 +35,11 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       return;
     }
     attachments.forEach(attachment => {
-      if (attachment.mime.startsWith("image/") && !thumbnails[attachment.id]) {
+      if (
+        attachment.mime.startsWith("image/") &&
+        attachment.metadata?.type === "IMAGE" &&
+        !thumbnails[attachment.id]
+      ) {
         const reader = new FileReader();
         reader.onload = e => {
           if (e.target?.result) {
@@ -50,10 +56,14 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
                 const extractor = new ImgMetadataExtractor();
                 const imageSpecs = extractor.getImageSpecsWorkup(buffer);
 
-                setMetadata(prev => ({
-                  ...prev,
-                  [attachment.id]: imageSpecs
-                }));
+                setMetadata(prev =>
+                  prev.metadata?.type === "IMAGE"
+                    ? {
+                        ...prev,
+                        [attachment.id]: { type: "IMAGE", ...imageSpecs }
+                      }
+                    : { ...prev }
+                );
                 setSize(prev => ({
                   ...prev,
                   [attachment.id]: attachment.size
@@ -117,7 +127,11 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
           baseStatus = "Unknown";
       }
 
-      if (meta?.animated && attachment.status === "pending") {
+      if (
+        meta?.type === "IMAGE" &&
+        meta?.animated &&
+        attachment.status === "pending"
+      ) {
         baseStatus += ` • Animated (${meta.frames ?? "?"} frames)`;
       }
 

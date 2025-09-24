@@ -12,11 +12,11 @@ import type {
   GenerateContentResponse,
   Part
 } from "@google/genai";
-import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
+import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderGeminiChatRequestEntity
@@ -97,6 +97,8 @@ export class GeminiService {
 
   public async uploadRemoteAssetToGoogle(
     attachment: {
+      compatCdnUrl: string | null;
+      compatMime: string | null;
       cdnUrl: string | null;
       filename: string | null;
       mime: string | null;
@@ -105,11 +107,12 @@ export class GeminiService {
     apiKey?: string
   ) {
     try {
+      const url = attachment.compatCdnUrl ?? attachment.cdnUrl ?? "";
       // 1. Fetch the remote file and get its buffer
-      const response = await fetch(attachment.cdnUrl ?? "", { method: "GET" });
+      const response = await fetch(url, { method: "GET" });
       if (!response.ok || !response.body) {
         throw new Error(
-          `Failed to fetch asset from ${attachment.cdnUrl}: ${response.statusText}`
+          `Failed to fetch asset from ${url}: ${response.statusText}`
         );
       }
       const buffer = await this.streamToBuffer(response.body);
@@ -131,7 +134,10 @@ export class GeminiService {
       const uploadedFile = await ai.files.upload({
         file: new Blob([buffer]),
         config: {
-          mimeType: attachment.mime ?? "application/octet-stream",
+          mimeType:
+            attachment.compatMime ??
+            attachment.mime ??
+            "application/octet-stream",
           name: deterministicName,
           displayName: attachment.filename ?? undefined
         }
@@ -266,6 +272,8 @@ export class GeminiService {
   private async ensureAssetUploaded(
     attachment: {
       cdnUrl: string | null;
+      compatCdnUrl: string | null;
+      compatMime: string | null;
       filename: string | null;
       mime: string | null;
       id: string;
@@ -284,7 +292,8 @@ export class GeminiService {
       this.logger.debug(`Reusing cached Gemini asset: ${attachment.id}`);
       return {
         fileUri: cached.fileUri,
-        mimeType: attachment.mime ?? "application/octet-stream"
+        mimeType:
+          attachment.compatMime ?? attachment.mime ?? "application/octet-stream"
       };
     }
 
@@ -313,7 +322,7 @@ export class GeminiService {
     const mapping = await this.prisma.upsertGeminiAssetMapping(
       attachment.id,
       keyFingerprint,
-      attachment.mime ?? "application/octet-stream",
+      attachment.compatMime ?? attachment.mime ?? "application/octet-stream",
       keyId
     );
 
@@ -458,7 +467,14 @@ export class GeminiService {
             if (attachment?.cdnUrl && attachment?.mime) {
               // Use the new ensureAssetUploaded method
               const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                attachment,
+                {
+                  cdnUrl: attachment.cdnUrl,
+                  compatCdnUrl: attachment.compatCdnUrl,
+                  compatMime: attachment.compatMime,
+                  filename: attachment.filename,
+                  id: attachment.id,
+                  mime: attachment.mime
+                },
                 gemini,
                 keyFingerprint,
                 keyId ?? undefined,

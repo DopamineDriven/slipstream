@@ -8,6 +8,16 @@
 * 🟢 You can import this file directly.
 */
 
+export const CompatStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  FAILED: 'FAILED',
+  ALIASED: 'ALIASED'
+} as const
+
+export type CompatStatus = (typeof CompatStatus)[keyof typeof CompatStatus]
+
+
 export const ProviderAssetState = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',

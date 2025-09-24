@@ -7,12 +7,13 @@ import type {
   UserData,
   WSServerOptions
 } from "@/types/index.ts";
-import type { EventTypeMap } from "@slipstream/types";
 import type { IncomingMessage } from "http";
 import type { RawData } from "ws";
+import { PdfService } from "@/pdf/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { WebSocket, WebSocketServer } from "ws";
+import type { EventTypeMap } from "@slipstream/types";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class WSServer {
   private wss: WebSocketServer;
@@ -36,13 +37,20 @@ export class WSServer {
   constructor(
     private opts: WSServerOptions,
     public redis: EnhancedRedisPubSub,
-    public prisma: PrismaService
+    public prisma: PrismaService,
+    public pdfService: PdfService
   ) {
     this.channel = opts.channel ?? "chat-global";
     this.jwtSecret = opts.jwtSecret;
-    this.httpServer = http.createServer((req, res) => {
+    this.httpServer = http.createServer(async (req, res) => {
       const startTime = performance.now();
-
+      if (
+        req.url===("/webhooks/adobe/pdf-created") &&
+        req.method === "POST"
+      ) {
+        await this.pdfService.handleWebhook(req, res);
+        return;
+      }
       if (req.url === "/health") {
         const processingTime = performance.now() - startTime;
         res.writeHead(200, { "Content-Type": "application/json" });

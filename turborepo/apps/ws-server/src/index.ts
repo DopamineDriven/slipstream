@@ -82,9 +82,25 @@ async function exe() {
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
+    const { PdfService } = await import("@/pdf/index.ts");
+
+    const pdfService = new PdfService(
+      cfg.PDF_SERVICES_CLIENT_ID,
+      cfg.PDF_SERVICES_CLIENT_SECRET,
+      cfg.ADOBE_WEBHOOK_SECRET,
+      s3,
+      prisma,
+      isProd
+    );
+
     const { WSServer } = await import("@/ws-server/index.ts");
 
-    const wsServer = new WSServer({ port, jwtSecret }, redisInstance, prisma);
+    const wsServer = new WSServer(
+      { port, jwtSecret },
+      redisInstance,
+      prisma,
+      pdfService
+    );
 
     const { Resolver } = await import("@/resolver/index.ts");
 
@@ -197,15 +213,22 @@ declare module "ws" {
   }
 }
 
-declare global {
-  interface BigInt {
-    toJSON(): string;
+declare module "http" {
+  interface IncomingHttpHeaders extends NodeJS.Dict<string | string[]> {
+    "x-adobe-pdf-hook"?: string;
+    "x-attachment-id"?: string;
   }
+}
+
+declare global {
   interface JSON {
     parse<T = unknown>(
       text: string,
       reviver?: (this: any, key: string, value: any) => any
     ): T;
+  }
+  interface Body {
+    json<T = unknown>(): Promise<T>;
   }
 }
 

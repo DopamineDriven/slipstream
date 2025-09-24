@@ -1,6 +1,6 @@
 import type { $Enums } from "@/generated/client/client.ts";
-import type { EventTypeMap } from "@slipstream/types";
 import { WebSocket } from "ws";
+import type { EventTypeMap } from "@slipstream/types";
 
 export interface WSServerOptions {
   port: number;
@@ -140,6 +140,14 @@ export type AttachmentSingleton<T extends boolean = false> = {
   s3ObjectId: string | null;
   origin: $Enums.AssetOrigin;
   status: $Enums.AssetStatus;
+  compatKey: string | null;
+  compatStatus: $Enums.CompatStatus | null;
+  compatCdnUrl: string | null;
+  compatReadyAt: Date | null;
+  compatVersionId: string | null;
+  compatS3ObjectId: string | null;
+  compatMime: string | null;
+  compatExt: string | null;
   uploadMethod: $Enums.UploadMethod;
   assetType: $Enums.AssetType;
   uploadDuration: number | null;
@@ -206,6 +214,59 @@ export type ConversationSingleton<T extends boolean = false> = {
   apiKey: string | null;
   conversationSettings: ConvoSettingsSingleton | null;
   messages: MessageSingleton<T>[];
+};
+
+/**
+   attachmentId: string;
+  compatKey: string;
+  compatStatus: $Enums.CompatStatus;
+  compatCdnUrl: string;
+  compatReadyAt: Date;
+  compatVersionId?: string;
+  compatS3ObjectId?: string;
+  compatMime?: string;
+  compatExt?: string;
+ */
+
+export type AssetReadyPayload = {
+  publicUrl: string | null;
+  bucket: string;
+  cacheControl: string | null;
+  contentDisposition: string | null;
+  etag: string | null;
+  s3ObjectId: string | null;
+  key: string;
+  cdnUrl: string | null;
+  versionId: string | null;
+  size: bigint | null;
+  storageClass: string | null;
+  id: string;
+  conversationId: string | null;
+  draftId: string | null;
+  batchId: string | null;
+  userId: string;
+  messageId: string | null;
+  origin: $Enums.AssetOrigin;
+  status: $Enums.AssetStatus;
+  uploadMethod: $Enums.UploadMethod;
+  assetType: $Enums.AssetType;
+  uploadDuration: number | null;
+  sourceUrl: string | null;
+  thumbnailKey: string | null;
+  region: string;
+  contentEncoding: string | null;
+  expiresAt: Date | null;
+  filename: string | null;
+  ext: string | null;
+  mime: string | null;
+  checksumAlgo: $Enums.ChecksumAlgo;
+  checksumSha256: string | null;
+  sseAlgorithm: string | null;
+  sseKmsKeyId: string | null;
+  s3LastModified: Date | null;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type Signals =

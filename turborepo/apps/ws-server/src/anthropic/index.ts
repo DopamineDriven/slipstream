@@ -11,16 +11,16 @@ import type {
   StopReason,
   TextBlockParam
 } from "@anthropic-ai/sdk/resources/messages";
-import type {
-  AllModelsUnion,
-  AnthropicModelIdUnion,
-  EventTypeMap
-} from "@slipstream/types";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import type {
+  AllModelsUnion,
+  AnthropicModelIdUnion,
+  EventTypeMap
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
@@ -98,12 +98,12 @@ export class AnthropicService {
               for (const attachment of msg.attachments) {
                 const { cdnUrl: url, mime } = attachment;
                 if (url && mime) {
-                  if (mime.includes("application/pdf")) {
+                  if (mime.includes("application")) {
                     const docBlock = {
                       type: "document",
                       source: {
                         type: "url",
-                        url
+                        url: attachment?.compatCdnUrl ?? url
                       }
                     } as const satisfies DocumentBlockParam;
                     content.push(docBlock);
@@ -161,12 +161,12 @@ export class AnthropicService {
             for (const attachment of userMsg.attachments) {
               const { cdnUrl: url, mime } = attachment;
               if (url && mime) {
-                if (mime.includes("application/pdf")) {
+                if (mime.includes("application")) {
                   const docBlock = {
                     type: "document",
                     source: {
                       type: "url",
-                      url
+                      url: attachment?.compatCdnUrl ?? url
                     }
                   } as const satisfies DocumentBlockParam;
                   content.push(docBlock);
