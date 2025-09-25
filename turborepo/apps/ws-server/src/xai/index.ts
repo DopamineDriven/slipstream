@@ -305,9 +305,10 @@ export class xAIService {
         if (
           thinkingText &&
           grokIsCurrentlyThinking &&
-          (model === "grok-code-fast-1" ||
-            model === "grok-3-mini-fast" ||
-            model === "grok-3-mini")
+          (model === ("grok-code-fast-1" satisfies GrokModelIdUnion) ||
+            model === ("grok-3-mini-fast" satisfies GrokModelIdUnion) ||
+            model === ("grok-3-mini" satisfies GrokModelIdUnion) ||
+            model === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))
         ) {
           iThink++;
           if (
