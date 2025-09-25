@@ -130,11 +130,22 @@ export class PdfService {
       { attachmentId: attachment.id, origin: attachment.origin, target },
       3600
     );
-
+    console.log("adobe-pdf-pipeline-init", {
+      inputUrl: { url: inputUrl.url, expiresAt: inputUrl.expiresAt },
+      outputUrl: {
+        uploadUrl: outputUrl.uploadUrl,
+        key: outputUrl.key,
+        bucket: outputUrl.bucket,
+        publicUrl: outputUrl.publicUrl,
+        requiredHeaders: outputUrl.requiredHeaders,
+        expiresAt: outputUrl.expiresAt,
+        s3Uri: outputUrl.s3Uri
+      }
+    });
     // Call Adobe API
     const token = await this.getAdobeAccessToken();
     const response = await fetch(
-      "https://pdf-services.adobe.io/operation/createpdf",
+      "https://pdf-services-ue1.adobe.io/operation/createpdf",
       {
         method: "POST",
         headers: {
@@ -170,10 +181,18 @@ export class PdfService {
       }
     );
     if (!response.ok) {
+      console.log("error from create pdf", {
+        status: response.status,
+        statusText: response.statusText,
+        responseUrl: response.url
+      });
       const error = await response.text();
+      console.log(`full error text: ` + error);
       throw new Error(`Adobe conversion failed: ${response.status} - ${error}`);
     }
     const compatCdnUrl = this.s3.getCfUrl(this.isProd, compatKey);
+
+    console.log(compatCdnUrl);
     return { compatCdnUrl, compatKey };
   }
 

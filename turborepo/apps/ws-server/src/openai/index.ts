@@ -83,71 +83,74 @@ export class OpenAIService {
       ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
       : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
-private async ensureAssetUploadedToOpenAI(
-  attachment: {
-    id: string;
-    cdnUrl: string | null;
-    filename: string | null;
-    mime: string | null;
-  },
-  client: OpenAI,
-  keyFingerprint = "server",
-  keyId?: string
-): Promise<{ file_id: string }> {
-  if (!attachment.cdnUrl) throw new Error("Attachment has no CDN URL");
+  private async ensureAssetUploadedToOpenAI(
+    attachment: {
+      id: string;
+      cdnUrl: string | null;
+      filename: string | null;
+      mime: string | null;
+    },
+    client: OpenAI,
+    keyFingerprint = "server",
+    keyId?: string
+  ): Promise<{ file_id: string }> {
+    if (!attachment.cdnUrl) throw new Error("Attachment has no CDN URL");
 
-  // 1) Reuse if we already uploaded this asset for this key fingerprint
-  const existing = await this.prisma.findActiveOpenAIAsset(
-    attachment.id,
-    keyFingerprint
-  );
-  if (existing?.providerRef) {
-    // IMPORTANT: return ONLY file_id; do NOT include filename alongside file_id
-    return { file_id: existing.providerRef };
-  }
-
-  // 2) Create mapping (PENDING)
-  const mapping = await this.prisma.upsertOpenAIAssetMapping(
-    attachment.id,
-    keyFingerprint,
-    attachment.mime ?? "application/octet-stream",
-    keyId // must be a real FK if set; otherwise omit in upsert
-  );
-
-  try {
-    // 3) Fetch remote asset
-    const resp = await fetch(attachment.cdnUrl, { method: "GET" });
-    if (!resp.ok) {
-      throw new Error(`Failed to fetch ${attachment.cdnUrl}: ${resp.status} ${resp.statusText}`);
+    // 1) Reuse if we already uploaded this asset for this key fingerprint
+    const existing = await this.prisma.findActiveOpenAIAsset(
+      attachment.id,
+      keyFingerprint
+    );
+    if (existing?.providerRef) {
+      // IMPORTANT: return ONLY file_id; do NOT include filename alongside file_id
+      return { file_id: existing.providerRef };
     }
 
-    // 4) Wrap for SDK (blob() when available; otherwise ArrayBuffer)
-    const blob = await resp.blob();
-    const file = await toFile(blob, attachment.filename ?? "upload.bin");
-
-    // 5) Upload to OpenAI Files — purpose MUST be "assistants" for Responses/File Search/Vector Stores
-    const uploaded = await client.files.create({
-      file,
-      purpose: "assistants",
-    });
-
-    // 6) Finalize mapping
-    await this.prisma.finalizeOpenAIAsset(
-      mapping.id,
-      uploaded.id,
-      BigInt(uploaded.bytes ?? 0)
+    // 2) Create mapping (PENDING)
+    const mapping = await this.prisma.upsertOpenAIAssetMapping(
+      attachment.id,
+      keyFingerprint,
+      attachment.mime ?? "application/octet-stream",
+      keyId // must be a real FK if set; otherwise omit in upsert
     );
 
-    // 7) Return ONLY file_id (no filename here)
-    return { file_id: uploaded.id };
-  } catch (err) {
-    await this.prisma.markOpenAIAssetFailed(
-      mapping.id,
-      err instanceof Error ? err.message : String(err)
-    );
-    throw err;
+    try {
+      // 3) Fetch remote asset
+      const resp = await fetch(attachment.cdnUrl, { method: "GET" });
+      if (!resp.ok) {
+        throw new Error(
+          `Failed to fetch ${attachment.cdnUrl}: ${resp.status} ${resp.statusText}`
+        );
+      }
+
+      // 4) Wrap for SDK (blob() when available; otherwise ArrayBuffer)
+      const arrBuff = await resp.arrayBuffer();
+      const blob = new Blob([arrBuff]);
+      const file = await toFile(blob, attachment.filename ?? "upload.bin");
+
+      // 5) Upload to OpenAI Files — purpose MUST be "assistants" for Responses/File Search/Vector Stores
+      const uploaded = await client.files.create({
+        file,
+        purpose: "assistants"
+      });
+
+      // 6) Finalize mapping
+      await this.prisma.finalizeOpenAIAsset(
+        mapping.id,
+        uploaded.id,
+        BigInt(uploaded.bytes ?? 0)
+      );
+
+      // 7) Return ONLY file_id (no filename here)
+      return { file_id: uploaded.id };
+    } catch (err) {
+      await this.prisma.markOpenAIAssetFailed(
+        mapping.id,
+        err instanceof Error ? err.message : String(err)
+      );
+      throw err;
+    }
   }
-}
 
   private ensureUserVectorStoreId(
     client: OpenAI,
@@ -193,7 +196,8 @@ private async ensureAssetUploadedToOpenAI(
   ) {
     const r = await fetch(url);
     if (!r.ok) throw new Error(`Fetch failed ${r.status}: ${url}`);
-    const file = await toFile(await r.blob(), filename);
+    const s = new Blob([await r.arrayBuffer()]);
+    const file = await toFile(s, filename);
     return client.vectorStores.files.createAndPoll(vectorStoreId, {
       file_id: (await client.files.create({ file, purpose: "assistants" })).id
     });
@@ -221,6 +225,10 @@ private async ensureAssetUploadedToOpenAI(
     for (const att of attachments) {
       const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
       const mime = att.compatMime ?? att.mime ?? "";
+      const filename =
+        att.compatStatus === "ACTIVE"
+          ? this.filenameToCompat(att.filename, att.compatExt)
+          : att.filename;
       if (!url || url.length === 0) continue;
 
       if (mime.startsWith("image/")) {
@@ -229,11 +237,27 @@ private async ensureAssetUploadedToOpenAI(
         content.push({
           type: "input_file",
           file_url: url,
-          filename: att.filename ?? undefined
+          filename: filename ?? undefined
         });
       }
     }
     return content;
+  }
+
+  private filenameToCompat(filename: string | null, compatExt: string | null) {
+    if (!filename) {
+      return `filename-${Date.now()}.${compatExt ?? "pdf"}`;
+    }
+    const splitIt = filename.split(/\./g);
+    const l = splitIt.length;
+    return splitIt
+      .map((t, o) => {
+        if (o === l - 1) {
+          if (compatExt) return compatExt;
+          else return "pdf";
+        } else return t;
+      })
+      .join(".");
   }
 
   private async buildAttachmentContentAsync(
@@ -261,13 +285,17 @@ private async ensureAssetUploadedToOpenAI(
     for (const att of attachments) {
       const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
       const mime = att.compatMime ?? att.mime ?? "";
+      const filename =
+        att.compatStatus === "ACTIVE"
+          ? this.filenameToCompat(att.filename, att.compatExt)
+          : att.filename;
       if (!url) continue;
 
       if (mime.startsWith("image/")) {
         content.push({ type: "input_image", image_url: url, detail: "auto" });
       } else {
         const { file_id } = await this.ensureAssetUploadedToOpenAI(
-          { id: att.id, cdnUrl: url, filename: att.filename, mime: att.mime },
+          { id: att.id, cdnUrl: url, filename, mime },
           client,
           keyFingerprint,
           keyId ?? undefined

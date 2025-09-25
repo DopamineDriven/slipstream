@@ -96,14 +96,21 @@ export class AnthropicService {
             // Add image attachments if present
             if (msg.attachments && msg.attachments.length > 0) {
               for (const attachment of msg.attachments) {
-                const { cdnUrl: url, mime } = attachment;
+                const {
+                  cdnUrl,
+                  mime: ogMime,
+                  compatCdnUrl,
+                  compatMime
+                } = attachment;
+                const url = compatCdnUrl ?? cdnUrl;
+                const mime = compatMime ?? ogMime;
                 if (url && mime) {
                   if (mime.includes("application")) {
                     const docBlock = {
                       type: "document",
                       source: {
                         type: "url",
-                        url: attachment?.compatCdnUrl ?? url
+                        url
                       }
                     } as const satisfies DocumentBlockParam;
                     content.push(docBlock);
@@ -159,14 +166,21 @@ export class AnthropicService {
         try {
           if (userMsg.attachments && userMsg.attachments.length > 0) {
             for (const attachment of userMsg.attachments) {
-              const { cdnUrl: url, mime } = attachment;
+                const {
+                  cdnUrl,
+                  mime: ogMime,
+                  compatCdnUrl,
+                  compatMime
+                } = attachment;
+                const url = compatCdnUrl ?? cdnUrl;
+                const mime = compatMime ?? ogMime;
               if (url && mime) {
                 if (mime.includes("application")) {
                   const docBlock = {
                     type: "document",
                     source: {
                       type: "url",
-                      url: attachment?.compatCdnUrl ?? url
+                      url
                     }
                   } as const satisfies DocumentBlockParam;
                   content.push(docBlock);

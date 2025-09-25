@@ -1466,8 +1466,8 @@ export class Resolver extends ModelService {
 
       ws.send(JSON.stringify(assetReady));
       // TODO implement image conversion pipeline with sharp (for all non-png/jpg/webp images)
-      if (compatStatus === "PENDING" && attachment.assetType === "DOCUMENT") {
-        void this.wsServer.pdfService.convertToPdf({
+      if (attachment.compatStatus === "PENDING" && attachment.assetType === "DOCUMENT") {
+        await this.wsServer.pdfService.convertToPdf({
           assetType: attachment.assetType,
           bucket: attachment.bucket,
           cdnUrl: attachment.cdnUrl ?? "",
