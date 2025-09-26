@@ -1,16 +1,20 @@
+import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ImageResponse } from "next/og";
-
 export const size = {
   width: 1200,
   height: 630
 };
 
 export default async function Image() {
+  const _logowhiteSource =
+    "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758838093131-Asset_2hdpi.png";
+  const _bgImgSource =
+    "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758850621314-ai-human.png";
+
   try {
     const [logoLight, bgImage] = await Promise.all([
-      readFile(join(process.cwd(), "src/app/logo-white.png"), "base64"),
+      readFile(join(process.cwd(), "src/app/logo-black.png"), "base64"),
       readFile(join(process.cwd(), "src/app/ai-human.png"), "base64")
     ]);
     return new ImageResponse(
@@ -19,18 +23,32 @@ export default async function Image() {
           style={{
             position: "relative",
             height: "100%",
-            display: "none",
+            display: "flex",
             width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
             overflow: "hidden"
           }}>
-          <div style={{ position: "absolute", inset: "0", display: "none" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginInline: "auto"
+            }}>
             <img
               alt="AI and human interaction artwork"
+              width={836.515}
+              height={630}
               style={{
                 inset: "0",
                 position: "absolute",
-                height: "100%",
-                width: "100%",
+                objectPosition: "center center",
+                alignSelf: "center",
+                height: "630px",
+                width: "836.515px",
                 objectFit: "cover",
                 pointerEvents: "none",
                 filter: "saturate(0.3) contrast(0.8) brightness(1.1)"
@@ -71,7 +89,7 @@ export default async function Image() {
             }}>
             <div
               style={{
-                display: "none",
+                display: "flex",
                 position: "relative",
                 transform: "translateY(40%)"
               }}>
@@ -90,14 +108,23 @@ export default async function Image() {
                 }}></div>
               <div
                 style={{
-                  padding: "1.5rem",
+                  padding: "0",
                   position: "relative",
-                  display: "none"
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  display: "flex"
                 }}>
                 <img
                   src={`data:image/png;base64,${logoLight}`}
                   alt="aicoalesce logo"
+                  width={267}
+                  height={202}
                   style={{
+                    zIndex: "50",
+                    position:"absolute",
+                    inset: "0",
+                    objectPosition: "center center",
                     height: "5rem",
                     width: "5rem",
                     objectFit: "contain",
