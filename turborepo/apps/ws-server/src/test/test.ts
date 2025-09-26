@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
-import { Provider } from "@slipstream/types";
 import * as dotenv from "dotenv";
+import { Provider } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -160,21 +160,33 @@ class ScriptGen extends Fs {
         timeZone: decodeURIComponent("america/chicago")
       });
       console.log(p.assetUrl);
+      const handleProvider =
+        p.provider === "grok"
+          ? "xai"
+          : p.provider === "gemini"
+            ? "google"
+            : p.provider;
       const agg =
         p.sender === "AI"
-          ? withThinking ==="true" ? p.thinking
-            ? `(${p.msgNumber})\n[${p.provider}/${p.model}]\n\n${p.thinking}\n\n${p.content}\n\n${d}\n`
-            : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n` : `(${p.msgNumber})\n[${p.provider}/${p.model}]\n${p.content}\n\n${d}\n`
+          ? withThinking === "true"
+            ? p.thinking
+              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
           : p.assetUrl.length > 0
-            ? `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\nbatchId: ${p.assetUrl[0]?.batchId}\n\n${d}\n`
-            : `(${p.msgNumber})\n[user/andrew]\n${p.content}\n\n${d}\n`;
+            ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\n${d}\n`
+            : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
       arr.push(agg);
     }
 
     return arr;
   }
 
-  public async gen(target: "dev" | "prod", id?: string, withThinking="false") {
+  public async gen(
+    target: "dev" | "prod",
+    id?: string,
+    withThinking = "false"
+  ) {
     const [data, raw] = await Promise.all([
       this.out(target, id, withThinking),
       this.targeted(target, id)
