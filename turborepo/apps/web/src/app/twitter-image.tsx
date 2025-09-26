@@ -1,19 +1,18 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-export const contentType = "image/png";
 export const size = {
   width: 1200,
   height: 628
 };
 
-export default function TwitterImage() {
+export default async function Image() {
   try {
-    const logoLight =
-      "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758838068725-aicoalesce-logo-white.png";
-    const bgImage =
-      "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758231667843-gemini.webp";
-
+    const [logoLight, bgImage] = await Promise.all([
+      readFile(join(process.cwd(), "src/app/logo-white.png"), "base64"),
+      readFile(join(process.cwd(), "src/app/ai-human.png"), "base64")
+    ]);
     return new ImageResponse(
       (
         <div
@@ -35,7 +34,7 @@ export default function TwitterImage() {
                 pointerEvents: "none",
                 filter: "saturate(0.3) contrast(0.8) brightness(1.1)"
               }}
-              src={bgImage}
+              src={`data:image/png;base64,${bgImage}`}
             />
           </div>
           <div
@@ -86,7 +85,7 @@ export default function TwitterImage() {
                 }}></div>
               <div style={{ padding: "1.5rem", position: "relative" }}>
                 <img
-                  src={logoLight}
+                  src={`data:image/png;base64,${logoLight}`}
                   alt="aicoalesce logo"
                   style={{
                     height: "5rem",
@@ -114,7 +113,7 @@ export default function TwitterImage() {
         <div
           style={{
             width: "1200px",
-            height: "630px",
+            height: "628px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
