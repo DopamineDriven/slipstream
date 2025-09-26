@@ -57,8 +57,8 @@
     "fix": "npm pkg fix"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.893.0",
-    "@aws-sdk/credential-providers": "^3.893.0",
+    "@aws-sdk/client-secrets-manager": "^3.896.0",
+    "@aws-sdk/credential-providers": "^3.896.0",
     "@slipstream/credentials": "workspace:*",
     "dotenv": "^17.2.2",
     "dotenv-expand": "^12.0.3"
@@ -72,14 +72,14 @@
     "chokidar": "^4.0.3",
     "dotenv-cli": "^10.0.0",
     "eslint": "^9.36.0",
-    "jiti": "^2.5.1",
+    "jiti": "^2.6.0",
     "prettier": "^3.6.2",
     "terser": "^5.44.0",
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
-    "tsx": "^4.20.5",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.0"
+    "typescript-eslint": "^8.44.1"
   },
   "prettier": "@slipstream/prettier-config"
 }

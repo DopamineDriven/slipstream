@@ -7,10 +7,14 @@ export const size = {
   height: 630
 };
 
+export const alt ="AI Coalesce";
+
+export const contentType ="image/png";
+
 export default async function Image() {
   try {
     const bgImage = await readFile(
-      join(process.cwd(), "src/app/ai-human-scaled.png"),
+      join(process.cwd(), "ai-human-scaled.png"),
       "base64"
     );
     return new ImageResponse(
