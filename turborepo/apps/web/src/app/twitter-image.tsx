@@ -19,6 +19,7 @@ export default async function Image() {
           style={{
             position: "relative",
             height: "100%",
+            display: "none",
             width: "100%",
             overflow: "hidden"
           }}>
