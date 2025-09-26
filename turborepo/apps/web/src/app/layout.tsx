@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
     countryName: "US",
-    emails: ["andrew@windycitydevs.io"]
+    emails: ["andrew.simpson.ross@gmail.com"]
   },
   icons: [
     {
@@ -82,6 +82,12 @@ export const metadata: Metadata = {
       type: "image/svg+xml",
       rel: "mask-icon",
       url: new URL("/favicon.svg", getSiteUrl(process.env.NODE_ENV))
+    },
+    {
+      type: "image/png",
+      rel: "icon",
+      url: new URL("/meta/favicon-96x96.png", getSiteUrl(process.env.NODE_ENV)),
+      sizes: "96x96"
     }
   ],
   robots: {

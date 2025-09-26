@@ -4,10 +4,10 @@ export const runtime = "edge";
 export const contentType = "image/png";
 export const size = {
   width: 1200,
-  height: 630
+  height: 628
 };
 
-export default function OpenGraphImage() {
+export default function TwitterImage() {
   try {
     const logoLight =
       "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758838068725-aicoalesce-logo-white.png";
@@ -102,7 +102,7 @@ export default function OpenGraphImage() {
       ),
       {
         width: 1200,
-        height: 630
+        height: 628
       }
     );
   } catch (error) {
@@ -132,7 +132,7 @@ export default function OpenGraphImage() {
       ),
       {
         width: 1200,
-        height: 630
+        height: 628
       }
     );
   }
