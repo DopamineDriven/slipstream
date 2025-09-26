@@ -3,7 +3,7 @@ import { NextResponse, userAgent } from "next/server";
 
 export { authConfig } from "@/lib/auth.config";
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image).*)"]
 };
 
 function detectDeviceAndSetCookies(
