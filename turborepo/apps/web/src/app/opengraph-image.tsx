@@ -23,7 +23,7 @@ export default async function Image() {
             width: "100%",
             overflow: "hidden"
           }}>
-          <div style={{ position: "absolute", inset: "0" }}>
+          <div style={{ position: "absolute", inset: "0", display: "none" }}>
             <img
               alt="AI and human interaction artwork"
               style={{
@@ -40,6 +40,7 @@ export default async function Image() {
           </div>
           <div
             style={{
+              display: "none",
               position: "absolute",
               inset: "0",
               background:
@@ -47,6 +48,7 @@ export default async function Image() {
             }}></div>
           <div
             style={{
+              display: "none",
               position: "absolute",
               inset: "0",
               background:
@@ -54,6 +56,7 @@ export default async function Image() {
             }}></div>
           <div
             style={{
+              display: "none",
               backgroundColor: "rgb(239 246 255 / 0.3)",
               inset: "0",
               position: "absolute"
@@ -68,6 +71,7 @@ export default async function Image() {
             }}>
             <div
               style={{
+                display: "none",
                 position: "relative",
                 transform: "translateY(40%)"
               }}>
@@ -84,7 +88,12 @@ export default async function Image() {
                   inset: "0",
                   position: "absolute"
                 }}></div>
-              <div style={{ padding: "1.5rem", position: "relative" }}>
+              <div
+                style={{
+                  padding: "1.5rem",
+                  position: "relative",
+                  display: "none"
+                }}>
                 <img
                   src={`data:image/png;base64,${logoLight}`}
                   alt="aicoalesce logo"
