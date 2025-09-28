@@ -137,6 +137,7 @@ build_targeted() {
         "@slipstream/key-validator"
         "@slipstream/types"
         "@slipstream/storage-s3"
+        "@slipstream/db"
         "@slipstream/ws-server"
     )
 

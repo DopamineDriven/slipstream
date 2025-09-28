@@ -79,7 +79,7 @@ type AssetRT =
 
 const _asset = () =>
   (async () => {
-    const { PrismaClient } = await import("@/generated/client/client.ts");
+    const { PrismaClient } = await import("@slipstream/db/node/generated/client");
     const { Credentials } = await import("@slipstream/credentials");
     const cfg = new Credentials();
     const [datasourceUrl, _direct] = await Promise.all([

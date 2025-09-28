@@ -1,0 +1,14 @@
+{
+  "extends": "@slipstream/tsconfig/db.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "rootDir": "./src",
+    "outDir": "dist"
+  },
+  "exclude": ["dist"],
+  "include": ["src/**/*.ts"]
+}

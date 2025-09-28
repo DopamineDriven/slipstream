@@ -1,0 +1,86 @@
+{
+  "name": "@slipstream/db",
+  "version": "1.0.0",
+  "description": "convenient db helper",
+  "type": "module",
+  "sideEffects": [
+    "**/*.wasm"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup src/* --format esm --watch",
+    "lint": "eslint",
+    "format": "prisma format",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "postbuild": "pnpm cp:edgefiles",
+    "prebuild": "rm -rf dist/ && pnpm db:generate",
+    "predev": "pnpm db:generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio --browser none --port 7777",
+    "precp:edgefiles": "cp -r ./src/generated/prisma-edge/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma-edge && cp -r ./src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma",
+    "cp:edgefiles": "cp -r ./src/generated/prisma-edge/internal/query_engine_bg.* ./dist/generated/prisma-edge/internal"
+  },
+  "files": [
+    "dist/**",
+    "prisma/**",
+    "package.json"
+  ],
+  "exports": {
+    "./node": {
+      "types": "./dist/db.d.ts",
+      "import": "./dist/db.js",
+      "default": "./dist/db.js"
+    },
+    "./node/generated/client": {
+      "types": "./dist/client-node.d.ts",
+      "import": "./dist/client-node.js",
+      "default": "./dist/client-node.js"
+    },
+    "./enums-node": {
+      "types": "./dist/enums-node.d.ts",
+      "import": "./dist/enums-node.js",
+      "default": "./dist/enums-node.js"
+    },
+    "./edge": {
+      "types": "./dist/db-edge.d.ts",
+      "import": "./dist/db-edge.js",
+      "default": "./dist/db-edge.js"
+    },
+    "./enums-edge": {
+      "types": "./dist/enums-edge.d.ts",
+      "import": "./dist/enums-edge.js",
+      "default": "./dist/enums-edge.js"
+    },
+    "./edge/generated/client": {
+      "types": "./dist/client-edge.d.ts",
+      "import": "./dist/client-edge.js",
+      "default": "./dist/client-edge.js"
+    }
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "6.16.2",
+    "@prisma/client": "6.16.2",
+    "@prisma/extension-accelerate": "2.0.2"
+  },
+  "devDependencies": {
+    "@d0paminedriven/fs": "^7.6.0",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "^24.5.2",
+    "dotenv": "^17.2.2",
+    "eslint": "^9.36.0",
+    "jiti": "^2.6.0",
+    "prettier": "^3.6.2",
+    "prisma": "^6.16.2",
+    "terser": "^5.44.0",
+    "tslib": "^2.8.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1"
+  },
+  "prettier": "@slipstream/prettier-config"
+}

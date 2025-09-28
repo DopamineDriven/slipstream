@@ -1,6 +1,6 @@
 import http from "http";
 import { timingSafeEqual } from "node:crypto";
-import type { AssetType, CompatStatus } from "@/generated/client/enums.ts";
+import type { AssetType, CompatStatus } from "@slipstream/db/enums-node";
 import { PrismaService } from "@/prisma/index.ts";
 import * as dotenv from "dotenv";
 import type { AssetOriginType } from "@slipstream/storage-s3";

@@ -1,4 +1,4 @@
-import type { $Enums } from "@/generated/client/client.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
@@ -78,7 +78,7 @@ type DataRT =
   | undefined;
 
 const data = async (env: string) => {
-  const { PrismaClient } = await import("@/generated/client/client.ts");
+  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
   const prismaClient = new PrismaClient({ datasourceUrl: env });
   try {
     prismaClient.$connect();
