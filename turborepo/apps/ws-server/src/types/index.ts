@@ -1,5 +1,5 @@
-import type { $Enums } from "@/generated/client/client.ts";
 import { WebSocket } from "ws";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EventTypeMap } from "@slipstream/types";
 
 export interface WSServerOptions {

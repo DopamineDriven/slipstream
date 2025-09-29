@@ -5,10 +5,18 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider        = "prisma-client"
   previewFeatures = ["typedSql"]
+  output          = "../src/generated/prisma"
+  runtime         = "nodejs"
 }
 
+generator edge {
+  provider = "prisma-client-js"
+  output   = "../edge/generated/client"
+  runtime = "vercel-edge"
+  previewFeatures = ["typedSql"]
+}
 
 enum CompatStatus {
   PENDING
@@ -432,7 +440,7 @@ model VideoMetadata {
   format       String
   width        Int
   height       Int
-  aspectRatio  Float? @default(1.0)
+  aspectRatio  Float?     @default(1.0)
   duration     Int // milliseconds
   frameRate    Float?
   bitrate      Int? // kbps

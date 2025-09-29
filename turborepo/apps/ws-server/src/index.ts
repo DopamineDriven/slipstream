@@ -70,12 +70,15 @@ async function exe() {
       cert,
       host
     );
+    const connectionString = process.env.DATABASE_URL ?? cfg.DATABASE_URL;
+
+    const { DbService } = await import("@slipstream/db/node");
+
+    const db = new DbService(connectionString);
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const connectionString = process.env.DATABASE_URL ?? cfg.DATABASE_URL;
-
-    const prisma = new PrismaService(connectionString, 10, 30000, fs);
+    const prisma = new PrismaService(db, fs);
 
     const jwtSecret =
       cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";

@@ -5,12 +5,11 @@ import type {
   DocumentMetadata,
   ImageMetadata,
   VideoMetadata
-} from "@/generated/client/client.ts";
+} from "@slipstream/db/node/generated/client";
 import type { ConversationSingleton, UserData } from "@/types/index.ts";
-import { PrismaClient } from "@/generated/client/client.ts";
+import { PrismaClient } from "@slipstream/db/node";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { PrismaPg } from "@prisma/adapter-pg";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -21,6 +20,7 @@ import type {
   XOR
 } from "@slipstream/types";
 import { EncryptionService } from "@slipstream/encryption";
+import {DbService} from "@slipstream/db/node";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 
@@ -42,22 +42,13 @@ export type UpdateAttachmentCompatProps = {
 export class PrismaService extends ModelService {
   readonly prismaClient: PrismaClient;
   private encryption: EncryptionService;
-  private adapter: PrismaPg;
   constructor(
-    connectionString: string,
-    poolMax = 10,
-    idleTimeoutMs = 30000,
+    prisma: DbService,
     public fs: Fs
   ) {
     super();
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
-
-    this.adapter = new PrismaPg({
-      connectionString,
-      max: poolMax,
-      idleTimeoutMillis: idleTimeoutMs
-    });
-    this.prismaClient = new PrismaClient({ adapter: this.adapter });
+    this.prismaClient = prisma.prismaClient;
   }
 
   public async getAndValidateUserSessionByEmail(email: string) {

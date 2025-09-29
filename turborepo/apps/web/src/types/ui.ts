@@ -1,4 +1,4 @@
-import type { Message as MessagePrisma } from "@prisma/client";
+import type { Message as MessagePrisma } from "@slipstream/db/edge-client";
 import type { ComponentPropsWithRef, JSX } from "react";
 import React from "react";
 

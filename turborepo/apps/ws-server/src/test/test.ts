@@ -29,7 +29,7 @@ class ScriptGen extends Fs {
   }
 
   private data = async (env: string, id: string) => {
-    const { PrismaClient } = await import("@/generated/client/client.ts");
+    const { PrismaClient } = await import("@slipstream/db/node/generated/client");
     const prismaClient = new PrismaClient({ datasourceUrl: env });
     try {
       prismaClient.$connect();

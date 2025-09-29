@@ -7,7 +7,6 @@ interface OrmServiceEntity {
   prismaConversationService: PrismaUserMessageService;
 }
 /**
- 
   async deleteAttachment(id: string, userId: string): Promise<Attachment> {
     // Verify ownership
     const attachment = await this.prismaClient.attachment.findUnique({

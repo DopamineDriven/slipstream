@@ -1,11 +1,11 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
-import type { $Enums, UserKey } from "@prisma/client";
+import { ErrorHelperService } from "@/orm/err-helper";
+import type { $Enums, UserKey } from "@slipstream/db/edge-client";
 import type {
   ClientContextWorkupProps,
   Provider,
   RecordCountsProps
 } from "@slipstream/types";
-import { ErrorHelperService } from "@/orm/err-helper";
 
 export class PrismaUserKeyService extends ErrorHelperService {
   constructor(public prismaClient: PrismaClientWithAccelerate) {
