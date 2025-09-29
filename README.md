@@ -1,5 +1,8 @@
 ## Slipstream — Polyrepo Overview
 
+
+![AI Coalesce](https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758923529552-aicoalesce-vivified.png){style="display: block; margin: 0 auto; filter: drop-shadow(4px 4px rgb(0 0 0 / 0.15)); border-radius:0.75rem;"}
+
 Monorepo + microservice setup for a realtime, multi‑model AI chat app. The web client and Node WebSocket server live in a Turborepo workspace. A separate Python FastAPI microservice handles generative asset tasks. Infra scripts support AWS ECS Fargate deployments.
 
 ### Architecture
