@@ -29,7 +29,7 @@ const providerMap = [
 )[] satisfies Provider[];
 
 export const authConfig = <NextAuthConfig>{
-  adapter: PrismaAdapter(prismaClient),
+  adapter: PrismaAdapter(prismaClient as unknown as any),
   providers: providerMap,
   session: {
     strategy: "jwt",

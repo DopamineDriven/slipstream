@@ -1,5 +1,5 @@
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { PrismaClient } from "./generated/client/edge";
+import { PrismaClient } from "./generated/client/edge.js";
 
 export type GetDbParams = {
   connectionString: string;

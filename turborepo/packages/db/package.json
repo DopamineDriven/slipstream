@@ -25,7 +25,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
-    "cp:binaries": "cp -r ./src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma"
+    "precp:binaries": "tsx src/test/scan-output.ts --scan output",
+    "cp:binaries": "cp -r ./src/generated/prisma/*.x.so.node ./dist/generated/prisma"
   },
   "files": [
     "dist/**",
