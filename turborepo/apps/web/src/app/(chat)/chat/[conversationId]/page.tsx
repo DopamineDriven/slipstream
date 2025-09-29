@@ -70,12 +70,12 @@ export default async function ChatPage({
 
   return (
     <Suspense fallback={<ChatAreaSkeleton />}>
-        <ChatInterface
-          initialMessages={messages}
-          conversationTitle={conversationTitle}
-          conversationId={conversationId}
-          user={session.user}
-        />
+      <ChatInterface
+        initialMessages={messages}
+        conversationTitle={conversationTitle}
+        conversationId={conversationId}
+        user={session.user}
+      />
     </Suspense>
   );
 }

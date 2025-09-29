@@ -1,7 +1,7 @@
 {
   "name": "@slipstream/db",
   "version": "1.0.0",
-  "description": "convenient db helper",
+  "description": "convenient db helpers",
   "type": "module",
   "sideEffects": [
     "**/*.wasm"

@@ -10,7 +10,6 @@ const tsupConfig = (options: Options) =>
       "src/anthropic/index.ts",
       "src/auth/index.ts",
       "src/gemini/index.ts",
-      "src/generated/**/*.ts",
       "src/logger/index.ts",
       "src/meta/index.ts",
       "src/models/index.ts",

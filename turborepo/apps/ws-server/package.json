@@ -23,9 +23,6 @@
       "gemini": [
         "dist/gemini/index.d.ts"
       ],
-      "generated": [
-        "dist/generated/*.d.ts"
-      ],
       "logger": [
         "dist/logger/index.d.ts"
       ],
@@ -70,14 +67,12 @@
   "scripts": {
     "build": "tsup",
     "prebuild": "pnpm db:generate",
-    "postinstall": "pnpm db:generate",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
+    "db:generate": "pnpm --filter \"@slipstream/db\" db:generate",
+    "db:migrate": "pnpm --filter \"@slipstream/db\" db:migrate",
+    "db:deploy": "npx --filter \"@slipstream/db\" db:deploy",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" --ignore-unknown --cache",
-    "prisma:studio": "prisma studio --browser none --port 7777",
+    "prisma:studio": "pnpm --filter \"@slipstream/db\" prisma:studio",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "devv": "tsup --config tsup.config.dev.ts",
     "dev": "nodemon --watch src --ext ts --exit-child --exec \"tsx src/index.ts\"",
     "lint": "eslint",
     "output:md": "tsx src/test/to-md.ts --target root false",
