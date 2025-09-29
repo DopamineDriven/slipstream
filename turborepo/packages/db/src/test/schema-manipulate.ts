@@ -1,78 +1,82 @@
 import { Fs } from "@d0paminedriven/fs";
 
-const fs = new Fs(process.cwd());
+class SchemaService extends Fs {
+  private restoreMap = new Map<string, string>();
 
-//prettier-ignore
-const targets = `generator client {
-  provider        = "prisma-client"
-  previewFeatures = ["typedSql"]
-  output          = "../src/generated/prisma"
-  runtime         = "nodejs"
-}
+  private nodeRegex = /generator\s+client\s*\{[^}]*\}/gm;
 
-generator edge {
-  provider = "prisma-client-js"
-  output   = "../edge/generated/client"
-  runtime = "vercel-edge"
-  previewFeatures = ["typedSql"]
-}`;
+  private edgeRegex = /generator\s+edge\s*\{[^}]*\}/gm;
 
-// prettier-ignore
-const edgeTarget = `generator edge {
-  provider = "prisma-client-js"
-  output   = "../edge/generated/client"
-  runtime = "vercel-edge"
-  previewFeatures = ["typedSql"]
-}`;
+  private groupRegex =
+    /generator\s+client\s*\{[^}]*\}(\s)+generator\s+edge\s*\{[^}]*\}|generator\s+edge\s*\{[^}]*\}(\s)+generator\s+client\s*\{[^}]*\}/gm;
 
-// prettier-ignore
-const nodeTarget =`generator client {
-  provider        = "prisma-client"
-  previewFeatures = ["typedSql"]
-  output          = "../src/generated/prisma"
-  runtime         = "nodejs"
-}`;
+  private targetsFile = "src/test/__out__/targets.txt" as const;
 
-function getSchema() {
-  return fs.fileToBuffer("prisma/schema.prisma").toString("utf-8");
-}
+  constructor(public override cwd: string) {
+    super((cwd ??= process.cwd()));
+  }
 
-function handleEdgeVsNode(target: "edge" | "node") {
-  const schema = getSchema();
+  private schema() {
+    return this.fileToBuffer("prisma/schema.prisma").toString("utf-8");
+  }
 
-  if (target === "edge") {
-    const schemaOut = schema.replace(targets, edgeTarget);
-    fs.withWs("prisma/schema.prisma", schemaOut);
-  } else if (target === "node") {
-    const schemaOut = schema.replace(targets, nodeTarget);
-    fs.withWs("prisma/schema.prisma", schemaOut);
-  } else {
-    console.warn(
-      "you must provide a target flag and arg, eg: --target edge | --target node"
-    );
+  private exeTarget<
+    const T extends "edge" | "from-edge" | "node" | "from-node" | "both"
+  >(target: T) {
+    if (target === "edge" || target === "from-edge") {
+      return this.edgeRegex.exec(this.schema())?.[0];
+    } else if (target === "node" || target === "from-node") {
+      return this.nodeRegex.exec(this.schema())?.[0];
+    } else return this.groupRegex.exec(this.schema())?.[0];
+  }
+
+  public replace<const T extends "edge" | "node">(target: T) {
+    // this.restoreMap.set("schema-initial", this.schema);
+    const targeted = this.exeTarget(target);
+    const targets = this.exeTarget("both");
+    if (targeted && targets) {
+      try {
+        this.restoreMap.set("targets", targets);
+        this.withWs(this.targetsFile, targets);
+      } finally {
+        this.withWs(
+          "prisma/schema.prisma",
+          this.schema().replace(targets, targeted)
+        );
+      }
+    } else {
+      console.warn(
+        "must provide a target flag and arg, eg: --target edge | --target node"
+      );
+    }
+  }
+
+  public restore<const T extends "from-edge" | "from-node">(target: T) {
+    const targets = this.restoreMap.get("targets");
+    const targeted = this.exeTarget(target);
+    if (targeted) {
+      if (!targets) {
+        const targets = this.fileToBuffer(this.targetsFile).toString("utf-8");
+        const schemaOut = this.schema().replace(targeted, targets);
+        this.withWs("prisma/schema.prisma", schemaOut);
+        return;
+      }
+      const schemaOut = this.schema().replace(targeted, targets);
+      this.withWs("prisma/schema.prisma", schemaOut);
+    } else {
+      console.warn(
+        "you must provide a target flag and arg, eg: --restore from-edge | --restore from-node"
+      );
+    }
   }
 }
 
-function handleRestoreFrom(target: "from-edge" | "from-node") {
-  const schema = getSchema();
-
-  if (target === "from-edge") {
-    const schemaOut = schema.replace(edgeTarget, targets);
-    fs.withWs("prisma/schema.prisma", schemaOut);
-  } else if (target === "from-node") {
-    const schemaOut = schema.replace(nodeTarget, targets);
-    fs.withWs("prisma/schema.prisma", schemaOut);
-  } else {
-    console.warn(
-      "you must provide a target flag and arg, eg: --restore from-edge | --restore from-node"
-    );
-  }
-}
+const manipulate = new SchemaService(process.cwd());
 
 if (process.argv[2] === "--target" && process.argv[3]) {
-  handleEdgeVsNode(process.argv[3] as "edge" | "node");
+  manipulate.replace(process.argv[3] as "edge" | "node");
 }
 
 if (process.argv[2] === "--restore" && process.argv[3]) {
-  handleRestoreFrom(process.argv[3] as "from-edge" | "from-node");
+  manipulate.restore(process.argv[3] as "from-edge" | "from-node");
 }

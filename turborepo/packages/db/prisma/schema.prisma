@@ -157,6 +157,7 @@ model User {
   email         String         @unique
   emailVerified DateTime?
   image         String?
+  isAnonymous   Boolean?
   profile       Profile?
   accounts      Account[]
   sessions      Session[]

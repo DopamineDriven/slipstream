@@ -22,7 +22,7 @@
     "db:generate:edge": "prisma generate --no-engine",
     "postdb:generate:edge": "tsx src/test/schema-manipulate.ts --restore from-edge",
     "db:generate": "pnpm db:generate:node && pnpm db:generate:edge",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate dev --skip-generate",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
     "precp:binaries": "tsx src/test/scan-output.ts --scan output",
