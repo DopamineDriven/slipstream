@@ -575,10 +575,6 @@ export type ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
 }
 
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
-}
-
 export type ConversationSettingsCreateWithoutConversationInput = {
   id?: string
   systemPrompt?: string | null
