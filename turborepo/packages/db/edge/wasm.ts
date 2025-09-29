@@ -1,1 +1,1 @@
-export * from "./generated/client/wasm";
+export * from "./generated/client/wasm.js";
