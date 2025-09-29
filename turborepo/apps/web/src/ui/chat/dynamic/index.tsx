@@ -3,7 +3,13 @@
 
 import type { AttachmentSingleton, UIMessage } from "@/types/shared";
 import type { User } from "next-auth";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { redirect, useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useAssetUpload } from "@/context/asset-context";
@@ -423,16 +429,18 @@ export function ChatInterface({
           onPromptClickAction={handlePromptClick}
         />
       </ChatFeed>
-      <ChatInput
-        handlePromptConsumed={handlePromptConsumed}
-        initialPrompt={queuedPrompt}
-        autoSubmitInitialPrompt
-        onUserMessage={handleUserMessage}
-        user={user}
-        isConnected={isConnected}
-        activeConversationId={activeConversationId}
-        conversationId={activeConversationId ?? conversationId}
-      />
+      <Suspense>
+        <ChatInput
+          handlePromptConsumed={handlePromptConsumed}
+          initialPrompt={queuedPrompt}
+          autoSubmitInitialPrompt
+          onUserMessage={handleUserMessage}
+          user={user}
+          isConnected={isConnected}
+          activeConversationId={activeConversationId}
+          conversationId={activeConversationId ?? conversationId}
+        />
+      </Suspense>
     </div>
   );
 }

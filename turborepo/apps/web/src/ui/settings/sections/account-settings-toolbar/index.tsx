@@ -37,7 +37,7 @@ export function AccountSettingsSection({ user }: { user?: User }) {
             <Input
               id="name"
               defaultValue={user?.name ?? "Andrew Ross"}
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
+              className="bg-brand-background pr-3 pl-10  border-brand-border focus:ring-brand-ring text-brand-text"
             />
           </div>
           <div className="space-y-1">
@@ -48,7 +48,7 @@ export function AccountSettingsSection({ user }: { user?: User }) {
               id="email"
               type="email"
               defaultValue={user?.email ?? "andrew@windycitydevs.io"}
-              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text"
+              className="bg-brand-background pr-3 pl-10  border-brand-border focus:ring-brand-ring text-brand-text"
             />
           </div>
           <Button className="bg-brand-primary text-brand-primaryForeground hover:bg-brand-primary/90">

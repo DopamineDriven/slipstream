@@ -69,6 +69,7 @@ const ATTACHMENT_OPTIONS = [
   { id: "camera", label: "Camera", icon: Camera },
   { id: "photo", label: "Photos", icon: ImageIcon }
 ] as const;
+
 export function ChatInput({
   user: _user,
   conversationId,
@@ -122,6 +123,8 @@ export function ChatInput({
       "image/*",
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       "text/markdown",
       "text/plain"
     ]
@@ -436,7 +439,7 @@ export function ChatInput({
   const fileMemo = useMemo(
     () =>
       selectedModel.provider === "openai"
-        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,application/*,text/*"
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,application/*,text/*"
         : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );
@@ -540,7 +543,7 @@ export function ChatInput({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
           className="mx-auto w-full max-w-2xl">
           {/* Attachment previews */}
           {assets.attachments.length > 0 && (
