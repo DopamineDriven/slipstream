@@ -3,12 +3,9 @@
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "rootDir": "./src",
+    "rootDirs": ["./src", "./edge"],
     "outDir": "dist"
   },
   "exclude": ["dist"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "edge/**/*.ts"]
 }

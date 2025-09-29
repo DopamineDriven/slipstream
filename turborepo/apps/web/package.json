@@ -7,17 +7,11 @@
   "prettier": "@slipstream/prettier-config",
   "scripts": {
     "dev": "next dev -p 3030 --turbo",
-    "prebuild": "pnpm db:generate",
     "build": "next build",
     "format": "prettier --write \"src/**/*.{ts,tsx,cts,mts,js,jsx,mjs,cjs,json,yaml,yml,css,html,md,mdx,graphql,gql}\" --ignore-unknown --cache",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "postinstall": "pnpm db:generate",
-    "db:generate": "prisma generate --no-engine",
-    "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio --browser none --port 7777",
     "output:md": "tsx src/utils/to-md.ts --target root false"
   },
   "dependencies": {
@@ -42,6 +36,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@slipstream/db": "workspace:*",
     "@slipstream/encryption": "workspace:*",
     "@slipstream/key-validator": "workspace:*",
     "@slipstream/storage-s3": "workspace:*",

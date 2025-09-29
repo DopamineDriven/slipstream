@@ -12,18 +12,24 @@
     "lint": "eslint",
     "format": "prisma format",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "postbuild": "pnpm cp:edgefiles",
+    "postbuild": "pnpm cp:binaries",
     "prebuild": "rm -rf dist/ && pnpm db:generate",
     "predev": "pnpm db:generate",
-    "db:generate": "prisma generate",
+    "predb:generate:node": "tsx src/test/schema-manipulate.ts --target node",
+    "db:generate:node": "prisma generate",
+    "postdb:generate:node": "tsx src/test/schema-manipulate.ts --restore from-node",
+    "predb:generate:edge": "tsx src/test/schema-manipulate.ts --target edge",
+    "db:generate:edge": "prisma generate --no-engine",
+    "postdb:generate:edge": "tsx src/test/schema-manipulate.ts --restore from-edge",
+    "db:generate": "pnpm db:generate:node && pnpm db:generate:edge",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
-    "precp:edgefiles": "cp -r ./src/generated/prisma-edge/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma-edge && cp -r ./src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma",
-    "cp:edgefiles": "cp -r ./src/generated/prisma-edge/internal/query_engine_bg.* ./dist/generated/prisma-edge/internal"
+    "cp:binaries": "cp -r ./src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node ./dist/generated/prisma"
   },
   "files": [
     "dist/**",
+    "edge/**",
     "prisma/**",
     "package.json"
   ],
@@ -44,19 +50,34 @@
       "default": "./dist/enums-node.js"
     },
     "./edge": {
-      "types": "./dist/db-edge.d.ts",
-      "import": "./dist/db-edge.js",
-      "default": "./dist/db-edge.js"
+      "types": "./edge/db-edge.ts",
+      "import": "./edge/db-edge.ts",
+      "default": "./edge/db-edge.ts"
     },
-    "./enums-edge": {
-      "types": "./dist/enums-edge.d.ts",
-      "import": "./dist/enums-edge.js",
-      "default": "./dist/enums-edge.js"
+    "./wasm": {
+      "types": "./edge/wasm.ts",
+      "import": "./edge/wasm.ts",
+      "default": "./edge/wasm.ts"
     },
-    "./edge/generated/client": {
-      "types": "./dist/client-edge.d.ts",
-      "import": "./dist/client-edge.js",
-      "default": "./dist/client-edge.js"
+    "./edge-client-edge": {
+      "types": "./edge/client-edge.ts",
+      "import": "./edge/client-edge.ts",
+      "default": "./edge/client-edge.ts"
+    },
+    "./edge-client": {
+      "types": "./edge/client.ts",
+      "import": "./edge/client.ts",
+      "default": "./edge/client.ts"
+    },
+    "./edge-generated": {
+      "types": "./edge/generated/client/*.d.ts",
+      "import": "./edge/generated/client/*.mjs",
+      "default": "./edge/generated/client/*.js"
+    },
+    "./edge-generated-runtime": {
+      "types": "./edge/generated/client/runtime/*.d.ts",
+      "import": "./edge/generated/client/runtime/*.js",
+      "default": "./edge/generated/client/runtime/*.js"
     }
   },
   "dependencies": {

@@ -3,7 +3,7 @@ import type {
   Conversation,
   ConversationSettings,
   Message
-} from "@prisma/client";
+} from "@slipstream/db/edge-client";
 import { ErrorHelperService } from "@/orm/err-helper";
 
 export type GetMessagesByConversationIdRT =

@@ -12,9 +12,10 @@ generator client {
 }
 
 generator edge {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma-edge"
-  runtime  = "vercel-edge"
+  provider = "prisma-client-js"
+  output   = "../edge/generated/client"
+  runtime = "vercel-edge"
+  previewFeatures = ["typedSql"]
 }
 
 enum CompatStatus {

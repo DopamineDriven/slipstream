@@ -1,4 +1,4 @@
-import type { $Enums, Message as MessagePrisma } from "@prisma/client";
+import type { $Enums, Message as MessagePrisma } from "@slipstream/db/edge-client";
 import type { Providers, RTC } from "@slipstream/types";
 
 export type ClientWorkupProps = {
