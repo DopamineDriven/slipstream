@@ -363,3 +363,72 @@ export function allProviders() {
 export function getAllProviders() {
   return allProviders();
 }
+
+export const imgMimeSupportByProvider = {
+  meta: ["image/jpeg", "image/png", "image/gif", "image/x-icon"],
+  grok: ["image/jpeg", "image/png", "image/webp"],
+  openai: ["image/jpeg", "image/png", "image/webp"],
+  vercel: ["image/jpeg", "image/png", "image/webp", "image/svg", "image/gif"],
+  gemini: ["image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"],
+  anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"]
+} as const;
+
+// direct input -- I have a document conversion pipeline set up
+// that handles office docs -> pdf as a background post-processing task
+// to be handed off to models on the backend, for example
+export const docMimeSupportByProvider = {
+  meta: [],
+  grok: [],
+  openai: ["application/pdf"],
+  vercel: ["application/pdf"],
+  gemini: [
+    "application/pdf",
+    "text/markdown",
+    "text/plain",
+    "text/csv",
+    "text/html",
+    "application/rtf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  ],
+  anthropic: ["application/pdf"]
+} as const;
+
+export const audioMimeSupportByProvider = {
+  meta: [],
+  grok: [],
+  openai: [""],
+  vercel: [""],
+  gemini: [
+    "audio/mp4",
+    "audio/aac",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/wav",
+    "audio/weba",
+    "audio/webm",
+    "audio/flac",
+    "audio/aiff"
+  ],
+  anthropic: ["application/pdf"]
+};
+
+export const videoMimeSupportByProvider = {
+  meta: [],
+  grok: [],
+  openai: ["application/pdf"],
+  vercel: ["video/mp4", "video/mov", "video/avi", "video/webm"],
+  gemini: [
+    "video/mp4",
+    "video/mpeg",
+    "video/mov",
+    "video/avi",
+    "video/x-flv",
+    "video/x-ms-wmv",
+    "video/webm",
+    "video/3gpp",
+    "video/ogg"
+  ],
+  anthropic: ["application/pdf"]
+} as const;

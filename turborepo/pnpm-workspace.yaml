@@ -4,6 +4,7 @@ packages:
   - tooling/*
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@prisma/client'
   - '@prisma/engines'
   - '@swc/core'

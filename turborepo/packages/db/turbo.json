@@ -2,15 +2,13 @@
   "extends": ["//"],
   "tasks": {
    "build": {
+    "dependsOn": ["^build"],
       "outputs": ["dist/**"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "src/**/*.ts",
-        "prisma/schema.prisma",
-        "tsconfig.json",
-        "package.json",
-        "eslint.config.mjs",
-        "prisma.config.ts"
+        "edge/**/*.ts",
+        "prisma/schema.prisma"
       ]
     }
   }
