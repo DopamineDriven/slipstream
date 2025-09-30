@@ -260,7 +260,7 @@ export function MessageBubble({
         id={`msg-${message.id}`}
         data-message-id={message.id}
         className={cn(
-          "mx-auto flex w-full max-w-[100dvw] gap-3 sm:max-w-3xl md:max-w-4xl",
+          "mx-auto flex w-full gap-3 sm:max-w-3xl md:max-w-4xl",
           isUser ? "justify-end" : "justify-start",
           className
         )}>
