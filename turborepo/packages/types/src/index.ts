@@ -114,6 +114,7 @@ export {
   getModelIdByDisplayName,
   getModelsForProvider,
   imageGenProvders,
+  imgMimeSupportByProvider,
   modelIdsByProvider,
   modelIdToDisplayName,
   providerModelChatApi,

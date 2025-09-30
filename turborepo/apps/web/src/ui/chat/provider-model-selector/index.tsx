@@ -190,7 +190,7 @@ export function ProviderModelSelector({
         className
       )}>
       <currentMeta.icon className="mr-2 size-4 flex-shrink-0" />
-      <div className="flex">
+      <div className="flex min-w-0">
         <span className="max-w-[20ch] truncate sm:max-w-fit">
           {selectedModel.displayName}
         </span>

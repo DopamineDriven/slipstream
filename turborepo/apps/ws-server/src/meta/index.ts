@@ -1,10 +1,10 @@
 import type { MessageSingleton } from "@/types/index.ts";
-import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { PrismaService } from "@/prisma/index.ts";
 import { ProviderChatRequestEntity } from "@/types/index.ts";
-import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { LlamaAPIClient } from "llama-api-client";
+import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
+import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class LlamaService {
   private defaultClient: LlamaAPIClient;
@@ -130,10 +130,10 @@ export class LlamaService {
     const stream = await client.chat.completions.create(
       {
         user: userId,
-        top_p: topP,
-        temperature,
+        top_p: topP ?? 1.0,
+        temperature: temperature ?? 1.0,
         model,
-        max_completion_tokens: max_tokens,
+        max_completion_tokens: max_tokens ?? 4096,
         messages: this.llamaFormat(isNewChat, msgs, systemPrompt),
         stream: true
       },
