@@ -65,10 +65,10 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.896.0",
-    "@aws-sdk/credential-providers": "^3.896.0",
-    "@aws-sdk/lib-storage": "^3.896.0",
-    "@aws-sdk/s3-request-presigner": "^3.896.0",
+    "@aws-sdk/client-s3": "^3.899.0",
+    "@aws-sdk/credential-providers": "^3.899.0",
+    "@aws-sdk/lib-storage": "^3.900.0",
+    "@aws-sdk/s3-request-presigner": "^3.899.0",
     "@aws-sdk/types": "^3.893.0",
     "@slipstream/types": "workspace:*",
     "sharp": "^0.34.4"
@@ -78,9 +78,9 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.5.2",
+    "@types/node": "^24.6.0",
     "chokidar": "^4.0.3",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "jiti": "^2.6.0",
     "prettier": "^3.6.2",
@@ -88,8 +88,8 @@
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.1"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.45.0"
   },
   "prettier": "@slipstream/prettier-config"
 }

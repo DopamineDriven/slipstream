@@ -131,13 +131,13 @@ clean_house() {
 build_targeted() {
     local build_order=(
         "@slipstream/ui"
+        "@slipstream/db"
         "@slipstream/redis-service"
         "@slipstream/credentials"
         "@slipstream/encryption"
         "@slipstream/key-validator"
         "@slipstream/types"
         "@slipstream/storage-s3"
-        "@slipstream/db"
         "@slipstream/ws-server"
     )
 
