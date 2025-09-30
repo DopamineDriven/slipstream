@@ -1,6 +1,6 @@
 {
   "name": "@slipstream/ui",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "convenient ui components",
   "files": [
     "dist/**/*.{js,mjs,cjs,d.mts,d.ts,d.cts,css}"
