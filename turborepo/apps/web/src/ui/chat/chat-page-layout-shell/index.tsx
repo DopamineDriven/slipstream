@@ -85,9 +85,7 @@ function HeaderActions() {
   );
 }
 
-export function ChatLayoutShell({
-  children
-}: ChatLayoutShellProps) {
+export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
@@ -115,13 +113,13 @@ export function ChatLayoutShell({
         <div className="flex h-full w-full overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
             <Suspense>
-              <EnhancedSidebar/>
+              <EnhancedSidebar />
             </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">
             <div className="flex h-[100dvh] flex-col">
               <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
-                <div className="flex items-center">
+                <div className="flex min-w-0 items-center">
                   <SidebarTrigger className="z-30 -ml-2">
                     <PanelLeft className="size-5" />
                     <span className="sr-only">Toggle Sidebar</span>
