@@ -32,7 +32,6 @@ interface ProviderModelSelectorProps {
   className?: string;
   variant?: "button" | "compact";
 }
-
 export function ProviderModelSelector({
   className,
   variant = "button"
@@ -186,12 +185,12 @@ export function ProviderModelSelector({
       variant="ghost"
       onClick={openDrawer}
       className={cn(
-        "text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base",
+        "text-brand-text hover:bg-brand-component px-3 text-sm sm:text-base min-w-0 max-w-full",
         className
       )}>
       <currentMeta.icon className="mr-2 size-4 flex-shrink-0" />
-      <div className="flex min-w-0">
-        <span className="max-w-[20ch] truncate sm:max-w-fit">
+      <div className="flex min-w-0 flex-1 overflow-x-hidden">
+        <span className="max-w-[10ch] sm:max-w-[16ch] lg:max-w-[20ch] truncate">
           {selectedModel.displayName}
         </span>
       </div>
