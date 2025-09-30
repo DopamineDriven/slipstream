@@ -1,20 +1,18 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": ["**/.env.*local","packages/credentials-service/.env"],
+  "globalDependencies": ["**/.env.*local", "packages/credentials-service/.env"],
   "tasks": {
     "build": {
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
       "dependsOn": ["^build"],
-      "cache": true
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "test": {
       "outputs": ["coverage/**"],
       "dependsOn": []
     },
-    "lint": {
-      "dependsOn": ["^build"]
-    },
+    "lint": {},
     "dev": {
-      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -25,7 +23,7 @@
       "cache": false
     }
   },
-  "ui": "stream",
+  "ui": "tui",
   "globalEnv": [
     "ADOBE_WEBHOOK_SECRET",
     "ANTHROPIC_API_KEY",
