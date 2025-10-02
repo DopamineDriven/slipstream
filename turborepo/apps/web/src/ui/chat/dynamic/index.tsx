@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useAssetUpload } from "@/context/asset-context";
 import { useCookiesCtx } from "@/context/cookie-context";
@@ -133,7 +133,6 @@ export function ChatInterface({
     ) {
       processedRef.current = true;
       setIsAwaitingFirstChunk(true);
-      redirect;
 
       // Build optimistic attachments from any persisted previews
       const optimisticAttachments = (initialPersistedAttachments ?? []).map(

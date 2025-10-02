@@ -42,7 +42,6 @@
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.6.0",
     "dotenv": "^17.2.3",
-    "esbuild-plugin-wasm": "^1.1.0",
     "eslint": "^9.36.0",
     "husky": "^9.1.7",
     "knip": "^5.64.1",

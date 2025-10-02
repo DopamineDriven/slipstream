@@ -1,9 +1,9 @@
 "use client";
 
 import type { MessageHandler } from "@/types/chat-ws";
-import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
+import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
@@ -21,7 +21,7 @@ export function useChatWebSocket(email?: string | null) {
 
   // Track the most recent event without forcing re-renders on noisy events
   const lastEventRef = useRef<ChatWsEvent | null>(null);
-
+  const updateScheduledRef = useRef(false);
   useEffect(() => {
     // Connect once per client instance
     client.connect();
@@ -30,7 +30,14 @@ export function useChatWebSocket(email?: string | null) {
     const handleEvent = (event: ChatWsEvent) => {
       lastEventRef.current = event;
       if (event.type !== "ping") {
-        setLastEvent(event);
+        // Coalesce updates to once per frame to avoid update-depth loops
+        if (!updateScheduledRef.current) {
+          updateScheduledRef.current = true;
+          requestAnimationFrame(() => {
+            updateScheduledRef.current = false;
+            setLastEvent(lastEventRef.current);
+          });
+        }
       } else {
         // ping also serves as a heartbeat to confirm connectivity
         setIsConnected(true);
