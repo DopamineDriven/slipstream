@@ -13,8 +13,7 @@
         "package.json",
         "postcss.config.mjs",
         "eslint.config.mjs",
-        "tsup.config.ts",
-        "tailwind.config.ts"
+        "tsup.config.ts"
       ]
     }
   }

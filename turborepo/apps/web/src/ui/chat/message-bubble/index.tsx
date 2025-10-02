@@ -127,11 +127,15 @@ export function MessageBubble({
     setShowMobileActions(true);
   }, []);
 
+  const streamingRenderedContent = useMemo(
+    () => (isStreaming ? processStreamingMarkdown(message.content) : null),
+    [isStreaming, message.content]
+  );
+
   // Process markdown content
   useEffect(() => {
     // For streaming messages, use lightweight processor
     if (isStreaming) {
-      setRenderedContent(processStreamingMarkdown(message.content));
       return;
     }
 
@@ -317,7 +321,9 @@ export function MessageBubble({
             <></>
           )}
           <div className="leading-relaxed text-pretty whitespace-pre-wrap">
-            {renderedContent ?? message.content}
+            {isStreaming
+              ? streamingRenderedContent
+              : (renderedContent ?? message.content)}
           </div>
           <MessageAttachments attachments={attachments} isUser={isUser} />
           <div

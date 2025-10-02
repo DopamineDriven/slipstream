@@ -41,3 +41,4 @@ notes.md
 *.mermaid
 apps/CLAUDE.md
 IMPLEMENTATION_PLAN.md
+assets/*

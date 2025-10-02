@@ -2,7 +2,10 @@ import type {
   MessageSingleton,
   ProviderChatRequestEntity
 } from "@/types/index.ts";
-import type { ResponseInput } from "openai/resources/responses/responses.mjs";
+import type {
+  ResponseInput,
+  ResponseTextConfig
+} from "openai/resources/responses/responses.mjs";
 import type { Reasoning } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI, toFile } from "openai";
@@ -534,6 +537,34 @@ export class OpenAIService {
       : undefined;
   }
 
+  private openAiVerbosity(model: OpenAiModelIdUnion, verbosity?: string) {
+    const v = verbosity
+      ? (verbosity as ResponseTextConfig["verbosity"])
+      : ("medium" satisfies ResponseTextConfig["verbosity"]);
+    switch (model) {
+      case "gpt-5":
+      case "gpt-5-mini":
+      case "gpt-5-nano": {
+        return { verbosity: v } satisfies ResponseTextConfig;
+      }
+      case "o3":
+      case "o3-mini":
+      case "o3-pro":
+      case "o4-mini":
+      case "gpt-3.5-turbo":
+      case "gpt-4":
+      case "gpt-4-turbo":
+      case "gpt-4.1":
+      case "gpt-4.1-mini":
+      case "gpt-4.1-nano":
+      case "gpt-4o":
+      case "gpt-4o-mini":
+      default: {
+        return undefined;
+      }
+    }
+  }
+
   public async handleOpenaiAiChatRequest({
     chunks,
     conversationId,
@@ -601,6 +632,7 @@ export class OpenAIService {
       instructions: this.buildInstructions(systemPrompt),
       store: false,
       model,
+      text: this.openAiVerbosity(model as OpenAiModelIdUnion, "medium"),
       temperature,
       max_output_tokens: max_tokens,
       top_p: topP,
@@ -626,18 +658,16 @@ export class OpenAIService {
 
         thinkingText = s.delta;
       }
-      if (
-        (s.type === "response.reasoning_summary_text.done" ||
-          s.type === "response.reasoning_text.done") &&
-        openaiIsCurrentlyThinking &&
-        openaiThinkingStartTime !== null
-      ) {
-        openaiIsCurrentlyThinking = false;
-        openaiThinkingDuration = Math.round(
-          performance.now() - openaiThinkingStartTime
-        );
-      }
       if (s.type === "response.output_text.delta") {
+        if (
+          openaiIsCurrentlyThinking === true &&
+          openaiThinkingStartTime !== null
+        ) {
+          const endTime = performance.now();
+          openaiThinkingDuration = Math.round(
+            endTime - openaiThinkingStartTime
+          );
+        }
         text = s.delta;
       }
       if (s.type === "response.output_text.done") {
