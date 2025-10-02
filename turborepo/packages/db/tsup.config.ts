@@ -1,6 +1,4 @@
-import { relative } from "node:path";
 import type { Options } from "tsup";
-import { wasmLoader } from "esbuild-plugin-wasm";
 import { defineConfig } from "tsup";
 
 export default defineConfig(
