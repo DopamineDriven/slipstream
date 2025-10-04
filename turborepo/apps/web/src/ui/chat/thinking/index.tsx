@@ -37,12 +37,11 @@ export function ThinkingSection({
   const startTimeRef = useRef<number | undefined>(undefined);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastUpdateRef = useRef<number>(0);
-  const isActiveRef = useRef<boolean>(false);
-  const displayDurationRef = useRef<number>(0);
-
+  // Drive live timer based on isThinking only
+  // This avoids loops from rapidly-changing duration
   useEffect(() => {
     if (!isThinking) {
-      isActiveRef.current = false;
+      // Ensure any active rAF is cancelled when thinking stops
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = undefined;
@@ -53,37 +52,27 @@ export function ThinkingSection({
     if (!startTimeRef.current) {
       startTimeRef.current = performance.now();
       lastUpdateRef.current = 0;
-      // reset ref so first tick paints 0.0 without synchronous setState operation
-      displayDurationRef.current = 0;
+      setDisplayDuration(0);
     }
 
-    isActiveRef.current = true;
-
     const updateDuration = (currentTime: number) => {
-      if (!isActiveRef.current || !startTimeRef.current) return;
-
+      if (!startTimeRef.current) return;
       const elapsed = currentTime - startTimeRef.current;
       const seconds = elapsed / 1000;
 
-      // throttle to ~10Hz; only update when displayed val changes (0.1s ticks for precision)
+      // Throttle to ~10Hz and only update when the displayed value changes at 0.1s precision
       if (currentTime - lastUpdateRef.current >= 100) {
         const rounded = Math.round(seconds * 10) / 10;
-        if (displayDurationRef.current !== rounded) {
-          displayDurationRef.current = rounded;
-          setDisplayDuration(rounded);
-        }
+        setDisplayDuration(prev => (prev !== rounded ? rounded : prev));
         lastUpdateRef.current = currentTime;
       }
 
-      if (isActiveRef.current) {
-        animationFrameRef.current = requestAnimationFrame(updateDuration);
-      }
+      animationFrameRef.current = requestAnimationFrame(updateDuration);
     };
 
     animationFrameRef.current = requestAnimationFrame(updateDuration);
 
     return () => {
-      isActiveRef.current = false;
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = undefined;
@@ -91,27 +80,26 @@ export function ThinkingSection({
     };
   }, [isThinking]);
 
+  // Apply final duration updates when not thinking; ignore during active thinking to avoid effect churn
   useEffect(() => {
-    if (isThinking) return;
+    if (isThinking) return; // live timer effect owns updates during thinking
 
-    // stop pending animation frames
+    // Stop any pending animation frames
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = undefined;
     }
 
-    // set final duration (ms -> s)
+    // Set the final duration (ms -> s) if provided
     if (typeof duration === "number") {
       const finalSeconds = Math.round((duration / 1000) * 10) / 10;
-      displayDurationRef.current = finalSeconds;
       setDisplayDuration(finalSeconds);
     }
 
-    // reset
+    // Reset for the next thinking session
     startTimeRef.current = undefined;
     lastUpdateRef.current = 0;
   }, [duration, isThinking]);
-
   const { resolvedTheme } = useTheme();
   const { get } = useCookiesCtx();
 
