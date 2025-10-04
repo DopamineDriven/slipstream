@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { shimmer } from "@/lib/shimmer";
 import { Logo } from "@/ui/logo";
 import {
   signinAnonymous,
@@ -9,6 +8,7 @@ import {
   signinGoogle
 } from "@/utils/auth-sign-in";
 import { AnonymousIcon, Button, Github, GoogleIcon } from "@slipstream/ui";
+import img from "../../assets/aicoalesce.png";
 
 export function AuthUI({
   target = "sign_in"
@@ -71,12 +71,12 @@ export function AuthUI({
       </div>
       <div className="via-background/95 relative z-10 flex-1 bg-gradient-to-b from-gray-900 to-gray-900 inset-shadow-gray-100 lg:block">
         <Image
-          width={2160}
-          height={1260}
+          width={img.width}
+          height={img.height}
           alt="humanity-x-ai"
           placeholder="blur"
-          blurDataURL={shimmer([2160, 1260])}
-          src="https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759131668389-aicoalesce-og-final-1758955992844.png"
+          blurDataURL={img.blurDataURL}
+          src={img.src}
           className="absolute inset-0 my-auto w-full rounded-sm object-cover"
         />
       </div>
