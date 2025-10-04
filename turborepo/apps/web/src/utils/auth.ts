@@ -2,7 +2,6 @@ import type { BetterAuthOptions } from "better-auth";
 import { cache } from "react";
 import { headers } from "next/headers";
 import { prismaClient } from "@/lib/prisma";
-import { getSiteUrl } from "@/lib/site-url";
 import jsonData from "@/utils/__out__/random-name-gen.json" with { type: "json" };
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -11,12 +10,14 @@ import { lastLoginMethod } from "better-auth/plugins";
 import { anonymous } from "better-auth/plugins/anonymous";
 
 // openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
+let x = ""
 export const auth = betterAuth({
-  trustedOrigins: [
-    "http://localhost:3030",
-    "https://chat.aicoalesce.com",
-    "https://dev.chat.aicoalesce.com"
-  ],
+  trustedOrigins: req => {
+    const url = new URL(req.url);
+    const origin = url.origin;
+    x=origin;
+    return [origin];
+  },
   database: prismaAdapter(prismaClient, {
     provider: "postgresql"
   }),
@@ -34,7 +35,7 @@ export const auth = betterAuth({
   },
 
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: getSiteUrl(process.env.NODE_ENV),
+  baseURL: x,
   account: {
     accountLinking: {
       enabled: true

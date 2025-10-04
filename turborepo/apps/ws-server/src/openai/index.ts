@@ -381,6 +381,7 @@ export class OpenAIService {
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano":
+      case "gpt-5-codex":
       case "o3":
       case "o3-mini":
       case "o3-pro":
@@ -544,6 +545,7 @@ export class OpenAIService {
     switch (model) {
       case "gpt-5":
       case "gpt-5-mini":
+      case "gpt-5-codex":
       case "gpt-5-nano": {
         return { verbosity: v } satisfies ResponseTextConfig;
       }
@@ -637,7 +639,7 @@ export class OpenAIService {
       max_output_tokens: max_tokens,
       top_p: topP,
       truncation: "auto",
-      ...(reasoning ? { reasoning } : {}),
+      reasoning,
       parallel_tool_calls: true,
       tools
     });

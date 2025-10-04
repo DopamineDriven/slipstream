@@ -66,8 +66,7 @@ interface AIChatContextValue {
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 
-// Active user streams tracking (prevents duplicate sends)
-const activeUserStreams = new Set<string>();
+// Note: Track active user streams within the provider to avoid module-scope writes
 
 export function AIChatProvider({
   children,
@@ -148,6 +147,8 @@ export function AIChatProvider({
   const thinkingTextRef = useRef(thinkingText);
   const isThinkingRef = useRef(isThinking);
   const thinkingDurationRef = useRef(thinkingDuration);
+  const titleRef = useRef<string | null>(null);
+  const activeUserStreamsRef = useRef<Set<string>>(new Set());
 
   // Update refs when state changes
   useEffect(() => {
@@ -165,6 +166,26 @@ export function AIChatProvider({
   useEffect(() => {
     thinkingDurationRef.current = thinkingDuration;
   }, [thinkingDuration]);
+
+  // Keep a ref of the latest title to avoid redundant updates in handlers
+  useEffect(() => {
+    titleRef.current = title;
+  }, [title]);
+
+  // Stable helper to update title state only when changed
+  const updateTitle = useCallback((nextTitle?: string | null) => {
+    if (!nextTitle) return;
+    if (titleRef.current === nextTitle) return;
+    setTitle(nextTitle);
+  }, []);
+
+  // Reflect title state into the DOM in an effect (React Compiler-friendly)
+  useEffect(() => {
+    if (!title) return;
+    if (typeof window !== "undefined") {
+      window.document.title = title;
+    }
+  }, [title]);
 
   // WebSocket event handlers - only depend on stable references
   useEffect(() => {
@@ -192,10 +213,8 @@ export function AIChatProvider({
         setIsWaitingForRealId(false);
       }
 
-      if (evt.title) {
-        setTitle(evt.title);
-        window.document.title = evt.title;
-      }
+      // Update title only if it actually changed
+      updateTitle(evt.title ?? null);
 
       // Always set isStreaming true when we have conversationId and title
       if (evt.conversationId && evt.title) {
@@ -256,7 +275,7 @@ export function AIChatProvider({
 
       // Clear active stream
       if (userId) {
-        activeUserStreams.delete(userId);
+        activeUserStreamsRef.current.delete(userId);
       }
 
       // Sync React Router only for new-chat transitions
@@ -302,7 +321,7 @@ export function AIChatProvider({
 
         // Clear active stream
         if (userId) {
-          activeUserStreams.delete(userId);
+          activeUserStreamsRef.current.delete(userId);
         }
 
         // Sync React Router only for new-chat transitions
@@ -339,7 +358,8 @@ export function AIChatProvider({
     isWaitingForRealId,
     selectedModel,
     activeConversationId,
-    router
+    router,
+    updateTitle
   ]);
 
   // Track recently sent messages to prevent duplicates
@@ -373,7 +393,7 @@ export function AIChatProvider({
       }
 
       // Prevent duplicate sends
-      if (activeUserStreams.has(userId)) {
+      if (activeUserStreamsRef.current.has(userId)) {
         console.warn(
           `[AIChatContext] User ${userId} already has an active stream`
         );
@@ -421,7 +441,7 @@ export function AIChatProvider({
       );
 
       // Mark user as having active stream
-      activeUserStreams.add(userId);
+      activeUserStreamsRef.current.add(userId);
 
       // Reset state for new message
       setStreamedText("");
