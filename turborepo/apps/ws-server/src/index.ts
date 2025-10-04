@@ -80,9 +80,6 @@ async function exe() {
 
     const prisma = new PrismaService(db, fs);
 
-    const jwtSecret =
-      cfg.JWT_SECRET ?? "QzItEuoPfuEZyoll41Zw8x+l0/8jSJxZYbpQ76dk4vI=";
-
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
     const { PdfService } = await import("@/pdf/index.ts");
@@ -99,7 +96,7 @@ async function exe() {
     const { WSServer } = await import("@/ws-server/index.ts");
 
     const wsServer = new WSServer(
-      { port, jwtSecret },
+      { port },
       redisInstance,
       prisma,
       pdfService
@@ -210,6 +207,8 @@ async function exe() {
 }
 
 exe();
+
+
 declare module "ws" {
   interface WebSocket {
     _socket: Socket;
@@ -234,16 +233,3 @@ declare global {
     json<T = unknown>(): Promise<T>;
   }
 }
-
-// BigInt.prototype.toJSON = function () {
-//   return this.toJSON(); // Convert to string for serialization
-// };
-// declare global {
-//  namespace NodeJS {
-//     interface ProcessEnv {
-//       readonly ASSETS_BUCKET: "ws-server-assets-dev" | "ws-server-assets-prod";
-//       readonly GEN_BUCKET: "py-gen-assets-dev" | "py-gen-assets-prod"
-//     }
-//   }
-
-// }

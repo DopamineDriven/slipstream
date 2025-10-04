@@ -2,7 +2,7 @@
   "name": "@slipstream/root",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a",
+  "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa",
   "scripts": {
     "build:credentials": "turbo build --filter=@slipstream/credentials",
     "build:db": "turbo build --filter=@slipstream/db",
@@ -10,7 +10,7 @@
     "build:key-validator": "turbo build --filter=@slipstream/key-validator",
     "build:redis-service": "turbo build --filter=@slipstream/redis-service",
     "build:storage-s3": "turbo build --filter=@slipstream/storage-s3",
-    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server",
+    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server && pnpm --filter \"@slipstream/web\" typegen",
     "build:types": "turbo build --filter=@slipstream/types",
     "build:ui": "turbo build --filter=@slipstream/ui",
     "build:web": "turbo build --filter=@slipstream/web",
@@ -40,7 +40,7 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.6.2",
     "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "husky": "^9.1.7",
@@ -49,12 +49,12 @@
     "tsx": "^4.20.6",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "vercel": "^48.1.6"
+    "vercel": "^48.2.0"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {
     "node": ">=22",
-    "npm": ">=9",
+    "npm": ">=10",
     "pnpm": ">=9"
   }
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": ["**/.env.*local", "packages/credentials-service/.env"],
+  "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
@@ -11,7 +11,9 @@
       "outputs": ["coverage/**"],
       "dependsOn": []
     },
-    "lint": {},
+    "lint": {
+      "dependsOn": ["^build"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
@@ -23,7 +25,7 @@
       "cache": false
     }
   },
-  "ui": "tui",
+  "ui": "stream",
   "globalEnv": [
     "ADOBE_WEBHOOK_SECRET",
     "ANTHROPIC_API_KEY",
@@ -42,6 +44,8 @@
     "AWS_SECRET_ACCESS_KEY_S3",
     "AWS_ACCESS_KEY_S3",
     "AWS_SECRETS_ID",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
     "CLAUDE_CODE_OAUTH_TOKEN",
     "COREPACK_ENABLE_STRICT",
     "DATABASE_API_KEY",

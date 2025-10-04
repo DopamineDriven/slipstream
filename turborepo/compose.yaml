@@ -13,7 +13,7 @@ services:
       - postgres
     environment:
       # Make sure your ws-server env points to the local Postgres
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/t3chatdb
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/slipstream
 
   redis:
     image: redis:8
@@ -31,7 +31,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: t3chatdb
+      POSTGRES_DB: slipstream
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:

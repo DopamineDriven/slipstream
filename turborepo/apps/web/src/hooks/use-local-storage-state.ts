@@ -9,7 +9,7 @@ export function useLocalStorageState<T>(
   useEffect(() => {
     try {
       const raw = localStorage.getItem(key);
-      if (raw) setState(JSON.parse(raw) as T);
+      if (raw) setState(JSON.parse(raw));
     } catch (err) {
       console.error(`something went wrong in useLocalStorageState...`, err instanceof Error ? err.message : "")
     }

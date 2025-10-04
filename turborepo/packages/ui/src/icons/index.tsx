@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
+import { AnonymousIcon } from "@/icons/anonymous";
 import { AnthropicIcon } from "@/icons/anthropic";
 import { ArrowDownCircle } from "@/icons/arrow-down-circle";
 import { ArrowLeft } from "@/icons/arrow-left";
@@ -26,8 +27,9 @@ import { Eye } from "@/icons/eye";
 import { EyeClosed } from "@/icons/eye-closed";
 import { EyeOff } from "@/icons/eye-off";
 import { FileText } from "@/icons/file-text";
-import {GeminiIcon  } from "@/icons/gemini";
+import { GeminiIcon } from "@/icons/gemini";
 import { Github } from "@/icons/github";
+import { GoogleIcon } from "@/icons/google";
 import { GripVertical } from "@/icons/grip-vertical";
 import { History } from "@/icons/history";
 import { ImageIcon } from "@/icons/image-icon";
@@ -46,7 +48,7 @@ import { MessageSquareText } from "@/icons/message-square-text";
 import { MetaIcon } from "@/icons/meta";
 import { Mic } from "@/icons/mic";
 import { Moon } from "@/icons/moon";
-import {OpenAiIcon  } from "@/icons/openai";
+import { OpenAiIcon } from "@/icons/openai";
 import { Package } from "@/icons/package";
 import { Palette } from "@/icons/palette";
 import { PanelLeft } from "@/icons/panel-left";
@@ -81,6 +83,7 @@ import { XAiIcon } from "@/icons/xai";
 import { Zap } from "@/icons/zap";
 
 const IconComponents = {
+  AnonymousIcon,
   AnthropicIcon,
   ArrowDownCircle,
   ArrowLeft,
@@ -108,6 +111,7 @@ const IconComponents = {
   FileText,
   GeminiIcon,
   Github,
+  GoogleIcon,
   GripVertical,
   History,
   ImageIcon,
@@ -195,6 +199,7 @@ export const Icon = Object.assign(
 );
 
 export {
+  AnonymousIcon,
   AnthropicIcon,
   ArrowDownCircle,
   ArrowLeft,
@@ -222,6 +227,7 @@ export {
   FileText,
   GeminiIcon,
   Github,
+  GoogleIcon,
   GripVertical,
   History,
   ImageIcon,

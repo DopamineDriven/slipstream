@@ -45,6 +45,8 @@ export type ConversationSettingsMinAggregateOutputType = {
   trackUsage: boolean | null
   enableWebSearch: boolean | null
   enableAssetGen: boolean | null
+  reasoningEffort: $Enums.ReasoningEffort | null
+  outputVerbosity: $Enums.OutputVerbosity | null
   maxTokens: number | null
   usageAlerts: boolean | null
   temperature: number | null
@@ -61,6 +63,8 @@ export type ConversationSettingsMaxAggregateOutputType = {
   trackUsage: boolean | null
   enableWebSearch: boolean | null
   enableAssetGen: boolean | null
+  reasoningEffort: $Enums.ReasoningEffort | null
+  outputVerbosity: $Enums.OutputVerbosity | null
   maxTokens: number | null
   usageAlerts: boolean | null
   temperature: number | null
@@ -77,6 +81,8 @@ export type ConversationSettingsCountAggregateOutputType = {
   trackUsage: number
   enableWebSearch: number
   enableAssetGen: number
+  reasoningEffort: number
+  outputVerbosity: number
   maxTokens: number
   usageAlerts: number
   temperature: number
@@ -107,6 +113,8 @@ export type ConversationSettingsMinAggregateInputType = {
   trackUsage?: true
   enableWebSearch?: true
   enableAssetGen?: true
+  reasoningEffort?: true
+  outputVerbosity?: true
   maxTokens?: true
   usageAlerts?: true
   temperature?: true
@@ -123,6 +131,8 @@ export type ConversationSettingsMaxAggregateInputType = {
   trackUsage?: true
   enableWebSearch?: true
   enableAssetGen?: true
+  reasoningEffort?: true
+  outputVerbosity?: true
   maxTokens?: true
   usageAlerts?: true
   temperature?: true
@@ -139,6 +149,8 @@ export type ConversationSettingsCountAggregateInputType = {
   trackUsage?: true
   enableWebSearch?: true
   enableAssetGen?: true
+  reasoningEffort?: true
+  outputVerbosity?: true
   maxTokens?: true
   usageAlerts?: true
   temperature?: true
@@ -242,6 +254,8 @@ export type ConversationSettingsGroupByOutputType = {
   trackUsage: boolean | null
   enableWebSearch: boolean | null
   enableAssetGen: boolean | null
+  reasoningEffort: $Enums.ReasoningEffort | null
+  outputVerbosity: $Enums.OutputVerbosity | null
   maxTokens: number | null
   usageAlerts: boolean | null
   temperature: number | null
@@ -281,6 +295,8 @@ export type ConversationSettingsWhereInput = {
   trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
   usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
@@ -298,6 +314,8 @@ export type ConversationSettingsOrderByWithRelationInput = {
   trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
   enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
   enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
+  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder
   maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
   usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
   temperature?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -318,6 +336,8 @@ export type ConversationSettingsWhereUniqueInput = Prisma.AtLeast<{
   trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
   usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
@@ -335,6 +355,8 @@ export type ConversationSettingsOrderByWithAggregationInput = {
   trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
   enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
   enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
+  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder
   maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
   usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
   temperature?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -359,6 +381,8 @@ export type ConversationSettingsScalarWhereWithAggregatesInput = {
   trackUsage?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
   enableWebSearch?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
   enableAssetGen?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.IntNullableWithAggregatesFilter<"ConversationSettings"> | number | null
   usageAlerts?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
   temperature?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null
@@ -374,6 +398,8 @@ export type ConversationSettingsCreateInput = {
   trackUsage?: boolean | null
   enableWebSearch?: boolean | null
   enableAssetGen?: boolean | null
+  reasoningEffort?: $Enums.ReasoningEffort | null
+  outputVerbosity?: $Enums.OutputVerbosity | null
   maxTokens?: number | null
   usageAlerts?: boolean | null
   temperature?: number | null
@@ -391,6 +417,8 @@ export type ConversationSettingsUncheckedCreateInput = {
   trackUsage?: boolean | null
   enableWebSearch?: boolean | null
   enableAssetGen?: boolean | null
+  reasoningEffort?: $Enums.ReasoningEffort | null
+  outputVerbosity?: $Enums.OutputVerbosity | null
   maxTokens?: number | null
   usageAlerts?: boolean | null
   temperature?: number | null
@@ -406,6 +434,8 @@ export type ConversationSettingsUpdateInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -423,6 +453,8 @@ export type ConversationSettingsUncheckedUpdateInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -439,6 +471,8 @@ export type ConversationSettingsCreateManyInput = {
   trackUsage?: boolean | null
   enableWebSearch?: boolean | null
   enableAssetGen?: boolean | null
+  reasoningEffort?: $Enums.ReasoningEffort | null
+  outputVerbosity?: $Enums.OutputVerbosity | null
   maxTokens?: number | null
   usageAlerts?: boolean | null
   temperature?: number | null
@@ -454,6 +488,8 @@ export type ConversationSettingsUpdateManyMutationInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -470,6 +506,8 @@ export type ConversationSettingsUncheckedUpdateManyInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -491,6 +529,8 @@ export type ConversationSettingsCountOrderByAggregateInput = {
   trackUsage?: Prisma.SortOrder
   enableWebSearch?: Prisma.SortOrder
   enableAssetGen?: Prisma.SortOrder
+  reasoningEffort?: Prisma.SortOrder
+  outputVerbosity?: Prisma.SortOrder
   maxTokens?: Prisma.SortOrder
   usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
@@ -513,6 +553,8 @@ export type ConversationSettingsMaxOrderByAggregateInput = {
   trackUsage?: Prisma.SortOrder
   enableWebSearch?: Prisma.SortOrder
   enableAssetGen?: Prisma.SortOrder
+  reasoningEffort?: Prisma.SortOrder
+  outputVerbosity?: Prisma.SortOrder
   maxTokens?: Prisma.SortOrder
   usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
@@ -529,6 +571,8 @@ export type ConversationSettingsMinOrderByAggregateInput = {
   trackUsage?: Prisma.SortOrder
   enableWebSearch?: Prisma.SortOrder
   enableAssetGen?: Prisma.SortOrder
+  reasoningEffort?: Prisma.SortOrder
+  outputVerbosity?: Prisma.SortOrder
   maxTokens?: Prisma.SortOrder
   usageAlerts?: Prisma.SortOrder
   temperature?: Prisma.SortOrder
@@ -575,6 +619,14 @@ export type ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
 }
 
+export type NullableEnumReasoningEffortFieldUpdateOperationsInput = {
+  set?: $Enums.ReasoningEffort | null
+}
+
+export type NullableEnumOutputVerbosityFieldUpdateOperationsInput = {
+  set?: $Enums.OutputVerbosity | null
+}
+
 export type ConversationSettingsCreateWithoutConversationInput = {
   id?: string
   systemPrompt?: string | null
@@ -582,6 +634,8 @@ export type ConversationSettingsCreateWithoutConversationInput = {
   trackUsage?: boolean | null
   enableWebSearch?: boolean | null
   enableAssetGen?: boolean | null
+  reasoningEffort?: $Enums.ReasoningEffort | null
+  outputVerbosity?: $Enums.OutputVerbosity | null
   maxTokens?: number | null
   usageAlerts?: boolean | null
   temperature?: number | null
@@ -597,6 +651,8 @@ export type ConversationSettingsUncheckedCreateWithoutConversationInput = {
   trackUsage?: boolean | null
   enableWebSearch?: boolean | null
   enableAssetGen?: boolean | null
+  reasoningEffort?: $Enums.ReasoningEffort | null
+  outputVerbosity?: $Enums.OutputVerbosity | null
   maxTokens?: number | null
   usageAlerts?: boolean | null
   temperature?: number | null
@@ -628,6 +684,8 @@ export type ConversationSettingsUpdateWithoutConversationInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -643,6 +701,8 @@ export type ConversationSettingsUncheckedUpdateWithoutConversationInput = {
   trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
   maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -661,6 +721,8 @@ export type ConversationSettingsSelect<ExtArgs extends runtime.Types.Extensions.
   trackUsage?: boolean
   enableWebSearch?: boolean
   enableAssetGen?: boolean
+  reasoningEffort?: boolean
+  outputVerbosity?: boolean
   maxTokens?: boolean
   usageAlerts?: boolean
   temperature?: boolean
@@ -678,6 +740,8 @@ export type ConversationSettingsSelectCreateManyAndReturn<ExtArgs extends runtim
   trackUsage?: boolean
   enableWebSearch?: boolean
   enableAssetGen?: boolean
+  reasoningEffort?: boolean
+  outputVerbosity?: boolean
   maxTokens?: boolean
   usageAlerts?: boolean
   temperature?: boolean
@@ -695,6 +759,8 @@ export type ConversationSettingsSelectUpdateManyAndReturn<ExtArgs extends runtim
   trackUsage?: boolean
   enableWebSearch?: boolean
   enableAssetGen?: boolean
+  reasoningEffort?: boolean
+  outputVerbosity?: boolean
   maxTokens?: boolean
   usageAlerts?: boolean
   temperature?: boolean
@@ -712,6 +778,8 @@ export type ConversationSettingsSelectScalar = {
   trackUsage?: boolean
   enableWebSearch?: boolean
   enableAssetGen?: boolean
+  reasoningEffort?: boolean
+  outputVerbosity?: boolean
   maxTokens?: boolean
   usageAlerts?: boolean
   temperature?: boolean
@@ -720,7 +788,7 @@ export type ConversationSettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "enableThinking" | "trackUsage" | "enableWebSearch" | "enableAssetGen" | "maxTokens" | "usageAlerts" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"]>
+export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "enableThinking" | "trackUsage" | "enableWebSearch" | "enableAssetGen" | "reasoningEffort" | "outputVerbosity" | "maxTokens" | "usageAlerts" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"]>
 export type ConversationSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
 }
@@ -744,6 +812,8 @@ export type $ConversationSettingsPayload<ExtArgs extends runtime.Types.Extension
     trackUsage: boolean | null
     enableWebSearch: boolean | null
     enableAssetGen: boolean | null
+    reasoningEffort: $Enums.ReasoningEffort | null
+    outputVerbosity: $Enums.OutputVerbosity | null
     maxTokens: number | null
     usageAlerts: boolean | null
     temperature: number | null
@@ -1181,6 +1251,8 @@ export interface ConversationSettingsFieldRefs {
   readonly trackUsage: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
   readonly enableWebSearch: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
   readonly enableAssetGen: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
+  readonly reasoningEffort: Prisma.FieldRef<"ConversationSettings", 'ReasoningEffort'>
+  readonly outputVerbosity: Prisma.FieldRef<"ConversationSettings", 'OutputVerbosity'>
   readonly maxTokens: Prisma.FieldRef<"ConversationSettings", 'Int'>
   readonly usageAlerts: Prisma.FieldRef<"ConversationSettings", 'Boolean'>
   readonly temperature: Prisma.FieldRef<"ConversationSettings", 'Float'>

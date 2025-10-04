@@ -1,107 +1,85 @@
 "use client";
 
 import Image from "next/image";
-import { signIn } from "@/lib/auth";
+import { shimmer } from "@/lib/shimmer";
 import { Logo } from "@/ui/logo";
+import {
+  signinAnonymous,
+  signinGithub,
+  signinGoogle
+} from "@/utils/auth-sign-in";
+import { AnonymousIcon, Button, Github, GoogleIcon } from "@slipstream/ui";
 
-const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className={"size-5"}>
-    <path
-      d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
-      fill="#EA4335"
-    />
-    <path
-      d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z"
-      fill="#4285F4"
-    />
-    <path
-      d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z"
-      fill="#FBBC05"
-    />
-    <path
-      d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z"
-      fill="#34A853"
-    />
-  </svg>
-);
-
-const GitHubIcon = () => (
-  <svg
-    fill="currentColor"
-    viewBox="0 0 20 20"
-    aria-hidden="true"
-    className="size-5">
-    <path
-      d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
-      clipRule="evenodd"
-      fillRule="evenodd"
-    />
-  </svg>
-);
-
-export function SignInUI() {
+export function AuthUI({
+  target = "sign_in"
+}: {
+  target: "sign_in" | "sign_up";
+}) {
   return (
-    <div className="bg-background text-foreground grid min-h-[100dvh] grid-cols-1 lg:grid-cols-2">
-      <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10 lg:px-20">
-        <div className="w-full max-w-sm">
-          <div>
-            <Logo className="text-foreground h-10 w-10" />
-            <h1 className="mt-8 text-2xl font-bold tracking-tight">Sign in</h1>
+    <div className="text-foreground grid min-h-[100dvh] grid-cols-1 bg-transparent lg:grid-cols-2">
+      <div className="via-background/95 flex flex-1 items-center justify-center bg-gradient-to-b from-gray-900 to-gray-900 px-6 py-12 sm:px-10 lg:px-20">
+        <div className="w-full max-w-md">
+          <div className="select-none">
+            <Logo className="text-foreground stroke-foreground size-12" />
+            <h1 className="mt-8 text-2xl font-bold tracking-tight">
+              {target === "sign_in" ? "Sign In" : "Sign Up"}
+            </h1>
             <p className="text-muted-foreground mt-2 text-sm">
               Choose a provider to continue
             </p>
           </div>
           <div className="mt-8 grid grid-cols-1 gap-3">
-            <button
+            <Button
+              variant="ghost"
               type="button"
-              onClick={async () => {
-                "use server";
-                signIn("google", { redirect: true });
-              }}
-              className="bg-muted text-foreground hover:bg-background border-border inline-flex w-full items-center justify-center gap-3 rounded-md border px-4 py-2 text-sm font-semibold transition-colors">
-              <GoogleIcon />
-              <span className="sr-only">Continue with Google</span>
-            </button>
-            <button
+              size="lg"
+              onClick={signinGithub}
+              className="dark:bg-background/50 text-foreground transition-color border-foreground/50 relative inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border px-4 py-2 text-sm font-semibold transition-colors duration-150 dark:hover:bg-transparent">
+              <Github className="absolute inset-y-auto left-28 my-auto size-12" />
+              <span className="absolute inset-y-auto left-36 my-auto">
+                Continue with GitHub
+              </span>
+            </Button>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-3">
+            <Button
+              variant="ghost"
               type="button"
-              onClick={async () => {
-                "use server";
-                signIn("github", { redirect: true });
-              }}
-              className="bg-muted text-foreground hover:bg-background border-border inline-flex w-full items-center justify-center gap-3 rounded-md border px-4 py-2 text-sm font-semibold transition-colors">
-              <GitHubIcon />
-              <span className="sr-only">Continue with GitHub</span>
-            </button>
+              size="lg"
+              onClick={signinGoogle}
+              className="dark:bg-background/50 text-foreground transition-color border-foreground/50 relative inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border px-10 py-2 text-sm font-semibold transition-colors duration-150 dark:hover:bg-transparent">
+              <GoogleIcon className="absolute inset-y-auto left-28 my-auto size-12 rounded-full" />
+              <span className="absolute inset-y-auto left-36 my-auto">
+                Continue with Google
+              </span>
+            </Button>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-3">
+            <Button
+              variant="ghost"
+              type="button"
+              size="lg"
+              onClick={signinAnonymous}
+              className="dark:bg-background/50 text-foreground transition-color border-foreground/50 relative inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border px-10 py-2 text-sm font-semibold transition-colors duration-150 dark:hover:bg-transparent">
+              <AnonymousIcon className="absolute inset-y-auto left-28 my-auto size-12 rounded-full" />
+              <span className="absolute inset-y-auto left-36 my-auto">
+                Continue Anonymously
+              </span>
+            </Button>
           </div>
         </div>
       </div>
-      <div className="relative hidden w-0 flex-1 lg:block">
+      <div className="via-background/95 relative z-10 flex-1 bg-gradient-to-b from-gray-900 to-gray-900 inset-shadow-gray-100 lg:block">
         <Image
+          width={2160}
+          height={1260}
           alt="humanity-x-ai"
-          src="https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758231667843-gemini.webp"
-          className="absolute inset-0 size-full object-cover"
+          placeholder="blur"
+          blurDataURL={shimmer([2160, 1260])}
+          src="https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759131668389-aicoalesce-og-final-1758955992844.png"
+          className="absolute inset-0 my-auto w-full rounded-sm object-cover"
         />
       </div>
     </div>
   );
 }
-/**
- * TODO
- * CREATE app/(nextauth)/nextauth/signin/page.tsx and app/(nextauth)/nextauth/signout/page.tsx files
-
-```tsx
-import { SignInUI } from "@/ui/auth";
-
-export default function SignInPage() {
-  return <SignInUI />;
-}
-```
-
-
-* TODO
-* RE-ADD TO lib/auth.config.ts
-
-```ts
-  pages: { signIn: "/nextauth/signin" },
-```
- */
