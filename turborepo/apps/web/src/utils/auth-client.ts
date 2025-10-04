@@ -8,7 +8,7 @@ import {
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: getSiteUrl(process.env.NODE_ENV),
+  baseURL: getSiteUrl(process.env.VERCEL_ENV),
   plugins: [
     inferAdditionalFields<typeof auth>(),
     anonymousClient(),
