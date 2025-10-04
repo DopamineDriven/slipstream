@@ -29,7 +29,7 @@ export const viewport = {
 } satisfies Viewport;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getSiteUrl(process.env.NODE_ENV)),
+  metadataBase: new URL(getSiteUrl(process.env.VERCEL_ENV)),
   title: {
     default: "AI Coalesce",
     template: "%s | aicoalesce"
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "AI Chat",
     description:
       "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
-    url: getSiteUrl(process.env.NODE_ENV),
+    url: getSiteUrl(process.env.VERCEL_ENV),
     siteName: "AI Coalesce | aicoalesce",
     locale: "en_US",
     type: "website",
@@ -66,18 +66,18 @@ export const metadata: Metadata = {
     {
       type: "image/png",
       rel: "apple-touch-icon",
-      url: new URL("/apple-touch-icon.png", getSiteUrl(process.env.NODE_ENV)),
+      url: new URL("/apple-touch-icon.png", getSiteUrl(process.env.VERCEL_ENV)),
       sizes: "180x180"
     },
     {
       type: "image/svg+xml",
       rel: "mask-icon",
-      url: new URL("/favicon.svg", getSiteUrl(process.env.NODE_ENV))
+      url: new URL("/favicon.svg", getSiteUrl(process.env.VERCEL_ENV))
     },
     {
       type: "image/png",
       rel: "icon",
-      url: new URL("/meta/favicon-96x96.png", getSiteUrl(process.env.NODE_ENV)),
+      url: new URL("/meta/favicon-96x96.png", getSiteUrl(process.env.VERCEL_ENV)),
       sizes: "96x96"
     }
   ],
