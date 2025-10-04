@@ -1,10 +1,11 @@
 "use client";
 
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import Link from "next/link";
 import { getInitials } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/ui/atoms/sidebar";
+import { signOutHelper } from "@/utils/auth-signout";
 import {
   Avatar,
   AvatarFallback,
@@ -68,19 +69,19 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href="/settings" passHref>
+        <Link href={`/settings/${userProfile?.id ?? "user-id"}`} passHref>
           <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
             <Settings className="mr-2 size-4" />
             <span>Settings</span>
           </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <Link href="/api/auth/signout" passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300">
-            <LogOut className="mr-2 size-4" />
-            <span>Sign Out</span>
-          </DropdownMenuItem>
-        </Link>
+        <DropdownMenuItem
+          className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300"
+          onClick={signOutHelper}>
+          <LogOut className="mr-2 size-4" />
+          <span>Sign Out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -35,10 +35,9 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       return;
     }
     attachments.forEach(attachment => {
+
       if (
-        attachment.mime.startsWith("image/") &&
-        attachment.metadata?.type === "IMAGE" &&
-        !thumbnails[attachment.id]
+        attachment.mime.startsWith("image/")
       ) {
         const reader = new FileReader();
         reader.onload = e => {
@@ -57,12 +56,10 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
                 const imageSpecs = extractor.getImageSpecsWorkup(buffer);
 
                 setMetadata(prev =>
-                  prev.metadata?.type === "IMAGE"
-                    ? {
+                ({
                         ...prev,
-                        [attachment.id]: { type: "IMAGE", ...imageSpecs }
-                      }
-                    : { ...prev }
+                        [attachment.id]: imageSpecs
+                      })
                 );
                 setSize(prev => ({
                   ...prev,
@@ -128,7 +125,6 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       }
 
       if (
-        meta?.type === "IMAGE" &&
         meta?.animated &&
         attachment.status === "pending"
       ) {

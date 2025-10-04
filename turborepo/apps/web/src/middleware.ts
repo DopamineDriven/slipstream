@@ -1,9 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse, userAgent } from "next/server";
+import { getCookieCache } from "better-auth/cookies";
 
-export { authConfig } from "@/lib/auth.config";
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image).*)"]
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image|auth/(?:login|signup)).*)"
+  ]
 };
 
 function detectDeviceAndSetCookies(
@@ -19,6 +21,7 @@ function detectDeviceAndSetCookies(
   const lng = request.headers.get("x-vercel-ip-longitude") ?? "-87.8966849";
   const lat = request.headers.get("x-vercel-ip-latitude") ?? "41.8338486";
   const postalCode = request.headers.get("x-vercel-ip-postal-code") ?? "60010";
+  const ip = request.headers.get("x-vercel-forwarded-for") ?? "127.0.0.1";
 
   const tz = request.headers.get("x-vercel-ip-timezone") ?? "America/Chicago";
   const { os, device, ua } = userAgent(request);
@@ -70,7 +73,12 @@ function detectDeviceAndSetCookies(
   if (request.cookies.has("tz")) {
     response.cookies.delete("tz");
   }
-
+  if (request.cookies.has("ip")) {
+    response.cookies.delete("ip");
+  }
+  if (request.cookies.has("ua")) {
+    response.cookies.delete("ua");
+  }
   if (request.cookies.has("isMac")) {
     response.cookies.delete("isMac");
   }
@@ -102,6 +110,8 @@ function detectDeviceAndSetCookies(
   response.cookies.set("ios", ios, config);
   response.cookies.set("latlng", latlng, config);
   response.cookies.set("tz", tz, config);
+  response.cookies.set("ua", ua, config);
+  response.cookies.set("ip", ip, config);
   response.cookies.set("country", country, config);
   response.cookies.set("city", city, config);
   response.cookies.set("isMac", `${isMac}`, config);
@@ -112,6 +122,10 @@ function detectDeviceAndSetCookies(
 }
 
 export default async function middleware(req: NextRequest) {
+  const session = await getCookieCache(req);
+  if (!session && !req.nextUrl.pathname.includes("/auth")) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
   if (req.nextUrl.pathname === "/") {
     return detectDeviceAndSetCookies(
       req,

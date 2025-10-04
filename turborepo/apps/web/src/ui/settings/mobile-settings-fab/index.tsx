@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { User } from "@/utils/auth-client";
 import { AnimatePresence, motion } from "motion/react";
-import { User } from "next-auth";
 import { useTheme } from "next-themes";
 import type { BaseSVGProps } from "@slipstream/ui";
 import {

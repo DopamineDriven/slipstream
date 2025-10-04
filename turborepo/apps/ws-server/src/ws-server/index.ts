@@ -1,4 +1,4 @@
-import http from "http";
+import http from "node:http";
 import { TLSSocket } from "tls";
 import type {
   BufferLike,
@@ -18,7 +18,6 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 export class WSServer {
   private wss: WebSocketServer;
   public readonly channel: string;
-  private readonly jwtSecret: string;
   private unsubscribePubSub?: () => Promise<void>;
   private userMap = new Map<WebSocket, string>();
   private userDataMap = new Map<string, UserData>();
@@ -41,13 +40,9 @@ export class WSServer {
     public pdfService: PdfService
   ) {
     this.channel = opts.channel ?? "chat-global";
-    this.jwtSecret = opts.jwtSecret;
     this.httpServer = http.createServer(async (req, res) => {
       const startTime = performance.now();
-      if (
-        req.url===("/webhooks/adobe/pdf-created") &&
-        req.method === "POST"
-      ) {
+      if (req.url === "/webhooks/adobe/pdf-created" && req.method === "POST") {
         await this.pdfService.handleWebhook(req, res);
         return;
       }

@@ -14,7 +14,7 @@ import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
 import { Logo } from "@/ui/logo";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/auth-client";
 import {
   Button,
   Check,
@@ -37,14 +37,13 @@ interface EnhancedSidebarProps {
 }
 
 export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
   const {
     conversations,
     updateCache,
     deleteConversation,
     updateTitle,
-    isLoading,
     isValidating
   } = useConversations(userId);
 
@@ -187,7 +186,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     };
   }, []);
 
-  if (isLoading || isValidating) return <SidebarSkeleton />;
+  if (isPending || isValidating) return <SidebarSkeleton />;
   return (
     <div
       className={cn(

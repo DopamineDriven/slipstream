@@ -257,10 +257,10 @@ export function preprocessMathDelimiters(content: string) {
   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
   const result = content
     .replace(displayMath, (_match, expr: string) => {
-      return `$$${expr}$$`;
+      return `\n$$\n${expr}\n$$\n`;
     })
     .replace(inlineMath, (_match, expr: string) => {
-      return `$${expr}$`;
+      return `$$${expr}$$`;
     });
   return result;
 }
@@ -327,7 +327,7 @@ export async function processMarkdownToReact(content: string) {
   const processor = unified();
   processor.use(remarkParse);
   processor.use(remarkGfm);
-  processor.use(remarkMath);
+  processor.use(remarkMath, Object.freeze({ singleDollarTextMath: false }));
   processor.use(remarkRehype, {
     allowDangerousHtml: true
   } satisfies RemarkRehypeOptions);

@@ -3,7 +3,7 @@
 import type { ClientWorkupProps } from "@/types/shared";
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
 import { cn } from "@/lib/utils";

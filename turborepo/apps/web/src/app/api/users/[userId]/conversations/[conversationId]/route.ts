@@ -1,12 +1,12 @@
-// app/api/users/[userId]/conversations/[conversationId]/route.ts
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
+import { getSession } from "@/utils/auth";
 
 export const fetchCache = "force-no-store";
 export const revalidate = 0;
+
 
 const { prismaConversationService } = ormHandler(prismaClient);
 
@@ -16,9 +16,9 @@ export async function GET(
 ) {
   const { userId, conversationId } = await params;
   try {
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id) {
-      redirect("/api/auth/signin");
+      redirect("/auth/login");
     }
 
     // Ensure user can only access their own conversations
@@ -47,9 +47,9 @@ export async function PATCH(
 ) {
   const { userId, conversationId } = await params;
   try {
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id) {
-      redirect("/api/auth/signin");
+      redirect("/auth/login");
     }
 
     if (session.user.id !== userId) {
@@ -89,9 +89,9 @@ export async function DELETE(
 ) {
   const { userId, conversationId } = await params;
   try {
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id) {
-      redirect("/api/auth/signin");
+      redirect("/auth/login");
     }
 
     if (session.user.id !== userId) {

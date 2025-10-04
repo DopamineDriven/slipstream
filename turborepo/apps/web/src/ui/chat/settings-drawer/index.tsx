@@ -19,7 +19,7 @@ import {
   User as UserIcon,
   X
 } from "@slipstream/ui";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/auth-client";
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -55,7 +55,7 @@ const _settingsOptions = [
 ];
 
 export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[90vh] flex-col">
@@ -78,7 +78,7 @@ export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
               </Button>
             </DrawerClose>
           </DrawerHeader>
-          {status === "loading" ? (
+          {isPending ? (
             <div className="p-4">
               <div className="h-12 w-full">Loading...</div>
             </div>

@@ -265,6 +265,40 @@ export type EnumProviderNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
 }
 
+export type EnumReasoningEffortNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel> | $Enums.ReasoningEffort | null
+}
+
+export type EnumOutputVerbosityNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.OutputVerbosity | Prisma.EnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  in?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel> | $Enums.OutputVerbosity | null
+}
+
+export type EnumReasoningEffortNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReasoningEffortNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReasoningEffort | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel>
+}
+
+export type EnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.OutputVerbosity | Prisma.EnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  in?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel> | $Enums.OutputVerbosity | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
+}
+
 export type EnumSenderTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.SenderType | Prisma.EnumSenderTypeFieldRefInput<$PrismaModel>
   in?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
@@ -741,6 +775,40 @@ export type NestedEnumProviderNullableWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProviderNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumReasoningEffortNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel> | $Enums.ReasoningEffort | null
+}
+
+export type NestedEnumOutputVerbosityNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.OutputVerbosity | Prisma.EnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  in?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel> | $Enums.OutputVerbosity | null
+}
+
+export type NestedEnumReasoningEffortNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReasoningEffort | Prisma.EnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ReasoningEffort[] | Prisma.ListEnumReasoningEffortFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumReasoningEffortNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReasoningEffort | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReasoningEffortNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.OutputVerbosity | Prisma.EnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  in?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.OutputVerbosity[] | Prisma.ListEnumOutputVerbosityFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumOutputVerbosityNullableWithAggregatesFilter<$PrismaModel> | $Enums.OutputVerbosity | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumOutputVerbosityNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumSenderTypeFilter<$PrismaModel = never> = {

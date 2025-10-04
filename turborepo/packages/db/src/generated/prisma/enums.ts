@@ -8,6 +8,25 @@
 * 🟢 You can import this file directly.
 */
 
+export const ReasoningEffort = {
+  minimal: 'minimal',
+  low: 'low',
+  medium: 'medium',
+  high: 'high'
+} as const
+
+export type ReasoningEffort = (typeof ReasoningEffort)[keyof typeof ReasoningEffort]
+
+
+export const OutputVerbosity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high'
+} as const
+
+export type OutputVerbosity = (typeof OutputVerbosity)[keyof typeof OutputVerbosity]
+
+
 export const CompatStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',

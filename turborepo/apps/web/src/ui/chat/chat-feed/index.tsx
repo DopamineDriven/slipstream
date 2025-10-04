@@ -1,7 +1,7 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useScrollObserver } from "@/hooks/use-scroll-observer";
@@ -219,7 +219,7 @@ export function ChatFeed({
       )}
       {rect && quote && (
         <SelectionToolbar
-        
+
           rect={rect}
           onQuoteAction={handleQuote}
           onCopyAction={handleCopy}

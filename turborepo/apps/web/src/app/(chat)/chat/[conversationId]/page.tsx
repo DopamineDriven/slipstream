@@ -2,11 +2,11 @@ import type { DynamicChatRouteProps } from "@/types/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatInterface } from "@/ui/chat/dynamic";
+import { getSession } from "@/utils/auth";
 import type { InferGSPRT } from "@slipstream/types";
 
 // Create once at module level
@@ -43,8 +43,8 @@ export default async function ChatPage({
   params
 }: InferGSPRT<typeof generateStaticParams>) {
   const { conversationId } = await params;
-  const session = await auth();
-  if (!session?.user?.id) redirect("/api/auth/signin");
+  const session = await getSession();
+  if (!session?.user?.id) redirect("/auth/login");
 
   // Fetch data directly on the server
   let messages: DynamicChatRouteProps | null = null;

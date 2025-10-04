@@ -21,12 +21,12 @@ export type UseConversationsReturn = {
   refreshSilently: () => Promise<SidebarProps[] | undefined>;
 };
 
-const fetcher = async (url: string): Promise<SidebarProps[]> => {
+const fetcher = async (url: string) => {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
-  return response.json() as Promise<SidebarProps[]>;
+  return response.json<SidebarProps[]>();
 };
 export function useConversations(userId?: string): UseConversationsReturn {
   const router = useRouter();

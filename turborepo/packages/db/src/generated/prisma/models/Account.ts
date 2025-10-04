@@ -40,12 +40,18 @@ export type AccountMinAggregateOutputType = {
   provider: string | null
   providerAccountId: string | null
   refresh_token: string | null
+  accessTokenExpiresAt: Date | null
+  refreshTokenExpiresAt: Date | null
   access_token: string | null
+  expiresAt: Date | null
   expires_at: number | null
   token_type: string | null
   scope: string | null
+  password: string | null
   id_token: string | null
   session_state: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AccountMaxAggregateOutputType = {
@@ -55,12 +61,18 @@ export type AccountMaxAggregateOutputType = {
   provider: string | null
   providerAccountId: string | null
   refresh_token: string | null
+  accessTokenExpiresAt: Date | null
+  refreshTokenExpiresAt: Date | null
   access_token: string | null
+  expiresAt: Date | null
   expires_at: number | null
   token_type: string | null
   scope: string | null
+  password: string | null
   id_token: string | null
   session_state: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AccountCountAggregateOutputType = {
@@ -70,12 +82,18 @@ export type AccountCountAggregateOutputType = {
   provider: number
   providerAccountId: number
   refresh_token: number
+  accessTokenExpiresAt: number
+  refreshTokenExpiresAt: number
   access_token: number
+  expiresAt: number
   expires_at: number
   token_type: number
   scope: number
+  password: number
   id_token: number
   session_state: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -95,12 +113,18 @@ export type AccountMinAggregateInputType = {
   provider?: true
   providerAccountId?: true
   refresh_token?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
   access_token?: true
+  expiresAt?: true
   expires_at?: true
   token_type?: true
   scope?: true
+  password?: true
   id_token?: true
   session_state?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type AccountMaxAggregateInputType = {
@@ -110,12 +134,18 @@ export type AccountMaxAggregateInputType = {
   provider?: true
   providerAccountId?: true
   refresh_token?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
   access_token?: true
+  expiresAt?: true
   expires_at?: true
   token_type?: true
   scope?: true
+  password?: true
   id_token?: true
   session_state?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type AccountCountAggregateInputType = {
@@ -125,12 +155,18 @@ export type AccountCountAggregateInputType = {
   provider?: true
   providerAccountId?: true
   refresh_token?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
   access_token?: true
+  expiresAt?: true
   expires_at?: true
   token_type?: true
   scope?: true
+  password?: true
   id_token?: true
   session_state?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -223,16 +259,22 @@ export type AccountGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type AccountGroupByOutputType = {
   id: string
   userId: string
-  type: string
+  type: string | null
   provider: string
   providerAccountId: string
   refresh_token: string | null
+  accessTokenExpiresAt: Date | null
+  refreshTokenExpiresAt: Date | null
   access_token: string | null
+  expiresAt: Date | null
   expires_at: number | null
   token_type: string | null
   scope: string | null
+  password: string | null
   id_token: string | null
   session_state: string | null
+  createdAt: Date
+  updatedAt: Date | null
   _count: AccountCountAggregateOutputType | null
   _avg: AccountAvgAggregateOutputType | null
   _sum: AccountSumAggregateOutputType | null
@@ -261,32 +303,44 @@ export type AccountWhereInput = {
   NOT?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   id?: Prisma.StringFilter<"Account"> | string
   userId?: Prisma.StringFilter<"Account"> | string
-  type?: Prisma.StringFilter<"Account"> | string
+  type?: Prisma.StringNullableFilter<"Account"> | string | null
   provider?: Prisma.StringFilter<"Account"> | string
   providerAccountId?: Prisma.StringFilter<"Account"> | string
   refresh_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
+  refreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   access_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   expires_at?: Prisma.IntNullableFilter<"Account"> | number | null
   token_type?: Prisma.StringNullableFilter<"Account"> | string | null
   scope?: Prisma.StringNullableFilter<"Account"> | string | null
+  password?: Prisma.StringNullableFilter<"Account"> | string | null
   id_token?: Prisma.StringNullableFilter<"Account"> | string | null
   session_state?: Prisma.StringNullableFilter<"Account"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type AccountOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerAccountId?: Prisma.SortOrder
   refresh_token?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   access_token?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   token_type?: Prisma.SortOrderInput | Prisma.SortOrder
   scope?: Prisma.SortOrderInput | Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   id_token?: Prisma.SortOrderInput | Prisma.SortOrder
   session_state?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -297,32 +351,44 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AccountWhereInput[]
   NOT?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   userId?: Prisma.StringFilter<"Account"> | string
-  type?: Prisma.StringFilter<"Account"> | string
+  type?: Prisma.StringNullableFilter<"Account"> | string | null
   provider?: Prisma.StringFilter<"Account"> | string
   providerAccountId?: Prisma.StringFilter<"Account"> | string
   refresh_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
+  refreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   access_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   expires_at?: Prisma.IntNullableFilter<"Account"> | number | null
   token_type?: Prisma.StringNullableFilter<"Account"> | string | null
   scope?: Prisma.StringNullableFilter<"Account"> | string | null
+  password?: Prisma.StringNullableFilter<"Account"> | string | null
   id_token?: Prisma.StringNullableFilter<"Account"> | string | null
   session_state?: Prisma.StringNullableFilter<"Account"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "provider_providerAccountId">
 
 export type AccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   provider?: Prisma.SortOrder
   providerAccountId?: Prisma.SortOrder
   refresh_token?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   access_token?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   token_type?: Prisma.SortOrderInput | Prisma.SortOrder
   scope?: Prisma.SortOrderInput | Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   id_token?: Prisma.SortOrderInput | Prisma.SortOrder
   session_state?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AccountCountOrderByAggregateInput
   _avg?: Prisma.AccountAvgOrderByAggregateInput
   _max?: Prisma.AccountMaxOrderByAggregateInput
@@ -336,120 +402,168 @@ export type AccountScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AccountScalarWhereWithAggregatesInput | Prisma.AccountScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Account"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Account"> | string
-  type?: Prisma.StringWithAggregatesFilter<"Account"> | string
+  type?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   provider?: Prisma.StringWithAggregatesFilter<"Account"> | string
   providerAccountId?: Prisma.StringWithAggregatesFilter<"Account"> | string
   refresh_token?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
+  refreshTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
   access_token?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
   expires_at?: Prisma.IntNullableWithAggregatesFilter<"Account"> | number | null
   token_type?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   scope?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  password?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   id_token?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   session_state?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Account"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Account"> | Date | string | null
 }
 
 export type AccountCreateInput = {
   id?: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutAccountsInput
 }
 
 export type AccountUncheckedCreateInput = {
   id?: string
   userId: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type AccountUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutAccountsNestedInput
 }
 
 export type AccountUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AccountCreateManyInput = {
   id?: string
   userId: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type AccountUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AccountUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AccountListRelationFilter = {
@@ -474,12 +588,18 @@ export type AccountCountOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerAccountId?: Prisma.SortOrder
   refresh_token?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
   access_token?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
   token_type?: Prisma.SortOrder
   scope?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   id_token?: Prisma.SortOrder
   session_state?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AccountAvgOrderByAggregateInput = {
@@ -493,12 +613,18 @@ export type AccountMaxOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerAccountId?: Prisma.SortOrder
   refresh_token?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
   access_token?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
   token_type?: Prisma.SortOrder
   scope?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   id_token?: Prisma.SortOrder
   session_state?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AccountMinOrderByAggregateInput = {
@@ -508,12 +634,18 @@ export type AccountMinOrderByAggregateInput = {
   provider?: Prisma.SortOrder
   providerAccountId?: Prisma.SortOrder
   refresh_token?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
   access_token?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
   token_type?: Prisma.SortOrder
   scope?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   id_token?: Prisma.SortOrder
   session_state?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AccountSumOrderByAggregateInput = {
@@ -572,30 +704,42 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type AccountCreateWithoutUserInput = {
   id?: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type AccountUncheckedCreateWithoutUserInput = {
   id?: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type AccountCreateOrConnectWithoutUserInput = {
@@ -630,72 +774,102 @@ export type AccountScalarWhereInput = {
   NOT?: Prisma.AccountScalarWhereInput | Prisma.AccountScalarWhereInput[]
   id?: Prisma.StringFilter<"Account"> | string
   userId?: Prisma.StringFilter<"Account"> | string
-  type?: Prisma.StringFilter<"Account"> | string
+  type?: Prisma.StringNullableFilter<"Account"> | string | null
   provider?: Prisma.StringFilter<"Account"> | string
   providerAccountId?: Prisma.StringFilter<"Account"> | string
   refresh_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
+  refreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   access_token?: Prisma.StringNullableFilter<"Account"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
   expires_at?: Prisma.IntNullableFilter<"Account"> | number | null
   token_type?: Prisma.StringNullableFilter<"Account"> | string | null
   scope?: Prisma.StringNullableFilter<"Account"> | string | null
+  password?: Prisma.StringNullableFilter<"Account"> | string | null
   id_token?: Prisma.StringNullableFilter<"Account"> | string | null
   session_state?: Prisma.StringNullableFilter<"Account"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
+  updatedAt?: Prisma.DateTimeNullableFilter<"Account"> | Date | string | null
 }
 
 export type AccountCreateManyUserInput = {
   id?: string
-  type: string
+  type?: string | null
   provider: string
   providerAccountId: string
   refresh_token?: string | null
+  accessTokenExpiresAt?: Date | string | null
+  refreshTokenExpiresAt?: Date | string | null
   access_token?: string | null
+  expiresAt?: Date | string | null
   expires_at?: number | null
   token_type?: string | null
   scope?: string | null
+  password?: string | null
   id_token?: string | null
   session_state?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string | null
 }
 
 export type AccountUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AccountUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AccountUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   providerAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   refresh_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expires_at?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   token_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   session_state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -707,12 +881,18 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   provider?: boolean
   providerAccountId?: boolean
   refresh_token?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
   access_token?: boolean
+  expiresAt?: boolean
   expires_at?: boolean
   token_type?: boolean
   scope?: boolean
+  password?: boolean
   id_token?: boolean
   session_state?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -723,12 +903,18 @@ export type AccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   provider?: boolean
   providerAccountId?: boolean
   refresh_token?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
   access_token?: boolean
+  expiresAt?: boolean
   expires_at?: boolean
   token_type?: boolean
   scope?: boolean
+  password?: boolean
   id_token?: boolean
   session_state?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -739,12 +925,18 @@ export type AccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   provider?: boolean
   providerAccountId?: boolean
   refresh_token?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
   access_token?: boolean
+  expiresAt?: boolean
   expires_at?: boolean
   token_type?: boolean
   scope?: boolean
+  password?: boolean
   id_token?: boolean
   session_state?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -755,15 +947,21 @@ export type AccountSelectScalar = {
   provider?: boolean
   providerAccountId?: boolean
   refresh_token?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
   access_token?: boolean
+  expiresAt?: boolean
   expires_at?: boolean
   token_type?: boolean
   scope?: boolean
+  password?: boolean
   id_token?: boolean
   session_state?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "provider" | "providerAccountId" | "refresh_token" | "access_token" | "expires_at" | "token_type" | "scope" | "id_token" | "session_state", ExtArgs["result"]["account"]>
+export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "provider" | "providerAccountId" | "refresh_token" | "accessTokenExpiresAt" | "refreshTokenExpiresAt" | "access_token" | "expiresAt" | "expires_at" | "token_type" | "scope" | "password" | "id_token" | "session_state" | "createdAt" | "updatedAt", ExtArgs["result"]["account"]>
 export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -782,16 +980,22 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    type: string
+    type: string | null
     provider: string
     providerAccountId: string
     refresh_token: string | null
+    accessTokenExpiresAt: Date | null
+    refreshTokenExpiresAt: Date | null
     access_token: string | null
+    expiresAt: Date | null
     expires_at: number | null
     token_type: string | null
     scope: string | null
+    password: string | null
     id_token: string | null
     session_state: string | null
+    createdAt: Date
+    updatedAt: Date | null
   }, ExtArgs["result"]["account"]>
   composites: {}
 }
@@ -1222,12 +1426,18 @@ export interface AccountFieldRefs {
   readonly provider: Prisma.FieldRef<"Account", 'String'>
   readonly providerAccountId: Prisma.FieldRef<"Account", 'String'>
   readonly refresh_token: Prisma.FieldRef<"Account", 'String'>
+  readonly accessTokenExpiresAt: Prisma.FieldRef<"Account", 'DateTime'>
+  readonly refreshTokenExpiresAt: Prisma.FieldRef<"Account", 'DateTime'>
   readonly access_token: Prisma.FieldRef<"Account", 'String'>
+  readonly expiresAt: Prisma.FieldRef<"Account", 'DateTime'>
   readonly expires_at: Prisma.FieldRef<"Account", 'Int'>
   readonly token_type: Prisma.FieldRef<"Account", 'String'>
   readonly scope: Prisma.FieldRef<"Account", 'String'>
+  readonly password: Prisma.FieldRef<"Account", 'String'>
   readonly id_token: Prisma.FieldRef<"Account", 'String'>
   readonly session_state: Prisma.FieldRef<"Account", 'String'>
+  readonly createdAt: Prisma.FieldRef<"Account", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Account", 'DateTime'>
 }
     
 

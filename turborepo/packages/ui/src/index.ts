@@ -4,6 +4,7 @@ import "./globals.css";
 // icons
 export { Icon } from "@/icons/index";
 export type { BaseSVGProps, IconName } from "@/icons/index";
+export { AnonymousIcon } from "@/icons/anonymous";
 export { AnthropicIcon } from "@/icons/anthropic";
 export { ArrowDownCircle } from "@/icons/arrow-down-circle";
 export { ArrowLeft } from "@/icons/arrow-left";
@@ -31,6 +32,7 @@ export { Eye } from "@/icons/eye";
 export { FileText } from "@/icons/file-text";
 export { GeminiIcon } from "@/icons/gemini";
 export { Github } from "@/icons/github";
+export { GoogleIcon } from "@/icons/google";
 export { GripVertical } from "@/icons/grip-vertical";
 export { History } from "@/icons/history";
 export { ImageIcon } from "@/icons/image-icon";

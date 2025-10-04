@@ -4,6 +4,8 @@ export const COOKIES = {
   ios: "ios",
   latlng: "latlng",
   tz: "tz",
+  ip: "ip",
+  ua: "ua",
   country: "country",
   city: "city",
   isMac: "isMac",
@@ -15,6 +17,8 @@ export const COOKIES = {
 export type CookieValue = {
   hostname: string;
   viewport: "mobile" | "desktop";
+  ip: string;
+  ua: string;
   ios: "true" | "false";
   /**
    ```ts

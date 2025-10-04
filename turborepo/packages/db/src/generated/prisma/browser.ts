@@ -92,7 +92,7 @@ export type AudioMetadata = Prisma.AudioMetadataModel
  */
 export type DocumentMetadata = Prisma.DocumentMetadataModel
 /**
- * Model VerificationToken
+ * Model Verification
  * 
  */
-export type VerificationToken = Prisma.VerificationTokenModel
+export type Verification = Prisma.VerificationModel

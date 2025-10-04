@@ -4,7 +4,6 @@ import type { EventTypeMap } from "@slipstream/types";
 
 export interface WSServerOptions {
   port: number;
-  jwtSecret: string;
   channel?: string;
 }
 

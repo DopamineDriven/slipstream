@@ -63,7 +63,7 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
-  VerificationToken: 'VerificationToken'
+  Verification: 'Verification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -87,8 +87,10 @@ export const UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
+  email_verified: 'email_verified',
   image: 'image',
   isAnonymous: 'isAnonymous',
+  lastLoginMethod: 'lastLoginMethod',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -119,12 +121,18 @@ export const AccountScalarFieldEnum = {
   provider: 'provider',
   providerAccountId: 'providerAccountId',
   refresh_token: 'refresh_token',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
   access_token: 'access_token',
+  expiresAt: 'expiresAt',
   expires_at: 'expires_at',
   token_type: 'token_type',
   scope: 'scope',
+  password: 'password',
   id_token: 'id_token',
-  session_state: 'session_state'
+  session_state: 'session_state',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
@@ -134,6 +142,8 @@ export const SessionScalarFieldEnum = {
   id: 'id',
   sessionToken: 'sessionToken',
   userId: 'userId',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
   expires: 'expires',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -193,6 +203,8 @@ export const ConversationSettingsScalarFieldEnum = {
   trackUsage: 'trackUsage',
   enableWebSearch: 'enableWebSearch',
   enableAssetGen: 'enableAssetGen',
+  reasoningEffort: 'reasoningEffort',
+  outputVerbosity: 'outputVerbosity',
   maxTokens: 'maxTokens',
   usageAlerts: 'usageAlerts',
   temperature: 'temperature',
@@ -393,13 +405,16 @@ export const DocumentMetadataScalarFieldEnum = {
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
-export const VerificationTokenScalarFieldEnum = {
+export const VerificationScalarFieldEnum = {
+  id: 'id',
   identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
+  value: 'value',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
 export const SortOrder = {

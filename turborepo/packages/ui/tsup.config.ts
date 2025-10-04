@@ -26,9 +26,7 @@ const tsupConfig = (
       "src/ui/*.tsx",
       "src/ui/base/progress.tsx",
       "!src/services/icon-workup.ts",
-      "!src/services/read.ts",
-      "!src/services/postbuild.ts",
-      "!src/services/__out__/*.json"
+      "!src/services/postbuild.ts"
     ],
     dts: true,
     external: ["react"],

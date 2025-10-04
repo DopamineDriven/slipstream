@@ -12,7 +12,7 @@ const tsupConfig = (options: Options) =>
       "src/types.ts",
       "src/codegen/**/*.ts"
     ],
-    target: ["node24"],
+    target: ["node24.9.0"],
     dts: true,
     watch: process.env.NODE_ENV === "development",
     keepNames: true,

@@ -2,7 +2,7 @@
 "use client";
 
 import type { ModelSelection } from "@/lib/models";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import { Logo } from "@/ui/logo";
 import { motion } from "motion/react";
 import {

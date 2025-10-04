@@ -2,13 +2,11 @@ import { relative } from "node:path";
 import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-/** `outExtension({format})` -> when format passed in it outputs esm so using it as `.${format}.mjs` -> `filename.esm.mjs` on output */
 const tsupConfig = (options: Options) =>
   ({
     entry: [
       "src/index.ts",
       "src/anthropic/index.ts",
-      "src/auth/index.ts",
       "src/gemini/index.ts",
       "src/logger/index.ts",
       "src/meta/index.ts",
@@ -41,3 +39,5 @@ const tsupConfig = (options: Options) =>
   }) satisfies Options;
 
 export default defineConfig(tsupConfig);
+
+/** `outExtension({format})` -> when format passed in it outputs esm so using it as `.${format}.mjs` -> `filename.esm.mjs` on output */

@@ -1,6 +1,7 @@
 export const modelIdsByProvider = {
   openai: [
     "gpt-5",
+    "gpt-5-codex",
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-4.1",

@@ -1,8 +1,8 @@
 "use client";
 
+import type { User as UserProps } from "@/utils/auth-client";
 import type { ValueKeyframesDefinition } from "motion-dom";
 import type { MotionStyle } from "motion/react";
-import type { User as UserProps } from "next-auth";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";

@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import {
   Button,
   Card,
@@ -39,7 +39,7 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
             <Input
               id="contact-name"
               placeholder={user?.name ?? "Enter your name"}
-              className="bg-brand-background pl-10 pr-3 border-brand-border focus:ring-brand-ring text-brand-text"
+              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text pr-3 pl-10"
             />
           </div>
           <div>
@@ -50,7 +50,7 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
               id="contact-email"
               type="email"
               placeholder={user?.email ?? "Enter your email address"}
-              className="bg-brand-background pr-3 pl-10 border-brand-border focus:ring-brand-ring text-brand-text"
+              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text pr-3 pl-10"
             />
           </div>
           <div>
@@ -60,7 +60,7 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
             <Input
               id="contact-subject"
               placeholder="Inquiry Subject"
-              className="bg-brand-background pr-3 pl-10 border-brand-border focus:ring-brand-ring text-brand-text"
+              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text pr-3 pl-10"
             />
           </div>
           <div>
@@ -70,7 +70,7 @@ export function ContactUsSettingsSection({ user }: { user?: User }) {
             <Textarea
               id="contact-message"
               placeholder="Describe your issue or question in detail..."
-              className="bg-brand-background pr-3 pl-10 border-brand-border focus:ring-brand-ring text-brand-text min-h-[120px]"
+              className="bg-brand-background border-brand-border focus:ring-brand-ring text-brand-text min-h-[120px] pr-3 pl-10"
             />
           </div>
           <Button
