@@ -1,9 +1,9 @@
 "use server";
 
-import type { Providers } from "@slipstream/types";
 import { revalidatePath } from "next/cache";
-import { getSession } from "@/utils/auth";
 import { prismaClient } from "@/lib/prisma";
+import { getSession } from "@/utils/auth";
+import type { Providers } from "@slipstream/types";
 import { EncryptionService } from "@slipstream/encryption";
 import { KeyValidator } from "@slipstream/key-validator";
 import { toPrismaFormat } from "@slipstream/types";
@@ -58,7 +58,7 @@ export async function upsertApiKey(formdata: FormData) {
         }
       }
     });
-    revalidatePath("/(chat)/settings");
+    revalidatePath("/(chat)/settings/[id]");
     return { success: true, id: createUserKey.id } as const;
   } else return { success: false, id: message } as const;
 }
@@ -93,7 +93,7 @@ export async function getDecryptedApiKeyOnEdit(
   try {
     const hasKey = decryptMapper.get(provider);
     if (typeof hasKey !== "undefined") {
-      revalidatePath("/(chat)/settings");
+      revalidatePath("/(chat)/settings/[id]");
       return hasKey;
     }
 
@@ -103,7 +103,7 @@ export async function getDecryptedApiKeyOnEdit(
       iv: rec.iv
     });
     decryptMapper.set(provider, decrypted);
-    revalidatePath("/(chat)/settings");
+    revalidatePath("/(chat)/settings/[id]");
     return decrypted;
   } catch (err) {
     if (err instanceof Error) {

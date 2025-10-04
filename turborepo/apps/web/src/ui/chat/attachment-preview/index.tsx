@@ -38,7 +38,6 @@ export function AttachmentPreviewComponent({
 }: AttachmentPreviewProps) {
   // Always call hook (React rules) but only use if external props not provided
   const internalData = useAssetMetadata({ attachments });
-
   // Use external props if provided, otherwise fall back to hook data
   const thumbnails = externalThumbnails ?? internalData.thumbnails;
   const metadata = externalMetadata ?? internalData.metadata;
@@ -61,12 +60,10 @@ export function AttachmentPreviewComponent({
           <Card key={attachment.id} className="border-border/50 bg-muted/30">
             <CardContent className="flex items-center gap-3 p-1.5">
               <div className="flex-shrink-0">
-                {attachment.mime.startsWith("image/") &&
-                meta?.type === "IMAGE" &&
-                thumbnail ? (
+                {attachment.mime.startsWith("image/") ? (
                   <div className="relative">
                     <NextImage
-                      src={thumbnail || "/dd-logo.svg"}
+                      src={thumbnail ?? "/aic-logo.svg"}
                       alt={attachment.filename}
                       width={attachment.width}
                       height={attachment.height}

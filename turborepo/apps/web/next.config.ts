@@ -8,8 +8,6 @@ export default {
     loader: "default",
     formats: ["image/avif", "image/webp"],
     dangerouslyAllowSVG: true,
-
-    qualities: [75, 100],
     remotePatterns: [
       {
         hostname: "localhost",

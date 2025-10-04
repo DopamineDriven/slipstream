@@ -12,7 +12,6 @@ import { PathnameProvider } from "@/context/pathname-context";
 import { getSiteUrl } from "@/lib/site-url";
 import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
-import "./katex.css";
 
 const inter = Inter({
   variable: "--font-inter",

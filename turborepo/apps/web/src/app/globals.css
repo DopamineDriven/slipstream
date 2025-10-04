@@ -1,6 +1,7 @@
 @import "tailwindcss" source("../../src");
 @import "tw-animate-css";
 @import "./highlight.css";
+@import "./katex.css";
 
 @plugin "tailwindcss-motion";
 

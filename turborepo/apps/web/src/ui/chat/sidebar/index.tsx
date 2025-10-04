@@ -37,14 +37,13 @@ interface EnhancedSidebarProps {
 }
 
 export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
   const {
     conversations,
     updateCache,
     deleteConversation,
     updateTitle,
-    isLoading,
     isValidating
   } = useConversations(userId);
 
@@ -187,7 +186,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     };
   }, []);
 
-  if (isLoading || isValidating) return <SidebarSkeleton />;
+  if (isPending || isValidating) return <SidebarSkeleton />;
   return (
     <div
       className={cn(

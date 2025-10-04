@@ -13,6 +13,7 @@ dotenv.config({ quiet: true });
 const providerModelChatApi = {
   openai: [
     "gpt-5",
+    "gpt-5-codex",
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-4.1",
@@ -263,7 +264,7 @@ function prettyModelName(id: string, provider: Provider = "openai") {
         return segment.toUpperCase();
       }
       return provider === "openai"
-        ? !/(mini|nano|turbo|pro)/.test(segment)
+        ? !/(mini|nano|turbo|pro|codex)/.test(segment)
           ? segment.charAt(0).toUpperCase() + segment.slice(1)
           : segment
         : segment.charAt(0).toUpperCase() + segment.slice(1);
