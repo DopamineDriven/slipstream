@@ -337,7 +337,7 @@ export function MessageBubble({
             )}>
             {isAI ? (
               <>
-                <div className="hidden items-center gap-2 md:flex">
+                <div className={cn(isMobile ? "hidden" : "flex", "items-center gap-2")}>
                   <AnimatedCopyButton
                     textToCopy={contentToCopy ?? ""}
                     className={cn(
