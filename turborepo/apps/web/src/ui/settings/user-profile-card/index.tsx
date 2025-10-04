@@ -1,8 +1,9 @@
 "use client";
 
 import type { KeyboardShortcut } from "@/types/ui";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import {
   Avatar,
   AvatarFallback,
@@ -10,7 +11,6 @@ import {
   Button,
   Progress
 } from "@slipstream/ui";
-import { motion } from "motion/react";
 
 export interface UserProfileCardProps {
   user?: User;

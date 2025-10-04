@@ -57,8 +57,8 @@
         "ui": [
           "dist/ui/*.d.ts"
         ],
-        "ui/base/progress": [
-          "dist/ui/base/progress.d.ts"
+        "ui/base": [
+          "dist/ui/base/*.d.ts"
         ]
       }
     }
@@ -139,7 +139,7 @@
     "jiti": "^2.6.1",
     "motion-dom": "^12.23.21",
     "motion-utils": "^12.23.6",
-    "next": "^15.6.0-canary.40",
+    "next": "^15.5.4",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "react": "^19.2.0",

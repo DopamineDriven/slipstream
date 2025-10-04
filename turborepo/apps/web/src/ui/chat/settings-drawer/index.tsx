@@ -19,7 +19,7 @@ import {
   User as UserIcon,
   X
 } from "@slipstream/ui";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/auth-client";
 
 interface SettingsDrawerProps {
   isOpen: boolean;

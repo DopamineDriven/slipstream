@@ -2,7 +2,7 @@
 "use client";
 
 import type { AttachmentSingleton, UIMessage } from "@/types/shared";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import React, {
   Suspense,
   useCallback,

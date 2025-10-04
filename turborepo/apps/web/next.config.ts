@@ -3,19 +3,6 @@ import type { NextConfig } from "next";
 export default {
   reactStrictMode: true,
   eslint: { ignoreDuringBuilds: false },
-  experimental: {
-    useCache: true
-  },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/',
-          destination: '/chat/home'
-        }
-      ]
-    }
-  },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     loader: "default",

@@ -2,7 +2,7 @@
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import type { Properties } from "csstype";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";

@@ -1,20 +1,20 @@
-import { authClient } from "@/utils/auth-client";
+import { signIn } from "@/utils/auth-client";
 
 export const signinGithub = async () => {
-  const data = await authClient.signIn.social({
+
+  return await signIn.social({
     provider: "github"
   });
-  return data;
 };
 
 export const signinGoogle = async () => {
-  const data = await authClient.signIn.social({
+
+  return await signIn.social({
     provider: "google"
   });
-  return data;
 };
 
 export const signinAnonymous = async () => {
-  const data = await authClient.signIn.anonymous();
-  return data;
+
+  return await signIn.anonymous();
 };

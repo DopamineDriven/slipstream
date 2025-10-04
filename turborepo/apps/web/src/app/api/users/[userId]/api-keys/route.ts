@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/utils/auth";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 
@@ -15,9 +15,9 @@ export async function GET(
 ) {
   const { userId } = await params;
   try {
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id) {
-      redirect("/api/auth/signin");
+      redirect("/auth/login");
     }
 
     // Ensure user can only access their own conversations

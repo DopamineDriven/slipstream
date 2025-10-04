@@ -14,7 +14,7 @@ import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
 import { Logo } from "@/ui/logo";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/auth-client";
 import {
   Button,
   Check,

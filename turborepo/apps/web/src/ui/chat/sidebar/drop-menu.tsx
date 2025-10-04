@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import Link from "next/link";
 import { getInitials } from "@/lib/helpers";
 import { cn } from "@/lib/utils";

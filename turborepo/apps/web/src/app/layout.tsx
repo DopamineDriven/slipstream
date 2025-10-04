@@ -6,21 +6,13 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import "@slipstream/ui/globals.css";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Script from "next/script";
-import { AIChatProvider } from "@/context/ai-chat-context";
-import { ApiKeysProvider } from "@/context/api-keys-context";
-import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { CookieProvider } from "@/context/cookie-context";
-import { ModelSelectionProvider } from "@/context/model-selection-context";
 import { PathnameProvider } from "@/context/pathname-context";
-import { auth } from "@/lib/auth";
 import { getSiteUrl } from "@/lib/site-url";
 import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
-import { SessionProvider } from "next-auth/react";
 import "./katex.css";
-import { AssetProvider } from "@/context/asset-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -113,9 +105,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/api/auth/signin");
-
   return (
     <html suppressHydrationWarning lang="en">
       <head>
@@ -143,24 +132,12 @@ export default async function RootLayout({
         )}>
         <CookieProvider>
           <ThemeProvider attribute={"class"} defaultTheme="system" enableSystem>
-            <SessionProvider session={session}>
-              <PathnameProvider>
-                <ChatWebSocketProvider user={session.user}>
-                  <ModelSelectionProvider>
-                    <ApiKeysProvider userId={session.user.id}>
-                      <AssetProvider userId={session.user.id}>
-                        <AIChatProvider userId={session.user.id}>
-                          <Suspense fallback={null}>
-                            <PathnameSync />
-                          </Suspense>
-                          {children}
-                        </AIChatProvider>
-                      </AssetProvider>
-                    </ApiKeysProvider>
-                  </ModelSelectionProvider>
-                </ChatWebSocketProvider>
-              </PathnameProvider>
-            </SessionProvider>
+            <PathnameProvider>
+              <Suspense fallback={null}>
+                <PathnameSync />
+              </Suspense>
+              {children}
+            </PathnameProvider>
           </ThemeProvider>
         </CookieProvider>
       </body>

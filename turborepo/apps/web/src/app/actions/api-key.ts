@@ -2,7 +2,7 @@
 
 import type { Providers } from "@slipstream/types";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/utils/auth";
 import { prismaClient } from "@/lib/prisma";
 import { EncryptionService } from "@slipstream/encryption";
 import { KeyValidator } from "@slipstream/key-validator";
@@ -19,7 +19,7 @@ function handleAsDefault(asDefault: FormDataEntryValue | null) {
 export async function upsertApiKey(formdata: FormData) {
   const getKey = formdata.get("apiKey");
   const getProvider = formdata.get("provider");
-  const authData = await auth();
+  const authData = await getSession();
   const userId = authData?.user?.id;
   const asDefault = formdata.get("asDefault");
   if (typeof getKey !== "string") {
@@ -58,10 +58,7 @@ export async function upsertApiKey(formdata: FormData) {
         }
       }
     });
-    void prismaClient.$accelerate.invalidate({
-      tags: [`user_api_keys_${userId}`] as const
-    });
-    revalidatePath("/(settings)/settings");
+    revalidatePath("/(chat)/settings");
     return { success: true, id: createUserKey.id } as const;
   } else return { success: false, id: message } as const;
 }
@@ -81,7 +78,7 @@ export async function getDecryptedApiKeyOnEdit(
   provider: Providers
 ): Promise<string> {
   const cryptService = new EncryptionService(process.env.ENCRYPTION_KEY);
-  const authData = await auth();
+  const authData = await getSession();
   const userId = authData?.user?.id;
   if (!userId) {
     decryptMapper.clear();
@@ -96,7 +93,7 @@ export async function getDecryptedApiKeyOnEdit(
   try {
     const hasKey = decryptMapper.get(provider);
     if (typeof hasKey !== "undefined") {
-      revalidatePath("/(settings)/settings");
+      revalidatePath("/(chat)/settings");
       return hasKey;
     }
 
@@ -106,7 +103,7 @@ export async function getDecryptedApiKeyOnEdit(
       iv: rec.iv
     });
     decryptMapper.set(provider, decrypted);
-    revalidatePath("/(settings)/settings");
+    revalidatePath("/(chat)/settings");
     return decrypted;
   } catch (err) {
     if (err instanceof Error) {

@@ -2,7 +2,7 @@
 
 import type { Provider } from "@/lib/models";
 import type { UIMessage } from "@/types/shared";
-import type { User } from "next-auth";
+import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";

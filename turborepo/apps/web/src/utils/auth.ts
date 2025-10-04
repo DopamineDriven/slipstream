@@ -1,7 +1,9 @@
 import type { BetterAuthOptions } from "better-auth";
+import { cache } from "react";
 import { headers } from "next/headers";
 import { prismaClient } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/site-url";
+import jsonData from "@/utils/__out__/random-name-gen.json" with { type: "json" };
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
@@ -10,7 +12,11 @@ import { anonymous } from "better-auth/plugins/anonymous";
 
 // openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
 export const auth = betterAuth({
-  trustedOrigins: ["http://localhost:3030"],
+  trustedOrigins: [
+    "http://localhost:3030",
+    "https://chat.aicoalesce.com",
+    "https://dev.chat.aicoalesce.com"
+  ],
   database: prismaAdapter(prismaClient, {
     provider: "postgresql"
   }),
@@ -26,6 +32,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ""
     }
   },
+
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: getSiteUrl(process.env.NODE_ENV),
   account: {
@@ -36,7 +43,7 @@ export const auth = betterAuth({
       accountId: "providerAccountId",
       refreshToken: "refresh_token",
       accessToken: "access_token",
-      accessTokenExpiresAt: "expires_at",
+      accessTokenExpiresAt: "expiresAt",
       idToken: "id_token",
       providerId: "provider"
     }
@@ -53,17 +60,46 @@ export const auth = betterAuth({
       maxAge: 3600 * 24 // seconds
     }
   },
-  user: { fields: { emailVerified: "email_verified" } },
+  user: {
+    fields: { emailVerified: "email_verified" }
+    // additionalFields: {
+    //   isAnonymous: { type: "boolean", input: true }
+    // }
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        async after(user, _context) {
+          if (!user.image) {
+            await prismaClient.user.update({
+              where: { id: user.id },
+              data: {
+                image:
+                  "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759541043761-doge-anonymous-avatar.png"
+              }
+            });
+          } else return () => {};
+        }
+      }
+    }
+  },
   appName: "AI Coalesce",
   // can handle onLinkAccount in `anonymous()` options
   plugins: [
     lastLoginMethod({ storeInDatabase: true }),
     anonymous({
       emailDomainName: "aicoalesce.com",
-
+      generateName: () => {
+        const { prefixes, suffixes } = jsonData;
+        const prefix =
+          prefixes.at(Math.floor(Math.random() * prefixes.length)) ?? "Random";
+        const suffix =
+          suffixes.at(Math.floor(Math.random() * suffixes.length)) ?? "User";
+        return `${prefix} ${suffix}`;
+      },
       onLinkAccount: async ({ anonymousUser, newUser }) => {
         const { emailVerified, ...userNew } = newUser.user;
-        // const {expiresAt, ...sessionNew} = newUser.session;
+
         await prismaClient.$transaction(async t => {
           await t.user.update({
             where: { id: anonymousUser.user.id },
@@ -81,11 +117,8 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 
-export type User = (typeof auth.$Infer.Session)["user"];
-
-export const getSession = async () => {
-  "use cache";
+export const getSession = cache(async () => {
   return await auth.api.getSession({
     headers: await headers()
   });
-};
+});

@@ -1,20 +1,28 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import { ChatLayoutClient } from "@/ui/chat/chat-layout";
-import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
+import React from "react";
+import { redirect } from "next/navigation";
+import { AIChatProvider } from "@/context/ai-chat-context";
+import { ApiKeysProvider } from "@/context/api-keys-context";
+import { AssetProvider } from "@/context/asset-context";
+import { ChatWebSocketProvider } from "@/context/chat-ws-context";
+import { ModelSelectionProvider } from "@/context/model-selection-context";
+import { getSession } from "@/utils/auth";
 
-export const metadata: Metadata = {
-  title: "Chat Home"
-};
-
-export default function ChatLayout({
+export default async function AuthedLayout({
   children
 }: Readonly<{
-  children: ReactNode;
+  children: React.ReactNode;
 }>) {
+  const session = await getSession();
+  if (!session?.user) redirect("/auth/login");
   return (
-    <ChatLayoutClient>
-      <ChatLayoutShell>{children}</ChatLayoutShell>
-    </ChatLayoutClient>
+    <ChatWebSocketProvider user={session.user}>
+      <ModelSelectionProvider>
+        <ApiKeysProvider userId={session.user.id}>
+          <AssetProvider userId={session.user.id}>
+            <AIChatProvider userId={session.user.id}>{children}</AIChatProvider>
+          </AssetProvider>
+        </ApiKeysProvider>
+      </ModelSelectionProvider>
+    </ChatWebSocketProvider>
   );
 }
