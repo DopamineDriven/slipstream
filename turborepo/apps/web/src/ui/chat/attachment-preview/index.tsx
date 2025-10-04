@@ -5,14 +5,7 @@ import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
 import type { DocSpecs, ImageSpecs } from "@slipstream/types";
-import {
-  Button,
-  Card,
-  CardContent,
-  FileText,
-  ImageIcon,
-  X
-} from "@slipstream/ui";
+import { Button, Card, CardContent, FileText, X } from "@slipstream/ui";
 
 interface AttachmentPreviewProps {
   attachments: AttachmentPreview[];
@@ -55,6 +48,39 @@ export function AttachmentPreviewComponent({
       )}>
       {attachments.map(attachment => {
         const meta = metadata[attachment.id];
+        // Determine meta type robustly
+        let metaType: "IMAGE" | "DOCUMENT";
+        if (meta?.type) {
+          metaType = meta.type;
+        } else if (attachment.mime.startsWith("image/")) {
+          metaType = "IMAGE";
+        } else {
+          metaType = "DOCUMENT";
+        }
+
+        // Prepare doc quick facts (format/pages/words/encoding)
+        let docFormat: string | null = null;
+        let docPageCount: number | null = null;
+        let docWordCount: number | null = null;
+        let docEncoding: string | null = null;
+        if (metaType === "DOCUMENT") {
+          if (meta?.type === "DOCUMENT") {
+            const d = meta as DocSpecs;
+            docFormat = d.format ? d.format.toUpperCase() : null;
+            docPageCount = d.pageCount ?? null;
+            docWordCount = d.wordCount ?? null;
+            docEncoding = d.encoding ? d.encoding.toUpperCase() : null;
+          } else {
+            const m = attachment.mime;
+            if (m === "application/pdf") docFormat = "PDF";
+            else if (m.includes("wordprocessingml")) docFormat = "DOCX";
+            else if (m.includes("presentationml")) docFormat = "PPTX";
+            else if (m.includes("spreadsheetml")) docFormat = "XLSX";
+            else if (m.startsWith("text/")) docFormat = "TEXT";
+          }
+        }
+
+
         const thumbnail = thumbnails[attachment.id];
         return (
           <Card key={attachment.id} className="border-border/50 bg-muted/30">
@@ -69,7 +95,7 @@ export function AttachmentPreviewComponent({
                       height={attachment.height}
                       className="h-10 w-10 rounded-md object-cover md:h-12 md:w-12"
                     />
-                    {meta?.animated && (
+                    {meta?.type === "IMAGE" && meta.animated && (
                       <div className="absolute -top-1 -right-1 rounded-full bg-blue-500 px-1 text-xs text-white">
                         {meta.format.toUpperCase()}
                       </div>
@@ -82,10 +108,6 @@ export function AttachmentPreviewComponent({
                           </div>
                         </div>
                       )}
-                  </div>
-                ) : attachment.mime.startsWith("image/") ? (
-                  <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md md:h-12 md:w-12">
-                    <ImageIcon className="text-muted-foreground h-5 w-5 md:h-6 md:w-6" />
                   </div>
                 ) : (
                   <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md md:h-12 md:w-12">
@@ -106,7 +128,7 @@ export function AttachmentPreviewComponent({
                     {formatFileSize(attachment.size)}
                   </span>
                   {attachment.mime.startsWith("image/") &&
-                    meta?.type === "IMAGE" && (
+                    metaType === "IMAGE" && meta?.type === "IMAGE" && (
                       <>
                         <span className="text-muted-foreground">•</span>
                         <span className="text-muted-foreground">
@@ -142,6 +164,36 @@ export function AttachmentPreviewComponent({
                         )}
                       </>
                     )}
+                  {metaType === "DOCUMENT" && (
+                    <>
+                      {docFormat && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{docFormat}</span>
+                        </>
+                      )}
+                      {typeof docPageCount === "number" && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">
+                            {docPageCount} page{docPageCount === 1 ? "" : "s"}
+                          </span>
+                        </>
+                      )}
+                      {typeof docWordCount === "number" && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{docWordCount} words</span>
+                        </>
+                      )}
+                      {docEncoding && (
+                        <>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{docEncoding}</span>
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
                 <div className="text-xs md:hidden">
                   <span className={getStatusColor(attachment.status)}>

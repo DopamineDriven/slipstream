@@ -76,8 +76,6 @@
   --highlight-variant-20: url("/highlights/20.svg");
 }
 
-
-
 /* Base utility — gives you the after-mask highlight box */
 @utility highlight {
   isolation: isolate;

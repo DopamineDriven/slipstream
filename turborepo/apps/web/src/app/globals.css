@@ -398,8 +398,8 @@
   }
 }
 
-
-.prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose
+  :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   color: var(--color-foreground);
   font-weight: 600;
 }
@@ -472,8 +472,13 @@ code > [data-line]::before {
   @apply rounded-sm bg-[color-mix(in_oklab,oklch(95.28%_0.005264_247.9)_20%,transparent)] px-[0.1em] py-[0.2em] dark:bg-[color-mix(in_oklab,oklch(60.13%_0.1982_263.1)_20%,transparent)];
 }
 .sssss {
-  background: linear-gradient(to bottom, rgb(255 255 255 / 0.4), transparent, rgb(255 255 255 / 0.5));
-     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.4),
+    transparent,
+    rgb(255 255 255 / 0.5)
+  );
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 }
 .prose {
   @apply max-w-none;

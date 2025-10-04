@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ImgMetadataExtractor } from "@/utils/img-extractor-client";
 import { DocSpecs, ImageSpecs } from "@slipstream/types";
+import { DocMetadataExtractor } from "@/utils/doc-extractor-client";
 
 export interface AttachmentPreview {
   id: string;
@@ -30,15 +31,34 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   >({});
   const [size, setSize] = useState<Record<string, number>>({});
 
+  // Helper: produce document specs using the client-side extractor
+  const getDocumentSpecsWorkup = useCallback(
+    async (file: File): Promise<DocSpecs | null> => {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const extractor = new DocMetadataExtractor();
+        const specs = extractor.getDocumentSpecsWorkup(
+          buffer,
+          file.type || "application/octet-stream",
+          file.name
+        );
+        return specs;
+      } catch (err) {
+        console.warn("Failed to extract document metadata:", err);
+        return null;
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!attachments || !Array.isArray(attachments)) {
       return;
     }
     attachments.forEach(attachment => {
-
-      if (
-        attachment.mime.startsWith("image/")
-      ) {
+      // Images → thumbnail + rich image metadata
+      if (attachment.mime.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = e => {
           if (e.target?.result) {
@@ -55,12 +75,10 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
                 const extractor = new ImgMetadataExtractor();
                 const imageSpecs = extractor.getImageSpecsWorkup(buffer);
 
-                setMetadata(prev =>
-                ({
-                        ...prev,
-                        [attachment.id]: imageSpecs
-                      })
-                );
+                setMetadata(prev => ({
+                  ...prev,
+                  [attachment.id]: { type: "IMAGE", ...imageSpecs }
+                }));
                 setSize(prev => ({
                   ...prev,
                   [attachment.id]: attachment.size
@@ -75,9 +93,39 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
           }
         };
         reader.readAsDataURL(attachment.file);
+        return;
+      }
+
+      // Documents (PDF, text/code, Office OpenXML, etc.) → rich doc metadata
+      if (
+        attachment.mime === "application/pdf" ||
+        attachment.mime === "application/rtf" ||
+        attachment.mime.startsWith("text/") ||
+        attachment.mime ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        attachment.mime ===
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+        attachment.mime ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        attachment.mime === "application/json" ||
+        attachment.mime === "application/javascript"
+      ) {
+        (async () => {
+          const specs = await getDocumentSpecsWorkup(attachment.file);
+          if (specs) {
+            setMetadata(prev => ({
+              ...prev,
+              [attachment.id]: specs
+            }));
+            setSize(prev => ({
+              ...prev,
+              [attachment.id]: attachment.size
+            }));
+          }
+        })();
       }
     });
-  }, [attachments, thumbnails]);
+  }, [attachments, thumbnails, getDocumentSpecsWorkup]);
 
   const formatFileSize = useCallback((bytes: number) => {
     if (bytes === 0) return "0 B";
@@ -124,11 +172,24 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
           baseStatus = "Unknown";
       }
 
-      if (
-        meta?.animated &&
-        attachment.status === "pending"
-      ) {
-        baseStatus += ` • Animated (${meta.frames ?? "?"} frames)`;
+      // Enrich preview line with image/document quick facts on pending
+      if (attachment.status === "pending" && meta) {
+        if (meta.type === "IMAGE") {
+          const img = meta;
+          if (img.animated) {
+            baseStatus += ` • Animated (${img.frames ?? "?"} frames)`;
+          }
+        } else {
+          const doc = meta;
+          const parts: string[] = [];
+          if (doc.format) parts.push(doc.format.toUpperCase());
+          if (typeof doc.pageCount === "number")
+            parts.push(`${doc.pageCount} page${doc.pageCount === 1 ? "" : "s"}`);
+          if (typeof doc.wordCount === "number") parts.push(`${doc.wordCount} words`);
+          if (typeof doc.lineCount === "number") parts.push(`${doc.lineCount} lines`);
+          if (doc.encoding) parts.push(doc.encoding.toUpperCase());
+          if (parts.length) baseStatus += ` • ${parts.join(" • ")}`;
+        }
       }
 
       return baseStatus;
@@ -141,6 +202,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
     attachments,
     thumbnails,
     metadata,
+    getDocumentSpecsWorkup,
     getStatusText,
     getStatusColor,
     formatFileSize

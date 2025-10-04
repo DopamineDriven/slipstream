@@ -69,7 +69,7 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        async after(user, _context) {
+        after: async (user, _context) => {
           if (!user.image) {
             await prismaClient.user.update({
               where: { id: user.id },
@@ -78,7 +78,7 @@ export const auth = betterAuth({
                   "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759541043761-doge-anonymous-avatar.png"
               }
             });
-          } else return () => {};
+          }
         }
       }
     }

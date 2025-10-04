@@ -3,8 +3,13 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[postcss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "bradlc.vscode-tailwindcss"
   },
+  "[css]": {
+    "editor.defaultFormatter": "bradlc.vscode-tailwindcss"
+  },
+"tailwindCSS.lint.invalidApply": "warning",
+"tailwindCSS.validate": true,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -16,6 +21,7 @@
     "comments": "off",
     "strings": "on"
   },
+  "css.lint.unknownAtRules": "ignore",
   "C_Cpp.dimInactiveRegions": false,
   "css.completion.completePropertyWithSemicolon": true,
   "css.format.enable": true,
