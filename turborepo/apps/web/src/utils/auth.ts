@@ -10,12 +10,11 @@ import { lastLoginMethod } from "better-auth/plugins";
 import { anonymous } from "better-auth/plugins/anonymous";
 
 // openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
-let x = ""
+
 export const auth = betterAuth({
   trustedOrigins: req => {
     const url = new URL(req.url);
     const origin = url.origin;
-    x=origin;
     return [origin];
   },
   database: prismaAdapter(prismaClient, {
@@ -35,7 +34,7 @@ export const auth = betterAuth({
   },
 
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: x,
+  baseURL: process.env.BETTER_AUTH_URL ?? "https://chat.aicoalesce.com",
   account: {
     accountLinking: {
       enabled: true
