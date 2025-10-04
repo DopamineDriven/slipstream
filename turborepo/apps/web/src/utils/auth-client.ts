@@ -1,4 +1,3 @@
-import { getSiteUrl } from "@/lib/site-url";
 import { auth } from "@/utils/auth";
 import {
   anonymousClient,
@@ -8,7 +7,7 @@ import {
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: getSiteUrl(process.env.VERCEL_ENV),
+  baseURL: process.env.BETTER_AUTH_URL ?? "https://chat.aicoalesce.com",
   plugins: [
     inferAdditionalFields<typeof auth>(),
     anonymousClient(),
