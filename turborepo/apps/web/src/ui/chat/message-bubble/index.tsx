@@ -123,6 +123,17 @@ export function MessageBubble({
 
   const contentToCopy = message.content;
 
+  // Lightweight, derived thinking content during live streaming to avoid setState in effects
+  const streamingThinkingRenderedContent = useMemo(() => {
+    if (liveThinkingText && (isStreaming || liveIsThinking)) {
+      return processStreamingMarkdown(liveThinkingText);
+    }
+    if (message.thinkingText && isStreaming) {
+      return processStreamingMarkdown(message.thinkingText);
+    }
+    return null;
+  }, [isStreaming, liveIsThinking, liveThinkingText, message.thinkingText]);
+
   const handleMobileActionsClick = useCallback(() => {
     setShowMobileActions(true);
   }, []);
@@ -178,33 +189,19 @@ export function MessageBubble({
     })();
   }, [message.content, message.id, isStreaming]);
 
-  // Process thinking text with markdown
+  // Process thinking text for completed messages (heavy processor + cache)
   useEffect(() => {
-    const thinkingTextToProcess = liveThinkingText ?? message.thinkingText;
+    const thinkingTextToProcess = message.thinkingText;
 
     if (!thinkingTextToProcess) {
       setRenderedThinkingContent(null);
       return;
     }
 
-    // For live/streaming thinking text, use lightweight processor
-    if (liveThinkingText && (isStreaming || liveIsThinking)) {
-      setRenderedThinkingContent(processStreamingMarkdown(liveThinkingText));
-      return;
-    }
+    // Skip heavy processing while streaming; handled by streamingThinkingRenderedContent
+    if (isStreaming || liveIsThinking) return;
 
-    // For persisted thinking text from message object, only use lightweight processor if still streaming
-    if (message.thinkingText && isStreaming) {
-      setRenderedThinkingContent(
-        processStreamingMarkdown(message.thinkingText)
-      );
-      return;
-    }
-
-    // For completed messages with thinking text, check cache first
-    if (!message.thinkingText) return;
-
-    const cacheKey = `thinking-${message.id}-${message.thinkingText.length}`;
+    const cacheKey = `thinking-${message.id}-${thinkingTextToProcess.length}`;
     const cached = markdownCache.get(cacheKey);
 
     if (cached) {
@@ -212,16 +209,13 @@ export function MessageBubble({
       return;
     }
 
-    // Prevent duplicate processing
     if (thinkingProcessingRef.current) return;
     thinkingProcessingRef.current = true;
 
     (async () => {
       try {
-        if (!message.thinkingText) return;
-
         const { processMarkdownToReact } = await import("@/lib/processor");
-        const processed = await processMarkdownToReact(message.thinkingText);
+        const processed = await processMarkdownToReact(thinkingTextToProcess);
         markdownCache.set(cacheKey, processed);
         setRenderedThinkingContent(processed);
       } catch (error) {
@@ -230,7 +224,7 @@ export function MessageBubble({
           <div className="text-yellow-500">
             Error rendering thinking content. Raw text shown below:
             <pre className="mt-1 text-xs whitespace-pre-wrap">
-              {message.thinkingText}
+              {thinkingTextToProcess}
             </pre>
           </div>
         );
@@ -238,13 +232,7 @@ export function MessageBubble({
         thinkingProcessingRef.current = false;
       }
     })();
-  }, [
-    message.thinkingText,
-    message.id,
-    isStreaming,
-    liveThinkingText,
-    liveIsThinking
-  ]);
+  }, [message.thinkingText, message.id, isStreaming, liveIsThinking]);
 
   // Action button styling
   const actionButtonVariants = {
@@ -302,7 +290,11 @@ export function MessageBubble({
           {liveIsThinking || liveThinkingText ? (
             <ThinkingSection
               isThinking={liveIsThinking}
-              thinkingContent={renderedThinkingContent ?? message.thinkingText}
+              thinkingContent={
+                streamingThinkingRenderedContent ??
+                renderedThinkingContent ??
+                message.thinkingText
+              }
               duration={
                 liveThinkingDuration ?? message?.thinkingDuration ?? undefined
               }
@@ -311,7 +303,11 @@ export function MessageBubble({
           ) : message.thinkingText ? (
             <ThinkingSection
               isThinking={liveIsThinking}
-              thinkingContent={renderedThinkingContent ?? message.thinkingText}
+              thinkingContent={
+                streamingThinkingRenderedContent ??
+                renderedThinkingContent ??
+                message.thinkingText
+              }
               duration={
                 liveThinkingDuration ?? message?.thinkingDuration ?? undefined
               }
@@ -416,7 +412,7 @@ export function MessageBubble({
                     {getFirstName(user?.name)}
                   </span>
                 </div>
-                <div className="hidden items-center gap-2 md:flex">
+                <div className="items-center gap-2 md:flex">
                   <AnimatedCopyButton
                     textToCopy={contentToCopy ?? ""}
                     className={actionButtonVariants.default}

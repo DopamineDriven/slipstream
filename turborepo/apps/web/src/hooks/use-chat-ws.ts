@@ -3,8 +3,8 @@
 import type { MessageHandler } from "@/types/chat-ws";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
-import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
-
+import type { AnyEvent, ChatWsEvent, EventTypeMap } from "@slipstream/types";
+// To continue this session, run codex resume 0199b1c3-7455-73e2-9928-95d2d88969ba.
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:4000";
 
 export function useChatWebSocket(email?: string | null) {
@@ -22,6 +22,11 @@ export function useChatWebSocket(email?: string | null) {
   // Track the most recent event without forcing re-renders on noisy events
   const lastEventRef = useRef<ChatWsEvent | null>(null);
   const updateScheduledRef = useRef(false);
+
+  const lastEventCb = useCallback((evt: AnyEvent | null) => {
+    setLastEvent(evt);
+  }, []);
+
   useEffect(() => {
     // Connect once per client instance
     client.connect();
@@ -35,7 +40,7 @@ export function useChatWebSocket(email?: string | null) {
           updateScheduledRef.current = true;
           requestAnimationFrame(() => {
             updateScheduledRef.current = false;
-            setLastEvent(lastEventRef.current);
+            lastEventCb(lastEventRef.current);
           });
         }
       } else {
@@ -61,7 +66,7 @@ export function useChatWebSocket(email?: string | null) {
       client.removeListener(handleEvent);
       client.close();
     };
-  }, [client]);
+  }, [client, lastEventCb]);
 
   // Stable send function
   const sendEvent = useCallback(

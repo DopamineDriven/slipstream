@@ -147,6 +147,7 @@ export function AIChatProvider({
   const thinkingTextRef = useRef(thinkingText);
   const isThinkingRef = useRef(isThinking);
   const thinkingDurationRef = useRef(thinkingDuration);
+  const isStreamingRef = useRef(isStreaming);
   const titleRef = useRef<string | null>(null);
   const activeUserStreamsRef = useRef<Set<string>>(new Set());
 
@@ -166,6 +167,11 @@ export function AIChatProvider({
   useEffect(() => {
     thinkingDurationRef.current = thinkingDuration;
   }, [thinkingDuration]);
+
+  // Mirror isStreaming in a ref to avoid redundant setState in handlers
+  useEffect(() => {
+    isStreamingRef.current = isStreaming;
+  }, [isStreaming]);
 
   // Keep a ref of the latest title to avoid redundant updates in handlers
   useEffect(() => {
@@ -216,8 +222,8 @@ export function AIChatProvider({
       // Update title only if it actually changed
       updateTitle(evt.title ?? null);
 
-      // Always set isStreaming true when we have conversationId and title
-      if (evt.conversationId && evt.title) {
+      // Mark streaming only once per session to avoid redundant updates
+      if (evt.conversationId && evt.title && !isStreamingRef.current) {
         setIsStreaming(true);
       }
 
