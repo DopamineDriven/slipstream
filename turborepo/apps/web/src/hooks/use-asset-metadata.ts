@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ImgMetadataExtractor } from "@/utils/img-extractor-client";
-import { DocSpecs, ImageSpecs } from "@slipstream/types";
-import { DocMetadataExtractor } from "@/utils/doc-extractor-client";
+import type { DocSpecs, ImageSpecs } from "@slipstream/metadata";
+import {
+  DocMetadataExtractor,
+  ImgMetadataExtractor
+} from "@slipstream/metadata";
 
 export interface AttachmentPreview {
   id: string;
@@ -77,7 +79,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
 
                 setMetadata(prev => ({
                   ...prev,
-                  [attachment.id]: { type: "IMAGE", ...imageSpecs }
+                  [attachment.id]: { ...imageSpecs }
                 }));
                 setSize(prev => ({
                   ...prev,
@@ -184,9 +186,13 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
           const parts: string[] = [];
           if (doc.format) parts.push(doc.format.toUpperCase());
           if (typeof doc.pageCount === "number")
-            parts.push(`${doc.pageCount} page${doc.pageCount === 1 ? "" : "s"}`);
-          if (typeof doc.wordCount === "number") parts.push(`${doc.wordCount} words`);
-          if (typeof doc.lineCount === "number") parts.push(`${doc.lineCount} lines`);
+            parts.push(
+              `${doc.pageCount} page${doc.pageCount === 1 ? "" : "s"}`
+            );
+          if (typeof doc.wordCount === "number")
+            parts.push(`${doc.wordCount} words`);
+          if (typeof doc.lineCount === "number")
+            parts.push(`${doc.lineCount} lines`);
           if (doc.encoding) parts.push(doc.encoding.toUpperCase());
           if (parts.length) baseStatus += ` • ${parts.join(" • ")}`;
         }
