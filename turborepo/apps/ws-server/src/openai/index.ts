@@ -83,8 +83,8 @@ export class OpenAIService {
 
   private buildInstructions(systemPrompt?: string) {
     return systemPrompt
-      ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      ? `${systemPrompt}\n\nWhen formatting codeblocks, always fence them with proper language tags using backticks not tildes.  Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
+      : "When formatting codeblocks, always fence them with proper language tags using backticks not tildes. Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
   private async ensureAssetUploadedToOpenAI(
     attachment: {
@@ -539,14 +539,14 @@ export class OpenAIService {
   }
 
   private openAiVerbosity(model: OpenAiModelIdUnion, verbosity?: string) {
-    const v = verbosity
-      ? (verbosity as ResponseTextConfig["verbosity"])
-      : ("medium" satisfies ResponseTextConfig["verbosity"]);
     switch (model) {
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-codex":
       case "gpt-5-nano": {
+        const v = verbosity
+          ? (verbosity as ResponseTextConfig["verbosity"])
+          : ("medium" satisfies ResponseTextConfig["verbosity"]);
         return { verbosity: v } satisfies ResponseTextConfig;
       }
       case "o3":
@@ -669,6 +669,8 @@ export class OpenAIService {
           openaiThinkingDuration = Math.round(
             endTime - openaiThinkingStartTime
           );
+          // Mark thinking as finished once output text begins
+          openaiIsCurrentlyThinking = false;
         }
         text = s.delta;
       }
@@ -732,9 +734,7 @@ export class OpenAIService {
             temperature,
             topP,
             chunk: text,
-            isThinking: openaiIsCurrentlyThinking,
-            thinkingText:
-              openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+            isThinking: false,
             thinkingDuration:
               openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
             done: false
@@ -749,7 +749,6 @@ export class OpenAIService {
           systemPrompt,
           temperature,
           topP,
-          isThinking: openaiIsCurrentlyThinking,
           provider,
           thinkingText:
             openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,

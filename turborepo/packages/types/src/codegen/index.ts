@@ -23,6 +23,7 @@ const providerModelChatApi = {
     "o3",
     "o3-pro",
     "o3-mini",
+    "gpt-image-1",
     "gpt-4o",
     "gpt-4o-mini",
     "gpt-4",
@@ -293,6 +294,8 @@ function formattedOpenAi(props: OpenAiResponse) {
   if (!props.data) throw new Error(props.error.message);
   return props?.data?.map(t => {
     const { id, ...rest } = t;
+    if (id ==="gpt-image-1") return {id, displayName: "GPT Image 1", ...rest };
+    if (id ==="gpt-5-codex") return {id, displayName: "GPT-5-Codex", ...rest};
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });

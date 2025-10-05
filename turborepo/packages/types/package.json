@@ -84,7 +84,7 @@
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.3",
     "dotenv-expand": "^12.0.3",
-    "eslint": "^9.36.0",
+    "eslint": "^9.37.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
     "terser": "^5.44.0",

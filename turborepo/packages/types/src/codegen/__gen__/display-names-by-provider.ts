@@ -1,7 +1,7 @@
 export const displayNameModelsByProvider = {
   openai: [
     "GPT-5",
-    "GPT-5 codex",
+    "GPT-5-Codex",
     "GPT-5 mini",
     "GPT-5 nano",
     "GPT-4.1",
@@ -11,6 +11,7 @@ export const displayNameModelsByProvider = {
     "o3",
     "o3-pro",
     "o3-mini",
+    "GPT Image 1",
     "GPT-4o",
     "GPT-4o mini",
     "GPT-4",

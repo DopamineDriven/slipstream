@@ -32,9 +32,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ""
     }
   },
-
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL ??"https://chat.aicoalesce.com",
   account: {
     accountLinking: {
       enabled: true
@@ -88,7 +86,6 @@ export const auth = betterAuth({
   plugins: [
     lastLoginMethod({ storeInDatabase: true }),
     anonymous({
-      emailDomainName: "aicoalesce.com",
       generateName: () => {
         const { prefixes, suffixes } = jsonData;
         const prefix =

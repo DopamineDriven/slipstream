@@ -11,6 +11,7 @@ export const modelIdsByProvider = {
     "o3",
     "o3-pro",
     "o3-mini",
+    "gpt-image-1",
     "gpt-4o",
     "gpt-4o-mini",
     "gpt-4",

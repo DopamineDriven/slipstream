@@ -1,7 +1,7 @@
 export const displayNameToModelId = {
   openai: {
     "GPT-5": "gpt-5",
-    "GPT-5 codex": "gpt-5-codex",
+    "GPT-5-Codex": "gpt-5-codex",
     "GPT-5 mini": "gpt-5-mini",
     "GPT-5 nano": "gpt-5-nano",
     "GPT-4.1": "gpt-4.1",
@@ -11,6 +11,7 @@ export const displayNameToModelId = {
     o3: "o3",
     "o3-pro": "o3-pro",
     "o3-mini": "o3-mini",
+    "GPT Image 1": "gpt-image-1",
     "GPT-4o": "gpt-4o",
     "GPT-4o mini": "gpt-4o-mini",
     "GPT-4": "gpt-4",
