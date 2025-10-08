@@ -5,35 +5,39 @@ import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name
 import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
 
 export type ImageGenModels =
-  | "stable-diffusion"
   | "gpt-image-1"
+  | "gpt-image-1-mini"
   | "dall-e-2"
   | "dall-e-3"
-  | "midjourney"
   | "grok-2-image-1212"
   | "imagen-3.0-generate-002"
   | "imagen-4.0-fast-generate-001"
   | "imagen-4.0-ultra-generate-001"
   | "imagen-4.0-generate-001"
-  | "gemini-2.0-flash-preview-image-generation";
+  | "gemini-2.5-flash-image";
+
 export const providerModelImageGenApi = {
-  openai: ["gpt-image-1", "dall-e-2", "dall-e-3"],
+  openai: ["gpt-image-1", "gpt-image-1-mini", "dall-e-2", "dall-e-3"],
   gemini: [
-    "gemini-2.0-flash-preview-image-generation",
+    "gemini-2.5-flash-image",
     "imagen-3.0-generate-002",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-generate-001",
     "imagen-4.0-ultra-generate-001"
   ],
-  grok: ["grok-2-image-1212"],
-  discord: ["midjourney"]
+  grok: ["grok-2-image-1212"]
 } as const;
 
-export const imageGenProvders = [
+export const imageModelSets = {
+  gemini: new Set(providerModelImageGenApi.gemini),
+  grok: new Set(providerModelImageGenApi.grok),
+  openai: new Set(providerModelImageGenApi.openai)
+} as const;
+
+export const imageGenProviders = [
   "grok",
   "gemini",
-  "openai",
-  "discord"
+  "openai"
 ] as const;
 
 export type ImageGenProviders = keyof typeof providerModelImageGenApi;
@@ -41,6 +45,19 @@ export type ImageGenProviders = keyof typeof providerModelImageGenApi;
 export type ImageGenModelsByProvider<
   T extends keyof typeof providerModelImageGenApi
 > = Unenumerate<(typeof providerModelImageGenApi)[T]>;
+
+
+export type ImgGenModelMap ={
+  readonly [P in keyof typeof providerModelImageGenApi] : Unenumerate<typeof providerModelImageGenApi[P]>
+};
+
+export type OpenAIImgGenModels = ImgGenModelMap['openai'];
+
+export type GeminiImgGenModels = ImgGenModelMap['gemini'];
+
+export type GrokImgGenModels = ImgGenModelMap['grok'];
+
+export type AllImgGenModelsUnion = ImgGenModelMap[ImageGenProviders];
 
 export const providerModelChatApi = modelIdsByProvider;
 
@@ -365,10 +382,13 @@ export function getAllProviders() {
 }
 
 export const imgMimeSupportByProvider = {
-  meta: ["image/jpeg", "image/png", "image/gif", "image/x-icon"],
+  meta: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/x-icon"],
   grok: ["image/jpeg", "image/png", "image/webp"],
   openai: ["image/jpeg", "image/png", "image/webp"],
   vercel: ["image/jpeg", "image/png", "image/webp", "image/svg", "image/gif"],
+  /**
+   * https://ai.google.dev/gemini-api/docs/image-understanding#supported-formats
+   */
   gemini: ["image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"],
   anthropic: ["image/jpeg", "image/png", "image/webp", "image/gif"]
 } as const;
@@ -381,16 +401,11 @@ export const docMimeSupportByProvider = {
   grok: [],
   openai: ["application/pdf"],
   vercel: ["application/pdf"],
+  /**
+   * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
+   */
   gemini: [
-    "application/pdf",
-    "text/markdown",
-    "text/plain",
-    "text/csv",
-    "text/html",
-    "application/rtf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    "application/pdf"
   ],
   anthropic: ["application/pdf"]
 } as const;
@@ -398,37 +413,40 @@ export const docMimeSupportByProvider = {
 export const audioMimeSupportByProvider = {
   meta: [],
   grok: [],
-  openai: [""],
-  vercel: [""],
+  openai: [],
+  vercel: [],
+  /**
+   * https://ai.google.dev/gemini-api/docs/audio#supported-formats
+   */
   gemini: [
-    "audio/mp4",
-    "audio/aac",
-    "audio/mpeg",
-    "audio/ogg",
     "audio/wav",
-    "audio/weba",
-    "audio/webm",
-    "audio/flac",
-    "audio/aiff"
+    "audio/mp3",
+    "audio/aiff",
+    "audio/aac",
+    "audio/ogg",
+    "audio/flac"
   ],
-  anthropic: ["application/pdf"]
-};
+  anthropic: []
+} as const;
 
 export const videoMimeSupportByProvider = {
   meta: [],
   grok: [],
-  openai: ["application/pdf"],
+  openai: ["video/mp4"],
   vercel: ["video/mp4", "video/mov", "video/avi", "video/webm"],
+  /**
+   * https://ai.google.dev/gemini-api/docs/video-understanding
+   */
   gemini: [
     "video/mp4",
     "video/mpeg",
     "video/mov",
     "video/avi",
     "video/x-flv",
-    "video/x-ms-wmv",
+    "video/mpg",
     "video/webm",
-    "video/3gpp",
-    "video/ogg"
+    "video/wmv",
+    "video/3gpp"
   ],
-  anthropic: ["application/pdf"]
+  anthropic: []
 } as const;

@@ -1,12 +1,6 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
-import type {
-  BufferLike,
-  DocumentSingleton,
-  ImageSingleton,
-  MessageSingleton,
-  UserData
-} from "@/types/index.ts";
+import type { BufferLike, UserData } from "@/types/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -21,8 +15,11 @@ import type {
   AnyEvent,
   AnyEventTypeUnion,
   DocSpecs,
+  DocumentSingleton,
   EventTypeMap,
+  ImageSingleton,
   ImageSpecs,
+  MessageSingleton,
   Provider,
   RTC
 } from "@slipstream/types";
@@ -41,7 +38,13 @@ export class Resolver extends ModelService {
     private xAIService: xAIService,
     private v0Service: v0Service,
     private llamaService: LlamaService,
-    private isProd: boolean
+    private isProd: boolean,
+    private openaiFallbackKey: string,
+    private geminiFallbackKey: string,
+    private anthropicFallbackKeyy: string,
+    private xaiFallbackKey: string,
+    private vercelFallbackKey: string,
+    private metaFallbackKey: string
   ) {
     super();
   }
@@ -82,20 +85,10 @@ export class Resolver extends ModelService {
       "asset_upload_progress",
       this.handleAssetProgress.bind(this)
     );
-  }
-
-  public safeErrMsg(err: unknown) {
-    if (err instanceof Error) {
-      return err.message;
-    } else if (typeof err === "object" && err != null) {
-      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
-    } else if (typeof err === "string") {
-      return err;
-    } else if (typeof err === "number") {
-      return err.toPrecision(5);
-    } else if (typeof err === "boolean") {
-      return `${err}`;
-    } else return String(err);
+    this.wsServer.on(
+      "image_gen_request",
+      this.handleImageGenRequest.bind(this)
+    );
   }
 
   private isValidUrl(url: string) {
@@ -269,7 +262,8 @@ export class Resolver extends ModelService {
       keyId = res.userKeyId,
       streamChannel = RedisChannels.conversationStream(conversationId),
       userChannel = RedisChannels.user(userId),
-      existingState = await this.wsServer.redis.getStreamState(conversationId);
+      existingState = await this.wsServer.redis.getStreamState(conversationId),
+      createdAt = res.createdAt;
 
     let chunks = Array.of<string>(),
       thinkingChunks = Array.of<string>(),
@@ -279,6 +273,42 @@ export class Resolver extends ModelService {
 
     const title = res?.title ?? (await this.titleGenUtil(event));
 
+    // if (this.isImgGenModel(provider, model)) {
+    //   const apiKeyImgGen =
+    //     typeof apiKey !== "undefined"
+    //       ? apiKey
+    //       : provider === "openai"
+    //         ? this.openaiFallbackKey
+    //         : provider === "gemini"
+    //           ? this.geminiFallbackKey
+    //           : this.xaiFallbackKey;
+
+    //   return await this.handleImageGenRequest(
+    //     {
+    //       conversationId,
+    //       chunks,
+    //       msgs,
+    //       isNewChat,
+    //       timestamp: createdAt.getTime(),
+    //       thinkingChunks,
+    //       keyId,
+    //       max_tokens,
+    //       systemPrompt,
+    //       temperature,
+    //       title,
+    //       topP,
+    //       model: model as AllImgGenModelsUnion,
+    //       prompt,
+    //       provider: provider as "gemini" | "openai" | "grok",
+    //       type: "image_gen_request",
+    //       hasProviderConfigured,
+    //       apiKey: apiKeyImgGen
+    //     },
+    //     ws,
+    //     userId,
+    //     userData
+    //   );
+    // }
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
       resumedFromChunk = chunks.length;
@@ -328,7 +358,7 @@ export class Resolver extends ModelService {
           conversationId,
           userId,
           title: title ?? "New Chat",
-          timestamp: res.createdAt.getTime() ?? Date.now()
+          timestamp: createdAt.getTime() ?? Date.now()
         }
       );
     }
@@ -433,6 +463,68 @@ export class Resolver extends ModelService {
     }
   }
   /** Dispatches incoming events to handlers */
+
+  public async handleImageGenRequest(
+    event: EventTypeMap["image_gen_request"],
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
+    const _userData =userData;
+    const {
+      apiKey,
+      chunks,
+      conversationId,
+      isNewChat,
+      keyId,
+      max_tokens,
+      model,
+      thinkingChunks,
+      msgs,
+      timestamp,
+      provider,
+      systemPrompt,
+      temperature,
+      title,
+      topP
+    } = event;
+    const streamChannel = RedisChannels.conversationStream(conversationId),
+      userChannel = RedisChannels.user(userId),
+      _existingState = await this.wsServer.redis.getStreamState(conversationId);
+    if (event.conversationId === "new-chat") {
+      void this.wsServer.redis.publishTypedEvent(
+        userChannel,
+        "conversation:created",
+        {
+          type: "conversation:created",
+          conversationId,
+          userId,
+          title: title ?? "New Chat",
+          timestamp: timestamp ?? Date.now()
+        }
+      );
+    }
+
+    console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
+    const _commonProps = {
+      chunks,
+      conversationId,
+      isNewChat,
+      msgs,
+      streamChannel,
+      thinkingChunks,
+      userId,
+      ws,
+      apiKey,
+      keyId,
+      max_tokens,
+      model,
+      systemPrompt,
+      temperature,
+      title,
+      topP
+    };
+  }
   public async handleRawMessage(
     ws: WebSocket,
     userId: string,
@@ -468,6 +560,9 @@ export class Resolver extends ModelService {
         break;
       case "asset_attached":
         await this.handleAssetAttached(event, ws, userId, userData);
+        break;
+      case "image_gen_request":
+        await this.handleImageGenRequest(event, ws, userId, userData);
         break;
       default:
         await this.wsServer.redis.publish(
@@ -1466,7 +1561,10 @@ export class Resolver extends ModelService {
 
       ws.send(JSON.stringify(assetReady));
       // TODO implement image conversion pipeline with sharp (for all non-png/jpg/webp images)
-      if (attachment.compatStatus === "PENDING" && attachment.assetType === "DOCUMENT") {
+      if (
+        attachment.compatStatus === "PENDING" &&
+        attachment.assetType === "DOCUMENT"
+      ) {
         await this.wsServer.pdfService.convertToPdf({
           assetType: attachment.assetType,
           bucket: attachment.bucket,

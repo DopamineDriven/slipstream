@@ -1,5 +1,4 @@
 import { WebSocket } from "ws";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { EventTypeMap } from "@slipstream/types";
 
 export interface WSServerOptions {
@@ -94,7 +93,7 @@ export type ImageSingleton = {
   createdAt: Date;
   updatedAt: Date;
   attachmentId: string;
-  format: $Enums.ImageFormat;
+  format: "apng" | "png" | "gif" | "bmp" | "webp" | "avif" | "svg" | "ico" | "tiff" | "jpeg" | "heic" | "unknown" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze";
   width: number;
   height: number;
   aspectRatio: number | null;
@@ -102,7 +101,7 @@ export type ImageSingleton = {
   hasAlpha: boolean | null;
   animated: boolean;
   orientation: number | null;
-  colorSpace: $Enums.ColorSpace | null;
+  colorSpace:  "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | null;
   exifDateTimeOriginal: Date | null;
   cameraMake: string | null;
   cameraModel: string | null;
@@ -137,18 +136,18 @@ export type AttachmentSingleton<T extends boolean = false> = {
   userId: string;
   messageId: string | null;
   s3ObjectId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
+  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
+  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
   compatKey: string | null;
-  compatStatus: $Enums.CompatStatus | null;
+  compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;
   compatReadyAt: Date | null;
   compatVersionId: string | null;
   compatS3ObjectId: string | null;
   compatMime: string | null;
   compatExt: string | null;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
+  uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
+  assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
   uploadDuration: number | null;
   cdnUrl: string | null;
   publicUrl: string | null;
@@ -167,7 +166,7 @@ export type AttachmentSingleton<T extends boolean = false> = {
   ext: string | null;
   mime: string | null;
   etag: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
+  checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
   checksumSha256: string | null;
   storageClass: string | null;
   sseAlgorithm: string | null;
@@ -183,13 +182,13 @@ export type AttachmentSingleton<T extends boolean = false> = {
 export type MessageSingleton<T extends boolean = false> = {
   id: string;
   userId: string | null;
-  provider: $Enums.Provider;
+  provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
   createdAt: Date;
   updatedAt: Date;
   userKeyId: string | null;
   conversationId: string;
   model: string | null;
-  senderType: $Enums.SenderType;
+  senderType:  "USER" | "AI" | "SYSTEM";
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -245,10 +244,10 @@ export type AssetReadyPayload = {
   batchId: string | null;
   userId: string;
   messageId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
+  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
+  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+  uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
+  assetType: "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN";
   uploadDuration: number | null;
   sourceUrl: string | null;
   thumbnailKey: string | null;
@@ -258,7 +257,7 @@ export type AssetReadyPayload = {
   filename: string | null;
   ext: string | null;
   mime: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
+  checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
   checksumSha256: string | null;
   sseAlgorithm: string | null;
   sseKmsKeyId: string | null;

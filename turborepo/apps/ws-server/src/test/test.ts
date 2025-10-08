@@ -166,6 +166,16 @@ class ScriptGen extends Fs {
           : p.provider === "gemini"
             ? "google"
             : p.provider;
+            const handleAssets = (target: {
+    cdnUrl: string;
+    msgId: string;
+    filename: string;
+    batchId: string;
+}[]) => {
+  return target.map((v) =>{
+    return `![${v.filename}](${v.cdnUrl})`
+  }).join("\n")
+}
       const agg =
         p.sender === "AI"
           ? withThinking === "true"
@@ -174,7 +184,7 @@ class ScriptGen extends Fs {
               : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
             : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
           : p.assetUrl.length > 0
-            ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n![${p.assetUrl[0]?.filename}](${p.assetUrl[0]?.cdnUrl})\n\n${d}\n`
+            ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
       arr.push(agg);
     }

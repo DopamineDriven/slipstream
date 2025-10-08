@@ -76,6 +76,7 @@ class Automate {
 
     const secretsTemplate = `{"secrets":[${flatWorkup}]}`;
     return Promise.all([
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       this.fs.withWs("src/service/__out__/secrets.json", secretsTemplate)
     ])
       .then(([_]) => {

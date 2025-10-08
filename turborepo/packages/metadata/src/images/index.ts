@@ -49,6 +49,7 @@ export interface ImageSpecs {
     | "gray";
   iccProfile: string | null; // Profile name/description if available, or 'embedded' if present but unnamed, null otherwise
   exifDateTimeOriginal: string | null; // ISO-like string or null
+  metadata?: Record<string, string>;
 }
 
 // Helper for AVIF box finding
@@ -128,13 +129,15 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
       let animated = false;
       let iccProfile: string | null = null;
       let exifDateTimeOriginal: string | null = null;
-      const orientation: number | null = null;
+      let orientation: number | null = null;
+      let metadata: Record<string, string> = {};
       // Scan chunks for extras
       let pos = 33; // After IHDR (8 sig + 4 len + 4 type + 13 data + 4 crc)
       while (pos < buffer.length - 12) {
         const chunkLen = buffer.readUInt32BE(pos);
         const chunkType = buffer.toString("ascii", pos + 4, pos + 8);
         const chunkData = pos + 8;
+
         if (chunkType === "acTL") {
           animated = true;
           frames = buffer.readUInt32BE(chunkData); // num_frames
@@ -181,27 +184,60 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
           // Parse iTXt: keyword\0 compression_flag compression_method language\0 translated_keyword\0 text
           let offset = chunkData;
           const keywordEnd = buffer.indexOf(0, offset);
+          if (keywordEnd === -1) continue; // skip malformed
           const keyword = buffer.toString("ascii", offset, keywordEnd);
           offset = keywordEnd + 1;
           const compressionFlag = buffer[offset];
           const _compressionMethod = buffer[offset + 1]; // Always 0 (zlib) if compressed
           offset += 2;
           const langEnd = buffer.indexOf(0, offset);
+          if (langEnd === -1) continue;
           offset = langEnd + 1; // Skip lang and translated keyword
           const transEnd = buffer.indexOf(0, offset);
+          if (transEnd === -1) continue;
           offset = transEnd + 1;
-          let textBuffer = buffer.subarray(offset, chunkData + chunkLen - 8); // Text starts here
+          let textBuffer = buffer.subarray(offset, chunkData + chunkLen); // Text starts here
           if (compressionFlag === 1) {
             try {
               textBuffer = Buffer.from(inflateSync(textBuffer));
             } catch (e) {
               console.error("Failed to decompress iTXt:", e);
+              continue;
               // Skip if decompression fails
             }
           }
           const text = textBuffer.toString("utf8");
+          metadata[keyword] = text; // Add to metadata
           if (keyword === "XML:com.adobe.xmp" && !iccProfile) {
             colorSpace = this.mapXmpToColorSpace(text, colorSpace);
+          }
+          if (keyword === "Creation Time" && !exifDateTimeOriginal) {
+            exifDateTimeOriginal = text.trim();
+          }
+        } else if (chunkType === "zTXt") {
+          let offset = chunkData;
+          const keywordEnd = buffer.indexOf(0, offset);
+          if (keywordEnd === -1 || keywordEnd >= chunkData + chunkLen) continue; // Malformed
+          const keyword = buffer.toString("latin1", offset, keywordEnd);
+          offset = keywordEnd + 1;
+          const compressionMethod = buffer[offset];
+          offset += 1;
+          let textBuffer = buffer.subarray(offset, chunkData + chunkLen);
+          if (compressionMethod === 0) {
+            // zlib
+            try {
+              textBuffer = Buffer.from(inflateSync(textBuffer));
+            } catch (e) {
+              console.error("Failed to decompress zTXt:", e);
+              continue;
+            }
+          } else {
+            continue; // Unsupported method
+          }
+          const text = textBuffer.toString("latin1");
+          metadata[keyword] = text; // Add to metadata
+          if (keyword === "Creation Time" && !exifDateTimeOriginal) {
+            exifDateTimeOriginal = text.trim();
           }
         } else if (chunkType === "tIME") {
           const month = buffer?.[chunkData + 2],
@@ -221,6 +257,15 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
             const year = buffer.readUInt16BE(chunkData);
             exifDateTimeOriginal = `${year}:${month.toString().padStart(2, "0")}:${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`;
           }
+        } else if (chunkType === "eXIf") {
+          // Parse eXIf chunk (EXIF data similar to JPEG APP1)
+          const { orientation: ori, dateTimeOriginal } = this.parseExif(
+            buffer,
+            chunkData - 4, // Adjust to mimic JPEG pos (assuming parseExif expects marker-like offset; tweak if needed)
+            chunkLen
+          );
+          orientation = ori;
+          exifDateTimeOriginal = dateTimeOriginal ?? exifDateTimeOriginal; // Prefer EXIF over tIME
         } else if (chunkType === "IDAT") {
           break; // Data starts, no need to scan further for basics
         }
@@ -239,13 +284,14 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
         aspectRatio: width / height,
         colorSpace,
         iccProfile,
-        exifDateTimeOriginal
+        exifDateTimeOriginal,
+        metadata: Object.entries(metadata).length > 0 ? metadata : {}
       } satisfies ImageSpecs;
     }
 
     // JPEG: Starts with FF D8, dimensions in SOF marker (FF C0-FF CF, excluding some)
     if (buffer.length >= 10 && buffer[0] === 0xff && buffer[1] === 0xd8) {
-      const colorSpace = "unknown" as ImageSpecs["colorSpace"],
+      let colorSpace = "srgb" as ImageSpecs["colorSpace"],
         hasAlpha = false;
       let pos = 2,
         colorModel = "unknown" as ImageSpecs["colorModel"],
@@ -285,7 +331,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
           ) {
             // Try to extract dimensions if we have enough data
             if (pos + 9 <= buffer.length) {
-              const numComponents = buffer[pos + 4];
+              const numComponents = buffer[pos + 9];
               switch (numComponents) {
                 case 1:
                   colorModel = "grayscale";
@@ -317,7 +363,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
           marker !== 0xc8 &&
           marker !== 0xcc
         ) {
-          const numComponents = buffer[pos + 4]; // After length (2 bytes) + precision (1) = pos + 4
+          const numComponents = buffer[pos + 9]; // After length (2 bytes) + precision (1) = pos + 4
           switch (numComponents) {
             case 1:
               colorModel = "grayscale";
@@ -348,6 +394,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
             const iccHeader = buffer.toString("ascii", pos + 4, pos + 18);
             if (iccHeader.startsWith("ICC_PROFILE")) {
               iccProfile = "embedded";
+              colorSpace = "unknown"; // Override default since ICC is present (parse ICC for exact space if needed)
             }
           }
         } else if (marker === 0xff) {

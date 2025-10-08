@@ -4,15 +4,14 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
+import type { MessageSingleton } from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 
-
-export type SpreadSheetExtensions =  "xlsx" | "xls" | "ods" | "csv";
+export type SpreadSheetExtensions = "xlsx" | "xls" | "ods" | "csv";
 export type PresentationExtensions = "pptx" | "ppt" | "odp";
-export  type DocExtensions = "pdf" | "docx" | "doc" | "odt" | "rtf";
+export type DocExtensions = "pdf" | "docx" | "doc" | "odt" | "rtf";
 export type TextExtensions = "txt" | "tex";
 export type EbookExtensions = "epub" | "mobi";
-
 
 export interface ImageSpecs {
   type: "IMAGE";
@@ -553,7 +552,21 @@ export type ImageGenRequest = {
   type: "image_gen_request";
   conversationId: string;
   prompt: string;
+  chunks: string[];
+  thinkingChunks: string[];
+  isNewChat: boolean;
+  msgs: MessageSingleton<true>[];
+  provider: ImageGenProviders;
   model: ImageGenModelsByProvider<ImageGenProviders>;
+  hasProviderConfigured?: boolean;
+  systemPrompt: string | undefined;
+  timestamp: number;
+  temperature: number | undefined;
+  title: string | undefined;
+  topP: number | undefined;
+  apiKey: string | undefined;
+  keyId: string | null;
+  max_tokens: number | undefined;
   width?: number;
   height?: number;
   seed?: number;
@@ -569,8 +582,13 @@ export type ImageGenResponse = {
   type: "image_gen_response";
   userId: string;
   conversationId: string;
+  cdnUrl: string;
+  mime: string;
+  versionId: string;
+  key: string;
+  bucket: string;
   messageId?: string;
-  attachmentId?: string;
+  attachmentId: string;
   imageUrl?: string;
   taskId?: string;
   success: boolean;

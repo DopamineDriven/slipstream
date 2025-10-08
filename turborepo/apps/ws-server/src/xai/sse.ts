@@ -28,7 +28,7 @@ export type xAIDeltaReasoning = {
 
 export type xAIDeltaEmpty = Record<string, never>;
 
-export type xAIDelta = 
+export type xAIDelta =
   | xAIDeltaGrok3Start
   | xAIDeltaGrok4Start
   | xAIDeltaGrokThinkingStart
@@ -64,6 +64,13 @@ export interface xAIBaseEntity {
   created: number;
   model: string;
   system_fingerprint: string;
+}
+
+export interface xAIImgGenResponse {
+  data: {
+    url: string;
+    revised_prompt: string;
+  }[];
 }
 
 export interface xAIChatCompletionsRes extends xAIBaseEntity {
@@ -191,17 +198,30 @@ export function createXAISSEParser(
 export function isReasoningDelta(
   delta: xAIDelta
 ): delta is xAIDeltaReasoning | xAIDeltaGrokThinkingStart {
-  return "reasoning_content" in delta && typeof (delta as xAIDeltaReasoning).reasoning_content === "string";
+  return (
+    "reasoning_content" in delta &&
+    typeof (delta as xAIDeltaReasoning).reasoning_content === "string"
+  );
 }
 
 export function isStartDelta(delta: xAIDelta): boolean {
-  return "role" in delta && (delta as xAIDeltaGrok3Start | xAIDeltaGrok4Start | xAIDeltaGrokThinkingStart).role === "assistant";
+  return (
+    "role" in delta &&
+    (
+      delta as
+        | xAIDeltaGrok3Start
+        | xAIDeltaGrok4Start
+        | xAIDeltaGrokThinkingStart
+    ).role === "assistant"
+  );
 }
 
 export function isContentDelta(
   delta: xAIDelta
 ): delta is xAIDeltaContent | xAIDeltaGrok3Start {
-  return "content" in delta && typeof (delta as xAIDeltaContent).content === "string";
+  return (
+    "content" in delta && typeof (delta as xAIDeltaContent).content === "string"
+  );
 }
 
 export function isEmptyDelta(delta: xAIDelta): delta is xAIDeltaEmpty {
@@ -209,5 +229,8 @@ export function isEmptyDelta(delta: xAIDelta): delta is xAIDeltaEmpty {
 }
 
 export function isFinishChoice(choice: xAIChoice): choice is xAIChoiceFinish {
-  return "finish_reason" in choice && (choice as xAIChoiceFinish).finish_reason === "stop";
+  return (
+    "finish_reason" in choice &&
+    (choice as xAIChoiceFinish).finish_reason === "stop"
+  );
 }

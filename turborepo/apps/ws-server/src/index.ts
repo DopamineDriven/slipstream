@@ -95,12 +95,7 @@ async function exe() {
 
     const { WSServer } = await import("@/ws-server/index.ts");
 
-    const wsServer = new WSServer(
-      { port },
-      redisInstance,
-      prisma,
-      pdfService
-    );
+    const wsServer = new WSServer({ port }, redisInstance, prisma, pdfService);
 
     const { Resolver } = await import("@/resolver/index.ts");
 
@@ -114,7 +109,13 @@ async function exe() {
 
     const { xAIService } = await import("@/xai/index.ts");
 
-    const xai = new xAIService(prisma, redisInstance, cfg.X_AI_KEY);
+    const { Extract } = await import("@/extract/index.ts");
+
+    const { ImgMetadataExtractor } = await import("@slipstream/metadata");
+
+    const extract = new Extract(new ImgMetadataExtractor());
+
+    const xai = new xAIService(prisma, redisInstance, extract, cfg.X_AI_KEY);
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
@@ -143,18 +144,26 @@ async function exe() {
       cfg.GOOGLE_API_KEY
     );
 
+    const fastApiUrl = process.env.FASTAPI_URL ?? cfg.FASTAPI_URL;
+
     const resolver = new Resolver(
       wsServer,
       openai,
       gemini,
       anthropic,
       s3,
-      cfg.FASTAPI_URL,
+      fastApiUrl,
       region,
       xai,
       v0,
       meta,
-      isProd
+      isProd,
+      cfg.OPENAI_API_KEY,
+      cfg.GEMINI_API_KEY,
+      cfg.ANTHROPIC_API_KEY,
+      cfg.X_AI_KEY,
+      cfg.V0_API_KEY,
+      cfg.LLAMA_API_KEY
     );
 
     resolver.registerAll();
@@ -207,7 +216,6 @@ async function exe() {
 }
 
 exe();
-
 
 declare module "ws" {
   interface WebSocket {
