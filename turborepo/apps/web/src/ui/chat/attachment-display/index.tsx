@@ -1,10 +1,10 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import type { Unenumerate } from "@slipstream/types";
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import type { Unenumerate } from "@slipstream/types";
 import {
   Button,
   Card,
@@ -96,13 +96,11 @@ export function AttachmentDisplay({
         {attachments.map(attachment => {
           const displayUrl = getDisplayUrl(attachment);
           const isImage =
-            (attachment.mime?.startsWith("image/") ??
-              attachment.assetType === "IMAGE") &&
-            Boolean(displayUrl);
+            attachment.mime?.startsWith("image/") ??
+            attachment.assetType === "IMAGE";
           const isPdf =
-            (attachment.mime?.toLowerCase().includes("application/pdf") ??
-              attachment.ext?.toLowerCase() === "pdf") &&
-            Boolean(displayUrl);
+            attachment.mime?.toLowerCase().includes("application/pdf") ??
+            attachment.ext?.toLowerCase() === "pdf";
 
           // Full image preview only when we have a real URL
           if (isImage && !compact && displayUrl) {
@@ -221,8 +219,8 @@ export function AttachmentDisplay({
                 onClick={e => e.stopPropagation()}>
                 <Image
                   src={
-                    expanded.url ||
-                    "/placeholder.svg?height=400&width=600&query=expanded attachment"
+                    expanded.url ??
+                    "/doge-404.jpg"
                   }
                   alt="Expanded attachment"
                   fill
@@ -235,9 +233,14 @@ export function AttachmentDisplay({
                 className="pointer-events-auto relative h-[92dvh] w-[96dvw]"
                 onClick={e => e.stopPropagation()}>
                 <iframe
-                  src={`${expanded.url}#toolbar=1&navpanes=0&statusbar=0&view=FitH`}
+                  src={`${expanded.url}#toolbar=1&navpanes=0&statusbar=0&view=Fit&zoom=80`}
                   className="h-full w-full rounded-md bg-white"
                   title="PDF preview"
+                  allowFullScreen
+                  aria-readonly="false"
+                  suppressContentEditableWarning
+                  suppressHydrationWarning
+                  allow="fullscreen; display-capture;"
                 />
               </div>
             )}

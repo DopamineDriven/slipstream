@@ -1,0 +1,19 @@
+{
+  "extends": "@slipstream/tsconfig/node-pkg.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "baseUrl": "./",
+    "exactOptionalPropertyTypes": false
+  },
+  "include": [
+    "**/*.ts",
+    "src/**/*.ts",
+    "**/*.mjs",
+    "**/*.preset.ts",
+    "tsup.config.ts"
+  ],
+  "exclude": ["dist"]
+}
