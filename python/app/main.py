@@ -12,3 +12,9 @@ app.include_router(router)  # register endpoints
 @app.get("/")
 def health():
     return {"status": "ok"}
+
+
+# Explicit health path for container/ALB checks
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}

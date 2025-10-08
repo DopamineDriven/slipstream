@@ -9,6 +9,16 @@ FastAPI microservice for generative asset tasks (image generation and uploads). 
   - Generates a PNG (placeholder via PIL here), uploads to S3, returns a presigned download URL.
 - `POST /upload` (multipart/form-data): `file` → `{ "filename": string | null, "url": string }`.
   - Streams the file to S3 and returns a presigned download URL.
+- `POST /assets/generate` (JSON):
+  - v1 Request `{ prompt, userId, conversationId, draftId, batchId, filename, contentType }`.
+  - v2 Request (preferred) uses discriminated union with BYOK:
+    `{ auth: { kind: "server"|"user", provider: "openai"|"gemini"|"grok", apiKey: string }, jobId, userId, conversationId, draftId?, batchId?, provider, model, prompt, filename?, contentType?, width?, height?, seed?, negativePrompt?, steps?, guidanceScale? }`.
+  - Uploads directly to the `pyGenAssets` bucket with aligned metadata, returns `{ bucket, key, versionId, s3ObjectId, publicUrl, cdnUrl, etag?, size?, width?, height? }`.
+  - Best-effort posts a webhook to the ws-server at `/webhooks/python/asset-generated` so the server can finalize and emit `asset_ready`.
+  - Security: requires headers
+    - `x-timestamp`: Unix epoch seconds (server time)
+    - `x-signature-sha256`: hex(HMAC_SHA256(ws_webhook_secret, `${x-timestamp}.${raw_body}`))
+    - Replay protection: timestamps older than 60s are rejected. If `ws_webhook_secret` is empty, verification is skipped (dev only).
 
 ### Configuration
 
@@ -17,6 +27,15 @@ FastAPI microservice for generative asset tasks (image generation and uploads). 
   - `s3_bucket`: destination bucket (e.g., `py-gen-assets-dev`/`py-gen-assets-prod`).
   - `s3_region`: AWS region for S3 client (e.g., `us-east-1`).
   - `s3_presign_ttl_seconds`: presigned URL TTL (default `3600`).
+  - `ws_server_url`: base URL to the ws-server HTTP (e.g., `http://localhost:4000`).
+  - `cf_domain` (optional): override CloudFront domain. Default resolves to `assets(-dev).aicoalesce.com` based on `is_prod`.
+  - `is_prod`: toggles default CloudFront domain selection.
+  - Provider call toggles (default false):
+    - `enable_provider_calls`: master switch to allow calling provider SDKs.
+    - `enable_openai`: enable OpenAI image generation path.
+    - `enable_gemini`: enable Gemini/Imagen image generation path.
+    - `enable_xai`: enable Grok (xai_sdk) image generation path.
+  - Optional: `xai_api_key` for local experiments; in production BYOK/server keys should be passed per-request via `auth.apiKey`.
   - AWS credentials: use IAM Task Role in Fargate; for local, standard AWS env/credentials chain.
 
 ### Local Development
