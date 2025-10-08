@@ -83,8 +83,8 @@ export class OpenAIService {
 
   private buildInstructions(systemPrompt?: string) {
     return systemPrompt
-      ? `${systemPrompt}\n\nWhen formatting codeblocks, always fence them with proper language tags using backticks not tildes.  Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "When formatting codeblocks, always fence them with proper language tags using backticks not tildes. Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      ? `${systemPrompt}\n\nWhen formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
+      : "When formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
   private async ensureAssetUploadedToOpenAI(
     attachment: {
@@ -378,6 +378,10 @@ export class OpenAIService {
     summary: Reasoning["summary"] = "auto"
   ) {
     switch (model) {
+      // gpt-5-pro is required to have high effort for reasoning
+      case "gpt-5-pro": {
+        return { effort: "high", summary: "detailed" } as const;
+      }
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano":
@@ -540,6 +544,9 @@ export class OpenAIService {
 
   private openAiVerbosity(model: OpenAiModelIdUnion, verbosity?: string) {
     switch (model) {
+      case "gpt-5-pro": {
+        return { verbosity: "high" } as const;
+      }
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-codex":

@@ -2,7 +2,12 @@ import type {
   MessageSingleton,
   ProviderChatRequestEntity
 } from "@/types/index.ts";
-import type { xAIChatCompletionsRes, xAIChoiceActive } from "@/xai/sse.ts";
+import type {
+  xAIChatCompletionsRes,
+  xAIChoiceActive,
+  xAIImgGenResponse
+} from "@/xai/sse.ts";
+import { Extract } from "@/extract/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   createXAISSEParser,
@@ -16,13 +21,49 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class xAIService {
   private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
+  private readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
 
   constructor(
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
+    private extract: Extract,
     private apiKey?: string
   ) {}
 
+  private handleMostRecentMsgForImg(
+    mostRecentMsg:
+      | {
+          role: "user";
+          content:
+            | string
+            | readonly (
+                | {
+                    type: "text";
+                    text: string;
+                  }
+                | {
+                    type: "image_url";
+                    image_url: {
+                      url: string;
+                      detail?: "low" | "medium" | "high" | undefined;
+                    };
+                  }
+              )[];
+        }
+      | {
+          role: "system" | "assistant";
+          content: string;
+        }
+      | undefined
+  ) {
+    return typeof mostRecentMsg?.content === "string"
+      ? mostRecentMsg.content
+      : (mostRecentMsg?.content
+          ?.map((t, o) =>
+            t.type === "text" ? t.text : `![img ${o++}](${t.image_url.url})`
+          )
+          .join("\n") ?? "");
+  }
   private async *stream(
     model = "grok-4-0709" satisfies GrokModelIdUnion,
     messages: readonly (
@@ -79,6 +120,53 @@ export class xAIService {
     const parser = createXAISSEParser(response);
     for await (const event of parser) {
       yield event.data;
+    }
+  }
+
+  private async handleImgGen(
+    model = "grok-2-image-1212" satisfies GrokModelIdUnion,
+    messages: readonly (
+      | {
+          role: "user";
+          content:
+            | string
+            | readonly (
+                | { type: "text"; text: string }
+                | {
+                    type: "image_url";
+                    image_url: {
+                      url: string;
+                      detail?: "low" | "medium" | "high";
+                    };
+                  }
+              )[];
+        }
+      | { role: "system" | "assistant"; content: string }
+    )[],
+    apiKey?: string
+  ) {
+    const mostRecentMsg = messages.slice(-1)?.[0];
+    const key = apiKey ?? this.apiKey;
+    if (model === ("grok-2-image-1212" satisfies GrokModelIdUnion)) {
+      const imgResponse = await fetch(this.baseImgGenUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "grok-2-image-1212" satisfies GrokModelIdUnion,
+          prompt: this.handleMostRecentMsgForImg(mostRecentMsg),
+          n: 1
+        })
+      });
+      if (!imgResponse.ok) {
+        const errorText = await imgResponse.text();
+        throw new Error(
+          `xAI API error (${imgResponse.status}, ${imgResponse.statusText}): ${errorText}`
+        );
+      }
+      return (await imgResponse.json()) as xAIImgGenResponse;
     }
   }
 
@@ -237,9 +325,87 @@ export class xAIService {
       grokIsCurrentlyThinking = false,
       grokThinkingAgg = "",
       grokAgg = "",
-      iThink = 0,
+      // iThink = 0,
       hasAggregateFinal = false;
+    if (model === ("grok-2-image-1212" satisfies GrokModelIdUnion)) {
+      const res = await this.handleImgGen(
+        model,
+        this.xAiFormat(isNewChat, msgs, systemPrompt, "medium"),
+        apiKey ?? undefined
+      );
+      grokAgg += "*Image Gen In Process...*";
+      ws.send(
+        JSON.stringify({
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          title,
+          provider,
+          systemPrompt,
+          temperature,
+          thinkingDuration:
+            grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+          isThinking: false,
+          topP,
+          model,
+          chunk: grokAgg,
+          done: false
+        })
+      );
+      if (!res) {
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_error",
+            provider: provider,
+            conversationId,
+            model,
+            systemPrompt,
+            temperature,
+            topP,
+            title,
+            userId,
+            done: true,
+            message: "something went wrong with image gen..."
+          })
+        );
+      } else {
+        grokAgg += this.extract.grokContent(this.extract.grokMapper(res.data));
+        await this.prisma.handleAiChatResponse({
+          chunk: grokAgg,
+          conversationId,
+          done: true,
+          provider,
+          title,
+          userId,
+          model,
+          systemPrompt,
+          thinkingDuration:
+            grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+          thinkingText: grokThinkingAgg,
+          temperature,
+          topP
+        });
 
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_response",
+            conversationId,
+            userId,
+            provider,
+            systemPrompt,
+            thinkingDuration:
+              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+            thinkingText: grokThinkingAgg,
+            title,
+            temperature,
+            topP,
+            model,
+            chunk: grokAgg,
+            done: true
+          } satisfies EventTypeMap["ai_chat_response"])
+        );
+      }
+    }
     try {
       const streamer = this.stream(
         model as GrokModelIdUnion,
@@ -310,19 +476,19 @@ export class xAIService {
             model === ("grok-3-mini" satisfies GrokModelIdUnion) ||
             model === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))
         ) {
-          iThink++;
-          if (
-            model === "grok-code-fast-1" &&
-            iThink > 3 &&
-            Math.abs(grokThinkingAgg.length - thinkingText.length) <= 4 * iThink
-          ) {
-            hasAggregateFinal = true;
-            const prependNew = `\n` + thinkingText;
-            finalThinkingChunk =
-              grokThinkingAgg.length < prependNew.length
-                ? prependNew.substring(grokThinkingAgg.length)
-                : "";
-          }
+          // iThink++;
+          // if (
+          //   model === "grok-code-fast-1" &&
+          //   iThink > 3 &&
+          //   Math.abs(grokThinkingAgg.length - thinkingText.length) <= 4 * iThink
+          // ) {
+          //   hasAggregateFinal = true;
+          //   const prependNew = `\n` + thinkingText;
+          //   finalThinkingChunk =
+          //     grokThinkingAgg.length < prependNew.length
+          //       ? prependNew.substring(grokThinkingAgg.length)
+          //       : "";
+          // }
 
           if (hasAggregateFinal) {
             grokThinkingAgg += finalThinkingChunk;

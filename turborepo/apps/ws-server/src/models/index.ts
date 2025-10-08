@@ -1,5 +1,12 @@
-import type { GetModelUtilRT, Provider } from "@slipstream/types";
+import type {
+  GeminiImgGenModels,
+  GetModelUtilRT,
+  GrokImgGenModels,
+  OpenAIImgGenModels,
+  Provider
+} from "@slipstream/types";
 import { providerModelChatApi } from "@slipstream/types";
+import { imageModelSets } from "@slipstream/types/models";
 
 export class ModelService {
   constructor() {}
@@ -76,6 +83,40 @@ export class ModelService {
       }
     }
   };
+
+  public safeErrMsg(err: unknown) {
+    if (err instanceof Error) {
+      return err.message;
+    } else if (typeof err === "object" && err != null) {
+      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+    } else if (typeof err === "string") {
+      return err;
+    } else if (typeof err === "number") {
+      return err.toPrecision(5);
+    } else if (typeof err === "boolean") {
+      return `${err}`;
+    } else return String(err);
+  }
+
+  public isImgGenModel<
+    const K extends Provider = Provider,
+    const V extends GetModelUtilRT<K> = GetModelUtilRT<K>
+  >(target: K, model: V) {
+    switch (target) {
+      case "gemini":
+        return imageModelSets.gemini.has(model as GeminiImgGenModels);
+      case "grok":
+        return imageModelSets.grok.has(model as GrokImgGenModels);
+      case "openai":
+        return imageModelSets.openai.has(model as OpenAIImgGenModels);
+      case "anthropic":
+      case "meta":
+      case "vercel":
+      default:
+        return false;
+    }
+  }
+
   public providerToPrismaFormat<const T extends Provider>(provider: T) {
     return provider.toUpperCase() as Uppercase<T>;
   }

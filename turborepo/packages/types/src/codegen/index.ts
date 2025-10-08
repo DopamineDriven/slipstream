@@ -16,6 +16,7 @@ const providerModelChatApi = {
     "gpt-5-codex",
     "gpt-5-mini",
     "gpt-5-nano",
+    "gpt-5-pro",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
@@ -24,27 +25,28 @@ const providerModelChatApi = {
     "o3-pro",
     "o3-mini",
     "gpt-image-1",
+    "gpt-image-1-mini",
     "gpt-4o",
     "gpt-4o-mini",
     "gpt-4",
     "gpt-4-turbo",
-    "gpt-3.5-turbo"
+    "gpt-3.5-turbo",
+    "dall-e-3",
+    "dall-e-2"
   ],
   gemini: [
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "gemini-2.5-pro-preview-tts",
-    "gemini-2.5-flash-preview-tts",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
-    "gemini-2.0-flash-preview-image-generation",
-    "gemini-embedding-001",
-    "imagen-4.0-generate-preview-06-06",
-    "imagen-4.0-ultra-generate-preview-06-06",
+    "gemini-2.5-flash-image",
+    "imagen-4.0-generate-001",
+    "imagen-4.0-fast-generate-001",
+    "imagen-4.0-ultra-generate-001",
     "imagen-3.0-generate-002",
-    "veo-3.0-generate-preview",
-    "veo-3.0-fast-generate-preview",
+    "veo-3.0-generate-001",
+    "veo-3.0-fast-generate-001",
     "veo-2.0-generate-001"
   ],
   grok: [
@@ -117,12 +119,11 @@ async function geminiFetcher() {
   );
 }
 
-
 /**
  * one-offs here for when xAI ships odd labels
  */
 const GROK_NAME_OVERRIDES = {
-  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
+  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning"
 } satisfies Record<string, string>;
 
 function grokDisplayName(id: string) {
@@ -134,7 +135,7 @@ function grokDisplayName(id: string) {
 
   // Explicit model-specific overrides take ultimate precedence
 
-  return id=== "grok-4-fast-non-reasoning" ? GROK_NAME_OVERRIDES[id] : s;
+  return id === "grok-4-fast-non-reasoning" ? GROK_NAME_OVERRIDES[id] : s;
 }
 
 function displayNameV0(id: string): string {
@@ -294,8 +295,14 @@ function formattedOpenAi(props: OpenAiResponse) {
   if (!props.data) throw new Error(props.error.message);
   return props?.data?.map(t => {
     const { id, ...rest } = t;
-    if (id ==="gpt-image-1") return {id, displayName: "GPT Image 1", ...rest };
-    if (id ==="gpt-5-codex") return {id, displayName: "GPT-5-Codex", ...rest};
+    if (id === "gpt-image-1")
+      return { id, displayName: "GPT Image 1", ...rest };
+    if (id === "gpt-5-codex")
+      return { id, displayName: "GPT-5-Codex", ...rest };
+    if (id === "gpt-image-1-mini")
+      return { id, displayName: "GPT Image 1 mini", ...rest };
+    if (id === "dall-e-3") return { id, displayName: "DALL·E 3", ...rest };
+    if (id === "dall-e-2") return { id, displayName: "DALL·E 2", ...rest };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });
@@ -389,14 +396,8 @@ const modelMapper = async (modelKeys = true) => {
         models.forEach(function (model) {
           const name = grokDisplayName(model);
           modelKeys === true
-            ? helper.push([
-                model,
-                name
-              ])
-            : helper.push([
-                name,
-                model
-              ]);
+            ? helper.push([model, name])
+            : helper.push([name, model]);
         });
         return helper;
       }

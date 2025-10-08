@@ -64,6 +64,8 @@ export interface CredentialEntity {
   PDF_SERVICES_CLIENT_SECRET?: string;
   PDF_SERVICES_ORGANIZATION_ID?: string;
   ADOBE_WEBHOOK_SECRET?: string;
+  PY_WEBHOOK_SECRET?: string;
+  TAVILY_API_KEY?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

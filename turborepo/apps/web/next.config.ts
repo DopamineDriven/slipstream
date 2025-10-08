@@ -55,6 +55,7 @@ export default {
         hostname: `assets-dev.aicoalesce.com`,
         protocol: "https"
       },
+      { hostname: "imgen.x.ai", protocol: "https" },
       { hostname: "images.unsplash.com", protocol: "https" },
       { hostname: "tailwindui.com", protocol: "https" }
     ]
