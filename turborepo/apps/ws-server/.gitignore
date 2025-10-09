@@ -6,3 +6,4 @@ aes*
 prisma/db_dump.bak
 public/*
 src/test/xai/*
+src/test/openai/*

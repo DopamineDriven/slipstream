@@ -80,7 +80,7 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.3",
     "dotenv-expand": "^12.0.3",
@@ -93,7 +93,7 @@
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.45.0"
+    "typescript-eslint": "^8.46.0"
   },
   "prettier": "@slipstream/prettier-config"
 }
