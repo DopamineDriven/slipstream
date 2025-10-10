@@ -2,9 +2,21 @@ import type { NextConfig } from "next";
 
 export default {
   reactStrictMode: true,
-  eslint: { ignoreDuringBuilds: false },
+  experimental: { turbopackFileSystemCacheForDev: true },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
+    localPatterns: [
+      { pathname: "/dd/**" },
+      { pathname: "/highlights/**" },
+      { pathname: "/icon/**" },
+      { pathname: "/ideation/**" },
+      { pathname: "/misc/**" },
+      { pathname: "/providers/**" },
+      { pathname: "/svgs/**" },
+      { pathname: "/*" }
+    ],
+    minimumCacheTTL: 604800, // 7 days; defaults to 14400 (4 hours)
+    qualities: [75, 100],
     loader: "default",
     formats: ["image/avif", "image/webp"],
     dangerouslyAllowSVG: true,

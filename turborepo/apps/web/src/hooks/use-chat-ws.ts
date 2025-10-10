@@ -1,7 +1,14 @@
 "use client";
 
 import type { MessageHandler } from "@/types/chat-ws";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type { AnyEvent, ChatWsEvent, EventTypeMap } from "@slipstream/types";
 // To continue this session, run codex resume 0199b1c3-7455-73e2-9928-95d2d88969ba.
@@ -18,6 +25,10 @@ export function useChatWebSocket(email?: string | null) {
   );
 
   const client = useMemo(() => new ChatWebSocketClient(wsUrl), [wsUrl]);
+
+  const syncConn = useEffectEvent(() => {
+    setIsConnected(client.isConnected);
+  });
 
   // Track the most recent event without forcing re-renders on noisy events
   const lastEventRef = useRef<ChatWsEvent | null>(null);
@@ -59,7 +70,7 @@ export function useChatWebSocket(email?: string | null) {
     }, 1000);
 
     // Initial connectivity snapshot
-    setIsConnected(client.isConnected);
+    syncConn();
 
     return () => {
       clearInterval(intervalId);

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { Button, Moon, Sun } from "@slipstream/ui";
 import { useTheme } from "next-themes";
 
@@ -12,8 +12,12 @@ export function ThemeToggle({
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  const mountEvt = useEffectEvent(() => {
     setMounted(true);
+  });
+
+  useEffect(() => {
+    mountEvt();
   }, []);
 
   const toggleTheme = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Provider } from "@slipstream/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
@@ -41,8 +41,12 @@ export function MobileModelSelectorDrawer() {
     selectedModel.provider
   );
 
+  const syncDraftProvider = useEffectEvent(() => {
+    setDraftProvider(p => (p === selectedModel.provider ? p : selectedModel.provider));
+  });
+
   useEffect(() => {
-    setDraftProvider(selectedModel.provider);
+    syncDraftProvider();
   }, [selectedModel.provider]);
 
   const styleMemo = useMemo(() => {

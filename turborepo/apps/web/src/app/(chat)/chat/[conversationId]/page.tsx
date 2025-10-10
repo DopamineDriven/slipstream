@@ -7,7 +7,7 @@ import { ormHandler } from "@/orm";
 import { ChatAreaSkeleton } from "@/ui/chat/chat-area-skeleton";
 import { ChatInterface } from "@/ui/chat/dynamic";
 import { getSession } from "@/utils/auth";
-import type { InferGSPRT } from "@slipstream/types";
+import type { InferGSPRT, Provider } from "@slipstream/types";
 
 // Create once at module level
 const { prismaConversationService } = ormHandler(prismaClient);
@@ -47,8 +47,11 @@ export default async function ChatPage({
   if (!session?.user?.id) redirect("/auth/login");
 
   // Fetch data directly on the server
-  let messages: DynamicChatRouteProps | null = null;
-  let conversationTitle: string | null = null;
+  let messages: DynamicChatRouteProps | null = null,
+    conversationTitle: string | null = null,
+    lastActiveProvider: null | Provider = null,
+    lastActiveModel: string | null = null;
+
   if (conversationId !== "new-chat" && conversationId !== "home") {
     const data =
       await prismaConversationService.getMessagesByConversationIdWithAssets(
@@ -56,7 +59,11 @@ export default async function ChatPage({
       );
 
     if (data) {
-      messages = data.messages.map(t => {
+      messages = data.messages.map((t, o) => {
+        if (o === data.messages.length - 1) {
+          lastActiveProvider = t.provider.toLowerCase() as Provider;
+          lastActiveModel = t.model;
+        }
         const { attachments, ...rest } = t;
         const cleanAttachments = attachments.map(att => ({
           ...att,
@@ -74,6 +81,8 @@ export default async function ChatPage({
         initialMessages={messages}
         conversationTitle={conversationTitle}
         conversationId={conversationId}
+        lastModel={lastActiveModel}
+        lastProvider={lastActiveProvider}
         user={session.user}
       />
     </Suspense>

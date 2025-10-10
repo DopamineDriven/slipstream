@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button, Copy, QuoteIcon } from "@slipstream/ui";
 import { createPortal } from "react-dom";
 
@@ -20,8 +20,12 @@ export function SelectionToolbar({
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  const mountEvt = useEffectEvent(() => {
     setMounted(true);
+  });
+
+  useEffect(() => {
+    mountEvt();
 
     const handleScroll = () => onClose();
     const handleResize = () => onClose();
