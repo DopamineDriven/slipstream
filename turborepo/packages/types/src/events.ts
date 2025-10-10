@@ -1,4 +1,16 @@
 import type {
+  AIChatEventTypeUnion,
+  AIChatRequestUserMetadata,
+  AssetOrigin,
+  AssetStatus,
+  AssetUploadAbortReason,
+  AssetUploadInstructionsMethod,
+  AttachmentMetadata,
+  MetadataUnion,
+  S3ObjectId,
+  WithExpiry
+} from "@/events-workup.ts";
+import type {
   GetModelUtilRT,
   ImageGenModelsByProvider,
   ImageGenProviders,
@@ -6,155 +18,6 @@ import type {
 } from "@/models.ts";
 import type { MessageSingleton } from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
-
-export type SpreadSheetExtensions = "xlsx" | "xls" | "ods" | "csv";
-export type PresentationExtensions = "pptx" | "ppt" | "odp";
-export type DocExtensions = "pdf" | "docx" | "doc" | "odt" | "rtf";
-export type TextExtensions = "txt" | "tex";
-export type EbookExtensions = "epub" | "mobi";
-
-export interface ImageSpecs {
-  type: "IMAGE";
-  width: number;
-  height: number;
-  format:
-    | "apng"
-    | "png"
-    | "jpeg"
-    | "gif"
-    | "bmp"
-    | "webp"
-    | "avif"
-    | "svg"
-    | "ico"
-    | "heic"
-    | "tiff"
-    | "unknown";
-  frames: number;
-  animated: boolean;
-  hasAlpha: boolean | null;
-  orientation: number | null; // EXIF orientation (1-8) or null
-  aspectRatio: number;
-  colorModel:
-    | "rgb"
-    | "rgba"
-    | "grayscale"
-    | "grayscale-alpha"
-    | "indexed"
-    | "cmyk"
-    | "ycbcr"
-    | "ycck"
-    | "vector"
-    | "lab"
-    | "unknown";
-  colorSpace:
-    | "unknown"
-    | "srgb"
-    | "display_p3"
-    | "adobe_rgb"
-    | "prophoto_rgb"
-    | "rec2020"
-    | "rec709"
-    | "cmyk"
-    | "lab"
-    | "xyz"
-    | "gray";
-  iccProfile: string | null; // Profile name/description if available, or 'embedded' if present but unnamed, null otherwise
-  exifDateTimeOriginal: string | null; // ISO-like string or null
-}
-
-export interface PdfDocSpecs {
-  pdfVersion: string | null;
-  isEncrypted: boolean | null;
-  isSearchable: boolean | null;
-  isLinearized: boolean | null;
-  hasForm: boolean | null;
-  hasSignatures: boolean | null;
-  hasAttachments: boolean | null;
-  hasJavaScript: boolean | null;
-  permissions: {
-    printing: boolean;
-    modifying: boolean;
-    copying: boolean;
-    annotating: boolean;
-  } | null;
-}
-
-export interface SpreadSheetDocSpecs {
-  sheetCount: number | null;
-  sheetNames: string[] | null;
-  hasFormulas: boolean | null;
-  hasMacros: boolean | null;
-  hasPivotTables: boolean | null;
-  hasCharts: boolean | null;
-  activeSheet: number | null;
-}
-
-export interface PresentationDocSpecs {
-  slideCount: number | null;
-  hasAnimations: boolean | null;
-  hasTransitions: boolean | null;
-  hasNotes: boolean | null;
-  hasMasterSlides: boolean | null;
-  presentationFormat: "standard" | "widescreen" | null;
-}
-
-export interface DocSpecs {
-  type: "DOCUMENT";
-  format: string | null;
-  mimeType: string | null;
-  pageCount: number | null;
-  wordCount: number | null;
-  lineCount: number | null;
-  language: string | null;
-  encoding: string | null;
-  author: string | null;
-  subject: string | null;
-  keywords: string[] | null;
-  pdfVersion: string | null;
-  isEncrypted: boolean | null;
-  isSearchable: boolean | null;
-  isLinearized: boolean | null;
-  textPreview: string | null;
-  createdDate: string | null;
-  modifiedDate: string | null;
-}
-
-export type MetadataUnion = ImageSpecs | DocSpecs;
-
-export type AttachmentMetadata = {
-  filename: string;
-  originalName?: string;
-  uploadMethod?: UploadMethod;
-  uploadDuration?: number;
-  uploadedAt: string;
-  scannedAt?: string;
-  scanResult?: "clean" | "infected";
-  thumbnailGenerated?: boolean;
-  extractedText?: string;
-  dimensions?: { width: number; height: number };
-  thumbnailDimensions?: { width: number; height: number };
-  quality?: number;
-  duration?: number;
-  [key: string]: unknown;
-};
-
-export type AIChatRequestUserMetadata = {
-  city?: string;
-  region?: string;
-  country?: string;
-  lat?: number;
-  lng?: number;
-  tz?: string;
-  postalCode?: string;
-  locale?: string;
-};
-
-export type AIChatEventTypeUnion =
-  | "chunk"
-  | "error"
-  | "inline_data"
-  | "response";
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
@@ -225,41 +88,6 @@ export type PingMessage = {
   type: "ping";
 };
 
-export type S3ObjectId = `s3://${string}/${string}#${string}`;
-
-export type AssetDraftId = `${string}~${string}~${string}~${number}`;
-
-export type WithExpiry<K extends string> = {
-  [P in K | `${K}ExpiresAt`]: P extends K ? string : number; // epoch ms
-};
-
-export type UploadMethod = Uppercase<
-  "server" | "presigned" | "generated" | "fetched"
->;
-export type AssetOrigin =
-  | "UPLOAD"
-  | "GENERATED"
-  | "REMOTE"
-  | "PASTED"
-  | "IMPORTED"
-  | "SCRAPED"
-  | "SCREENSHOT";
-
-/**
- * Asset status lifecycle
- */
-export type AssetStatus =
-  | "REQUESTED" // Presigned URL requested (legacy)
-  | "PLANNED" // Generation job created
-  | "UPLOADING" // Currently uploading
-  | "STORED" // In S3, not verified
-  | "SCANNING" // Security/virus scan
-  | "READY" // Available for use
-  | "FAILED" // Upload/generation failed
-  | "QUARANTINED" // Failed security scan
-  | "ATTACHED" // Attached to a message
-  | "DELETED"; // Soft deleted
-
 /**
  * Server notifies client that an asset was uploaded server-side
  * (After successful upload via API route or server action)
@@ -294,7 +122,10 @@ export type AssetPasteEvent = {
   conversationId: string;
   draftId: string;
   batchId: string;
-  filename: string; // Usually "paste.png" or similar
+  /**
+   *  Usually "paste.png" or similar
+   */
+  filename: string;
   mime: string;
   size: number;
   width?: number;
@@ -315,9 +146,15 @@ export type AssetReady = DX<
     publicUrl?: string;
     cdnUrl?: string;
     versionId?: string;
-    s3ObjectId: S3ObjectId; // eg, "s3://bucket/key#<versionId|nov>"
+    /**
+     * eg, "s3://bucket/key#<versionId|nov>"
+     */
+    s3ObjectId: S3ObjectId;
     etag?: string;
-    size: number; // bytes
+    /**
+     * bytes
+     */
+    size: number;
     mime: string;
     origin: AssetOrigin;
     status: Extract<AssetStatus, "READY">;
@@ -333,7 +170,10 @@ export type AssetUploadProgress = {
   batchId?: string;
   conversationId: string;
   attachmentId: string;
-  progress: number; // 0-100
+  /**
+   * 0-100
+   */
+  progress: number;
   bytesUploaded: number;
   totalBytes: number;
 };
@@ -408,12 +248,7 @@ export type AssetUploadAbort = {
   attachmentId: string;
   draftId?: string;
   batchId?: string;
-  reason?:
-    | "user" // user hit cancel / navigated away
-    | "network" // network error/timeout on client
-    | "server" // server told client to abort
-    | "timeout"
-    | "unknown";
+  reason?: AssetUploadAbortReason;
   bytesUploaded?: number; // last known
   totalBytes?: number;
 };
@@ -478,7 +313,10 @@ export type AssetUploadPrepare = {
   type: "asset_upload_prepare";
   conversationId: string;
   filename: string;
-  mime: string; // keep naming consistent with other events
+  /**
+   * keep naming consistent with other events
+   */
+  mime: string;
   size: number;
   origin: Exclude<AssetOrigin, "REMOTE" | "GENERATED" | "IMPORTED" | "SCRAPED">;
   draftId?: string;
@@ -494,10 +332,16 @@ export type AssetUploadInstructions = {
   mimeType: string;
   batchId?: string;
   attachmentId: string;
-  method: "PUT" | "POST"; // if you later support POST policy, widen to "PUT" | "POST"
+  method: AssetUploadInstructionsMethod;
   uploadUrl: string;
-  requiredHeaders?: Record<string, string>; // e.g. { "Content-Type": mime }
-  expiresIn: number; // seconds
+  /**
+   *  { "Content-Type": mime }
+   */
+  requiredHeaders?: Record<string, string>;
+  /**
+   * seconds
+   */
+  expiresIn: number;
   bucket: string;
   key: string;
 };
@@ -519,10 +363,16 @@ export type AssetUploadComplete = {
   metadata?: MetadataUnion;
   etag?: string;
   success: boolean;
-  duration: number; //milliseconds
+  /**
+   * milliseconds
+   */
+  duration: number;
   bytesUploaded?: number;
 };
-// client -> server
+
+/**
+ * client -> server
+ */
 export type AssetUploadCompleteError = {
   type: "asset_upload_complete_error";
   conversationId: string;
@@ -535,7 +385,10 @@ export type AssetUploadCompleteError = {
   versionId?: string;
   publicUrl?: string;
   etag?: string;
-  duration?: number; //milliseconds
+  /**
+   * milliseconds
+   */
+  duration?: number;
   bytesUploaded?: number;
   width?: number;
   height?: number;
@@ -615,9 +468,18 @@ export type ImageGenProgress = {
   userId: string;
   conversationId: string;
   taskId: string;
-  progress: number; // 0-100
-  stage?: string; // "queued" | "processing" | "finalizing"
-  eta?: number; // seconds remaining
+  /**
+   * 0-100
+   */
+  progress: number;
+  /**
+   * "queued" | "processing" | "finalizing"
+   */
+  stage?: string;
+  /**
+   *  seconds remaining
+   */
+  eta?: number;
 };
 
 /**
@@ -713,13 +575,3 @@ export type EventTypeMap = {
 export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
-
-export type RecordCountsProps = {
-  isSet: Record<Provider, number>;
-  isDefault: Record<Provider, number>;
-};
-
-export type ClientContextWorkupProps = {
-  isSet: Record<Provider, boolean>;
-  isDefault: Record<Provider, boolean>;
-};
