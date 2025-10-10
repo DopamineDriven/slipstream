@@ -4,6 +4,7 @@ ws-server-taskdef.json
 python-service-taskdef.json
 remote/**/*
 inspect/**/*
+ffmpeg/*
 schema-taskdef.json
 notes.md
 .certs

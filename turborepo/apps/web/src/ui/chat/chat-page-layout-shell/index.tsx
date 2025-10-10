@@ -118,7 +118,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
           </Sidebar>
           <SidebarInset className="flex-1">
             <div className="flex h-[100dvh] flex-col">
-              <header className="border-border bg-background flex h-14 shrink-0 items-center justify-between border-b px-4">
+              <header className="border-border bg-background relative flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex min-w-0 items-center">
                   <SidebarTrigger className="z-30 -ml-2">
                     <PanelLeft className="size-5" />

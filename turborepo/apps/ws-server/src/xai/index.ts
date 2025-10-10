@@ -343,8 +343,7 @@ export class xAIService {
           provider,
           systemPrompt,
           temperature,
-          thinkingDuration:
-            grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+          thinkingDuration: undefined,
           isThinking: false,
           topP,
           model,
@@ -368,8 +367,23 @@ export class xAIService {
             message: "something went wrong with image gen..."
           })
         );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_error", {
+          type: "ai_chat_error",
+          provider,
+          conversationId,
+          model,
+          title,
+          systemPrompt,
+          temperature,
+          topP,
+          userId,
+          done: true,
+          message: "Something went wrong with image gen..."
+        });
+        return;
       } else {
         grokAgg += this.extract.grokContent(this.extract.grokMapper(res.data));
+
         await this.prisma.handleAiChatResponse({
           chunk: grokAgg,
           conversationId,
@@ -379,9 +393,8 @@ export class xAIService {
           userId,
           model,
           systemPrompt,
-          thinkingDuration:
-            grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
-          thinkingText: grokThinkingAgg,
+          thinkingDuration: undefined,
+          thinkingText: undefined,
           temperature,
           topP
         });
@@ -393,9 +406,8 @@ export class xAIService {
             userId,
             provider,
             systemPrompt,
-            thinkingDuration:
-              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
-            thinkingText: grokThinkingAgg,
+            thinkingDuration: undefined,
+            thinkingText: undefined,
             title,
             temperature,
             topP,
@@ -404,6 +416,26 @@ export class xAIService {
             done: true
           } satisfies EventTypeMap["ai_chat_response"])
         );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
+          type: "ai_chat_response",
+          conversationId,
+          userId,
+          systemPrompt,
+          temperature,
+          title,
+          thinkingDuration:
+            grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+          thinkingText: grokThinkingAgg,
+          topP,
+          provider,
+          model,
+          chunk: grokAgg,
+          done: true
+        });
+
+        // Clear saved state on successful completion
+        void this.redis.del(`stream:state:${conversationId}`);
+        return;
       }
     }
     try {

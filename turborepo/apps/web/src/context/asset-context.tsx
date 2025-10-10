@@ -12,7 +12,7 @@ import {
   useState
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
-import { usePathnameContext } from "@/context/pathname-context";
+import { useConversationIdContext } from "@/context/conversation-id-context";
 import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
 import { createDraftId } from "@slipstream/types";
 
@@ -115,13 +115,11 @@ export function AssetProvider({
   children: React.ReactNode;
   userId: string;
 }) {
-  const { conversationId: pathConvId } = usePathnameContext();
+  const { conversationId: effectiveConvId } = useConversationIdContext();
   const { client, sendEvent, isConnected } = useChatWebSocketContext();
 
   // core state (same style as AIChat)
-  const [activeConversationId, setActiveConversationId] = useState<
-    string | null
-  >(pathConvId ?? "new-chat");
+  const activeConversationId = effectiveConvId ?? "new-chat";
   const [currentBatchId, setCurrentBatchId] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -140,13 +138,6 @@ export function AssetProvider({
     batchOrdinalRef.current.set(bId, n + 1);
     return n;
   };
-
-  // keep conv id in sync with PathnameContext (passive read mirroring AIChat context workup)
-  useEffect(() => {
-    if (pathConvId && pathConvId !== activeConversationId) {
-      setActiveConversationId(pathConvId);
-    }
-  }, [pathConvId, activeConversationId]);
 
   // task store: super simple
   const tasksByDraftIdRef = useRef<Map<string, UploadTask>>(new Map());

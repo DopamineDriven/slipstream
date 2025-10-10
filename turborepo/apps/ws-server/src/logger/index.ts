@@ -5,8 +5,8 @@ import type {
 } from "pino";
 import type { PrettyOptions } from "pino-pretty";
 import { UserData } from "@/types/index.ts";
-import { EventTypeMap } from "@slipstream/types";
 import pino, { stdTimeFunctions } from "pino";
+import { EventTypeMap } from "@slipstream/types";
 
 export interface EventLogContext<T extends keyof EventTypeMap> {
   type: T;
@@ -187,7 +187,7 @@ export class LoggerService {
   >(level: L, { type, payload }: EventLogContext<T>) {
     switch (payload?.type) {
       case `${type}`: {
-        this.logger[level]({ ...payload });
+        this.logger[level](JSON.stringify(payload, null, 2));
         break;
       }
       default:

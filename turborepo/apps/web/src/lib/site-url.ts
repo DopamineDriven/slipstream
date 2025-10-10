@@ -17,11 +17,11 @@ export const envMediatedBaseUrl = (env: typeof process.env.NODE_ENV) =>
           : getPreviewUrl;
 
 export const getSiteUrl = (env?: "development" | "production" | "preview") => {
-  console.log({
-    vercelTargetEnv: process.env.VERCEL_TARGET_ENV ?? "",
-    vercelUrl: process.env.VERCEL_URL ?? "",
-    vercelEnv: process.env.VERCEL_ENV ?? "development"
-  });
+  // console.log({
+  //   vercelTargetEnv: process.env.VERCEL_TARGET_ENV ?? "",
+  //   vercelUrl: process.env.VERCEL_URL ?? "",
+  //   vercelEnv: process.env.VERCEL_ENV ?? "development"
+  // });
   if (!env) return getLocalUrl;
   else if (env === "production") return getProductionUrl;
   else if (env === "preview") return getPreviewUrl;

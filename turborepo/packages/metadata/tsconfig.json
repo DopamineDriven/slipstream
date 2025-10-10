@@ -13,7 +13,7 @@
     "src/**/*.ts",
     "**/*.mjs",
     "**/*.preset.ts",
-    "tsup.config.ts"
+    "tsdown.config.ts"
   ],
   "exclude": ["dist"]
 }

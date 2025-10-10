@@ -42,22 +42,26 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
     const slug = typeof children === "string" ? slugify(children) : "";
     const target =
       `h${level}` as const satisfies keyof React.JSX.IntrinsicElements;
+
     return createElement(
       target,
       {
         id: slug,
         className:
-          " [&_h1]:text-5xl [&_h2]:text-4xl [&_h3]:text-3xl [&_h4]:text-2xl [&_h5]:text-xl [&_h6]:text-lg",
+          "[h1]:text-5xl [h2]:text-4xl [h3]:text-3xl [h4]:text-2xl [h5]:text-xl [h6]:text-lg",
         ...rest
       },
       [
-        createElement("a", {
-          href: `#${slug}`,
-          key: `link-${slug}`,
-          className: "anchor hover:underline"
-        })
-      ],
-      children
+        createElement(
+          "a",
+          {
+            href: `#${slug}`,
+            key: `link-${slug}`,
+            className: "anchor hover:underline"
+          },
+          [children]
+        )
+      ]
     );
   };
   Heading.displayName = `Heading${level}`;
@@ -150,7 +154,7 @@ const components = {
   li: ({ ...props }: ComponentPropsWithRef<"li">) => (
     <li
       className={cn(
-        "leading-7 [&>p]:mb-1 [&>p:last-child]:mb-0",
+        "leading-7 whitespace-normal! [&>p]:mb-1 [&>p:last-child]:mb-0",
         props.className
       )}
       {...props}>
@@ -160,7 +164,7 @@ const components = {
   ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
     <ol
       className={cn(
-        "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-6",
+        "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2.5",
         props.className
       )}
       {...props}>
@@ -170,7 +174,7 @@ const components = {
   ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
     <ul
       className={cn(
-        "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-6",
+        "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2.5",
         props.className
       )}
       {...props}>
@@ -214,15 +218,32 @@ const components = {
   aside: ({ ...props }: ComponentPropsWithRef<"aside">) => (
     <aside {...props}>{props.children}</aside>
   ),
-  table: ({ ...props }: ComponentPropsWithRef<"table">) => (
-    <table
-      className={cn("mb-4 w-full border-collapse border", props.className)}
+  table: ({ className, ...props }: ComponentPropsWithRef<"table">) => (
+    <div
+      className="-mx-3 my-3 overflow-x-auto overscroll-x-contain px-3 [-webkit-overflow-scrolling:touch] md:mx-0"
+      role="region"
+      aria-label="Scrollable table">
+      <table
+        className={cn(
+          "mb-4 w-full min-w-[80dvw] table-fixed border-collapse",
+          "border",
+          className
+        )}
+        {...props}>
+        {props.children}
+      </table>
+    </div>
+  ),
+  thead: ({ className, ...props }: ComponentPropsWithRef<"thead">) => (
+    <thead
+      className={cn(
+        "px-2.5 py-2 text-left align-top text-sm",
+        "break-words whitespace-normal",
+        className
+      )}
       {...props}>
       {props.children}
-    </table>
-  ),
-  thead: ({ ...props }: ComponentPropsWithRef<"thead">) => (
-    <thead {...props}>{props.children}</thead>
+    </thead>
   ),
   tbody: ({ ...props }: ComponentPropsWithRef<"tbody">) => (
     <tbody {...props}>{props.children}</tbody>
@@ -238,14 +259,25 @@ const components = {
       {props.children}
     </tr>
   ),
-  td: ({ ...props }: ComponentPropsWithRef<"td">) => (
-    <td {...props} className={cn("px-4 py-2", props.className)}>
+  td: ({ className, ...props }: ComponentPropsWithRef<"td">) => (
+    <td
+      {...props}
+      className={cn(
+        "px-3 py-1.5 align-top text-sm",
+        "break-words whitespace-normal",
+        "[&_a]:break-words [&_code]:break-words [&_li]:break-words",
+        className
+      )}>
       {props.children}
     </td>
   ),
-  th: ({ ...props }: ComponentPropsWithRef<"th">) => (
+  th: ({ className, ...props }: ComponentPropsWithRef<"th">) => (
     <th
-      className={cn("px-4 py-2 text-left font-semibold", props.className)}
+      className={cn(
+        "px-2.5 py-2 text-left align-top text-sm",
+        "break-words whitespace-normal",
+        className
+      )}
       {...props}>
       {props.children}
     </th>

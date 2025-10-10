@@ -9,7 +9,7 @@
         "tsconfig.json",
         "package.json",
         "eslint.config.mjs",
-        "tsup.config.ts"
+        "tsdown.config.ts"
       ]
     }
   }

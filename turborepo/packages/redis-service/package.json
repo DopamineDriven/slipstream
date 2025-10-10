@@ -69,12 +69,11 @@
     "./pubsub/extended-events": "./dist/pubsub/extended-events.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "dev": "pnpm build",
     "lint": "eslint",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache",
-    "fix": "npm pkg fix"
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
   },
   "dependencies": {
     "@slipstream/types": "workspace:*",
@@ -87,18 +86,18 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.1",
     "chokidar": "^4.0.3",
     "dotenv-cli": "^10.0.0",
     "eslint": "^9.37.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
     "terser": "^5.44.0",
+    "tsdown": "^0.15.6",
     "tslib": "^2.8.1",
-    "tsup": "^8.5.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.45.0"
+    "typescript-eslint": "^8.46.0"
   },
   "prettier": "@slipstream/prettier-config"
 }

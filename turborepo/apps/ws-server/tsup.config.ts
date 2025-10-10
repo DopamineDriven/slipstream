@@ -7,6 +7,7 @@ const tsupConfig = (options: Options) =>
     entry: [
       "src/index.ts",
       "src/anthropic/index.ts",
+      "src/extract/index.ts",
       "src/gemini/index.ts",
       "src/logger/index.ts",
       "src/meta/index.ts",

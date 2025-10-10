@@ -1,5 +1,3 @@
-"use client";
-
 import type { ComponentPropsWithRef } from "react";
 import { AnonymousIcon } from "@/icons/anonymous";
 import { AnthropicIcon } from "@/icons/anthropic";

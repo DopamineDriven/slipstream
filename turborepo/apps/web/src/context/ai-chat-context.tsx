@@ -1,11 +1,6 @@
 // src/context/ai-chat-context.tsx
 "use client";
 
-import type { AllModelsUnion, EventTypeMap, Provider } from "@slipstream/types";
-import type {
-  AIChatRequest,
-  AIChatRequestUserMetadata
-} from "@slipstream/types/events";
 import {
   createContext,
   useCallback,
@@ -15,14 +10,19 @@ import {
   useRef,
   useState
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useApiKeys } from "@/context/api-keys-context";
 import { useAssetUpload } from "@/context/asset-context";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import { useConversationIdContext } from "@/context/conversation-id-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { getModel } from "@/lib/get-model";
-import { pathParser } from "@/lib/path-parser";
+import type { AllModelsUnion, EventTypeMap, Provider } from "@slipstream/types";
+import type {
+  AIChatRequest,
+  AIChatRequestUserMetadata
+} from "@slipstream/types/events";
 
 interface StreamingMessage {
   id: string;
@@ -76,23 +76,17 @@ export function AIChatProvider({
   userId?: string;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const { selectedModel } = useModelSelection();
   const { apiKeys } = useApiKeys();
   const { startNewBatch, currentBatchId, getUploadsByBatchId } =
     useAssetUpload();
-
-  // Parse conversation ID from pathname
-  const getConversationIdFromPath = useCallback((): string | null => {
-    const parsed = pathParser(pathname);
-    return parsed.conversationId ?? null;
-  }, [pathname]);
+  const { conversationId: effectiveConvId } = useConversationIdContext();
 
   // Core state - initialize from path
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
-  >(getConversationIdFromPath());
+  >(effectiveConvId);
   const [title, setTitle] = useState<string | null>(null);
   const [streamedText, setStreamedText] = useState<string>("");
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -112,35 +106,37 @@ export function AIChatProvider({
   const firstChunkReceivedRef = useRef<boolean>(false);
   const originalConversationIdRef = useRef<string | null>(activeConversationId);
 
-  // Initialize and sync active conversation from pathname
-  // This is passive - only reads from the URL, never manipulates it
-  // Router manipulation only happens during new-chat → real ID transitions
+  // Initialize and sync active conversation from shared conversation id
+  // This is passive - only reads from ConversationIdProvider, never manipulates router
+  // Router manipulation still happens only during new-chat → real ID transitions below
   useEffect(() => {
     // Skip during streaming or URL transitions
     if (isStreaming || urlUpdatedRef.current) {
       return;
     }
 
-    const pathConvId = getConversationIdFromPath();
-
-    // Only update if we have a valid path conversation ID and it's different
-    if (pathConvId && pathConvId !== activeConversationId) {
+    const ctxConvId = effectiveConvId;
+    if (!ctxConvId) return;
+    // Only update if we have a valid conversation ID and it's different
+    if (ctxConvId !== activeConversationId) {
       console.log(
-        `[AIChatContext] Updating conversation ID from path: ${pathConvId}`
+        `[AIChatContext] Updating conversation ID from context: ${ctxConvId}`
       );
-      setActiveConversationId(pathConvId);
-      originalConversationIdRef.current = pathConvId;
+      return () => {
+        setActiveConversationId(ctxConvId);
+        originalConversationIdRef.current = ctxConvId;
 
-      // Reset streaming state when navigating to a different conversation
-      setStreamedText("");
-      setThinkingText("");
-      setIsThinking(false);
-      setThinkingDuration(null);
-      setCurrentStreamingMessage(null);
-      setIsWaitingForRealId(false);
-      firstChunkReceivedRef.current = false;
+        // Reset streaming state when navigating to a different conversation
+        setStreamedText("");
+        setThinkingText("");
+        setIsThinking(false);
+        setThinkingDuration(null);
+        setCurrentStreamingMessage(null);
+        setIsWaitingForRealId(false);
+        firstChunkReceivedRef.current = false;
+      };
     }
-  }, [pathname, activeConversationId, getConversationIdFromPath, isStreaming]);
+  }, [effectiveConvId, activeConversationId, isStreaming]);
 
   // Store refs for state values that need to be accessed in event handlers
   const streamedTextRef = useRef(streamedText);
