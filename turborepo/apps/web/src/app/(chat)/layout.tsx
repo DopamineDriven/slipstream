@@ -21,7 +21,9 @@ export default async function AuthedLayout({
         <ModelSelectionProvider>
           <ApiKeysProvider userId={session.user.id}>
             <AssetProvider userId={session.user.id}>
-              <AIChatProvider userId={session.user.id}>{children}</AIChatProvider>
+              <AIChatProvider userId={session.user.id}>
+                {children}
+              </AIChatProvider>
             </AssetProvider>
           </ApiKeysProvider>
         </ModelSelectionProvider>
