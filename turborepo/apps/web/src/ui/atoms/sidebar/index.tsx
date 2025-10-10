@@ -17,6 +17,7 @@ import {
   TooltipTrigger
 } from "@slipstream/ui";
 import * as React from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -618,9 +619,14 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean;
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
+  // Random width between 50 to 90%, set after mount to avoid impure calls during render.
+  const [width, setWidth] = useState<string>("70%");
+  const setRandomWidth = useEffectEvent(() => {
+    const w = `${Math.floor(Math.random() * 40) + 50}%`;
+    setWidth(w);
+  });
+  useEffect(() => {
+    setRandomWidth();
   }, []);
 
   return (

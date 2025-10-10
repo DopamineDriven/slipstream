@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
@@ -7,16 +8,20 @@ export const size = {
   height: 630
 };
 
-export const alt ="AI Coalesce";
+export const alt = "Slipstream";
 
-export const contentType ="image/png";
+export const contentType = "image/png";
 
 export default async function Image() {
+  const file = "aicoalesce-og-img.png";
+  const filePath = join(process.cwd(), file);
+  const fileExists = existsSync(filePath);
   try {
-    const bgImage = await readFile(
-      join(process.cwd(), "ai-human-scaled.png"),
-      "base64"
-    );
+    if (!fileExists) {
+      throw new Error(`file ${filePath} does not exist!`);
+    }
+    const bgImage = await readFile(filePath, "base64");
+    const dataUrl = `data:image/png;base64,${bgImage}` as const;
     return new ImageResponse(
       (
         <div
@@ -40,8 +45,8 @@ export default async function Image() {
               marginInline: "auto"
             }}>
             <img
-              alt="AI and human interaction artwork"
-              width={1057}
+              alt="Slipstream"
+              width={1080}
               height={630}
               style={{
                 inset: "0",
@@ -49,11 +54,11 @@ export default async function Image() {
                 objectPosition: "center center",
                 alignSelf: "center",
                 height: "630px",
-                width: "1077px",
+                width: "1080px",
                 objectFit: "cover",
                 pointerEvents: "none"
               }}
-              src={`data:image/png;base64,${bgImage}`}
+              src={dataUrl}
             />
           </div>
         </div>

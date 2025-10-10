@@ -4,7 +4,7 @@ import type { User as UserProps } from "@/utils/auth-client";
 import type { ValueKeyframesDefinition } from "motion-dom";
 import type { MotionStyle } from "motion/react";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useElementDimensions } from "@/hooks/use-element-dimensions";
@@ -135,34 +135,41 @@ export default function SettingsScaffold({
 
   const [scrollContainerDimensions] = useElementDimensions(scrollContainerRef);
 
-  const scrollMetrics = useMemo(() => {
+  const [scrollMetrics, setScrollMetrics] = useState({
+    totalScrollHeight: 0,
+    sectionHeight: 0,
+    bufferZone: 0,
+    rootMargin: "0px",
+    containerHeight: 0
+  });
+
+  const updateScrollMetrics = useEffectEvent(() => {
     if (!scrollContainerRef.current || scrollContainerDimensions.height === 0) {
-      return {
+      setScrollMetrics({
         totalScrollHeight: 0,
         sectionHeight: 0,
         bufferZone: 0,
-        rootMargin: "0px"
-      };
+        rootMargin: "0px",
+        containerHeight: 0
+      });
+      return;
     }
-
-    // Get the total scrollable content height
     const totalScrollHeight = scrollContainerRef.current.scrollHeight;
     const containerHeight = scrollContainerDimensions.height;
-
-    // Calculate section allocation based on actual scroll content
     const sectionHeight = totalScrollHeight / TOTAL_SECTIONS;
     const bufferZone = sectionHeight * PERIPHERAL_TRANSITION_PERCENT;
-
-    // Create pixel-based root margin for intersection observer
     const rootMargin = `-${Math.round(bufferZone)}px 0px -${Math.round(bufferZone)}px 0px`;
-
-    return {
+    setScrollMetrics({
       totalScrollHeight,
       sectionHeight,
       bufferZone,
       rootMargin,
       containerHeight
-    };
+    });
+  });
+
+  useEffect(() => {
+    updateScrollMetrics();
   }, [scrollContainerDimensions.height]);
 
   useEffect(() => {

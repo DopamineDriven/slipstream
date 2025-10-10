@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse, userAgent } from "next/server";
+import { Session, User } from "better-auth";
 import { getCookieCache } from "better-auth/cookies";
 
 export const config = {
@@ -121,10 +122,17 @@ function detectDeviceAndSetCookies(
   return response;
 }
 
-export default async function middleware(req: NextRequest) {
-  const session = await getCookieCache(req);
+export default async function proxy(req: NextRequest) {
+  const session = (await getCookieCache(req)) satisfies {
+    session: Session & Record<string, any>;
+    user: User & Record<string, any>;
+  } | null;
+
   if (!session && !req.nextUrl.pathname.includes("/auth")) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return detectDeviceAndSetCookies(
+      req,
+      NextResponse.redirect(new URL("/auth/login", req.url))
+    );
   }
   if (req.nextUrl.pathname === "/") {
     return detectDeviceAndSetCookies(

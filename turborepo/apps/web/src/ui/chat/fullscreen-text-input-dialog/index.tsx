@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import {
   Button,
   Dialog,
@@ -27,9 +27,13 @@ export function FullscreenTextInputDialog({
 }: FullscreenTextInputDialogProps) {
   const [text, setText] = useState(initialValue);
 
+  const resetText = useEffectEvent(() => {
+    setText(initialValue);
+  });
+
   useEffect(() => {
     if (isOpen) {
-      setText(initialValue);
+      resetText();
     }
   }, [isOpen, initialValue]);
 

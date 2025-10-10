@@ -11,7 +11,7 @@
     "build:metadata": "turbo build --filter=@slipstream/metadata",
     "build:redis-service": "turbo build --filter=@slipstream/redis-service",
     "build:storage-s3": "turbo build --filter=@slipstream/storage-s3",
-    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:metadata && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server && pnpm --filter \"@slipstream/web\" typegen",
+    "build:targeted": "pnpm build:ui && pnpm build:redis-service && pnpm build:credentials && pnpm build:encryption && pnpm build:metadata && pnpm build:key-validator && pnpm build:types && pnpm build:storage-s3 && pnpm build:ws-server",
     "build:types": "turbo build --filter=@slipstream/types",
     "build:ui": "turbo build --filter=@slipstream/ui",
     "build:web": "turbo build --filter=@slipstream/web",
@@ -33,6 +33,7 @@
     "run:web": "turbo dev --filter=@slipstream/web",
     "run:ws-server": "turbo dev --filter=@slipstream/ws-server",
     "latest:pnpm": "corepack use pnpm@latest",
+    "postbuild:targeted":"pnpm --filter \"@slipstream/web\" typegen",
     "wsl2:info": "lsb_release -a"
   },
   "devDependencies": {
