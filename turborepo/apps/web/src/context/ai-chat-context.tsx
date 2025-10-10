@@ -18,11 +18,13 @@ import { useConversationIdContext } from "@/context/conversation-id-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { getModel } from "@/lib/get-model";
-import type { AllModelsUnion, EventTypeMap, Provider } from "@slipstream/types";
 import type {
   AIChatRequest,
-  AIChatRequestUserMetadata
-} from "@slipstream/types/events";
+  AIChatRequestUserMetadata,
+  AllModelsUnion,
+  EventTypeMap,
+  Provider
+} from "@slipstream/types";
 
 interface StreamingMessage {
   id: string;
