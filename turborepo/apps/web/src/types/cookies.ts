@@ -11,7 +11,8 @@ export const COOKIES = {
   isMac: "isMac",
   region: "region",
   postalCode: "postalCode",
-  locale: "locale"
+  locale: "locale",
+  userId: "userId"
 } as const;
 
 export type CookieValue = {
@@ -33,6 +34,7 @@ export type CookieValue = {
   city: string;
   isMac: "true" | "false";
   locale: string;
+  userId: string | null;
 };
 
 export type CookieKey = keyof typeof COOKIES;

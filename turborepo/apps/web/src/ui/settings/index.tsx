@@ -4,7 +4,7 @@ import type { User as UserProps } from "@/utils/auth-client";
 import type { ValueKeyframesDefinition } from "motion-dom";
 import type { MotionStyle } from "motion/react";
 import type React from "react";
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useElementDimensions } from "@/hooks/use-element-dimensions";
@@ -134,7 +134,6 @@ export default function SettingsScaffold({
     useState(false);
 
   const [scrollContainerDimensions] = useElementDimensions(scrollContainerRef);
-
   const [scrollMetrics, setScrollMetrics] = useState({
     totalScrollHeight: 0,
     sectionHeight: 0,
@@ -142,23 +141,27 @@ export default function SettingsScaffold({
     rootMargin: "0px",
     containerHeight: 0
   });
-
-  const updateScrollMetrics = useEffectEvent(() => {
+  // Update metrics in an effect, not useMemo
+  useEffect(() => {
     if (!scrollContainerRef.current || scrollContainerDimensions.height === 0) {
-      setScrollMetrics({
-        totalScrollHeight: 0,
-        sectionHeight: 0,
-        bufferZone: 0,
-        rootMargin: "0px",
-        containerHeight: 0
+      queueMicrotask(() => {
+        setScrollMetrics({
+          totalScrollHeight: 0,
+          sectionHeight: 0,
+          bufferZone: 0,
+          rootMargin: "0px",
+          containerHeight: 0
+        });
       });
       return;
     }
+
     const totalScrollHeight = scrollContainerRef.current.scrollHeight;
     const containerHeight = scrollContainerDimensions.height;
     const sectionHeight = totalScrollHeight / TOTAL_SECTIONS;
     const bufferZone = sectionHeight * PERIPHERAL_TRANSITION_PERCENT;
     const rootMargin = `-${Math.round(bufferZone)}px 0px -${Math.round(bufferZone)}px 0px`;
+
     setScrollMetrics({
       totalScrollHeight,
       sectionHeight,
@@ -166,10 +169,6 @@ export default function SettingsScaffold({
       rootMargin,
       containerHeight
     });
-  });
-
-  useEffect(() => {
-    updateScrollMetrics();
   }, [scrollContainerDimensions.height]);
 
   useEffect(() => {
@@ -378,7 +377,7 @@ export default function SettingsScaffold({
               )}>
               <Avatar className="size-10">
                 <AvatarImage
-                  src={user?.image ?? "/user.svg?width=40&height=40&query=AR"}
+                  src={user?.image ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
                   alt={user?.name ?? "username"}
                 />
                 <AvatarFallback>
@@ -455,7 +454,7 @@ export default function SettingsScaffold({
           <div className="mb-6">
             <Avatar className="size-10">
               <AvatarImage
-                src={user?.image ?? "/user.svg"}
+                src={user?.image ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
                 width={24}
                 height={24}
                 alt={user?.name ?? "username"}

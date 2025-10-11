@@ -1,9 +1,10 @@
 // src/context/api-keys-context.tsx
 "use client";
 
-import type { ClientContextWorkupProps } from "@slipstream/types";
 import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import useSWR from "swr";
+import type { ClientContextWorkupProps } from "@slipstream/types";
 
 interface ApiKeysContextValue {
   apiKeys: ClientContextWorkupProps;
@@ -14,61 +15,70 @@ const ApiKeysContext = createContext<ApiKeysContextValue | undefined>(
   undefined
 );
 
+const fallbackApiKeys = {
+  isDefault: {
+    anthropic: false,
+    gemini: false,
+    grok: false,
+    meta: false,
+    openai: false,
+    vercel: false
+  },
+  isSet: {
+    anthropic: false,
+    gemini: false,
+    grok: false,
+    meta: false,
+    openai: false,
+    vercel: false
+  }
+};
+
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  return response.json<ClientContextWorkupProps>();
+};
+
 export function ApiKeysProvider({
   children,
-  userId
-}: Readonly<{ children: ReactNode; userId?: string }>) {
-  const [apiKeys, setApiKeys] = useState<ClientContextWorkupProps>();
-  const [_isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchApiKeys() {
-      if (!userId) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/users/${userId}/api-keys`);
-        console.log("fetching user api key data");
-        if (response.ok) {
-          const data = (await response.json()) as ClientContextWorkupProps;
-          setApiKeys(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch API keys:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  userId,
+  fallbackData
+}: Readonly<{
+  children: ReactNode;
+  userId?: string;
+  fallbackData?:
+    | ClientContextWorkupProps
+    | Promise<ClientContextWorkupProps>
+    | undefined;
+}>) {
+  const { data, mutate } = useSWR(
+    userId ? `/api/users/${userId}/api-keys` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false, // Don't revalidate when window gains focus (tab switching)
+      revalidateOnReconnect: false, // Don't revalidate on network reconnect
+      revalidateOnMount: true, // Keep initial load on mount
+      revalidateIfStale: false, // Don't revalidate if data is considered stale
+      refreshInterval: 0, // Disable automatic polling
+      dedupingInterval: 60000, // Cache requests for 1 minute to prevent duplicate calls
+      errorRetryCount: 2,
+      errorRetryInterval: 5000,
+      fetcher,
+      fallbackData // always hydrates on first load or when a user reauthenticates (starts a new session)
     }
-
-    fetchApiKeys();
-  }, [userId]);
+  );
 
   const updateApiKeys = (keys: ClientContextWorkupProps) => {
-    setApiKeys(keys);
+    // Optimistically update SWR cache, no immediate revalidation
+    mutate(keys, false);
   };
-  const fallbackApiKeys = {
-    isDefault: {
-      anthropic: false,
-      gemini: false,
-      grok: false,
-      meta: false,
-      openai: false,
-      vercel: false
-    },
-    isSet: {
-      anthropic: false,
-      gemini: false,
-      grok: false,
-      meta: false,
-      openai: false,
-      vercel: false
-    }
-  };
+
   return (
     <ApiKeysContext.Provider
-      value={{ updateApiKeys, apiKeys: apiKeys ?? fallbackApiKeys }}>
+      value={{ updateApiKeys, apiKeys: data ?? fallbackApiKeys }}>
       {children}
     </ApiKeysContext.Provider>
   );

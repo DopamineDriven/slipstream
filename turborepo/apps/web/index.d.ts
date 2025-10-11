@@ -7,7 +7,7 @@ declare global {
     dataLayer?: object[];
     chatScrollToBottom?: () => void;
   }
-    interface JSON {
+  interface JSON {
     parse<T = unknown>(
       text: string,
       reviver?: (this: any, key: string, value: any) => any

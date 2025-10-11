@@ -7,6 +7,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssetUpload } from "@/context/asset-context";
+import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import { useAssets } from "@/hooks/use-assets";
@@ -88,6 +89,7 @@ export function ChatInput({
   const [openAttach, setOpenAttach] = useState(false);
 
   const { selectedModel, openDrawer } = useModelSelection();
+  const { openToTab: openSettingsToTab } = useSettingsDrawer();
 
   const assetUpload = useAssetUpload();
 
@@ -670,7 +672,8 @@ export function ChatInput({
                       variant="ghost"
                       size="icon"
                       title="Tools and settings"
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent h-8">
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent h-8"
+                      onClick={() => openSettingsToTab("apiKeys")}>
                       <Tools className="size-4" />
                       <span className="sr-only">Tools</span>
                     </Button>

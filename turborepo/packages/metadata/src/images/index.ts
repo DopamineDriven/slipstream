@@ -215,27 +215,69 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
             exifDateTimeOriginal = text.trim();
           }
         } else if (chunkType === "zTXt") {
-          let offset = chunkData;
+          const chunkStart = chunkData;
+          const chunkEnd = chunkData + chunkLen;
+          let offset = chunkStart;
+
+          // Find null-terminated keyword
           const keywordEnd = buffer.indexOf(0, offset);
-          if (keywordEnd === -1 || keywordEnd >= chunkData + chunkLen) continue; // Malformed
+          if (keywordEnd === -1 || keywordEnd >= chunkEnd) continue;
+
           const keyword = buffer.toString("latin1", offset, keywordEnd);
           offset = keywordEnd + 1;
+
+          // Check we have space for compression method
+          if (offset >= chunkEnd) continue;
+
           const compressionMethod = buffer[offset];
           offset += 1;
-          let textBuffer = buffer.subarray(offset, chunkData + chunkLen);
+
+          // Check we have actual compressed data
+          if (offset >= chunkEnd) {
+            // No text data after compression method
+            continue;
+          }
+
+          const compressedDataLength = chunkEnd - offset;
+          if (compressedDataLength <= 0) {
+            // Empty compressed data
+            continue;
+          }
+
+          let textBuffer = buffer.subarray(offset, chunkEnd);
+
           if (compressionMethod === 0) {
-            // zlib
+            // zlib compression
             try {
+              // Check for minimum zlib header size (2 bytes)
+              if (textBuffer.length < 2) {
+                continue; // Too small to be valid zlib data
+              }
+
+              // Validate zlib header (optional but helps catch corruption)
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const cmf = textBuffer[0]!;
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const flg = textBuffer[1]!
+
+              if ((cmf * 256 + flg) % 31 !== 0) {
+                // Invalid zlib header checksum
+                continue;
+              }
+
               textBuffer = Buffer.from(inflateSync(textBuffer));
-            } catch (e) {
-              console.error("Failed to decompress zTXt:", e);
+            } catch {
+              // Silently skip malformed chunks instead of spamming console
               continue;
             }
           } else {
-            continue; // Unsupported method
+            // Unsupported compression method
+            continue;
           }
+
           const text = textBuffer.toString("latin1");
-          metadata[keyword] = text; // Add to metadata
+          metadata[keyword] = text;
+
           if (keyword === "Creation Time" && !exifDateTimeOriginal) {
             exifDateTimeOriginal = text.trim();
           }

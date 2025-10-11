@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 export default {
   reactStrictMode: true,
-  experimental: { turbopackFileSystemCacheForDev: true },
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [
@@ -15,10 +14,12 @@ export default {
       { pathname: "/svgs/**" },
       { pathname: "/*" }
     ],
-    minimumCacheTTL: 604800, // 7 days; defaults to 14400 (4 hours)
     qualities: [75, 100],
     loader: "default",
     formats: ["image/avif", "image/webp"],
+    dangerouslyAllowLocalIP: true,
+    maximumRedirects: 5,
+    contentDispositionType: "attachment",
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {
@@ -67,9 +68,10 @@ export default {
         hostname: `assets-dev.aicoalesce.com`,
         protocol: "https"
       },
+      {hostname: "raw.githubusercontent.com", protocol: "https"},
       { hostname: "imgen.x.ai", protocol: "https" },
       { hostname: "images.unsplash.com", protocol: "https" },
-      { hostname: "tailwindui.com", protocol: "https" }
+      { hostname: "tailwindcss.com", protocol: "https" }
     ]
   },
   productionBrowserSourceMaps: true

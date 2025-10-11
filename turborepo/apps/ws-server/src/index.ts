@@ -144,26 +144,17 @@ async function exe() {
       cfg.GOOGLE_API_KEY
     );
 
-    const fastApiUrl = process.env.FASTAPI_URL ?? cfg.FASTAPI_URL;
-
     const resolver = new Resolver(
       wsServer,
       openai,
       gemini,
       anthropic,
       s3,
-      fastApiUrl,
       region,
       xai,
       v0,
       meta,
-      isProd,
-      cfg.OPENAI_API_KEY,
-      cfg.GEMINI_API_KEY,
-      cfg.ANTHROPIC_API_KEY,
-      cfg.X_AI_KEY,
-      cfg.V0_API_KEY,
-      cfg.LLAMA_API_KEY
+      isProd
     );
 
     resolver.registerAll();

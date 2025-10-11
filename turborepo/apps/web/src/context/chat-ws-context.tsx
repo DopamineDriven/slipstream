@@ -3,7 +3,7 @@
 import type { MessageHandler } from "@/types/chat-ws";
 import type { User } from "@/utils/auth-client";
 import type { Context, ReactNode } from "react";
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef,  } from "react";
 import { useChatWebSocket } from "@/hooks/use-chat-ws";
 import { ChatWebSocketClient } from "@/utils/chat-ws-client";
 import type { ChatWsEvent, EventTypeMap } from "@slipstream/types";
@@ -28,6 +28,7 @@ const ChatWebSocketContext = createContext<ChatWsContextProps | null>(
 
 // Singleton manager to ensure only one client exists globally
 class WebSocketManager {
+  constructor() {}
   private static instance: WebSocketManager;
   private clients = new Map<string, ChatWebSocketClient>();
 
@@ -38,11 +39,11 @@ class WebSocketManager {
     return WebSocketManager.instance;
   }
 
-  public getClient(key: string): ChatWebSocketClient | null {
+  public getClient(key: string) {
     return this.clients.get(key) ?? null;
   }
 
-  public setClient(key: string, client: ChatWebSocketClient): void {
+  public setClient(key: string, client: ChatWebSocketClient) {
     // Clean up any existing client with this key
     const existing = this.clients.get(key);
     if (existing && existing !== client) {
@@ -51,7 +52,7 @@ class WebSocketManager {
     this.clients.set(key, client);
   }
 
-  public removeClient(key: string): void {
+  public removeClient(key: string) {
     const client = this.clients.get(key);
     if (client) {
       client.close();
@@ -74,25 +75,26 @@ export function ChatWebSocketProvider({
 }>) {
   const wsManager = useRef(WebSocketManager.getInstance());
   const { lastEvent, isConnected, sendEvent, client, on, disconnect } =
-    useChatWebSocket(user?.email);
+    useChatWebSocket(user?.id);
 
   // Register this client with the manager
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.id) return;
     const wsManagerInner = wsManager.current;
-    const key = user?.email ?? "no-user@gmail.com";
+    const key = user?.id ?? "no-id"; // special flag
     wsManagerInner.setClient(key, client);
 
     return () => {
-      // Only remove if it's still our client (email hasn't changed)
+      // Only remove if it's still our client (id hasn't changed)
       const currentClient = wsManagerInner.getClient(key);
       if (currentClient === client) {
         wsManagerInner.removeClient(key);
       }
     };
-  }, [client, user?.email]);
+  }, [client, user?.id]);
 
   // Clean up on unmount
+
   useEffect(() => {
     return () => {
       disconnect();

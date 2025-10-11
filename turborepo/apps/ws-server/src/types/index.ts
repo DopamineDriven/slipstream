@@ -7,6 +7,8 @@ export interface WSServerOptions {
 }
 
 export interface UserData {
+  ip?: string;
+  ua?: string;
   email?: string;
   city?: string;
   country?: string;
@@ -14,6 +16,7 @@ export interface UserData {
   latlng?: string;
   postalCode?: string;
   tz?: string;
+  locale?: string;
 }
 
 export type MessageHandler<T extends keyof EventTypeMap> = (

@@ -41,7 +41,7 @@ export function UserProfileCard({
       <div className="flex flex-col items-center text-center">
         <Avatar className="border-brand-primary mb-3 h-20 w-20 border-2 sm:mb-4 sm:h-24 sm:w-24">
           <AvatarImage
-            src={user?.image ?? "/placeholder.svg"}
+            src={user?.image ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
             alt={user?.name ?? "user avatar"}
           />
           <AvatarFallback className="text-2xl sm:text-3xl">

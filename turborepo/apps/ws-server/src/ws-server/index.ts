@@ -101,12 +101,16 @@ export class WSServer {
     email?: string
   ) {
     if (!cookieObj) return;
-    const { city, country, latlng, tz, region, postalCode } = cookieObj;
+    const { city, country, latlng, tz, region, postalCode, ip, locale, ua } =
+      cookieObj;
     void this.prisma.updateProfile({
       email: email ?? "",
       region,
       postalCode,
       city,
+      ip,
+      locale,
+      ua: decodeURIComponent(ua),
       country,
       latlng,
       tz,
@@ -115,6 +119,9 @@ export class WSServer {
     return this.userDataMap.set(userId, {
       email,
       region,
+      ip,
+      locale,
+      ua: decodeURIComponent(ua),
       postalCode,
       city,
       country,
@@ -139,6 +146,9 @@ export class WSServer {
     const {
       city,
       country,
+      ip,
+      locale,
+      ua,
       latlng,
       tz,
       postalCode,
@@ -150,12 +160,15 @@ export class WSServer {
       country: "unknown country",
       latlng: "unknown latlng",
       tz: "unknown tz",
+      ip: "0.0.0.0",
+      ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
+      locale: "en-US",
       postalCode: "unknown postal code",
       region: "unknown"
     };
 
     this.userMap.set(ws, userId);
-    const message = `User ${userId} connected from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with an approx location of ${latlng}`;
+    const message = `User ${userId} connected from ${city}, ${country} (${region} region) having postal code ${postalCode} in the ${tz} timezone with a locale of ${locale}, an approx location of ${latlng}, an ip of ${ip}, and a ua of ${ua}`;
     console.info(message);
     ws.on("message", raw => {
       if (this.resolver) {
@@ -163,6 +176,9 @@ export class WSServer {
         this.resolver.handleRawMessage(ws, uid, raw, {
           email: userEmail,
           city,
+          ip,
+          locale,
+          ua,
           country,
           latlng,
           postalCode,
@@ -183,27 +199,33 @@ export class WSServer {
     ws: WebSocket,
     req: IncomingMessage
   ): Promise<{ userId: string; email: string } | null> {
-    const userEmail = this.extractUserEmailFromUrl(req);
+    const id = this.extractUserIdFromUrl(req);
 
-    if (!userEmail) {
-      ws.close(4001, "no user email, connection closed");
+    if (!id) {
+      ws.close(4001, "no user id, connection closed");
       return null;
     }
 
-    if (userEmail === "no-user-email") {
-      ws.close(4001, "no user email, connection closed");
+    if (id === "no-id") {
+      ws.close(4001, "no user id, connection closed");
       return null;
     }
 
     try {
-      const decodedEmail = decodeURIComponent(userEmail);
+      const decodedId = decodeURIComponent(id);
 
-      const { isValid: userIsValid, userId } =
-        await this.prisma.getAndValidateUserSessionByEmail(decodedEmail);
+      const {
+        isValid: userIsValid,
+        userId,
+        email
+      } = await this.prisma.getAndValidateUserSessionById(decodedId);
 
-      if (userIsValid === false) throw new Error("Invalid Session");
+      if (userIsValid === false) {
+        ws.close(4001, `Invalid Session for user ${userId}`);
+        return null;
+      }
 
-      return { userId, email: decodedEmail };
+      return { userId, email };
     } catch (err) {
       if (err instanceof Error) {
         ws.close(4001, `Auth failed: ${err.message}`);
@@ -222,6 +244,9 @@ export class WSServer {
         cookieHeader.split(";").forEach(function (cookie) {
           const cookieKeys = [
             "city",
+            "locale",
+            "ua",
+            "ip",
             "country",
             "latlng",
             "tz",
@@ -254,7 +279,7 @@ export class WSServer {
     }
   }
 
-  private extractUserEmailFromUrl(req: IncomingMessage): string | null {
+  private extractUserIdFromUrl(req: IncomingMessage): string | null {
     const rawPath = req?.url ?? "";
     const host = req?.headers?.host;
     if (!host) return null;
@@ -265,7 +290,7 @@ export class WSServer {
     // build a full URL so URL.searchParams works
     try {
       const full = new URL(`${scheme}://${host}${rawPath}`);
-      return full.searchParams.get("email");
+      return full.searchParams.get("id");
     } catch {
       return null;
     }

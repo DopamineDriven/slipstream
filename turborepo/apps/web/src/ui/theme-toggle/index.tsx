@@ -1,23 +1,20 @@
 "use client";
 
-import type { ComponentPropsWithRef } from "react";
-import { useEffect, useEffectEvent, useState } from "react";
-import { Button, Moon, Sun } from "@slipstream/ui";
+import type { CustomComponentPropsWithRef } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { Button, Moon, Sun } from "@slipstream/ui";
 
 export function ThemeToggle({
   className,
   ...props
-}: ComponentPropsWithRef<typeof Button>) {
+}: CustomComponentPropsWithRef<typeof Button>) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const mountEvt = useEffectEvent(() => {
-    setMounted(true);
-  });
-
   useEffect(() => {
-    mountEvt();
+    // eslint-disable-next-line
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {

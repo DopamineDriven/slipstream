@@ -33,18 +33,11 @@ export class Resolver extends ModelService {
     private geminiService: GeminiService,
     private anthropicService: AnthropicService,
     private s3Service: S3Storage,
-    private fastApiUrl: string,
     private region: string,
     private xAIService: xAIService,
     private v0Service: v0Service,
     private llamaService: LlamaService,
     private isProd: boolean,
-    private openaiFallbackKey: string,
-    private geminiFallbackKey: string,
-    private anthropicFallbackKeyy: string,
-    private xaiFallbackKey: string,
-    private vercelFallbackKey: string,
-    private metaFallbackKey: string
   ) {
     super();
   }

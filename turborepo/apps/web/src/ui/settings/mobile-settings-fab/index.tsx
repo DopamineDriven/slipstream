@@ -191,7 +191,7 @@ export function MobileSettingsFAB({
                         <AvatarImage
                           src={
                             user?.image ??
-                            "/placeholder.svg?width=32&height=32&query=AR"
+                            "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
                           }
                           alt={user?.name ?? user?.id}
                         />

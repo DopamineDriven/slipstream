@@ -50,7 +50,7 @@ export class AnthropicService {
       );
     this.defaultClient = new Anthropic({
       apiKey: this.apiKey,
-      logLevel: "info",
+      logLevel: "debug",
       logger: this.logger
     });
   }
@@ -307,7 +307,10 @@ export class AnthropicService {
       model as AllModelsUnion,
       max_tokens
     );
-
+    this.logger.debug(
+      messages,
+      "debugging full content on first message to anthropic"
+    );
     const tools = this.webSearchTool(user_location);
 
     const stream = (await anthropic.messages.create(
@@ -319,10 +322,12 @@ export class AnthropicService {
         temperature,
         system,
         model,
+        metadata: { user_id: userId },
         messages,
+        service_tier: "auto",
         tools
       },
-      { stream: true }
+      { stream: true,  }
     )) satisfies Stream<RawMessageStreamEvent> & {
       _request_id?: string | null;
     };
