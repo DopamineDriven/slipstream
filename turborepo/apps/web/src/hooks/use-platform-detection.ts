@@ -1,6 +1,6 @@
 "use client"
 
-import { useCookiesCtx } from "@/context/cookie-context";
+import { useState, useEffect } from "react"
 
 interface PlatformInfo {
   isMac: boolean
@@ -14,21 +14,51 @@ interface PlatformInfo {
 }
 
 export function usePlatformDetection(): PlatformInfo {
-  const { get } = useCookiesCtx();
+  const [platformInfo, setPlatformInfo] = useState<PlatformInfo>({
+    isMac: false,
+    isIOS: false,
+    viewport: "desktop",
+    country: "US",
+    city: "Chicago",
+    timezone: "america/chicago",
+    coordinates: "41.8338486,-87.8966849",
+    hostname: "localhost",
+  })
 
-  return {
-    isMac: get("isMac") === "true",
-    isIOS: get("ios") === "true",
-    viewport: (get("viewport") as "mobile" | "desktop" | undefined) ?? "desktop",
-    country: get("country") ?? "US",
-    city: get("city") ?? "Chicago",
-    timezone: get("tz") ?? "america/chicago",
-    coordinates: get("latlng") ?? "41.8338486,-87.8966849",
-    hostname: get("hostname") ?? "localhost",
-  }
+  useEffect(() => {
+    // Read from cookies set by middleware
+    const getCookie = (name: string): string => {
+      const value = `; ${document.cookie}`
+      const parts = value.split(`; ${name}=`)
+      if (parts.length === 2) return parts.pop()?.split(";").shift() ?? ""
+      return ""
+    }
+    // eslint-disable-next-line
+    setPlatformInfo({
+      isMac: getCookie("isMac") === "true",
+      isIOS: getCookie("ios") === "true",
+      viewport: (getCookie("viewport") as "mobile" | "desktop") || "desktop",
+      country: getCookie("country") || "US",
+      city: getCookie("city") || "Chicago",
+      timezone: getCookie("tz") || "america/chicago",
+      coordinates: getCookie("latlng") || "41.8338486,-87.8966849",
+      hostname: getCookie("hostname") || "localhost",
+    })
+  }, [])
+
+  return platformInfo
 }
 
-export function useIsMac(): boolean {
-  const { get } = useCookiesCtx();
-  return get("isMac") === "true";
+// Helper function for backward compatibility
+export function isMac(): boolean {
+  if (typeof document === "undefined") return false
+
+  const getCookie = (name: string): string => {
+    const value = `; ${document.cookie}`
+    const parts = value.split(`; ${name}=`)
+    if (parts.length === 2) return parts.pop()?.split(";").shift() ?? ""
+    return ""
+  }
+
+  return getCookie("isMac") === "true"
 }

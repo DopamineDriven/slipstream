@@ -50,7 +50,25 @@ export class PrismaService extends ModelService {
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
     this.prismaClient = prisma.prismaClient;
   }
+  public async getAndValidateUserSessionById(id: string) {
+    const res = await this.prismaClient.user.findUniqueOrThrow({
+      where: { id },
+      include: { sessions: true }
+    });
 
+    const sesh = res?.sessions.sort(
+      (a, b) => b?.expires?.getTime() - a.expires.getTime()
+    );
+    let isValid = false;
+    if (sesh?.[0]) {
+      isValid = sesh?.[0].expires.getTime() > new Date(Date.now()).getTime();
+    }
+    return {
+      userId: id,
+      email: res.email,
+      isValid
+    };
+  }
   public async getAndValidateUserSessionByEmail(email: string) {
     const res = await this.prismaClient.user.findUnique({
       where: { email },

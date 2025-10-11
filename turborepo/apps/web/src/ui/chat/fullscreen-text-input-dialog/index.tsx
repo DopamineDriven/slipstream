@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -27,13 +27,10 @@ export function FullscreenTextInputDialog({
 }: FullscreenTextInputDialogProps) {
   const [text, setText] = useState(initialValue);
 
-  const resetText = useEffectEvent(() => {
-    setText(initialValue);
-  });
-
   useEffect(() => {
     if (isOpen) {
-      resetText();
+      // eslint-disable-next-line
+      setText(initialValue);
     }
   }, [isOpen, initialValue]);
 

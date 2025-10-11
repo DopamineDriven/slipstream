@@ -1,7 +1,6 @@
 "use client";
 
-import type { Provider } from "@slipstream/types";
-import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useModelSelection } from "@/context/model-selection-context";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
@@ -15,6 +14,7 @@ import {
   DrawerTitle
 } from "@/ui/atoms/drawer";
 import { ModelUI } from "@/ui/chat/mobile-model-selector-drawer/model-badges";
+import type { Provider } from "@slipstream/types";
 import {
   displayNameToModelId,
   getDisplayNamesForProvider
@@ -26,6 +26,13 @@ import {
   TabsList,
   TabsTrigger
 } from "@slipstream/ui";
+
+const cxStyles = {
+  default: `focus:ring-brand-primary/50 h-auto w-full justify-between p-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98]`,
+  isSelected: "bg-brand-primary text-brand-primary-foreground shadow-md",
+  isNotSelected:
+    "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
+} as const;
 
 export function MobileModelSelectorDrawer() {
   const {
@@ -41,23 +48,10 @@ export function MobileModelSelectorDrawer() {
     selectedModel.provider
   );
 
-  const syncDraftProvider = useEffectEvent(() => {
-    setDraftProvider(p => (p === selectedModel.provider ? p : selectedModel.provider));
-  });
-
   useEffect(() => {
-    syncDraftProvider();
+    // eslint-disable-next-line
+    setDraftProvider(selectedModel.provider);
   }, [selectedModel.provider]);
-
-  const styleMemo = useMemo(() => {
-    const mobileModelSelectStyles = {
-      default: `focus:ring-brand-primary/50 h-auto w-full justify-between p-4 text-left transition-all focus:ring-2 focus:ring-offset-0 active:scale-[0.98]`,
-      isSelected: "bg-brand-primary text-brand-primary-foreground shadow-md",
-      isNotSelected:
-        "bg-brand-sidebar border-brand-border hover:bg-brand-primary/10 hover:border-brand-primary/30 text-brand-text active:bg-brand-primary/20"
-    };
-    return mobileModelSelectStyles;
-  }, []);
 
   return (
     <Drawer open={isDrawerOpen} onOpenChange={open => !open && closeDrawer()}>
@@ -93,21 +87,25 @@ export function MobileModelSelectorDrawer() {
                 })}
               </TabsList>
               {providers.map(provider => {
-                const Icon = providerMetadata[provider].icon;
+                const {
+                  description,
+                  icon: Icon,
+                  name
+                } = providerMetadata[provider];
                 return (
                   <TabsContent
-                    key={providerMetadata[provider].name}
+                    key={name}
                     value={provider}
                     className="flex-1 overflow-x-hidden">
                     <div className="bg-brand-sidebar/50 border-brand-border/50 mb-6 rounded-lg border p-4">
                       <div className="mb-2 flex items-center gap-3">
                         <Icon className="size-6 shrink-0" />
                         <h3 className="text-brand-text-emphasis text-base font-semibold sm:text-lg">
-                          {providerMetadata[provider].name}
+                          {name}
                         </h3>
                       </div>
                       <p className="text-brand-text-muted text-sm leading-relaxed">
-                        {providerMetadata[provider].description}
+                        {description}
                       </p>
                     </div>
                     <div className="-mr-2 flex-1 overflow-y-auto pr-2">
@@ -122,10 +120,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)
@@ -148,10 +146,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)
@@ -174,10 +172,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)
@@ -200,10 +198,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)
@@ -226,10 +224,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)
@@ -252,10 +250,10 @@ export function MobileModelSelectorDrawer() {
                                 key={displayNameToModelId[provider][model]}
                                 variant={isSelected ? "default" : "outline"}
                                 className={cn(
-                                  styleMemo.default,
+                                  cxStyles.default,
                                   isSelected
-                                    ? styleMemo.isSelected
-                                    : styleMemo.isNotSelected
+                                    ? cxStyles.isSelected
+                                    : cxStyles.isNotSelected
                                 )}
                                 onClick={() =>
                                   handleModelSelect(provider, model)

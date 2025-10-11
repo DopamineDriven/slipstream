@@ -8,13 +8,25 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image|auth/(?:login|signup)).*)"
   ]
 };
+type CookieCacheProps = {
+  session: Session & Record<string, any>;
+  user: User & Record<string, any>;
+} | null;
 
 function detectDeviceAndSetCookies(
   request: NextRequest,
-  response: NextResponse
+  response: NextResponse,
+  sesh: CookieCacheProps = null
 ) {
   const domain =
     process.env.NODE_ENV !== "development" ? ".aicoalesce.com" : undefined;
+  const config = {
+    domain,
+    path: "/",
+    secure: typeof domain !== "undefined",
+    sameSite: "lax",
+    httpOnly: false
+  } as const;
   const country = request.headers.get("x-vercel-ip-country") ?? "US";
   const region =
     request.headers.get("x-vercel-ip-country-region") ?? "Illinois";
@@ -83,6 +95,9 @@ function detectDeviceAndSetCookies(
   if (request.cookies.has("isMac")) {
     response.cookies.delete("isMac");
   }
+  if (request.cookies.has("userId")) {
+    response.cookies.delete("userId");
+  }
 
   const isIOS = /(ios|iphone|ipad|iwatch)/i.test(ua);
 
@@ -97,13 +112,10 @@ function detectDeviceAndSetCookies(
     locale = `${locale.toLowerCase()}-${country}`;
   }
 
-  const config = {
-    domain,
-    path: "/",
-    secure: typeof domain !== "undefined",
-    sameSite: "lax",
-    httpOnly: false
-  } as const;
+  if (sesh) {
+    response.cookies.set("userId", sesh.user.id, config);
+  }
+
   // Set cookies
   response.cookies.set("hostname", hostname, config);
   response.cookies.set("locale", locale, config);
@@ -111,7 +123,7 @@ function detectDeviceAndSetCookies(
   response.cookies.set("ios", ios, config);
   response.cookies.set("latlng", latlng, config);
   response.cookies.set("tz", tz, config);
-  response.cookies.set("ua", ua, config);
+  response.cookies.set("ua", encodeURIComponent(ua), config);
   response.cookies.set("ip", ip, config);
   response.cookies.set("country", country, config);
   response.cookies.set("city", city, config);
@@ -122,22 +134,21 @@ function detectDeviceAndSetCookies(
   return response;
 }
 
-export default async function proxy(req: NextRequest) {
-  const session = (await getCookieCache(req)) satisfies {
-    session: Session & Record<string, any>;
-    user: User & Record<string, any>;
-  } | null;
+export default async function middleware(req: NextRequest) {
+  const session = (await getCookieCache(req)) satisfies CookieCacheProps;
 
   if (!session && !req.nextUrl.pathname.includes("/auth")) {
     return detectDeviceAndSetCookies(
       req,
-      NextResponse.redirect(new URL("/auth/login", req.url))
+      NextResponse.redirect(new URL("/auth/login", req.url)),
+      session
     );
   }
   if (req.nextUrl.pathname === "/") {
     return detectDeviceAndSetCookies(
       req,
-      NextResponse.rewrite(new URL("/chat/home", req.url))
+      NextResponse.rewrite(new URL("/chat/home", req.url)),
+      session
     );
-  } else return detectDeviceAndSetCookies(req, NextResponse.next());
+  } else return detectDeviceAndSetCookies(req, NextResponse.next(), session);
 }

@@ -1,11 +1,13 @@
 "use client";
 
 import type React from "react";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
+import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import dynamic from "next/dynamic";
 import { useCookiesCtx } from "@/context/cookie-context";
-import { useModelSelection } from "@/context/model-selection-context";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { useResolvedTheme } from "@/hooks/use-resolved-theme";
+import { SidebarProps } from "@/types/ui";
 import {
   Sidebar,
   SidebarInset,
@@ -16,7 +18,6 @@ import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawe
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
-import { useTheme } from "next-themes";
 import {
   Button,
   PanelLeftClose as PanelLeft,
@@ -32,36 +33,18 @@ const ThemeToggle = dynamic(
 
 interface ChatLayoutShellProps {
   children: React.ReactNode;
+  fallbackData?: SidebarProps[];
+  userId?: string;
 }
 
 function HeaderActions() {
-  const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    if (!resolvedTheme) {
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else {
-      if (resolvedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  }, [resolvedTheme]);
-
+  useResolvedTheme();
+  const { openToTab } = useSettingsDrawer();
   const handleShareChat = useCallback(() => {
     console.log("Share chat clicked. Implement sharing logic.");
     alert("Share functionality to be implemented!");
   }, []);
-  const { openDrawer } = useModelSelection();
+
   return (
     <div className="flex items-center space-x-1 sm:space-x-2">
       <Button
@@ -75,7 +58,7 @@ function HeaderActions() {
       <Button
         variant="ghost"
         size="icon"
-        onClick={openDrawer}
+        onClick={() => openToTab("apiKeys")}
         className="text-brand-text-muted hover:text-brand-text hover:bg-brand-component">
         <Settings className="size-5" />
         <span className="sr-only">Settings</span>
@@ -85,10 +68,12 @@ function HeaderActions() {
   );
 }
 
-export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
+export function ChatLayoutShell({
+  children,
+  fallbackData,
+  userId
+}: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
 
   const { get } = useCookiesCtx();
   const isMac = get("isMac") === "true";
@@ -108,12 +93,12 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
   useKeyboardShortcuts(keyboardShortcutsMemo);
 
   return (
-    <>
+    <div className="bg-background text-foreground h-full w-screen overflow-hidden">
       <SidebarProvider>
         <div className="flex h-full w-full overflow-hidden">
           <Sidebar collapsible="icon" className="bg-muted/20 border-r">
             <Suspense>
-              <EnhancedSidebar />
+              <EnhancedSidebar fallbackData={fallbackData} />
             </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">
@@ -135,10 +120,7 @@ export function ChatLayoutShell({ children }: ChatLayoutShellProps) {
         </div>
       </SidebarProvider>
       <MobileModelSelectorDrawer />
-      <SettingsDrawer
-        isOpen={isSettingsDrawerOpen}
-        onOpenChange={setIsSettingsDrawerOpen}
-      />
-    </>
+      <SettingsDrawer />
+    </div>
   );
 }

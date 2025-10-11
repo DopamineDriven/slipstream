@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag, refresh } from "next/cache";
 import { prismaClient } from "@/lib/prisma";
 import { getSession } from "@/utils/auth";
 import type { Providers } from "@slipstream/types";
@@ -58,7 +58,13 @@ export async function upsertApiKey(formdata: FormData) {
         }
       }
     });
-    revalidatePath("/(chat)/settings/[id]");
+    await prismaClient.$accelerate.invalidate({
+      tags: [`user_api_keys_${userId}`]
+    });
+    updateTag(`user_api_keys_${userId}`);
+    // Refresh uncached server-driven UI to reflect changes immediately
+    refresh();
+
     return { success: true, id: createUserKey.id } as const;
   } else return { success: false, id: message } as const;
 }
@@ -85,7 +91,8 @@ export async function getDecryptedApiKeyOnEdit(
     throw new Error("unauthorized");
   }
   const rec = await prismaClient.userKey.findUnique({
-    where: { userId_provider: { userId, provider: toPrismaFormat(provider) } }
+    where: { userId_provider: { userId, provider: toPrismaFormat(provider) } },
+    select: { authTag: true, apiKey: true, iv: true }
   });
   if (!rec) {
     throw new Error(`No API key configured for ${provider}!`);
@@ -93,7 +100,6 @@ export async function getDecryptedApiKeyOnEdit(
   try {
     const hasKey = decryptMapper.get(provider);
     if (typeof hasKey !== "undefined") {
-      revalidatePath("/(chat)/settings/[id]");
       return hasKey;
     }
 
@@ -103,7 +109,6 @@ export async function getDecryptedApiKeyOnEdit(
       iv: rec.iv
     });
     decryptMapper.set(provider, decrypted);
-    revalidatePath("/(chat)/settings/[id]");
     return decrypted;
   } catch (err) {
     if (err instanceof Error) {

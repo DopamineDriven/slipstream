@@ -1,22 +1,20 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useViewportDimensions() {
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
   } | null>(null);
-  const setDimensionsEffect = useEffectEvent(() => {
-    if (typeof window === "undefined") return;
-    setDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-  });
 
   useEffect(() => {
-    setDimensionsEffect();
+      // eslint-disable-next-line
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+
     const handleResize = () => {
       setDimensions({
         width: window.innerWidth,

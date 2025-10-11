@@ -1,5 +1,10 @@
 "use client";
 
+import * as React from "react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import { cn } from "@/lib/utils";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, VariantProps } from "class-variance-authority";
 import {
   Button,
   Input,
@@ -16,12 +21,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@slipstream/ui";
-import * as React from "react";
-import { useEffect, useEffectEvent, useState } from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, VariantProps } from "class-variance-authority";
-import { useIsMobile } from "@/hooks/use-is-mobile";
-import { cn } from "@/lib/utils";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -611,6 +610,9 @@ function SidebarMenuBadge({
     />
   );
 }
+function fiftyToNinetyPercentRandom() {
+  return `${Math.floor(Math.random() * 40) + 50}%` as const;
+}
 
 function SidebarMenuSkeleton({
   className,
@@ -619,14 +621,9 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean;
 }) {
-  // Random width between 50 to 90%, set after mount to avoid impure calls during render.
-  const [width, setWidth] = useState<string>("70%");
-  const setRandomWidth = useEffectEvent(() => {
-    const w = `${Math.floor(Math.random() * 40) + 50}%`;
-    setWidth(w);
-  });
-  useEffect(() => {
-    setRandomWidth();
+  // Random width between 50 to 90%.
+  const width = React.useMemo(() => {
+    return fiftyToNinetyPercentRandom();
   }, []);
 
   return (

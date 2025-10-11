@@ -2,7 +2,7 @@
 
 import type { Properties } from "csstype";
 import type { ReactNode } from "react";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { cn } from "@/lib/utils";
 import { AnimateNumber } from "motion-plus/react";
@@ -39,14 +39,6 @@ export function ThinkingSection({
   const lastUpdateRef = useRef<number>(0);
   // Drive live timer based on isThinking only
   // This avoids loops from rapidly-changing duration
-  const resetDisplay = useEffectEvent(() => {
-    setDisplayDuration(0);
-  });
-
-  const setDisplayRounded = useEffectEvent((rounded: number) => {
-    setDisplayDuration(prev => (prev !== rounded ? rounded : prev));
-  });
-
   useEffect(() => {
     if (!isThinking) {
       // Ensure any active rAF is cancelled when thinking stops
@@ -60,7 +52,8 @@ export function ThinkingSection({
     if (!startTimeRef.current) {
       startTimeRef.current = performance.now();
       lastUpdateRef.current = 0;
-      resetDisplay();
+      // eslint-disable-next-line
+      setDisplayDuration(0);
     }
 
     const updateDuration = (currentTime: number) => {
@@ -71,7 +64,7 @@ export function ThinkingSection({
       // Throttle to ~10Hz and only update when the displayed value changes at 0.1s precision
       if (currentTime - lastUpdateRef.current >= 100) {
         const rounded = Math.round(seconds * 10) / 10;
-        setDisplayRounded(rounded);
+        setDisplayDuration(prev => (prev !== rounded ? rounded : prev));
         lastUpdateRef.current = currentTime;
       }
 
@@ -89,10 +82,6 @@ export function ThinkingSection({
   }, [isThinking]);
 
   // Apply final duration updates when not thinking; ignore during active thinking to avoid effect churn
-  const setFinalDisplay = useEffectEvent((finalSeconds: number) => {
-    setDisplayDuration(finalSeconds);
-  });
-
   useEffect(() => {
     if (isThinking) return; // live timer effect owns updates during thinking
 
@@ -105,7 +94,8 @@ export function ThinkingSection({
     // Set the final duration (ms -> s) if provided
     if (typeof duration === "number") {
       const finalSeconds = Math.round((duration / 1000) * 10) / 10;
-      setFinalDisplay(finalSeconds);
+      // eslint-disable-next-line
+      setDisplayDuration(finalSeconds);
     }
 
     // Reset for the next thinking session

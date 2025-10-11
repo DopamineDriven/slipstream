@@ -89,7 +89,7 @@ export function AttachmentPreviewComponent({
                 {attachment.mime.startsWith("image/") ? (
                   <div className="relative">
                     <NextImage
-                      src={thumbnail ?? "/aic-logo.svg"}
+                      src={thumbnail ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
                       alt={attachment.filename}
                       width={attachment.width}
                       height={attachment.height}

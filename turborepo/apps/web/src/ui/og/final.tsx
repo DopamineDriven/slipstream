@@ -87,7 +87,7 @@ export function OGFinal() {
               <Image
                 width={267}
                 height={202}
-                src={logoLight || "/placeholder.svg"}
+                src={logoLight || "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
                 alt="aicoalesce logo"
                 style={{
                   height: "5rem",

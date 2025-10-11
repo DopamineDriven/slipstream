@@ -122,7 +122,7 @@ function CustomImage({
 }: CustomImageProps) {
   return (
     <Image
-      src={src || "/placeholder.svg"}
+      src={src || "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
       alt={alt}
       width={width}
       height={height}

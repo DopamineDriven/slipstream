@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { DocSpecs, ImageSpecs } from "@slipstream/metadata";
+import type { DocSpecs, ImageSpecs } from "@slipstream/types";
 import {
-  DocMetadataExtractor,
   ImgMetadataExtractor
-} from "@slipstream/metadata";
-
+} from "@/utils/img-extractor-client";
+import {DocMetadataExtractor} from "@/utils/doc-extractor-client";
 export interface AttachmentPreview {
   id: string;
   file: File;
@@ -79,7 +78,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
 
                 setMetadata(prev => ({
                   ...prev,
-                  [attachment.id]: { ...imageSpecs }
+                  [attachment.id]: {type: "IMAGE", ...imageSpecs }
                 }));
                 setSize(prev => ({
                   ...prev,

@@ -12,9 +12,9 @@ import { useSidebar } from "@/ui/atoms/sidebar";
 import { SidebarDropdownMenu } from "@/ui/chat/sidebar/drop-menu";
 import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
 import { Logo } from "@/ui/logo";
+import { useSession } from "@/utils/auth-client";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "motion/react";
-import { useSession } from "@/utils/auth-client";
 import {
   Button,
   Check,
@@ -34,9 +34,13 @@ import {
 
 interface EnhancedSidebarProps {
   className?: string;
+  fallbackData?: SidebarProps[];
 }
 
-export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
+export function EnhancedSidebar({
+  className = "",
+  fallbackData
+}: EnhancedSidebarProps) {
   const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
   const {
@@ -45,7 +49,7 @@ export function EnhancedSidebar({ className = "" }: EnhancedSidebarProps) {
     deleteConversation,
     updateTitle,
     isValidating
-  } = useConversations(userId);
+  } = useConversations(userId, fallbackData);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");

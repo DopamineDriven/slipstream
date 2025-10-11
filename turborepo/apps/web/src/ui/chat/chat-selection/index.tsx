@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { Button, Copy, QuoteIcon } from "@slipstream/ui";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Button, Copy, QuoteIcon } from "@slipstream/ui";
 
 type Props = {
   rect: DOMRect;
@@ -20,12 +20,9 @@ export function SelectionToolbar({
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
-  const mountEvt = useEffectEvent(() => {
-    setMounted(true);
-  });
-
   useEffect(() => {
-    mountEvt();
+    // eslint-disable-next-line
+    setMounted(true)
 
     const handleScroll = () => onClose();
     const handleResize = () => onClose();

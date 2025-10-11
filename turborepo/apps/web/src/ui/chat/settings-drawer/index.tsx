@@ -1,5 +1,11 @@
 "use client";
 
+import type { ClientWorkupProps } from "@/types/shared";
+import type { User } from "@/utils/auth-client";
+import { useMemo } from "react";
+import { useApiKeys } from "@/context/api-keys-context";
+import { useSettingsDrawer } from "@/context/settings-drawer-context";
+import { ApiKeysTab } from "@/ui/api-key-settings";
 import {
   Drawer,
   DrawerClose,
@@ -9,55 +15,24 @@ import {
   DrawerTitle
 } from "@/ui/atoms/drawer";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
-import { ApiKeysTab } from "@/ui/settings/api-keys-tab"; // Example tab
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import {
-  Button,
-  History,
-  KeyRound,
-  Palette,
-  User as UserIcon,
-  X
-} from "@slipstream/ui";
 import { useSession } from "@/utils/auth-client";
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger, X } from "@slipstream/ui";
 
-interface SettingsDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-}
-
-const _settingsOptions = [
-  {
-    id: "profile",
-    label: "Profile",
-    icon: UserIcon,
-    component: UserProfileCard
-  },
-  {
-    id: "apiKeys",
-    label: "API Keys",
-    icon: KeyRound,
-    component: ApiKeysTab
-  },
-  // Add more settings options here
-  {
-    id: "customization",
-    label: "Customization",
-    icon: Palette,
-    component: () => <p>Customization (TODO)</p>
-  },
-  {
-    id: "history",
-    label: "History & Sync",
-    icon: History,
-    component: () => <p>History & Sync (TODO)</p>
-  }
-];
-
-export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
+export function SettingsDrawer({ initialData, initUser }: { initialData?: ClientWorkupProps; initUser?: User }) {
   const { data: session, isPending } = useSession();
+  const { apiKeys } = useApiKeys();
+  const { isOpen, close, activeTab, setActiveTab } = useSettingsDrawer();
+  const effectiveInitialData = useMemo(() => {
+    if (initialData) return initialData;
+    return {
+      isSet: apiKeys.isSet,
+      isDefault: apiKeys.isDefault
+    } satisfies ClientWorkupProps;
+  }, [apiKeys.isDefault, apiKeys.isSet, initialData]);
+  const user = (initUser ?? session?.user) satisfies User | undefined;
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+    <Drawer open={isOpen} onOpenChange={open => !open && close()}>
       <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[90vh] flex-col">
         <div className="mx-auto flex w-full max-w-md flex-grow flex-col overflow-hidden">
           <DrawerHeader className="flex shrink-0 items-center justify-between">
@@ -84,15 +59,26 @@ export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
             </div>
           ) : (
             <ScrollArea className="flex-grow p-4">
-              <div className="space-y-3">
-                <UserProfileCard
-                  user={session?.user}
-                  className="bg-brand-background border-brand-border"
-                />
-                <ApiKeysTab
-                  isProUser={false}
-                  className="bg-brand-background border-brand-border rounded-lg p-4"
-                />
+              <div className="space-y-4">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={v => setActiveTab(v as typeof activeTab)}
+                  className="w-full">
+                  <TabsList className="bg-brand-sidebar border-brand-border grid w-full grid-cols-2 border">
+                    <TabsTrigger value="apiKeys">API Keys</TabsTrigger>
+                    <TabsTrigger value="account">Profile</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="apiKeys" className="mt-4">
+                    <ApiKeysTab
+                      initialData={effectiveInitialData}
+                      user={user}
+                      className="bg-brand-background border-brand-border rounded-lg p-4"
+                    />
+                  </TabsContent>
+                  <TabsContent value="account" className="mt-4">
+                    <UserProfileCard user={user} />
+                  </TabsContent>
+                </Tabs>
               </div>
             </ScrollArea>
           )}
@@ -101,3 +87,4 @@ export function SettingsDrawer({ isOpen, onOpenChange }: SettingsDrawerProps) {
     </Drawer>
   );
 }
+// To continue this session, run codex resume 0199d2f1-929a-7c21-bf96-61e8b341cc70

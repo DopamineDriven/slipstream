@@ -1,19 +1,17 @@
 "use client";
 
+import type { AllModelsUnion, Provider } from "@slipstream/types";
 import {
   createContext,
   ReactNode,
   useCallback,
   useContext,
   useEffect,
-  useEffectEvent,
   useMemo,
-  useRef,
   useState
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { defaultModelSelection, ModelSelection } from "@/lib/models";
-import type { AllModelsUnion, Provider } from "@slipstream/types";
 import {
   displayNameToModelId,
   getAllProviders,
@@ -56,24 +54,16 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
   const [selectedModel, setSelectedModel] = useState<ModelSelection>(
     defaultModelSelection
   );
-
-  const selectedRef = useRef(selectedModel);
   // Add drawer state
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const syncStateEffectEvt = useEffectEvent(() => {
-    setSelectedModel(selectedRef.current);
-  });
-  
+
   // Load from localStorage exactly once, after mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const storedVal = JSON.parse<ModelSelection>(stored);
-        if (storedVal !== selectedRef.current) {
-          selectedRef.current = storedVal;
-          syncStateEffectEvt();
-        }
+        // eslint-disable-next-line
+        setSelectedModel(JSON.parse<ModelSelection>(stored));
       }
     } catch (err) {
       console.warn("Could not load model from storage:", err);
@@ -89,16 +79,12 @@ export function ModelSelectionProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedModel]);
 
-  const defaultEffectEvent = useEffectEvent(() => {
-    setSelectedModel(defaultModelSelection);
-  });
-
   // Keep WebSocket-based reactions separate
   useEffect(() => {
     if (!lastEvent) return;
     if (lastEvent.type === "ai_chat_error") {
-      // reset model on error
-      defaultEffectEvent();
+        // eslint-disable-next-line
+      setSelectedModel(defaultModelSelection);
     }
     // etc.
   }, [lastEvent]);

@@ -7,7 +7,6 @@ import React, {
   Suspense,
   useCallback,
   useEffect,
-  useEffectEvent,
   useRef,
   useState
 } from "react";
@@ -24,11 +23,10 @@ import {
   finalizeStreamingMessage
 } from "@/lib/ui-message-helpers";
 import { cn } from "@/lib/utils";
-import { getModelDisplayName } from "@/lib/models";
 import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
-import { Provider } from "@slipstream/types";
+import type { Provider } from "@slipstream/types";
 
 interface ChatInterfaceProps {
   initialMessages?: UIMessage[] | null;
@@ -42,9 +40,7 @@ interface ChatInterfaceProps {
 export function ChatInterface({
   initialMessages,
   conversationId, // From route - not used, we rely on context
-  user,
-  lastModel,
-  lastProvider
+  user
 }: ChatInterfaceProps) {
   const [queuedPrompt, setQueuedPrompt] = useState<string | null>(null);
 
@@ -62,7 +58,7 @@ export function ChatInterface({
     thinkingDuration
   } = useAIChatContext();
   const router = useRouter();
-  const { selectedModel, setSelectedModel } = useModelSelection();
+  const { selectedModel } = useModelSelection();
   const assetUpload = useAssetUpload();
   const { isHome } = usePathnameContext();
   const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
@@ -71,25 +67,6 @@ export function ChatInterface({
   const lastUserMessageRef = useRef<string>("");
   const { get } = useCookiesCtx();
   const tz = get("tz");
-
-  // Sync model/provider selection to the last-used combo for the active conversation
-  // Keeps UX consistent when switching between conversation tabs
-  const syncConversationModel = useEffectEvent(() => {
-    if (!lastProvider || !lastModel) return;
-    if (
-      selectedModel.provider === lastProvider &&
-      selectedModel.modelId === lastModel
-    )
-      return;
-
-    const displayName = getModelDisplayName(lastProvider, lastModel);
-    setSelectedModel({ provider: lastProvider, modelId: lastModel, displayName });
-  });
-
-  React.useEffect(() => {
-    syncConversationModel();
-    // Note: do not include syncConversationModel in deps (useEffectEvent is stable)
-  }, [activeConversationId, lastProvider, lastModel]);
 
   const handlePromptClick = useCallback(
     (prompt: string) => {
