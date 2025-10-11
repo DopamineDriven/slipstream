@@ -34,7 +34,7 @@ export type CookieValue = {
   city: string;
   isMac: "true" | "false";
   locale: string;
-  userId: string | null;
+  userId: string;
 };
 
 export type CookieKey = keyof typeof COOKIES;
