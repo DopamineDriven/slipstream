@@ -220,6 +220,20 @@ imgSpecs().then(v => {
     "src/test/__out__/img-extraction/test-two.json",
     JSON.stringify(v, null, 2)
   );
-  console.log(vv);
   return vv;
 });
+
+const fs = new Fs(process.cwd());
+
+const paths = fs.readDir("src/test/chapters").map((v)=> `src/test/chapters/${v}`);
+
+fs.withWs("src/test/chapters/paths.json", JSON.stringify(paths,null,2))
+
+console.log(fs.readDir("src/test/chapters"))
+// prettier-ignore
+const _template = (name: string) => `curl -X POST "https://api.anthropic.com/v1/files" \
+     -H "x-api-key: $ANTHROPIC_API_KEY" \
+     -H "anthropic-version: 2023-06-01" \
+     -H "anthropic-beta: files-api-2025-04-14" \
+     -F "file=src/test/chapters/${name}"
+`

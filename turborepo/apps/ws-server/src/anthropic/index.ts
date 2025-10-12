@@ -3,14 +3,16 @@ import type {
   ProviderChatRequestEntity
 } from "@/types/index.ts";
 import type {
-  ContentBlockParam,
-  DocumentBlockParam,
-  ImageBlockParam,
-  MessageParam,
-  RawMessageStreamEvent,
-  StopReason,
-  TextBlockParam
-} from "@anthropic-ai/sdk/resources/messages";
+  BetaContentBlockParam,
+  BetaImageBlockParam,
+  BetaMessageParam,
+  BetaRawMessageStreamEvent,
+  BetaRequestDocumentBlock,
+  BetaStopReason,
+  BetaTextBlockParam,
+  BetaWebSearchResultBlock,
+  BetaWebSearchTool20250305
+} from "@anthropic-ai/sdk/resources/beta.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -24,18 +26,14 @@ import type {
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
-  user_location?: {
-    type: "approximate";
-    city?: string;
-    region?: string;
-    country?: string;
-    tz?: string;
-  };
+  user_location?: BetaWebSearchTool20250305.UserLocation;
 }
 
 export class AnthropicService {
   private defaultClient: Anthropic;
   private logger: PinoLogger;
+  // In-memory cache for uploaded files (similar to Gemini pattern)
+  private assetCache = new Map<string, { fileId: string; expiresAt: Date }>();
   constructor(
     logger: LoggerService,
     private prisma: PrismaService,
@@ -61,6 +59,137 @@ export class AnthropicService {
       return client.withOptions({ apiKey: overrideKey });
     }
     return client;
+  }
+
+  private async streamToBuffer(stream: ReadableStream<Uint8Array>) {
+    const reader = stream.getReader();
+    const chunks = Array.of<Uint8Array>();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+      }
+    }
+    return Buffer.concat(chunks);
+  }
+
+  private async uploadFileToAnthropic(
+    attachment: {
+      compatCdnUrl: string | null;
+      compatMime: string | null;
+      cdnUrl: string | null;
+      mime: string | null;
+      id: string;
+      filename: string | null;
+    },
+    client: Anthropic
+  ) {
+    const url = attachment.compatCdnUrl ?? attachment.cdnUrl;
+    if (!url) throw new Error("No CDN URL available for upload");
+
+    // Fetch the file
+    const response = await fetch(url);
+    if (!response.ok || !response.body) {
+      throw new Error(`Failed to fetch file: ${response.statusText}`);
+    }
+
+    const buffer = await this.streamToBuffer(response.body);
+    const mime = attachment.compatMime ?? attachment.mime ?? "application/pdf";
+    const filename = attachment.filename ?? "document.pdf";
+
+    // Upload using Anthropic Files API
+    const file = await client.beta.files.upload({
+      file: new File([buffer], filename, { type: mime }),
+      betas: ["files-api-2025-04-14"]
+    });
+
+    return file;
+  }
+
+  private async ensureAnthropicAssetUploaded(
+    attachment: {
+      cdnUrl: string | null;
+      compatCdnUrl: string | null;
+      compatMime: string | null;
+      filename: string | null;
+      mime: string | null;
+      id: string;
+    },
+    client: Anthropic,
+    keyFingerprint: string,
+    keyId?: string
+  ): Promise<string> {
+    const cacheKey = `${keyFingerprint}:${attachment.id}`;
+    const now = new Date();
+
+    // Check in-memory cache
+    const cached = this.assetCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      this.logger.debug(`Reusing cached Anthropic file: ${attachment.id}`);
+      return cached.fileId;
+    }
+
+    // Check database
+    const existing = await this.prisma.findActiveAnthropicAsset(
+      attachment.id,
+      keyFingerprint
+    );
+
+    if (
+      existing?.providerRef &&
+      existing.expiresAt &&
+      existing.expiresAt > now
+    ) {
+      this.logger.debug(`Reusing Anthropic file from DB: ${attachment.id}`);
+      this.assetCache.set(cacheKey, {
+        fileId: existing.providerRef,
+        expiresAt: existing.expiresAt
+      });
+      return existing.providerRef;
+    }
+
+    // Create mapping (acts as lock)
+    const mapping = await this.prisma.upsertAnthropicAssetMapping(
+      attachment.id,
+      keyFingerprint,
+      attachment.compatMime ?? attachment.mime ?? "application/pdf",
+      keyId
+    );
+
+    try {
+      // Upload file
+      const uploadedFile = await this.uploadFileToAnthropic(attachment, client);
+
+      // Anthropic files expire in 7 days per documentation
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+      await this.prisma.finalizeAnthropicAsset(
+        mapping.id,
+        uploadedFile.id,
+        expiresAt,
+        BigInt(uploadedFile.size_bytes ?? 0)
+      );
+
+      // Update cache
+      this.assetCache.set(cacheKey, {
+        fileId: uploadedFile.id,
+        expiresAt
+      });
+
+      this.logger.info(
+        `Uploaded PDF to Anthropic Files API: ${uploadedFile.id} (${uploadedFile.filename})`
+      );
+
+      return uploadedFile.id;
+    } catch (error) {
+      await this.prisma.markAnthropicAssetFailed(
+        mapping.id,
+        error instanceof Error ? error.message : JSON.stringify(error, null, 2)
+      );
+      throw error;
+    }
   }
 
   private get outputTokensByModel() {
@@ -92,7 +221,7 @@ export class AnthropicService {
     if (!isNewChat) {
       const messages = msgs.map(msg => {
         if (msg.senderType === "USER") {
-          const content = Array.of<ContentBlockParam>();
+          const content = Array.of<BetaContentBlockParam>();
           try {
             // Add image attachments if present
             if (msg.attachments && msg.attachments.length > 0) {
@@ -113,7 +242,7 @@ export class AnthropicService {
                         type: "url",
                         url
                       }
-                    } as const satisfies DocumentBlockParam;
+                    } as const satisfies BetaRequestDocumentBlock;
                     content.push(docBlock);
                   } else if (mime.startsWith("image/")) {
                     const imageBlock = {
@@ -122,7 +251,7 @@ export class AnthropicService {
                         type: "url",
                         url
                       }
-                    } as const satisfies ImageBlockParam;
+                    } as const satisfies BetaImageBlockParam;
                     content.push(imageBlock);
                   }
                 }
@@ -137,7 +266,7 @@ export class AnthropicService {
           return {
             role: "user",
             content: content.length > 0 ? content : msg.content
-          } as const satisfies MessageParam;
+          } as const satisfies BetaMessageParam;
         } else {
           const provider = msg.provider.toLowerCase();
           const model = msg.model ?? "";
@@ -146,7 +275,7 @@ export class AnthropicService {
             content: `<model provider="${provider}" name="${model}">\n${msg.content}\n</model>`
           } as const;
         }
-      }) satisfies MessageParam[];
+      }) satisfies BetaMessageParam[];
 
       const enhancedSystemPrompt = systemPrompt
         ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
@@ -156,12 +285,12 @@ export class AnthropicService {
         messages,
         system: [
           { type: "text", text: enhancedSystemPrompt }
-        ] as const satisfies TextBlockParam[]
+        ] as const satisfies BetaTextBlockParam[]
       };
     } else {
       // new chat means only one message exists period -> the first user message
       const userMsg = msgs[0];
-      const content = Array.of<ContentBlockParam>();
+      const content = Array.of<BetaContentBlockParam>();
 
       if (userMsg) {
         try {
@@ -183,7 +312,7 @@ export class AnthropicService {
                       type: "url",
                       url
                     }
-                  } as const satisfies DocumentBlockParam;
+                  } as const satisfies BetaRequestDocumentBlock;
                   content.push(docBlock);
                 } else if (mime.startsWith("image/")) {
                   const imageBlock = {
@@ -192,7 +321,7 @@ export class AnthropicService {
                       type: "url",
                       url
                     }
-                  } as const satisfies ImageBlockParam;
+                  } as const satisfies BetaImageBlockParam;
                   content.push(imageBlock);
                 }
               }
@@ -214,14 +343,237 @@ export class AnthropicService {
           role: "user",
           content: content.length >= 1 ? content : "no user message found"
         }
-      ] as const satisfies MessageParam[];
+      ] as const satisfies BetaMessageParam[];
 
       if (systemPrompt) {
         return {
           messages,
           system: [
             { type: "text", text: systemPrompt }
-          ] as const satisfies TextBlockParam[]
+          ] as const satisfies BetaTextBlockParam[]
+        };
+      } else {
+        return {
+          messages,
+          system: undefined
+        };
+      }
+    }
+  }
+
+  public async formatAnthropicHistoryWithFiles(
+    isNewChat: boolean,
+    msgs: MessageSingleton<true>[],
+    systemPrompt?: string,
+    client?: Anthropic,
+    keyFingerprint = "server",
+    keyId?: string
+  ) {
+    if (!isNewChat) {
+      const messages = await Promise.all(
+        msgs.map(async msg => {
+          if (msg.senderType === "USER") {
+            const content = Array.of<BetaContentBlockParam>();
+            try {
+              // Process attachments
+              if (msg.attachments && msg.attachments.length > 0 && client) {
+                for (const attachment of msg.attachments) {
+                  const {
+                    cdnUrl,
+                    mime: ogMime,
+                    compatCdnUrl,
+                    compatMime
+                  } = attachment;
+                  const url = compatCdnUrl ?? cdnUrl;
+                  const mime = compatMime ?? ogMime;
+
+                  if (url && mime) {
+                    // Use Files API for PDFs only
+                    if (mime === "application/pdf") {
+                      try {
+                        const fileId = await this.ensureAnthropicAssetUploaded(
+                          attachment,
+                          client,
+                          keyFingerprint,
+                          keyId
+                        );
+                        const docBlock = {
+                          type: "document",
+                          source: {
+                            type: "file",
+                            file_id: fileId
+                          }
+                        } as const satisfies BetaRequestDocumentBlock;
+                        content.push(docBlock);
+                      } catch (err) {
+                        this.logger.warn(
+                          { err },
+                          "Failed to upload PDF to Files API, falling back to URL"
+                        );
+                        // Fallback to URL
+                        const docBlock = {
+                          type: "document",
+                          source: {
+                            type: "url",
+                            url
+                          }
+                        } as const satisfies BetaRequestDocumentBlock;
+                        content.push(docBlock);
+                      }
+                    } else if (mime.startsWith("image/")) {
+                      // Images use URLs
+                      const imageBlock = {
+                        type: "image",
+                        source: {
+                          type: "url",
+                          url
+                        }
+                      } as const satisfies BetaImageBlockParam;
+                      content.push(imageBlock);
+                    } else if (mime.includes("application")) {
+                      // Other docs use URLs
+                      const docBlock = {
+                        type: "document",
+                        source: {
+                          type: "url",
+                          url
+                        }
+                      } as const satisfies BetaRequestDocumentBlock;
+                      content.push(docBlock);
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              this.logger.warn({ err }, "error in anthropic history workup");
+            } finally {
+              content.push({ type: "text", text: msg.content } as const);
+            }
+
+            return {
+              role: "user",
+              content: content.length > 0 ? content : msg.content
+            } as const satisfies BetaMessageParam;
+          } else {
+            const provider = msg.provider.toLowerCase();
+            const model = msg.model ?? "";
+            return {
+              role: "assistant",
+              content: `<model provider="${provider}" name="${model}">\n${msg.content}\n</model>`
+            } as const;
+          }
+        })
+      );
+
+      const enhancedSystemPrompt = systemPrompt
+        ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
+        : "Previous responses in this conversation may be tagged with their source model for context.";
+
+      return {
+        messages,
+        system: [
+          { type: "text", text: enhancedSystemPrompt }
+        ] as const satisfies BetaTextBlockParam[]
+      };
+    } else {
+      // new chat means only one message exists period -> the first user message
+      const userMsg = msgs[0];
+      const content = Array.of<BetaContentBlockParam>();
+
+      if (userMsg) {
+        try {
+          if (userMsg.attachments && userMsg.attachments.length > 0 && client) {
+            for (const attachment of userMsg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatCdnUrl,
+                compatMime
+              } = attachment;
+              const url = compatCdnUrl ?? cdnUrl;
+              const mime = compatMime ?? ogMime;
+
+              if (url && mime) {
+                // Use Files API for PDFs only
+                if (mime === "application/pdf") {
+                  try {
+                    const fileId = await this.ensureAnthropicAssetUploaded(
+                      attachment,
+                      client,
+                      keyFingerprint,
+                      keyId
+                    );
+                    const docBlock = {
+                      type: "document",
+                      source: {
+                        type: "file",
+                        file_id: fileId
+                      }
+                    } as const satisfies BetaRequestDocumentBlock;
+                    content.push(docBlock);
+                  } catch (err) {
+                    this.logger.warn(
+                      { err },
+                      "Failed to upload PDF to Files API, falling back to URL"
+                    );
+                    // Fallback to URL
+                    const docBlock = {
+                      type: "document",
+                      source: {
+                        type: "url",
+                        url
+                      }
+                    } as const satisfies BetaContentBlockParam;
+                    content.push(docBlock);
+                  }
+                } else if (mime.startsWith("image/")) {
+                  // Images use URLs
+                  const imageBlock = {
+                    type: "image",
+                    source: {
+                      type: "url",
+                      url
+                    }
+                  } as const satisfies BetaContentBlockParam;
+                  content.push(imageBlock);
+                } else if (mime.includes("application")) {
+                  // Other docs use URLs
+                  const docBlock = {
+                    type: "document",
+                    source: {
+                      type: "url",
+                      url
+                    }
+                  } as const satisfies BetaContentBlockParam;
+                  content.push(docBlock);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          this.logger.warn(
+            { err },
+            "error in new chat anthropic history workup"
+          );
+        } finally {
+          content.push({ type: "text", text: userMsg.content } as const);
+        }
+      }
+
+      // never pass the already database persisted user prompt
+      const messages = [
+        {
+          role: "user",
+          content: content.length >= 1 ? content : "no user message found"
+        }
+      ] as const satisfies BetaMessageParam[];
+
+      if (systemPrompt) {
+        return {
+          messages,
+          system: [
+            { type: "text", text: systemPrompt }
+          ] as const satisfies BetaTextBlockParam[]
         };
       } else {
         return {
@@ -265,7 +617,7 @@ export class AnthropicService {
   ) {
     return [
       { type: "web_search_20250305", name: "web_search", user_location }
-    ] satisfies Anthropic.Messages.ToolUnion[] | undefined;
+    ] satisfies BetaWebSearchTool20250305[] | undefined;
   }
 
   public async handleAnthropicAiChatRequest({
@@ -278,6 +630,7 @@ export class AnthropicService {
     userId,
     ws,
     apiKey,
+    keyId,
     max_tokens,
     model = "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion,
     systemPrompt,
@@ -296,11 +649,16 @@ export class AnthropicService {
       anthropicCi = 0;
 
     const anthropic = this.getClient(apiKey ?? undefined);
+    const keyFingerprint = keyId ?? "server";
 
-    const { messages, system } = this.formatAnthropicHistory(
+    // Use Files API for PDFs
+    const { messages, system } = await this.formatAnthropicHistoryWithFiles(
       isNewChat,
       msgs,
-      systemPrompt
+      systemPrompt,
+      anthropic,
+      keyFingerprint,
+      keyId ?? undefined
     );
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
@@ -313,7 +671,7 @@ export class AnthropicService {
     );
     const tools = this.webSearchTool(user_location);
 
-    const stream = (await anthropic.messages.create(
+    const stream = (await anthropic.beta.messages.create(
       {
         max_tokens: maxTokens,
         stream: true,
@@ -327,16 +685,16 @@ export class AnthropicService {
         service_tier: "auto",
         tools
       },
-      { stream: true,  }
-    )) satisfies Stream<RawMessageStreamEvent> & {
+      { stream: true }
+    )) satisfies Stream<BetaRawMessageStreamEvent> & {
       _request_id?: string | null;
     };
 
     for await (const chunk of stream) {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
-        webSearchRes: Anthropic.WebSearchResultBlock | null = null,
-        done: StopReason | null = null;
+        webSearchRes: BetaWebSearchResultBlock | null = null,
+        done: BetaStopReason | null = null;
 
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "server_tool_use") {
@@ -352,6 +710,7 @@ export class AnthropicService {
           if (Array.isArray(chunk.content_block.content)) {
             for (const subblock of chunk.content_block.content) {
               webSearchRes = subblock;
+              this.logger.debug(webSearchRes, "web_search_res");
               anthropicWebsearchToolUse = false;
             }
           }
