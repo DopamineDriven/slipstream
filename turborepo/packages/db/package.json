@@ -82,21 +82,21 @@
     }
   },
   "dependencies": {
-    "@prisma/adapter-pg": "6.17.0",
-    "@prisma/client": "6.17.0",
-    "@prisma/extension-accelerate": "2.0.2"
+    "@prisma/adapter-pg": "^6.17.1",
+    "@prisma/client": "^6.17.1",
+    "@prisma/extension-accelerate": "^2.0.2"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^7.6.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.7.1",
+    "@types/node": "^24.7.2",
     "dotenv": "^17.2.3",
     "eslint": "^9.37.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
-    "prisma": "^6.17.0",
+    "prisma": "^6.17.1",
     "terser": "^5.44.0",
     "tsdown": "^0.15.6",
     "tslib": "^2.8.1",

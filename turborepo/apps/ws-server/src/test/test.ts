@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import { Provider } from "@slipstream/types";
+import type { Provider } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -29,7 +29,9 @@ class ScriptGen extends Fs {
   }
 
   private data = async (env: string, id: string) => {
-    const { PrismaClient } = await import("@slipstream/db/node/generated/client");
+    const { PrismaClient } = await import(
+      "@slipstream/db/node/generated/client"
+    );
     const prismaClient = new PrismaClient({ datasourceUrl: env });
     try {
       prismaClient.$connect();
@@ -157,25 +159,36 @@ class ScriptGen extends Fs {
         day: "2-digit",
         year: "numeric",
         hour12: false,
-        timeZone: decodeURIComponent("america/chicago")
+        timeZone: decodeURIComponent("America/Chicago")
       });
-      console.log(p.assetUrl);
+      if (p.assetUrl.length > 0) console.log(p.assetUrl);
       const handleProvider =
         p.provider === "grok"
           ? "xai"
           : p.provider === "gemini"
             ? "google"
             : p.provider;
-            const handleAssets = (target: {
-    cdnUrl: string;
-    msgId: string;
-    filename: string;
-    batchId: string;
-}[]) => {
-  return target.map((v) =>{
-    return `![${v.filename}](${v.cdnUrl})`
-  }).join("\n")
-}
+      const handleAssets = (
+        target: {
+          cdnUrl: string;
+          msgId: string;
+          filename: string;
+          batchId: string;
+        }[]
+      ) => {
+        return target
+          .map(v => {
+            if (
+              v.cdnUrl.endsWith("webp") ||
+              v.cdnUrl.endsWith("avif") ||
+              v.cdnUrl.endsWith("tiff")
+            ) {
+              return `source: ${v.cdnUrl}`;
+            }
+            return `![${v.filename}](${v.cdnUrl})`;
+          })
+          .join("\n\n");
+      };
       const agg =
         p.sender === "AI"
           ? withThinking === "true"
@@ -191,6 +204,44 @@ class ScriptGen extends Fs {
 
     return arr;
   }
+  // prettier-ignore
+  private withFrontmatter = (content: string, title: string | null) => {
+    const t = title ?? "no-title";
+  // prettier-ignore
+    return`---
+papersize: letterpaper
+geometry: portrait,margin=0.75in
+fontsize: 10pt
+header-includes: |
+  \\usepackage{fontspec}
+  \\newfontfamily\\FiraCode{Fira Code}
+  \\usepackage{listings}
+  \\lstset{
+    basicstyle=\\FiraCode\\small,
+    breaklines=true,
+    aboveskip=4pt,
+    belowskip=4pt
+  }
+  \\usepackage{fancyhdr}
+  \\usepackage[useregional=false,style=iso]{datetime2}
+  \\DTMsetdatestyle{iso}
+  \\pagestyle{fancy}
+  \\fancyhf{}
+  \\fancyhead[C]{${t}}
+  \\fancyfoot[C]{\\thepage}
+  \\renewcommand{\\sectionmark}[1]{\\markboth{#1}{}}
+---\n\n${content}`};
+
+  private withWsAsync(data: string[], toSlug: string, title: string) {
+    return new Promise(res =>
+      res(
+        this.withWs(
+          `src/test/__out__/condensed/${toSlug}.md`,
+          this.withFrontmatter(data.join(`\n`), title)
+        )
+      )
+    );
+  }
 
   public async gen(
     target: "dev" | "prod",
@@ -203,7 +254,38 @@ class ScriptGen extends Fs {
     ]);
     if (!data) return;
     if (!raw) return;
-    this.withWs(`src/test/__out__/condensed/${raw.title}.md`, data.join(`\n`));
+    if (!raw.title) return;
+    const toSlug = raw.title.replace(/ /gim, "-").replace(/:/gmi, "--").replace(/'/gmi, "");
+    try {
+      await Promise.all([this.withWsAsync(data, toSlug, raw.title)]).then(() =>
+        this.wait(2000)
+          .then(() => {
+            if (this.exists(`src/test/__out__/condensed/${toSlug}.md`)) {
+              return;
+            } else {
+              return this.wait(3000).then(() => {
+                return;
+              });
+            }
+          })
+          .then(() =>
+            this.executeCommand({
+              command: `pandoc -i src/test/__out__/condensed/${toSlug}.md -o src/test/__out__/condensed/${toSlug}.pdf --pdf-engine=xelatex`,
+              cwd: this.cwd
+            })
+          )
+      );
+    } catch (err) {
+      throw new Error(
+        "error in script-gen".concat(
+          typeof err === "string"
+            ? err
+            : err instanceof Error
+              ? err.message
+              : JSON.stringify(err, null, 2)
+        )
+      );
+    }
   }
 }
 

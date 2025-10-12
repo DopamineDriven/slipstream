@@ -1,3 +1,6 @@
+import type { ConversationSingleton, UserData } from "@/types/index.ts";
+import { ModelService } from "@/models/index.ts";
+import { Fs } from "@d0paminedriven/fs";
 import type {
   $Enums,
   Attachment,
@@ -6,10 +9,6 @@ import type {
   ImageMetadata,
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
-import type { ConversationSingleton, UserData } from "@/types/index.ts";
-import { PrismaClient } from "@slipstream/db/node";
-import { ModelService } from "@/models/index.ts";
-import { Fs } from "@d0paminedriven/fs";
 import type {
   AIChatRequest,
   AIChatResponse,
@@ -19,8 +18,8 @@ import type {
   RTC,
   XOR
 } from "@slipstream/types";
+import { DbService, PrismaClient } from "@slipstream/db/node";
 import { EncryptionService } from "@slipstream/encryption";
-import {DbService} from "@slipstream/db/node";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 
@@ -1152,6 +1151,85 @@ export class PrismaService extends ModelService {
         attachments: { where: { conversationId } },
         messages: { orderBy: { createdAt: "asc" } },
         conversationSettings: true
+      }
+    });
+  }
+
+  public async findActiveAnthropicAsset(
+    attachmentId: string,
+    keyFingerprint = "server"
+  ) {
+    return this.prismaClient.attachmentProvider.findFirst({
+      where: {
+        attachmentId,
+        provider: "ANTHROPIC",
+        keyFingerprint,
+        state: "ACTIVE",
+        expiresAt: { gt: new Date() }
+      }
+    });
+  }
+
+  public async upsertAnthropicAssetMapping(
+    attachmentId: string,
+    keyFingerprint = "server",
+    mime: string,
+    keyId?: string
+  ) {
+    return this.prismaClient.attachmentProvider.upsert({
+      where: {
+        attachmentId_provider_keyFingerprint: {
+          attachmentId,
+          provider: "ANTHROPIC",
+          keyFingerprint
+        }
+      },
+      update: {
+        state: "PENDING",
+        errorCode: null,
+        errorMessage: null,
+        lastCheckedAt: new Date()
+      },
+      create: {
+        attachmentId,
+        provider: "ANTHROPIC",
+        userKeyId: keyId,
+        keyFingerprint,
+        state: "PENDING",
+        mime
+      }
+    });
+  }
+
+  public async finalizeAnthropicAsset(
+    mappingId: string,
+    fileId: string,
+    expiresAt: Date,
+    size?: bigint
+  ) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "ACTIVE",
+        providerRef: fileId,
+        expiresAt,
+        size,
+        readyAt: new Date(),
+        lastCheckedAt: new Date()
+      }
+    });
+  }
+
+  public async markAnthropicAssetFailed(
+    mappingId: string,
+    errorMessage: string
+  ) {
+    await this.prismaClient.attachmentProvider.update({
+      where: { id: mappingId },
+      data: {
+        state: "FAILED",
+        errorMessage,
+        lastCheckedAt: new Date()
       }
     });
   }
