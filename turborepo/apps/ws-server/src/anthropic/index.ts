@@ -11,6 +11,7 @@ import type {
   BetaRequestDocumentBlock,
   BetaStopReason,
   BetaTextBlockParam,
+  BetaThinkingConfigParam,
   BetaWebSearchResultBlock,
   BetaWebSearchTool20250305,
   FileUploadParams
@@ -460,13 +461,30 @@ export class AnthropicService {
 
   private handleThinking(mod: AllModelsUnion, max_tokens?: number) {
     const model = mod as AnthropicModelIdUnion;
-    if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
-      return {
-        type: "enabled",
-        budget_tokens: this.getMaxTokens(model) - 1024
-      } as const;
-    } else {
-      return { type: "disabled" } as const;
+    switch (model) {
+      case "claude-3-7-sonnet-20250219":
+      case "claude-opus-4-1-20250805":
+      case "claude-opus-4-20250514":
+      case "claude-sonnet-4-20250514":
+      case "claude-sonnet-4-5-20250929": {
+        if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
+          return {
+            type: "enabled",
+            budget_tokens: this.getMaxTokens(model) - 1024
+          } as const satisfies BetaThinkingConfigParam;
+        } else {
+          return {
+            type: "disabled"
+          } as const satisfies BetaThinkingConfigParam;
+        }
+      }
+      case "claude-3-5-haiku-20241022":
+      case "claude-3-5-sonnet-20240620":
+      case "claude-3-5-sonnet-20241022":
+      case "claude-3-haiku-20240307":
+      default: {
+        return { type: "disabled" } as const satisfies BetaThinkingConfigParam;
+      }
     }
   }
 
@@ -481,8 +499,13 @@ export class AnthropicService {
     user_location: ProviderAnthropicChatRequestEntity["user_location"]
   ) {
     return [
-      { type: "web_search_20250305", name: "web_search", user_location }
-    ] satisfies BetaWebSearchTool20250305[] | undefined;
+      {
+        type: "web_search_20250305",
+        cache_control: { type: "ephemeral", ttl: "1h" },
+        name: "web_search",
+        user_location
+      }
+    ] satisfies BetaWebSearchTool20250305[] | undefined; 
   }
 
   public async handleAnthropicAiChatRequest({
@@ -549,7 +572,6 @@ export class AnthropicService {
         messages,
         service_tier: "auto",
         betas: [
-          "dev-full-thinking-2025-05-14",
           "files-api-2025-04-14",
           "context-1m-2025-08-07",
           "extended-cache-ttl-2025-04-11"
