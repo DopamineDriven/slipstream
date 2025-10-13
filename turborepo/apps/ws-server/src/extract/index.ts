@@ -10,14 +10,17 @@ export class Extract {
   ): Promise<Buffer> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-
+    let r: Response;
     try {
       // 1. Try HEAD request to check if Range is supported
-      const headResponse = await fetch(url, {
+      r = await fetch(url, {
         method: "HEAD",
         signal: controller.signal
       });
-
+      if (!r.ok) {
+        r = await fetch(url, { method: "GET", signal: controller.signal });
+      }
+      const headResponse = r;
       const acceptsRange =
         headResponse.headers.get("accept-ranges") === "bytes";
       const contentLength = parseInt(

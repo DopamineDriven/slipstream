@@ -2,6 +2,7 @@ import type {
   MessageSingleton,
   ProviderChatRequestEntity
 } from "@/types/index.ts";
+import type { Uploadable } from "@anthropic-ai/sdk";
 import type {
   BetaContentBlockParam,
   BetaImageBlockParam,
@@ -11,7 +12,8 @@ import type {
   BetaStopReason,
   BetaTextBlockParam,
   BetaWebSearchResultBlock,
-  BetaWebSearchTool20250305
+  BetaWebSearchTool20250305,
+  FileUploadParams
 } from "@anthropic-ai/sdk/resources/beta.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
@@ -23,6 +25,7 @@ import type {
   AnthropicModelIdUnion,
   EventTypeMap
 } from "@slipstream/types";
+import { CompatStatus } from "@slipstream/db/enums-node";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
@@ -74,7 +77,9 @@ export class AnthropicService {
     }
     return Buffer.concat(chunks);
   }
-
+  private handleNumBigIntUnion(size: number | bigint) {
+    return typeof size === "bigint" ? 10n * 1024n * 1024n : 10 * 1024 * 1024;
+  }
   private async uploadFileToAnthropic(
     attachment: {
       compatCdnUrl: string | null;
@@ -83,27 +88,30 @@ export class AnthropicService {
       mime: string | null;
       id: string;
       filename: string | null;
+      compatStatus: CompatStatus | null;
     },
     client: Anthropic
   ) {
-    const url = attachment.compatCdnUrl ?? attachment.cdnUrl;
+    let url: string | null;
+    if (attachment.compatStatus === "ALIASED")
+      url = attachment.cdnUrl ?? attachment.compatCdnUrl;
+    url = attachment.compatCdnUrl ?? attachment.cdnUrl;
     if (!url) throw new Error("No CDN URL available for upload");
-
     // Fetch the file
     const response = await fetch(url);
     if (!response.ok || !response.body) {
       throw new Error(`Failed to fetch file: ${response.statusText}`);
     }
 
-    const buffer = await this.streamToBuffer(response.body);
-    const mime = attachment.compatMime ?? attachment.mime ?? "application/pdf";
-    const filename = attachment.filename ?? "document.pdf";
+    // const buffer = await this.streamToBuffer(response.body);
+    // const mime = (attachment.compatStatus === "ACTIVE" ? attachment.compatMime : attachment.mime) ?? "application/pdf";
+    // const filename = attachment.filename ?? "document.pdf";
 
     // Upload using Anthropic Files API
     const file = await client.beta.files.upload({
-      file: new File([buffer], filename, { type: mime }),
+      file: (await fetch(url)) satisfies Uploadable,
       betas: ["files-api-2025-04-14"]
-    });
+    } satisfies FileUploadParams);
 
     return file;
   }
@@ -116,6 +124,7 @@ export class AnthropicService {
       filename: string | null;
       mime: string | null;
       id: string;
+      compatStatus: CompatStatus | null;
     },
     client: Anthropic,
     keyFingerprint: string,
@@ -150,11 +159,16 @@ export class AnthropicService {
       return existing.providerRef;
     }
 
+    const mime =
+      (attachment.compatStatus === "ACTIVE"
+        ? attachment.compatMime
+        : attachment.mime) ?? "application/pdf";
+
     // Create mapping (acts as lock)
     const mapping = await this.prisma.upsertAnthropicAssetMapping(
       attachment.id,
       keyFingerprint,
-      attachment.compatMime ?? attachment.mime ?? "application/pdf",
+      mime,
       keyId
     );
 
@@ -213,154 +227,6 @@ export class AnthropicService {
     return this.outputTokensByModel[model];
   };
 
-  public formatAnthropicHistory(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[],
-    systemPrompt?: string
-  ) {
-    if (!isNewChat) {
-      const messages = msgs.map(msg => {
-        if (msg.senderType === "USER") {
-          const content = Array.of<BetaContentBlockParam>();
-          try {
-            // Add image attachments if present
-            if (msg.attachments && msg.attachments.length > 0) {
-              for (const attachment of msg.attachments) {
-                const {
-                  cdnUrl,
-                  mime: ogMime,
-                  compatCdnUrl,
-                  compatMime
-                } = attachment;
-                const url = compatCdnUrl ?? cdnUrl;
-                const mime = compatMime ?? ogMime;
-                if (url && mime) {
-                  if (mime.includes("application")) {
-                    const docBlock = {
-                      type: "document",
-                      source: {
-                        type: "url",
-                        url
-                      }
-                    } as const satisfies BetaRequestDocumentBlock;
-                    content.push(docBlock);
-                  } else if (mime.startsWith("image/")) {
-                    const imageBlock = {
-                      type: "image",
-                      source: {
-                        type: "url",
-                        url
-                      }
-                    } as const satisfies BetaImageBlockParam;
-                    content.push(imageBlock);
-                  }
-                }
-              }
-            }
-          } catch (err) {
-            this.logger.warn({ err }, "error in anthropic history workup");
-          } finally {
-            content.push({ type: "text", text: msg.content } as const);
-          }
-
-          return {
-            role: "user",
-            content: content.length > 0 ? content : msg.content
-          } as const satisfies BetaMessageParam;
-        } else {
-          const provider = msg.provider.toLowerCase();
-          const model = msg.model ?? "";
-          return {
-            role: "assistant",
-            content: `<model provider="${provider}" name="${model}">\n${msg.content}\n</model>`
-          } as const;
-        }
-      }) satisfies BetaMessageParam[];
-
-      const enhancedSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
-        : "Previous responses in this conversation may be tagged with their source model for context.";
-
-      return {
-        messages,
-        system: [
-          { type: "text", text: enhancedSystemPrompt }
-        ] as const satisfies BetaTextBlockParam[]
-      };
-    } else {
-      // new chat means only one message exists period -> the first user message
-      const userMsg = msgs[0];
-      const content = Array.of<BetaContentBlockParam>();
-
-      if (userMsg) {
-        try {
-          if (userMsg.attachments && userMsg.attachments.length > 0) {
-            for (const attachment of userMsg.attachments) {
-              const {
-                cdnUrl,
-                mime: ogMime,
-                compatCdnUrl,
-                compatMime
-              } = attachment;
-              const url = compatCdnUrl ?? cdnUrl;
-              const mime = compatMime ?? ogMime;
-              if (url && mime) {
-                if (mime.includes("application")) {
-                  const docBlock = {
-                    type: "document",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies BetaRequestDocumentBlock;
-                  content.push(docBlock);
-                } else if (mime.startsWith("image/")) {
-                  const imageBlock = {
-                    type: "image",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies BetaImageBlockParam;
-                  content.push(imageBlock);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          this.logger.warn(
-            { err },
-            "error in new chat anthropic history workup"
-          );
-        } finally {
-          content.push({ type: "text", text: userMsg.content } as const);
-        }
-      }
-
-      // never pass the already database persisted user prompt
-      const messages = [
-        {
-          role: "user",
-          content: content.length >= 1 ? content : "no user message found"
-        }
-      ] as const satisfies BetaMessageParam[];
-
-      if (systemPrompt) {
-        return {
-          messages,
-          system: [
-            { type: "text", text: systemPrompt }
-          ] as const satisfies BetaTextBlockParam[]
-        };
-      } else {
-        return {
-          messages,
-          system: undefined
-        };
-      }
-    }
-  }
-
   public async formatAnthropicHistoryWithFiles(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
@@ -381,11 +247,12 @@ export class AnthropicService {
                   const {
                     cdnUrl,
                     mime: ogMime,
+                    compatStatus,
                     compatCdnUrl,
                     compatMime
                   } = attachment;
-                  const url = compatCdnUrl ?? cdnUrl;
-                  const mime = compatMime ?? ogMime;
+                  const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+                  const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
                   if (url && mime) {
                     // Use Files API for PDFs only
@@ -399,10 +266,7 @@ export class AnthropicService {
                         );
                         const docBlock = {
                           type: "document",
-                          source: {
-                            type: "file",
-                            file_id: fileId
-                          }
+                          source: { file_id: fileId, type: "file" }
                         } as const satisfies BetaRequestDocumentBlock;
                         content.push(docBlock);
                       } catch (err) {
@@ -508,7 +372,8 @@ export class AnthropicService {
                       source: {
                         type: "file",
                         file_id: fileId
-                      }
+                      },
+                      cache_control: { type: "ephemeral", ttl: "1h" }
                     } as const satisfies BetaRequestDocumentBlock;
                     content.push(docBlock);
                   } catch (err) {
@@ -683,6 +548,12 @@ export class AnthropicService {
         metadata: { user_id: userId },
         messages,
         service_tier: "auto",
+        betas: [
+          "dev-full-thinking-2025-05-14",
+          "files-api-2025-04-14",
+          "context-1m-2025-08-07",
+          "extended-cache-ttl-2025-04-11"
+        ],
         tools
       },
       { stream: true }

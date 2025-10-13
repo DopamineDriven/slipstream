@@ -24,8 +24,12 @@ export default defineConfig(
       entry: [
         "src/index.ts",
         "src/docs/index.ts",
+        "src/extract/index.ts",
         "src/images/index.ts",
-        "src/images/workup.ts"
+        "src/images/workup.ts",
+        "src/mixins/index.ts",
+        "src/types/index.ts",
+        "!src/test/**"
       ],
       target: ["esnext"],
       platform: "neutral",

@@ -1,71 +1,8 @@
+import type { DocSpecs, ZipEntry } from "@/types/index.ts";
 import { inflateSync } from "fflate";
 
-export interface PdfDocSpecs {
-  pdfVersion: string | null;
-  isEncrypted: boolean | null;
-  isSearchable: boolean | null;
-  isLinearized: boolean | null;
-  hasForm: boolean | null;
-  hasSignatures: boolean | null;
-  hasAttachments: boolean | null;
-  hasJavaScript: boolean | null;
-  permissions: {
-    printing: boolean;
-    modifying: boolean;
-    copying: boolean;
-    annotating: boolean;
-  } | null;
-}
-
-export interface SpreadSheetDocSpecs {
-  sheetCount: number | null;
-  sheetNames: string[] | null;
-  hasFormulas: boolean | null;
-  hasMacros: boolean | null;
-  hasPivotTables: boolean | null;
-  hasCharts: boolean | null;
-  activeSheet: number | null;
-}
-
-export interface PresentationDocSpecs {
-  slideCount: number | null;
-  hasAnimations: boolean | null;
-  hasTransitions: boolean | null;
-  hasNotes: boolean | null;
-  hasMasterSlides: boolean | null;
-  presentationFormat: "standard" | "widescreen" | null;
-}
-
-export interface DocSpecs {
-  type: "DOCUMENT";
-  format: string | null;
-  mimeType: string | null;
-  pageCount: number | null;
-  wordCount: number | null;
-  lineCount: number | null;
-  language: string | null;
-  encoding: string | null;
-  author: string | null;
-  subject: string | null;
-  keywords: string[] | null;
-  pdfVersion: string | null;
-  isEncrypted: boolean | null;
-  isSearchable: boolean | null;
-  isLinearized: boolean | null;
-  textPreview: string | null;
-  createdDate: string | null;
-  modifiedDate: string | null;
-}
-
-export type ZipEntry = {
-  name: string;
-  compressedSize: number;
-  uncompressedSize: number;
-  compressionMethod: number; // 0 = store, 8 = deflate
-  localHeaderOffset: number;
-};
-
 export class DocMetadataExtractor {
+  // Safer decoding with fallback paths
   private toSafeString(buf: Uint8Array, encoding = "utf-8"): string {
     try {
       // TextDecoder is available in browsers and modern runtimes
@@ -95,6 +32,20 @@ export class DocMetadataExtractor {
     if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff)
       return { encoding: "utf-16be", offset: 2 };
     return { encoding: "utf-8", offset: 0 };
+  }
+
+  // Best-effort text detection/decoding with UTF-8 validation and Windows-1252 fallback
+  private detectAndDecodeText(buffer: Uint8Array): string {
+    const { encoding, offset } = this.detectTextEncodingPrefix(buffer);
+    const body = buffer.subarray(offset);
+    if (encoding === "utf-8" && offset === 0) {
+      try {
+        return new TextDecoder("utf-8", { fatal: true }).decode(body);
+      } catch {
+        return new TextDecoder("windows-1252", { fatal: false }).decode(body);
+      }
+    }
+    return this.toSafeString(body, encoding);
   }
 
   private _stripXmlTags(xml: string): string {
@@ -168,6 +119,300 @@ export class DocMetadataExtractor {
     };
     return map[ext] ?? null;
   }
+
+  // -------- PDF helpers --------
+  private countPDFPages(buffer: Buffer): number | null {
+    try {
+      const text = buffer.toString("latin1");
+      // Strategy 1: /Pages /Count
+      const pagesMatch = text.match(/\/Type\s*\/Pages[^>]*?\/Count\s+(\d+)/);
+
+      if (pagesMatch?.[1]) {
+        const count = parseInt(pagesMatch[1], 10);
+        if (count > 0 && count < 100000) {
+          return count;
+        }
+      }
+      // Strategy 2: Catalog -> Pages ref -> Count
+      const catalogMatch = text.match(
+        /\/Type\s*\/Catalog[^>]*?\/Pages\s+(\d+)\s+\d+\s+R/
+      );
+      if (catalogMatch?.[1]) {
+        const objNum = catalogMatch[1];
+        const pagesObjRegex = new RegExp(
+          `${objNum}\\s+\\d+\\s+obj[\\s\\S]*?\\/Type\\s*\\/Pages[\\s\\S]*?\\/Count\\s+(\\d+)`
+        );
+        const pagesObjMatch = text.match(pagesObjRegex);
+        if (pagesObjMatch?.[1]) {
+          const count = parseInt(pagesObjMatch[1], 10);
+          if (count > 0 && count < 100000) return count;
+        }
+      }
+      // Strategy 3: Linearized dictionary /N
+      if (/Linearized/i.test(text)) {
+        const linearMatch = text.match(
+          /<<[\s\S]*?\/Linearized[\s\S]*?\/N\s+(\d+)/
+        );
+        if (linearMatch?.[1]) {
+          const count = parseInt(linearMatch[1], 10);
+          if (count > 0 && count < 100000) return count;
+        }
+      }
+      // Strategy 4: Kids refs -> unique pages
+      const pageRefs = new Set<string>();
+      const kidsMatches = text.matchAll(/\/Kids\s*\[([\s\S]*?)\]/g);
+      for (const match of kidsMatches) {
+        if (match[1]) {
+          const refs = match[1].matchAll(/(\d+)\s+\d+\s+R/g);
+          for (const ref of refs) {
+            if (ref[1]) {
+              pageRefs.add(ref[1]);
+            }
+          }
+        }
+      }
+      const count = pageRefs.size;
+      if (count > 0) return count;
+      // Strategy 5: Fallback: count Page objects (with MediaBox/Parent preferred)
+      const fallback =
+        (
+          text.match(
+            /obj[\s\S]*?\/Type\s*\/Page\b(?![s])[\s\S]*?(?:\/MediaBox|\/Parent)/g
+          ) ?? []
+        ).length || (text.match(/\/Type\s*\/Page\b/g) ?? []).length;
+      return fallback || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private extractPDFText(buffer: Buffer, maxLength = 500): string | null {
+    try {
+      const text = buffer.toString("latin1");
+      const textBlocks = Array.of<string>();
+      const btMatches = text.matchAll(/BT([\s\S]*?)ET/g);
+      for (const m of btMatches) {
+        const body = m[1];
+        // Tj with () strings
+        if (body) {
+          for (const tj of body.matchAll(/\(([^)]*)\)\s*Tj/g)) {
+            if (tj[1]) textBlocks.push(this.decodePdfString(tj[1]));
+            if (textBlocks.join(" ").length > maxLength) break;
+          }
+          // Tj with <hex>
+          for (const hex of body.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g)) {
+            if (hex[1]) textBlocks.push(this.decodeHexString(hex[1]));
+            if (textBlocks.join(" ").length > maxLength) break;
+          }
+          // TJ arrays
+          for (const tja of body.matchAll(/\[(.*?)\]\s*TJ/g)) {
+            const arr = tja[1];
+            if (arr) {
+              for (const str of arr.matchAll(/\(([^)]*)\)/g)) {
+                if (str[1]) textBlocks.push(this.decodePdfString(str[1]));
+                if (textBlocks.join(" ").length > maxLength) break;
+              }
+              for (const hx of arr.matchAll(/<([0-9A-Fa-f]+)>/g)) {
+                if (hx[1]) textBlocks.push(this.decodeHexString(hx[1]));
+                if (textBlocks.join(" ").length > maxLength) break;
+              }
+            }
+          }
+        }
+        if (textBlocks.join(" ").length > maxLength) break;
+      }
+      if (!textBlocks.length) return null;
+      let result = textBlocks
+        .join(" ")
+        .replace(/[\r\n]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!result) return null;
+      if (result.length > maxLength) result = result.slice(0, maxLength) + "…";
+      return result;
+    } catch {
+      return null;
+    }
+  }
+  private decodePdfString(str: string): string {
+    if (!str) return "";
+    let out = str.replace(/\\(\d{1,3})/g, (_, oct: string) => {
+      const code = parseInt(oct, 8);
+      return code < 256 ? String.fromCharCode(code) : "";
+    });
+    out = out
+      .replace(/\\n/g, "\n")
+      .replace(/\\r/g, "\r")
+      .replace(/\\t/g, "\t")
+      .replace(/\\b/g, "\b")
+      .replace(/\\f/g, "\f")
+      .replace(/\\([()\\])/g, "$1");
+    return out;
+  }
+  private decodeHexString(hex: string): string {
+    if (!hex) return "";
+
+    // Remove spaces and ensure even length
+    hex = hex.replace(/\s/g, "");
+    if (hex.length % 2) hex += "0";
+
+    let result = "";
+    for (let i = 0; i < hex.length; i += 2) {
+      const code = parseInt(hex.substring(i, 2), 16);
+      if (!isNaN(code)) {
+        result += String.fromCharCode(code);
+      }
+    }
+    return result;
+  }
+  /**
+   * Parse PDF date format into ISO 8601
+   * PDF Format: D:YYYYMMDDHHmmSSOHH'mm'
+   * Your implementation is good but needs small fixes
+   */
+  private parsePdfDate(value: string): string | null {
+    if (!value) return null;
+
+    // Clean the input
+    const v = value.startsWith("D:") ? value.slice(2) : value;
+
+    // Fixed regex - make timezone optional and handle variations
+    const re =
+      /^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?(?:(Z|[+\-])(\d{2})'?(\d{2})'?)?/;
+    const m = v.match(re);
+    if (!m) return null;
+
+    const [_, Y, Mo, D, H, Mi, S, tzIndicator, tzHours, tzMinutes] = m;
+
+    // Build date components with defaults
+    const yyyy = Y;
+    const mm = Mo ?? "01";
+    const dd = D ?? "01";
+    const hh = H ?? "00";
+    const mi = Mi ?? "00";
+    const ss = S ?? "00";
+
+    // Build timezone string
+    let tz = "";
+    if (tzIndicator) {
+      if (tzIndicator === "Z") {
+        tz = "Z";
+      } else {
+        // Handle +/- timezone
+        const tzH = tzHours ?? "00";
+        const tzM = tzMinutes ?? "00";
+        tz = `${tzIndicator}${tzH.padStart(2, "0")}:${tzM.padStart(2, "0")}`;
+      }
+    }
+
+    // Return ISO 8601 format
+    return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${hh.padStart(2, "0")}:${mi.padStart(2, "0")}:${ss.padStart(2, "0")}${tz}`;
+  }
+  private getPdfInfoString(text: string, key: string): string | null {
+    // Parenthesis format
+    let m = text.match(new RegExp(`\/${key}\\s*\(([^)]*)\)`));
+    if (m?.[1]) return this.decodePdfString(m[1]);
+    // Hex format
+    m = text.match(new RegExp(`\/${key}\\s*<([0-9A-Fa-f]+)>`));
+    if (m?.[1]) return this.decodeHexString(m[1]);
+    return null;
+  }
+
+  /**
+   * Extract date fields from PDF - handles all encoding formats
+   * This is what you need to call from your main PDF parser
+   */
+  private extractPdfDate(text: string, fieldName: string): string | null {
+    // Method 1: Parentheses format (most common)
+    // Example: /CreationDate (D:20241225120000+05'00')
+    let match = text.match(new RegExp(`\/${fieldName}\\s*\\(([^)]+)\\)`));
+    if (match?.[1]) {
+      // Decode PDF string escapes first
+      const decoded = this.decodePdfString(match[1]);
+      return this.parsePdfDate(decoded);
+    }
+
+    // Method 2: Hexadecimal format
+    // Example: /CreationDate <443A32303234313232353132303030302B30352730302720>
+    match = text.match(new RegExp(`\/${fieldName}\\s*<([0-9A-Fa-f]+)>`));
+    if (match?.[1]) {
+      const decoded = this.decodeHexString(match[1]);
+      return this.parsePdfDate(decoded);
+    }
+
+    // Method 3: Direct string (rare but possible)
+    // Example: /CreationDate D:20241225120000Z
+    match = text.match(new RegExp(`\/${fieldName}\\s+(D:[^\\s/>]+)`));
+    if (match?.[1]) {
+      return this.parsePdfDate(match[1]);
+    }
+
+    return null;
+  }
+
+  /**
+   * Extract dates from XMP metadata packet
+   * Used as fallback when traditional PDF Info dictionary lacks dates
+   */
+  private extractXmpDates(text: string): {
+    createdDate: string | null;
+    modifiedDate: string | null;
+  } {
+    // Look for XMP packet
+    const xmpMatch = text.match(/<\?xpacket[^>]*\?>([\s\S]*?)<\/x:xmpmeta>/);
+    if (!xmpMatch?.[1]) {
+      return { createdDate: null, modifiedDate: null };
+    }
+
+    const xmpContent = xmpMatch[1];
+    let createdDate: string | null = null;
+    let modifiedDate: string | null = null;
+
+    // Try various XMP date field formats
+    // Format 1: <xmp:CreateDate>2025-09-25T03:22:11-04:00</xmp:CreateDate>
+    let match = xmpContent.match(/<xmp:CreateDate>([^<]+)<\/xmp:CreateDate>/);
+    if (match?.[1]) {
+      createdDate = match[1];
+    }
+
+    match = xmpContent.match(/<xmp:ModifyDate>([^<]+)<\/xmp:ModifyDate>/);
+    if (match?.[1]) {
+      modifiedDate = match[1];
+    }
+
+    // Format 2: xmp:CreateDate="2025-09-25T03:22:11-04:00"
+    if (!createdDate) {
+      match = xmpContent.match(/xmp:CreateDate=["']([^"']+)["']/);
+      if (match?.[1]) {
+        createdDate = match[1];
+      }
+    }
+
+    if (!modifiedDate) {
+      match = xmpContent.match(/xmp:ModifyDate=["']([^"']+)["']/);
+      if (match?.[1]) {
+        modifiedDate = match[1];
+      }
+    }
+
+    // Also check for PDF-specific XMP fields
+    if (!createdDate) {
+      match = xmpContent.match(/<pdf:CreationDate>([^<]+)<\/pdf:CreationDate>/);
+      if (match?.[1]) {
+        createdDate = match[1];
+      }
+    }
+
+    if (!modifiedDate) {
+      match = xmpContent.match(/<pdf:ModDate>([^<]+)<\/pdf:ModDate>/);
+      if (match?.[1]) {
+        modifiedDate = match[1];
+      }
+    }
+
+    return { createdDate, modifiedDate };
+  }
+
   public parsePdf(buffer: Buffer, mime: string): DocSpecs {
     // Use latin1 for stable byte->char mapping during regex scans
     const text = buffer.toString("latin1");
@@ -176,64 +421,62 @@ export class DocMetadataExtractor {
     const isLinearized = /Linearized/i.test(text);
     const isEncrypted = /\/Encrypt\b/.test(text);
 
-    // Count pages via '/Type /Page' occurrences — heuristic
-    const pageCount = (text.match(/\/Type\s*\/Page\b/g) ?? []).length || null;
+    // Better page counting: prefer /Pages /Count, then Kids refs, then fallback
+    const pageCount = this.countPDFPages(buffer);
 
-    // Heuristic: searchable if we see text operators or ToUnicode maps
-    const isSearchable = /\b(BT|ToUnicode)\b/.test(text);
+    // Basic text extraction for preview
+    const textPreview = this.extractPDFText(buffer, 500);
+    const isSearchable =
+      !!textPreview || /\bToUnicode\b/.test(text) || /\/Font\b/.test(text);
 
-    // Simple Info dictionary extraction (heuristic)
-    const getInfo = (key: string) => {
-      const m = text.match(new RegExp(`${key}\\s*\x28([^\x29]*)\x29`)); // /Key (Value)
-      return m?.[1] ?? null;
-    };
-    const author = getInfo("/Author");
-    const subject = getInfo("/Subject");
-    const title = getInfo("/Title");
-    const keywordsRaw = getInfo("/Keywords");
-    const keywords = keywordsRaw
+    // Info dictionary extraction with () and <hex> handling
+    const author = this.getPdfInfoString(text, "Author");
+    const subject = this.getPdfInfoString(text, "Subject");
+    const title = this.getPdfInfoString(text, "Title");
+    const creator = this.getPdfInfoString(text, "Creator");
+    const producer = this.getPdfInfoString(text, "Producer");
+    const keywordsRaw = this.getPdfInfoString(text, "Keywords");
+    let keywords = keywordsRaw
       ? keywordsRaw
           .split(/[,;]/)
           .map(s => s.trim())
           .filter(Boolean)
       : null;
+    // Best-effort: include creator/producer as keywords if present
+    if (creator || producer) {
+      const extra = [creator, producer].filter(Boolean) as string[];
+      keywords = (keywords ?? []).concat(extra);
+    }
 
-    // Dates usually like D:YYYYMMDDHHmmSS...
-    const dateVal = (key: string) => {
-      const m = text.match(new RegExp(`${key}\\s*\x28([^\x29]*)\x29`));
-      const v = m?.[1] ?? null;
-      if (!v) return null;
-      if (/^D:\\d{14}/.test(v)) {
-        const yyyy = v.slice(2, 6);
-        const MM = v.slice(6, 8);
-        const dd = v.slice(8, 10);
-        const hh = v.slice(10, 12);
-        const mm = v.slice(12, 14);
-        const ss = v.slice(14, 16);
-        return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
-      }
-      return v;
-    };
-    const createdDate = dateVal("/CreationDate");
-    const modifiedDate = dateVal("/ModDate");
+    // Dates: robust parsing of various PDF date shapes
+    // Try traditional PDF Info dictionary first
+    let createdDate = this.extractPdfDate(text, "CreationDate");
+    let modifiedDate = this.extractPdfDate(text, "ModDate");
+
+    // If no dates found in traditional format, try XMP metadata
+    if (!createdDate && !modifiedDate) {
+      const xmpDates = this.extractXmpDates(text);
+      createdDate = xmpDates.createdDate;
+      modifiedDate = xmpDates.modifiedDate;
+    }
 
     return {
       type: "DOCUMENT",
       format: "pdf",
       mimeType: mime ?? "application/pdf",
       pageCount,
-      wordCount: null,
+      wordCount: textPreview ? this.countWords(textPreview) : null,
       lineCount: null,
       language: null,
       encoding: null,
-      author: author ?? (title ? null : null),
+      author: author ?? creator ?? producer ?? null,
       subject: subject ?? title ?? null,
       keywords,
       pdfVersion,
       isEncrypted,
       isSearchable,
       isLinearized,
-      textPreview: null,
+      textPreview,
       createdDate,
       modifiedDate
     } satisfies DocSpecs;
@@ -281,8 +524,8 @@ export class DocMetadataExtractor {
       buffer.byteOffset,
       buffer.byteLength
     );
-    const { encoding, offset } = this.detectTextEncodingPrefix(u8);
-    const text = this.toSafeString(u8.subarray(offset), encoding);
+    const { encoding } = this.detectTextEncodingPrefix(u8);
+    const text = this.detectAndDecodeText(u8);
     const ext = this.getExtFromFilename(filename);
     const language = this.extToLanguage(ext);
     const words = this.countWords(text);
@@ -329,18 +572,40 @@ export class DocMetadataExtractor {
     return -1;
   }
   public readCentralDirectory(buffer: Buffer): ZipEntry[] {
-    const eocd = this.findEOCD(buffer);
-    if (eocd < 0) return [];
-    const totalEntries = buffer.readUInt16LE(eocd + 10);
-    const _cdirSize = buffer.readUInt32LE(eocd + 12);
-    const cdirOffset = buffer.readUInt32LE(eocd + 16);
+    try {
+      const eocd = this.findEOCD(buffer);
+      if (eocd < 0 || eocd + 22 > buffer.length) return [];
+      const sig = buffer.readUInt32LE(eocd);
+      if (sig !== 0x06054b50) return [];
+
+      const diskNumber = buffer.readUInt16LE(eocd + 4);
+      const diskWithCD = buffer.readUInt16LE(eocd + 6);
+      if (diskNumber !== 0 || diskWithCD !== 0) return [];
+
+      const totalEntries = buffer.readUInt16LE(eocd + 10);
+      const cdirSize = buffer.readUInt32LE(eocd + 12);
+      const cdirOffset = buffer.readUInt32LE(eocd + 16);
+
+      if (cdirOffset + cdirSize > buffer.length) {
+        return this.recoverCentralDirectory(buffer, cdirOffset, totalEntries);
+      }
+      return this.parseCentralDirectory(buffer, cdirOffset, totalEntries);
+    } catch {
+      return [];
+    }
+  }
+
+  private parseCentralDirectory(
+    buffer: Buffer,
+    offset: number,
+    totalEntries: number
+  ): ZipEntry[] {
     const entries: ZipEntry[] = [];
-    let p = cdirOffset;
+    let p = offset;
     const CEN_SIG = 0x02014b50;
     for (let i = 0; i < totalEntries; i++) {
+      if (p + 46 > buffer.length) break;
       if (buffer.readUInt32LE(p) !== CEN_SIG) break;
-      // central header fixed fields
-      // skip sig(4) + ver(2) + verNeeded(2) + flag(2)
       const compression = buffer.readUInt16LE(p + 10);
       const compSize = buffer.readUInt32LE(p + 20);
       const uncompSize = buffer.readUInt32LE(p + 24);
@@ -348,7 +613,10 @@ export class DocMetadataExtractor {
       const extraLen = buffer.readUInt16LE(p + 30);
       const commentLen = buffer.readUInt16LE(p + 32);
       const localHeaderOffset = buffer.readUInt32LE(p + 42);
-      const name = buffer.subarray(p + 46, p + 46 + nameLen).toString("utf-8");
+      const nameStart = p + 46;
+      const nameEnd = nameStart + nameLen;
+      if (nameEnd > buffer.length) break;
+      const name = buffer.subarray(nameStart, nameEnd).toString("utf-8");
       entries.push({
         name,
         compressedSize: compSize,
@@ -358,7 +626,42 @@ export class DocMetadataExtractor {
       });
       p += 46 + nameLen + extraLen + commentLen;
     }
-    // cdirSize is not strictly required; entries length should match totalEntries
+    return entries;
+  }
+
+  private recoverCentralDirectory(
+    buffer: Buffer,
+    startOffset: number,
+    maxEntries: number
+  ): ZipEntry[] {
+    const entries: ZipEntry[] = [];
+    const CEN_SIG = 0x02014b50;
+    let p = Math.max(0, startOffset);
+    while (p + 46 <= buffer.length && entries.length < maxEntries) {
+      if (buffer.readUInt32LE(p) === CEN_SIG) {
+        const compression = buffer.readUInt16LE(p + 10);
+        const compSize = buffer.readUInt32LE(p + 20);
+        const uncompSize = buffer.readUInt32LE(p + 24);
+        const nameLen = buffer.readUInt16LE(p + 28);
+        const extraLen = buffer.readUInt16LE(p + 30);
+        const commentLen = buffer.readUInt16LE(p + 32);
+        const localHeaderOffset = buffer.readUInt32LE(p + 42);
+        const nameStart = p + 46;
+        const nameEnd = nameStart + nameLen;
+        if (nameEnd > buffer.length) break;
+        const name = buffer.subarray(nameStart, nameEnd).toString("utf-8");
+        entries.push({
+          name,
+          compressedSize: compSize,
+          uncompressedSize: uncompSize,
+          compressionMethod: compression,
+          localHeaderOffset
+        });
+        p += 46 + nameLen + extraLen + commentLen;
+        continue;
+      }
+      p += 1;
+    }
     return entries;
   }
   public readLocalFileData(buffer: Buffer, entry: ZipEntry): Uint8Array | null {
@@ -447,6 +750,7 @@ export class DocMetadataExtractor {
 
     // Optional: quick text preview from primary document part (best effort)
     let textPreview: string | null = null;
+    let extraKeywords = Array.of<string>();
     if (kind === "docx") {
       const docEntry = byName.get("word/document.xml");
       if (docEntry) {
@@ -467,6 +771,90 @@ export class DocMetadataExtractor {
           }
         }
       }
+    } else if (kind === "xlsx") {
+      // Count worksheets by listing entries and parse sheet names
+      const worksheetCount = entries.filter(e =>
+        e.name.startsWith("xl/worksheets/sheet")
+      ).length;
+      if (worksheetCount) pageCount = worksheetCount;
+
+      const workbook = byName.get("xl/workbook.xml");
+      let hasHiddenSheets = false;
+      if (workbook) {
+        const data = this.readLocalFileData(buffer, workbook);
+        if (data) {
+          const xml = this.toSafeString(data);
+          const sheets = Array.from(
+            xml.matchAll(/<sheet[^>]+name="([^"]+)"/g),
+            m => m?.[1] ?? ""
+          );
+          if (sheets.length) extraKeywords = sheets;
+          if (/state="(?:hidden|veryHidden)"/.test(xml)) hasHiddenSheets = true;
+        }
+      }
+
+      // Use shared strings for preview and rough word count
+      const sharedStrings = byName.get("xl/sharedStrings.xml");
+      if (sharedStrings) {
+        const data = this.readLocalFileData(buffer, sharedStrings);
+        if (data) {
+          const xml = this.toSafeString(data);
+          const textNodes = Array.from(
+            xml.matchAll(/<t[^>]*>([^<]+)<\/t>/g),
+            m => m[1]
+          );
+          if (textNodes.length) {
+            wordCount = textNodes.join(" ").split(/\s+/).filter(Boolean).length;
+            const preview = textNodes.slice(0, 10).join(" ");
+            textPreview = this.firstN(preview, 200);
+          }
+        }
+      }
+
+      // Analyze first few worksheets for dimensions and formulas
+      let totalRows = 0;
+      let hasFormulas = false;
+      const worksheetEntries = entries.filter(
+        e => e.name.startsWith("xl/worksheets/sheet") && e.name.endsWith(".xml")
+      );
+      for (const entry of worksheetEntries.slice(0, 3)) {
+        const data = this.readLocalFileData(buffer, entry);
+        if (!data) continue;
+        const xml = this.toSafeString(data);
+        const dim = xml.match(/<dimension\s+ref="([A-Z]+\d+):([A-Z]+\d+)"/);
+        if (dim?.[2]) {
+          const end = dim[2];
+          const m = end.match(/^([A-Z]+)(\d+)$/);
+          if (m?.[2]) {
+            const row = Number.parseInt(m[2], 10);
+            if (!Number.isNaN(row)) totalRows = Math.max(totalRows, row);
+          }
+        }
+        if (!hasFormulas && (xml.includes("<f>") || xml.includes("<f ")))
+          hasFormulas = true;
+      }
+
+      // Detect features from entry names
+      const entryNames = new Set(entries.map(e => e.name));
+      const hasPivotTables = entries.some(e => e.name.includes("pivotTable"));
+      const hasCharts = entries.some(e => e.name.includes("/charts/"));
+      const hasMacros = entryNames.has("xl/vbaProject.bin");
+      const hasConnections = entryNames.has("xl/connections.xml");
+      const hasCustomXml = entries.some(e => e.name.startsWith("customXml/"));
+
+      if (hasHiddenSheets) extraKeywords.push("hidden-sheets");
+      if (hasFormulas) extraKeywords.push("formulas");
+      if (hasPivotTables) extraKeywords.push("pivot-tables");
+      if (hasCharts) extraKeywords.push("charts");
+      if (hasMacros) extraKeywords.push("macros");
+      if (hasConnections) extraKeywords.push("connections");
+      if (hasCustomXml) extraKeywords.push("custom-xml");
+
+      // Use rows as lineCount if available
+      if (totalRows > 0) {
+        // Thread through via closure variable in return below using local capture
+        // We'll set lineCount after keywords merge below
+      }
     }
 
     return {
@@ -475,12 +863,43 @@ export class DocMetadataExtractor {
       mimeType: mime,
       pageCount,
       wordCount,
-      lineCount: null,
+      lineCount: (() => {
+        if (kind === "xlsx") {
+          // recompute minimal rows using same small scan to avoid storing temp across branches
+          const worksheetEntries = entries.filter(
+            e =>
+              e.name.startsWith("xl/worksheets/sheet") &&
+              e.name.endsWith(".xml")
+          );
+          let totalRows = 0;
+          for (const entry of worksheetEntries.slice(0, 3)) {
+            const data = this.readLocalFileData(buffer, entry);
+            if (!data) continue;
+            const xml = this.toSafeString(data);
+            const dim = xml.match(/<dimension\s+ref="([A-Z]+\d+):([A-Z]+\d+)"/);
+            if (dim?.[2]) {
+              const end = dim[2];
+              const m = end.match(/^([A-Z]+)(\d+)$/);
+              if (m?.[2]) {
+                const row = Number.parseInt(m[2], 10);
+                if (!Number.isNaN(row)) totalRows = Math.max(totalRows, row);
+              }
+            }
+          }
+          return totalRows || null;
+        }
+        return null;
+      })(),
       language: null,
       encoding: null,
       author,
       subject,
-      keywords,
+      keywords: (() => {
+        const base = keywords ?? [];
+        return base.concat(extraKeywords).filter(Boolean).length
+          ? base.concat(extraKeywords)
+          : keywords;
+      })(),
       pdfVersion: null,
       isEncrypted: null,
       isSearchable: null,
