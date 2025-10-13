@@ -1,4 +1,4 @@
-import type { BoxInfo, ImageSpecs } from "@/images/index.ts";
+import type { BoxInfo, ImageSpecs } from "@/types/index.ts";
 
 export class ImgMetadataExtractorWorkup {
   public parseExif(

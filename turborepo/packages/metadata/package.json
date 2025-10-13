@@ -20,6 +20,15 @@
       ],
       "docs": [
         "dist/docs/index.d.ts"
+      ],
+      "extract": [
+        "dist/extract/index.d.ts"
+      ],
+      "mixins": [
+        "dist/mixins/index.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
       ]
     }
   },
@@ -37,6 +46,15 @@
         ],
         "docs": [
           "dist/docs/index.d.ts"
+        ],
+        "extract": [
+          "dist/extract/index.d.ts"
+        ],
+        "mixins": [
+          "dist/mixins/index.d.ts"
+        ],
+        "types": [
+          "dist/types/index.d.ts"
         ]
       }
     }
@@ -47,8 +65,11 @@
   "exports": {
     ".": "./dist/index.js",
     "./docs": "./dist/docs/index.js",
+    "./extract": "./dist/extract/index.js",
     "./images": "./dist/images/index.js",
-    "./images/workup": "./dist/images/workup.js"
+    "./images/workup": "./dist/images/workup.js",
+    "./mixins": "./dist/mixins/index.js",
+    "./types": "./dist/types/index.js"
   },
   "scripts": {
     "lint": "eslint",
@@ -56,7 +77,8 @@
     "prebuild": "rm -rf dist",
     "build": "tsdown",
     "clean": "git clean -xdf dist node_modules",
-    "types": "tsc --emitDeclarationOnly"
+    "types": "tsc --emitDeclarationOnly",
+    "test": "tsx src/test/workup.ts"
   },
   "dependencies": {
     "fflate": "^0.8.2"
