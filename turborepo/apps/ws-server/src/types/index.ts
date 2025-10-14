@@ -1,6 +1,98 @@
 import { WebSocket } from "ws";
-import type { EventTypeMap } from "@slipstream/types";
+import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
+import type { CTR, EventTypeMap, RTC } from "@slipstream/types";
 
+// new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
+
+export type InferTopLevelMime<T extends string> =
+  T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
+
+export type UpdateAttachment = CTR<
+  RTC<Attachment>,
+  "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
+>;
+
+export type UpdateAttachmentMetadata = {
+  img?:
+    | {
+        animated: boolean;
+        aspectRatio: number;
+        cameraMake: null;
+        cameraModel: null;
+        colorSpace:
+          | "unknown"
+          | "srgb"
+          | "display_p3"
+          | "adobe_rgb"
+          | "prophoto_rgb"
+          | "rec2020"
+          | "rec709"
+          | "cmyk"
+          | "lab"
+          | "xyz"
+          | "gray";
+        dominantColorHex: null;
+        exifDateTimeOriginal: Date | null;
+        format:
+          | "jpeg"
+          | "png"
+          | "gif"
+          | "webp"
+          | "avif"
+          | "heic"
+          | "apng"
+          | "bmp"
+          | "tiff"
+          | "ico"
+          | "svg"
+          | undefined;
+        frames: number;
+        gpsLat: null;
+        gpsLon: null;
+        hasAlpha: boolean;
+        height: number;
+        width: number;
+        iccProfile: string | null;
+        lensModel: null;
+        orientation: number | null;
+        createdAt: undefined;
+        updatedAt: undefined;
+      }
+    | undefined;
+  doc?:
+    | {
+        author: string | undefined;
+        createdAt: Date | undefined;
+        updatedAt: Date | undefined;
+        encoding: string | undefined;
+        format: string;
+        isEncrypted: boolean | undefined;
+        isSearchable: boolean | undefined;
+        keywords: string[] | undefined;
+        language: string | undefined;
+        lineCount: number | undefined;
+        pageCount: number | undefined;
+        pdfVersion: string | undefined;
+        subject: string | undefined;
+        textPreview: string | undefined;
+        title: undefined;
+        wordCount: number | undefined;
+      }
+    | undefined;
+  type: "IMAGE" | "DOCUMENT";
+};
+
+export type UpdateAttachmentCompatProps = {
+  attachmentId: string;
+  compatKey: string;
+  compatStatus: $Enums.CompatStatus;
+  compatCdnUrl: string;
+  compatReadyAt: Date;
+  compatVersionId?: string;
+  compatS3ObjectId?: string;
+  compatMime?: string;
+  compatExt?: string;
+};
 export interface WSServerOptions {
   port: number;
   channel?: string;
@@ -96,7 +188,33 @@ export type ImageSingleton = {
   createdAt: Date;
   updatedAt: Date;
   attachmentId: string;
-  format: "apng" | "png" | "gif" | "bmp" | "webp" | "avif" | "svg" | "ico" | "tiff" | "jpeg" | "heic" | "unknown" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze";
+  format:
+    | "apng"
+    | "png"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | "jpeg"
+    | "heic"
+    | "unknown"
+    | "jxl"
+    | "jp2"
+    | "jpx"
+    | "jxr"
+    | "jls"
+    | "raw"
+    | "dng"
+    | "cr2"
+    | "nef"
+    | "arw"
+    | "hdr"
+    | "pic"
+    | "rgbe"
+    | "xyze";
   width: number;
   height: number;
   aspectRatio: number | null;
@@ -104,7 +222,19 @@ export type ImageSingleton = {
   hasAlpha: boolean | null;
   animated: boolean;
   orientation: number | null;
-  colorSpace:  "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | null;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray"
+    | null;
   exifDateTimeOriginal: Date | null;
   cameraMake: string | null;
   cameraModel: string | null;
@@ -139,8 +269,25 @@ export type AttachmentSingleton<T extends boolean = false> = {
   userId: string;
   messageId: string | null;
   s3ObjectId: string | null;
-  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
-  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+  origin:
+    | "UPLOAD"
+    | "REMOTE"
+    | "GENERATED"
+    | "PASTED"
+    | "SCREENSHOT"
+    | "IMPORTED"
+    | "SCRAPED";
+  status:
+    | "REQUESTED"
+    | "PLANNED"
+    | "UPLOADING"
+    | "STORED"
+    | "SCANNING"
+    | "READY"
+    | "FAILED"
+    | "QUARANTINED"
+    | "ATTACHED"
+    | "DELETED";
   compatKey: string | null;
   compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;
@@ -191,7 +338,7 @@ export type MessageSingleton<T extends boolean = false> = {
   userKeyId: string | null;
   conversationId: string;
   model: string | null;
-  senderType:  "USER" | "AI" | "SYSTEM";
+  senderType: "USER" | "AI" | "SYSTEM";
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -247,8 +394,25 @@ export type AssetReadyPayload = {
   batchId: string | null;
   userId: string;
   messageId: string | null;
-  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
-  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+  origin:
+    | "UPLOAD"
+    | "REMOTE"
+    | "GENERATED"
+    | "PASTED"
+    | "SCREENSHOT"
+    | "IMPORTED"
+    | "SCRAPED";
+  status:
+    | "REQUESTED"
+    | "PLANNED"
+    | "UPLOADING"
+    | "STORED"
+    | "SCANNING"
+    | "READY"
+    | "FAILED"
+    | "QUARANTINED"
+    | "ATTACHED"
+    | "DELETED";
   uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
   assetType: "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN";
   uploadDuration: number | null;

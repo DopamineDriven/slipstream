@@ -1,112 +1,9 @@
-import { ImageSpecs, ImgMetadataExtractor } from "@slipstream/metadata";
+import { Extract, ImageSpecs } from "@slipstream/metadata";
 
-export class Extract {
-  constructor(public meta: ImgMetadataExtractor) {}
-
-  private async fetchMinimalBuffer(
-    url: string,
-    size = 16384,
-    timeout = 5000
-  ): Promise<Buffer> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    let r: Response;
-    try {
-      // 1. Try HEAD request to check if Range is supported
-      r = await fetch(url, {
-        method: "HEAD",
-        signal: controller.signal
-      });
-      if (!r.ok) {
-        r = await fetch(url, { method: "GET", signal: controller.signal });
-      }
-      const headResponse = r;
-      const acceptsRange =
-        headResponse.headers.get("accept-ranges") === "bytes";
-      const contentLength = parseInt(
-        headResponse.headers.get("content-length") ?? "0"
-      );
-
-      clearTimeout(timeoutId);
-
-      // 2. Fetch with Range header if supported
-      if (acceptsRange) {
-        // We only need first 16KB for metadata (even less for most formats)
-        const rangeResponse = await fetch(url, {
-          headers: {
-            Range: `bytes=0-${size}` // First 16KB
-          },
-          signal: AbortSignal.timeout(timeout)
-        });
-
-        if (rangeResponse.status === 206) {
-          // Partial Content
-          const arrayBuffer = await rangeResponse.arrayBuffer();
-          return Buffer.from(arrayBuffer);
-        }
-      }
-
-      // 3. Fallback: Fetch entire file if small, or first chunk if streaming
-      if (contentLength && contentLength < 1024 * 1024) {
-        // < 1MB
-        const response = await fetch(url, {
-          signal: AbortSignal.timeout(timeout)
-        });
-        const arrayBuffer = await response.arrayBuffer();
-        return Buffer.from(arrayBuffer);
-      }
-
-      // 4. For large files without Range support, read partial stream
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(timeout)
-      });
-
-      if (!response.body) {
-        throw new Error("No response body");
-      }
-
-      // Read only first 16KB from stream
-      const reader = response.body.getReader();
-      const chunks: Uint8Array[] = [];
-      let totalBytes = 0;
-      const maxBytes = size;
-
-      while (totalBytes < maxBytes) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const bytesToAdd = Math.min(value.length, maxBytes - totalBytes);
-        chunks.push(value.slice(0, bytesToAdd));
-        totalBytes += bytesToAdd;
-
-        if (totalBytes >= maxBytes) {
-          reader.cancel(); // Stop reading
-          break;
-        }
-      }
-
-      return Buffer.concat(chunks);
-    } finally {
-      clearTimeout(timeoutId);
-    }
+export class ExtractService extends Extract {
+  constructor() {
+    super();
   }
-
-  public async extractRemote(
-    source: Buffer | string,
-    size = 16384,
-    timeout = 5000
-  ) {
-    let buffer: Buffer;
-    if (Buffer.isBuffer(source)) {
-      buffer = source;
-      return this.meta.getImageSpecsWorkup(buffer, size);
-    } else {
-      // Remote URL - smart fetch with Range
-      buffer = await this.fetchMinimalBuffer(source, size, timeout);
-      return this.meta.getImageSpecsWorkup(buffer, size);
-    }
-  }
-
   public grokMapper(
     data: {
       url: string;
@@ -173,7 +70,10 @@ export class Extract {
       });
     for (const d of expandedData) {
       const specs = await this.extractRemote(d.url, 64 * 1024);
-      arr.push({ index: d.index, imgSpecs: specs });
+      const specsFiltered = specs.type === "IMAGE" ? specs : null;
+      specsFiltered
+        ? arr.push({ index: d.index, imgSpecs: specsFiltered })
+        : null;
     }
     return arr;
   };
