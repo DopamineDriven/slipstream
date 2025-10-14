@@ -1,4 +1,11 @@
-import type { ConversationSingleton, UserData } from "@/types/index.ts";
+import type {
+  ConversationSingleton,
+  InferTopLevelMime,
+  UpdateAttachment,
+  UpdateAttachmentCompatProps,
+  UpdateAttachmentMetadata,
+  UserData
+} from "@/types/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import type {
@@ -22,21 +29,6 @@ import { DbService, PrismaClient } from "@slipstream/db/node";
 import { EncryptionService } from "@slipstream/encryption";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
-
-export type InferTopLevelMime<T extends string> =
-  T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
-
-export type UpdateAttachmentCompatProps = {
-  attachmentId: string;
-  compatKey: string;
-  compatStatus: $Enums.CompatStatus;
-  compatCdnUrl: string;
-  compatReadyAt: Date;
-  compatVersionId?: string;
-  compatS3ObjectId?: string;
-  compatMime?: string;
-  compatExt?: string;
-};
 
 export class PrismaService extends ModelService {
   readonly prismaClient: PrismaClient;
@@ -613,21 +605,44 @@ export class PrismaService extends ModelService {
    * Update an attachment record
    */
   async updateAttachment({
-    conversationId,
-    ...data
-  }: CTR<
-    RTC<Attachment>,
-    "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
-  >): Promise<Attachment> {
-    console.log(data);
+    metadata,
+    ...att
+  }: {
+    data: UpdateAttachment;
+    metadata?: UpdateAttachmentMetadata;
+  }) {
+    const { data } = att;
+
+    const { conversationId, ...rest } = data;
+
     return await this.prismaClient.attachment.update({
       where: {
-        id: data.id
+        id: rest.id
       },
-
+      include: { image: true, document: true },
       data: {
-        conversationId: this.convoId(conversationId),
-        ...data
+        ...rest,
+        image:
+          metadata?.type === "IMAGE" && metadata.img
+            ? {
+                upsert: {
+                  where: { attachmentId: rest.id },
+                  create: { ...metadata.img },
+                  update: { ...metadata.img }
+                }
+              }
+            : undefined,
+        document:
+          metadata?.type === "DOCUMENT" && metadata.doc
+            ? {
+                upsert: {
+                  where: { attachmentId: rest.id },
+                  create: { ...metadata.doc },
+                  update: { ...metadata.doc }
+                }
+              }
+            : undefined,
+        conversationId: this.convoId(conversationId)
       }
     });
   }

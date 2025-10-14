@@ -1,3 +1,4 @@
+// tsdown.config.ts
 import { relative } from "node:path";
 import type { Options } from "tsdown";
 import { defineConfig } from "tsdown";
@@ -16,6 +17,7 @@ export default defineConfig(
       | "clean"
       | "outDir"
       | "tsconfig"
+      | "outputOptions"
     >
   ) =>
     ({
@@ -27,18 +29,29 @@ export default defineConfig(
         "src/lib/*.ts",
         "src/ui/*.tsx",
         "src/ui/base/progress.tsx",
-        "!src/services/icon-workup.ts",
         "!src/services/postbuild.ts"
       ],
       dts: true,
       external: ["react"],
       platform: "neutral",
-      watch: process.env.NODE_ENV === "development",
       target: ["esnext"],
       format: ["esm"],
-      sourcemap: true,tsconfig: relative(process.cwd(), "tsconfig.json"),
+      sourcemap: true,
+      tsconfig: relative(process.cwd(), "tsconfig.json"),
       cwd: process.cwd(),
       clean: true,
-      outDir: "dist"
+      outDir: "dist",
+      unbundle: true,
+      outputOptions: out => ({
+        ...out,
+        cssEntryFileNames: asset =>
+          asset.name.startsWith("globals") ? "globals.css" : "[name][extname]",
+        chunkFileNames: chunk =>
+          chunk.isEntry && chunk.name.startsWith("globals")
+            ? "globals.css"
+            : "chunk-[hash].js",
+        entryFileNames: chunk =>
+          chunk.name === "index" ? "index.js" : "[name].js"
+      })
     }) satisfies Options
 );

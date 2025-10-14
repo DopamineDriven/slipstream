@@ -16,6 +16,6 @@
     "outDir": "dist"
   },
 
-  "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/globals.d.ts", "next-env.d.ts"],
   "exclude": ["dist"]
 }

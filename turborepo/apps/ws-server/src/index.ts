@@ -109,11 +109,9 @@ async function exe() {
 
     const { xAIService } = await import("@/xai/index.ts");
 
-    const { Extract } = await import("@/extract/index.ts");
+    const { ExtractService } = await import("@/extract/index.ts");
 
-    const { ImgMetadataExtractor } = await import("@slipstream/metadata");
-
-    const extract = new Extract(new ImgMetadataExtractor());
+    const extract = new ExtractService();
 
     const xai = new xAIService(prisma, redisInstance, extract, cfg.X_AI_KEY);
 
@@ -154,7 +152,8 @@ async function exe() {
       xai,
       v0,
       meta,
-      isProd
+      isProd,
+      extract
     );
 
     resolver.registerAll();

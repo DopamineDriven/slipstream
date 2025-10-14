@@ -7,7 +7,7 @@ import type {
   xAIChoiceActive,
   xAIImgGenResponse
 } from "@/xai/sse.ts";
-import { Extract } from "@/extract/index.ts";
+import { ExtractService } from "@/extract/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   createXAISSEParser,
@@ -26,7 +26,7 @@ export class xAIService {
   constructor(
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
-    private extract: Extract,
+    private extract: ExtractService,
     private apiKey?: string
   ) {}
 

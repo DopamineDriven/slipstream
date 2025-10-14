@@ -2,6 +2,7 @@ import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import type { BufferLike, UserData } from "@/types/index.ts";
 import { AnthropicService } from "@/anthropic/index.ts";
+import { ExtractService } from "@/extract/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
@@ -23,6 +24,7 @@ import type {
   Provider,
   RTC
 } from "@slipstream/types";
+import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 
@@ -38,6 +40,7 @@ export class Resolver extends ModelService {
     private v0Service: v0Service,
     private llamaService: LlamaService,
     private isProd: boolean,
+    private extract: ExtractService
   ) {
     super();
   }
@@ -463,7 +466,7 @@ export class Resolver extends ModelService {
     userId: string,
     userData?: UserData
   ) {
-    const _userData =userData;
+    const _userData = userData;
     const {
       apiKey,
       chunks,
@@ -1120,45 +1123,6 @@ export class Resolver extends ModelService {
     }
   }
 
-  public async promoteAttachmentToConversation(
-    attachmentId: string,
-    realConversationId: string,
-    messageId: string,
-    userId: string,
-    userData?: UserData
-  ): Promise<void> {
-    // The beauty is we DON'T need to update the S3 key!
-    // Just update the conversationId and messageId in the database
-
-    const attachment = await this.wsServer.prisma.getAttachment(attachmentId);
-
-    if (!attachment) {
-      throw new Error(`Attachment ${attachmentId} not found`);
-    }
-
-    if (attachment.userId !== userId) {
-      throw new Error(`Unauthorized to update attachment ${attachmentId}`);
-    }
-
-    // Update conversationId AND messageId - key stays the same!
-    void this.wsServer.prisma.updateAttachment({
-      id: attachmentId,
-      s3ObjectId: attachment.s3ObjectId,
-      versionId: attachment.versionId,
-      cdnUrl: attachment.cdnUrl,
-      ext: attachment.ext,
-      conversationId: realConversationId,
-      messageId, // Now the attachment is linked to the specific message
-      userId,
-      bucket: attachment.bucket,
-      key: attachment.key, // SAME KEY - no S3 operations needed!
-      status: attachment.status === "REQUESTED" ? "READY" : attachment.status
-    });
-
-    console.log(
-      `[Attachment Promoted] ${attachmentId} moved from new-chat to ${realConversationId}, message: ${messageId}, user from ${userData?.city ?? "unknown"}`
-    );
-  }
   /**
    * Handle fetching remote assets from URLs
    * Uses fs package's intelligent fetchRemoteWriteLocalLargeFiles which:
@@ -1400,6 +1364,63 @@ export class Resolver extends ModelService {
     return size ? (size === 0n ? 0 : Number(size)) : undefined;
   }
 
+  private handleMetadata(specs: ExpandedDocSpecs | ExpandedImgSpecs) {
+    return {
+      type: specs.type,
+      doc:
+        specs.type === "DOCUMENT"
+          ? {
+              author: specs.author ?? undefined,
+              createdAt: specs.createdDate
+                ? new Date(specs.createdDate)
+                : undefined,
+              updatedAt: specs.modifiedDate
+                ? new Date(specs.modifiedDate)
+                : undefined,
+              encoding: specs.encoding ?? undefined,
+              format: specs.format ?? "application/pdf",
+              isEncrypted: specs.isEncrypted ?? undefined,
+              isSearchable: specs.isSearchable ?? undefined,
+              keywords: specs.keywords ?? undefined,
+              language: specs.language ?? undefined,
+              lineCount: specs.lineCount ?? undefined,
+              pageCount: specs.pageCount ?? undefined,
+              pdfVersion: specs.pdfVersion ?? undefined,
+              subject: specs.subject ?? undefined,
+              textPreview: specs.textPreview ?? undefined,
+              title: undefined,
+              wordCount: specs.wordCount ?? undefined
+            }
+          : undefined,
+      img:
+        specs.type === "IMAGE"
+          ? {
+              animated: specs.animated,
+              aspectRatio: specs.aspectRatio,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: specs.colorSpace ?? null,
+              dominantColorHex: null,
+              exifDateTimeOriginal: specs.exifDateTimeOriginal
+                ? new Date(specs.exifDateTimeOriginal)
+                : null,
+              format: specs.format === "unknown" ? undefined : specs.format,
+              frames: specs.animated === true ? specs.frames : 1,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: specs.hasAlpha ?? false,
+              height: specs.height,
+              width: specs.width,
+              iccProfile: specs.iccProfile,
+              lensModel: null,
+              orientation: specs.orientation,
+              createdAt: undefined,
+              updatedAt: undefined
+            }
+          : undefined
+    };
+  }
+
   public async handleAssetUploadComplete(
     event: EventTypeMap["asset_upload_complete"],
     ws: WebSocket,
@@ -1457,72 +1478,81 @@ export class Resolver extends ModelService {
                 ? "ALIASED"
                 : "PENDING";
 
+      const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
+
       const attachment = await this.wsServer.prisma.updateAttachment({
-        bucket: finalBucket,
-        cacheControl,
-        checksumAlgo: checksum?.algo,
-        checksumSha256: checksum?.value,
-        contentDisposition,
-        draftId,
-        compatStatus,
-        expiresAt: expires,
-        s3LastModified: lastModified ? new Date(lastModified) : undefined,
-        storageClass,
-        conversationId,
-        id: attachmentId,
-        key: finalKey,
-        sourceUrl: presignedUrl,
-        region: this.region,
-        uploadDuration: duration,
-        userId,
-        publicUrl,
-        compatCdnUrl: compatStatus === "ALIASED" ? cdnUrl : undefined,
-        compatExt:
-          compatStatus === "ALIASED"
-            ? (extension ?? this.contentTypeToExt(contentType))
-            : undefined,
-        compatKey: compatStatus === "ALIASED" ? key : undefined,
-        compatMime: compatStatus === "ALIASED" ? contentType : undefined,
-        compatReadyAt:
-          compatStatus === "ALIASED"
-            ? lastModified
-              ? new Date(lastModified)
-              : new Date()
-            : undefined,
-        compatS3ObjectId:
-          compatStatus === "ALIASED" ? finalS3ObjectId : undefined,
-        compatVersionId: compatStatus === "ALIASED" ? versionId : undefined,
-        cdnUrl,
-        versionId: finalVersion,
-        s3ObjectId: finalS3ObjectId,
-        etag: finalEtag ?? etag,
-        status: "READY",
-        ext: extension ?? this.contentTypeToExt(contentType),
-        mime: contentType,
-        size: this.toBigInt(size, bytesUploaded)
+        data: {
+          bucket: finalBucket,
+          cacheControl,
+          checksumAlgo: checksum?.algo,
+          checksumSha256: checksum?.value,
+          contentDisposition,
+          draftId,
+          compatStatus,
+          expiresAt: expires,
+          s3LastModified: lastModified ? new Date(lastModified) : undefined,
+          storageClass,
+          conversationId,
+          id: attachmentId,
+          key: finalKey,
+          sourceUrl: presignedUrl,
+          region: this.region,
+          uploadDuration: duration,
+          userId,
+          publicUrl,
+          compatCdnUrl: compatStatus === "ALIASED" ? cdnUrl : undefined,
+          compatExt:
+            compatStatus === "ALIASED"
+              ? (extension ?? this.contentTypeToExt(contentType))
+              : undefined,
+          compatKey: compatStatus === "ALIASED" ? key : undefined,
+          compatMime: compatStatus === "ALIASED" ? contentType : undefined,
+          compatReadyAt:
+            compatStatus === "ALIASED"
+              ? lastModified
+                ? new Date(lastModified)
+                : new Date()
+              : undefined,
+          compatS3ObjectId:
+            compatStatus === "ALIASED" ? finalS3ObjectId : undefined,
+          compatVersionId: compatStatus === "ALIASED" ? versionId : undefined,
+          cdnUrl,
+          versionId: finalVersion,
+          s3ObjectId: finalS3ObjectId,
+          etag: finalEtag ?? etag,
+          status: "READY",
+          ext: extension ?? this.contentTypeToExt(contentType),
+          mime: contentType,
+          size: this.toBigInt(size, bytesUploaded)
+        },
+        metadata: this.handleMetadata(specs)
       });
 
-      const meta =
+      const meta = (
         metadata?.type === "DOCUMENT"
           ? {
+              duration,
+              extractedText: attachment.document
+                ? (attachment.document.textPreview ?? undefined)
+                : undefined,
               filename: attachment.filename ?? "",
               uploadedAt: attachment.updatedAt.toISOString()
             }
           : metadata?.type === "IMAGE"
             ? {
                 duration: duration,
-                dimensions:
-                  attachment.assetType === "IMAGE" ||
-                  attachment.assetType === "VIDEO"
-                    ? width && height
-                      ? { width, height }
-                      : undefined
-                    : undefined,
+                dimensions: attachment.image
+                  ? {
+                      width: attachment.image.width,
+                      height: attachment.image.height
+                    }
+                  : undefined,
                 filename: attachment.filename ?? "",
                 uploadDuration: duration,
                 uploadedAt: attachment.updatedAt.toISOString()
               }
-            : undefined;
+            : undefined
+      ) satisfies EventTypeMap["asset_ready"]["metadata"];
 
       const assetReady = {
         type: "asset_ready",
