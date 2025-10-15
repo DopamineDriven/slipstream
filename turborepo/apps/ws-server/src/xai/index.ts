@@ -283,12 +283,12 @@ export class xAIService {
     // Existing chat: include history (assistant tags), and for the last
     // user turn, include its attachments inline, if any.
     const last = msgs.at(-1);
-    if (last && last.senderType === "USER") {
+    if (last?.senderType === "USER") {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const base = this.formatMsgs(history, systemPrompt);
       const parts = buildUserContent(last);
       const userMsg =
-        parts.length === 1 && parts?.[0] && parts[0].type === "text"
+        parts.length === 1 && parts?.[0]?.type === "text"
           ? ({ role: "user", content: parts?.[0].text } as const)
           : ({ role: "user", content: parts } as const);
       return [...base, userMsg] as const;

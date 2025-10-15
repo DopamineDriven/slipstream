@@ -81,6 +81,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
         const chunkLen = buffer.readUInt32BE(pos);
         const chunkType = buffer.toString("ascii", pos + 4, pos + 8);
         const chunkData = pos + 8;
+        const nextPos = pos + 12 + chunkLen; // advance target regardless of branch
 
         if (chunkType === "acTL") {
           animated = true;
@@ -128,17 +129,26 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
           // Parse iTXt: keyword\0 compression_flag compression_method language\0 translated_keyword\0 text
           let offset = chunkData;
           const keywordEnd = buffer.indexOf(0, offset);
-          if (keywordEnd === -1) continue; // skip malformed
+          if (keywordEnd === -1) {
+            pos = nextPos;
+            continue; // skip malformed
+          }
           const keyword = buffer.toString("ascii", offset, keywordEnd);
           offset = keywordEnd + 1;
           const compressionFlag = buffer[offset];
           const _compressionMethod = buffer[offset + 1]; // Always 0 (zlib) if compressed
           offset += 2;
           const langEnd = buffer.indexOf(0, offset);
-          if (langEnd === -1) continue;
+          if (langEnd === -1) {
+            pos = nextPos;
+            continue;
+          }
           offset = langEnd + 1; // Skip lang and translated keyword
           const transEnd = buffer.indexOf(0, offset);
-          if (transEnd === -1) continue;
+          if (transEnd === -1) {
+            pos = nextPos;
+            continue;
+          }
           offset = transEnd + 1;
           let textBuffer = buffer.subarray(offset, chunkData + chunkLen); // Text starts here
           if (compressionFlag === 1) {
@@ -146,6 +156,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
               textBuffer = Buffer.from(inflateSync(textBuffer));
             } catch (e) {
               console.error("Failed to decompress iTXt:", e);
+              pos = nextPos;
               continue;
               // Skip if decompression fails
             }
@@ -165,13 +176,19 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
 
           // Find null-terminated keyword
           const keywordEnd = buffer.indexOf(0, offset);
-          if (keywordEnd === -1 || keywordEnd >= chunkEnd) continue;
+          if (keywordEnd === -1 || keywordEnd >= chunkEnd) {
+            pos = nextPos;
+            continue;
+          }
 
           const keyword = buffer.toString("latin1", offset, keywordEnd);
           offset = keywordEnd + 1;
 
           // Check we have space for compression method
-          if (offset >= chunkEnd) continue;
+          if (offset >= chunkEnd) {
+            pos = nextPos;
+            continue;
+          }
 
           const compressionMethod = buffer[offset];
           offset += 1;
@@ -179,12 +196,14 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
           // Check we have actual compressed data
           if (offset >= chunkEnd) {
             // No text data after compression method
+            pos = nextPos;
             continue;
           }
 
           const compressedDataLength = chunkEnd - offset;
           if (compressedDataLength <= 0) {
             // Empty compressed data
+            pos = nextPos;
             continue;
           }
 
@@ -195,6 +214,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
             try {
               // Check for minimum zlib header size (2 bytes)
               if (textBuffer.length < 2) {
+                pos = nextPos;
                 continue; // Too small to be valid zlib data
               }
 
@@ -206,16 +226,19 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
 
               if ((cmf * 256 + flg) % 31 !== 0) {
                 // Invalid zlib header checksum
+                pos = nextPos;
                 continue;
               }
 
               textBuffer = Buffer.from(inflateSync(textBuffer));
             } catch {
               // Silently skip malformed chunks instead of spamming console
+              pos = nextPos;
               continue;
             }
           } else {
             // Unsupported compression method
+            pos = nextPos;
             continue;
           }
 
@@ -255,7 +278,7 @@ export class ImgMetadataExtractor extends ImgMetadataExtractorWorkup {
         } else if (chunkType === "IDAT") {
           break; // Data starts, no need to scan further for basics
         }
-        pos += 12 + chunkLen; // len + type + data + crc
+        pos = nextPos; // len + type + data + crc
       }
       return {
         type: "IMAGE",

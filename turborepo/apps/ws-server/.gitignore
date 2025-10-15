@@ -8,3 +8,4 @@ public/*
 src/test/xai/*
 src/test/openai/*
 src/test/chapters/*
+*.pdf

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 export default {
   reactStrictMode: true,
+  reactCompiler: true,
   typescript: { ignoreBuildErrors: false, tsconfigPath: "./tsconfig.json" },
   images: {
     localPatterns: [

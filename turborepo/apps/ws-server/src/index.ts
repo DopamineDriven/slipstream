@@ -105,7 +105,12 @@ async function exe() {
 
     const { LlamaService } = await import("@/meta/index.ts");
 
-    const meta = new LlamaService(prisma, redisInstance, cfg.LLAMA_API_KEY);
+    const meta = new LlamaService(
+      logger,
+      prisma,
+      redisInstance,
+      cfg.LLAMA_API_KEY
+    );
 
     const { xAIService } = await import("@/xai/index.ts");
 
