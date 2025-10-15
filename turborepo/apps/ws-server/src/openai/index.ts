@@ -348,7 +348,7 @@ export class OpenAIService {
     } else {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const last = msgs.at(-1);
-      if (last && last.senderType === "USER") {
+      if (last?.senderType === "USER") {
         const attContent = this.buildAttachmentContent(last.attachments);
         if (attContent.length > 0) {
           return [
@@ -439,7 +439,7 @@ export class OpenAIService {
     } else {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const last = msgs.at(-1);
-      if (last && last.senderType === "USER") {
+      if (last?.senderType === "USER") {
         const attContent = await this.buildAttachmentContentAsync(
           last.attachments,
           client,

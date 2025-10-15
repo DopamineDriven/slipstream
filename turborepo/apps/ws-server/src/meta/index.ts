@@ -1,21 +1,40 @@
-import type { MessageSingleton } from "@/types/index.ts";
-import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import type {
+  MessageSingleton,
+  ProviderChatRequestEntity
+} from "@/types/index.ts";
+import type {
+  CompletionMessage,
+  MessageImageContentItem,
+  MessageTextContentItem,
+  SystemMessage,
+  UserMessage
+} from "llama-api-client/resources/index.mjs";
+import type { Logger as PinoLogger } from "pino";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { ProviderChatRequestEntity } from "@/types/index.ts";
 import { LlamaAPIClient } from "llama-api-client";
 import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class LlamaService {
   private defaultClient: LlamaAPIClient;
-
+  private logger: PinoLogger;
   constructor(
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[llama] " }
+      );
     this.defaultClient = new LlamaAPIClient({
-      apiKey: this.apiKey
+      apiKey: this.apiKey,
+      logger: this.logger,
+      logLevel: "debug"
     });
   }
 
@@ -46,19 +65,18 @@ export class LlamaService {
           content: `${modelIdentifier} \n` + msg.content
         } as const;
       }
-    }) satisfies ChatCompletionMessageParam[];
+    }) satisfies (UserMessage | CompletionMessage)[];
   }
 
   private formatMsgs(
-    msgs: (
+    msgs: readonly (
       | {
           readonly role: "user";
-          readonly content: string;
+          readonly content:
+            | string
+            | (MessageTextContentItem | MessageImageContentItem)[];
         }
-      | {
-          readonly role: "assistant";
-          readonly content: string;
-        }
+      | { readonly role: "assistant"; readonly content: string }
     )[],
     systemPrompt?: string
   ) {
@@ -69,7 +87,7 @@ export class LlamaService {
       return [
         { role: "system", content: enhancedSystemPrompt } as const,
         ...msgs
-      ] as const satisfies ChatCompletionMessageParam[];
+      ] as const satisfies (SystemMessage | UserMessage | CompletionMessage)[];
     } else {
       return [
         {
@@ -77,7 +95,7 @@ export class LlamaService {
           content: enhancedSystemPrompt
         },
         ...msgs
-      ] as const satisfies ChatCompletionMessageParam[];
+      ] as const satisfies (SystemMessage | UserMessage | CompletionMessage)[];
     }
   }
 
@@ -86,25 +104,84 @@ export class LlamaService {
     msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"]
   ) {
+    // Helper to build mixed content parts (text + public image URLs)
+    const buildUserContent = (m: MessageSingleton<true>) => {
+      const parts: (MessageTextContentItem | MessageImageContentItem)[] = [];
+      if (m.attachments?.length > 0) {
+        for (const att of m.attachments) {
+          const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
+          const mime = att.compatMime ?? att.mime ?? "";
+          if (url && mime.startsWith("image/")) {
+            parts.push({ type: "image_url", image_url: { url } });
+          }
+        }
+      }
+      parts.push({ type: "text", text: m.content });
+      return parts;
+    };
+
     if (isNewChat) {
       const first = msgs[0];
-      const userContent = first ? first.content : "";
+      if (!first) {
+        return systemPrompt
+          ? ([
+              { role: "system", content: systemPrompt },
+              { role: "user", content: "" }
+            ] as const satisfies (
+              | SystemMessage
+              | UserMessage
+              | CompletionMessage
+            )[])
+          : ([{ role: "user", content: "" }] as const satisfies (
+              | SystemMessage
+              | UserMessage
+              | CompletionMessage
+            )[]);
+      }
+      const parts = buildUserContent(first);
+      const userMsg =
+        parts.length === 1 && parts[0]?.type === "text"
+          ? ({ role: "user", content: parts[0].text } as const)
+          : ({ role: "user", content: parts } as const);
       if (systemPrompt) {
         return [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userContent }
-        ] as const satisfies ChatCompletionMessageParam[];
-      } else {
-        return [
-          { role: "user", content: userContent }
-        ] as const satisfies ChatCompletionMessageParam[];
+          userMsg
+        ] as const satisfies (
+          | SystemMessage
+          | UserMessage
+          | CompletionMessage
+        )[];
       }
-    } else {
-      return this.formatMsgs(
-        this.prependProviderModelTag(msgs),
-        systemPrompt
-      ) satisfies ChatCompletionMessageParam[];
+      return [userMsg] as const satisfies (
+        | SystemMessage
+        | UserMessage
+        | CompletionMessage
+      )[];
     }
+
+    // Existing chat: include history w/ model tags, and inline images for last user turn
+    const last = msgs.at(-1);
+    if (last?.senderType === "USER") {
+      const history = this.prependProviderModelTag(msgs.slice(0, -1));
+      const base = this.formatMsgs(history, systemPrompt);
+      const parts = buildUserContent(last);
+      const userMsg =
+        parts.length === 1 && parts[0]?.type === "text"
+          ? ({ role: "user", content: parts[0].text } as const)
+          : ({ role: "user", content: parts } as const);
+      return [...base, userMsg] as const satisfies (
+        | SystemMessage
+        | UserMessage
+        | CompletionMessage
+      )[];
+    }
+
+    // If last is assistant or not present, map entire history
+    return this.formatMsgs(
+      this.prependProviderModelTag(msgs),
+      systemPrompt
+    ) satisfies (SystemMessage | UserMessage | CompletionMessage)[];
   }
 
   public async handleMetaAiChatRequest({
@@ -255,3 +332,4 @@ export class LlamaService {
     }
   }
 }
+// codex resume 0199e67c-6d99-72d2-8d2b-6740e7ff818b
