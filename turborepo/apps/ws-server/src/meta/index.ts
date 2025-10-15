@@ -64,7 +64,7 @@ export class LlamaService {
   ) {
     const enhancedSystemPrompt = systemPrompt
       ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
-      : "Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      : "Note: Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
     if (systemPrompt) {
       return [
         { role: "system", content: enhancedSystemPrompt } as const,

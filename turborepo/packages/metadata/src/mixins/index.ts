@@ -1,4 +1,3 @@
-// extract-mixins.ts
 import type {
   Constructor,
   ExpandedDocSpecs,
@@ -10,6 +9,7 @@ import { ImgMetadataExtractor } from "@/images/index.ts";
 export function create<Type>(c: new () => Type): Type {
   return new c();
 }
+
 export function createInstance<A extends object>(c: new () => A): A {
   return new c();
 }
