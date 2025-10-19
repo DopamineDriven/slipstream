@@ -1,13 +1,14 @@
 import type {
   AIChatEventTypeUnion,
-  AIChatRequestUserMetadata,
   AssetOrigin,
   AssetStatus,
   AssetUploadAbortReason,
   AssetUploadInstructionsMethod,
   AttachmentMetadata,
+  ImgGenStage,
   MetadataUnion,
   S3ObjectId,
+  UserMetadata,
   WithExpiry
 } from "@/events-workup.ts";
 import type {
@@ -16,7 +17,6 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
-import type { MessageSingleton } from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
@@ -46,7 +46,7 @@ export type AIChatRequest = {
   maxTokens?: number;
   hasProviderConfigured?: boolean;
   isDefaultProvider?: boolean;
-  metadata?: AIChatRequestUserMetadata;
+  metadata?: UserMetadata;
   batchId?: string;
 };
 
@@ -405,27 +405,145 @@ export type ImageGenRequest = {
   type: "image_gen_request";
   conversationId: string;
   prompt: string;
-  chunks: string[];
-  thinkingChunks: string[];
-  isNewChat: boolean;
-  msgs: MessageSingleton<true>[];
   provider: ImageGenProviders;
-  model: ImageGenModelsByProvider<ImageGenProviders>;
+  model?:
+    | ImageGenModelsByProvider<"gemini">
+    | ImageGenModelsByProvider<"openai">
+    | ImageGenModelsByProvider<"grok">;
+  systemPrompt?: string;
+  temperature?: number;
+  topP?: number;
+  maxTokens?: number;
   hasProviderConfigured?: boolean;
-  systemPrompt: string | undefined;
-  timestamp: number;
-  temperature: number | undefined;
-  title: string | undefined;
-  topP: number | undefined;
-  apiKey: string | undefined;
-  keyId: string | null;
-  max_tokens: number | undefined;
-  width?: number;
-  height?: number;
-  seed?: number;
+  isDefaultProvider?: boolean;
+  batchId?: string;
+  metadata?: UserMetadata;
+  /**
+   * gpt-image-1 only
+   *
+   * values include "high" | "low" | null
+   */
+  input_fidelity?: string;
+  /**
+   * gpt-image-1 & gpt-image-1-mini only
+   *
+   * values include "low" | "auto"
+   */
+  moderation?: string;
+  /**
+   * gpt-image-1, gpt-image-1-mini, dall-e-2:
+   *
+   * n=1 (default),
+   * n=10 (max)
+   *
+   * dall-e-3:
+   *
+   * n=1 (default),
+   * n=1 (max)
+   *
+   * gemini-2.5-flash-image:
+   *
+   * n=1 (default),
+   * n=10 (max)
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * n=1 (default),
+   * n=4 (max)
+   *
+   * grok-2-image-1212
+   *
+   * n=1 (default),
+   * n=10 (max)
+   */
+  n?: number;
   negativePrompt?: string;
-  steps?: number;
-  guidanceScale?: number;
+  /**
+   * gpt-image-1 & gpt-image-1-mini only:
+   *
+   * n=0 (default),
+   * n=3 (max)
+   *
+   * *streaming must be set to **true***
+   */
+  output_partial_images?: number;
+  /**
+   * gpt-image-1, gpt-image-1-mini:
+   *
+   * "png" (default);
+   * "png" | "jpeg" | "webp"
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * "png" (default);
+   * "png" | "jpeg"
+   */
+  output_format?: string;
+  /**
+   *
+   * gpt-image-1, gpt-image-1-mini:
+   *
+   * output must be of type jpeg or webp
+   *
+   * Range: 0-100. Default: 100
+   *
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * Only applies if mimeType is "image/jpeg",
+   * Range: 0-100. Default: 75
+   */
+  output_compression?: number;
+  /**
+   * gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "transparent" | "opaque" | "auto"
+   *
+   * output format must be "png" | "webp"
+   */
+  output_background?: "transparent" | "opaque" | "auto";
+  /**
+   *  gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "low" | "medium" | "high" | "auto"
+   *
+   * dall-e-3:
+   *
+   * "auto" (default); "standard" | "hd" | "auto"
+   *
+   * dall-e-2:
+   *
+   * "auto" (default); "standard" | "auto"
+   *
+   * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * "1K" (default); "1K" | "2K"
+   */
+  output_quality: string;
+    /**
+   *  gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
+   *
+   * dall-e-3:
+   *
+   * "auto" (default); "1024x1024" | "1792x1024" | "1024x1792" | "auto"
+   *
+   * dall-e-2:
+   *
+   * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * "1:1" (default); "1:1" | "9:16" | "16:9" | "3:4" | "4:3"
+   *
+   * gemini-2.5-flash-image:
+   *
+   * "1:1" (default); "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "9:16" | "16:9" | "21:9"
+   */
+  output_size?: string;
+
+  seed?: number;
 };
 
 /**
@@ -433,29 +551,45 @@ export type ImageGenRequest = {
  */
 export type ImageGenResponse = {
   type: "image_gen_response";
+  done: boolean;
   userId: string;
+  temperature?: number;
+  topP?: number;
+  systemPrompt?: string;
   conversationId: string;
-  cdnUrl: string;
-  mime: string;
-  versionId: string;
-  key: string;
-  bucket: string;
+  chunk?: string;
+  thinkingChunk?: string;
+  thinkingDuration?: string;
+  usage?: number;
+  title?: string;
+  provider: string;
+  duration: number;
+  model: string;
+  requested_count: number;
+  actual_count: number;
+  partialImages?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
+  images: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
   messageId?: string;
-  attachmentId: string;
-  imageUrl?: string;
-  taskId?: string;
   success: boolean;
   error?: string;
 };
 
 export type ImageGenError = {
   type: "image_gen_error";
+  done: boolean;
   userId: string;
+  temperature?: number;
+  systemPrompt?: string;
+  prompt?: string;
+  topP?: number;
+  requested_count: number;
+  duration: number;
+  title?: string;
+  provider: string;
+  model: string;
+  stop_reason?: unknown;
   conversationId: string;
   messageId?: string;
-  attachmentId?: string;
-  imageUrl?: string;
-  taskId?: string;
   success: false;
   error: string;
 };
@@ -465,19 +599,32 @@ export type ImageGenError = {
  */
 export type ImageGenProgress = {
   type: "image_gen_progress";
+  done: boolean;
   userId: string;
+  temperature?: number;
+  topP?: number;
   conversationId: string;
-  taskId: string;
+  model: string;
+  chunk?: string;
+  thinkingChunk?: string;
+  thinkingDuration?: string;
+  title?: string;
+  provider: string;
+  duration: number;
+  partial_image?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
+  images?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
+  requested_count: number;
+  systemPrompt?: string;
   /**
-   * 0-100
+   * 0-100 (??????? how do we know the progress if provider/user-network dependent?)
    */
   progress: number;
   /**
-   * "queued" | "processing" | "finalizing"
+   * "queued" | "processing" | "persisting" | "finalizing" | "refusal" | "aborted"
    */
-  stage?: string;
+  stage?: ImgGenStage;
   /**
-   *  seconds remaining
+   *  seconds remaining (how will we know the seconds remaining if provider/user-network dependent)?
    */
   eta?: number;
 };

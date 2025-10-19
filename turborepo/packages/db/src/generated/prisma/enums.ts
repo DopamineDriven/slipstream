@@ -159,6 +159,28 @@ export const UploadMethod = {
 export type UploadMethod = (typeof UploadMethod)[keyof typeof UploadMethod]
 
 
+export const ImageGenStage = {
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  PERSISTING: 'PERSISTING',
+  FINALIZING: 'FINALIZING',
+  COMPLETED: 'COMPLETED',
+  REFUSAL: 'REFUSAL',
+  FAILED: 'FAILED',
+  ABORTED: 'ABORTED'
+} as const
+
+export type ImageGenStage = (typeof ImageGenStage)[keyof typeof ImageGenStage]
+
+
+export const ImageGenOutputKind = {
+  PARTIAL: 'PARTIAL',
+  FINAL: 'FINAL'
+} as const
+
+export type ImageGenOutputKind = (typeof ImageGenOutputKind)[keyof typeof ImageGenOutputKind]
+
+
 export const AssetOrigin = {
   UPLOAD: 'UPLOAD',
   REMOTE: 'REMOTE',

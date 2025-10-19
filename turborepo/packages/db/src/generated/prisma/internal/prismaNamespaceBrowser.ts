@@ -63,6 +63,8 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  ImageGenJob: 'ImageGenJob',
+  ImageGenOutput: 'ImageGenOutput',
   Verification: 'Verification'
 } as const
 
@@ -403,6 +405,63 @@ export const DocumentMetadataScalarFieldEnum = {
 } as const
 
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
+
+
+export const ImageGenJobScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  requestMessageId: 'requestMessageId',
+  provider: 'provider',
+  model: 'model',
+  userId: 'userId',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  prompt: 'prompt',
+  systemPrompt: 'systemPrompt',
+  temperature: 'temperature',
+  topP: 'topP',
+  nRequested: 'nRequested',
+  nCompleted: 'nCompleted',
+  seed: 'seed',
+  negativePrompt: 'negativePrompt',
+  outputSize: 'outputSize',
+  outputQuality: 'outputQuality',
+  outputFormat: 'outputFormat',
+  outputBackground: 'outputBackground',
+  outputCompression: 'outputCompression',
+  partialImagesRequested: 'partialImagesRequested',
+  inputFidelity: 'inputFidelity',
+  personGenertion: 'personGenertion',
+  moderation: 'moderation',
+  stage: 'stage',
+  progress: 'progress',
+  etaSeconds: 'etaSeconds',
+  durationMs: 'durationMs',
+  usage: 'usage',
+  revisedPrompt: 'revisedPrompt',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageGenJobScalarFieldEnum = (typeof ImageGenJobScalarFieldEnum)[keyof typeof ImageGenJobScalarFieldEnum]
+
+
+export const ImageGenOutputScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  index: 'index',
+  kind: 'kind',
+  partialIndex: 'partialIndex',
+  attachmentId: 'attachmentId',
+  width: 'width',
+  height: 'height',
+  mime: 'mime',
+  revisedPrompt: 'revisedPrompt',
+  createdAt: 'createdAt'
+} as const
+
+export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
 
 
 export const VerificationScalarFieldEnum = {

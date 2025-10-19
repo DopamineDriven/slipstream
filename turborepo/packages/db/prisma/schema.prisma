@@ -141,6 +141,22 @@ enum UploadMethod {
   GENERATED
 }
 
+enum ImageGenStage {
+  QUEUED
+  PROCESSING
+  PERSISTING
+  FINALIZING
+  COMPLETED
+  REFUSAL
+  FAILED
+  ABORTED
+}
+
+enum ImageGenOutputKind {
+  PARTIAL
+  FINAL
+}
+
 enum AssetOrigin {
   UPLOAD // local asset
   REMOTE // external resource
@@ -246,6 +262,7 @@ model UserKey {
   updatedAt           DateTime             @updatedAt
   user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages            Message[]            @relation("MessageToUserKey")
+  imageGenJobs        ImageGenJob[]        @relation("ImageGenJobToUserKey")
   attachmentProviders AttachmentProvider[]
   isDefault           Boolean              @default(false)
 
@@ -276,6 +293,7 @@ model Conversation {
   attachments          Attachment[]
   isShared             Boolean               @default(false)
   shareToken           String?               @unique
+  imageGenJob          ImageGenJob[]
   conversationSettings ConversationSettings?
 }
 
@@ -314,8 +332,9 @@ model Message {
   tryAgain         Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
-  userKey          UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id])
+  userKey          UserKey?     @relation("MessageToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
   attachments      Attachment[]
+  imageGenJob      ImageGenJob? @relation("ImageGenJobToMessage")
   conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
@@ -373,14 +392,15 @@ model Attachment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  conversation  Conversation?        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message       Message?             @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  providerLinks AttachmentProvider[]
-  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  image         ImageMetadata?
-  video         VideoMetadata?
-  document      DocumentMetadata?
-  audio         AudioMetadata?
+  conversation   Conversation?        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message        Message?             @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  providerLinks  AttachmentProvider[]
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image          ImageMetadata?
+  video          VideoMetadata?
+  document       DocumentMetadata?
+  audio          AudioMetadata?
+  imageGenOutput ImageGenOutput?      @relation("ImageGenOutputToAttachment")
 
   @@index([checksumSha256])
   @@index([assetType, createdAt])
@@ -550,6 +570,82 @@ model DocumentMetadata {
   @@index([pageCount])
   @@index([language])
   @@index([format])
+}
+
+model ImageGenJob {
+  id               String   @id @default(cuid(2))
+  conversationId   String
+  requestMessageId String   @unique
+  provider         Provider
+  model            String
+  userId           String
+  userKeyId        String? // BYOK used; store keyFingerprint here too if you wish
+  keyFingerprint   String? // useful for Google file/caches affinity
+
+  // Core request fields (provider-agnostic)
+  prompt         String
+  systemPrompt   String?
+  temperature    Float?
+  topP           Float?
+  nRequested     Int     @default(1)
+  nCompleted     Int     @default(0)
+  seed           Int?
+  negativePrompt String?
+
+  // Normalized output controls (shared across providers)
+  outputSize             String? // e.g. "1024x1024", "1:1"
+  outputQuality          String? // "low|medium|high|standard|hd|1K|2K"
+  outputFormat           String? // "png|jpeg|webp"
+  outputBackground       String? // "transparent|opaque|auto"
+  outputCompression      Int?
+  partialImagesRequested Int? // 0..3 for gpt-image-1 streaming
+  inputFidelity          String?
+  personGenertion        String?
+  moderation             String?
+
+  // Runtime status / progress
+  stage         ImageGenStage @default(QUEUED)
+  progress      Int           @default(0) // 0..100 (synthetic or signal-based)
+  etaSeconds    Int?
+  durationMs    Int? // filled on completion
+  usage         Int? // tokens/credits if provider reports
+  revisedPrompt String? // DALLE-3, grok-2-image-1212, Imagen.
+  error         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  requestMessage Message          @relation("ImageGenJobToMessage", fields: [requestMessageId], references: [id], onDelete: Cascade)
+  conversation   Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userKey        UserKey?         @relation("ImageGenJobToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
+  outputs        ImageGenOutput[]
+
+  @@index([conversationId, createdAt])
+  @@index([provider, model, createdAt])
+  @@index([stage, createdAt])
+  @@index([userId, createdAt])
+  @@index([userKeyId])
+}
+
+model ImageGenOutput {
+  id            String             @id @default(cuid(2))
+  jobId         String
+  index         Int // slot: 0..n-1
+  kind          ImageGenOutputKind @default(FINAL)
+  partialIndex  Int? // 0..3 if PARTIAL (OpenAI)
+  attachmentId  String             @unique
+  width         Int?
+  height        Int?
+  mime          String?
+  revisedPrompt String?
+  createdAt     DateTime           @default(now())
+
+  job        ImageGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  attachment Attachment  @relation("ImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, index, kind, partialIndex])
+  @@index([jobId, index, kind])
 }
 
 model Verification {

@@ -1,4 +1,3 @@
-import { resolve } from "node:path";
 import type {
   MessageSingleton,
   ProviderChatRequestEntity,
@@ -14,8 +13,9 @@ import type {
 } from "@google/genai";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
+import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, MediaResolution } from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
@@ -23,7 +23,7 @@ export interface ProviderGeminiChatRequestEntity
   extends ProviderChatRequestEntity {
   userData?: UserData;
 }
-export class GeminiService {
+export class GeminiService extends ModelService {
   private defaultClient: GoogleGenAI;
   private logger: Logger;
   // Simple in-memory cache for the session/lifecycle
@@ -34,6 +34,7 @@ export class GeminiService {
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
+    super();
     this.logger = logger
       .getPinoInstance()
       .child(
@@ -146,8 +147,8 @@ export class GeminiService {
       return uploadedFile;
     } catch (error) {
       this.logger.error(
-        error,
-        `Error in uploadRemoteAssetToGoogle for attachment: ${attachment.id}`
+        `Error in uploadRemoteAssetToGoogle for attachment: ${attachment.id} ` +
+          this.safeErrMsg(error)
       );
       throw new Error(
         error instanceof Error
@@ -173,14 +174,8 @@ export class GeminiService {
     return Buffer.concat(chunks);
   }
 
-  private async formatHistoryForSession(
-    msgs: MessageSingleton<true>[],
-    keyId?: string,
-    apiKey?: string
-  ) {
+  private async formatHistoryForSession(msgs: MessageSingleton<true>[]) {
     const formatted = Array.of<Content>();
-    const _client = this.getClient(apiKey);
-    const _keyFingerprint = keyId ?? "server";
 
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
@@ -228,9 +223,7 @@ export class GeminiService {
   public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
-    systemPrompt?: string,
-    keyId?: string,
-    apiKey?: string
+    systemPrompt?: string
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
@@ -248,7 +241,7 @@ export class GeminiService {
     } else {
       const historyMsgs = msgs.slice(0, -1);
       return {
-        history: await this.formatHistoryForSession(historyMsgs, keyId, apiKey),
+        history: await this.formatHistoryForSession(historyMsgs),
         systemInstruction
       };
     }
@@ -354,7 +347,7 @@ export class GeminiService {
       try {
         uploadedFile = await this.uploadRemoteAssetToGoogle(attachment, apiKey);
       } catch (e) {
-        const msg = (e as Error)?.message || "";
+        const msg = this.safeErrMsg(e);
         // If Google complains the file already exists, try to fetch it and proceed
         if (
           /ALREADY_EXISTS|exists/i.test(msg) ||
@@ -365,10 +358,10 @@ export class GeminiService {
           if (existing?.uri) {
             uploadedFile = existing;
           } else {
-            throw e;
+            throw new Error(this.safeErrMsg(e));
           }
         } else {
-          throw e;
+          throw new Error(this.safeErrMsg(e));
         }
       }
 
@@ -397,31 +390,12 @@ export class GeminiService {
     } catch (error) {
       await this.prisma.markGeminiAssetFailed(
         mapping.id,
-        (error as Error).message
+        this.safeErrMsg(error)
       );
       throw error;
     }
   }
 
-  private handleLatLng(latlng?: string) {
-    const [lat, lng] = latlng
-      ? (latlng?.split(",")?.map(p => {
-          return Number.parseFloat(p);
-        }) as [number, number])
-      : [47.7749, -122.4194];
-    return [lat, lng] as const;
-  }
-  private getFileName = (p: string) =>
-    p.split("?")[0]?.split("/").reverse()[0] ?? "";
-
-  private async writeTmp(filename: string, sourceUrl: string) {
-    const absPath = resolve(this.prisma.fs.tmpDir, filename);
-    return await this.prisma.fs
-      .fetchRemoteWriteLocalLargeFiles(sourceUrl, absPath, false)
-      .then(() => {
-        return absPath;
-      });
-  }
   public async handleGeminiAiChatRequest({
     chunks,
     conversationId,
@@ -452,13 +426,13 @@ export class GeminiService {
       geminiDataPart: Blob | undefined = undefined;
 
     const gemini = this.getClient(apiKey);
+
     const { history, systemInstruction } = await this.getHistoryAndInstruction(
       isNewChat,
       msgs,
-      systemPrompt,
-      keyId ?? undefined,
-      apiKey
+      systemPrompt
     );
+
     const currentPartArr = Array.of<Part>();
     for (const msg of msgs) {
       try {
@@ -487,7 +461,9 @@ export class GeminiService {
           }
         }
       } catch (err) {
-        this.logger.warn({ err }, "error in gemini attachment upload");
+        this.logger.warn(
+          "error in gemini attachment upload: " + this.safeErrMsg(err)
+        );
       } finally {
         currentPartArr.push({ text: msg.content });
       }
@@ -500,6 +476,7 @@ export class GeminiService {
       fullContent,
       "debugging full content on first message to gemini"
     );
+
     const stream = (await gemini.models.generateContentStream({
       contents: fullContent,
       model,
@@ -509,7 +486,7 @@ export class GeminiService {
           retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
         },
         tools: [{ googleSearch: {} }, { urlContext: {} }],
-        topP,
+        topP,mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH,
         temperature,
         systemInstruction,
         thinkingConfig: { includeThoughts: true, thinkingBudget: -1 }

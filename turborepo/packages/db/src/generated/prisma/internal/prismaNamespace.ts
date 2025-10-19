@@ -403,6 +403,8 @@ export const ModelName = {
   VideoMetadata: 'VideoMetadata',
   AudioMetadata: 'AudioMetadata',
   DocumentMetadata: 'DocumentMetadata',
+  ImageGenJob: 'ImageGenJob',
+  ImageGenOutput: 'ImageGenOutput',
   Verification: 'Verification'
 } as const
 
@@ -419,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "verification"
+    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1533,6 +1535,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ImageGenJob: {
+      payload: Prisma.$ImageGenJobPayload<ExtArgs>
+      fields: Prisma.ImageGenJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageGenJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageGenJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        findFirst: {
+          args: Prisma.ImageGenJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageGenJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        findMany: {
+          args: Prisma.ImageGenJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>[]
+        }
+        create: {
+          args: Prisma.ImageGenJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        createMany: {
+          args: Prisma.ImageGenJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImageGenJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>[]
+        }
+        delete: {
+          args: Prisma.ImageGenJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        update: {
+          args: Prisma.ImageGenJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageGenJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageGenJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImageGenJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImageGenJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenJobPayload>
+        }
+        aggregate: {
+          args: Prisma.ImageGenJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageGenJob>
+        }
+        groupBy: {
+          args: Prisma.ImageGenJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageGenJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageGenJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageGenJobCountAggregateOutputType> | number
+        }
+      }
+    }
+    ImageGenOutput: {
+      payload: Prisma.$ImageGenOutputPayload<ExtArgs>
+      fields: Prisma.ImageGenOutputFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageGenOutputFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageGenOutputFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        findFirst: {
+          args: Prisma.ImageGenOutputFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageGenOutputFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        findMany: {
+          args: Prisma.ImageGenOutputFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>[]
+        }
+        create: {
+          args: Prisma.ImageGenOutputCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        createMany: {
+          args: Prisma.ImageGenOutputCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ImageGenOutputCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>[]
+        }
+        delete: {
+          args: Prisma.ImageGenOutputDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        update: {
+          args: Prisma.ImageGenOutputUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageGenOutputDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageGenOutputUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ImageGenOutputUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>[]
+        }
+        upsert: {
+          args: Prisma.ImageGenOutputUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageGenOutputPayload>
+        }
+        aggregate: {
+          args: Prisma.ImageGenOutputAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageGenOutput>
+        }
+        groupBy: {
+          args: Prisma.ImageGenOutputGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageGenOutputGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageGenOutputCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageGenOutputCountAggregateOutputType> | number
+        }
+      }
+    }
     Verification: {
       payload: Prisma.$VerificationPayload<ExtArgs>
       fields: Prisma.VerificationFieldRefs
@@ -1973,6 +2123,63 @@ export const DocumentMetadataScalarFieldEnum = {
 export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFieldEnum)[keyof typeof DocumentMetadataScalarFieldEnum]
 
 
+export const ImageGenJobScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  requestMessageId: 'requestMessageId',
+  provider: 'provider',
+  model: 'model',
+  userId: 'userId',
+  userKeyId: 'userKeyId',
+  keyFingerprint: 'keyFingerprint',
+  prompt: 'prompt',
+  systemPrompt: 'systemPrompt',
+  temperature: 'temperature',
+  topP: 'topP',
+  nRequested: 'nRequested',
+  nCompleted: 'nCompleted',
+  seed: 'seed',
+  negativePrompt: 'negativePrompt',
+  outputSize: 'outputSize',
+  outputQuality: 'outputQuality',
+  outputFormat: 'outputFormat',
+  outputBackground: 'outputBackground',
+  outputCompression: 'outputCompression',
+  partialImagesRequested: 'partialImagesRequested',
+  inputFidelity: 'inputFidelity',
+  personGenertion: 'personGenertion',
+  moderation: 'moderation',
+  stage: 'stage',
+  progress: 'progress',
+  etaSeconds: 'etaSeconds',
+  durationMs: 'durationMs',
+  usage: 'usage',
+  revisedPrompt: 'revisedPrompt',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageGenJobScalarFieldEnum = (typeof ImageGenJobScalarFieldEnum)[keyof typeof ImageGenJobScalarFieldEnum]
+
+
+export const ImageGenOutputScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  index: 'index',
+  kind: 'kind',
+  partialIndex: 'partialIndex',
+  attachmentId: 'attachmentId',
+  width: 'width',
+  height: 'height',
+  mime: 'mime',
+  revisedPrompt: 'revisedPrompt',
+  createdAt: 'createdAt'
+} as const
+
+export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]
+
+
 export const VerificationScalarFieldEnum = {
   id: 'id',
   identifier: 'identifier',
@@ -2287,6 +2494,34 @@ export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace[]'>
     
 
+
+/**
+ * Reference to a field of type 'ImageGenStage'
+ */
+export type EnumImageGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageGenStage'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageGenStage[]'
+ */
+export type ListEnumImageGenStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageGenStage[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageGenOutputKind'
+ */
+export type EnumImageGenOutputKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageGenOutputKind'>
+    
+
+
+/**
+ * Reference to a field of type 'ImageGenOutputKind[]'
+ */
+export type ListEnumImageGenOutputKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageGenOutputKind[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2389,6 +2624,8 @@ export type GlobalOmitConfig = {
   videoMetadata?: Prisma.VideoMetadataOmit
   audioMetadata?: Prisma.AudioMetadataOmit
   documentMetadata?: Prisma.DocumentMetadataOmit
+  imageGenJob?: Prisma.ImageGenJobOmit
+  imageGenOutput?: Prisma.ImageGenOutputOmit
   verification?: Prisma.VerificationOmit
 }
 
