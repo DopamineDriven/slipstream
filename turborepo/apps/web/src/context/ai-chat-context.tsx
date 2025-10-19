@@ -20,7 +20,7 @@ import { getModel } from "@/lib/get-model";
 import { pathParser } from "@/lib/path-parser";
 import type {
   AIChatRequest,
-  AIChatRequestUserMetadata,
+  UserMetadata as AIChatRequestUserMetadata,
   AllModelsUnion,
   EventTypeMap,
   Provider
