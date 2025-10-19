@@ -79,14 +79,7 @@ export class PrismaService extends ModelService {
       isValid
     };
   }
-  private handleLatLng(latlng?: string) {
-    const [lat, lng] = latlng
-      ? (latlng?.split(",")?.map(p => {
-          return Number.parseFloat(p);
-        }) as [number, number])
-      : [47.7749, -122.4194];
-    return [lat, lng] as const;
-  }
+
   public async updateProfile({
     city,
     country,
@@ -977,6 +970,7 @@ export class PrismaService extends ModelService {
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
   }
+
   public async findActiveOpenAIAsset(
     attachmentId: string,
     keyFingerprint = "server"

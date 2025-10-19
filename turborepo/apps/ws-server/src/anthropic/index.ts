@@ -21,12 +21,12 @@ import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import type { CompatStatus } from "@slipstream/db/enums-node";
 import type {
   AllModelsUnion,
   AnthropicModelIdUnion,
   EventTypeMap
 } from "@slipstream/types";
-import { CompatStatus } from "@slipstream/db/enums-node";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
@@ -65,6 +65,33 @@ export class AnthropicService {
     return client;
   }
 
+  private handleBetaHeaders(model: AnthropicModelIdUnion) {
+    switch (model) {
+      case "claude-sonnet-4-5-20250929":
+      case "claude-sonnet-4-20250514": {
+        return [
+          "files-api-2025-04-14",
+          "extended-cache-ttl-2025-04-11",
+          "context-1m-2025-08-07"
+        ] satisfies Anthropic.Beta.AnthropicBeta[];
+      }
+      case "claude-3-5-haiku-20241022":
+      case "claude-3-5-sonnet-20240620":
+      case "claude-3-5-sonnet-20241022":
+      case "claude-3-haiku-20240307":
+      case "claude-3-7-sonnet-20250219":
+      case "claude-opus-4-1-20250805":
+      case "claude-opus-4-20250514":
+      case "claude-haiku-4-5-20251001":
+      default: {
+        return [
+          "files-api-2025-04-14",
+          "extended-cache-ttl-2025-04-11"
+        ] satisfies Anthropic.Beta.AnthropicBeta[];
+      }
+    }
+  }
+
   private async streamToBuffer(stream: ReadableStream<Uint8Array>) {
     const reader = stream.getReader();
     const chunks = Array.of<Uint8Array>();
@@ -91,7 +118,8 @@ export class AnthropicService {
       filename: string | null;
       compatStatus: CompatStatus | null;
     },
-    client: Anthropic
+    client: Anthropic,
+    model: AnthropicModelIdUnion
   ) {
     let url: string | null;
     if (attachment.compatStatus === "ALIASED")
@@ -111,7 +139,7 @@ export class AnthropicService {
     // Upload using Anthropic Files API
     const file = await client.beta.files.upload({
       file: (await fetch(url)) satisfies Uploadable,
-      betas: ["files-api-2025-04-14"]
+      betas: this.handleBetaHeaders(model)
     } satisfies FileUploadParams);
 
     return file;
@@ -128,6 +156,7 @@ export class AnthropicService {
       compatStatus: CompatStatus | null;
     },
     client: Anthropic,
+    model: AnthropicModelIdUnion,
     keyFingerprint: string,
     keyId?: string
   ): Promise<string> {
@@ -175,7 +204,11 @@ export class AnthropicService {
 
     try {
       // Upload file
-      const uploadedFile = await this.uploadFileToAnthropic(attachment, client);
+      const uploadedFile = await this.uploadFileToAnthropic(
+        attachment,
+        client,
+        model
+      );
 
       // Anthropic files expire in 7 days per documentation
       const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -215,6 +248,7 @@ export class AnthropicService {
       "claude-3-5-sonnet-20241022": 8192,
       "claude-opus-4-20250514": 32000,
       "claude-opus-4-1-20250805": 32000,
+      "claude-haiku-4-5-20251001": 32000,
       "claude-sonnet-4-20250514": 64000,
       "claude-sonnet-4-5-20250929": 64000,
       "claude-3-7-sonnet-20250219": 64000
@@ -231,6 +265,7 @@ export class AnthropicService {
   public async formatAnthropicHistoryWithFiles(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
+    model: AnthropicModelIdUnion,
     systemPrompt?: string,
     client?: Anthropic,
     keyFingerprint = "server",
@@ -262,6 +297,7 @@ export class AnthropicService {
                         const fileId = await this.ensureAnthropicAssetUploaded(
                           attachment,
                           client,
+                          model,
                           keyFingerprint,
                           keyId
                         );
@@ -365,6 +401,7 @@ export class AnthropicService {
                     const fileId = await this.ensureAnthropicAssetUploaded(
                       attachment,
                       client,
+                      model,
                       keyFingerprint,
                       keyId
                     );
@@ -466,6 +503,7 @@ export class AnthropicService {
       case "claude-opus-4-1-20250805":
       case "claude-opus-4-20250514":
       case "claude-sonnet-4-20250514":
+      case "claude-haiku-4-5-20251001":
       case "claude-sonnet-4-5-20250929": {
         if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
           return {
@@ -505,7 +543,7 @@ export class AnthropicService {
         name: "web_search",
         user_location
       }
-    ] satisfies BetaWebSearchTool20250305[] | undefined; 
+    ] satisfies BetaWebSearchTool20250305[] | undefined;
   }
 
   public async handleAnthropicAiChatRequest({
@@ -543,6 +581,7 @@ export class AnthropicService {
     const { messages, system } = await this.formatAnthropicHistoryWithFiles(
       isNewChat,
       msgs,
+      model as AnthropicModelIdUnion,
       systemPrompt,
       anthropic,
       keyFingerprint,
@@ -559,6 +598,8 @@ export class AnthropicService {
     );
     const tools = this.webSearchTool(user_location);
 
+    const betas = this.handleBetaHeaders(model as AnthropicModelIdUnion);
+
     const stream = (await anthropic.beta.messages.create(
       {
         max_tokens: maxTokens,
@@ -571,11 +612,7 @@ export class AnthropicService {
         metadata: { user_id: userId },
         messages,
         service_tier: "auto",
-        betas: [
-          "files-api-2025-04-14",
-          "context-1m-2025-08-07",
-          "extended-cache-ttl-2025-04-11"
-        ],
+        betas,
         tools
       },
       { stream: true }

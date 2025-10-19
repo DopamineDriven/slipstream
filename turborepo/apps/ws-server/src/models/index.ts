@@ -98,6 +98,16 @@ export class ModelService {
     } else return String(err);
   }
 
+    public handleLatLng(latlng?: string) {
+    const [lat, lng] = latlng
+      ? (latlng?.split(",")?.map(p => {
+          return Number.parseFloat(p);
+        }) as [number, number])
+      : [47.7749, -122.4194];
+    return [lat, lng] as const;
+  }
+
+
   public isImgGenModel<
     const K extends Provider = Provider,
     const V extends GetModelUtilRT<K> = GetModelUtilRT<K>

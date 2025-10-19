@@ -92,6 +92,16 @@ export type AudioMetadata = Prisma.AudioMetadataModel
  */
 export type DocumentMetadata = Prisma.DocumentMetadataModel
 /**
+ * Model ImageGenJob
+ * 
+ */
+export type ImageGenJob = Prisma.ImageGenJobModel
+/**
+ * Model ImageGenOutput
+ * 
+ */
+export type ImageGenOutput = Prisma.ImageGenOutputModel
+/**
  * Model Verification
  * 
  */

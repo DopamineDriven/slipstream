@@ -18,6 +18,7 @@ import type {
   DocSpecs,
   DocumentSingleton,
   EventTypeMap,
+  ImageGenModels,
   ImageSingleton,
   ImageSpecs,
   MessageSingleton,
@@ -140,7 +141,7 @@ export class Resolver extends ModelService {
   private async titleGenUtil({
     prompt,
     provider
-  }: EventTypeMap["ai_chat_request"]) {
+  }: EventTypeMap["ai_chat_request" | "image_gen_request"]) {
     const openai = this.openai.getClient();
     try {
       const turbo = await openai.chat.completions.create({
@@ -159,6 +160,58 @@ export class Resolver extends ModelService {
       return this.sanitizeTitle(title);
     } catch (err) {
       console.warn(err);
+    }
+  }
+
+  private async handleFreeMsgQuota(
+    ws: WebSocket,
+    userId: string,
+    conversationIdInitial: string,
+    provider?: Provider,
+    model?: string,
+    systemPrompt?: string,
+    temperature?: number,
+    topP?: number
+  ) {
+    try {
+      const MAX_FREE_MSGS_PER_24H = 25;
+      const used = await this.wsServer.prisma.countFallbackUserMessages(
+        userId,
+        24 * 60 * 60 * 1000
+      );
+      if (used >= MAX_FREE_MSGS_PER_24H) {
+        const friendly =
+          `Free tier limit reached: You have sent ${used} messages in the last 24 hours using default API keys. ` +
+          `To continue without limits, add your own API key in Settings.`;
+        const errEvt = {
+          type: "ai_chat_error" as const,
+          provider,
+          conversationId: conversationIdInitial,
+          model,
+          systemPrompt,
+          temperature,
+          topP,
+          title: this.formatProvider(provider),
+          userId,
+          done: true,
+          message: friendly
+        } satisfies EventTypeMap["ai_chat_error"];
+
+        // Notify the requesting client immediately
+        ws.send(JSON.stringify(errEvt));
+
+        // Best-effort notify via Redis on the user channel
+        void this.wsServer.redis.publishTypedEvent(
+          RedisChannels.user(userId),
+          "ai_chat_error",
+          errEvt
+        );
+
+        return; // stop processing
+      }
+    } catch (e) {
+      // If the guardrail check fails for any reason, fall through to normal handling
+      console.warn("rate-limit check failed", this.safeErrMsg(e));
     }
   }
 
@@ -186,46 +239,16 @@ export class Resolver extends ModelService {
     // Quick server-side guardrail: limit free-tier (fallback key) usage
     // Trust client-provided hasProviderConfigured to avoid extra lookups.
     if (event.hasProviderConfigured === false) {
-      try {
-        const MAX_FREE_MSGS_PER_24H = 25;
-        const used = await this.wsServer.prisma.countFallbackUserMessages(
-          userId,
-          24 * 60 * 60 * 1000
-        );
-        if (used >= MAX_FREE_MSGS_PER_24H) {
-          const friendly =
-            `Free tier limit reached: You have sent ${used} messages in the last 24 hours using default API keys. ` +
-            `To continue without limits, add your own API key in Settings.`;
-          const errEvt = {
-            type: "ai_chat_error" as const,
-            provider,
-            conversationId: conversationIdInitial,
-            model,
-            systemPrompt,
-            temperature,
-            topP,
-            title: this.formatProvider(provider),
-            userId,
-            done: true,
-            message: friendly
-          } satisfies EventTypeMap["ai_chat_error"];
-
-          // Notify the requesting client immediately
-          ws.send(JSON.stringify(errEvt));
-
-          // Best-effort notify via Redis on the user channel
-          void this.wsServer.redis.publishTypedEvent(
-            RedisChannels.user(userId),
-            "ai_chat_error",
-            errEvt
-          );
-
-          return; // stop processing
-        }
-      } catch (e) {
-        // If the guardrail check fails for any reason, fall through to normal handling
-        console.warn("rate-limit check failed", e);
-      }
+      this.handleFreeMsgQuota(
+        ws,
+        userId,
+        conversationIdInitial,
+        provider,
+        model,
+        systemPrompt,
+        temperature,
+        topP
+      );
     }
 
     const res = await this.wsServer.prisma.handleAiChatRequest({
@@ -240,7 +263,8 @@ export class Resolver extends ModelService {
       systemPrompt,
       temperature,
       topP,
-      model
+      model,
+      metadata: userData
     });
 
     const user_location = {
@@ -269,42 +293,6 @@ export class Resolver extends ModelService {
 
     const title = res?.title ?? (await this.titleGenUtil(event));
 
-    // if (this.isImgGenModel(provider, model)) {
-    //   const apiKeyImgGen =
-    //     typeof apiKey !== "undefined"
-    //       ? apiKey
-    //       : provider === "openai"
-    //         ? this.openaiFallbackKey
-    //         : provider === "gemini"
-    //           ? this.geminiFallbackKey
-    //           : this.xaiFallbackKey;
-
-    //   return await this.handleImageGenRequest(
-    //     {
-    //       conversationId,
-    //       chunks,
-    //       msgs,
-    //       isNewChat,
-    //       timestamp: createdAt.getTime(),
-    //       thinkingChunks,
-    //       keyId,
-    //       max_tokens,
-    //       systemPrompt,
-    //       temperature,
-    //       title,
-    //       topP,
-    //       model: model as AllImgGenModelsUnion,
-    //       prompt,
-    //       provider: provider as "gemini" | "openai" | "grok",
-    //       type: "image_gen_request",
-    //       hasProviderConfigured,
-    //       apiKey: apiKeyImgGen
-    //     },
-    //     ws,
-    //     userId,
-    //     userData
-    //   );
-    // }
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
       resumedFromChunk = chunks.length;
@@ -408,7 +396,7 @@ export class Resolver extends ModelService {
         });
       }
     } catch (err) {
-      console.error(`AI Stream Error`, err);
+      console.error(`AI Stream Error`, this.safeErrMsg(err));
       ws.send(
         JSON.stringify({
           type: "ai_chat_error",
@@ -458,7 +446,6 @@ export class Resolver extends ModelService {
       );
     }
   }
-  /** Dispatches incoming events to handlers */
 
   public async handleImageGenRequest(
     event: EventTypeMap["image_gen_request"],
@@ -467,60 +454,121 @@ export class Resolver extends ModelService {
     userData?: UserData
   ) {
     const _userData = userData;
-    const {
-      apiKey,
-      chunks,
-      conversationId,
-      isNewChat,
-      keyId,
-      max_tokens,
-      model,
-      thinkingChunks,
-      msgs,
-      timestamp,
+    const provider = event.provider,
+      model = this.getModel(
+        provider,
+        event?.model as ImageGenModels | undefined
+      ),
+      topP = event.topP,
+      temperature = event.temperature,
+      systemPrompt = event.systemPrompt,
+      max_tokens = event.maxTokens,
+      hasProviderConfigured = event.hasProviderConfigured,
+      isDefaultProvider = event.isDefaultProvider,
+      prompt = event.prompt,
+      conversationIdInitial = event.conversationId,
+      batchId = event.batchId,
+      _n = event?.n ?? 1,
+      _seed = event?.seed,
+      _moderation = event?.moderation,
+      _negative_prompt = event.negativePrompt,
+      _output_format = event?.output_format,
+      _output_quality = event?.output_quality,
+      _output_compression = event?.output_compression,
+      _output_background = event?.output_background,
+      _output_partial_images = event?.output_partial_images,
+      _output_size = event?.output_size;
+
+    const res = await this.wsServer.prisma.handleAiChatRequest({
+      userId,
+      batchId,
+      conversationId: conversationIdInitial,
+      prompt,
       provider,
+      hasProviderConfigured,
+      maxTokens: max_tokens,
+      isDefaultProvider,
       systemPrompt,
       temperature,
-      title,
-      topP
-    } = event;
-    const streamChannel = RedisChannels.conversationStream(conversationId),
-      userChannel = RedisChannels.user(userId),
-      _existingState = await this.wsServer.redis.getStreamState(conversationId);
-    if (event.conversationId === "new-chat") {
-      void this.wsServer.redis.publishTypedEvent(
-        userChannel,
-        "conversation:created",
-        {
-          type: "conversation:created",
+      topP,
+      model,
+      metadata: userData
+    });
+
+    const _user_location = {
+      type: "approximate",
+      city: userData?.city ?? "Barrington",
+      country: userData?.country ?? "US",
+      region: userData?.region ?? "Illinois",
+      timezone: userData?.tz ?? "America/Chicago"
+    } as const;
+
+    const _isNewChat = conversationIdInitial.startsWith("new-chat"),
+      _msgs = res.messages satisfies MessageSingleton<true>[],
+      conversationId = res.id,
+      // apiKey = res.apiKey ?? undefined,
+      // keyId = res.userKeyId,
+      streamChannel = RedisChannels.conversationStream(conversationId),
+      // userChannel = RedisChannels.user(userId),
+      existingState = await this.wsServer.redis.getStreamState(conversationId);
+    // createdAt = res.createdAt,
+    // title = res?.title ?? (await this.titleGenUtil(event));
+
+    let chunks = Array.of<string>(),
+      // thinkingChunks = Array.of<string>(),
+      resumedFromChunk = 0;
+    // thinkingAgg = "",
+    // thinkingDuration = 0,
+    // partialImageGenOut = Array.of<Buffer>(),
+    // partialImageGenAgg: Buffer | null = null,
+    // revisedPromptAgg = "",
+    // revisedPromptChunks = Array.of<string>(),
+    // cdnUrlAgg = "",
+    // cdnUrlChunks = Array.of<string>(),
+    // imageGenOut = Array.of<Buffer | string>(),
+    // imageGenAgg: Buffer | string | null = null;
+
+    if (existingState && !existingState.metadata.completed) {
+      chunks = existingState.chunks;
+      resumedFromChunk = chunks.length;
+      if (existingState.thinkingChunks)
+        // thinkingChunks = existingState.thinkingChunks;
+        // Send resume event
+        void this.wsServer.redis.publishTypedEvent(
+          streamChannel,
+          "stream:resumed",
+          {
+            type: "stream:resumed",
+            conversationId,
+            resumedAt: resumedFromChunk,
+            chunks,
+            title: existingState.metadata.title,
+            model: existingState.metadata.model,
+            provider: existingState.metadata.provider
+          }
+        );
+
+      // Send the accumulated chunks as a single ai_chat_chunk to catch up
+      ws.send(
+        JSON.stringify({
+          type: "image_gen_progress",
           conversationId,
+          duration: 0,
+          progress: 0,
+          requested_count: 1,
           userId,
-          title: title ?? "New Chat",
-          timestamp: timestamp ?? Date.now()
-        }
+          done: false,
+          model: existingState.metadata.model ?? model,
+          provider: existingState.metadata.provider as Provider,
+          title: existingState.metadata.title,
+          systemPrompt,
+          temperature,
+          topP
+        } satisfies EventTypeMap["image_gen_progress"])
       );
     }
-
-    console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
-    const _commonProps = {
-      chunks,
-      conversationId,
-      isNewChat,
-      msgs,
-      streamChannel,
-      thinkingChunks,
-      userId,
-      ws,
-      apiKey,
-      keyId,
-      max_tokens,
-      model,
-      systemPrompt,
-      temperature,
-      title,
-      topP
-    };
   }
+  /** Dispatches incoming events to handlers */
   public async handleRawMessage(
     ws: WebSocket,
     userId: string,
@@ -1154,7 +1202,13 @@ export class Resolver extends ModelService {
       if (!headResponse.ok) {
         throw new Error(`Failed to access URL: ${headResponse.status}`);
       }
+      // TODO USE THIS FOR IMPLEMENTING IMAGE GENERATION
+      // const meta = await this.extract.extractRemote(sourceUrl);
 
+      // const specs =this.handleMetadata(meta);
+      // if (specs.type==="IMAGE" && specs.img) {
+      //   const _spec = specs.img;
+      // }
       const contentLength = headResponse.headers.get("content-length");
       const contentType =
         headResponse.headers.get("content-type") ?? "application/octet-stream";

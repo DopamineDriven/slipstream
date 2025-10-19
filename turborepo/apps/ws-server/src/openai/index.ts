@@ -13,6 +13,7 @@ import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import { ModelService } from "@/models/index.ts";
 
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
@@ -26,7 +27,7 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
 
 export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
 
-export class OpenAIService {
+export class OpenAIService extends ModelService {
   private defaultClient: OpenAI;
   private logger: PinoLogger;
   /** key: storename; val: storeId; */
@@ -38,6 +39,7 @@ export class OpenAIService {
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
+    super();
     this.logger = logger
       .getPinoInstance()
       .child(
@@ -45,7 +47,7 @@ export class OpenAIService {
         { msgPrefix: "[openai] " }
       );
     this.defaultClient = new OpenAI({
-      logLevel: "info",
+      logLevel: "debug",
       apiKey: this.apiKey,
       logger: this.logger
     });
@@ -90,6 +92,9 @@ export class OpenAIService {
     attachment: {
       id: string;
       cdnUrl: string | null;
+      compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
+      compatCdnUrl: string | null;
+      compatMime: string | null;
       filename: string | null;
       mime: string | null;
     },
@@ -97,7 +102,16 @@ export class OpenAIService {
     keyFingerprint = "server",
     keyId?: string
   ): Promise<{ file_id: string }> {
-    if (!attachment.cdnUrl) throw new Error("Attachment has no CDN URL");
+    const url =
+      attachment.compatStatus === "ACTIVE"
+        ? attachment.compatCdnUrl
+        : attachment.cdnUrl;
+
+    const mime =
+      attachment.compatStatus === "ACTIVE"
+        ? attachment.compatMime
+        : attachment.mime;
+    if (!url) throw new Error("Attachment has no CDN URL");
 
     // 1) Reuse if we already uploaded this asset for this key fingerprint
     const existing = await this.prisma.findActiveOpenAIAsset(
@@ -113,28 +127,26 @@ export class OpenAIService {
     const mapping = await this.prisma.upsertOpenAIAssetMapping(
       attachment.id,
       keyFingerprint,
-      attachment.mime ?? "application/octet-stream",
-      keyId // must be a real FK if set; otherwise omit in upsert
+      mime ?? "application/octet-stream",
+      keyId
     );
 
     try {
-      // 3) Fetch remote asset
-      const resp = await fetch(attachment.cdnUrl, { method: "GET" });
+      const resp = await fetch(url, { method: "GET" });
       if (!resp.ok) {
         throw new Error(
-          `Failed to fetch ${attachment.cdnUrl}: ${resp.status} ${resp.statusText}`
+          `Failed to fetch ${url}: ${resp.status} ${resp.statusText}`
         );
       }
 
-      // 4) Wrap for SDK (blob() when available; otherwise ArrayBuffer)
-      const arrBuff = await resp.arrayBuffer();
-      const blob = new Blob([arrBuff]);
-      const file = await toFile(blob, attachment.filename ?? "upload.bin");
+      const file = await toFile(resp, attachment.filename ?? "upload.bin", {
+        type:
+          mime ?? mapping.mime ?? resp.headers.get("Content-Type") ?? undefined
+      });
 
-      // 5) Upload to OpenAI Files — purpose MUST be "assistants" for Responses/File Search/Vector Stores
       const uploaded = await client.files.create({
         file,
-        purpose: "assistants"
+        purpose: "user_data"
       });
 
       // 6) Finalize mapping
@@ -149,7 +161,7 @@ export class OpenAIService {
     } catch (err) {
       await this.prisma.markOpenAIAssetFailed(
         mapping.id,
-        err instanceof Error ? err.message : String(err)
+        err instanceof Error ? err.message : this.safeErrMsg(err)
       );
       throw err;
     }
@@ -189,21 +201,6 @@ export class OpenAIService {
 
     this.inflightVS.set(name, p);
     return p;
-  }
-
-  private async addFileToVectorStoreFromUrl(
-    client: OpenAI,
-    vectorStoreId: string,
-    url: string,
-    filename = "upload.bin"
-  ) {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`Fetch failed ${r.status}: ${url}`);
-    const s = new Blob([await r.arrayBuffer()]);
-    const file = await toFile(s, filename);
-    return client.vectorStores.files.createAndPoll(vectorStoreId, {
-      file_id: (await client.files.create({ file, purpose: "assistants" })).id
-    });
   }
 
   private buildAttachmentContent(
@@ -298,7 +295,15 @@ export class OpenAIService {
         content.push({ type: "input_image", image_url: url, detail: "auto" });
       } else {
         const { file_id } = await this.ensureAssetUploadedToOpenAI(
-          { id: att.id, cdnUrl: url, filename, mime },
+          {
+            id: att.id,
+            cdnUrl: url,
+            compatCdnUrl: att.compatCdnUrl,
+            compatMime: att.compatMime,
+            compatStatus: att.compatStatus,
+            filename,
+            mime
+          },
           client,
           keyFingerprint,
           keyId ?? undefined
@@ -374,7 +379,7 @@ export class OpenAIService {
 
   private openaiReasoning(
     model: OpenAiModelIdUnion,
-    effort: Reasoning["effort"] = "low",
+    effort: Reasoning["effort"] = "medium",
     summary: Reasoning["summary"] = "auto"
   ) {
     switch (model) {
@@ -400,6 +405,10 @@ export class OpenAIService {
       case "gpt-4.1-nano":
       case "gpt-4o":
       case "gpt-4o-mini":
+      case "dall-e-2":
+      case "dall-e-3":
+      case "gpt-image-1":
+      case "gpt-image-1-mini":
       default: {
         return undefined;
       }
@@ -466,18 +475,83 @@ export class OpenAIService {
     }
   }
 
+  private shouldCallImageApi(model: OpenAiModelIdUnion) {
+    switch (model) {
+      case "gpt-image-1":
+      case "gpt-image-1-mini":
+      case "dall-e-2":
+      case "dall-e-3": {
+        return true;
+      }
+      case "gpt-5-pro":
+      case "gpt-5-codex":
+      case "gpt-5":
+      case "gpt-5-mini":
+      case "gpt-5-nano":
+      case "gpt-4.1":
+      case "gpt-4.1-mini":
+      case "gpt-4.1-nano":
+      case "o3":
+      case "gpt-4o":
+      case "gpt-4o-mini":
+      case "o3-mini":
+      case "o3-pro":
+      case "o4-mini":
+      case "gpt-3.5-turbo":
+      case "gpt-4":
+      case "gpt-4-turbo":
+      default: {
+        return false;
+      }
+    }
+  }
+
+  private imageGenToolCompat(model: OpenAiModelIdUnion) {
+    switch (model) {
+      case "gpt-5":
+      case "gpt-5-mini":
+      case "gpt-5-nano":
+      case "gpt-4.1":
+      case "gpt-4.1-mini":
+      case "gpt-4.1-nano":
+      case "o3":
+      case "gpt-4o":
+      case "gpt-4o-mini": {
+        return true;
+      }
+      case "gpt-5-pro":
+      case "gpt-5-codex":
+      case "o3-mini":
+      case "o3-pro":
+      case "o4-mini":
+      case "gpt-3.5-turbo":
+      case "gpt-4":
+      case "gpt-4-turbo":
+      default: {
+        return false;
+      }
+    }
+  }
+
   private handleTooling(
+    model: OpenAiModelIdUnion,
     hasFiles: boolean,
-    user_location?: {
-      type: "approximate";
-      city?: string | null;
-      country?: string | null;
-      region?: string | null;
-      timezone?: string | null;
-    },
+    user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
     vector_store_ids?: string[]
   ) {
+    // TODO determine where/when to incorporate Image Gen Tool
+    const _imageGenToolingCompat = this.imageGenToolCompat(model);
     if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
+      // if (imageGenToolingCompat) {
+      //   return [
+      //   { type: "file_search", vector_store_ids },
+      //   {
+      //     type: "web_search_preview",
+      //     user_location
+      //   },
+      //   {type: "image_generation",  input_image_mask: {file_id: ""} satisfies OpenAI.Responses.Tool.ImageGeneration.InputImageMask}
+      // ] satisfies OpenAI.Responses.Tool[];
+      // }
       return [
         { type: "file_search", vector_store_ids },
         {
@@ -531,15 +605,22 @@ export class OpenAIService {
   private normalizeLocation(
     user_location: ProviderOpenaiRequestEntity["user_location"]
   ) {
-    return user_location
-      ? {
-          type: "approximate" as const,
-          city: user_location.city ?? null,
-          country: user_location.country ?? null,
-          region: user_location.region ?? null,
-          timezone: user_location.tz ?? null
-        }
-      : undefined;
+    return (
+      user_location
+        ? {
+            type: "approximate" as const,
+            city: user_location.city ?? null,
+            country: user_location.country ?? null,
+            region: user_location.region ?? null,
+            timezone: user_location.tz
+              ? decodeURIComponent(user_location.tz)
+              : null
+          }
+        : undefined
+    ) satisfies
+      | OpenAI.Responses.WebSearchTool.UserLocation
+      | null
+      | undefined;
   }
 
   private openAiVerbosity(model: OpenAiModelIdUnion, verbosity?: string) {
@@ -564,6 +645,10 @@ export class OpenAIService {
       case "gpt-4":
       case "gpt-4-turbo":
       case "gpt-4.1":
+      case "dall-e-2":
+      case "dall-e-3":
+      case "gpt-image-1":
+      case "gpt-image-1-mini":
       case "gpt-4.1-mini":
       case "gpt-4.1-nano":
       case "gpt-4o":
@@ -593,6 +678,7 @@ export class OpenAIService {
     topP,
     user_location
   }: ProviderOpenaiRequestEntity) {
+    const m = model as OpenAiModelIdUnion;
     const provider = "openai" as const;
     let openaiThinkingStartTime: number | null = null,
       openaiThinkingDuration = 0,
@@ -625,26 +711,25 @@ export class OpenAIService {
     }
 
     const tools = this.handleTooling(
+      m,
       hasFiles,
       loc,
       vectorStoreId ? [vectorStoreId] : undefined
     );
 
-    const reasoning = this.openaiReasoning(
-      model as OpenAiModelIdUnion,
-      "medium",
-      "auto"
-    );
+    const reasoning = this.openaiReasoning(m, "medium", "auto");
+
     const responsesStream = await client.responses.create({
       stream: true,
       input: formatted,
       instructions: this.buildInstructions(systemPrompt),
       store: false,
-      model,
+      model: m,
       text: this.openAiVerbosity(model as OpenAiModelIdUnion, "medium"),
       temperature,
       max_output_tokens: max_tokens,
       top_p: topP,
+      safety_identifier: userId,
       truncation: "auto",
       reasoning,
       parallel_tool_calls: true,
@@ -843,3 +928,6 @@ export class OpenAIService {
     }
   }
 }
+
+
+

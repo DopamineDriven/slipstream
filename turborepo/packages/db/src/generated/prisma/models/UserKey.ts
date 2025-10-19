@@ -223,6 +223,7 @@ export type UserKeyWhereInput = {
   isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
+  imageGenJobs?: Prisma.ImageGenJobListRelationFilter
   attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }
 
@@ -239,6 +240,7 @@ export type UserKeyOrderByWithRelationInput = {
   isDefault?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
+  imageGenJobs?: Prisma.ImageGenJobOrderByRelationAggregateInput
   attachmentProviders?: Prisma.AttachmentProviderOrderByRelationAggregateInput
 }
 
@@ -259,6 +261,7 @@ export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
   isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
+  imageGenJobs?: Prisma.ImageGenJobListRelationFilter
   attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }, "id" | "userId_provider">
 
@@ -306,6 +309,7 @@ export type UserKeyCreateInput = {
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -321,6 +325,7 @@ export type UserKeyUncheckedCreateInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -336,6 +341,7 @@ export type UserKeyUpdateInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -351,6 +357,7 @@ export type UserKeyUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -533,6 +540,22 @@ export type UserKeyUpdateOneWithoutAttachmentProvidersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
 }
 
+export type UserKeyCreateNestedOneWithoutImageGenJobsInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  connect?: Prisma.UserKeyWhereUniqueInput
+}
+
+export type UserKeyUpdateOneWithoutImageGenJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  upsert?: Prisma.UserKeyUpsertWithoutImageGenJobsInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput, Prisma.UserKeyUpdateWithoutImageGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+}
+
 export type UserKeyCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
@@ -544,6 +567,7 @@ export type UserKeyCreateWithoutUserInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -558,6 +582,7 @@ export type UserKeyUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -614,6 +639,7 @@ export type UserKeyCreateWithoutMessagesInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
@@ -628,6 +654,7 @@ export type UserKeyUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isDefault?: boolean
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
@@ -658,6 +685,7 @@ export type UserKeyUpdateWithoutMessagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -672,6 +700,7 @@ export type UserKeyUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -687,6 +716,7 @@ export type UserKeyCreateWithoutAttachmentProvidersInput = {
   isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
   messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
@@ -701,6 +731,7 @@ export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
   updatedAt?: Date | string
   isDefault?: boolean
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutAttachmentProvidersInput = {
@@ -731,6 +762,7 @@ export type UserKeyUpdateWithoutAttachmentProvidersInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
@@ -745,6 +777,83 @@ export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+}
+
+export type UserKeyCreateWithoutImageGenJobsInput = {
+  id?: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  user: Prisma.UserCreateNestedOneWithoutKeysInput
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
+  id?: string
+  userId: string
+  provider: $Enums.Provider
+  apiKey: string
+  iv: string
+  authTag: string
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
+}
+
+export type UserKeyCreateOrConnectWithoutImageGenJobsInput = {
+  where: Prisma.UserKeyWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+}
+
+export type UserKeyUpsertWithoutImageGenJobsInput = {
+  update: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+  create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  where?: Prisma.UserKeyWhereInput
+}
+
+export type UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput = {
+  where?: Prisma.UserKeyWhereInput
+  data: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
+}
+
+export type UserKeyUpdateWithoutImageGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
+}
+
+export type UserKeyUncheckedUpdateWithoutImageGenJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateManyUserInput = {
@@ -770,6 +879,7 @@ export type UserKeyUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -784,6 +894,7 @@ export type UserKeyUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
   attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
@@ -806,11 +917,13 @@ export type UserKeyUncheckedUpdateManyWithoutUserInput = {
 
 export type UserKeyCountOutputType = {
   messages: number
+  imageGenJobs: number
   attachmentProviders: number
 }
 
 export type UserKeyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | UserKeyCountOutputTypeCountMessagesArgs
+  imageGenJobs?: boolean | UserKeyCountOutputTypeCountImageGenJobsArgs
   attachmentProviders?: boolean | UserKeyCountOutputTypeCountAttachmentProvidersArgs
 }
 
@@ -834,6 +947,13 @@ export type UserKeyCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Type
 /**
  * UserKeyCountOutputType without action
  */
+export type UserKeyCountOutputTypeCountImageGenJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ImageGenJobWhereInput
+}
+
+/**
+ * UserKeyCountOutputType without action
+ */
 export type UserKeyCountOutputTypeCountAttachmentProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AttachmentProviderWhereInput
 }
@@ -852,6 +972,7 @@ export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   isDefault?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
   attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
@@ -901,6 +1022,7 @@ export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type UserKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
   attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
   _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -916,6 +1038,7 @@ export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     messages: Prisma.$MessagePayload<ExtArgs>[]
+    imageGenJobs: Prisma.$ImageGenJobPayload<ExtArgs>[]
     attachmentProviders: Prisma.$AttachmentProviderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1325,6 +1448,7 @@ export interface Prisma__UserKeyClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   messages<T extends Prisma.UserKey$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  imageGenJobs<T extends Prisma.UserKey$imageGenJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$imageGenJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageGenJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachmentProviders<T extends Prisma.UserKey$attachmentProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserKey$attachmentProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1782,6 +1906,30 @@ export type UserKey$messagesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * UserKey.imageGenJobs
+ */
+export type UserKey$imageGenJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImageGenJob
+   */
+  select?: Prisma.ImageGenJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImageGenJob
+   */
+  omit?: Prisma.ImageGenJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageGenJobInclude<ExtArgs> | null
+  where?: Prisma.ImageGenJobWhereInput
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
 }
 
 /**

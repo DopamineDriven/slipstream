@@ -301,13 +301,17 @@ export class Extract extends Unified {
               }
             }
             // we have enough head bytes already for routing; continue with originUrl
+            const length = alt.headers.get("Content-Length");
+            const buffer = alt.buf;
             return {
               contentType:
                 this.sniffMime(alt.buf) ??
                 alt.headers.get("content-type") ??
                 undefined,
-              buffer: alt.buf,
-              source: originUrl
+              buffer,
+              source: originUrl,
+              reportedTotalBytes: buffer.length,
+              fetchedBytes: length ? Number.parseInt(length) : undefined
             };
           }
         } catch {
@@ -401,10 +405,16 @@ export class Extract extends Unified {
             startSize,
             endSize
           });
+          const buffer = Buffer.concat([
+            Buffer.from(startBuf),
+            Buffer.from(endBuf)
+          ]);
           return {
             contentType,
-            buffer: Buffer.concat([Buffer.from(startBuf), Buffer.from(endBuf)]),
-            source: url
+            buffer,
+            source: url,
+            reportedTotalBytes: contentLength ?? undefined,
+            fetchedBytes: buffer.length
           };
         }
         // fall through if ranges misbehave
@@ -425,8 +435,15 @@ export class Extract extends Unified {
         );
         if (rr.status === 206) {
           const ab = await rr.arrayBuffer();
+          const buffer = Buffer.from(ab);
           this.dlog("fetchMinimalBuffer:range:first-bytes", { url, size });
-          return { contentType, buffer: Buffer.from(ab), source: url };
+          return {
+            contentType,
+            buffer,
+            source: url,
+            reportedTotalBytes: contentLength ?? undefined,
+            fetchedBytes: buffer.length
+          };
         }
         // if we get 200, we'll stream below
       }
@@ -439,8 +456,15 @@ export class Extract extends Unified {
           timeout
         );
         const ab = await res.arrayBuffer();
+        const buffer = Buffer.from(ab);
         this.dlog("fetchMinimalBuffer:get:small", { url, contentLength });
-        return { contentType, buffer: Buffer.from(ab), source: url };
+        return {
+          contentType,
+          buffer,
+          source: url,
+          reportedTotalBytes: contentLength ?? undefined,
+          fetchedBytes: buffer.length
+        };
       }
 
       // 4) Large / no-range: stream only first 'size' bytes with idle guard
@@ -455,7 +479,13 @@ export class Extract extends Unified {
         Math.min(1500, Math.max(600, Math.floor(timeout * 0.6)))
       );
       this.dlog("fetchMinimalBuffer:stream:first-bytes", { url, size });
-      return { contentType, buffer: buf, source: url };
+      return {
+        contentType,
+        buffer: buf,
+        source: url,
+        reportedTotalBytes: contentLength ?? undefined,
+        fetchedBytes: buf.length
+      };
     } catch (e) {
       // Any downstream failure after a successful probe marks URL as suspect
       this.dlog("fetchMinimalBuffer:error", {
@@ -473,9 +503,11 @@ export class Extract extends Unified {
     size = 16384,
     timeout = 5000
   ): Promise<ExpandedDocSpecs | ExpandedImgSpecs> {
-    let buffer: Buffer;
-    let contentType: string | undefined;
-    let url: string | undefined;
+    let buffer: Buffer,
+      contentType: string | undefined,
+      url: string | undefined,
+      fetchedBytes: number | undefined,
+      reportedTotalBytes: number | undefined;
 
     if (Buffer.isBuffer(source)) {
       buffer = source;
@@ -486,6 +518,8 @@ export class Extract extends Unified {
       buffer = out.buffer;
       contentType = out.contentType;
       url = out.source;
+      fetchedBytes = out.fetchedBytes;
+      reportedTotalBytes = out.reportedTotalBytes;
       this.dlog("extractRemote:buf", {
         url,
         contentType,
@@ -505,7 +539,13 @@ export class Extract extends Unified {
           h: imgSpecs.height,
           fmt: imgSpecs.format
         });
-        return { source: url ?? "buffer", ...imgSpecs };
+        return {
+          source: url ?? "buffer",
+          byteSize: reportedTotalBytes,
+          contentType,
+          fetchedBytes,
+          ...imgSpecs
+        };
       } catch {
         this.dlog("imageWorkup:fallback", { url, contentType });
         // FAST FALLBACK: header-only dimension sniffers for common formats
@@ -546,6 +586,9 @@ export class Extract extends Unified {
             colorSpace: "unknown",
             iccProfile: null,
             exifDateTimeOriginal: null,
+            byteSize: reportedTotalBytes,
+            contentType,
+            fetchedBytes,
             metadata: {}
           } satisfies ExpandedImgSpecs;
         }
@@ -557,7 +600,13 @@ export class Extract extends Unified {
         buffer,
         contentType ?? "application/pdf"
       );
-      return { source: url ?? "buffer", ...docSpecs };
+      return {
+        source: url ?? "buffer",
+        byteSize: reportedTotalBytes,
+        contentType,
+        fetchedBytes,
+        ...docSpecs
+      };
     }
   }
 

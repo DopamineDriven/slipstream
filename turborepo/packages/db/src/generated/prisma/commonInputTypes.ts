@@ -523,6 +523,40 @@ export type EnumColorSpaceNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
 }
 
+export type EnumImageGenStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel> | $Enums.ImageGenStage
+}
+
+export type EnumImageGenStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenStageWithAggregatesFilter<$PrismaModel> | $Enums.ImageGenStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel>
+}
+
+export type EnumImageGenOutputKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenOutputKind | Prisma.EnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel> | $Enums.ImageGenOutputKind
+}
+
+export type EnumImageGenOutputKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenOutputKind | Prisma.EnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenOutputKindWithAggregatesFilter<$PrismaModel> | $Enums.ImageGenOutputKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -1033,6 +1067,40 @@ export type NestedEnumColorSpaceNullableWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumImageGenStageFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel> | $Enums.ImageGenStage
+}
+
+export type NestedEnumImageGenStageWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenStage | Prisma.EnumImageGenStageFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenStage[] | Prisma.ListEnumImageGenStageFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenStageWithAggregatesFilter<$PrismaModel> | $Enums.ImageGenStage
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumImageGenStageFilter<$PrismaModel>
+}
+
+export type NestedEnumImageGenOutputKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenOutputKind | Prisma.EnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel> | $Enums.ImageGenOutputKind
+}
+
+export type NestedEnumImageGenOutputKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ImageGenOutputKind | Prisma.EnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ImageGenOutputKind[] | Prisma.ListEnumImageGenOutputKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumImageGenOutputKindWithAggregatesFilter<$PrismaModel> | $Enums.ImageGenOutputKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumImageGenOutputKindFilter<$PrismaModel>
 }
 
 

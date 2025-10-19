@@ -122,9 +122,16 @@ export type ZipEntry = {
 
 export interface ExpandedImgSpecs extends ImageSpecs {
   source?: string;
+  fetchedBytes?: number;
+  byteSize?: number;
+  contentType?: string;
 }
 export interface ExpandedDocSpecs extends DocSpecs {
   source?: string;
+  fetchedBytes?: number;
+  byteSize?: number;
+  contentType?: string;
+
 }
 
 export type Constructor<T = object> = new (...args: any[]) => T;
