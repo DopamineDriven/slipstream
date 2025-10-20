@@ -84,7 +84,9 @@
   "dependencies": {
     "@prisma/adapter-pg": "^6.17.1",
     "@prisma/client": "^6.17.1",
-    "@prisma/extension-accelerate": "^2.0.2"
+    "@prisma/extension-accelerate": "^2.0.2",
+    "@prisma/extension-optimize": "^2.0.0",
+    "@prisma/instrumentation": "^6.17.1"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^7.6.0",

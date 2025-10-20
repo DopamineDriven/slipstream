@@ -224,7 +224,6 @@ export type ConversationWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
-  imageGenJob?: Prisma.ImageGenJobListRelationFilter
   conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
 }
 
@@ -242,7 +241,6 @@ export type ConversationOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
-  imageGenJob?: Prisma.ImageGenJobOrderByRelationAggregateInput
   conversationSettings?: Prisma.ConversationSettingsOrderByWithRelationInput
 }
 
@@ -263,7 +261,6 @@ export type ConversationWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   messages?: Prisma.MessageListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
-  imageGenJob?: Prisma.ImageGenJobListRelationFilter
   conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
 }, "id" | "shareToken">
 
@@ -312,7 +309,6 @@ export type ConversationCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
 }
 
@@ -329,7 +325,6 @@ export type ConversationUncheckedCreateInput = {
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
 }
 
@@ -346,7 +341,6 @@ export type ConversationUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
 }
 
@@ -363,7 +357,6 @@ export type ConversationUncheckedUpdateInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
 }
 
@@ -550,20 +543,6 @@ export type ConversationUpdateOneWithoutAttachmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ConversationUpdateWithoutAttachmentsInput>, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput>
 }
 
-export type ConversationCreateNestedOneWithoutImageGenJobInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutImageGenJobInput, Prisma.ConversationUncheckedCreateWithoutImageGenJobInput>
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutImageGenJobInput
-  connect?: Prisma.ConversationWhereUniqueInput
-}
-
-export type ConversationUpdateOneRequiredWithoutImageGenJobNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutImageGenJobInput, Prisma.ConversationUncheckedCreateWithoutImageGenJobInput>
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutImageGenJobInput
-  upsert?: Prisma.ConversationUpsertWithoutImageGenJobInput
-  connect?: Prisma.ConversationWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutImageGenJobInput, Prisma.ConversationUpdateWithoutImageGenJobInput>, Prisma.ConversationUncheckedUpdateWithoutImageGenJobInput>
-}
-
 export type ConversationCreateWithoutUserInput = {
   id?: string
   userKeyId?: string | null
@@ -576,7 +555,6 @@ export type ConversationCreateWithoutUserInput = {
   shareToken?: string | null
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
 }
 
@@ -592,7 +570,6 @@ export type ConversationUncheckedCreateWithoutUserInput = {
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
 }
 
@@ -651,7 +628,6 @@ export type ConversationCreateWithoutConversationSettingsInput = {
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutConversationSettingsInput = {
@@ -667,7 +643,6 @@ export type ConversationUncheckedCreateWithoutConversationSettingsInput = {
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutConversationSettingsInput = {
@@ -699,7 +674,6 @@ export type ConversationUpdateWithoutConversationSettingsInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutConversationSettingsInput = {
@@ -715,7 +689,6 @@ export type ConversationUncheckedUpdateWithoutConversationSettingsInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutMessagesInput = {
@@ -730,7 +703,6 @@ export type ConversationCreateWithoutMessagesInput = {
   shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
 }
 
@@ -746,7 +718,6 @@ export type ConversationUncheckedCreateWithoutMessagesInput = {
   isShared?: boolean
   shareToken?: string | null
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
 }
 
@@ -778,7 +749,6 @@ export type ConversationUpdateWithoutMessagesInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
 }
 
@@ -794,7 +764,6 @@ export type ConversationUncheckedUpdateWithoutMessagesInput = {
   isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
 }
 
@@ -810,7 +779,6 @@ export type ConversationCreateWithoutAttachmentsInput = {
   shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
 }
 
@@ -826,7 +794,6 @@ export type ConversationUncheckedCreateWithoutAttachmentsInput = {
   isShared?: boolean
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
 }
 
@@ -858,7 +825,6 @@ export type ConversationUpdateWithoutAttachmentsInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
 }
 
@@ -874,87 +840,6 @@ export type ConversationUncheckedUpdateWithoutAttachmentsInput = {
   isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
-}
-
-export type ConversationCreateWithoutImageGenJobInput = {
-  id?: string
-  userKeyId?: string | null
-  title?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  branchId?: string | null
-  parentId?: string | null
-  isShared?: boolean
-  shareToken?: string | null
-  user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
-}
-
-export type ConversationUncheckedCreateWithoutImageGenJobInput = {
-  id?: string
-  userId: string
-  userKeyId?: string | null
-  title?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  branchId?: string | null
-  parentId?: string | null
-  isShared?: boolean
-  shareToken?: string | null
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
-}
-
-export type ConversationCreateOrConnectWithoutImageGenJobInput = {
-  where: Prisma.ConversationWhereUniqueInput
-  create: Prisma.XOR<Prisma.ConversationCreateWithoutImageGenJobInput, Prisma.ConversationUncheckedCreateWithoutImageGenJobInput>
-}
-
-export type ConversationUpsertWithoutImageGenJobInput = {
-  update: Prisma.XOR<Prisma.ConversationUpdateWithoutImageGenJobInput, Prisma.ConversationUncheckedUpdateWithoutImageGenJobInput>
-  create: Prisma.XOR<Prisma.ConversationCreateWithoutImageGenJobInput, Prisma.ConversationUncheckedCreateWithoutImageGenJobInput>
-  where?: Prisma.ConversationWhereInput
-}
-
-export type ConversationUpdateToOneWithWhereWithoutImageGenJobInput = {
-  where?: Prisma.ConversationWhereInput
-  data: Prisma.XOR<Prisma.ConversationUpdateWithoutImageGenJobInput, Prisma.ConversationUncheckedUpdateWithoutImageGenJobInput>
-}
-
-export type ConversationUpdateWithoutImageGenJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
-}
-
-export type ConversationUncheckedUpdateWithoutImageGenJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
 }
 
@@ -982,7 +867,6 @@ export type ConversationUpdateWithoutUserInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
 }
 
@@ -998,7 +882,6 @@ export type ConversationUncheckedUpdateWithoutUserInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
 }
 
@@ -1022,13 +905,11 @@ export type ConversationUncheckedUpdateManyWithoutUserInput = {
 export type ConversationCountOutputType = {
   messages: number
   attachments: number
-  imageGenJob: number
 }
 
 export type ConversationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | ConversationCountOutputTypeCountMessagesArgs
   attachments?: boolean | ConversationCountOutputTypeCountAttachmentsArgs
-  imageGenJob?: boolean | ConversationCountOutputTypeCountImageGenJobArgs
 }
 
 /**
@@ -1055,13 +936,6 @@ export type ConversationCountOutputTypeCountAttachmentsArgs<ExtArgs extends runt
   where?: Prisma.AttachmentWhereInput
 }
 
-/**
- * ConversationCountOutputType without action
- */
-export type ConversationCountOutputTypeCountImageGenJobArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageGenJobWhereInput
-}
-
 
 export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1077,7 +951,6 @@ export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
   attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
-  imageGenJob?: boolean | Prisma.Conversation$imageGenJobArgs<ExtArgs>
   conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
@@ -1128,7 +1001,6 @@ export type ConversationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
   attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
-  imageGenJob?: boolean | Prisma.Conversation$imageGenJobArgs<ExtArgs>
   conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1145,7 +1017,6 @@ export type $ConversationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     user: Prisma.$UserPayload<ExtArgs>
     messages: Prisma.$MessagePayload<ExtArgs>[]
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
-    imageGenJob: Prisma.$ImageGenJobPayload<ExtArgs>[]
     conversationSettings: Prisma.$ConversationSettingsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1556,7 +1427,6 @@ export interface Prisma__ConversationClient<T, Null = never, ExtArgs extends run
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   messages<T extends Prisma.Conversation$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachments<T extends Prisma.Conversation$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  imageGenJob<T extends Prisma.Conversation$imageGenJobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$imageGenJobArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageGenJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversationSettings<T extends Prisma.Conversation$conversationSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$conversationSettingsArgs<ExtArgs>>): Prisma.Prisma__ConversationSettingsClient<runtime.Types.Result.GetResult<Prisma.$ConversationSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2038,30 +1908,6 @@ export type Conversation$attachmentsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
-}
-
-/**
- * Conversation.imageGenJob
- */
-export type Conversation$imageGenJobArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ImageGenJob
-   */
-  select?: Prisma.ImageGenJobSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ImageGenJob
-   */
-  omit?: Prisma.ImageGenJobOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ImageGenJobInclude<ExtArgs> | null
-  where?: Prisma.ImageGenJobWhereInput
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
-  cursor?: Prisma.ImageGenJobWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
 }
 
 /**

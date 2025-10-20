@@ -520,7 +520,7 @@ export type ImageGenRequest = {
    * "1K" (default); "1K" | "2K"
    */
   output_quality: string;
-    /**
+  /**
    *  gpt-image-1, gpt-image-1-mini:
    *
    * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
@@ -542,6 +542,23 @@ export type ImageGenRequest = {
    * "1:1" (default); "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "9:16" | "16:9" | "21:9"
    */
   output_size?: string;
+  /**
+   * **Imagen 3 & 4 models only**
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001,
+   * imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001
+   *
+   * "dont_allow": Disallow the inclusion of people or faces in images.
+   *
+   * "allow_adult": Allow generation of adults only.
+   *
+   * "allow_all": Allow generation of people of all ages.
+   *
+   * ---
+   *
+   * "allow_adult" (default)
+   */
+  personGeneration?: string;
 
   seed?: number;
 };
@@ -567,8 +584,20 @@ export type ImageGenResponse = {
   model: string;
   requested_count: number;
   actual_count: number;
-  partialImages?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
-  images: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
+  partialImages?: {
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+    revised_prompt?: string;
+  }[];
+  images: {
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+    revised_prompt?: string;
+  }[];
   messageId?: string;
   success: boolean;
   error?: string;
@@ -611,8 +640,20 @@ export type ImageGenProgress = {
   title?: string;
   provider: string;
   duration: number;
-  partial_image?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
-  images?: { cdnUrl: string; width: number; height: number; mime: string; revised_prompt?: string; }[];
+  partial_image?: {
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+    revised_prompt?: string;
+  }[];
+  images?: {
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+    revised_prompt?: string;
+  }[];
   requested_count: number;
   systemPrompt?: string;
   /**

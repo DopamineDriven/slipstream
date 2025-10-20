@@ -1,6 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Docker prerequisite check
+echo "🐳 Checking Docker status..."
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Docker is not running!"
+    echo ""
+    if [[ $(uname -r) =~ microsoft|WSL ]]; then
+        echo "To start Docker in WSL2:"
+        echo "   1. Open Docker Desktop from Windows Start Menu"
+        echo "   2. Ensure 'Use the WSL 2 based engine' is enabled in Docker settings"
+        echo "   3. Wait for Docker to fully initialize (~30 seconds)"
+        echo "   4. Run 'npm run deploy:ws-server' again"
+    else
+        echo "Please start Docker and try again."
+    fi
+    echo ""
+    exit 1
+fi
+
+# Additional check for Docker buildx since you're using it
+if ! docker buildx version > /dev/null 2>&1; then
+    echo "❌ Docker buildx is not available!"
+    echo "This is required for multi-platform builds."
+    exit 1
+fi
+
+TASKDEF_IMAGE=$(jq -r '.taskDefinition.containerDefinitions[0].image' remote/describe/taskdef/ws-server.json)
+
+ECS_REGISTRY_REF_WS=${TASKDEF_IMAGE%%:*}
+
+echo "✅ Docker is ready"
+echo ""
+
 echo "📸 Syncing infrastructure state (pre-deployment)..."
 ./aws-remote.sh
 
@@ -11,9 +43,9 @@ docker buildx create --name myWsServerBuilder --use 2>/dev/null || docker buildx
 docker buildx build \
   --platform linux/amd64 \
   -f turborepo/Dockerfile \
-  -t 782904577755.dkr.ecr.us-east-1.amazonaws.com/t3-chat-clone-ws-server:latest \
-  --cache-from type=registry,ref=782904577755.dkr.ecr.us-east-1.amazonaws.com/t3-chat-clone-ws-server:buildcache \
-  --cache-to type=registry,ref=782904577755.dkr.ecr.us-east-1.amazonaws.com/t3-chat-clone-ws-server:buildcache,mode=max \
+  -t $ECS_REGISTRY_REF_WS:latest \
+  --cache-from type=registry,ref=$ECS_REGISTRY_REF_WS:buildcache \
+  --cache-to type=registry,ref=$ECS_REGISTRY_REF_WS:buildcache,mode=max \
   --push \
   turborepo/
 

@@ -79,7 +79,9 @@ type AssetRT =
 
 const _asset = () =>
   (async () => {
-    const { PrismaClient } = await import("@slipstream/db/node/generated/client");
+    const { PrismaClient } = await import(
+      "@slipstream/db/node/generated/client"
+    );
     const { Credentials } = await import("@slipstream/credentials");
     const cfg = new Credentials();
     const [datasourceUrl, _direct] = await Promise.all([
@@ -104,3 +106,105 @@ const _asset = () =>
     console.log(t);
     return t;
   });
+
+
+  // Using your DeepReplace utility
+export type DeepBigIntToNumber<T> = DeepReplace<T, bigint, number>;
+
+// But let's make DeepReplace even more robust without any
+export type DeepReplace<T, From, To> = T extends From
+  ? To
+  : T extends readonly (infer U)[]
+  ? readonly DeepReplace<U, From, To>[]
+  : T extends (infer U)[]
+  ? DeepReplace<U, From, To>[]
+  : T extends Map<infer K, infer V>
+  ? Map<K, DeepReplace<V, From, To>>
+  : T extends Set<infer U>
+  ? Set<DeepReplace<U, From, To>>
+  : T extends Promise<infer U>
+  ? Promise<DeepReplace<U, From, To>>
+  : T extends (...args: infer Args) => infer R
+  ? (...args: Args) => DeepReplace<R, From, To>
+  : T extends object
+  ? { [K in keyof T]: DeepReplace<T[K], From, To> }
+  : T;
+
+// Generic deep transformer without any
+export function deepTransform<T, TResult = T>(
+  value: T,
+  transformer: <V>(val: V, path: readonly string[]) => unknown,
+  path: readonly string[] = [],
+  visited = new WeakSet<object>()
+): TResult {
+  // Handle primitives and null/undefined
+  if (value === null || value === undefined || typeof value !== 'object') {
+    return transformer(value, path) as TResult;
+  }
+
+  // Prevent circular references
+  if (visited.has(value as object)) {
+    return value as unknown as TResult;
+  }
+  visited.add(value as object);
+
+  // Arrays
+  if (Array.isArray(value)) {
+    return value.map((item, index) =>
+      deepTransform(item, transformer, [...path, String(index)], visited)
+    ) as unknown as TResult;
+  }
+
+  // Maps
+  if (value instanceof Map) {
+    const result = new Map();
+    let index = 0;
+    for (const [k, v] of value) {
+      result.set(
+        k,
+        deepTransform(v, transformer, [...path, `map[${index}]`], visited)
+      );
+      index++;
+    }
+    return result as unknown as TResult;
+  }
+
+  // Sets
+  if (value instanceof Set) {
+    const result = new Set();
+    let index = 0;
+    for (const item of value) {
+      result.add(
+        deepTransform(item, transformer, [...path, `set[${index}]`], visited)
+      );
+      index++;
+    }
+    return result as unknown as TResult;
+  }
+
+  // Plain objects
+  const proto = Object.getPrototypeOf(value);
+  if (proto === Object.prototype || proto === null) {
+    const result: Record<string, unknown> = {};
+    for (const key of Object.keys(value)) {
+      result[key] = deepTransform(
+        (value as Record<string, unknown>)[key],
+        transformer,
+        [...path, key],
+        visited
+      );
+    }
+    return result as unknown as TResult;
+  }
+
+  // Other objects (Date, RegExp, class instances)
+  return transformer(value, path) as TResult;
+}
+
+// Specific bigint converter using the generic transformer
+export function deepConvertBigIntToNumber<T>(value: T): DeepBigIntToNumber<T> {
+  return deepTransform<T, DeepBigIntToNumber<T>>(
+    value,
+    (val) => typeof val === 'bigint' ? Number(val) : val
+  );
+}
