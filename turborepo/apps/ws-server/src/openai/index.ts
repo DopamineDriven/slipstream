@@ -475,7 +475,7 @@ export class OpenAIService extends ModelService {
     }
   }
 
-  private shouldCallImageApi(model: OpenAiModelIdUnion) {
+  private canCallImageApi(model: OpenAiModelIdUnion) {
     switch (model) {
       case "gpt-image-1":
       case "gpt-image-1-mini":

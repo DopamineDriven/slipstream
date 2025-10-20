@@ -66,6 +66,8 @@ export interface CredentialEntity {
   ADOBE_WEBHOOK_SECRET?: string;
   PY_WEBHOOK_SECRET?: string;
   TAVILY_API_KEY?: string;
+  OPTIMIZE_API_KEY?: string;
+  PRISMA_SERVICE_TOKEN?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

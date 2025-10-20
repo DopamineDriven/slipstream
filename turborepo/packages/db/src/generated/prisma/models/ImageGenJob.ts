@@ -55,7 +55,6 @@ export type ImageGenJobSumAggregateOutputType = {
 
 export type ImageGenJobMinAggregateOutputType = {
   id: string | null
-  conversationId: string | null
   requestMessageId: string | null
   provider: $Enums.Provider | null
   model: string | null
@@ -77,7 +76,7 @@ export type ImageGenJobMinAggregateOutputType = {
   outputCompression: number | null
   partialImagesRequested: number | null
   inputFidelity: string | null
-  personGenertion: string | null
+  personGeneration: string | null
   moderation: string | null
   stage: $Enums.ImageGenStage | null
   progress: number | null
@@ -92,7 +91,6 @@ export type ImageGenJobMinAggregateOutputType = {
 
 export type ImageGenJobMaxAggregateOutputType = {
   id: string | null
-  conversationId: string | null
   requestMessageId: string | null
   provider: $Enums.Provider | null
   model: string | null
@@ -114,7 +112,7 @@ export type ImageGenJobMaxAggregateOutputType = {
   outputCompression: number | null
   partialImagesRequested: number | null
   inputFidelity: string | null
-  personGenertion: string | null
+  personGeneration: string | null
   moderation: string | null
   stage: $Enums.ImageGenStage | null
   progress: number | null
@@ -129,7 +127,6 @@ export type ImageGenJobMaxAggregateOutputType = {
 
 export type ImageGenJobCountAggregateOutputType = {
   id: number
-  conversationId: number
   requestMessageId: number
   provider: number
   model: number
@@ -151,7 +148,7 @@ export type ImageGenJobCountAggregateOutputType = {
   outputCompression: number
   partialImagesRequested: number
   inputFidelity: number
-  personGenertion: number
+  personGeneration: number
   moderation: number
   stage: number
   progress: number
@@ -196,7 +193,6 @@ export type ImageGenJobSumAggregateInputType = {
 
 export type ImageGenJobMinAggregateInputType = {
   id?: true
-  conversationId?: true
   requestMessageId?: true
   provider?: true
   model?: true
@@ -218,7 +214,7 @@ export type ImageGenJobMinAggregateInputType = {
   outputCompression?: true
   partialImagesRequested?: true
   inputFidelity?: true
-  personGenertion?: true
+  personGeneration?: true
   moderation?: true
   stage?: true
   progress?: true
@@ -233,7 +229,6 @@ export type ImageGenJobMinAggregateInputType = {
 
 export type ImageGenJobMaxAggregateInputType = {
   id?: true
-  conversationId?: true
   requestMessageId?: true
   provider?: true
   model?: true
@@ -255,7 +250,7 @@ export type ImageGenJobMaxAggregateInputType = {
   outputCompression?: true
   partialImagesRequested?: true
   inputFidelity?: true
-  personGenertion?: true
+  personGeneration?: true
   moderation?: true
   stage?: true
   progress?: true
@@ -270,7 +265,6 @@ export type ImageGenJobMaxAggregateInputType = {
 
 export type ImageGenJobCountAggregateInputType = {
   id?: true
-  conversationId?: true
   requestMessageId?: true
   provider?: true
   model?: true
@@ -292,7 +286,7 @@ export type ImageGenJobCountAggregateInputType = {
   outputCompression?: true
   partialImagesRequested?: true
   inputFidelity?: true
-  personGenertion?: true
+  personGeneration?: true
   moderation?: true
   stage?: true
   progress?: true
@@ -394,7 +388,6 @@ export type ImageGenJobGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type ImageGenJobGroupByOutputType = {
   id: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -416,7 +409,7 @@ export type ImageGenJobGroupByOutputType = {
   outputCompression: number | null
   partialImagesRequested: number | null
   inputFidelity: string | null
-  personGenertion: string | null
+  personGeneration: string | null
   moderation: string | null
   stage: $Enums.ImageGenStage
   progress: number
@@ -454,7 +447,6 @@ export type ImageGenJobWhereInput = {
   OR?: Prisma.ImageGenJobWhereInput[]
   NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
   id?: Prisma.StringFilter<"ImageGenJob"> | string
-  conversationId?: Prisma.StringFilter<"ImageGenJob"> | string
   requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string
   provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
   model?: Prisma.StringFilter<"ImageGenJob"> | string
@@ -476,7 +468,7 @@ export type ImageGenJobWhereInput = {
   outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
-  personGenertion?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
   progress?: Prisma.IntFilter<"ImageGenJob"> | number
@@ -488,14 +480,12 @@ export type ImageGenJobWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
   requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   outputs?: Prisma.ImageGenOutputListRelationFilter
 }
 
 export type ImageGenJobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
   requestMessageId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -517,7 +507,7 @@ export type ImageGenJobOrderByWithRelationInput = {
   outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder
   partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder
   inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder
-  personGenertion?: Prisma.SortOrderInput | Prisma.SortOrder
+  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder
   moderation?: Prisma.SortOrderInput | Prisma.SortOrder
   stage?: Prisma.SortOrder
   progress?: Prisma.SortOrder
@@ -529,7 +519,6 @@ export type ImageGenJobOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   requestMessage?: Prisma.MessageOrderByWithRelationInput
-  conversation?: Prisma.ConversationOrderByWithRelationInput
   userKey?: Prisma.UserKeyOrderByWithRelationInput
   outputs?: Prisma.ImageGenOutputOrderByRelationAggregateInput
 }
@@ -540,7 +529,6 @@ export type ImageGenJobWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
   OR?: Prisma.ImageGenJobWhereInput[]
   NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
-  conversationId?: Prisma.StringFilter<"ImageGenJob"> | string
   provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
   model?: Prisma.StringFilter<"ImageGenJob"> | string
   userId?: Prisma.StringFilter<"ImageGenJob"> | string
@@ -561,7 +549,7 @@ export type ImageGenJobWhereUniqueInput = Prisma.AtLeast<{
   outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
-  personGenertion?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
   progress?: Prisma.IntFilter<"ImageGenJob"> | number
@@ -573,14 +561,12 @@ export type ImageGenJobWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
   requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
   outputs?: Prisma.ImageGenOutputListRelationFilter
 }, "id" | "requestMessageId">
 
 export type ImageGenJobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
   requestMessageId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -602,7 +588,7 @@ export type ImageGenJobOrderByWithAggregationInput = {
   outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder
   partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder
   inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder
-  personGenertion?: Prisma.SortOrderInput | Prisma.SortOrder
+  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder
   moderation?: Prisma.SortOrderInput | Prisma.SortOrder
   stage?: Prisma.SortOrder
   progress?: Prisma.SortOrder
@@ -625,7 +611,6 @@ export type ImageGenJobScalarWhereWithAggregatesInput = {
   OR?: Prisma.ImageGenJobScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | Prisma.ImageGenJobScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
   requestMessageId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
   provider?: Prisma.EnumProviderWithAggregatesFilter<"ImageGenJob"> | $Enums.Provider
   model?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
@@ -647,7 +632,7 @@ export type ImageGenJobScalarWhereWithAggregatesInput = {
   outputCompression?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
   partialImagesRequested?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
   inputFidelity?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
-  personGenertion?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
   moderation?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
   stage?: Prisma.EnumImageGenStageWithAggregatesFilter<"ImageGenJob"> | $Enums.ImageGenStage
   progress?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number
@@ -681,7 +666,7 @@ export type ImageGenJobCreateInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -693,14 +678,12 @@ export type ImageGenJobCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  conversation: Prisma.ConversationCreateNestedOneWithoutImageGenJobInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
   outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateInput = {
   id?: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -722,7 +705,7 @@ export type ImageGenJobUncheckedCreateInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -757,7 +740,7 @@ export type ImageGenJobUpdateInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -769,14 +752,12 @@ export type ImageGenJobUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutImageGenJobNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
   outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
@@ -798,7 +779,7 @@ export type ImageGenJobUncheckedUpdateInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -814,7 +795,6 @@ export type ImageGenJobUncheckedUpdateInput = {
 
 export type ImageGenJobCreateManyInput = {
   id?: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -836,7 +816,7 @@ export type ImageGenJobCreateManyInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -870,7 +850,7 @@ export type ImageGenJobUpdateManyMutationInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -885,7 +865,6 @@ export type ImageGenJobUpdateManyMutationInput = {
 
 export type ImageGenJobUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
@@ -907,7 +886,7 @@ export type ImageGenJobUncheckedUpdateManyInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -937,7 +916,6 @@ export type ImageGenJobNullableScalarRelationFilter = {
 
 export type ImageGenJobCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
   requestMessageId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -959,7 +937,7 @@ export type ImageGenJobCountOrderByAggregateInput = {
   outputCompression?: Prisma.SortOrder
   partialImagesRequested?: Prisma.SortOrder
   inputFidelity?: Prisma.SortOrder
-  personGenertion?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
   moderation?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   progress?: Prisma.SortOrder
@@ -988,7 +966,6 @@ export type ImageGenJobAvgOrderByAggregateInput = {
 
 export type ImageGenJobMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
   requestMessageId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -1010,7 +987,7 @@ export type ImageGenJobMaxOrderByAggregateInput = {
   outputCompression?: Prisma.SortOrder
   partialImagesRequested?: Prisma.SortOrder
   inputFidelity?: Prisma.SortOrder
-  personGenertion?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
   moderation?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   progress?: Prisma.SortOrder
@@ -1025,7 +1002,6 @@ export type ImageGenJobMaxOrderByAggregateInput = {
 
 export type ImageGenJobMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
   requestMessageId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -1047,7 +1023,7 @@ export type ImageGenJobMinOrderByAggregateInput = {
   outputCompression?: Prisma.SortOrder
   partialImagesRequested?: Prisma.SortOrder
   inputFidelity?: Prisma.SortOrder
-  personGenertion?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
   moderation?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   progress?: Prisma.SortOrder
@@ -1118,48 +1094,6 @@ export type ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput = {
   connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
   update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput[]
   updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput[]
-  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
-}
-
-export type ImageGenJobCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput> | Prisma.ImageGenJobCreateWithoutConversationInput[] | Prisma.ImageGenJobUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutConversationInput | Prisma.ImageGenJobCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.ImageGenJobCreateManyConversationInputEnvelope
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-}
-
-export type ImageGenJobUncheckedCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput> | Prisma.ImageGenJobCreateWithoutConversationInput[] | Prisma.ImageGenJobUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutConversationInput | Prisma.ImageGenJobCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.ImageGenJobCreateManyConversationInputEnvelope
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-}
-
-export type ImageGenJobUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput> | Prisma.ImageGenJobCreateWithoutConversationInput[] | Prisma.ImageGenJobUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutConversationInput | Prisma.ImageGenJobCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutConversationInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.ImageGenJobCreateManyConversationInputEnvelope
-  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutConversationInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutConversationInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
-}
-
-export type ImageGenJobUncheckedUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput> | Prisma.ImageGenJobCreateWithoutConversationInput[] | Prisma.ImageGenJobUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutConversationInput | Prisma.ImageGenJobCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutConversationInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.ImageGenJobCreateManyConversationInputEnvelope
-  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
-  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutConversationInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutConversationInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutConversationInput[]
   deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
 }
 
@@ -1234,7 +1168,7 @@ export type ImageGenJobCreateWithoutUserKeyInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1246,13 +1180,11 @@ export type ImageGenJobCreateWithoutUserKeyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  conversation: Prisma.ConversationCreateNestedOneWithoutImageGenJobInput
   outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutUserKeyInput = {
   id?: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -1273,7 +1205,7 @@ export type ImageGenJobUncheckedCreateWithoutUserKeyInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1318,7 +1250,6 @@ export type ImageGenJobScalarWhereInput = {
   OR?: Prisma.ImageGenJobScalarWhereInput[]
   NOT?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
   id?: Prisma.StringFilter<"ImageGenJob"> | string
-  conversationId?: Prisma.StringFilter<"ImageGenJob"> | string
   requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string
   provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
   model?: Prisma.StringFilter<"ImageGenJob"> | string
@@ -1340,7 +1271,7 @@ export type ImageGenJobScalarWhereInput = {
   outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
   inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
-  personGenertion?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
   progress?: Prisma.IntFilter<"ImageGenJob"> | number
@@ -1351,106 +1282,6 @@ export type ImageGenJobScalarWhereInput = {
   error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
-}
-
-export type ImageGenJobCreateWithoutConversationInput = {
-  id?: string
-  provider: $Enums.Provider
-  model: string
-  userId: string
-  keyFingerprint?: string | null
-  prompt: string
-  systemPrompt?: string | null
-  temperature?: number | null
-  topP?: number | null
-  nRequested?: number
-  nCompleted?: number
-  seed?: number | null
-  negativePrompt?: string | null
-  outputSize?: string | null
-  outputQuality?: string | null
-  outputFormat?: string | null
-  outputBackground?: string | null
-  outputCompression?: number | null
-  partialImagesRequested?: number | null
-  inputFidelity?: string | null
-  personGenertion?: string | null
-  moderation?: string | null
-  stage?: $Enums.ImageGenStage
-  progress?: number
-  etaSeconds?: number | null
-  durationMs?: number | null
-  usage?: number | null
-  revisedPrompt?: string | null
-  error?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
-  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
-}
-
-export type ImageGenJobUncheckedCreateWithoutConversationInput = {
-  id?: string
-  requestMessageId: string
-  provider: $Enums.Provider
-  model: string
-  userId: string
-  userKeyId?: string | null
-  keyFingerprint?: string | null
-  prompt: string
-  systemPrompt?: string | null
-  temperature?: number | null
-  topP?: number | null
-  nRequested?: number
-  nCompleted?: number
-  seed?: number | null
-  negativePrompt?: string | null
-  outputSize?: string | null
-  outputQuality?: string | null
-  outputFormat?: string | null
-  outputBackground?: string | null
-  outputCompression?: number | null
-  partialImagesRequested?: number | null
-  inputFidelity?: string | null
-  personGenertion?: string | null
-  moderation?: string | null
-  stage?: $Enums.ImageGenStage
-  progress?: number
-  etaSeconds?: number | null
-  durationMs?: number | null
-  usage?: number | null
-  revisedPrompt?: string | null
-  error?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput
-}
-
-export type ImageGenJobCreateOrConnectWithoutConversationInput = {
-  where: Prisma.ImageGenJobWhereUniqueInput
-  create: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput>
-}
-
-export type ImageGenJobCreateManyConversationInputEnvelope = {
-  data: Prisma.ImageGenJobCreateManyConversationInput | Prisma.ImageGenJobCreateManyConversationInput[]
-  skipDuplicates?: boolean
-}
-
-export type ImageGenJobUpsertWithWhereUniqueWithoutConversationInput = {
-  where: Prisma.ImageGenJobWhereUniqueInput
-  update: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutConversationInput, Prisma.ImageGenJobUncheckedUpdateWithoutConversationInput>
-  create: Prisma.XOR<Prisma.ImageGenJobCreateWithoutConversationInput, Prisma.ImageGenJobUncheckedCreateWithoutConversationInput>
-}
-
-export type ImageGenJobUpdateWithWhereUniqueWithoutConversationInput = {
-  where: Prisma.ImageGenJobWhereUniqueInput
-  data: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutConversationInput, Prisma.ImageGenJobUncheckedUpdateWithoutConversationInput>
-}
-
-export type ImageGenJobUpdateManyWithWhereWithoutConversationInput = {
-  where: Prisma.ImageGenJobScalarWhereInput
-  data: Prisma.XOR<Prisma.ImageGenJobUpdateManyMutationInput, Prisma.ImageGenJobUncheckedUpdateManyWithoutConversationInput>
 }
 
 export type ImageGenJobCreateWithoutRequestMessageInput = {
@@ -1474,7 +1305,7 @@ export type ImageGenJobCreateWithoutRequestMessageInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1485,14 +1316,12 @@ export type ImageGenJobCreateWithoutRequestMessageInput = {
   error?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  conversation: Prisma.ConversationCreateNestedOneWithoutImageGenJobInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
   outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutRequestMessageInput = {
   id?: string
-  conversationId: string
   provider: $Enums.Provider
   model: string
   userId: string
@@ -1513,7 +1342,7 @@ export type ImageGenJobUncheckedCreateWithoutRequestMessageInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1564,7 +1393,7 @@ export type ImageGenJobUpdateWithoutRequestMessageInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1575,14 +1404,12 @@ export type ImageGenJobUpdateWithoutRequestMessageInput = {
   error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutImageGenJobNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
   outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutRequestMessageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1603,7 +1430,7 @@ export type ImageGenJobUncheckedUpdateWithoutRequestMessageInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1638,7 +1465,7 @@ export type ImageGenJobCreateWithoutOutputsInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1650,13 +1477,11 @@ export type ImageGenJobCreateWithoutOutputsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  conversation: Prisma.ConversationCreateNestedOneWithoutImageGenJobInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutOutputsInput = {
   id?: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -1678,7 +1503,7 @@ export type ImageGenJobUncheckedCreateWithoutOutputsInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1728,7 +1553,7 @@ export type ImageGenJobUpdateWithoutOutputsInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1740,13 +1565,11 @@ export type ImageGenJobUpdateWithoutOutputsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutImageGenJobNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutOutputsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1768,7 +1591,7 @@ export type ImageGenJobUncheckedUpdateWithoutOutputsInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1783,7 +1606,6 @@ export type ImageGenJobUncheckedUpdateWithoutOutputsInput = {
 
 export type ImageGenJobCreateManyUserKeyInput = {
   id?: string
-  conversationId: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
@@ -1804,7 +1626,7 @@ export type ImageGenJobCreateManyUserKeyInput = {
   outputCompression?: number | null
   partialImagesRequested?: number | null
   inputFidelity?: string | null
-  personGenertion?: string | null
+  personGeneration?: string | null
   moderation?: string | null
   stage?: $Enums.ImageGenStage
   progress?: number
@@ -1838,7 +1660,7 @@ export type ImageGenJobUpdateWithoutUserKeyInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1850,13 +1672,11 @@ export type ImageGenJobUpdateWithoutUserKeyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutImageGenJobNestedInput
   outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutUserKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1877,7 +1697,7 @@ export type ImageGenJobUncheckedUpdateWithoutUserKeyInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1893,7 +1713,6 @@ export type ImageGenJobUncheckedUpdateWithoutUserKeyInput = {
 
 export type ImageGenJobUncheckedUpdateManyWithoutUserKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   model?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1914,153 +1733,7 @@ export type ImageGenJobUncheckedUpdateManyWithoutUserKeyInput = {
   outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
-  progress?: Prisma.IntFieldUpdateOperationsInput | number
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ImageGenJobCreateManyConversationInput = {
-  id?: string
-  requestMessageId: string
-  provider: $Enums.Provider
-  model: string
-  userId: string
-  userKeyId?: string | null
-  keyFingerprint?: string | null
-  prompt: string
-  systemPrompt?: string | null
-  temperature?: number | null
-  topP?: number | null
-  nRequested?: number
-  nCompleted?: number
-  seed?: number | null
-  negativePrompt?: string | null
-  outputSize?: string | null
-  outputQuality?: string | null
-  outputFormat?: string | null
-  outputBackground?: string | null
-  outputCompression?: number | null
-  partialImagesRequested?: number | null
-  inputFidelity?: string | null
-  personGenertion?: string | null
-  moderation?: string | null
-  stage?: $Enums.ImageGenStage
-  progress?: number
-  etaSeconds?: number | null
-  durationMs?: number | null
-  usage?: number | null
-  revisedPrompt?: string | null
-  error?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type ImageGenJobUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
-  progress?: Prisma.IntFieldUpdateOperationsInput | number
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
-  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
-  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
-}
-
-export type ImageGenJobUncheckedUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
-  progress?: Prisma.IntFieldUpdateOperationsInput | number
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput
-}
-
-export type ImageGenJobUncheckedUpdateManyWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  personGenertion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
   progress?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2106,7 +1779,6 @@ export type ImageGenJobCountOutputTypeCountOutputsArgs<ExtArgs extends runtime.T
 
 export type ImageGenJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  conversationId?: boolean
   requestMessageId?: boolean
   provider?: boolean
   model?: boolean
@@ -2128,7 +1800,7 @@ export type ImageGenJobSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   outputCompression?: boolean
   partialImagesRequested?: boolean
   inputFidelity?: boolean
-  personGenertion?: boolean
+  personGeneration?: boolean
   moderation?: boolean
   stage?: boolean
   progress?: boolean
@@ -2140,7 +1812,6 @@ export type ImageGenJobSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   updatedAt?: boolean
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
   outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs>
   _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs>
@@ -2148,7 +1819,6 @@ export type ImageGenJobSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type ImageGenJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  conversationId?: boolean
   requestMessageId?: boolean
   provider?: boolean
   model?: boolean
@@ -2170,7 +1840,7 @@ export type ImageGenJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   outputCompression?: boolean
   partialImagesRequested?: boolean
   inputFidelity?: boolean
-  personGenertion?: boolean
+  personGeneration?: boolean
   moderation?: boolean
   stage?: boolean
   progress?: boolean
@@ -2182,13 +1852,11 @@ export type ImageGenJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   createdAt?: boolean
   updatedAt?: boolean
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenJob"]>
 
 export type ImageGenJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  conversationId?: boolean
   requestMessageId?: boolean
   provider?: boolean
   model?: boolean
@@ -2210,7 +1878,7 @@ export type ImageGenJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   outputCompression?: boolean
   partialImagesRequested?: boolean
   inputFidelity?: boolean
-  personGenertion?: boolean
+  personGeneration?: boolean
   moderation?: boolean
   stage?: boolean
   progress?: boolean
@@ -2222,13 +1890,11 @@ export type ImageGenJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   createdAt?: boolean
   updatedAt?: boolean
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenJob"]>
 
 export type ImageGenJobSelectScalar = {
   id?: boolean
-  conversationId?: boolean
   requestMessageId?: boolean
   provider?: boolean
   model?: boolean
@@ -2250,7 +1916,7 @@ export type ImageGenJobSelectScalar = {
   outputCompression?: boolean
   partialImagesRequested?: boolean
   inputFidelity?: boolean
-  personGenertion?: boolean
+  personGeneration?: boolean
   moderation?: boolean
   stage?: boolean
   progress?: boolean
@@ -2263,22 +1929,19 @@ export type ImageGenJobSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ImageGenJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "requestMessageId" | "provider" | "model" | "userId" | "userKeyId" | "keyFingerprint" | "prompt" | "systemPrompt" | "temperature" | "topP" | "nRequested" | "nCompleted" | "seed" | "negativePrompt" | "outputSize" | "outputQuality" | "outputFormat" | "outputBackground" | "outputCompression" | "partialImagesRequested" | "inputFidelity" | "personGenertion" | "moderation" | "stage" | "progress" | "etaSeconds" | "durationMs" | "usage" | "revisedPrompt" | "error" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenJob"]>
+export type ImageGenJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestMessageId" | "provider" | "model" | "userId" | "userKeyId" | "keyFingerprint" | "prompt" | "systemPrompt" | "temperature" | "topP" | "nRequested" | "nCompleted" | "seed" | "negativePrompt" | "outputSize" | "outputQuality" | "outputFormat" | "outputBackground" | "outputCompression" | "partialImagesRequested" | "inputFidelity" | "personGeneration" | "moderation" | "stage" | "progress" | "etaSeconds" | "durationMs" | "usage" | "revisedPrompt" | "error" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenJob"]>
 export type ImageGenJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
   outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs>
   _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ImageGenJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }
 export type ImageGenJobIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }
 
@@ -2286,13 +1949,11 @@ export type $ImageGenJobPayload<ExtArgs extends runtime.Types.Extensions.Interna
   name: "ImageGenJob"
   objects: {
     requestMessage: Prisma.$MessagePayload<ExtArgs>
-    conversation: Prisma.$ConversationPayload<ExtArgs>
     userKey: Prisma.$UserKeyPayload<ExtArgs> | null
     outputs: Prisma.$ImageGenOutputPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    conversationId: string
     requestMessageId: string
     provider: $Enums.Provider
     model: string
@@ -2314,7 +1975,7 @@ export type $ImageGenJobPayload<ExtArgs extends runtime.Types.Extensions.Interna
     outputCompression: number | null
     partialImagesRequested: number | null
     inputFidelity: string | null
-    personGenertion: string | null
+    personGeneration: string | null
     moderation: string | null
     stage: $Enums.ImageGenStage
     progress: number
@@ -2720,7 +2381,6 @@ readonly fields: ImageGenJobFieldRefs;
 export interface Prisma__ImageGenJobClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   requestMessage<T extends Prisma.MessageDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MessageDefaultArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  conversation<T extends Prisma.ConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   userKey<T extends Prisma.ImageGenJob$userKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImageGenJob$userKeyArgs<ExtArgs>>): Prisma.Prisma__UserKeyClient<runtime.Types.Result.GetResult<Prisma.$UserKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   outputs<T extends Prisma.ImageGenJob$outputsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ImageGenJob$outputsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageGenOutputPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2753,7 +2413,6 @@ export interface Prisma__ImageGenJobClient<T, Null = never, ExtArgs extends runt
  */
 export interface ImageGenJobFieldRefs {
   readonly id: Prisma.FieldRef<"ImageGenJob", 'String'>
-  readonly conversationId: Prisma.FieldRef<"ImageGenJob", 'String'>
   readonly requestMessageId: Prisma.FieldRef<"ImageGenJob", 'String'>
   readonly provider: Prisma.FieldRef<"ImageGenJob", 'Provider'>
   readonly model: Prisma.FieldRef<"ImageGenJob", 'String'>
@@ -2775,7 +2434,7 @@ export interface ImageGenJobFieldRefs {
   readonly outputCompression: Prisma.FieldRef<"ImageGenJob", 'Int'>
   readonly partialImagesRequested: Prisma.FieldRef<"ImageGenJob", 'Int'>
   readonly inputFidelity: Prisma.FieldRef<"ImageGenJob", 'String'>
-  readonly personGenertion: Prisma.FieldRef<"ImageGenJob", 'String'>
+  readonly personGeneration: Prisma.FieldRef<"ImageGenJob", 'String'>
   readonly moderation: Prisma.FieldRef<"ImageGenJob", 'String'>
   readonly stage: Prisma.FieldRef<"ImageGenJob", 'ImageGenStage'>
   readonly progress: Prisma.FieldRef<"ImageGenJob", 'Int'>

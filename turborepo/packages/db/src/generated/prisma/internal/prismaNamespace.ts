@@ -2125,7 +2125,6 @@ export type DocumentMetadataScalarFieldEnum = (typeof DocumentMetadataScalarFiel
 
 export const ImageGenJobScalarFieldEnum = {
   id: 'id',
-  conversationId: 'conversationId',
   requestMessageId: 'requestMessageId',
   provider: 'provider',
   model: 'model',
@@ -2147,7 +2146,7 @@ export const ImageGenJobScalarFieldEnum = {
   outputCompression: 'outputCompression',
   partialImagesRequested: 'partialImagesRequested',
   inputFidelity: 'inputFidelity',
-  personGenertion: 'personGenertion',
+  personGeneration: 'personGeneration',
   moderation: 'moderation',
   stage: 'stage',
   progress: 'progress',

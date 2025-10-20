@@ -293,7 +293,6 @@ model Conversation {
   attachments          Attachment[]
   isShared             Boolean               @default(false)
   shareToken           String?               @unique
-  imageGenJob          ImageGenJob[]
   conversationSettings ConversationSettings?
 }
 
@@ -574,7 +573,6 @@ model DocumentMetadata {
 
 model ImageGenJob {
   id               String   @id @default(cuid(2))
-  conversationId   String
   requestMessageId String   @unique
   provider         Provider
   model            String
@@ -599,9 +597,9 @@ model ImageGenJob {
   outputBackground       String? // "transparent|opaque|auto"
   outputCompression      Int?
   partialImagesRequested Int? // 0..3 for gpt-image-1 streaming
-  inputFidelity          String?
-  personGenertion        String?
-  moderation             String?
+  inputFidelity          String? // gpt-image-1 only -> "high" | "low" (default) | undefined
+  personGeneration       String? // imagen google gen models only -> "dont_allow" | "allow_adult" (default) | "allow_all" | undefined
+  moderation             String? // (gpt-image-1 & gpt-image-1-mini) only -> "auto" (default) | "low" | undefined
 
   // Runtime status / progress
   stage         ImageGenStage @default(QUEUED)
@@ -617,11 +615,10 @@ model ImageGenJob {
 
   // Relations
   requestMessage Message          @relation("ImageGenJobToMessage", fields: [requestMessageId], references: [id], onDelete: Cascade)
-  conversation   Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   userKey        UserKey?         @relation("ImageGenJobToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
   outputs        ImageGenOutput[]
 
-  @@index([conversationId, createdAt])
+  @@index([requestMessageId, createdAt])
   @@index([provider, model, createdAt])
   @@index([stage, createdAt])
   @@index([userId, createdAt])
