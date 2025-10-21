@@ -308,6 +308,7 @@ export class OpenAIService extends ModelService {
           keyFingerprint,
           keyId ?? undefined
         );
+
         content.push({ type: "input_file", file_id });
       }
     }

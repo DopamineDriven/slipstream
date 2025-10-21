@@ -15,7 +15,7 @@ import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { GoogleGenAI, MediaResolution } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
@@ -486,7 +486,7 @@ export class GeminiService extends ModelService {
           retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
         },
         tools: [{ googleSearch: {} }, { urlContext: {} }],
-        topP,mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH,
+        topP,
         temperature,
         systemInstruction,
         thinkingConfig: { includeThoughts: true, thinkingBudget: -1 }

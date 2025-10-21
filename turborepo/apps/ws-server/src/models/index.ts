@@ -38,7 +38,7 @@ export class ModelService {
           )
         ) {
           return model;
-        } else return "grok-4" as const as NonNullable<K>;
+        } else return "grok-4-fast-reasoning" as const as NonNullable<K>;
       }
       case "anthropic": {
         if (
@@ -48,7 +48,7 @@ export class ModelService {
           )
         ) {
           return model;
-        } else return "claude-sonnet-4-20250514" as const as NonNullable<K>;
+        } else return "claude-haiku-4-5-20251001" as const as NonNullable<K>;
       }
       case "meta": {
         if (
@@ -79,7 +79,7 @@ export class ModelService {
           )
         ) {
           return model;
-        } else return "gpt-5-nano" as const as NonNullable<K>;
+        } else return "gpt-5-mini" as const as NonNullable<K>;
       }
     }
   };

@@ -1,6 +1,11 @@
 import type {
   BigIntToCompatProps,
+  Dalle2OutputSize,
+  Dalle3OutputSize,
+  GptImageOutputSize,
+  ImagenOutputSize,
   InferTopLevelMime,
+  NanoBananaOutputSize,
   UpdateAttachment,
   UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata,
@@ -243,10 +248,11 @@ export class PrismaService extends ModelService {
     if (
       typeof data?.background !== "undefined" &&
       typeof data?.format !== "undefined" &&
-      data.format !== "jpeg"
+      data.format !== "jpeg" &&
+      /^(transparent|opaque|auto)$/gm.test(data.background)
     ) {
       return data?.background;
-    } else return undefined;
+    } else return "auto";
   }
 
   /**
@@ -260,8 +266,7 @@ export class PrismaService extends ModelService {
     }
   ) {
     if (provider !== "openai") return undefined;
-    if (!model) return undefined;
-    if (model !== "gpt-image-1") return undefined;
+    if (!(model === "gpt-image-1")) return undefined;
     const iF = data?.input_fidelity as "low" | "high" | undefined;
     if (typeof iF !== "undefined" && /^(low|high)$/gm.test(iF)) {
       return iF;
@@ -424,19 +429,19 @@ export class PrismaService extends ModelService {
   ) {
     if (provider !== "openai") return undefined;
     if (typeof model === "undefined") return undefined;
-    if (model === "gpt-image-1" || model === "gpt-image-1-mini") {
-      if (typeof data?.partialImagesRequested !== "undefined") {
-        if (
-          data.partialImagesRequested >= 0 &&
-          data.partialImagesRequested <= 3
-        ) {
-          return data.partialImagesRequested;
-        }
-        if (data.partialImagesRequested > 3) {
-          return 3;
-        } else return 0;
+    if (!(model === "gpt-image-1" || model === "gpt-image-1-mini"))
+      return undefined;
+    if (typeof data?.partialImagesRequested !== "undefined") {
+      if (
+        data.partialImagesRequested >= 0 &&
+        data.partialImagesRequested <= 3
+      ) {
+        return data.partialImagesRequested;
+      }
+      if (data.partialImagesRequested > 3) {
+        return 3;
       } else return 0;
-    }
+    } else return 0;
   }
 
   private handleOutputSize(
@@ -446,12 +451,7 @@ export class PrismaService extends ModelService {
     let os;
     if (model === "grok-2-image-1212") return undefined;
     else if (model === "dall-e-2") {
-      os = data?.output_size as
-        | "256x256"
-        | "512x512"
-        | "1024x1024"
-        | "auto"
-        | undefined;
+      os = data?.output_size as Dalle2OutputSize;
       if (
         typeof os !== "undefined" &&
         /^(256x256|512x512|1024x1024|auto)$/gm.test(os)
@@ -459,12 +459,7 @@ export class PrismaService extends ModelService {
         return os;
       } else return "auto";
     } else if (model === "dall-e-3") {
-      os = data?.output_size as
-        | "1024x1024"
-        | "1792x1024"
-        | "1024x1792"
-        | "auto"
-        | undefined;
+      os = data?.output_size as Dalle3OutputSize;
       if (
         typeof os !== "undefined" &&
         /^(1792x1024|1024x1792|1024x1024|auto)$/gm.test(os)
@@ -472,18 +467,7 @@ export class PrismaService extends ModelService {
         return os;
       } else return "auto";
     } else if (model === "gemini-2.5-flash-image") {
-      os = data?.output_size as
-        | "1:1"
-        | "2:3"
-        | "3:2"
-        | "3:4"
-        | "4:3"
-        | "4:5"
-        | "5:4"
-        | "9:16"
-        | "16:9"
-        | "21:9"
-        | undefined;
+      os = data?.output_size as NanoBananaOutputSize;
       if (
         typeof os !== "undefined" &&
         /^(1:1|2:3|3:2|3:4|4:3|4:5|5:4|9:16|16:9|21:9)$/gm.test(os)
@@ -491,12 +475,7 @@ export class PrismaService extends ModelService {
         return os;
       } else return "1:1";
     } else if (model === "gpt-image-1" || model === "gpt-image-1-mini") {
-      os = data?.output_size as
-        | "1024x1024"
-        | "1536x1024"
-        | "1024x1536"
-        | "auto"
-        | undefined;
+      os = data?.output_size as GptImageOutputSize;
       if (
         typeof os !== "undefined" &&
         /^(1536x1024|1024x1536|1024x1024|auto)$/gm.test(os)
@@ -504,13 +483,7 @@ export class PrismaService extends ModelService {
         return os;
       } else return "1:1";
     } else {
-      os = data?.output_size as
-        | "1:1"
-        | "9:16"
-        | "16:9"
-        | "3:4"
-        | "4:3"
-        | undefined;
+      os = data?.output_size as ImagenOutputSize;
       if (typeof os !== "undefined" && /^(1:1|3:4|4:3|9:16|16:9)$/gm.test(os)) {
         return os;
       } else return "1:1";
