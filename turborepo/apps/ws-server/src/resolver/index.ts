@@ -1,6 +1,11 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
-import type { BufferLike, UserData } from "@/types/index.ts";
+import type {
+  BigIntToCompatProps,
+  BufferLike,
+  UserData
+} from "@/types/index.ts";
+import OpenAI from "openai";
 import { AnthropicService } from "@/anthropic/index.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
@@ -138,28 +143,87 @@ export class Resolver extends ModelService {
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
   }
-  private async titleGenUtil({
-    prompt,
-    provider
-  }: EventTypeMap["ai_chat_request" | "image_gen_request"]) {
-    const openai = this.openai.getClient();
-    try {
-      const turbo = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        store: false,
-        messages: [
-          {
-            role: "system",
-            content: `Generate a concise, descriptive title (max 10 words) for this user-submitted-prompt: "${prompt}". Do **not** wrap the generated title in quotes.`
-          }
-        ]
-      });
-      const title =
-        turbo.choices?.[0]?.message?.content ?? this.formatProvider(provider);
+  private async titleGenUtil<
+    const T extends "ai_chat_request" | "image_gen_request"
+  >(
+    type: T,
+    {
+      messages,
+      prompt
+    }: BigIntToCompatProps<typeof type>["rt"] & {
+      prompt: string;
+    }
+  ) {
+    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
+    const msgs = messages?.[0];
 
+    const openai = this.openai.getClient();
+
+    if (msgs?.attachments) {
+      for (const t of msgs.attachments) {
+        if (typeof t !== "undefined") {
+          const {
+            mime,
+            compatMime,
+            compatCdnUrl,
+            compatStatus,
+            cdnUrl,
+            assetType
+          } = t;
+          if (compatStatus != null && cdnUrl != null && mime != null) {
+            const file_url =
+              compatStatus === "ACTIVE" && compatCdnUrl != null
+                ? compatCdnUrl
+                : cdnUrl;
+            const mimeType =
+              compatStatus === "ACTIVE" && compatMime != null
+                ? compatMime
+                : mime;
+            if (mimeType === "application/pdf" && assetType === "DOCUMENT") {
+              content.push({ type: "input_file", file_url });
+            }
+            if (mimeType.startsWith("image") && assetType === "IMAGE") {
+              content.push({
+                type: "input_image",
+                image_url: file_url,
+                detail: "auto"
+              });
+            }
+          }
+        }
+        break;
+      }
+      content.push({ type: "input_text", text: msgs.content });
+      try {
+        const res = await openai.responses.create({
+          model: "gpt-5-mini",
+          store: false,
+          reasoning: { effort: "minimal" },
+          instructions: `Generate a creative & descriptive yet concise title (max 12 words) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+          temperature: 1,
+          input: [{ role: "user", content } as const]
+        });
+        const title = res.output_text;
+        console.log(`1. ` + title);
+        return this.sanitizeTitle(title);
+      } catch {
+        /**fall through */
+      }
+    }
+    content.push({ type: "input_text", text: prompt });
+    try {
+      const res = await openai.responses.create({
+        model: "gpt-5-mini",
+        store: false,
+        instructions: `Generate a creative & descriptive yet concise title (max 12 words) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+        temperature: 1,
+        input: [{ role: "user", content } as const]
+      });
+      const title = res.output_text;
+      console.log(`2. ` + title);
       return this.sanitizeTitle(title);
-    } catch (err) {
-      console.warn(err);
+    } catch {
+      /**fall through */
     }
   }
 
@@ -291,7 +355,12 @@ export class Resolver extends ModelService {
       thinkingAgg = "",
       thinkingDuration = 0;
 
-    const title = res?.title ?? (await this.titleGenUtil(event));
+    const title =
+      res?.title ??
+      (await this.titleGenUtil("ai_chat_request", {
+        prompt: event.prompt,
+        ...res
+      }));
 
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
@@ -453,7 +522,6 @@ export class Resolver extends ModelService {
     userId: string,
     userData?: UserData
   ) {
-    const _userData = userData;
     const provider = event.provider,
       model = this.getModel(
         provider,
@@ -461,38 +529,15 @@ export class Resolver extends ModelService {
       ),
       topP = event.topP,
       temperature = event.temperature,
-      systemPrompt = event.systemPrompt,
-      max_tokens = event.maxTokens,
-      hasProviderConfigured = event.hasProviderConfigured,
-      isDefaultProvider = event.isDefaultProvider,
-      prompt = event.prompt,
-      conversationIdInitial = event.conversationId,
-      batchId = event.batchId,
-      _n = event?.n ?? 1,
-      _seed = event?.seed,
-      _moderation = event?.moderation,
-      _negative_prompt = event.negativePrompt,
-      _output_format = event?.output_format,
-      _output_quality = event?.output_quality,
-      _output_compression = event?.output_compression,
-      _output_background = event?.output_background,
-      _output_partial_images = event?.output_partial_images,
-      _output_size = event?.output_size;
+      systemPrompt = event.systemPrompt;
 
-    const res = await this.wsServer.prisma.handleAiChatRequest({
+    const { type: _type, model: _m, ...rest } = event,
+      isNewChat = rest.conversationId.startsWith("new-chat");
+
+    const res = await this.wsServer.prisma.handleImageGenRequest({
       userId,
-      batchId,
-      conversationId: conversationIdInitial,
-      prompt,
-      provider,
-      hasProviderConfigured,
-      maxTokens: max_tokens,
-      isDefaultProvider,
-      systemPrompt,
-      temperature,
-      topP,
       model,
-      metadata: userData
+      ...rest
     });
 
     const _user_location = {
@@ -500,19 +545,29 @@ export class Resolver extends ModelService {
       city: userData?.city ?? "Barrington",
       country: userData?.country ?? "US",
       region: userData?.region ?? "Illinois",
-      timezone: userData?.tz ?? "America/Chicago"
+      timezone: userData?.tz
+        ? decodeURIComponent(userData?.tz)
+        : "America/Chicago"
     } as const;
 
-    const _isNewChat = conversationIdInitial.startsWith("new-chat"),
-      _msgs = res.messages satisfies MessageSingleton<true>[],
+    const _msgs = res.messages,
       conversationId = res.id,
       // apiKey = res.apiKey ?? undefined,
       // keyId = res.userKeyId,
       streamChannel = RedisChannels.conversationStream(conversationId),
       // userChannel = RedisChannels.user(userId),
-      existingState = await this.wsServer.redis.getStreamState(conversationId);
-    // createdAt = res.createdAt,
-    // title = res?.title ?? (await this.titleGenUtil(event));
+      existingState = await this.wsServer.redis.getStreamState(conversationId),
+      // createdAt = res.createdAt,
+      _title = isNewChat
+        ? await this.titleGenUtil("image_gen_request", {
+            prompt: event.prompt,
+            ...res
+          })
+        : (res.title ??
+          (await this.titleGenUtil("image_gen_request", {
+            prompt: event.prompt,
+            ...res
+          })));
 
     let chunks = Array.of<string>(),
       // thinkingChunks = Array.of<string>(),

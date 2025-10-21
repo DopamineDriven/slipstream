@@ -9,11 +9,11 @@
     "declarationMap": true,
     "importHelpers": false,
     "incremental": true,
-    "module": "node18",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "sourceMap": true,
-    "target": "esnext",
+    "target": "ESNext",
     "useDefineForClassFields": true
   }
 }

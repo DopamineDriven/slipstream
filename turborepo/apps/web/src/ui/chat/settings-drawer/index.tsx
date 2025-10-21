@@ -8,7 +8,6 @@ import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { ApiKeysTab } from "@/ui/api-key-settings";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
@@ -17,7 +16,7 @@ import {
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
 import { useSession } from "@/utils/auth-client";
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger, X } from "@slipstream/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@slipstream/ui";
 
 export function SettingsDrawer({ initialData, initUser }: { initialData?: ClientWorkupProps; initUser?: User }) {
   const { data: session, isPending } = useSession();
@@ -33,46 +32,38 @@ export function SettingsDrawer({ initialData, initUser }: { initialData?: Client
   const user = (initUser ?? session?.user) satisfies User | undefined;
   return (
     <Drawer open={isOpen} onOpenChange={open => !open && close()}>
-      <DrawerContent className="bg-brand-component border-brand-border text-brand-text flex h-[90vh] flex-col">
-        <div className="mx-auto flex w-full max-w-md flex-grow flex-col overflow-hidden">
-          <DrawerHeader className="flex shrink-0 items-center justify-between">
+      <DrawerContent className=" bg-blend-luminosity bg-radial from-25% from-background/90 via-35% via-muted-foreground/40 to-background/90 to-50%  backdrop-blur-sm border-foreground/55 text-foreground/80 font-basis flex h-[90vh] flex-col">
+        <div className="mx-auto flex w-full max-w-md sm:max-w-xl flex-grow flex-col overflow-x-hidden">
+          <DrawerHeader className="flex shrink-0 items-center justify-between bg-transparent">
             <div>
-              <DrawerTitle className="text-brand-text-emphasis">
+              <DrawerTitle className="text-foreground text-2xl">
                 Settings
               </DrawerTitle>
-              <DrawerDescription className="text-brand-text-muted">
-                Manage your preferences and account.
+              <DrawerDescription className="sr-only">
+                Manage your ApiKeys.
               </DrawerDescription>
             </div>
-            <DrawerClose asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-brand-text-muted hover:text-brand-text">
-                <X className="h-5 w-5" />
-              </Button>
-            </DrawerClose>
           </DrawerHeader>
           {isPending ? (
             <div className="p-4">
               <div className="h-12 w-full">Loading...</div>
             </div>
           ) : (
-            <ScrollArea className="flex-grow p-4">
-              <div className="space-y-4">
+            <ScrollArea className="flex-grow px-4">
+              <div className="space-y-2">
                 <Tabs
                   value={activeTab}
                   onValueChange={v => setActiveTab(v as typeof activeTab)}
                   className="w-full">
-                  <TabsList className="bg-brand-sidebar border-brand-border grid w-full grid-cols-2 border">
-                    <TabsTrigger value="apiKeys">API Keys</TabsTrigger>
+                  <TabsList className="bg-background/40 border-foreground/45 grid w-full grid-cols-2 border">
+                    <TabsTrigger  value="apiKeys">API Keys</TabsTrigger>
                     <TabsTrigger value="account">Profile</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="apiKeys" className="mt-4">
+                  <TabsContent value="apiKeys" className="my-auto">
                     <ApiKeysTab
                       initialData={effectiveInitialData}
                       user={user}
-                      className="bg-brand-background border-brand-border rounded-lg p-4"
+                      className="bg-background/40 border-brand-border"
                     />
                   </TabsContent>
                   <TabsContent value="account" className="mt-4">

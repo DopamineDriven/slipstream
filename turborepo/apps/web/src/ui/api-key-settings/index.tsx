@@ -476,10 +476,10 @@ export function ApiKeysTab({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className={cn("w-full", className)}>
-        <Card className="bg-brand-component border-brand-border text-brand-text mx-auto w-full max-w-full overflow-hidden sm:mx-0">
+        <Card className="bg-background/40 backdrop-blur-xs border-foreground/25 text-foreground/90 font-basis mx-auto w-full max-w-full overflow-hidden sm:mx-0">
           <CardHeader className="">
-            <CardTitle className="text-brand-text-emphasis">BYOK</CardTitle>
-            <CardDescription className="text-brand-text-muted text-xs tracking-tight sm:text-sm">
+            <CardTitle className="text-foreground/95 text-xl">BYOK</CardTitle>
+            <CardDescription className="text-foreground-muted text-xs tracking-tight sm:text-base">
               {CARD_HEADER_TEXT}
             </CardDescription>
           </CardHeader>
@@ -488,9 +488,9 @@ export function ApiKeysTab({
             {/* Configured Providers Section */}
             {apiKeys.filter(key => key.isSet).length > 0 && (
               <div className="space-y-4">
-                <div className="text-brand-text-muted text-sm font-medium">
+                <h3 className="text-brand-text-muted text-sm font-medium sr-only">
                   Configured Providers
-                </div>
+                </h3>
                 <AnimatePresence mode="popLayout">
                   {apiKeys
                     .filter(key => key.isSet)
@@ -503,15 +503,15 @@ export function ApiKeysTab({
                         transition={{ duration: 0.3 }}
                         className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <keyData.icon className="h-5 w-5 flex-shrink-0" />
-                            <span className="text-brand-text text-sm font-medium">
+                          <div className="flex items-center space-x-2 relative">
+                            <keyData.icon className="size-4 flex-shrink-0" />
+                            <span className="text-foreground text-sm font-medium">
                               {keyData.text}
                             </span>
-                            <div className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500" />
+                            <div className="size-1.5 flex-shrink-0 rounded-full bg-green-600 motion-safe:animate-twinkle" />
                             {keyData.isDefault && (
-                              <span className="flex-shrink-0 rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
-                                Default
+                              <span className="flex-shrink-0 rounded-2xl bg-foreground/20 text-foreground/80 bg-clip-border px-1 py-0.5 text-xxs sr-only ">
+                                default
                               </span>
                             )}
                           </div>
@@ -567,7 +567,7 @@ export function ApiKeysTab({
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel className="bg-brand-sidebar border-brand-border text-brand-text hover:bg-brand-primary/20">
+                                  <AlertDialogCancel className="">
                                     Cancel
                                   </AlertDialogCancel>
                                   <AlertDialogAction

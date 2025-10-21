@@ -12,11 +12,46 @@ export type UpdateAttachment = CTR<
   "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
 >;
 
-export type ImgGenModeration = {
-  openai?: "low" | "auto" | undefined;
-  gemini?: "dont_allow" | "allow_adult" | "allow_all" | undefined;
-  grok?: undefined;
-};
+export type NanoBananaOutputSize =
+  | "1:1"
+  | "2:3"
+  | "3:2"
+  | "3:4"
+  | "4:3"
+  | "4:5"
+  | "5:4"
+  | "9:16"
+  | "16:9"
+  | "21:9"
+  | undefined;
+
+export type GptImageOutputSize =
+  | "1024x1024"
+  | "1536x1024"
+  | "1024x1536"
+  | "auto"
+  | undefined;
+
+export type Dalle3OutputSize =
+  | "1024x1024"
+  | "1792x1024"
+  | "1024x1792"
+  | "auto"
+  | undefined;
+
+export type Dalle2OutputSize =
+  | "256x256"
+  | "512x512"
+  | "1024x1024"
+  | "auto"
+  | undefined;
+export type ImagenOutputSize =
+  | "1:1"
+  | "9:16"
+  | "16:9"
+  | "3:4"
+  | "4:3"
+  | undefined;
 
 export type BigIntToCompatProps<
   T extends "image_gen_request" | "ai_chat_request"
@@ -29,162 +64,6 @@ export type BigIntToCompatProps<
       props: ConversationSingleton<false>;
       rt: ConversationSingleton<true>;
     };
-
-export type ImageGenReqDbRes<T extends boolean = false> = {
-  messages: ({
-    attachments: ({
-      image: {
-        createdAt: Date;
-        updatedAt: Date;
-        format: $Enums.ImageFormat;
-        attachmentId: string;
-        width: number;
-        height: number;
-        aspectRatio: number | null;
-        frames: number;
-        hasAlpha: boolean | null;
-        animated: boolean;
-        orientation: number | null;
-        colorSpace: $Enums.ColorSpace | null;
-        exifDateTimeOriginal: Date | null;
-        cameraMake: string | null;
-        cameraModel: string | null;
-        lensModel: string | null;
-        gpsLat: number | null;
-        gpsLon: number | null;
-        dominantColorHex: string | null;
-        iccProfile: string | null;
-      } | null;
-      document: DocumentSingleton | null;
-    } & {
-      id: string;
-      userId: string;
-      createdAt: Date;
-      updatedAt: Date;
-      conversationId: string | null;
-      batchId: string | null;
-      draftId: string | null;
-      messageId: string | null;
-      s3ObjectId: string | null;
-      origin: $Enums.AssetOrigin;
-      status: $Enums.AssetStatus;
-      uploadMethod: $Enums.UploadMethod;
-      assetType: $Enums.AssetType;
-      uploadDuration: number | null;
-      cdnUrl: string | null;
-      publicUrl: string | null;
-      sourceUrl: string | null;
-      thumbnailKey: string | null;
-      compatMime: string | null;
-      compatExt: string | null;
-      compatVersionId: string | null;
-      compatKey: string | null;
-      compatS3ObjectId: string | null;
-      compatStatus: $Enums.CompatStatus | null;
-      compatReadyAt: Date | null;
-      compatCdnUrl: string | null;
-      bucket: string;
-      key: string;
-      versionId: string | null;
-      region: string;
-      cacheControl: string | null;
-      contentDisposition: string | null;
-      contentEncoding: string | null;
-      expiresAt: Date | null;
-      size: BigIntOrNumber<T> | null;
-      filename: string | null;
-      ext: string | null;
-      mime: string | null;
-      etag: string | null;
-      checksumAlgo: $Enums.ChecksumAlgo;
-      checksumSha256: string | null;
-      storageClass: string | null;
-      sseAlgorithm: string | null;
-      sseKmsKeyId: string | null;
-      s3LastModified: Date | null;
-      deletedAt: Date | null;
-    })[];
-    imageGenJob: {
-      id: string;
-      userId: string;
-      provider: $Enums.Provider;
-      createdAt: Date;
-      updatedAt: Date;
-      userKeyId: string | null;
-      prompt: string;
-      model: string;
-      systemPrompt: string | null;
-      temperature: number | null;
-      topP: number | null;
-      moderation: string | null;
-      negativePrompt: string | null;
-      personGeneration: string | null;
-      seed: number | null;
-      partialImagesRequested: number | null;
-      keyFingerprint: string | null;
-      nRequested: number;
-      nCompleted: number;
-      outputSize: string | null;
-      outputQuality: string | null;
-      outputFormat: string | null;
-      outputBackground: string | null;
-      outputCompression: number | null;
-      inputFidelity: string | null;
-      stage: $Enums.ImageGenStage;
-      progress: number;
-      etaSeconds: number | null;
-      durationMs: number | null;
-      usage: number | null;
-      revisedPrompt: string | null;
-      error: string | null;
-      requestMessageId: string;
-    } | null;
-  } & {
-    id: string;
-    userId: string | null;
-    provider: $Enums.Provider;
-    createdAt: Date;
-    updatedAt: Date;
-    userKeyId: string | null;
-    conversationId: string;
-    model: string | null;
-    senderType: $Enums.SenderType;
-    content: string;
-    thinkingText: string | null;
-    thinkingDuration: number | null;
-    liked: boolean | null;
-    disliked: boolean | null;
-    tryAgain: boolean | null;
-  })[];
-  conversationSettings: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    conversationId: string;
-    systemPrompt: string | null;
-    temperature: number | null;
-    topP: number | null;
-    maxTokens: number | null;
-    enableThinking: boolean | null;
-    trackUsage: boolean | null;
-    enableWebSearch: boolean | null;
-    enableAssetGen: boolean | null;
-    reasoningEffort: $Enums.ReasoningEffort | null;
-    outputVerbosity: $Enums.OutputVerbosity | null;
-    usageAlerts: boolean | null;
-  } | null;
-  id: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userKeyId: string | null;
-  title: string | null;
-  branchId: string | null;
-  parentId: string | null;
-  isShared: boolean;
-  shareToken: string | null;
-  apiKey: string | null;
-};
 
 export type UpdateAttachmentMetadata = {
   img?:
@@ -314,6 +193,20 @@ export type BufferLike =
   | { valueOf(): readonly number[] }
   | { valueOf(): string }
   | { [Symbol.toPrimitive](hint: string): string };
+
+export type SSEBufferLike =
+  | string
+  | Buffer
+  | BufferSource
+  | ArrayBufferLike
+  | ArrayBufferView
+  | Blob
+  | ArrayLike<number>
+  | readonly (Uint8Array | Buffer)[]
+  | {
+      valueOf(): string | ArrayBufferLike | ArrayBufferView | ArrayLike<number>;
+    }
+  | { [Symbol.toPrimitive](hint: "string" | "number" | "default"): string };
 
 export interface ProviderChatRequestEntity {
   isNewChat: boolean;
@@ -646,3 +539,159 @@ export type Signals =
   | "SIGWINCH"
   | "SIGXCPU"
   | "SIGXFSZ";
+
+export type ImageGenReqDbRes<T extends boolean = false> = {
+  messages: ({
+    attachments: ({
+      image: {
+        createdAt: Date;
+        updatedAt: Date;
+        format: $Enums.ImageFormat;
+        attachmentId: string;
+        width: number;
+        height: number;
+        aspectRatio: number | null;
+        frames: number;
+        hasAlpha: boolean | null;
+        animated: boolean;
+        orientation: number | null;
+        colorSpace: $Enums.ColorSpace | null;
+        exifDateTimeOriginal: Date | null;
+        cameraMake: string | null;
+        cameraModel: string | null;
+        lensModel: string | null;
+        gpsLat: number | null;
+        gpsLon: number | null;
+        dominantColorHex: string | null;
+        iccProfile: string | null;
+      } | null;
+      document: DocumentSingleton | null;
+    } & {
+      id: string;
+      userId: string;
+      createdAt: Date;
+      updatedAt: Date;
+      conversationId: string | null;
+      batchId: string | null;
+      draftId: string | null;
+      messageId: string | null;
+      s3ObjectId: string | null;
+      origin: $Enums.AssetOrigin;
+      status: $Enums.AssetStatus;
+      uploadMethod: $Enums.UploadMethod;
+      assetType: $Enums.AssetType;
+      uploadDuration: number | null;
+      cdnUrl: string | null;
+      publicUrl: string | null;
+      sourceUrl: string | null;
+      thumbnailKey: string | null;
+      compatMime: string | null;
+      compatExt: string | null;
+      compatVersionId: string | null;
+      compatKey: string | null;
+      compatS3ObjectId: string | null;
+      compatStatus: $Enums.CompatStatus | null;
+      compatReadyAt: Date | null;
+      compatCdnUrl: string | null;
+      bucket: string;
+      key: string;
+      versionId: string | null;
+      region: string;
+      cacheControl: string | null;
+      contentDisposition: string | null;
+      contentEncoding: string | null;
+      expiresAt: Date | null;
+      size: BigIntOrNumber<T> | null;
+      filename: string | null;
+      ext: string | null;
+      mime: string | null;
+      etag: string | null;
+      checksumAlgo: $Enums.ChecksumAlgo;
+      checksumSha256: string | null;
+      storageClass: string | null;
+      sseAlgorithm: string | null;
+      sseKmsKeyId: string | null;
+      s3LastModified: Date | null;
+      deletedAt: Date | null;
+    })[];
+    imageGenJob: {
+      id: string;
+      userId: string;
+      provider: $Enums.Provider;
+      createdAt: Date;
+      updatedAt: Date;
+      userKeyId: string | null;
+      prompt: string;
+      model: string;
+      systemPrompt: string | null;
+      temperature: number | null;
+      topP: number | null;
+      moderation: string | null;
+      negativePrompt: string | null;
+      personGeneration: string | null;
+      seed: number | null;
+      partialImagesRequested: number | null;
+      keyFingerprint: string | null;
+      nRequested: number;
+      nCompleted: number;
+      outputSize: string | null;
+      outputQuality: string | null;
+      outputFormat: string | null;
+      outputBackground: string | null;
+      outputCompression: number | null;
+      inputFidelity: string | null;
+      stage: $Enums.ImageGenStage;
+      progress: number;
+      etaSeconds: number | null;
+      durationMs: number | null;
+      usage: number | null;
+      revisedPrompt: string | null;
+      error: string | null;
+      requestMessageId: string;
+    } | null;
+  } & {
+    id: string;
+    userId: string | null;
+    provider: $Enums.Provider;
+    createdAt: Date;
+    updatedAt: Date;
+    userKeyId: string | null;
+    conversationId: string;
+    model: string | null;
+    senderType: $Enums.SenderType;
+    content: string;
+    thinkingText: string | null;
+    thinkingDuration: number | null;
+    liked: boolean | null;
+    disliked: boolean | null;
+    tryAgain: boolean | null;
+  })[];
+  conversationSettings: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    conversationId: string;
+    systemPrompt: string | null;
+    temperature: number | null;
+    topP: number | null;
+    maxTokens: number | null;
+    enableThinking: boolean | null;
+    trackUsage: boolean | null;
+    enableWebSearch: boolean | null;
+    enableAssetGen: boolean | null;
+    reasoningEffort: $Enums.ReasoningEffort | null;
+    outputVerbosity: $Enums.OutputVerbosity | null;
+    usageAlerts: boolean | null;
+  } | null;
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userKeyId: string | null;
+  title: string | null;
+  branchId: string | null;
+  parentId: string | null;
+  isShared: boolean;
+  shareToken: string | null;
+  apiKey: string | null;
+};
