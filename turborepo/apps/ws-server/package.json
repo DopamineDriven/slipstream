@@ -29,6 +29,9 @@
       "meta": [
         "dist/meta/index.d.ts"
       ],
+      "mixins": [
+        "src/mixins/index.d.ts"
+      ],
       "models": [
         "dist/models/index.d.ts"
       ],
@@ -40,6 +43,9 @@
       ],
       "prisma": [
         "dist/prisma/index.d.ts"
+      ],
+      "providers": [
+        "src/providers/index.d.ts"
       ],
       "resolver": [
         "dist/resolver/index.d.ts"
@@ -80,19 +86,19 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.67.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.913.0",
-    "@aws-sdk/client-secrets-manager": "^3.913.0",
-    "@aws-sdk/credential-providers": "^3.913.0",
-    "@aws-sdk/s3-request-presigner": "^3.913.0",
-    "@aws-sdk/types": "^3.910.0",
+    "@aws-sdk/client-s3": "^3.914.0",
+    "@aws-sdk/client-secrets-manager": "^3.914.0",
+    "@aws-sdk/credential-providers": "^3.914.0",
+    "@aws-sdk/s3-request-presigner": "^3.914.0",
+    "@aws-sdk/types": "^3.914.0",
     "@d0paminedriven/fs": "^7.6.0",
-    "@google/genai": "^1.25.0",
+    "@google/genai": "^1.26.0",
     "@napi-rs/canvas": "^0.1.80",
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/exporter-prometheus": "^0.206.0",
-    "@opentelemetry/instrumentation-http":"^0.206.0",
-    "@opentelemetry/sdk-metrics": "^2.1.0",
-    "@opentelemetry/sdk-node": "^0.206.0",
+    "@opentelemetry/exporter-prometheus": "^0.207.0",
+    "@opentelemetry/instrumentation-http": "^0.207.0",
+    "@opentelemetry/sdk-metrics": "^2.2.0",
+    "@opentelemetry/sdk-node": "^0.207.0",
     "@slipstream/credentials": "workspace:*",
     "@slipstream/db": "workspace:*",
     "@slipstream/encryption": "workspace:*",
@@ -101,7 +107,7 @@
     "@slipstream/redis-service": "workspace:*",
     "@slipstream/storage-s3": "workspace:*",
     "@slipstream/types": "workspace:*",
-    "@types/node": "^24.8.1",
+    "@types/node": "^24.9.1",
     "@types/pg": "^8.15.5",
     "@types/ws": "^8.18.1",
     "bullmq": "^5.61.0",
@@ -110,7 +116,7 @@
     "dotenv-expand": "^12.0.3",
     "llama-api-client": "^0.3.0",
     "node-html-parser": "^7.0.1",
-    "openai": "^6.5.0",
+    "openai": "^6.6.0",
     "p-limit": "^7.2.0",
     "pg": "^8.16.3",
     "pino": "^10.1.0",
@@ -135,10 +141,10 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "terser": "^5.44.0",
-    "tsdown": "^0.15.8",
+    "tsdown": "^0.15.9",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
-    "typescript-eslint": "^8.46.1",
+    "typescript-eslint": "^8.46.2",
     "wait-on": "^9.0.1"
   }
 }

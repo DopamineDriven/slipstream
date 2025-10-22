@@ -6,15 +6,10 @@ import type {
   UserData
 } from "@/types/index.ts";
 import OpenAI from "openai";
-import { AnthropicService } from "@/anthropic/index.ts";
 import { ExtractService } from "@/extract/index.ts";
-import { GeminiService } from "@/gemini/index.ts";
-import { LlamaService } from "@/meta/index.ts";
 import { ModelService } from "@/models/index.ts";
-import { OpenAIService } from "@/openai/index.ts";
-import { v0Service } from "@/vercel/index.ts";
+import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import { xAIService } from "@/xai/index.ts";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -37,14 +32,9 @@ import { S3Storage } from "@slipstream/storage-s3";
 export class Resolver extends ModelService {
   constructor(
     public wsServer: WSServer,
-    private openai: OpenAIService,
-    private geminiService: GeminiService,
-    private anthropicService: AnthropicService,
+    private providers: ProviderService,
     private s3Service: S3Storage,
     private region: string,
-    private xAIService: xAIService,
-    private v0Service: v0Service,
-    private llamaService: LlamaService,
     private isProd: boolean,
     private extract: ExtractService
   ) {
@@ -157,7 +147,8 @@ export class Resolver extends ModelService {
     const content = Array.of<OpenAI.Responses.ResponseInputContent>();
     const msgs = messages?.[0];
 
-    const openai = this.openai.getClient();
+    const openaiSvc = this.providers.getInstance("openai");
+    const openai = openaiSvc.getClient();
 
     if (msgs?.attachments) {
       for (const t of msgs.attachments) {
@@ -436,33 +427,43 @@ export class Resolver extends ModelService {
       topP
     };
     try {
-      if (provider === "gemini") {
-        await this.geminiService.handleGeminiAiChatRequest({
-          ...commonProps,
-          userData
-        });
-      } else if (provider === "anthropic") {
-        await this.anthropicService.handleAnthropicAiChatRequest({
-          ...commonProps,
-          user_location
-        });
-      } else if (provider === "vercel") {
-        await this.v0Service.handleV0AiChatRequest({
-          ...commonProps
-        });
-      } else if (provider === "meta") {
-        await this.llamaService.handleMetaAiChatRequest({
-          ...commonProps
-        });
-      } else if (provider === "grok") {
-        await this.xAIService.handleXAIAiChatRequest({
-          ...commonProps
-        });
-      } else {
-        await this.openai.handleOpenaiAiChatRequest({
-          ...commonProps,
-          user_location
-        });
+      switch (provider) {
+        case "gemini": {
+          const svc = this.providers.getRequiredInstance("gemini");
+          await svc.handleGeminiAiChatRequest({ ...commonProps, userData });
+          break;
+        }
+        case "anthropic": {
+          const svc = this.providers.getRequiredInstance("anthropic");
+          await svc.handleAnthropicAiChatRequest({
+            ...commonProps,
+            user_location
+          });
+          break;
+        }
+        case "vercel": {
+          const svc = this.providers.getRequiredInstance("vercel");
+          await svc.handleV0AiChatRequest({ ...commonProps });
+          break;
+        }
+        case "meta": {
+          const svc = this.providers.getRequiredInstance("meta");
+          await svc.handleMetaAiChatRequest({ ...commonProps });
+          break;
+        }
+        case "grok": {
+          const svc = this.providers.getRequiredInstance("grok");
+          await svc.handleXAIAiChatRequest({ ...commonProps });
+          break;
+        }
+        case "openai":
+        default: {
+          const svc = this.providers.getRequiredInstance("openai");
+          await svc.handleOpenaiAiChatRequest({
+            ...commonProps,
+            user_location
+          });
+        }
       }
     } catch (err) {
       console.error(`AI Stream Error`, this.safeErrMsg(err));
