@@ -7,12 +7,35 @@ import { OpenAIService } from "@/openai/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { v0Service } from "@/vercel/index.ts";
 import { xAIService } from "@/xai/index.ts";
-import type { Provider, Rm } from "@slipstream/types";
+import type { Provider } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+
+export type ProviderNarrowing<P extends Provider> = P extends "openai"
+  ? OpenAIService
+  : P extends "grok"
+    ? xAIService
+    : P extends "anthropic"
+      ? AnthropicService
+      : P extends "gemini"
+        ? GeminiService
+        : P extends "vercel"
+          ? v0Service
+          : P extends "meta"
+            ? LlamaService
+            : never;
+
+export interface ProviderMap {
+  anthropic: AnthropicService;
+  gemini: GeminiService;
+  openai: OpenAIService;
+  meta: LlamaService;
+  vercel: v0Service;
+  grok: xAIService;
+}
 
 export interface ProviderEntry<V extends Provider> {
   provider: V;
-  instance?: Rm<ProviderOpts, "apiKeys" | "dependencies">[V];
+  instance?: Partial<ProviderMap>[V];
   hasProviderApiKeySet: boolean;
   available: boolean;
   initialized: boolean;
@@ -20,12 +43,19 @@ export interface ProviderEntry<V extends Provider> {
   initTime?: number;
 }
 
-export type ServiceFromProvider<P extends Provider> = Rm<
-  ProviderOpts,
-  "apiKeys" | "dependencies"
->[P];
+export type ServiceFromProvider<P extends Provider> = Partial<ProviderMap>[P];
 
-export type Constructor<T = object> = new (...args: any[]) => T;
+export type Constructor<A extends any[] = any[], I = object> = new (
+  ...args: A
+) => I;
+
+export interface HasDependencies {
+  getDependencies(): ProviderDependencies | undefined;
+}
+
+export interface HasOpts {
+  readonly opts?: ProviderOpts;
+}
 
 /**
  * Shared dependencies for all provider services
@@ -41,13 +71,7 @@ export type ProviderFactory<T> = (
   apiKey?: string
 ) => T;
 
-export interface ProviderOpts {
-  anthropic?: AnthropicService;
-  gemini?: GeminiService;
-  openai?: OpenAIService;
-  meta?: LlamaService;
-  vercel?: v0Service;
-  grok?: xAIService;
+export interface ProviderOpts extends Partial<ProviderMap> {
   dependencies?: ProviderDependencies;
   apiKeys?: {
     anthropic?: string;
@@ -59,30 +83,24 @@ export interface ProviderOpts {
   };
 }
 export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
-  return class ProviderBase extends Base {
+  return class ProviderBase extends Base implements HasDependencies, HasOpts {
+    readonly opts?: ProviderOpts | undefined;
     static sharedDependencies?: ProviderDependencies;
-    dependencies?: ProviderDependencies;
+    readonly dependencies?: ProviderDependencies;
 
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as ConstructorParameters<TBase>));
       const maybeOpts = args[0] as ProviderOpts | undefined;
+      this.opts = maybeOpts;
       this.dependencies =
         maybeOpts?.dependencies ??
         (this.constructor as typeof ProviderBase).sharedDependencies;
     }
 
-    /**
-     * Set shared dependencies for all provider instances
-     * Call this once during application bootstrap
-     */
     static setSharedDependencies(deps: ProviderDependencies) {
       this.sharedDependencies = deps;
     }
 
-    /**
-     * Get dependencies for creating providers
-     */
     public getDependencies() {
       return (
         this.dependencies ??
@@ -92,662 +110,387 @@ export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
   };
 }
 
-export function AnthropicMixin<TBase extends Constructor>(Base: TBase) {
+export function AnthropicMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = AnthropicService;
   return class AnthropicServiceMixin extends Base {
-    #anthropic?: AnthropicService;
+    #anthropic?: S;
     #anthropicApiKey?: string;
-    static sharedAnthropic?: AnthropicService;
-    static anthropicFactory?: ProviderFactory<AnthropicService>;
+    static sharedAnthropic?: S;
+    static anthropicFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.anthropic) {
-        this.#anthropic = maybeOpts.anthropic;
-      }
-      this.#anthropicApiKey = maybeOpts?.apiKeys?.anthropic;
+      const opts = this.opts;
+
+      if (opts?.anthropic) this.#anthropic = opts.anthropic;
+
+      this.#anthropicApiKey = opts?.apiKeys?.anthropic;
     }
-    public get anthropic(): AnthropicService {
+    public get anthropic() {
       if (!this.#anthropic) {
         const shared = (this.constructor as typeof AnthropicServiceMixin)
           .sharedAnthropic;
         if (shared) {
           this.#anthropic = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof AnthropicServiceMixin)
-              .anthropicFactory;
-            if (factory) {
-              this.#anthropic = factory(deps, this.#anthropicApiKey);
-            } else {
-              // Default factory
-              this.#anthropic = new AnthropicService(
-                deps.logger,
-                deps.prisma,
-                deps.redis,
-                this.#anthropicApiKey ?? ""
-              );
-              return this.#anthropic;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Anthropic deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#anthropic) {
-          throw new Error(
-            "Anthropic service not initialized. Set Deps or shared instance."
-          );
+          const factory = (this.constructor as typeof AnthropicServiceMixin)
+            .anthropicFactory;
+          this.#anthropic =
+            factory?.(deps, this.#anthropicApiKey) ??
+            new AnthropicService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              this.#anthropicApiKey ?? ""
+            );
         }
       }
       return this.#anthropic;
     }
-    /**
-     * Set shared Anthropic instance for all mixins
-     */
-    static setSharedAnthropic(instance: AnthropicService) {
+
+    static setSharedAnthropic(instance: S) {
       this.sharedAnthropic = instance;
     }
 
-    /**
-     * Set factory function for creating Anthropic instances
-     */
-    static setAnthropicFactory(factory: ProviderFactory<AnthropicService>) {
+    static setAnthropicFactory(factory: ProviderFactory<S>) {
       this.anthropicFactory = factory;
     }
 
-    public hasAnthropic(): boolean {
+    public hasAnthropic() {
       return !!(
         this.#anthropic ??
         (this.constructor as typeof AnthropicServiceMixin)?.sharedAnthropic ??
-        ("getDependencies" in this && this.getDependencies)
+        this.getDependencies()
       );
     }
   };
 }
 
-export function GeminiMixin<TBase extends Constructor>(Base: TBase) {
+export function GeminiMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = GeminiService;
   return class GeminiServiceMixin extends Base {
-    #gemini?: GeminiService;
+    #gemini?: S;
     #geminiApiKey?: string;
-    static sharedGemini?: GeminiService;
-    static geminiFactory?: ProviderFactory<GeminiService>;
+    static sharedGemini?: S;
+    static geminiFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.gemini) {
-        this.#gemini = maybeOpts.gemini;
-      }
-      this.#geminiApiKey = maybeOpts?.apiKeys?.gemini;
+      const opts = this.opts;
+
+      if (opts?.gemini) this.#gemini = opts.gemini;
+
+      this.#geminiApiKey = opts?.apiKeys?.gemini;
     }
-    public get gemini(): GeminiService {
+    public get gemini() {
       if (!this.#gemini) {
         const shared = (this.constructor as typeof GeminiServiceMixin)
           .sharedGemini;
         if (shared) {
           this.#gemini = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof GeminiServiceMixin)
-              .geminiFactory;
-            if (factory) {
-              this.#gemini = factory(deps, this.#geminiApiKey);
-            } else {
-              // Default factory
-              this.#gemini = new GeminiService(
-                deps.logger,
-                deps.prisma,
-                deps.redis,
-                this.#geminiApiKey ?? ""
-              );
-              return this.#gemini;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Gemini deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#gemini) {
-          throw new Error(
-            "Gemini service not initialized. Set Deps or shared instance."
-          );
+
+          const factory = (this.constructor as typeof GeminiServiceMixin)
+            .geminiFactory;
+
+          this.#gemini =
+            factory?.(deps, this.#geminiApiKey) ??
+            new GeminiService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              this.#geminiApiKey ?? ""
+            );
         }
       }
       return this.#gemini;
     }
-    /**
-     * Set shared Gemini instance for all mixins
-     */
-    static setSharedGemini(instance: GeminiService) {
+
+    static setSharedGemini(instance: S) {
       this.sharedGemini = instance;
     }
 
-    /**
-     * Set factory function for creating Gemini instances
-     */
-    static setGeminiFactory(factory: ProviderFactory<GeminiService>) {
+    static setGeminiFactory(factory: ProviderFactory<S>) {
       this.geminiFactory = factory;
     }
 
-    public hasGemini(): boolean {
+    public hasGemini() {
       return !!(
         this.#gemini ??
-        (this.constructor as typeof GeminiServiceMixin)?.setSharedGemini ??
-        ("getDependencies" in this && this.getDependencies)
+        (this.constructor as typeof GeminiServiceMixin)?.sharedGemini ??
+        this.getDependencies()
       );
     }
   };
 }
 
-export function OpenAIMixin<TBase extends Constructor>(Base: TBase) {
+export function OpenAIMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = OpenAIService;
   return class OpenAIServiceMixin extends Base {
-    #openai?: OpenAIService;
+    #openai?: S;
     #openaiApiKey?: string;
-    static sharedOpenai?: OpenAIService;
-    static openaiFactory?: ProviderFactory<OpenAIService>;
+    static sharedOpenai?: S;
+    static openaiFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.openai) {
-        this.#openai = maybeOpts.openai;
-      }
-      this.#openaiApiKey = maybeOpts?.apiKeys?.openai;
+      const opts = this.opts;
+
+      if (opts?.openai) this.#openai = opts.openai;
+
+      this.#openaiApiKey = opts?.apiKeys?.openai;
     }
-    public get openai(): OpenAIService {
+    public get openai() {
       if (!this.#openai) {
         const shared = (this.constructor as typeof OpenAIServiceMixin)
           .sharedOpenai;
         if (shared) {
           this.#openai = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof OpenAIServiceMixin)
-              .openaiFactory;
-            if (factory) {
-              this.#openai = factory(deps, this.#openaiApiKey);
-            } else {
-              // Default factory
-              this.#openai = new OpenAIService(
-                deps.logger,
-                deps.prisma,
-                deps.redis,
-                this.#openaiApiKey ?? ""
-              );
-              return this.#openai;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "OpenAI deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#openai) {
-          throw new Error(
-            "OpenAI service not initialized. Set Deps or shared instance."
-          );
+
+          const factory = (this.constructor as typeof OpenAIServiceMixin)
+            .openaiFactory;
+
+          this.#openai =
+            factory?.(deps, this.#openaiApiKey) ??
+            new OpenAIService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              this.#openaiApiKey ?? ""
+            );
         }
       }
       return this.#openai;
     }
-    /**
-     * Set shared OpenAI instance for all mixins
-     */
-    static setSharedOpenai(instance: OpenAIService) {
+
+    static setSharedOpenai(instance: S) {
       this.sharedOpenai = instance;
     }
 
-    /**
-     * Set factory function for creating OpenAI instances
-     */
-    static setOpenAIFactory(factory: ProviderFactory<OpenAIService>) {
+    static setOpenAIFactory(factory: ProviderFactory<S>) {
       this.openaiFactory = factory;
     }
 
-    public hasOpenAI(): boolean {
+    public hasOpenAI() {
       return !!(
         this.#openai ??
-        (this.constructor as typeof OpenAIServiceMixin)?.setSharedOpenai ??
-        ("getDependencies" in this && this.getDependencies)
+        (this.constructor as typeof OpenAIServiceMixin)?.sharedOpenai ??
+        this.getDependencies()
       );
     }
   };
 }
 
-export function GrokMixin<TBase extends Constructor>(Base: TBase) {
+export function GrokMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = xAIService;
   return class GrokServiceMixin extends Base {
-    #grok?: xAIService;
+    #grok?: S;
     #grokApiKey?: string;
-    static sharedGrok?: xAIService;
-    static grokFactory?: ProviderFactory<xAIService>;
+    static sharedGrok?: S;
+    static grokFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.grok) {
-        this.#grok = maybeOpts.grok;
-      }
-      this.#grokApiKey = maybeOpts?.apiKeys?.grok;
+      const opts = this.opts;
+
+      if (opts?.grok) this.#grok = opts.grok;
+
+      this.#grokApiKey = opts?.apiKeys?.grok;
     }
-    public get grok(): xAIService {
+    public get grok() {
       if (!this.#grok) {
         const shared = (this.constructor as typeof GrokServiceMixin).sharedGrok;
         if (shared) {
           this.#grok = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof GrokServiceMixin)
-              .grokFactory;
-            if (factory) {
-              this.#grok = factory(deps, this.#grokApiKey);
-            } else {
-              // Default factory
-              this.#grok = new xAIService(
-                deps.prisma,
-                deps.redis,
-                deps.extract,
-                this.#grokApiKey ?? ""
-              );
-              return this.#grok;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "xAI deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#grok) {
-          throw new Error(
-            "xAI service not initialized. Set Deps or shared instance."
-          );
+
+          const factory = (this.constructor as typeof GrokServiceMixin)
+            .grokFactory;
+
+          this.#grok =
+            factory?.(deps, this.#grokApiKey) ??
+            new xAIService(
+              deps.prisma,
+              deps.redis,
+              deps.extract,
+              this.#grokApiKey ?? ""
+            );
         }
       }
       return this.#grok;
     }
-    /**
-     * Set shared Grok instance for all mixins
-     */
-    static setSharedGrok(instance: xAIService) {
+
+    static setSharedGrok(instance: S) {
       this.sharedGrok = instance;
     }
 
-    /**
-     * Set factory function for creating Grok instances
-     */
-    static setGrokFactory(factory: ProviderFactory<xAIService>) {
+    static setGrokFactory(factory: ProviderFactory<S>) {
       this.grokFactory = factory;
     }
 
-    public hasGrok(): boolean {
+    public hasGrok() {
       return !!(
         this.#grok ??
-        (this.constructor as typeof GrokServiceMixin)?.setSharedGrok ??
-        ("getDependencies" in this && this.getDependencies)
+        (this.constructor as typeof GrokServiceMixin)?.sharedGrok ??
+        this.getDependencies()
       );
     }
   };
 }
 
-export function VercelMixin<TBase extends Constructor>(Base: TBase) {
+export function VercelMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = v0Service;
   return class VercelServiceMixin extends Base {
-    #vercel?: v0Service;
+    #vercel?: S;
     #vercelApiKey?: string;
-    static sharedVercel?: v0Service;
-    static vercelFactory?: ProviderFactory<v0Service>;
+    static sharedVercel?: S;
+    static vercelFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.vercel) {
-        this.#vercel = maybeOpts.vercel;
-      }
-      this.#vercelApiKey = maybeOpts?.apiKeys?.vercel;
+      const opts = this.opts;
+
+      if (opts?.vercel) this.#vercel = opts.vercel;
+
+      this.#vercelApiKey = opts?.apiKeys?.vercel;
     }
-    public get vercel(): v0Service {
+    public get vercel() {
       if (!this.#vercel) {
         const shared = (this.constructor as typeof VercelServiceMixin)
           .sharedVercel;
         if (shared) {
           this.#vercel = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof VercelServiceMixin)
-              .vercelFactory;
-            if (factory) {
-              this.#vercel = factory(deps, this.#vercelApiKey);
-            } else {
-              // Default factory
-              this.#vercel = new v0Service(
-                deps.prisma,
-                deps.redis,
-                this.#vercelApiKey ?? ""
-              );
-              return this.#vercel;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "v0 (Vercel) deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#vercel) {
-          throw new Error(
-            "v0 (Vercel) service not initialized. Set Deps or shared instance."
-          );
+          const factory = (this.constructor as typeof VercelServiceMixin)
+            .vercelFactory;
+
+          this.#vercel =
+            factory?.(deps, this.#vercelApiKey) ??
+            new v0Service(deps.prisma, deps.redis, this.#vercelApiKey ?? "");
         }
       }
       return this.#vercel;
     }
-    /**
-     * Set shared Vercel instance for all mixins
-     */
-    static setSharedVercel(instance: v0Service) {
+
+    static setSharedVercel(instance: S) {
       this.sharedVercel = instance;
     }
 
-    /**
-     * Set factory function for creating Vercel instances
-     */
-    static setVercelFactory(factory: ProviderFactory<v0Service>) {
+    static setVercelFactory(factory: ProviderFactory<S>) {
       this.vercelFactory = factory;
     }
 
-    public hasVercel(): boolean {
+    public hasVercel() {
       return !!(
         this.#vercel ??
-        (this.constructor as typeof VercelServiceMixin)?.setSharedVercel ??
-        ("getDependencies" in this && this.getDependencies)
+        (this.constructor as typeof VercelServiceMixin)?.sharedVercel ??
+        this.getDependencies()
       );
     }
   };
 }
 
-export function MetaMixin<TBase extends Constructor>(Base: TBase) {
+export function MetaMixin<
+  TBase extends Constructor<any[], HasDependencies & HasOpts>
+>(Base: TBase) {
+  type S = LlamaService;
   return class MetaServiceMixin extends Base {
-    #meta?: LlamaService;
+    #meta?: S;
     #metaApiKey?: string;
-    static sharedMeta?: LlamaService;
-    static metaFactory?: ProviderFactory<LlamaService>;
+    static sharedMeta?: S;
+    static metaFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      super(...args);
+      super(...(args as (ProviderOpts | undefined)[]));
 
-      const maybeOpts = args?.[0] as ProviderOpts | undefined;
-      if (maybeOpts?.meta) {
-        this.#meta = maybeOpts.meta;
-      }
-      this.#metaApiKey = maybeOpts?.apiKeys?.meta;
+      const opts = this.opts;
+
+      if (opts?.meta) this.#meta = opts.meta;
+
+      this.#metaApiKey = opts?.apiKeys?.meta;
     }
-    public get meta(): LlamaService {
+    public get meta() {
       if (!this.#meta) {
         const shared = (this.constructor as typeof MetaServiceMixin).sharedMeta;
         if (shared) {
           this.#meta = shared;
-        } else if (
-          "getDependencies" in this &&
-          typeof this.getDependencies === "function"
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const deps = this.getDependencies() as unknown as
-            | ProviderDependencies
-            | undefined;
-          if (deps) {
-            const factory = (this.constructor as typeof MetaServiceMixin)
-              .metaFactory;
-            if (factory) {
-              this.#meta = factory(deps, this.#metaApiKey);
-            } else {
-              // Default factory
-              this.#meta = new LlamaService(
-                deps.logger,
-                deps.prisma,
-                deps.redis,
-                this.#metaApiKey ?? ""
-              );
-              return this.#meta;
-            }
+        } else {
+          const deps = this.getDependencies();
+          if (!deps) {
+            throw new Error(
+              "Llama (Meta) deps missing. Set shared deps or pass dependencies in ProviderOpts."
+            );
           }
-        }
-        if (!this.#meta) {
-          throw new Error(
-            "Llama (meta) service not initialized. Set Deps or shared instance."
-          );
+          const factory = (this.constructor as typeof MetaServiceMixin)
+            .metaFactory;
+
+          this.#meta =
+            factory?.(deps, this.#metaApiKey) ??
+            new LlamaService(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              this.#metaApiKey ?? ""
+            );
         }
       }
       return this.#meta;
     }
-    /**
-     * Set shared Meta instance for all mixins
-     */
-    static setSharedMeta(instance: LlamaService) {
+
+    static setSharedMeta(instance: S) {
       this.sharedMeta = instance;
     }
 
-    /**
-     * Set factory function for creating Meta instances
-     */
-    static setMetaFactory(factory: ProviderFactory<LlamaService>) {
+    static setMetaFactory(factory: ProviderFactory<S>) {
       this.metaFactory = factory;
     }
 
-    public hasMeta(): boolean {
+    public hasMeta() {
       return !!(
         this.#meta ??
-        (this.constructor as typeof MetaServiceMixin)?.setSharedMeta ??
-        ("getDependencies" in this && this.getDependencies)
+        (this.constructor as typeof MetaServiceMixin)?.sharedMeta ??
+        this.getDependencies()
       );
     }
   };
-}
-
-export class TypeSafeProviderMap {
-  // The Map is typed to maintain the relationship between key and value
-  #map = new Map<Provider, ProviderEntry<Provider>>();
-
-  /**
-   * Type-safe setter that enforces correct service type
-   */
-  set<const P extends Provider>(
-    provider: P,
-    entry: ProviderEntry<typeof provider>
-  ) {
-    this.#map.set(provider, entry);
-    return this;
-  }
-
-  /**
-   * Type-safe getter with narrowed return type
-   */
-  get(provider: Provider) {
-    return this.#map.get(provider) satisfies
-      | ProviderEntry<typeof provider>
-      | undefined;
-  }
-
-  /**
-   * Get just the service instance with correct type
-   */
-  getInstance(
-    provider: Provider
-  ): ServiceFromProvider<typeof provider> | undefined {
-    const entry = this.get(provider) satisfies
-      | ProviderEntry<typeof provider>
-      | undefined;
-    return entry?.instance satisfies
-      | ServiceFromProvider<typeof provider>
-      | undefined;
-  }
-
-  /**
-   * Type-safe initialization with perfect inference
-   */
-  initializeProvider<const P extends Provider>(
-    provider: P,
-    instance: ServiceFromProvider<typeof provider>,
-    hasProviderApiKeySet = false
-  ) {
-    const existing = this.get(provider);
-    if (existing) {
-      existing.instance = instance;
-      existing.initialized = true;
-      existing.initTime = performance.now();
-      existing.hasProviderApiKeySet = hasProviderApiKeySet;
-    } else {
-      this.set(provider, {
-        provider,
-        instance,
-        hasProviderApiKeySet,
-        available: true,
-        initialized: true,
-        lastAccessed: performance.now(),
-        initTime: performance.now()
-      } satisfies ProviderEntry<typeof provider>);
-    }
-  }
-}
-
-class ProviderServiceBase {
-  public get providers() {
-    return [
-      "anthropic",
-      "gemini",
-      "grok",
-      "meta",
-      "openai",
-      "vercel"
-    ] as const satisfies Provider[];
-  }
-  constructor(protected opts?: ProviderOpts) {}
-}
-
-export class ProviderService extends GrokMixin(
-  VercelMixin(
-    MetaMixin(
-      OpenAIMixin(
-        GeminiMixin(AnthropicMixin(ProviderBaseMixin(ProviderServiceBase)))
-      )
-    )
-  )
-) {
-  #providerMap = new Map<Provider, ProviderEntry<Provider>>();
-  constructor(opts?: ProviderOpts) {
-    super(opts);
-    this.#initializeMap(opts);
-  }
-
-  /**
-   * Type-safe setter that enforces correct service type
-   */
-  set<const P extends Provider>(
-    provider: P,
-    entry: ProviderEntry<typeof provider>
-  ) {
-    this.#providerMap.set(provider, entry);
-    return this;
-  }
-
-  /**
-   * Type-safe getter with narrowed return type
-   */
-  get(provider: Provider) {
-    return this.#providerMap.get(provider) satisfies
-      | ProviderEntry<typeof provider>
-      | undefined;
-  }
-
-  /**
-   * Get just the service instance with correct type
-   */
-  getInstance(
-    provider: Provider
-  ): ServiceFromProvider<typeof provider> | undefined {
-    const entry = this.get(provider) satisfies
-      | ProviderEntry<typeof provider>
-      | undefined;
-    return entry?.instance satisfies
-      | ServiceFromProvider<typeof provider>
-      | undefined;
-  }
-
-  /**
-   * Type-safe initialization with perfect inference
-   */
-  initializeProvider<const P extends Provider>(
-    provider: P,
-    instance: ServiceFromProvider<typeof provider>,
-    hasProviderApiKeySet = false
-  ) {
-    const existing = this.get(provider);
-    if (existing) {
-      existing.instance = instance;
-      existing.initialized = true;
-      existing.initTime = performance.now();
-      existing.hasProviderApiKeySet = hasProviderApiKeySet;
-    } else {
-      this.set(provider, {
-        provider,
-        instance,
-        hasProviderApiKeySet,
-        available: true,
-        initialized: true,
-        lastAccessed: performance.now(),
-        initTime: performance.now()
-      } satisfies ProviderEntry<typeof provider>);
-    }
-  }
-  #initializeMap(opts?: ProviderOpts) {
-    // Beautiful type inference - each provider gets its exact service type!
-
-    for (const provider of this.providers) {
-      this.#providerMap.set(provider, {
-        provider,
-        instance: opts?.[provider], // Type-safe! TS knows this is the right service
-        hasProviderApiKeySet: !!opts?.apiKeys?.[provider],
-        available: true,
-        initialized: !!opts?.[provider],
-        lastAccessed: undefined,
-        initTime: undefined
-      });
-    }
-  }
-  // #checkAvailability(provider: Provider): boolean {
-  //   const Constructor = this.getDependencies();
-  //   const hasSharedDeps = !!Constructor.sharedDependencies;
-  //   const hasSharedInstance = !!(Constructor as any)[
-  //     `shared${this.#capitalize(provider)}`
-  //   ];
-
-
-  //   return hasSharedDeps || hasSharedInstance || hasApiKey;
-  // }
-
-  // #capitalize(str: Provider): Capitalize<typeof str> {
-  //   return str
-  //     .substring(0, 1)
-  //     .toUpperCase()
-  //     .concat(str.substring(1)) as Capitalize<typeof str>;
-  // }
 }

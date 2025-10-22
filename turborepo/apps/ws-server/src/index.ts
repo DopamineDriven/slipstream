@@ -1,4 +1,3 @@
-import process from "node:process";
 import type { Signals } from "@/types/index.ts";
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
@@ -8,7 +7,6 @@ dotenv.config({ quiet: true });
 
 async function exe() {
   const cred = new Credentials();
-
   const cfg = await cred.getAll();
 
   try {
@@ -37,10 +35,7 @@ async function exe() {
 
     const loggerConfig = {
       serviceName: "ws-server",
-      environment:
-        typeof process.env.IS_PROD === "undefined"
-          ? "production"
-          : "development",
+      environment: isProd === true ? "production" : "development",
       region,
       taskArn: process.env.ECS_TASK_ARN,
       taskDefinition: process.env.ECS_TASK_DEFINITION,
@@ -147,23 +142,40 @@ async function exe() {
       cfg.GOOGLE_API_KEY
     );
 
+    const { ProviderService } = await import("@/providers/index.ts");
+
+    const providers = new ProviderService({
+      apiKeys: {
+        anthropic: cfg.ANTHROPIC_API_KEY,
+        gemini: cfg.GOOGLE_API_KEY,
+        grok: cfg.X_AI_KEY,
+        meta: cfg.LLAMA_API_KEY,
+        openai: cfg.OPENAI_API_KEY,
+        vercel: cfg.V0_API_KEY
+      },
+      dependencies: { extract, logger, prisma, redis: redisInstance },
+      anthropic,
+      gemini,
+      grok: xai,
+      meta,
+      openai,
+      vercel: v0
+    });
+
     const resolver = new Resolver(
       wsServer,
-      openai,
-      gemini,
-      anthropic,
+      providers,
       s3,
       region,
-      xai,
-      v0,
-      meta,
       isProd,
       extract
     );
 
     resolver.registerAll();
+
     wsServer.setResolver(resolver);
-    setInterval(async () => {
+
+    const redisPingHandle = setInterval(async () => {
       try {
         await redisInstance.ping();
       } catch (err) {
@@ -188,18 +200,20 @@ async function exe() {
       log.warn(`${signal} received, shutting down gracefully...`);
 
       try {
+        clearInterval(redisPingHandle);
         await wsServer.stop();
         log.info("Cleanup complete, exiting gracefully");
         process.exitCode = 0;
       } catch (error) {
-        log.error(
-          `Error during shutdown: ` +
-            (typeof error === "string" ? error : JSON.stringify(error))
-        );
-        if (error instanceof Error) {
-          log.error("Stacktrace: " + (error.stack ?? ""));
-        }
         process.exitCode = 1;
+
+        if (error instanceof Error) {
+          log.error(
+            { name: error.name, stack: error.stack, cause: error.cause },
+            error.message
+          );
+          throw new Error(error.message);
+        } else throw new Error(JSON.stringify(error, null, 2));
       }
     };
     process.on("SIGTERM", async () => gracefulShutdown("SIGTERM"));

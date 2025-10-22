@@ -257,7 +257,7 @@ export type ClientContextWorkupProps = {
 };
 
 /**
- * --- OpenAI Image Handling ---
+ * --- Image Handling ---
  */
 
 /**
