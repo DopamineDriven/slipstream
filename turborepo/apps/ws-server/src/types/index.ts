@@ -1,6 +1,14 @@
 import { WebSocket } from "ws";
 import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
-import type { CTR, EventTypeMap, RTC } from "@slipstream/types";
+import type {
+  AIChatRequest,
+  AIChatRequestImgGenFields,
+  AllModelsUnion,
+  CTR,
+  EventTypeMap,
+  Provider,
+  RTC
+} from "@slipstream/types";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
@@ -225,6 +233,8 @@ export interface ProviderChatRequestEntity {
   model?: string;
   chunks: string[];
   thinkingChunks: string[];
+  imgGenEnabled?: boolean;
+  imgGenFields?: AIChatRequestImgGenFields;
 }
 
 export type BigIntOrNumber<T extends boolean = false> = T extends true
@@ -704,3 +714,22 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     tz?: string;
   };
 }
+
+export type NormalizeAIChatReqDataRT = {
+  provider: Provider;
+  model: AllModelsUnion;
+  topP: number | undefined;
+  temperature: number | undefined;
+  systemPrompt: string | undefined;
+  max_tokens: number | undefined;
+  hasProviderConfigured: boolean | undefined;
+  isDefaultProvider: boolean | undefined;
+  prompt: string;
+  conversationIdInitial: string;
+  batchId: string | undefined;
+  imgGenEnabled: boolean | undefined;
+  isNewChat: boolean;
+  isImgGenCapable: boolean;
+  isPureImgGenModel: boolean;
+  imgGenFields: AIChatRequest["imgGenFields"];
+};
