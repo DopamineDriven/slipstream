@@ -559,7 +559,8 @@ export class GeminiService extends ModelService {
                 )
               : undefined,
             thinkingText: thinkingPart,
-            done: false
+            done: false,
+            imgGenEnabled: false
           } satisfies EventTypeMap["ai_chat_chunk"])
         );
 
@@ -580,7 +581,8 @@ export class GeminiService extends ModelService {
               )
             : undefined,
           thinkingText: thinkingPart,
-          done: false
+          done: false,
+          imgGenEnabled: false
         });
         if (chunks.length % 10 === 0) {
           void this.redis.saveStreamState(
@@ -620,7 +622,8 @@ export class GeminiService extends ModelService {
             chunk: textPart,
             thinkingDuration:
               geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
-            done: false
+            done: false,
+            imgGenEnabled: false
           } satisfies EventTypeMap["ai_chat_chunk"])
         );
 
@@ -639,7 +642,8 @@ export class GeminiService extends ModelService {
           thinkingDuration:
             geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
           chunk: textPart,
-          done: false
+          done: false,
+          imgGenEnabled: false
         });
         if (chunks.length % 10 === 0) {
           void this.redis.saveStreamState(
@@ -676,7 +680,8 @@ export class GeminiService extends ModelService {
             temperature,
             title,
             topP,
-            provider
+            provider,
+            imgGenEnabled: false
           } satisfies EventTypeMap["ai_chat_inline_data"])
         );
       }
@@ -697,7 +702,8 @@ export class GeminiService extends ModelService {
           model,
           thinkingText: geminiThinkingAgg,
           thinkingDuration:
-            geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined
+            geminiThinkingDuration > 0 ? geminiThinkingDuration : undefined,
+          imgGenEnabled: false
         });
         ws.send(
           JSON.stringify({
@@ -712,6 +718,7 @@ export class GeminiService extends ModelService {
             temperature,
             title,
             topP,
+            imgGenEnabled: false,
             provider,
             chunk: geminiAgg,
             thinkingText: geminiThinkingAgg,
@@ -726,6 +733,7 @@ export class GeminiService extends ModelService {
           userId,
           systemPrompt,
           temperature,
+          imgGenEnabled: false,
           data: geminiDataPart
             ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
             : undefined,

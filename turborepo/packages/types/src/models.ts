@@ -28,36 +28,92 @@ export const providerModelImageGenApi = {
   grok: ["grok-2-image-1212"]
 } as const;
 
+export const providerModelImageGenFacilitatingApi = {
+  openai: [
+    "gpt-5",
+    "gpt-5-mini",
+    "gpt-5-nano",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "o3",
+    "gpt-4o",
+    "gpt-4o-mini"
+  ],
+  gemini: ["gemini-2.5-flash-image"]
+} as const;
+
 export const imageModelSets = {
   gemini: new Set(providerModelImageGenApi.gemini),
   grok: new Set(providerModelImageGenApi.grok),
   openai: new Set(providerModelImageGenApi.openai)
 } as const;
 
-export const imageGenProviders = [
-  "grok",
-  "gemini",
-  "openai"
-] as const;
+export const imageModelFacilitatorSets = {
+  gemini: new Set(providerModelImageGenFacilitatingApi.gemini),
+  openai: new Set(providerModelImageGenFacilitatingApi.openai)
+} as const;
 
+export const imageGenProviders = ["grok", "gemini", "openai"] as const;
+export const imageGenFacilitatingProviders = ["gemini", "openai"] as const;
 export type ImageGenProviders = keyof typeof providerModelImageGenApi;
+export type ImageGenFacilitatingProviders =
+  keyof typeof providerModelImageGenFacilitatingApi;
 
 export type ImageGenModelsByProvider<
   T extends keyof typeof providerModelImageGenApi
 > = Unenumerate<(typeof providerModelImageGenApi)[T]>;
 
+export type ImageGenFacilitatingModelsByProvider<
+  T extends keyof typeof providerModelImageGenFacilitatingApi
+> = Unenumerate<(typeof providerModelImageGenFacilitatingApi)[T]>;
 
-export type ImgGenModelMap ={
-  readonly [P in keyof typeof providerModelImageGenApi] : Unenumerate<typeof providerModelImageGenApi[P]>
+export type ImgGenModelMap = {
+  readonly [P in keyof typeof providerModelImageGenApi]: Unenumerate<
+    (typeof providerModelImageGenApi)[P]
+  >;
 };
 
-export type OpenAIImgGenModels = ImgGenModelMap['openai'];
+export type ImgGenFacilitatingModelMap = {
+  readonly [P in keyof typeof providerModelImageGenFacilitatingApi]: Unenumerate<
+    (typeof providerModelImageGenFacilitatingApi)[P]
+  >;
+};
 
-export type GeminiImgGenModels = ImgGenModelMap['gemini'];
+export type OpenAIImgGenModels = ImgGenModelMap["openai"];
 
-export type GrokImgGenModels = ImgGenModelMap['grok'];
+
+
+export type OpenAIImgGenFacilitatingModels =
+  ImgGenFacilitatingModelMap["openai"];
+
+export type GeminiImgGenFacilitatingModels =
+  ImgGenFacilitatingModelMap["gemini"];
+
+export type GeminiImgGenModels = ImgGenModelMap["gemini"];
+
+export type GrokImgGenModels = ImgGenModelMap["grok"];
+
+export type AllImgGenFacilitatingModelsUnion =
+  ImgGenFacilitatingModelMap[ImageGenFacilitatingProviders];
 
 export type AllImgGenModelsUnion = ImgGenModelMap[ImageGenProviders];
+
+export type GetImgModelUtilRT<T = ImageGenProviders> = T extends "openai"
+  ? OpenAIImgGenModels
+  : T extends "gemini"
+    ? GeminiImgGenModels
+    : T extends "grok"
+      ? GrokImgGenModels
+      : never;
+
+export type GetImgGenFacilitatingModelUtilRT<
+  T = ImageGenFacilitatingProviders
+> = T extends "openai"
+  ? OpenAIImgGenFacilitatingModels
+  : T extends "gemini"
+    ? GeminiImgGenFacilitatingModels
+    : never;
 
 export const providerModelChatApi = modelIdsByProvider;
 
@@ -397,16 +453,14 @@ export const imgMimeSupportByProvider = {
 // that handles office docs -> pdf as a background post-processing task
 // to be handed off to models on the backend, for example
 export const docMimeSupportByProvider = {
-  meta: [],
+  meta: ["application/pdf"],
   grok: [],
   openai: ["application/pdf"],
   vercel: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
-  gemini: [
-    "application/pdf"
-  ],
+  gemini: ["application/pdf"],
   anthropic: ["application/pdf"]
 } as const;
 

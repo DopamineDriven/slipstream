@@ -83,27 +83,7 @@ export class Resolver extends ModelService {
     );
   }
 
-  private isValidUrl(url: string) {
-    return URL.canParse(url);
-  }
 
-  private formatProvider(provider?: Provider) {
-    switch (provider) {
-      case "anthropic":
-        return "Anthropic";
-      case "gemini":
-        return "Gemini";
-      case "grok":
-        return "Grok";
-      case "meta":
-        return "Meta";
-      case "vercel":
-        return "Vercel";
-      case "openai":
-      default:
-        return "OpenAI";
-    }
-  }
 
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
@@ -289,7 +269,9 @@ export class Resolver extends ModelService {
       isDefaultProvider = event.isDefaultProvider,
       prompt = event.prompt,
       conversationIdInitial = event.conversationId,
-      batchId = event.batchId;
+      batchId = event.batchId,
+      isImgGenEnabled= event.imgGenEnabled,
+      imgGenFields =event.imgGenFields;
 
     // Quick server-side guardrail: limit free-tier (fallback key) usage
     // Trust client-provided hasProviderConfigured to avoid extra lookups.
@@ -312,10 +294,11 @@ export class Resolver extends ModelService {
       conversationId: conversationIdInitial,
       prompt,
       provider,
+      imgGenEnabled: false,
       hasProviderConfigured,
       maxTokens: max_tokens,
       isDefaultProvider,
-      systemPrompt,
+      systemPrompt,imgGenFields,
       temperature,
       topP,
       model,
@@ -378,7 +361,7 @@ export class Resolver extends ModelService {
         JSON.stringify({
           type: "ai_chat_chunk",
           conversationId,
-          userId,
+          userId,imgGenEnabled: false,
           chunk: chunks.join(""),
           thinkingText: thinkingAgg,
           thinkingDuration,
@@ -393,7 +376,7 @@ export class Resolver extends ModelService {
       );
     }
 
-    if (event.conversationId === "new-chat") {
+    if (isNewChat) {
       void this.wsServer.redis.publishTypedEvent(
         userChannel,
         "conversation:created",
@@ -413,6 +396,8 @@ export class Resolver extends ModelService {
       conversationId,
       isNewChat,
       msgs,
+      imgGenFields,
+      imgGenEnabled: isImgGenEnabled ?? false,
       streamChannel,
       thinkingChunks,
       userId,
@@ -499,7 +484,7 @@ export class Resolver extends ModelService {
           message: this.safeErrMsg(err)
         }
       );
-      return await this.wsServer.redis.saveStreamState(
+      void this.wsServer.redis.saveStreamState(
         conversationId,
         chunks,
         {
