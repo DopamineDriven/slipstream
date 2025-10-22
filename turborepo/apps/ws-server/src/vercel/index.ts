@@ -4,6 +4,8 @@ import type {
 } from "@/types/index.ts";
 import type { v0ChatCompletionsRes, v0Usage } from "@/vercel/sse.ts";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import type { Logger as PinoLogger } from "pino";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { createV0SSEParser, isReasoningDelta } from "@/vercel/sse.ts";
 import type { EventTypeMap, VercelModelIdUnion } from "@slipstream/types";
@@ -11,11 +13,21 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class v0Service {
   private readonly baseUrl = "https://api.v0.dev/v1/chat/completions";
+  private logger: PinoLogger;
+  /** key: storename; val: storeId; */
   constructor(
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private apiKey?: string
-  ) {}
+  ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[v0] " }
+      );
+  }
 
   private async *stream(
     model = "v0-1.5-md" satisfies VercelModelIdUnion,
@@ -268,6 +280,7 @@ export class v0Service {
       }
       if (thinkingText && v0IsCurrentlyThinking) {
         iThink++;
+        console.debug(`[${iThink}]: ${thinkingText}`);
         if (
           iThink > 3 &&
           Math.abs(v0ThinkingAgg.length - thinkingText.length) <= 4 * iThink

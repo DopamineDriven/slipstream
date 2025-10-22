@@ -3,7 +3,7 @@ import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
 import type { CTR, EventTypeMap, RTC } from "@slipstream/types";
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
-
+export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
 export type InferTopLevelMime<T extends string> =
   T extends `${infer X}/${string}` ? InferTopLevelMime<X> : T;
 
@@ -695,3 +695,12 @@ export type ImageGenReqDbRes<T extends boolean = false> = {
   shareToken: string | null;
   apiKey: string | null;
 };
+export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
+  user_location?: {
+    type: "approximate";
+    city?: string;
+    region?: string;
+    country?: string;
+    tz?: string;
+  };
+}

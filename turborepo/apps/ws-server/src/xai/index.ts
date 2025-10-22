@@ -7,7 +7,9 @@ import type {
   xAIChoiceActive,
   xAIImgGenResponse
 } from "@/xai/sse.ts";
+import type { Logger as PinoLogger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   createXAISSEParser,
@@ -22,13 +24,22 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 export class xAIService {
   private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
   private readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-
+  private logger: PinoLogger;
+  /** key: storename; val: storeId; */
   constructor(
+    logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private extract: ExtractService,
     private apiKey?: string
-  ) {}
+  ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[xai] " }
+      );
+  }
 
   private handleMostRecentMsgForImg(
     mostRecentMsg:
@@ -325,7 +336,7 @@ export class xAIService {
       grokIsCurrentlyThinking = false,
       grokThinkingAgg = "",
       grokAgg = "",
-      // iThink = 0,
+      iThink = 0,
       hasAggregateFinal = false;
     if (model === ("grok-2-image-1212" satisfies GrokModelIdUnion)) {
       const res = await this.handleImgGen(
@@ -439,9 +450,12 @@ export class xAIService {
       }
     }
     try {
+      const formatted = this.xAiFormat(isNewChat, msgs, systemPrompt, "medium");
+
+      // this.logger.debug(JSON.stringify(formatted, null, 2));
       const streamer = this.stream(
         model as GrokModelIdUnion,
-        this.xAiFormat(isNewChat, msgs, systemPrompt, "medium"),
+        formatted,
         apiKey ?? undefined,
         { max_tokens, top_p: topP, temperature }
       );
@@ -508,7 +522,7 @@ export class xAIService {
             model === ("grok-3-mini" satisfies GrokModelIdUnion) ||
             model === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))
         ) {
-          // iThink++;
+          iThink++;
           // if (
           //   model === "grok-code-fast-1" &&
           //   iThink > 3 &&
@@ -521,7 +535,7 @@ export class xAIService {
           //       ? prependNew.substring(grokThinkingAgg.length)
           //       : "";
           // }
-
+          console.info(`[${iThink}]: ${thinkingText}`);
           if (hasAggregateFinal) {
             grokThinkingAgg += finalThinkingChunk;
             if (finalThinkingChunk) thinkingChunks.push(finalThinkingChunk);

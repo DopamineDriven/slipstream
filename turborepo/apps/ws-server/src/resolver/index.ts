@@ -499,7 +499,7 @@ export class Resolver extends ModelService {
           message: this.safeErrMsg(err)
         }
       );
-      void this.wsServer.redis.saveStreamState(
+      return await this.wsServer.redis.saveStreamState(
         conversationId,
         chunks,
         {

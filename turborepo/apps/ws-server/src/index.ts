@@ -96,7 +96,7 @@ async function exe() {
 
     const { v0Service } = await import("@/vercel/index.ts");
 
-    const v0 = new v0Service(prisma, redisInstance, cfg.V0_API_KEY);
+    const v0 = new v0Service(logger, prisma, redisInstance, cfg.V0_API_KEY);
 
     const { LlamaService } = await import("@/meta/index.ts");
 
@@ -113,7 +113,13 @@ async function exe() {
 
     const extract = new ExtractService();
 
-    const xai = new xAIService(prisma, redisInstance, extract, cfg.X_AI_KEY);
+    const xai = new xAIService(
+      logger,
+      prisma,
+      redisInstance,
+      extract,
+      cfg.X_AI_KEY
+    );
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
 

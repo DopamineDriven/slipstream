@@ -38,6 +38,9 @@
       "openai": [
         "dist/openai/index.d.ts"
       ],
+      "openai/workup": [
+        "src/openai/workup.d.ts"
+      ],
       "pdf": [
         "dist/pdf/index.d.ts"
       ],
