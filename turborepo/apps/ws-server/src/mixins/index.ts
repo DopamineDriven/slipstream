@@ -33,6 +33,10 @@ export interface ProviderMap {
   grok: xAIService;
 }
 
+export type ProviderNarrowed<T extends keyof ProviderMap> = {
+  [V in T]: ProviderMap[V];
+}[T];
+
 export interface ProviderEntry<V extends Provider> {
   provider: V;
   instance?: Partial<ProviderMap>[V];
@@ -343,6 +347,7 @@ export function GrokMixin<
           this.#grok =
             factory?.(deps, this.#grokApiKey) ??
             new xAIService(
+              deps.logger,
               deps.prisma,
               deps.redis,
               deps.extract,
@@ -407,7 +412,12 @@ export function VercelMixin<
 
           this.#vercel =
             factory?.(deps, this.#vercelApiKey) ??
-            new v0Service(deps.prisma, deps.redis, this.#vercelApiKey ?? "");
+            new v0Service(
+              deps.logger,
+              deps.prisma,
+              deps.redis,
+              this.#vercelApiKey ?? ""
+            );
         }
       }
       return this.#vercel;
