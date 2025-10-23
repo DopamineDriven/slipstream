@@ -1,6 +1,8 @@
 import type { JSX, ReactNode } from "react";
 import { preprocessAIMarkdown } from "@/lib/preprocess";
 import { preprocessMathDelimiters } from "@/lib/processor";
+import { cn } from "@/lib/utils";
+import { CodeBlock } from "@/ui/atoms/code-block";
 
 /**
  * Lightweight markdown processor for streaming messages
@@ -32,7 +34,7 @@ export function processStreamingMarkdown(content: string): ReactNode {
 
         // Handle horizontal rules
         if (/^[-*_]{3,}$/.test(block.trim())) {
-          return <hr key={i} className="border-brand-border my-4" />;
+          return <hr key={i} className="my-3" />;
         }
 
         // Handle code blocks
@@ -42,14 +44,9 @@ export function processStreamingMarkdown(content: string): ReactNode {
           const code = lines.slice(1, -1).join("\n");
 
           return (
-            <pre
-              key={i}
-              lang={language}
-              className="my-2 overflow-x-auto rounded-md bg-slate-800 p-3">
-              <code className={`text-sm text-slate-100 language-${language}`}>
-                {code}
-              </code>
-            </pre>
+            <CodeBlock key={i} className="my-2">
+              <code className={cn(`language-${language}`)}>{code}</code>
+            </CodeBlock>
           );
         }
 
@@ -65,18 +62,16 @@ export function processStreamingMarkdown(content: string): ReactNode {
             .replace(/\*(.+?)\*/g, "<em>$1</em>")
             .replace(
               /`(.+?)`/g,
-              '<code class="bg-slate-700 px-1 py-0.5 rounded text-xs">$1</code>'
+              '<code class="px-1 py-0.5 rounded text-[0.9em] font-mono bg-black/20">$1</code>'
             )
             .replace(
               /\[([^\]]+)\]\(([^)]+)\)/g,
-              '<a href="$2" class="text-brand-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
+              '<a href="$2" class="hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
             )
             .replace(/\n/g, "<br>");
 
           return (
-            <blockquote
-              key={i}
-              className="border-brand-primary/50 text-brand-text-muted my-3 border-l-4 pl-4">
+            <blockquote key={i} className="mb-2 border-l-4 pl-4 italic">
               <p dangerouslySetInnerHTML={{ __html: processedQuote }} />
             </blockquote>
           );
@@ -101,26 +96,30 @@ export function processStreamingMarkdown(content: string): ReactNode {
             );
 
             return (
-              <div key={i} className="my-3 overflow-x-auto">
-                <table className="divide-brand-border min-w-full divide-y">
-                  <thead>
-                    <tr>
+              <div
+                key={i}
+                className="-mx-3 my-3 overflow-x-auto overscroll-x-contain px-3 [-webkit-overflow-scrolling:touch] md:mx-0"
+                role="region"
+                aria-label="Scrollable table">
+                <table className="mb-4 w-full min-w-[80dvw] table-fixed border-collapse border">
+                  <thead className="wrap-break-words px-2.5 py-2 text-left align-top text-sm whitespace-normal">
+                    <tr className="border-b">
                       {headers?.map((header, j) => (
                         <th
                           key={j}
-                          className="text-brand-text-muted px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                          className="wrap-break-words px-2.5 py-2 text-left align-top text-sm whitespace-normal">
                           {header}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-brand-border divide-y">
+                  <tbody>
                     {rows.map((row, j) => (
-                      <tr key={j}>
+                      <tr key={j} className="border-b">
                         {row.map((cell, k) => (
                           <td
                             key={k}
-                            className="text-brand-text px-3 py-2 text-sm whitespace-nowrap">
+                            className="wrap-break-words [&_a]:wrap-break-words [&_code]:wrap-break-words [&_li]:wrap-break-words px-3 py-1.5 align-top text-sm whitespace-normal">
                             <span
                               dangerouslySetInnerHTML={{
                                 __html: cell
@@ -131,7 +130,7 @@ export function processStreamingMarkdown(content: string): ReactNode {
                                   .replace(/\*(.+?)\*/g, "<em>$1</em>")
                                   .replace(
                                     /`(.+?)`/g,
-                                    '<code class="bg-slate-700 px-1 py-0.5 rounded text-xs">$1</code>'
+                                    '<code class="px-1 py-0.5 rounded text-[0.9em] font-mono bg-black/20">$1</code>'
                                   )
                               }}
                             />
@@ -153,18 +152,16 @@ export function processStreamingMarkdown(content: string): ReactNode {
           const text = headingMatch[2];
           const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
           const sizeClasses = [
-            "text-2xl font-bold", // h1
-            "text-xl font-bold", // h2
-            "text-lg font-semibold", // h3
-            "text-base font-semibold", // h4
-            "text-sm font-medium", // h5
-            "text-xs font-medium" // h6
+            "text-5xl", // h1
+            "text-4xl", // h2
+            "text-3xl", // h3
+            "text-2xl", // h4
+            "text-xl", // h5
+            "text-lg" // h6
           ];
 
           return (
-            <HeadingTag
-              key={i}
-              className={`${sizeClasses?.[level - 1]} text-brand-text my-2 [&_h1]:text-4xl [&_h2]:text-3xl [&_h3]:text-2xl [&_h4,h5]:text-xl`}>
+            <HeadingTag key={i} className={cn(`${sizeClasses?.[level - 1]}`)}>
               {text}
             </HeadingTag>
           );
@@ -202,14 +199,11 @@ export function processStreamingMarkdown(content: string): ReactNode {
                 .replace(/\*(.+?)\*/g, "<em>$1</em>")
                 .replace(
                   /`(.+?)`/g,
-                  '<code class="bg-slate-700 px-1 py-0.5 rounded text-xs">$1</code>'
+                  '<code class="px-1 py-0.5 rounded text-[0.9em] font-mono bg-black/20">$1</code>'
                 );
 
               return {
-                content: `<span class="flex items-center gap-2">
-                  <input type="checkbox" ${isChecked ? "checked" : ""} disabled class="rounded border-brand-border" />
-                  <span>${taskContent}</span>
-                </span>`,
+                content: `<span class="flex items-center gap-2">\n<input type="checkbox" ${isChecked ? "checked" : ""} disabled class="rounded border" />\n<span>${taskContent}</span>\n</span>`,
                 indent: currentIndent,
                 isTask: true
               };
@@ -220,7 +214,7 @@ export function processStreamingMarkdown(content: string): ReactNode {
               .replace(/\*(.+?)\*/g, "<em>$1</em>")
               .replace(
                 /`(.+?)`/g,
-                '<code class="bg-slate-700 px-1 py-0.5 rounded text-xs">$1</code>'
+                '<code class="px-1 py-0.5 rounded text-[0.9em] font-mono bg-black/20">$1</code>'
               );
 
             return {
@@ -237,11 +231,18 @@ export function processStreamingMarkdown(content: string): ReactNode {
           return (
             <ListTag
               key={i}
-              className={`${listClass} text-brand-text my-2 list-inside space-y-1`}>
+              className={cn(
+                `mb-2 ml-6 ${listClass} space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2.5`
+              )}>
               {items.map((item, j) => (
                 <li
                   key={j}
-                  className={item.indent > 0 ? `ml-${item.indent * 4}` : ""}
+                  className="leading-7 whitespace-normal"
+                  style={
+                    item.indent > 0
+                      ? { marginLeft: item.indent * 16 }
+                      : undefined
+                  }
                   dangerouslySetInnerHTML={{ __html: item.content }}
                 />
               ))}
@@ -255,20 +256,19 @@ export function processStreamingMarkdown(content: string): ReactNode {
           .replace(/\*(.+?)\*/g, "<em>$1</em>")
           .replace(
             /`(.+?)`/g,
-            '<code class="bg-slate-700 px-1 py-0.5 rounded text-sm">$1</code>'
+            '<code class="px-1 py-0.5 rounded text-[0.9em] font-mono bg-black/20">$1</code>'
           )
           .replace(
             /\[([^\]]+)\]\(([^)]+)\)/g,
-            '<a href="$2" class="text-brand-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
+            '<a href="$2" class="hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
           )
           // eslint-disable-next-line no-regex-spaces
-          .replace(/  \n/g, "<br>") // Two spaces at end of line = line break
-          .replace(/\n/g, " "); // Regular line breaks become spaces
+          .replace(/  \n/g, "<br>"); // Two spaces at end of line = line break
 
         return (
           <p
             key={i}
-            className="text-brand-text mb-2 leading-relaxed"
+            className="mb-1.5 leading-7"
             dangerouslySetInnerHTML={{ __html: processedText }}
           />
         );

@@ -188,7 +188,7 @@ export function ProviderModelSelector({
         "text-brand-text hover:bg-brand-component max-w-full min-w-0 px-3 text-sm sm:text-base",
         className
       )}>
-      <currentMeta.icon className="mr-2 size-4 flex-shrink-0" />
+      <currentMeta.icon className="mr-2 size-4 shrink-0" />
       <div className="flex min-w-0 flex-1 overflow-x-hidden">
         <span className="max-w-[10ch] truncate sm:max-w-[16ch] lg:max-w-[20ch]">
           {selectedModel.displayName}

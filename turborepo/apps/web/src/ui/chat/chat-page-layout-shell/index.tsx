@@ -70,8 +70,7 @@ function HeaderActions() {
 
 export function ChatLayoutShell({
   children,
-  fallbackData,
-  userId
+  fallbackData
 }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -102,7 +101,7 @@ export function ChatLayoutShell({
             </Suspense>
           </Sidebar>
           <SidebarInset className="flex-1">
-            <div className="flex h-[100dvh] flex-col">
+            <div className="flex h-dvh flex-col">
               <header className="border-border bg-background relative flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex min-w-0 items-center">
                   <SidebarTrigger className="z-30 -ml-2">

@@ -69,6 +69,8 @@ export function MessageBubble({
 
   const { handleReaction, isPending, reactionState } = useReaction(message);
 
+
+
   const RxnIcons = [
     {
       id: "like-action",
@@ -267,7 +269,7 @@ export function MessageBubble({
           className={cn(
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
             isUser
-              ? "bg-muted text-forground"
+              ? "bg-muted text-foreground"
               : resolvedTheme === "light"
                 ? "bg-[#2252ba] text-[#fefefe]"
                 : "bg-[#0d2a6b] text-[#fafafa]"

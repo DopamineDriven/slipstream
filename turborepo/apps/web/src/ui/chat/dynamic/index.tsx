@@ -418,6 +418,7 @@ export function ChatInterface({
         messages={messages}
         streamedText={isStreaming ? streamedText : ""}
         isAwaitingFirstChunk={isAwaitingFirstChunk}
+        activeConversationId={activeConversationId ?? "new-chat"}
         isStreaming={isStreaming}
         isThinking={isThinking}
         isHome={isHome}

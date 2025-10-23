@@ -95,7 +95,7 @@ export function ChatHero({
             onClick={() => onPromptClickAction(item.prompt)}>
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
-                <item.icon className="text-primary mt-0.5 size-5 flex-shrink-0" />
+                <item.icon className="text-primary mt-0.5 size-5 shrink-0" />
                 <div>
                   <h3 className="text-foreground mb-1 font-medium">
                     {item.title}

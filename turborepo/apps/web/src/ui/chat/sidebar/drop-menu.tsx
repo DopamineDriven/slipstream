@@ -70,14 +70,14 @@ export function SidebarDropdownMenu({ user: userProfile }: { user?: User }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href={`/settings/${userProfile?.id ?? "user-id"}`} passHref>
-          <DropdownMenuItem className="hover:!bg-brand-primary/20 cursor-pointer">
+          <DropdownMenuItem className="hover:bg-brand-primary/20! cursor-pointer">
             <Settings className="mr-2 size-4" />
             <span>Settings</span>
           </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="hover:!bg-brand-primary/20 cursor-pointer text-red-400 hover:!text-red-300"
+          className="hover:bg-brand-primary/20! cursor-pointer text-red-400 hover:text-red-300!"
           onClick={signOutHelper}>
           <LogOut className="mr-2 size-4" />
           <span>Sign Out</span>

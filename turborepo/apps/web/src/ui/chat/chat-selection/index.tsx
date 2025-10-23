@@ -44,7 +44,7 @@ export function SelectionToolbar({
   return createPortal(
     <div
       ref={ref}
-      className="bg-background/95 supports-[backdrop-filter]:bg-background/60 pointer-events-auto fixed z-50 -translate-x-1/2 rounded-full border px-2 py-1 shadow-xl backdrop-blur"
+      className="bg-background/95 supports-backdrop-filter:bg-background/60 pointer-events-auto fixed z-50 -translate-x-1/2 rounded-full border px-2 py-1 shadow-xl backdrop-blur"
       style={{ top, left }}
       data-selection-toolbar
       role="toolbar"

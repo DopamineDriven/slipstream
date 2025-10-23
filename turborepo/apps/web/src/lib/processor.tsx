@@ -238,7 +238,7 @@ const components = {
     <thead
       className={cn(
         "px-2.5 py-2 text-left align-top text-sm",
-        "break-words whitespace-normal",
+        "wrap-break-words whitespace-normal",
         className
       )}
       {...props}>
@@ -264,8 +264,8 @@ const components = {
       {...props}
       className={cn(
         "px-3 py-1.5 align-top text-sm",
-        "break-words whitespace-normal",
-        "[&_a]:break-words [&_code]:break-words [&_li]:break-words",
+        "wrap-break-words whitespace-normal",
+        "[&_a]:wrap-break-words [&_code]:wrap-break-words [&_li]:wrap-break-words",
         className
       )}>
       {props.children}
@@ -275,7 +275,7 @@ const components = {
     <th
       className={cn(
         "px-2.5 py-2 text-left align-top text-sm",
-        "break-words whitespace-normal",
+        "wrap-break-words whitespace-normal",
         className
       )}
       {...props}>
