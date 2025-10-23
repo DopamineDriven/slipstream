@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { NativeTruncatedText } from "@/ui/atoms/native-truncated-text";
 import { useSidebar } from "@/ui/atoms/sidebar";
 import { SidebarDropdownMenu } from "@/ui/chat/sidebar/drop-menu";
-import { SidebarSkeleton } from "@/ui/chat/sidebar/skeleton";
 import { Logo } from "@/ui/logo";
 import { useSession } from "@/utils/auth-client";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -41,15 +40,10 @@ export function EnhancedSidebar({
   className = "",
   fallbackData
 }: EnhancedSidebarProps) {
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const userId = session?.user?.id;
-  const {
-    conversations,
-    updateCache,
-    deleteConversation,
-    updateTitle,
-    isValidating
-  } = useConversations(userId, fallbackData);
+  const { conversations, updateCache, deleteConversation, updateTitle } =
+    useConversations(userId, fallbackData);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -190,7 +184,6 @@ export function EnhancedSidebar({
     };
   }, []);
 
-  if (isPending || isValidating) return <SidebarSkeleton />;
   return (
     <div
       className={cn(
@@ -357,7 +350,7 @@ export function EnhancedSidebar({
                                   baseChars={15}
                                   maxExtraChars={3}
                                 />
-                                <span className="text-brand-text-muted mt-0.5 flex-shrink-0 text-xs">
+                                <span className="text-brand-text-muted mt-0.5 shrink-0 text-xs">
                                   {new Date(
                                     thread.updatedAt
                                   ).toLocaleDateString()}

@@ -32,8 +32,8 @@ export function SettingsDrawer({ initialData, initUser }: { initialData?: Client
   const user = (initUser ?? session?.user) satisfies User | undefined;
   return (
     <Drawer open={isOpen} onOpenChange={open => !open && close()}>
-      <DrawerContent className=" bg-blend-luminosity bg-radial from-25% from-background/90 via-35% via-muted-foreground/40 to-background/90 to-50%  backdrop-blur-sm border-foreground/55 text-foreground/80 font-basis flex h-[90vh] flex-col">
-        <div className="mx-auto flex w-full max-w-md sm:max-w-xl flex-grow flex-col overflow-x-hidden">
+      <DrawerContent className="bg-linear-210 from-background/95 via-background/75 to-background/95 backdrop-blur-sm border-foreground/55 text-foreground/80 font-basis flex h-[90vh] flex-col">
+        <div className="mx-auto flex w-full max-w-md sm:max-w-xl grow flex-col overflow-x-hidden">
           <DrawerHeader className="flex shrink-0 items-center justify-between bg-transparent">
             <div>
               <DrawerTitle className="text-foreground text-2xl">
@@ -49,7 +49,7 @@ export function SettingsDrawer({ initialData, initUser }: { initialData?: Client
               <div className="h-12 w-full">Loading...</div>
             </div>
           ) : (
-            <ScrollArea className="flex-grow px-4">
+            <ScrollArea className="grow px-4">
               <div className="space-y-2">
                 <Tabs
                   value={activeTab}

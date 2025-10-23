@@ -596,7 +596,10 @@ export class AnthropicService {
       messages,
       "debugging full content on first message to anthropic"
     );
-    const tools = this.webSearchTool(user_location);
+    /**
+     * tools failing on anthropic following bash_tool_20251022 release...
+     */
+    const _tools = this.webSearchTool(user_location);
 
     const betas = this.handleBetaHeaders(model as AnthropicModelIdUnion);
 
@@ -612,8 +615,7 @@ export class AnthropicService {
         metadata: { user_id: userId },
         messages,
         service_tier: "auto",
-        betas,
-        tools
+        betas
       },
       { stream: true }
     )) satisfies Stream<BetaRawMessageStreamEvent> & {
@@ -624,7 +626,7 @@ export class AnthropicService {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
         webSearchRes: BetaWebSearchResultBlock | null = null,
-        done: BetaStopReason | null = null;
+        done: BetaStopReason | null = null; 
 
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "server_tool_use") {

@@ -67,7 +67,7 @@ export function SidebarSkeleton({
         )
       )}
       {/* Chat Threads Section */}
-      <div className="flex-grow space-y-2">
+      <div className="grow space-y-2">
         {/* "Recent" Header Skeleton */}
         <div className="px-2 py-1">
           <motion.div

@@ -1,1 +1,3 @@
-# Nextjs WebSocket Client
+## Next.js WebSocket Client
+
+*details coming soon*

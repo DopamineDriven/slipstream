@@ -310,7 +310,7 @@ export class Resolver extends ModelService {
       city: userData?.city ?? "Barrington",
       country: userData?.country ?? "US",
       region: userData?.region ?? "Illinois",
-      timezone: userData?.tz ?? "America/Chicago"
+      timezone: userData?.tz ? decodeURIComponent(userData.tz) : "America/Chicago"
     } as const;
 
     const isNewChat = conversationIdInitial.startsWith("new-chat"),
@@ -411,6 +411,7 @@ export class Resolver extends ModelService {
       title,
       topP
     };
+    console.log(apiKey ?? "no api Key")
     try {
       switch (provider) {
         case "gemini": {
@@ -459,7 +460,8 @@ export class Resolver extends ModelService {
           conversationId,
           model,
           systemPrompt,
-          temperature,
+          temperature,imgGenEnabled: false,
+          imgGenFields: undefined,
           topP,
           title,
           userId,
@@ -474,7 +476,8 @@ export class Resolver extends ModelService {
           type: "ai_chat_error",
           provider,
           conversationId,
-          model,
+          model,imgGenEnabled: false,
+          imgGenFields: undefined,
           title,
           systemPrompt,
           temperature,
