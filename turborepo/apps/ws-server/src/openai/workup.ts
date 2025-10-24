@@ -11,13 +11,186 @@ import type { Reasoning } from "openai/resources/shared.mjs";
 import { OpenAI, toFile } from "openai";
 import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import type { OpenAiModelIdUnion } from "@slipstream/types";
+import type {
+  AIChatRequestImgGenFields,
+  ImgGenWorkupResRT,
+  OpenAiModelIdUnion
+} from "@slipstream/types";
 
 export class OpenAIServiceWorkup extends ModelService {
   protected readonly vsCache = new Map<string, string>();
   protected readonly inflightVS = new Map<string, Promise<string>>();
   constructor(protected prisma: PrismaService) {
     super();
+  }
+
+  protected responsesImgGen(
+    imgGenEnabled: boolean,
+    model: OpenAiModelIdUnion,
+    imgFields?: AIChatRequestImgGenFields,
+    currentMsgBoundAssets?: ProviderOpenaiRequestEntity["currentMsgBoundAssets"]
+  ): ImgGenWorkupResRT<OpenAiModelIdUnion> {
+    if (imgGenEnabled === false) return undefined;
+    if (!imgFields) return undefined;
+    if (
+      model === "gpt-3.5-turbo" ||
+      model === "gpt-4" ||
+      model === "gpt-4-turbo" ||
+      model === "gpt-5-codex" ||
+      model === "gpt-5-pro" ||
+      model === "o3-mini" ||
+      model === "o4-mini" ||
+      model === "o3-pro"
+    )
+      return undefined;
+
+    const msgBoundImgAssets =
+      typeof currentMsgBoundAssets?.assets !== "undefined" &&
+      currentMsgBoundAssets.assetCounts > 0 &&
+      currentMsgBoundAssets?.assets?.filter(t => t.type === "IMAGE")?.length >
+        0;
+
+    // facilitating models automatically recruit gpt-image-1 via the image_generation tool -> streaming = true
+
+    const {
+      moderation,
+      n,
+      input_fidelity,
+      input_image_mask,
+      response_format,
+      pureImgGenModel,
+      style,
+      output_background,
+      output_compression,
+      output_format,
+      output_partial_images,
+      output_quality,
+      output_size
+    } = imgFields;
+
+    if (model === "dall-e-3") {
+      const dalle3Opts = {
+        /**
+         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+         *
+         * "url" (default) | "b64_json"
+         */
+        response_format: response_format ?? "url",
+
+        isPureImgGenModel: true as const,
+        /**
+         * **dall-e-3 only**
+         *
+         * defaults to "vivid"
+         */
+        style: (style as "vivid" | "natural" | undefined) ?? ("vivid" as const),
+        msgBoundImgAssets,
+        /** dall-e-3 has max n of 1 */
+        n: 1,
+        model: model,
+        output_quality:
+          (this.handleImgGenOutputQuality("openai", model, {
+            output_quality
+          }) as "auto" | "hd" | "standard" | undefined) ?? ("auto" as const),
+        output_size:
+          (this.handleOutputSize(model, { output_size }) as
+            | "auto"
+            | "1024x1024"
+            | "1792x1024"
+            | "1024x1792"
+            | undefined) ?? ("auto" as const),
+        targetApi: "images" as const
+      };
+      return dalle3Opts satisfies ImgGenWorkupResRT<"dall-e-3">;
+    }
+    if (model === "dall-e-2") {
+      const dalle2Opts = {
+        /**
+         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+         *
+         * "url" (default) | "b64_json"
+         */
+        response_format: response_format ?? "url",
+        isPureImgGenModel: true as const,
+        msgBoundImgAssets,
+        /**
+         * count
+         *
+         * 1 (min)
+         * 10 (max)
+         */
+        n: this.handleImgGenCount(model, { n }),
+        model: "dall-e-2" as const,
+        output_quality:
+          (this.handleImgGenOutputQuality("openai", model, {
+            output_quality
+          }) as "auto" | "standard" | undefined) ?? ("auto" as const),
+        output_size:
+          (this.handleOutputSize(model, { output_size }) as
+            | "auto"
+            | "256x256"
+            | "512x512"
+            | "1024x1024"
+            | undefined) ?? ("auto" as const),
+        targetApi: "images" as const
+      };
+      return dalle2Opts satisfies ImgGenWorkupResRT<"dall-e-2">;
+    }
+
+    const moderate = (moderation as "low" | "auto" | undefined) ?? "low";
+    const outputFormat =
+      (output_format as "jpeg" | "webp" | "png" | undefined) ??
+      ("png" as const);
+    const bg = this.handleImgGenBg("openai", model, {
+      background: output_background,
+      format: outputFormat
+    });
+    const sharedOpts = {
+      input_image_mask,
+      isPureImgGenModel:
+        (pureImgGenModel ?? model === "gpt-image-1")
+          ? true
+          : model === "gpt-image-1-mini"
+            ? true
+            : false,
+      msgBoundImgAssets,
+      n: this.handleImgGenCount(model, { n }),
+      moderation: moderate,
+      output_format: outputFormat,
+      output_compression: this.handleImgGenCompression("openai", model, {
+        output_compression,
+        output_format
+      }),
+      model: model,
+      output_quality:
+        (this.handleImgGenOutputQuality("openai", model, { output_quality }) as
+          | "low"
+          | "auto"
+          | "high"
+          | "standard"
+          | "hd"
+          | "medium"
+          | undefined) ?? ("high" as const),
+      output_size:
+        (this.handleOutputSize(model, { output_size }) as
+          | "1536x1024"
+          | "1024x1536"
+          | "1024x1024"
+          | undefined) ?? ("auto" as const),
+      output_background: bg,
+      targetApi:
+        this.imageGenToolCompat(model) === true
+          ? ("responses" as const)
+          : ("images" as const),
+      partialImagesRequested: this.handlePartialImgGen("openai", model, {
+        partialImagesRequested: output_partial_images
+      }),
+      input_fidelity:
+        input_fidelity && msgBoundImgAssets
+          ? this.handleInputFidelity("openai", model, { input_fidelity })
+          : undefined
+    };
+    return sharedOpts as ImgGenWorkupResRT<typeof model>;
   }
   public async ensureAssetUploadedToOpenAI(
     attachment: {
@@ -289,7 +462,17 @@ export class OpenAIServiceWorkup extends ModelService {
       );
     });
   }
-
+  public hasImages(
+    formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
+  ) {
+    return formatted.some(m => {
+      if (typeof m.content === "string") return false;
+      if (m.role !== "user") return false;
+      return m.content.some(
+        t => t.type === "input_image" && typeof t?.image_url !== "undefined"
+      );
+    });
+  }
   public fileIds(
     formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
   ) {
@@ -380,54 +563,6 @@ export class OpenAIServiceWorkup extends ModelService {
     return [...msgs] as const satisfies ResponseInput;
   }
 
-  public formatOpenAi(isNewChat: boolean, msgs: MessageSingleton<true>[]) {
-    if (isNewChat) {
-      const first = msgs[0];
-      if (!first) {
-        return [{ role: "user", content: "" }] as const satisfies ResponseInput;
-      }
-      const attContent = this.buildAttachmentContent(first.attachments);
-      if (attContent.length > 0) {
-        return [
-          {
-            role: "user",
-            content: [
-              ...attContent,
-              { type: "input_text", text: first.content }
-            ]
-          }
-        ] as const satisfies ResponseInput;
-      }
-      return [
-        { role: "user", content: first.content }
-      ] as const satisfies ResponseInput;
-    } else {
-      const history = this.prependProviderModelTag(msgs.slice(0, -1));
-      const last = msgs.at(-1);
-      if (last?.senderType === "USER") {
-        const attContent = this.buildAttachmentContent(last.attachments);
-        if (attContent.length > 0) {
-          return [
-            ...history,
-            {
-              role: "user",
-              content: [
-                ...attContent,
-                { type: "input_text", text: last.content }
-              ]
-            }
-          ] as const satisfies ResponseInput;
-        } else {
-          return [
-            ...history,
-            { role: "user", content: last.content }
-          ] as const satisfies ResponseInput;
-        }
-      }
-      return this.formatMsgs(this.prependProviderModelTag(msgs));
-    }
-  }
-
   public normalizeLocation(
     user_location: ProviderOpenaiRequestEntity["user_location"]
   ) {
@@ -450,21 +585,22 @@ export class OpenAIServiceWorkup extends ModelService {
     model: OpenAiModelIdUnion,
     hasFiles: boolean,
     user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
-    vector_store_ids?: string[]
+    vector_store_ids?: string[],
+    imgGenEnabled = false,
+    imgGen?: OpenAI.Responses.Tool.ImageGeneration
   ) {
-    // TODO determine where/when to incorporate Image Gen Tool
-    const _imageGenToolingCompat = this.imageGenToolCompat(model);
+    const pureImgModel = this.canCallImageApi(model);
     if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
-      // if (imageGenToolingCompat) {
-      //   return [
-      //   { type: "file_search", vector_store_ids },
-      //   {
-      //     type: "web_search_preview",
-      //     user_location
-      //   },
-      //   {type: "image_generation",  input_image_mask: {file_id: ""} satisfies OpenAI.Responses.Tool.ImageGeneration.InputImageMask}
-      // ] satisfies OpenAI.Responses.Tool[];
-      // }
+      if (imgGenEnabled === true && imgGen && pureImgModel === false) {
+        return [
+          { type: "file_search", vector_store_ids },
+          {
+            type: "web_search_preview",
+            user_location
+          },
+          { ...imgGen }
+        ] satisfies OpenAI.Responses.Tool[];
+      }
       return [
         { type: "file_search", vector_store_ids },
         {
@@ -473,6 +609,15 @@ export class OpenAIServiceWorkup extends ModelService {
         }
       ] satisfies OpenAI.Responses.Tool[];
     } else {
+      if (imgGenEnabled === true && imgGen && pureImgModel === false) {
+        return [
+          {
+            type: "web_search_preview",
+            user_location
+          },
+          { ...imgGen }
+        ] satisfies OpenAI.Responses.Tool[];
+      }
       return [
         {
           type: "web_search_preview",
@@ -564,6 +709,10 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4o-mini": {
         return true;
       }
+      case "dall-e-2":
+      case "dall-e-3":
+      case "gpt-image-1":
+      case "gpt-image-1-mini":
       case "gpt-5-pro":
       case "gpt-5-codex":
       case "o3-mini":

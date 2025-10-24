@@ -1,9 +1,17 @@
 import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
+import { Stream } from "openai/core/streaming.mjs";
+import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import type { EventTypeMap, OpenAiModelIdUnion } from "@slipstream/types";
+import type {
+  AIChatResponseImgGenFields,
+  EventTypeMap,
+  GptImageAndFacilitatorsImgGenWorkupRT,
+  OpenAiModelIdUnion,
+  Unenumerate
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { OpenAIServiceWorkup } from "./workup.ts";
 
@@ -13,7 +21,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
   /** key: storename; val: storeId; */
   constructor(
     logger: LoggerService,
-    protected override prisma: PrismaService,
+    protected prisma: PrismaService,
+    private extractor: ExtractService,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
@@ -57,15 +66,27 @@ export class OpenAIService extends OpenAIServiceWorkup {
     temperature,
     title,
     topP,
+    currentMsgBoundAssets,
+    imgGenEnabled = false,
+    imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
     const m = model as OpenAiModelIdUnion;
     const provider = "openai" as const;
+    const partialImgArr = Array.of<[string, number]>();
+    const _finalImgArr =
+      Array.of<Unenumerate<AIChatResponseImgGenFields>["images"]>();
     let openaiThinkingStartTime: number | null = null,
       openaiThinkingDuration = 0,
       openaiIsCurrentlyThinking = false,
       openaiThinkingAgg = "",
-      openaiAgg = "";
+      openaiAgg = "",
+      partialImgsRequested = false,
+      partialImgAgg: [string, number] | undefined = undefined,
+      finalImgAgg: string | undefined = undefined,
+      str: Stream<OpenAI.Responses.ResponseStreamEvent> & {
+        _request_id?: string | null;
+      };
 
     const client = this.getClient(apiKey ?? undefined);
 
@@ -78,6 +99,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
     );
 
     const loc = this.normalizeLocation(user_location);
+
+    const _hasImages = this.hasImages(formatted);
 
     const hasFiles = this.hasFiles(formatted);
 
@@ -100,7 +123,72 @@ export class OpenAIService extends OpenAIServiceWorkup {
 
     const reasoning = this.openaiReasoning(m, "medium", "auto");
 
-    const responsesStream = await client.responses.create({
+    const resImg = this.responsesImgGen(
+      imgGenEnabled,
+      m,
+      imgGenFields,
+      currentMsgBoundAssets
+    );
+
+    if (
+      (m === "o3" ||
+        m === "gpt-4.1" ||
+        m === "gpt-4.1-mini" ||
+        m === "gpt-4.1-nano" ||
+        m === "gpt-5" ||
+        m === "gpt-5-mini" ||
+        m === "gpt-5-nano" ||
+        m === "gpt-4o" ||
+        m === "gpt-4o-mini") &&
+      this.imageGenToolCompat(m) &&
+      typeof resImg !== "undefined"
+    ) {
+      const r = resImg as GptImageAndFacilitatorsImgGenWorkupRT;
+      partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
+
+      const tools = this.handleTooling(
+        m,
+        hasFiles,
+        loc,
+        vectorStoreId ? [vectorStoreId] : undefined,
+        true,
+        {
+          type: "image_generation",
+          background: r.output_background,
+          input_fidelity: r.input_fidelity,
+          model: "gpt-image-1",
+          moderation: r.moderation,
+          output_compression: r.output_compression,
+          output_format: r.output_format,
+          partial_images: r.partialImagesRequested,
+          quality: r.output_quality,
+          size: r.output_size
+        }
+      );
+
+      str = await client.responses.create({
+        stream: true,
+        input: formatted,
+        instructions: this.buildInstructions(systemPrompt),
+        store: false,
+        model: m,
+        text: this.openAiVerbosity(m, "medium"),
+        temperature,
+        max_output_tokens: max_tokens,
+        top_p: topP,
+        safety_identifier: userId,
+        include: [
+          "web_search_call.action.sources",
+          "web_search_call.results",
+          "message.input_image.image_url"
+        ],
+        truncation: "auto",
+        reasoning,
+        parallel_tool_calls: true,
+        tools
+      });
+    }
+    str = await client.responses.create({
       stream: true,
       input: formatted,
       instructions: this.buildInstructions(systemPrompt),
@@ -108,6 +196,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
       model: m,
       text: this.openAiVerbosity(model as OpenAiModelIdUnion, "medium"),
       temperature,
+      include: [
+        "web_search_call.action.sources",
+        "web_search_call.results",
+        "message.input_image.image_url"
+      ],
       max_output_tokens: max_tokens,
       top_p: topP,
       safety_identifier: userId,
@@ -117,11 +210,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
       tools
     });
 
-    for await (const s of responsesStream) {
+    for await (const s of str) {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
         done = false;
-      // s.type as ResponseStreamEvent['type'];
+
       if (
         s.type === "response.reasoning_text.delta" ||
         s.type === "response.reasoning_summary_text.delta"
@@ -133,6 +226,21 @@ export class OpenAIService extends OpenAIServiceWorkup {
 
         thinkingText = s.delta;
       }
+      if (
+        partialImgsRequested &&
+        s.type === "response.image_generation_call.partial_image"
+      ) {
+        // push to s3, get cdnUrl to pass to streamed res
+        partialImgAgg = [s.partial_image_b64, s.partial_image_index];
+        s.item_id;
+      }
+      if (s.type === "response.output_item.added") {
+        if (s.item.type === "image_generation_call") {
+          s.item.result;
+          s.item.id;
+        }
+      }
+
       if (s.type === "response.output_text.delta") {
         if (
           openaiIsCurrentlyThinking === true &&
@@ -150,7 +258,24 @@ export class OpenAIService extends OpenAIServiceWorkup {
       if (s.type === "response.output_text.done") {
         done = true;
       }
-
+      if (s.type === "response.completed") {
+        s.response.usage;
+        s.response.output;
+        for (const r of s.response.output) {
+          if (r.type === "image_generation_call" && r.result) {
+            finalImgAgg = r.result;
+          }
+        }
+      }
+      if (partialImgAgg) {
+        partialImgArr.push(partialImgAgg);
+        // b64url to upload to s3 -> get cdnUrl -> forward to client
+        const _partial = partialImgAgg[0];
+      }
+      if (finalImgAgg) {
+        // TODO UPLOAD WITH S3 TO GET CDN URL AND GET INFO ON width, height, etc via extractor service
+        const _toUpload = finalImgAgg;
+      }
       if (thinkingText) {
         openaiThinkingAgg += thinkingText;
         thinkingChunks.push(thinkingText);
@@ -163,6 +288,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             model,
             provider,
+            imgGenEnabled,
+            imgGenFields: {},
             systemPrompt,
             temperature,
             title,

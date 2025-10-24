@@ -30,7 +30,7 @@ export default defineConfig(
         "src/pubsub/extended-events.ts",
         "!src/test/**"
       ],
-      target: ["node24.10.0"],
+      target: ["node25"],
       dts: true,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],
