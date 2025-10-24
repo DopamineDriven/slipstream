@@ -10,218 +10,6 @@ export type OpenAIImgCapableModels =
   | OpenAIImgGenFacilitatingModels
   | OpenAIImgGenModels;
 
-export type AIChatRequestImgGenFields = {
-  pureImgGenModel?: boolean;
-  /**
-   * gpt-image-1 only
-   *
-   * values include "high" | "low" | null
-   */
-  input_fidelity?: string;
-  /**
-   * gpt-image-1 & gpt-image-1-mini only
-   *
-   * values include "low" | "auto"
-   */
-  moderation?: string;
-  /**
-   * gpt-image-1, gpt-image-1-mini, gemini-2.5-flash-image, dall-e-2, grok-2-image-1212:
-   *
-   * n=1 (default),
-   * n=10 (max)
-   *
-   * dall-e-3:
-   *
-   * n=1 (default),
-   * n=1 (max)
-   *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * n=4 (default),
-   * n=1 (min)
-   *
-   */
-  n?: number;
-  /**
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001 only**
-   *
-   * A negative prompt.
-   * What you *don't* want to see in the image.
-   *
-   */
-  negativePrompt?: string;
-  /**
-   * gpt-image-1 & gpt-image-1-mini only:
-   *
-   * n=0 (default),
-   * n=3 (max)
-   *
-   * streaming must be set to ***true***
-   */
-  output_partial_images?: number;
-  /**
-   *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001**
-   *
-   * "image/png" (default) | "image/jpeg"
-   *
-   *
-   * "jpg" | "webp" | "png" (default)
-   */
-  output_format?: string;
-  /**
-   *
-   * gpt-image-1, gpt-image-1-mini:
-   *
-   * output must be of type jpeg or webp
-   *
-   * Range: 0-100. Default: 100
-   *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * Only applies if mimeType is "image/jpeg",
-   * Range: 0-100. Default: 75
-   */
-  output_compression?: number;
-  /**
-   * gpt-image-1, gpt-image-1-mini:
-   *
-   * "auto" (default); "transparent" | "opaque" | "auto"
-   *
-   * output format must be "png" | "webp"
-   */
-  output_background?: "transparent" | "opaque" | "auto";
-  /**
-   *  gpt-image-1, gpt-image-1-mini:
-   *
-   * "auto" (default); "low" | "medium" | "high" | "auto"
-   *
-   * dall-e-3:
-   *
-   * "auto" (default); "standard" | "hd" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "standard" | "auto"
-   *
-   * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * "1K" (default); "1K" | "2K"
-   */
-  output_quality?: string;
-  /**
-   *  gpt-image-1, gpt-image-1-mini:
-   *
-   * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
-   *
-   * dall-e-3:
-   *
-   * "auto" (default); "1024x1024" | "1792x1024" | "1024x1792" | "auto"
-   *
-   * dall-e-2:
-   *
-   * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
-   *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
-   *
-   * "1:1"="1024x1024" (default) | "9:16"="768x1344" | "16:9"="1344x768" | "3:4"="864x1184" | "4:3"="1184x864"
-   *
-   * gemini-2.5-flash-image:
-   *
-   * "1:1"="1024x1024" (default) | "2:3"="832x1248" | "3:2"="1248x832" | "3:4"="864x1184" | "4:3"="1184x864" | "4:5"="896x1152" | "5:4"="1152x896" | "9:16"="768x1344" | "16:9"="1344x768" | "21:9"="1536x672"
-   *
-   */
-  output_size?: string;
-  /**
-   * **Imagen 3 & 4 models only**
-   *
-   * "allow_adult" (default) | "dont_allow" | "allow_all"
-   */
-  personGeneration?: string;
-  /**
-   * **dall-e-3 only**
-   *
-   * "vivid" (default) | "natural"
-   */
-  style?: string;
-  /**
-   * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
-   *
-   * "url" (default) | "b64_json"
-   */
-  response_format?: "url" | "b64_json";
-
-  /**
-   * **gpt-image-1 and gpt-image-1-mini only**
-   *
-   * Optional mask for inpainting. Contains `image_url` (string, optional) and
-   * `file_id` (string, optional).
-   */
-  input_image_mask?: {
-    /**
-     * File ID for the mask image.
-     */
-    file_id?: string;
-    /**
-     * Base64-encoded URL or Image URL mask.
-     */
-    image_url?: string;
-  };
-
-  /**
-   *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
-   *
-   * A seed value for reproducible results.
-   * 0 for random.
-   */
-  seed?: number;
-
-  /**
-   *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
-   *
-   * Whether to automatically enhance the prompt.
-   * (Available on Imagen 4 and 3.0-002)
-   * Default: true
-   */
-  enhancePrompt?: boolean;
-};
-
-export type AIChatResponseImgGenFields = {
-  outputSize?: string;
-  outputQuality?: string;
-  outputCompression?: number;
-  outputBackground?: string;
-  outputWidth?: number;
-  outputHeight?: number;
-  outputAspectRatio?: number;
-  size?: number;
-  requestedCount?: number;
-  actualCount?: number;
-  outputFormat?: string;
-  outputMime?: string;
-  duration?: number;
-  seed?: number;
-  revisedPrompt?: string;
-  partialImagesRequested?: number;
-  partialImagesActual?: number;
-  partialImages?: {
-    index?: number;
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-  }[];
-  images?: {
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-    revisedPrompt?: string;
-  }[];
-};
-
 /**
  * --- Image Handling ---
  */
@@ -587,6 +375,218 @@ export type ImageGenOptsByProvider = {
   openai: OpenAIImageGenOpts;
   gemini: GoogleGenAIImageGenOpts;
   grok: GrokImageGenOpts;
+};
+
+export type AIChatRequestImgGenFields = {
+  pureImgGenModel?: boolean;
+  /**
+   * gpt-image-1 only
+   *
+   * values include "high" | "low" | null
+   */
+  input_fidelity?: string;
+  /**
+   * gpt-image-1 & gpt-image-1-mini only
+   *
+   * values include "low" | "auto"
+   */
+  moderation?: string;
+  /**
+   * gpt-image-1, gpt-image-1-mini, gemini-2.5-flash-image, dall-e-2, grok-2-image-1212:
+   *
+   * n=1 (default),
+   * n=10 (max)
+   *
+   * dall-e-3:
+   *
+   * n=1 (default),
+   * n=1 (max)
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * n=4 (default),
+   * n=1 (min)
+   *
+   */
+  n?: number;
+  /**
+   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001 only**
+   *
+   * A negative prompt.
+   * What you *don't* want to see in the image.
+   *
+   */
+  negativePrompt?: string;
+  /**
+   * gpt-image-1 & gpt-image-1-mini only:
+   *
+   * n=0 (default),
+   * n=3 (max)
+   *
+   * streaming must be set to ***true***
+   */
+  output_partial_images?: number;
+  /**
+   *
+   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001**
+   *
+   * "image/png" (default) | "image/jpeg"
+   *
+   *
+   * "jpg" | "webp" | "png" (default)
+   */
+  output_format?: string;
+  /**
+   *
+   * gpt-image-1, gpt-image-1-mini:
+   *
+   * output must be of type jpeg or webp
+   *
+   * Range: 0-100. Default: 100
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * Only applies if mimeType is "image/jpeg",
+   * Range: 0-100. Default: 75
+   */
+  output_compression?: number;
+  /**
+   * gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "transparent" | "opaque" | "auto"
+   *
+   * output format must be "png" | "webp"
+   */
+  output_background?: "transparent" | "opaque" | "auto";
+  /**
+   *  gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "low" | "medium" | "high" | "auto"
+   *
+   * dall-e-3:
+   *
+   * "auto" (default); "standard" | "hd" | "auto"
+   *
+   * dall-e-2:
+   *
+   * "auto" (default); "standard" | "auto"
+   *
+   * imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * "1K" (default); "1K" | "2K"
+   */
+  output_quality?: string;
+  /**
+   *  gpt-image-1, gpt-image-1-mini:
+   *
+   * "auto" (default); "1024x1024" | "1536x1024" | "1024x1536" | "auto"
+   *
+   * dall-e-3:
+   *
+   * "auto" (default); "1024x1024" | "1792x1024" | "1024x1792" | "auto"
+   *
+   * dall-e-2:
+   *
+   * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
+   *
+   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *
+   * "1:1"="1024x1024" (default) | "9:16"="768x1344" | "16:9"="1344x768" | "3:4"="864x1184" | "4:3"="1184x864"
+   *
+   * gemini-2.5-flash-image:
+   *
+   * "1:1"="1024x1024" (default) | "2:3"="832x1248" | "3:2"="1248x832" | "3:4"="864x1184" | "4:3"="1184x864" | "4:5"="896x1152" | "5:4"="1152x896" | "9:16"="768x1344" | "16:9"="1344x768" | "21:9"="1536x672"
+   *
+   */
+  output_size?: string;
+  /**
+   * **Imagen 3 & 4 models only**
+   *
+   * "allow_adult" (default) | "dont_allow" | "allow_all"
+   */
+  personGeneration?: string;
+  /**
+   * **dall-e-3 only**
+   *
+   * "vivid" (default) | "natural"
+   */
+  style?: string;
+  /**
+   * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+   *
+   * "url" (default) | "b64_json"
+   */
+  response_format?: "url" | "b64_json";
+
+  /**
+   * **gpt-image-1 and gpt-image-1-mini only**
+   *
+   * Optional mask for inpainting. Contains `image_url` (string, optional) and
+   * `file_id` (string, optional).
+   */
+  input_image_mask?: {
+    /**
+     * File ID for the mask image.
+     */
+    file_id?: string;
+    /**
+     * Base64-encoded URL or Image URL mask.
+     */
+    image_url?: string;
+  };
+
+  /**
+   *
+   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
+   *
+   * A seed value for reproducible results.
+   * 0 for random.
+   */
+  seed?: number;
+
+  /**
+   *
+   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
+   *
+   * Whether to automatically enhance the prompt.
+   * (Available on Imagen 4 and 3.0-002)
+   * Default: true
+   */
+  enhancePrompt?: boolean;
+};
+
+export type AIChatResponseImgGenFields = {
+  outputSize?: string;
+  outputQuality?: string;
+  outputCompression?: number;
+  outputBackground?: string;
+  outputWidth?: number;
+  outputHeight?: number;
+  outputAspectRatio?: number;
+  size?: number;
+  requestedCount?: number;
+  actualCount?: number;
+  outputFormat?: string;
+  outputMime?: string;
+  duration?: number;
+  seed?: number;
+  revisedPrompt?: string;
+  partialImagesRequested?: number;
+  partialImagesActual?: number;
+  partialImages?: {
+    index?: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  }[];
+  images?: {
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+    revisedPrompt?: string;
+  }[];
 };
 
 export type ImgGenStage =
