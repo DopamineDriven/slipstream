@@ -199,6 +199,31 @@ export class PrismaService extends ModelService {
     >["rt"];
   }
 
+  private toCompatPropsExtened<
+    const T extends "image_gen_request" | "ai_chat_request"
+  >(
+    target: T,
+    rt: BigIntToCompatProps<typeof target>["rt"],
+    assetInfo: {
+      /**
+       * count of assets bound to the current user messsage
+       */
+      assetCounts: number;
+      assets?: {
+        type: $Enums.AssetType;
+        compatStatus: $Enums.CompatStatus;
+        url: string;
+        mime: string;
+        ext: string;
+      }[];
+    }
+  ): BigIntToCompatProps<typeof target>["rtExtended"] {
+    return {
+      ...rt,
+      ...assetInfo
+    } satisfies BigIntToCompatProps<typeof target>["rtExtended"];
+  }
+
   public async handleImageGenRequest({
     userId,
     batchId,
@@ -345,9 +370,31 @@ export class PrismaService extends ModelService {
             orderBy: [{ createdAt: "desc" }],
             include: { image: true, document: true }
           });
+          const extended = attachments.map(t => {
+            const {
+              compatStatus,
+              assetType,
+              compatCdnUrl,
+              compatMime,
+              compatExt
+            } = t;
+            return {
+              type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
+              compatStatus: compatStatus ?? "ALIASED",
+              url: compatCdnUrl ?? "",
+              mime: compatMime ?? "",
+              ext: compatExt ?? ""
+            };
+          });
+
+          const withAssetInfo = {
+            assetCounts: extended.length,
+            assets: extended
+          };
+
           const connectById = attachments.map(({ id }) => ({ id }));
 
-          return await pr.conversation.create({
+          const create = await pr.conversation.create({
             include: includeWithAttachments,
             data: {
               attachments: { connect: connectById },
@@ -362,11 +409,17 @@ export class PrismaService extends ModelService {
               userId
             }
           });
+          return { create, withAssetInfo };
         });
-        return this.bigintToNumber("image_gen_request", {
-          apiKey,
-          ...batchIt
-        });
+
+        return this.toCompatPropsExtened(
+          "image_gen_request",
+          this.bigintToNumber("image_gen_request", {
+            apiKey,
+            ...batchIt.create
+          }),
+          batchIt.withAssetInfo
+        );
       }
 
       const p = await this.prismaClient.conversation.create({
@@ -383,7 +436,12 @@ export class PrismaService extends ModelService {
         }
       });
       const apiKeyAndRes = { apiKey, ...p };
-      return this.bigintToNumber("image_gen_request", apiKeyAndRes);
+
+      return this.toCompatPropsExtened(
+        "image_gen_request",
+        this.bigintToNumber("image_gen_request", apiKeyAndRes),
+        { assetCounts: 0, assets: undefined }
+      );
     } else {
       const conversationSettings = {
         update: {
@@ -402,9 +460,30 @@ export class PrismaService extends ModelService {
             orderBy: [{ createdAt: "desc" }],
             include: { image: true, document: true }
           });
+          const extended = attachments.map(t => {
+            const {
+              compatStatus,
+              assetType,
+              compatCdnUrl,
+              compatMime,
+              compatExt
+            } = t;
+            return {
+              type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
+              compatStatus: compatStatus ?? "ALIASED",
+              url: compatCdnUrl ?? "",
+              mime: compatMime ?? "",
+              ext: compatExt ?? ""
+            };
+          });
+
+          const withAssetInfo = {
+            assetCounts: extended.length,
+            assets: extended
+          };
 
           const connectById = attachments.map(({ id }) => ({ id }));
-          return await pr.conversation.update({
+          const create = await pr.conversation.update({
             include: includeWithAttachments,
             where: { id: conversationId },
             data: {
@@ -420,11 +499,16 @@ export class PrismaService extends ModelService {
               userKeyId: keyId
             }
           });
+          return { create, withAssetInfo };
         });
-        return this.bigintToNumber("image_gen_request", {
-          apiKey,
-          ...batchIt
-        });
+        return this.toCompatPropsExtened(
+          "image_gen_request",
+          this.bigintToNumber("image_gen_request", {
+            apiKey,
+            ...batchIt.create
+          }),
+          batchIt.withAssetInfo
+        );
       }
       const pr = await this.prismaClient.conversation.update({
         include: includeSansAttachments,
@@ -441,7 +525,11 @@ export class PrismaService extends ModelService {
         }
       });
       const apiKeyAndRes = { apiKey, ...pr };
-      return this.bigintToNumber("image_gen_request", apiKeyAndRes);
+      return this.toCompatPropsExtened(
+        "image_gen_request",
+        this.bigintToNumber("image_gen_request", apiKeyAndRes),
+        { assetCounts: 0, assets: undefined }
+      );
     }
   }
 

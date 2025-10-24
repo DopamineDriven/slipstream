@@ -67,10 +67,36 @@ export type BigIntToCompatProps<
   ? {
       props: ImageGenReqDbRes<false>;
       rt: ImageGenReqDbRes<true>;
+      rtExtended: ImageGenReqDbRes<true> & {
+        /**
+         * count of assets bound to the current user messsage
+         */
+        assetCounts: number;
+        assets?: {
+          type: $Enums.AssetType;
+          compatStatus: $Enums.CompatStatus;
+          url: string;
+          mime: string;
+          ext: string;
+        }[];
+      };
     }
   : {
       props: ConversationSingleton<false>;
       rt: ConversationSingleton<true>;
+      rtExtended: ConversationSingleton<true> & {
+        /**
+         * count of assets bound to the current user messsage
+         */
+        assetCounts: number;
+        assets?: {
+          type: $Enums.AssetType;
+          compatStatus: $Enums.CompatStatus;
+          url: string;
+          mime: string;
+          ext: string;
+        }[];
+      };
     };
 
 export type UpdateAttachmentMetadata = {
@@ -234,7 +260,14 @@ export interface ProviderChatRequestEntity {
   chunks: string[];
   thinkingChunks: string[];
   imgGenEnabled?: boolean;
+  partialImgArr?: {b64image_url: string;}[]
   imgGenFields?: AIChatRequestImgGenFields;
+}
+
+export type OpenAIPartialImgSummary ={
+  seq: number;
+  partial_index: number;
+  length: number;
 }
 
 export type BigIntOrNumber<T extends boolean = false> = T extends true
@@ -712,6 +745,20 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     region?: string;
     country?: string;
     tz?: string;
+  };
+
+  currentMsgBoundAssets?: {
+    /**
+     * count of assets bound to the current user messsage
+     */
+    assetCounts: number;
+    assets?: {
+      type: $Enums.AssetType;
+      compatStatus: $Enums.CompatStatus;
+      url: string;
+      mime: string;
+      ext: string;
+    }[];
   };
 }
 

@@ -284,6 +284,7 @@ export function OpenAIMixin<
             new OpenAIService(
               deps.logger,
               deps.prisma,
+              deps.extract,
               deps.redis,
               this.#openaiApiKey ?? ""
             );

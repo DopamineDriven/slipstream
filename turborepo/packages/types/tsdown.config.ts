@@ -22,6 +22,7 @@ export default defineConfig(
       ...options,
       entry: [
         "src/index.ts",
+        "src/events-images.ts",
         "src/events-workup.ts",
         "src/events.ts",
         "src/utils.ts",
