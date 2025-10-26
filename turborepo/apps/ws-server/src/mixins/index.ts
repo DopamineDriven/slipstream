@@ -9,6 +9,7 @@ import { v0Service } from "@/vercel/index.ts";
 import { xAIService } from "@/xai/index.ts";
 import type { Provider } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import { S3Storage } from "@slipstream/storage-s3";
 
 export type ProviderNarrowing<P extends Provider> = P extends "openai"
   ? OpenAIService
@@ -69,6 +70,7 @@ export interface ProviderDependencies {
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
   extract: ExtractService;
+  s3: S3Storage;
 }
 export type ProviderFactory<T> = (
   deps: ProviderDependencies,
@@ -285,6 +287,7 @@ export function OpenAIMixin<
               deps.logger,
               deps.prisma,
               deps.extract,
+              deps.s3,
               deps.redis,
               this.#openaiApiKey ?? ""
             );

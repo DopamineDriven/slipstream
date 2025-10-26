@@ -83,8 +83,6 @@ export class Resolver extends ModelService {
     );
   }
 
-
-
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   };
@@ -167,12 +165,19 @@ export class Resolver extends ModelService {
       content.push({ type: "input_text", text: msgs.content });
       try {
         const res = await openai.responses.create({
-          model: "gpt-5-mini",
+          model: "gpt-5-nano",
           store: false,
           reasoning: { effort: "minimal" },
-          instructions: `Generate a creative & descriptive yet concise title (max 12 words) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
           temperature: 1,
-          input: [{ role: "user", content } as const]
+          input: [
+            {
+              role: "system",
+              content:
+                "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+            },
+            { role: "user", content } as const
+          ]
         });
         const title = res.output_text;
         console.log(`1. ` + title);
@@ -184,11 +189,19 @@ export class Resolver extends ModelService {
     content.push({ type: "input_text", text: prompt });
     try {
       const res = await openai.responses.create({
-        model: "gpt-5-mini",
+        model: "gpt-5-nano",
         store: false,
-        instructions: `Generate a creative & descriptive yet concise title (max 12 words) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+        reasoning: { effort: "minimal" },
+        instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
         temperature: 1,
-        input: [{ role: "user", content } as const]
+        input: [
+          {
+            role: "system",
+            content:
+              "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+          },
+          { role: "user", content } as const
+        ]
       });
       const title = res.output_text;
       console.log(`2. ` + title);
@@ -270,8 +283,8 @@ export class Resolver extends ModelService {
       prompt = event.prompt,
       conversationIdInitial = event.conversationId,
       batchId = event.batchId,
-      isImgGenEnabled= event.imgGenEnabled,
-      imgGenFields =event.imgGenFields;
+      isImgGenEnabled = event.imgGenEnabled,
+      imgGenFields = event.imgGenFields;
 
     // Quick server-side guardrail: limit free-tier (fallback key) usage
     // Trust client-provided hasProviderConfigured to avoid extra lookups.
@@ -298,7 +311,8 @@ export class Resolver extends ModelService {
       hasProviderConfigured,
       maxTokens: max_tokens,
       isDefaultProvider,
-      systemPrompt,imgGenFields,
+      systemPrompt,
+      imgGenFields,
       temperature,
       topP,
       model,
@@ -310,7 +324,9 @@ export class Resolver extends ModelService {
       city: userData?.city ?? "Barrington",
       country: userData?.country ?? "US",
       region: userData?.region ?? "Illinois",
-      timezone: userData?.tz ? decodeURIComponent(userData.tz) : "America/Chicago"
+      timezone: userData?.tz
+        ? decodeURIComponent(userData.tz)
+        : "America/Chicago"
     } as const;
 
     const isNewChat = conversationIdInitial.startsWith("new-chat"),
@@ -361,7 +377,8 @@ export class Resolver extends ModelService {
         JSON.stringify({
           type: "ai_chat_chunk",
           conversationId,
-          userId,imgGenEnabled: false,
+          userId,
+          imgGenEnabled: false,
           chunk: chunks.join(""),
           thinkingText: thinkingAgg,
           thinkingDuration,
@@ -411,7 +428,7 @@ export class Resolver extends ModelService {
       title,
       topP
     };
-    console.log(apiKey ?? "no api Key")
+    console.log(apiKey ?? "no api Key");
     try {
       switch (provider) {
         case "gemini": {
@@ -460,7 +477,8 @@ export class Resolver extends ModelService {
           conversationId,
           model,
           systemPrompt,
-          temperature,imgGenEnabled: false,
+          temperature,
+          imgGenEnabled: false,
           imgGenFields: undefined,
           topP,
           title,
@@ -476,7 +494,8 @@ export class Resolver extends ModelService {
           type: "ai_chat_error",
           provider,
           conversationId,
-          model,imgGenEnabled: false,
+          model,
+          imgGenEnabled: false,
           imgGenFields: undefined,
           title,
           systemPrompt,

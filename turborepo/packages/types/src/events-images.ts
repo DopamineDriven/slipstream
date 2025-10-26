@@ -33,6 +33,225 @@ export type OpenAISizeQualityOpts = {
     "gpt-image-1-mini": "1024x1024" | "1536x1024" | "1024x1536" | "auto";
   };
 };
+
+export type GoogleImgSizeQualityOpts = {
+    size: {
+      "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+      "imagen-3.0-generate-002": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+      "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+      "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+      "gemini-2.5-flash-image":
+        | "1:1"
+        | "2:3"
+        | "3:2"
+        | "3:4"
+        | "4:3"
+        | "4:5"
+        | "5:4"
+        | "9:16"
+        | "16:9"
+        | "21:9";
+    };
+    quality: {
+      "imagen-4.0-fast-generate-001": "1K" | "2K";
+      "imagen-3.0-generate-002": "1K";
+      "imagen-4.0-generate-001": "1K" | "2K";
+      "imagen-4.0-ultra-generate-001": "1K" | "2K";
+    };
+};
+
+export type GoogleImgOutputFormat = {
+  format: {
+    "imagen-4.0-fast-generate-001": "image/png" | "image/jpeg";
+    "imagen-3.0-generate-002": "image/png" | "image/jpeg";
+    "imagen-4.0-generate-001": "image/png" | "image/jpeg";
+    "imagen-4.0-ultra-generate-001": "image/png" | "image/jpeg";
+  };
+};
+
+/** Required. The harm block threshold. */
+export enum GoogleSafetyFilterLevel {
+  BLOCK_LOW_AND_ABOVE = "BLOCK_LOW_AND_ABOVE",
+  BLOCK_MEDIUM_AND_ABOVE = "BLOCK_MEDIUM_AND_ABOVE",
+  BLOCK_ONLY_HIGH = "BLOCK_ONLY_HIGH",
+  BLOCK_NONE = "BLOCK_NONE"
+}
+
+/** Required. Harm category. */
+export enum GoogleHarmCategory {
+  /**
+   * The harm category is unspecified.
+   */
+  HARM_CATEGORY_UNSPECIFIED = "HARM_CATEGORY_UNSPECIFIED",
+  /**
+   * The harm category is harassment.
+   */
+  HARM_CATEGORY_HARASSMENT = "HARM_CATEGORY_HARASSMENT",
+  /**
+   * The harm category is hate speech.
+   */
+  HARM_CATEGORY_HATE_SPEECH = "HARM_CATEGORY_HATE_SPEECH",
+  /**
+   * The harm category is sexually explicit content.
+   */
+  HARM_CATEGORY_SEXUALLY_EXPLICIT = "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+  /**
+   * The harm category is dangerous content.
+   */
+  HARM_CATEGORY_DANGEROUS_CONTENT = "HARM_CATEGORY_DANGEROUS_CONTENT",
+  /**
+   * Deprecated: Election filter is not longer supported. The harm category is civic integrity.
+   */
+  HARM_CATEGORY_CIVIC_INTEGRITY = "HARM_CATEGORY_CIVIC_INTEGRITY",
+  /**
+   * The harm category is image hate. This enum value is not supported in Gemini API.
+   */
+  HARM_CATEGORY_IMAGE_HATE = "HARM_CATEGORY_IMAGE_HATE",
+  /**
+   * The harm category is image dangerous content. This enum value is not supported in Gemini API.
+   */
+  HARM_CATEGORY_IMAGE_DANGEROUS_CONTENT = "HARM_CATEGORY_IMAGE_DANGEROUS_CONTENT",
+  /**
+   * The harm category is image harassment. This enum value is not supported in Gemini API.
+   */
+  HARM_CATEGORY_IMAGE_HARASSMENT = "HARM_CATEGORY_IMAGE_HARASSMENT",
+  /**
+   * The harm category is image sexually explicit content. This enum value is not supported in Gemini API.
+   */
+  HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT = "HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT",
+  /**
+   * The harm category is for jailbreak prompts. This enum value is not supported in Gemini API.
+   */
+  HARM_CATEGORY_JAILBREAK = "HARM_CATEGORY_JAILBREAK"
+}
+
+export enum GooglePersonGeneration {
+  /**
+   * Block generation of images of people.
+   */
+  DONT_ALLOW = "DONT_ALLOW",
+  /**
+   * Generate images of adults, but not children.
+   */
+  ALLOW_ADULT = "ALLOW_ADULT",
+  /**
+   * Generate images that include adults and children.
+   */
+  ALLOW_ALL = "ALLOW_ALL"
+}
+
+export enum GoogleImagePromptLanguage {
+  /**
+   * Auto-detect the language.
+   */
+  auto = "auto",
+  /**
+   * English
+   */
+  en = "en",
+  /**
+   * Japanese
+   */
+  ja = "ja",
+  /**
+   * Korean
+   */
+  ko = "ko",
+  /**
+   * Hindi
+   */
+  hi = "hi",
+  /**
+   * Chinese
+   */
+  zh = "zh",
+  /**
+   * Portuguese
+   */
+  pt = "pt",
+  /**
+   * Spanish
+   */
+  es = "es"
+}
+
+export interface GoogleImagenGenerateImagesConfig {
+  /** Used to override HTTP request options. */
+  httpOptions?: {
+    /** The base URL for the AI platform service endpoint. */ baseUrl?: string;
+    /** Specifies the version of the API to use. */
+    apiVersion?: string;
+    /** Additional HTTP headers to be sent with the request. */
+    headers?: Record<string, string>;
+    /** Timeout for the request in milliseconds. */
+    timeout?: number;
+    /** Extra parameters to add to the request body.
+     The structure must match the backend API's request structure.
+     - VertexAI backend API docs: https://cloud.google.com/vertex-ai/docs/reference/rest
+     - GeminiAPI backend API docs: https://ai.google.dev/api/rest */
+    extraBody?: Record<string, unknown>;
+  };
+  /** Abort signal which can be used to cancel the request.
+
+     NOTE: AbortSignal is a client-only operation. Using it to cancel an
+     operation will not cancel the request in the service. You will still
+     be charged usage for any applicable operations.
+     */
+  abortSignal?: AbortSignal;
+  /** Cloud Storage URI used to store the generated images. */
+  outputGcsUri?: string;
+  /** Description of what to discourage in the generated images. */
+  negativePrompt?: string;
+  /** Number of images to generate. 1 min, 4 max (10 for Nano Banana) */
+  numberOfImages?: number;
+  /** Aspect ratio of the generated images. Supported values are
+     "1:1", "3:4", "4:3", "9:16", and "16:9". */
+  aspectRatio?: string;
+  /** Controls how much the model adheres to the text prompt. Large
+     values increase output and prompt alignment, but may compromise image
+     quality. */
+  guidanceScale?: number;
+  /** Random seed for image generation. This is not available when
+     ``add_watermark`` is set to true.
+     
+     Accepted integer values: 1-2147483647 */
+  seed?: number;
+  /** Filter level for safety filtering. */
+  safetyFilterLevel?: keyof typeof GoogleSafetyFilterLevel;
+  /** Allows generation of people by the model. */
+  personGeneration?: keyof typeof GooglePersonGeneration;
+  /** Whether to report the safety scores of each generated image and
+     the positive prompt in the response. */
+  includeSafetyAttributes?: boolean;
+  /** Whether to include the Responsible AI filter reason if the image
+     is filtered out of the response. */
+  includeRaiReason?: boolean;
+  /** Language of the text in the prompt. */
+  language?: keyof typeof GoogleImagePromptLanguage;
+  /** MIME type of the generated image.       
+   * 
+   *   "image/webp"
+      | "image/gif"
+      | "image/png"
+      | "image/vnd.microsoft.icon"
+      | "image/bmp"
+      | "image/tiff"
+      | "image/jpeg" */
+  outputMimeType?: string;
+  /** Compression quality of the generated image (for ``image/jpeg``
+     only). */
+  outputCompressionQuality?: number;
+  /** Whether to add a watermark to the generated images. */
+  addWatermark?: boolean;
+  /** User specified labels to track billing usage. */
+  labels?: Record<string, string>;
+  /** The size of the largest dimension of the generated image.
+     Supported sizes are 1K and 2K (not supported for Imagen 3 models). */
+  imageSize?: string;
+  /** Whether to use the prompt rewriting logic. */
+  enhancePrompt?: boolean;
+}
+
 /**
  * Shared OpenAI Image Options
  *
@@ -218,7 +437,7 @@ export type ImagenOptions = {
 
   /**
    * A seed value for reproducible results.
-   * 0 for random.
+   * accepted integer values: 1 - 2147483647
    */
   seed?: number;
 
@@ -279,6 +498,52 @@ export type NanoBananaImageGenOpts = {
      * * Default: 1, Max: 8
      */
     candidateCount?: number;
+
+    responseModalities: ["TEXT", "IMAGE"];
+    /**
+     * Specific controls for the image generation part.
+     */
+    imageConfig?: {
+      /**
+       * Number of images to generate for this request.
+       * Max: 10
+       */
+      sampleCount?: number;
+      /**
+       * Aspect ratio for the *output* images.
+       * Default: "1:1" (1024x1024)
+       *
+       * "2:3" (832x1248)
+       *
+       * "3:2" (1248x832)
+       *
+       * "3:4" (864x1184)
+       *
+       * "4:3" (1184x864)
+       *
+       * "4:5" (896x1152)
+       *
+       * "5:4" (1152x896)
+       *
+       * "9:16" (768x1344)
+       *
+       * "16:9" (1344x768)
+       *
+       * "21:9" (1536x672)
+       */
+      aspectRatio?:
+        | "1:1"
+        | "2:3"
+        | "3:2"
+        | "3:4"
+        | "4:3"
+        | "4:5"
+        | "5:4"
+        | "9:16"
+        | "16:9"
+        | "21:9";
+    };
+
     /**
      * Controls randomness. Lower is more deterministic.
      * Default: 1.0, Range: 0.0 - 2.0
@@ -294,50 +559,6 @@ export type NanoBananaImageGenOpts = {
      * Default: 64 (fixed)
      */
     topK?: number;
-  };
-
-  /**
-   * Specific controls for the image generation part.
-   */
-  imageConfig?: {
-    /**
-     * Number of images to generate for this request.
-     * Max: 10
-     */
-    sampleCount?: number;
-    /**
-     * Aspect ratio for the *output* images.
-     * Default: "1:1" (1024x1024)
-     *
-     * "2:3" (832x1248)
-     *
-     * "3:2" (1248x832)
-     *
-     * "3:4" (864x1184)
-     *
-     * "4:3" (1184x864)
-     *
-     * "4:5" (896x1152)
-     *
-     * "5:4" (1152x896)
-     *
-     * "9:16" (768x1344)
-     *
-     * "16:9" (1344x768)
-     *
-     * "21:9" (1536x672)
-     */
-    aspectRatio?:
-      | "1:1"
-      | "2:3"
-      | "3:2"
-      | "3:4"
-      | "4:3"
-      | "4:5"
-      | "5:4"
-      | "9:16"
-      | "16:9"
-      | "21:9";
   };
 };
 

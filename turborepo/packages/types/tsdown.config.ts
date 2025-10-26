@@ -31,7 +31,7 @@ export default defineConfig(
         "src/codegen/**/*.ts"
       ],
       cwd: process.cwd(),
-      target: ["node24.10.0"],
+      target: ["node25"],
       dts: true,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],

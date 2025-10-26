@@ -1,7 +1,7 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Unenumerate } from "@slipstream/types";
@@ -23,21 +23,6 @@ interface AttachmentDisplayProps {
   className?: string;
   compact?: boolean;
 }
-
-export function AttachmentDisplay({
-  attachments,
-  className,
-  compact = false
-}: AttachmentDisplayProps) {
-  const [expanded, setExpanded] = useState<{
-    url: string;
-    kind: "image" | "pdf";
-  } | null>(null);
-
-  if (!attachments || attachments.length === 0) {
-    return null;
-  }
-
   const formatFileSize = (bytes?: bigint | number): string => {
     if (!bytes) return "Unknown size";
     const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
@@ -66,15 +51,11 @@ export function AttachmentDisplay({
         return <FileText className="h-4 w-4" />;
     }
   };
-
   // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
   const getDisplayUrl = (attachment: MessageAttachment): string | null => {
     return attachment?.cdnUrl ?? null;
   };
 
-  const handlePreview = (url: string, kind: "image" | "pdf") => {
-    setExpanded({ url, kind });
-  };
 
   const handleDownload = (attachment: MessageAttachment) => {
     const url = getDisplayUrl(attachment);
@@ -89,7 +70,38 @@ export function AttachmentDisplay({
       document.body.removeChild(link);
     }
   };
+export function AttachmentDisplay({
+  attachments,
+  className,
+  compact = false
+}: AttachmentDisplayProps) {
+  const [expanded, setExpanded] = useState<{
+    url: string;
+    kind: "image" | "pdf";
+  } | null>(null);
 
+
+
+  const handlePreview = useCallback((url: string, kind: "image" | "pdf") => {
+    setExpanded({ url, kind });
+  },[]);
+
+  const handleDownload = (attachment: MessageAttachment) => {
+    const url = getDisplayUrl(attachment);
+    if (url) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
+      link.download = attachment?.filename ?? "download";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+  if (!attachments || attachments.length === 0) {
+    return null;
+  }
   return (
     <>
       <div className={cn("mt-2 space-y-2", className)}>
@@ -145,7 +157,7 @@ export function AttachmentDisplay({
           return (
             <Card key={attachment.id} className="p-3">
               <div className="flex items-center gap-3">
-                <div className="text-muted-foreground flex-shrink-0">
+                <div className="text-muted-foreground shrink-0">
                   {getFileIcon(attachment)}
                 </div>
                 <div className="min-w-0 flex-1">

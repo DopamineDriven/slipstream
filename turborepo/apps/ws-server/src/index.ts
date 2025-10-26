@@ -136,6 +136,7 @@ async function exe() {
       logger,
       prisma,
       extract,
+      s3,
       redisInstance,
       cfg.OPENAI_API_KEY
     );
@@ -160,7 +161,7 @@ async function exe() {
         openai: cfg.OPENAI_API_KEY,
         vercel: cfg.V0_API_KEY
       },
-      dependencies: { extract, logger, prisma, redis: redisInstance },
+      dependencies: { extract, logger, prisma, redis: redisInstance, s3 },
       anthropic,
       gemini,
       grok: xai,

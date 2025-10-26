@@ -38,11 +38,56 @@ export class Extract extends Unified {
     this.debug = !!opts?.debug;
   }
 
+  private fmt(msg: string | boolean) {
+    const ts = new Date(Date.now()).toISOString();
+    return `[extractor ${ts}]: ${msg}` as const;
+  }
+  private log(msg: unknown) {
+    if (msg instanceof Error) {
+      return this.fmt(msg.message);
+    }
+    if (Array.isArray(msg)) {
+      return this.fmt(JSON.stringify(msg, null, 2));
+    }
+    if (msg instanceof RangeError) {
+      return this.fmt(msg.message);
+    }
+    switch (typeof msg) {
+      case "bigint": {
+        return this.fmt(Number(msg).toPrecision(14));
+      }
+      case "boolean": {
+        return this.fmt(msg);
+      }
+      case "number": {
+        return this.fmt(msg.toPrecision(14));
+      }
+      case "object": {
+        return this.fmt(
+          JSON.stringify(msg, Object.getOwnPropertyNames(msg), 2)
+        );
+      }
+      case "string": {
+        return this.fmt(msg);
+      }
+      case "symbol": {
+        return this.fmt(msg.toString());
+      }
+      case "undefined": {
+        return this.fmt(`msg is undefined...`);
+      }
+      case "function": {
+        return this.fmt(msg.name);
+      }
+      default: {
+        return this.fmt("something went wrong...");
+      }
+    }
+  }
+
   private dlog(...args: any[]) {
     if (!this.debug) return;
-    const ts = new Date().toISOString();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    console.log(`[extractor ${ts}]`, ...args);
+    this.log(args);
   }
 
   // ---------- Quarantine helpers ----------
@@ -359,15 +404,19 @@ export class Extract extends Unified {
         }
       }
 
-      // 1) PDFs: need head + tail when big and ranged
+      // 1) PDFs and TIFFs: need head + tail when big and ranged
+      // TIFFs can have IFDs anywhere in the file, including at the end
       if (
         contentType &&
-        contentType === "application/pdf" &&
+        (contentType === "application/pdf" || contentType === "image/tiff") &&
         supportsRange &&
         contentLength > size * 2
       ) {
-        const startSize = Math.min(16384, size);
-        const endSize = Math.min(400000, contentLength);
+        // For TIFFs, we need a reasonable amount from both ends
+        // For PDFs, we need more from the end for the xref table
+        const isTiff = contentType === "image/tiff";
+        const startSize = isTiff ? Math.min(32768, size) : Math.min(16384, size);
+        const endSize = isTiff ? Math.min(32768, contentLength) : Math.min(400000, contentLength);
         const endStart = Math.max(0, contentLength - endSize);
 
         const [startRes, endRes] = await Promise.all([
@@ -400,7 +449,7 @@ export class Extract extends Unified {
             startRes.arrayBuffer(),
             endRes.arrayBuffer()
           ]);
-          this.dlog("fetchMinimalBuffer:pdf:ranged", {
+          this.dlog(`fetchMinimalBuffer:${contentType === "image/tiff" ? "tiff" : "pdf"}:ranged`, {
             url,
             startSize,
             endSize
@@ -414,7 +463,9 @@ export class Extract extends Unified {
             buffer,
             source: url,
             reportedTotalBytes: contentLength ?? undefined,
-            fetchedBytes: buffer.length
+            fetchedBytes: buffer.length,
+            // For TIFF, we need to know the total file size to handle the gap
+            totalFileSize: contentType === "image/tiff" ? contentLength : undefined
           };
         }
         // fall through if ranges misbehave
@@ -532,7 +583,9 @@ export class Extract extends Unified {
       // Prefer the full image workup (header-based, non-blocking). If it fails, fall back to dims-only.
       try {
         this.dlog("imageWorkup:start", { url, size, contentType });
-        const imgSpecs = this.img.getImageSpecsWorkup(buffer, size);
+        // For TIFF files, we may need more buffer than the default size to find IFDs
+        const workupSize = contentType === "image/tiff" ? buffer.length : size;
+        const imgSpecs = this.img.getImageSpecsWorkup(buffer, workupSize);
         this.dlog("imageWorkup:done", {
           url,
           w: imgSpecs.width,
@@ -568,6 +621,19 @@ export class Extract extends Unified {
             dims = this.sniffGifDims(buffer);
             format = "gif";
             break;
+          case "image/heic": {
+            dims = this.sniffHeic(buffer);
+            format = "heic";
+            break;
+          }
+          case "image/tiff": {
+            // For TIFF, we need the full buffer as IFDs can be anywhere in the file
+            // Pass the full buffer as rawbuffer, and a truncated version for initial checks
+            const truncated = buffer.subarray(0, Math.min(buffer.length, 4096 * 6));
+            dims = this.sniffTiff(buffer, truncated) ?? null;
+            format = "tiff"
+            break;
+          }
         }
         if (dims && format) {
           const { width, height } = dims;
@@ -617,6 +683,83 @@ export class Extract extends Unified {
     if (buf.readUInt32BE(8) !== 13 || buf.toString("ascii", 12, 16) !== "IHDR")
       return null;
     return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  }
+
+  private sniffTiff(rawbuffer:Buffer, buffer: Buffer){
+     if (
+      buffer.length >= 8 &&
+      // "II*\0" (little-endian classic TIFF)
+      ((buffer?.[0] === 0x49 &&
+        buffer?.[1] === 0x49 &&
+        buffer?.[2] === 0x2a &&
+        buffer?.[3] === 0x00) ||
+        // "MM\0*" (big-endian classic TIFF)
+        (buffer?.[0] === 0x4d &&
+          buffer?.[1] === 0x4d &&
+          buffer?.[2] === 0x00 &&
+          buffer?.[3] === 0x2a) ||
+        // BigTIFF magic "II+\0" or "MM\0+"
+        (buffer?.[0] === 0x49 &&
+          buffer?.[1] === 0x49 &&
+          buffer?.[2] === 0x2b &&
+          buffer?.[3] === 0x00) ||
+        (buffer?.[0] === 0x4d &&
+          buffer?.[1] === 0x4d &&
+          buffer?.[2] === 0x00 &&
+          buffer?.[3] === 0x2b))
+    ) {
+      const data = this.img.tiff(rawbuffer, buffer);
+      if (!data) return null;
+      else {
+        return {width: data.width, height: data.height}
+      }
+    }
+  }
+
+  private sniffHeic(buffer: Buffer) {
+    if (buffer.length >= 32 && buffer.toString("ascii", 4, 8) === "ftyp") {
+      const ftyp = this.img.findBox(buffer, "ftyp");
+      if (!ftyp) throw new Error("Invalid HEIC: No ftyp");
+      const brands = buffer
+        .toString("ascii", ftyp.pos, ftyp.pos + ftyp.size)
+        .toLowerCase();
+      const isHeic =
+        brands.includes("heic") ||
+        brands.includes("heix") ||
+        brands.includes("heim") ||
+        brands.includes("heis") ||
+        brands.includes("hevc") ||
+        brands.includes("hevx") ||
+        brands.includes("mif1");
+      if (!isHeic) return null;
+
+      const meta = this.img.findBox(buffer, "meta");
+      if (!meta) throw new Error("Invalid HEIC: No meta");
+      const metaSubStart = meta.pos + 4; // Skip version + flags
+      const metaSubEnd = meta.pos + meta.size;
+
+      const iprp = this.img.findBox(buffer, "iprp", metaSubStart, metaSubEnd);
+      if (!iprp) throw new Error("Invalid HEIC: No iprp");
+      const ipco = this.img.findBox(
+        buffer,
+        "ipco",
+        iprp.pos,
+        iprp.pos + iprp.size
+      );
+      if (!ipco) throw new Error("Invalid HEIC: No ipco");
+      const ispe = this.img.findBox(
+        buffer,
+        "ispe",
+        ipco.pos,
+        ipco.pos + ipco.size
+      );
+      if (!ispe) throw new Error("Invalid HEIC: No ispe");
+
+      if (buffer[ispe.pos] !== 0) throw new Error("Invalid ispe version");
+      const width = buffer.readUInt32BE(ispe.pos + 4);
+      const height = buffer.readUInt32BE(ispe.pos + 8);
+      return { width, height };
+    } else return null;
   }
 
   private sniffGifDims(buf: Buffer) {

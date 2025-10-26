@@ -1,7 +1,6 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
-import type { ImageSpecs } from "@/utils/img-extractor-client";
 import {
   createContext,
   useCallback,
@@ -14,6 +13,7 @@ import {
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
 import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
+import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { createDraftId } from "@slipstream/types";
 
 /** Public context shape — intentionally small (mirrors AIChatContext vibe) */
@@ -86,7 +86,7 @@ type UploadTask = {
   size: number;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: ExpandedImgSpecs | ExpandedDocSpecs;
 
   // presign/instructions
   bucket?: string;
@@ -484,11 +484,17 @@ export function AssetProvider({
         task.cdnUrl = evt.cdnUrl ?? evt.downloadUrl ?? task.cdnUrl ?? null;
         task.publicUrl = evt.publicUrl ?? task.publicUrl ?? null;
         // keep width/height/metadata if provided
-        if (evt.metadata?.dimensions && task.metadata?.aspectRatio) {
+        if (
+          task.metadata?.type === "IMAGE" &&
+          evt.metadata?.dimensions &&
+          task.metadata?.aspectRatio
+        ) {
           task.metadata.aspectRatio =
             evt.metadata.dimensions.width / evt.metadata.dimensions.height;
           task.metadata.width = evt.metadata.dimensions.width;
           task.metadata.height = evt.metadata.dimensions.height;
+        } else if (task.metadata?.type === "DOCUMENT") {
+          task.metadata.byteSize = evt.size;
         }
       }
       recompute();

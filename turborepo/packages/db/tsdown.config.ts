@@ -28,8 +28,7 @@ export default defineConfig(
       clean: true,
       dts: true,
       cwd: process.cwd(),
-      target: "node24",
-      outDir: "dist",
-      unbundle: true
+      target: "esnext",
+      outDir: "dist"
     }) satisfies Options
 );

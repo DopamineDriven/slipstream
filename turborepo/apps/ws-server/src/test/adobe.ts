@@ -151,6 +151,7 @@ export function deepTransform<T, TResult = T>(
   // Arrays
   if (Array.isArray(value)) {
     return value.map((item, index) =>
+      // eslint-disable-next-line
       deepTransform(item, transformer, [...path, String(index)], visited)
     ) as unknown as TResult;
   }
@@ -183,6 +184,7 @@ export function deepTransform<T, TResult = T>(
   }
 
   // Plain objects
+        // eslint-disable-next-line
   const proto = Object.getPrototypeOf(value);
   if (proto === Object.prototype || proto === null) {
     const result: Record<string, unknown> = {};

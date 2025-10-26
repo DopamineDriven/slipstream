@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import type { DocSpecs, ImageSpecs } from "@slipstream/types";
-import {
-  ImgMetadataExtractor
-} from "@/utils/img-extractor-client";
-import {DocMetadataExtractor} from "@/utils/doc-extractor-client";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
+import { Extract } from "@slipstream/metadata";
+
 export interface AttachmentPreview {
   id: string;
   file: File;
@@ -18,7 +16,7 @@ export interface AttachmentPreview {
   error?: string;
   width?: number;
   height?: number;
-  metadata?: ImageSpecs;
+  metadata?: ExpandedImgSpecs | ExpandedDocSpecs;
 }
 
 export interface AttachmentPreviewProps {
@@ -28,21 +26,21 @@ export interface AttachmentPreviewProps {
 export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [metadata, setMetadata] = useState<
-    Record<string, ImageSpecs | DocSpecs>
+    Record<string, ExpandedImgSpecs | ExpandedDocSpecs>
   >({});
   const [size, setSize] = useState<Record<string, number>>({});
 
+  const extractor = useMemo(() => new Extract(), []);
+
   // Helper: produce document specs using the client-side extractor
   const getDocumentSpecsWorkup = useCallback(
-    async (file: File): Promise<DocSpecs | null> => {
+    async (file: File): Promise<ExpandedDocSpecs | null> => {
       try {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        const extractor = new DocMetadataExtractor();
         const specs = extractor.getDocumentSpecsWorkup(
           buffer,
-          file.type || "application/octet-stream",
-          file.name
+          file.type || "application/octet-stream"
         );
         return specs;
       } catch (err) {
@@ -50,7 +48,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
         return null;
       }
     },
-    []
+    [extractor]
   );
 
   useEffect(() => {
@@ -73,12 +71,12 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
               try {
                 const arrayBuffer = await attachment.file.arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
-                const extractor = new ImgMetadataExtractor();
+
                 const imageSpecs = extractor.getImageSpecsWorkup(buffer);
 
                 setMetadata(prev => ({
                   ...prev,
-                  [attachment.id]: {type: "IMAGE", ...imageSpecs }
+                  [attachment.id]: { ...imageSpecs }
                 }));
                 setSize(prev => ({
                   ...prev,
@@ -126,7 +124,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
         })();
       }
     });
-  }, [attachments, thumbnails, getDocumentSpecsWorkup]);
+  }, [attachments, thumbnails, getDocumentSpecsWorkup, extractor]);
 
   const formatFileSize = useCallback((bytes: number) => {
     if (bytes === 0) return "0 B";

@@ -107,7 +107,24 @@ async function openAiFetcher() {
     }
   });
 }
-
+async function _llamaFetcher() {
+  const  res =  await fetch("https://api.llama.com/v1/models", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
+      "Content-Type": "application/json"
+    }
+  });
+  console.log(res.headers);
+  return res
+}
+async function _v0Fetcher() {
+  return await fetch("https://api.v0.dev/v1/models", {
+    headers: {
+      Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
+    }
+  });
+}
 async function grokFetcher() {
   return await fetch("https://api.x.ai/v1/models", {
     headers: {
@@ -118,7 +135,7 @@ async function grokFetcher() {
 
 async function geminiFetcher() {
   return await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
+    `https://generativelanguage.googleapis.com/v1alpha/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
   );
 }
 

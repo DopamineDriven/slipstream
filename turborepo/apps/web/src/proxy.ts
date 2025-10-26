@@ -134,7 +134,7 @@ function detectDeviceAndSetCookies(
   return response;
 }
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const session = (await getCookieCache(req)) satisfies CookieCacheProps;
 
   if (!session && !req.nextUrl.pathname.includes("/auth")) {

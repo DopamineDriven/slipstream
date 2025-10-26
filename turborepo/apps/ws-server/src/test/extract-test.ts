@@ -1,10 +1,76 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
+import type {
+  $Enums,
+  DocumentMetadata,
+  ImageMetadata
+} from "@slipstream/db/node/generated/client";
+import {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs,
+  Extract
+} from "@slipstream/metadata";
+
+type UserDrivenEnvRT = {
+  assetType: $Enums.AssetType;
+  cdnUrl: string | null;
+  compatMime: string | null;
+  compatExt: string | null;
+  compatStatus: $Enums.CompatStatus | null;
+  compatCdnUrl: string | null;
+  size: bigint | null;
+  ext: string | null;
+  mime: string | null;
+  image: {
+    createdAt: Date;
+    updatedAt: Date;
+    attachmentId: string;
+    format: $Enums.ImageFormat;
+    width: number;
+    height: number;
+    aspectRatio: number | null;
+    frames: number;
+    hasAlpha: boolean | null;
+    animated: boolean;
+    orientation: number | null;
+    colorSpace: $Enums.ColorSpace | null;
+    exifDateTimeOriginal: Date | null;
+    cameraMake: string | null;
+    cameraModel: string | null;
+    lensModel: string | null;
+    gpsLat: number | null;
+    gpsLon: number | null;
+    dominantColorHex: string | null;
+    iccProfile: string | null;
+  } | null;
+  document: {
+    createdAt: Date;
+    updatedAt: Date;
+    attachmentId: string;
+    format: string;
+    pageCount: number | null;
+    wordCount: number | null;
+    language: string | null;
+    title: string | null;
+    author: string | null;
+    subject: string | null;
+    keywords: string[];
+    pdfVersion: string | null;
+    isEncrypted: boolean;
+    isSearchable: boolean;
+    encoding: string | null;
+    lineCount: number | null;
+    textPreview: string | null;
+  } | null;
+}[];
 
 dotenv.config({ quiet: true });
 
 class Data extends Fs {
-  constructor() {
+  constructor(
+    public targetEnv: "dev" | "prod",
+    private extract: Extract
+  ) {
     super(process.cwd());
   }
   public data = async (env: string) => {
@@ -22,8 +88,13 @@ class Data extends Fs {
           compatCdnUrl: true,
           mime: true,
           compatMime: true,
+          assetType: true,
+          size: true,
+          compatStatus: true,
           ext: true,
-          compatExt: true
+          compatExt: true,
+          image: true,
+          document: true
         }
       });
     } catch (err) {
@@ -33,111 +104,338 @@ class Data extends Fs {
     }
   };
 
-  public async Prod() {
-    let compatCounts: Record<string, number> = {};
-    let compatExtCounts: Record<string, number> = {};
-    let counts: Record<string, number> = {};
-    let extCounts: Record<string, number> = {};
+  private async prodWorkup() {
     const { Credentials } = await import("@slipstream/credentials");
     const cred = new Credentials();
     const env = await cred.get("DIRECT_URL");
     const s = await this.data(env);
-    if (!s) throw new Error("no data returned");
+    if (!s) throw new Error("no data returned -- prod");
+    return s;
+  }
 
-    const assets = (
-      s.filter(
-        t =>
-          t.cdnUrl !== null &&
-          t.mime !== null &&
-          t.ext !== null &&
-          !t.cdnUrl.startsWith("https://assets.d0paminedriven") &&
-          !t.cdnUrl.startsWith("https://ws-server-assets-prod")
-      ) as {
-        cdnUrl: string;
-        compatMime: string | null;
-        compatExt: string | null;
-        compatCdnUrl: string | null;
-        ext: string;
-        mime: string;
-      }[]
-    ).map(v => {
-      counts[v.mime] = (counts[v.mime] ?? 0) + 1;
-      extCounts[v.ext] = (extCounts[v.ext] ?? 0) + 1;
-      return { url: v.cdnUrl, mime: v.mime, ext: v.ext };
-    });
+  private async devWorkup() {
+    const cred = process.env.DIRECT_URL;
+    if (!cred) throw new Error("DIRECT_URL env var not set in .env");
+    const s = await this.data(cred);
+    if (!s) throw new Error("no data returned -- dev");
+    return s;
+  }
 
-    const compatAssets = (
-      s.filter(
-        t =>
-          t.compatMime !== null &&
-          t.compatExt !== null &&
-          t.compatCdnUrl !== null &&
-          !t.compatCdnUrl.startsWith("https://assets.d0paminedriven")
-      ) as {
-        cdnUrl: string | null;
-        compatMime: string;
-        compatExt: string;
-        compatCdnUrl: string;
-        ext: string | null;
-        mime: string | null;
-      }[]
-    ).map(v => {
-      compatCounts[v.compatMime] = (compatCounts[v.compatMime] ?? 0) + 1;
-      compatExtCounts[v.compatExt] = (compatExtCounts[v.compatExt] ?? 0) + 1;
-      return {
-        compatUrl: v.compatCdnUrl,
-        compatMime: v.compatMime,
-        compatExt: v.compatExt
+  private async userDrivenEnv() {
+    if (this.targetEnv === "dev") {
+      return await this.devWorkup();
+    } else return await this.prodWorkup();
+  }
+
+  public async exe() {
+    let compatCounts: Record<string, number> = {};
+    let compatExtCounts: Record<string, number> = {};
+    let counts: Record<string, number> = {};
+    let extCounts: Record<string, number> = {};
+    let u = Array.of<string>();
+
+    const s = (await this.userDrivenEnv()) satisfies UserDrivenEnvRT;
+    try {
+      const assets = (
+        s.filter(
+          t =>
+            t.cdnUrl !== null &&
+            t.mime !== null &&
+            t.ext !== null &&
+            !t.cdnUrl.startsWith("https://assets.d0paminedriven") &&
+            !t.cdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+            !t.cdnUrl.startsWith("https://ws-server-assets-dev") &&
+            !t.cdnUrl.startsWith("https://ws-server-assets-prod")
+        ) as {
+          cdnUrl: string;
+          compatMime: string | null;
+          compatExt: string | null;
+          compatCdnUrl: string | null;
+          ext: string;
+          mime: string;
+        }[]
+      ).map(v => {
+        counts[v.mime] = (counts[v.mime] ?? 0) + 1;
+        extCounts[v.ext] = (extCounts[v.ext] ?? 0) + 1;
+        return { url: v.cdnUrl, mime: v.mime, ext: v.ext };
+      });
+
+      const compatAssets = (
+        s.filter(
+          t =>
+            t.compatMime !== null &&
+            t.compatExt !== null &&
+            t.compatCdnUrl !== null &&
+            !t.compatCdnUrl.startsWith("https://assets.d0paminedriven") &&
+            !t.compatCdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+            !t.compatCdnUrl.startsWith("https://ws-server-assets-dev") &&
+            !t.compatCdnUrl.startsWith("https://ws-server-assets-prod")
+        ) as {
+          cdnUrl: string | null;
+          compatMime: string;
+          compatExt: string;
+          compatCdnUrl: string;
+          ext: string | null;
+          mime: string | null;
+        }[]
+      ).map(v => {
+        compatCounts[v.compatMime] = (compatCounts[v.compatMime] ?? 0) + 1;
+        compatExtCounts[v.compatExt] = (compatExtCounts[v.compatExt] ?? 0) + 1;
+        return {
+          compatUrl: v.compatCdnUrl,
+          compatMime: v.compatMime,
+          compatExt: v.compatExt
+        };
+      });
+
+      const _media = (_target: keyof typeof $Enums.AssetType) =>
+        (
+          s.filter(
+            t =>
+              t.assetType &&
+              t.compatStatus !== null &&
+              t.size !== null &&
+              t.compatCdnUrl !== null &&
+              t.compatExt !== null &&
+              t.compatCdnUrl !== null &&
+              !t.compatCdnUrl.startsWith("https://assets.d0paminedriven") &&
+              !t.compatCdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+              !t.compatCdnUrl.startsWith("https://ws-server-assets-dev") &&
+              !t.compatCdnUrl.startsWith("https://ws-server-assets-prod") &&
+              t.cdnUrl !== null &&
+              t.mime !== null &&
+              t.ext !== null &&
+              !t.compatCdnUrl.startsWith("https://assets.d0paminedriven") &&
+              !t.compatCdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+              !t.compatCdnUrl.startsWith("https://ws-server-assets-dev") &&
+              !t.compatCdnUrl.startsWith("https://ws-server-assets-prod")
+          ) as {
+            cdnUrl: string;
+            compatMime: string;
+            compatExt: string;
+            compatCdnUrl: string;
+            ext: string;
+            mime: string;
+            compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED";
+            size: bigint;
+            assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
+            image?: ImageMetadata;
+            document?: DocumentMetadata;
+          }[]
+        ).map(v => {
+          const {
+            cdnUrl,
+            compatCdnUrl,
+            compatExt,
+            compatMime,
+            compatStatus,
+            ext,
+            mime,
+            document,
+            image,
+            size: s
+          } = v;
+
+          const size = Number(s);
+          if (v.assetType === "IMAGE" && typeof image !== "undefined") {
+            const {
+              width,
+              height,
+              iccProfile,
+              animated,
+              aspectRatio,
+              colorSpace,
+              hasAlpha,
+              attachmentId,
+              frames,
+              exifDateTimeOriginal
+            } = image;
+
+            return {
+              compatExt,
+              compatMime,
+              compatCdnUrl,
+              attachmentId,
+              compatStatus,
+              cdnUrl,
+              mime,
+              ext,
+              width,
+              height,
+              iccProfile,
+              animated,
+              aspectRatio: aspectRatio ?? width / height,
+              colorSpace,
+              hasAlpha,
+              frames,
+              exifDateTimeOriginal,
+              size
+            };
+          } else if (
+            v.assetType === "DOCUMENT" &&
+            typeof document !== "undefined"
+          ) {
+            const {
+              isSearchable,
+              isEncrypted,
+              keywords,
+              pageCount,
+              textPreview,
+              pdfVersion,
+              author,
+              createdAt,
+              lineCount,
+              updatedAt,
+              wordCount,
+              title,
+              attachmentId
+            } = document;
+
+            return {
+              compatExt,
+              compatMime,
+              compatCdnUrl,
+              attachmentId,
+              compatStatus,
+              cdnUrl,
+              mime,
+              ext,
+              isSearchable,
+              isEncrypted,
+              keywords,
+              pageCount,
+              textPreview,
+              pdfVersion,
+              author,
+              createdAt,
+              lineCount,
+              updatedAt,
+              wordCount,
+              title,
+              size
+            };
+          }
+          counts[v.mime] = (counts[v.mime] ?? 0) + 1;
+          extCounts[v.ext] = (extCounts[v.ext] ?? 0) + 1;
+          compatCounts[v.compatMime] = (compatCounts[v.compatMime] ?? 0) + 1;
+          compatExtCounts[v.compatExt] =
+            (compatExtCounts[v.compatExt] ?? 0) + 1;
+          return {
+            compatExt,
+            compatMime,
+            compatCdnUrl,
+            size,
+            compatStatus,
+            cdnUrl,
+            mime,
+            ext
+          };
+        });
+
+      const urlsOnly = (
+        s.filter(
+          t =>
+            t.cdnUrl !== null &&
+            !t.cdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+            !t.cdnUrl.startsWith("https://assets.d0paminedriven") &&
+            !t.cdnUrl.startsWith("https://ws-server-assets-dev") &&
+            !t.cdnUrl.startsWith("https://ws-server-assets-prod")
+        ) as { cdnUrl: string }[]
+      ).map(v => v.cdnUrl);
+
+      const compatUrlsOnly = (
+        s.filter(
+          t =>
+            t.compatCdnUrl !== null &&
+            t.compatStatus !== null &&
+            t.compatStatus === "ACTIVE" &&
+            !t.compatCdnUrl.startsWith("https://assets.d0paminedriven") &&
+            !t.compatCdnUrl.startsWith("https://assets-dev.d0paminedriven") &&
+            !t.compatCdnUrl.startsWith("https://ws-server-assets-dev") &&
+            !t.compatCdnUrl.startsWith("https://ws-server-assets-prod")
+        ) as { compatCdnUrl: string }[]
+      ).map(v => v.compatCdnUrl);
+      const data = {
+        nonCompat: { mime: counts, ext: extCounts },
+        compat: { mime: compatCounts, ext: compatExtCounts }
       };
-    });
 
-    const data = {
-      nonCompat: { mime: counts, ext: extCounts },
-      compat: { mime: compatCounts, ext: compatExtCounts }
-    };
-
-    const map = assets.map((t, i) => {
-      // prettier-ignore
-      return `${i++}
+      const map = assets.map((t, i) => {
+        // prettier-ignore
+        return `${i++}
 url="${t.url}"
 mime="${t.mime}"
 ext="${t.ext}"`
-    });
-    const cMap = compatAssets.map((t, i) => {
-      // prettier-ignore
-      return `${i++}
+      });
+      const cMap = compatAssets.map((t, i) => {
+        // prettier-ignore
+        return `${i++}
 url="${t.compatUrl}"
 mime="${t.compatMime}"
 ext="${t.compatExt}"`
-    });
-    this.withWs(
-      `src/test/__out__/aggregate/asset-counts.json`,
-      JSON.stringify(data, null, 2)
-    );
-    this.withWs(`src/test/__out__/aggregate/assets-data.txt`, map.join("\n\n"));
-    this.withWs(
-      `src/test/__out__/aggregate/assets.json`,
-      JSON.stringify(assets, null, 2)
-    );
-    this.withWs(
-      `src/test/__out__/aggregate/compat-assets-data.txt`,
-      cMap.join("\n\n")
-    );
-    this.withWs(
-      `src/test/__out__/aggregate/compat-assets.json`,
-      JSON.stringify(compatAssets, null, 2)
-    );
-    return { assets, compatAssets };
+      });
+      const urls = [...urlsOnly, ...compatUrlsOnly];
+
+      u = urls;
+      this.withWs(
+        `src/test/__out__/aggregate/${this.targetEnv}/asset-counts.json`,
+        JSON.stringify(data, null, 2)
+      );
+      this.withWs(
+        `src/test/__out__/aggregate/${this.targetEnv}/assets-data.txt`,
+        map.join("\n\n")
+      );
+      this.withWs(
+        `src/test/__out__/aggregate/${this.targetEnv}/assets.json`,
+        JSON.stringify(assets, null, 2)
+      );
+      this.withWs(
+        `src/test/__out__/aggregate/${this.targetEnv}/compat-assets-data.txt`,
+        cMap.join("\n\n")
+      );
+      this.withWs(
+        `src/test/__out__/aggregate/${this.targetEnv}/compat-assets.json`,
+        JSON.stringify(compatAssets, null, 2)
+      );
+      const ss = JSON.stringify(urls, null, 2);
+      this.withWs(
+        `src/test/__out__/ts/${this.targetEnv}/cdn-url-bulk.ts`,
+        `export const ${this.targetEnv}CdnUrls = ${ss}`
+      );
+      return { assets, compatAssets, urls };
+    } catch (err) {
+      const _e = err;
+      throw new Error("something went wrong");
+    } finally {
+      const v = Array.of<ExpandedDocSpecs | ExpandedImgSpecs>();
+      let i = 0;
+      i < u.length;
+      try {
+        for (const uu of u) {
+          v.push(await this.extract.extractRemote(uu, 4096 * 24));
+        }
+      } finally {
+        this.withWs(
+          `src/test/__out__/aggregate/agg/${this.targetEnv}/metadata.json`,
+          JSON.stringify(v)
+        );
+      }
+    }
   }
 }
 
-new Data().Prod().then(v => {
-  console.log({
-    nonCompat: v.assets.length ?? 0,
-    compat: v.compatAssets.length ?? 0
+const extract = new Extract();
+const argv3 = process.argv[3];
+
+if (argv3 && (argv3 === "dev" || argv3 === "prod")) {
+  new Data(argv3, extract).exe().then(v => {
+    console.log({
+      nonCompat: v.assets.length ?? 0,
+      compat: v.compatAssets.length ?? 0
+    });
+    return v;
   });
-  return v;
-});
+}
 
 // const mapper = [
 //   "https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1759612202052-pollingplaces_6_28_2022_19_13_50.xlsx",

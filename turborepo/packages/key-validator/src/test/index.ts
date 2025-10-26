@@ -19,7 +19,7 @@ async function anthropicFetcher() {
 }
 
 async function llamaFetcher() {
-  const  res =  await fetch("https://api.llama.com/v1/models/Llama-4-Scout-17B-16E-Instruct-FP8", {
+  const  res =  await fetch("https://api.llama.com/v1/models", {
     method: "GET",
     headers: {
       Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
@@ -30,7 +30,7 @@ async function llamaFetcher() {
   return res
 }
 async function v0Fetcher() {
-  return await fetch("https://api.v0.dev/v1/user", {
+  return await fetch("https://api.v0.dev/v1/models", {
     headers: {
       Authorization: `Bearer ` + (process.env.V0_API_KEY ?? "")
     }
@@ -54,7 +54,7 @@ async function grokFetcher() {
 
 async function geminiFetcher() {
   const gemini = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
+    `https://generativelanguage.googleapis.com/v1alpha/models?key=${process.env.GOOGLE_API_KEY ?? ""}&pageSize=1000`
   );
   console.log(gemini.status);
   return gemini;
