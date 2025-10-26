@@ -15,4 +15,5 @@ export type {
   SpreadSheetDocSpecs,
   ZipEntry
 } from "@/types/index.ts";
+export type { ExtractorHardenedOptions } from "@/extract/index.ts";
 export { Extract } from "@/extract/index.ts";

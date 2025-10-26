@@ -413,7 +413,7 @@ body::-webkit-scrollbar-thumb {
 @layer components {
   .container {
     margin-inline: auto;
-    @apply [padding-inline:1rem] sm:[padding-inline:2rem] lg:[padding-inline:3rem];
+    @apply px-4 sm:px-8 lg:px-12;
   }
 
   .truncate {
@@ -510,7 +510,7 @@ code > [data-line]::before {
 }
 
 .prose pre {
-  @apply border-accent-foreground relative m-0 overflow-x-auto rounded-lg border-[0.0625rem] border-solid bg-transparent p-0 text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
+  @apply border-accent-foreground relative m-0 overflow-x-auto rounded-lg border border-solid bg-transparent p-0 text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
 }
 
 @media (width < 768px) {

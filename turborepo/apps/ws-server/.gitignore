@@ -5,8 +5,9 @@ public/inspect/*
 aes*
 prisma/db_dump.bak
 public/*
-src/test/xai/*
-src/test/openai/*
-src/test/chapters/*
+src/test/**ai/*
+src/test/v0/*
+src/test/sanity/*
+src/test/c**/*
 *.pdf
 testing.sh

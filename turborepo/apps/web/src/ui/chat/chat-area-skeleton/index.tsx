@@ -1,6 +1,6 @@
 export function ChatAreaSkeleton() {
   return (
-    <div className="flex-grow p-2 sm:p-4 md:p-6">
+    <div className="grow p-2 sm:p-4 md:p-6">
       <div className="space-y-4">
         {/* User message skeleton */}
         <div className="flex justify-end">

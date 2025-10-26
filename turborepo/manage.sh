@@ -137,6 +137,7 @@ build_targeted() {
         "@slipstream/encryption"
         "@slipstream/key-validator"
         "@slipstream/types"
+        "@slipstream/img-gen"
         "@slipstream/metadata"
         "@slipstream/storage-s3"
         "@slipstream/ws-server"

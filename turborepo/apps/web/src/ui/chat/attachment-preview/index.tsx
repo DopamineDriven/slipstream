@@ -85,7 +85,7 @@ export function AttachmentPreviewComponent({
         return (
           <Card key={attachment.id} className="border-border/50 bg-muted/30">
             <CardContent className="flex items-center gap-3 p-1.5">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {attachment.mime.startsWith("image/") ? (
                   <div className="relative">
                     <NextImage

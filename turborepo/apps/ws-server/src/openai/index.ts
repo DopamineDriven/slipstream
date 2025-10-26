@@ -376,6 +376,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
           );
         }
       }
+      
       if (done) {
         await this.prisma.handleAiChatResponse({
           chunk: openaiAgg,

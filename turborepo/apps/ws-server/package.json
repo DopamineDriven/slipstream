@@ -105,6 +105,7 @@
     "@slipstream/credentials": "workspace:*",
     "@slipstream/db": "workspace:*",
     "@slipstream/encryption": "workspace:*",
+    "@slipstream/img-gen": "workspace:*",
     "@slipstream/key-validator": "workspace:*",
     "@slipstream/metadata": "workspace:*",
     "@slipstream/redis-service": "workspace:*",

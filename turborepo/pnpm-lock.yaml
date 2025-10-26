@@ -113,6 +113,9 @@ importers:
       '@slipstream/encryption':
         specifier: workspace:*
         version: link:../../packages/encryption
+      '@slipstream/img-gen':
+        specifier: workspace:*
+        version: link:../../packages/img-gen
       '@slipstream/key-validator':
         specifier: workspace:*
         version: link:../../packages/key-validator
@@ -405,6 +408,9 @@ importers:
       '@slipstream/encryption':
         specifier: workspace:*
         version: link:../../packages/encryption
+      '@slipstream/img-gen':
+        specifier: workspace:*
+        version: link:../../packages/img-gen
       '@slipstream/key-validator':
         specifier: workspace:*
         version: link:../../packages/key-validator
@@ -703,6 +709,64 @@ importers:
       dotenv-cli:
         specifier: ^10.0.0
         version: 10.0.0
+      eslint:
+        specifier: ^9.38.0
+        version: 9.38.0(jiti@2.6.1)
+      jiti:
+        specifier: ^2.6.1
+        version: 2.6.1
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      terser:
+        specifier: ^5.44.0
+        version: 5.44.0
+      tsdown:
+        specifier: ^0.15.9
+        version: 0.15.9(oxc-resolver@11.8.3)(typescript@5.9.3)(unplugin-lightningcss@0.4.3)
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.46.2
+        version: 8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
+
+  packages/img-gen:
+    dependencies:
+      '@slipstream/metadata':
+        specifier: workspace:*
+        version: link:../metadata
+      '@slipstream/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@d0paminedriven/fs':
+        specifier: ^7.6.0
+        version: 7.6.0
+      '@slipstream/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
+      '@slipstream/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@slipstream/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      '@types/node':
+        specifier: ^24.9.1
+        version: 24.9.1
+      chokidar:
+        specifier: ^4.0.3
+        version: 4.0.3
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
       eslint:
         specifier: ^9.38.0
         version: 9.38.0(jiti@2.6.1)

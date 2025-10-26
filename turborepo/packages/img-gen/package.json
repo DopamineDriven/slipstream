@@ -1,0 +1,74 @@
+{
+  "name": "@slipstream/img-gen",
+  "version": "1.0.0",
+  "description": "convenient img-gen utils",
+  "publishConfig": {
+    "access": "public",
+    "typesVersions": {
+      "*": {
+        "*": [
+          "dist/*.d.ts",
+          "dist/*/index.d.ts"
+        ],
+        "provider-validation": [
+          "dist/provider-validation/index.d.ts"
+        ]
+      }
+    }
+  },
+  "license": "MIT",
+  "source": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/*/index.d.ts"
+      ],
+      "provider-validation": [
+        "dist/provider-validation/index.d.ts"
+      ]
+    }
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**/*.{js,cjs,d.ts,d.cts,css}"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js",
+    "./provider-validation": "./dist/provider-validation/index.js"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "pnpm build",
+    "lint": "eslint",
+    "clean": "git clean -xdf .turbo dist node_modules",
+    "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
+  },
+  "dependencies": {
+    "@slipstream/metadata": "workspace:*",
+    "@slipstream/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@d0paminedriven/fs": "^7.6.0",
+    "@slipstream/eslint-config": "workspace:*",
+    "@slipstream/prettier-config": "workspace:*",
+    "@slipstream/tsconfig": "workspace:*",
+    "@types/node": "^24.9.1",
+    "chokidar": "^4.0.3",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.38.0",
+    "jiti": "^2.6.1",
+    "prettier": "^3.6.2",
+    "terser": "^5.44.0",
+    "tsdown": "^0.15.9",
+    "tslib": "^2.8.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  },
+  "prettier": "@slipstream/prettier-config"
+}

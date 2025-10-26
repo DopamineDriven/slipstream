@@ -9,8 +9,10 @@ export default defineConfig(
       | "entry"
       | "target"
       | "dts"
+      | "watch"
       | "format"
       | "cwd"
+      | "sourcemap"
       | "clean"
       | "outDir"
       | "tsconfig"
@@ -19,16 +21,17 @@ export default defineConfig(
     ({
       ...options,
       entry: [
-        "!src/generated/prisma-edge/internal/query_engine_bg.*",
-        "!src/test/**",
-        "!edge/**",
-        "src/**/*.ts"
+        "src/index.ts",
+        "src/provider-validation/index.ts"
       ],
-      format: ["esm"],
-      clean: true,
-      dts: true,
       cwd: process.cwd(),
-      target: "esnext",
+      target: ["node25"],
+      dts: true,
+      watch: process.env.NODE_ENV === "development",
+      format: ["esm"],
+      sourcemap: true,
+      tsconfig: relative(process.cwd(), "tsconfig.json"),
+      clean: true,
       outDir: "dist"
     }) satisfies Options
 );

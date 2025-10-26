@@ -134,4 +134,6 @@ export interface ExpandedDocSpecs extends DocSpecs {
 
 }
 
-export type Constructor<T = object> = new (...args: any[]) => T;
+export type Constructor<A extends any[] = any[], I = object> = new (
+  ...args: A
+) => I;

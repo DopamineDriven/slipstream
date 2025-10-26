@@ -3,7 +3,7 @@ import { inflateSync } from "fflate";
 
 export class DocMetadataExtractor {
   // Safer decoding with fallback paths
-  private toSafeString(buf: Uint8Array, encoding = "utf-8"): string {
+  protected toSafeString(buf: Uint8Array, encoding = "utf-8"): string {
     try {
       // TextDecoder is available in browsers and modern runtimes
       return new TextDecoder(encoding, { fatal: false }).decode(buf);
@@ -15,7 +15,7 @@ export class DocMetadataExtractor {
     }
   }
 
-  private detectTextEncodingPrefix(buffer: Uint8Array): {
+  protected detectTextEncodingPrefix(buffer: Uint8Array): {
     encoding: string;
     offset: number;
   } {
@@ -35,7 +35,7 @@ export class DocMetadataExtractor {
   }
 
   // Best-effort text detection/decoding with UTF-8 validation and Windows-1252 fallback
-  private detectAndDecodeText(buffer: Uint8Array): string {
+  protected detectAndDecodeText(buffer: Uint8Array): string {
     const { encoding, offset } = this.detectTextEncodingPrefix(buffer);
     const body = buffer.subarray(offset);
     if (encoding === "utf-8" && offset === 0) {
