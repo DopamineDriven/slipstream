@@ -4,7 +4,7 @@ import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
-import type { DocSpecs, ImageSpecs } from "@slipstream/types";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { Button, Card, CardContent, FileText, X } from "@slipstream/ui";
 
 interface AttachmentPreviewProps {
@@ -13,7 +13,7 @@ interface AttachmentPreviewProps {
   className?: string;
   // Optional: if provided, component won't run useAssetMetadata
   thumbnails?: Record<string, string>;
-  metadata?: Record<string, ImageSpecs | DocSpecs>;
+  metadata?: Record<string, ExpandedImgSpecs | ExpandedDocSpecs>;
   getStatusText?: (attachment: AttachmentPreview) => string;
   getStatusColor?: (status: AttachmentPreview["status"]) => string;
   formatFileSize?: (bytes: number) => string;
@@ -39,7 +39,7 @@ export function AttachmentPreviewComponent({
   const formatFileSize = externalFormatFileSize ?? internalData.formatFileSize;
 
   if (attachments.length === 0) return null;
-
+  console.log({ metadata });
   return (
     <div
       className={cn(
@@ -65,7 +65,7 @@ export function AttachmentPreviewComponent({
         let docEncoding: string | null = null;
         if (metaType === "DOCUMENT") {
           if (meta?.type === "DOCUMENT") {
-            const d = meta as DocSpecs;
+            const d = meta satisfies ExpandedDocSpecs;
             docFormat = d.format ? d.format.toUpperCase() : null;
             docPageCount = d.pageCount ?? null;
             docWordCount = d.wordCount ?? null;
@@ -80,7 +80,6 @@ export function AttachmentPreviewComponent({
           }
         }
 
-
         const thumbnail = thumbnails[attachment.id];
         return (
           <Card key={attachment.id} className="border-border/50 bg-muted/30">
@@ -89,7 +88,10 @@ export function AttachmentPreviewComponent({
                 {attachment.mime.startsWith("image/") ? (
                   <div className="relative">
                     <NextImage
-                      src={thumbnail ?? "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
+                      src={
+                        thumbnail ??
+                        "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
+                      }
                       alt={attachment.filename}
                       width={attachment.width}
                       height={attachment.height}
@@ -128,7 +130,8 @@ export function AttachmentPreviewComponent({
                     {formatFileSize(attachment.size)}
                   </span>
                   {attachment.mime.startsWith("image/") &&
-                    metaType === "IMAGE" && meta?.type === "IMAGE" && (
+                    metaType === "IMAGE" &&
+                    meta?.type === "IMAGE" && (
                       <>
                         <span className="text-muted-foreground">•</span>
                         <span className="text-muted-foreground">
@@ -169,7 +172,9 @@ export function AttachmentPreviewComponent({
                       {docFormat && (
                         <>
                           <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">{docFormat}</span>
+                          <span className="text-muted-foreground">
+                            {docFormat}
+                          </span>
                         </>
                       )}
                       {typeof docPageCount === "number" && (
@@ -183,13 +188,17 @@ export function AttachmentPreviewComponent({
                       {typeof docWordCount === "number" && (
                         <>
                           <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">{docWordCount} words</span>
+                          <span className="text-muted-foreground">
+                            {docWordCount} words
+                          </span>
                         </>
                       )}
                       {docEncoding && (
                         <>
                           <span className="text-muted-foreground">•</span>
-                          <span className="text-muted-foreground">{docEncoding}</span>
+                          <span className="text-muted-foreground">
+                            {docEncoding}
+                          </span>
                         </>
                       )}
                     </>

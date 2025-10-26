@@ -13,6 +13,7 @@ import type {
   Unenumerate
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import { S3Storage } from "@slipstream/storage-s3";
 import { OpenAIServiceWorkup } from "./workup.ts";
 
 export class OpenAIService extends OpenAIServiceWorkup {
@@ -23,6 +24,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
     logger: LoggerService,
     protected prisma: PrismaService,
     private extractor: ExtractService,
+    private s3: S3Storage,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
@@ -82,6 +84,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
       openaiThinkingAgg = "",
       openaiAgg = "",
       partialImgsRequested = false,
+      outputFormat: "png" | "jpeg" | "webp" = "png",
       partialImgAgg: [string, number] | undefined = undefined,
       finalImgAgg: string | undefined = undefined,
       str: Stream<OpenAI.Responses.ResponseStreamEvent> & {
@@ -145,7 +148,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
     ) {
       const r = resImg as GptImageAndFacilitatorsImgGenWorkupRT;
       partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
-
+      outputFormat = r.output_format;
       const tools = this.handleTooling(
         m,
         hasFiles,
@@ -237,6 +240,22 @@ export class OpenAIService extends OpenAIServiceWorkup {
       if (s.type === "response.output_item.added") {
         if (s.item.type === "image_generation_call") {
           s.item.result;
+          if (s.item.result) {
+            const contentType =
+              outputFormat === "jpeg"
+                ? "image/jpeg"
+                : outputFormat === "png"
+                  ? "image/png"
+                  : "image/webp";
+
+            const _uploadingDirect = await this.s3.uploadDirect(s.item.result, {
+              contentType,
+              filename: s.item.id.concat(s.output_index.toString(10)),
+              origin: "GENERATED",
+              userId,
+              conversationId
+            });
+          }
           s.item.id;
         }
       }
@@ -376,7 +395,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
           );
         }
       }
-      
+
       if (done) {
         await this.prisma.handleAiChatResponse({
           chunk: openaiAgg,
@@ -437,3 +456,4 @@ export class OpenAIService extends OpenAIServiceWorkup {
     }
   }
 }
+
