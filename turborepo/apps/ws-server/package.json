@@ -102,6 +102,7 @@
     "@opentelemetry/instrumentation-http": "^0.207.0",
     "@opentelemetry/sdk-metrics": "^2.2.0",
     "@opentelemetry/sdk-node": "^0.207.0",
+    "@paralleldrive/cuid2": "^3.1.0",
     "@slipstream/credentials": "workspace:*",
     "@slipstream/db": "workspace:*",
     "@slipstream/encryption": "workspace:*",

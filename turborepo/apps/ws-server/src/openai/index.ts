@@ -5,13 +5,15 @@ import { Stream } from "openai/core/streaming.mjs";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { init } from "@paralleldrive/cuid2";
 import type {
-  AIChatResponseImgGenFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
   OpenAiModelIdUnion,
-  Unenumerate
+  S3Checksum,
+  S3StorageClass
 } from "@slipstream/types";
+import { ExpandedImgSpecs } from "@slipstream/metadata";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 import { OpenAIServiceWorkup } from "./workup.ts";
@@ -25,6 +27,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
     protected prisma: PrismaService,
     private extractor: ExtractService,
     private s3: S3Storage,
+    private isProd: boolean,
     private redis: EnhancedRedisPubSub,
     private apiKey: string
   ) {
@@ -51,6 +54,23 @@ export class OpenAIService extends OpenAIServiceWorkup {
     return client;
   }
 
+  public generatorGroupId(convoId: string, timestamp: number) {
+    const createId = init({
+      fingerprint: `openai-${convoId}-${timestamp}`,
+      random: () => Math.random(),
+      length: 10
+    });
+    return createId();
+  }
+
+  public getGenMime(target: "png" | "webp" | "jpeg") {
+    return target === "jpeg"
+      ? "image/jpeg"
+      : target === "png"
+        ? "image/png"
+        : "image/webp";
+  }
+
   public async handleOpenaiAiChatRequest({
     chunks,
     conversationId,
@@ -69,24 +89,113 @@ export class OpenAIService extends OpenAIServiceWorkup {
     title,
     topP,
     currentMsgBoundAssets,
-    imgGenEnabled = false,
+    imgGenEnabled,
     imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
     const m = model as OpenAiModelIdUnion;
     const provider = "openai" as const;
-    const partialImgArr = Array.of<[string, number]>();
-    const _finalImgArr =
-      Array.of<Unenumerate<AIChatResponseImgGenFields>["images"]>();
+    /**
+     *
+    cdnUrl: string;
+    index: number;
+    itemId: string;
+    filename?: string;
+    ext?: string | undefined;
+    etag?: string | undefined;
+    size?: number | undefined;
+    s3LastModified?: string | undefined;
+    ContentDisposition?: string | undefined;
+    CacheControl?: string | undefined;
+    Checksum?: S3Checksum;
+    StorageClass?: S3StorageClass;
+     */
+    const partialImgArr = Array.of<
+      [
+        number,
+        string,
+        string,
+        number,
+        number,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        number | undefined,
+        string | undefined,
+        string | undefined,
+        string | undefined,
+        S3Checksum | undefined,
+        S3StorageClass | undefined,
+        string,
+        (
+          | {
+              animated: boolean;
+              aspectRatio: number;
+              cameraMake: null;
+              cameraModel: null;
+              colorSpace:
+                | "unknown"
+                | "srgb"
+                | "display_p3"
+                | "adobe_rgb"
+                | "prophoto_rgb"
+                | "rec2020"
+                | "rec709"
+                | "cmyk"
+                | "lab"
+                | "xyz"
+                | "gray";
+              dominantColorHex: null;
+              exifDateTimeOriginal: Date | null;
+              format:
+                | "apng"
+                | "png"
+                | "jpeg"
+                | "gif"
+                | "bmp"
+                | "webp"
+                | "avif"
+                | "heic"
+                | "svg"
+                | "ico"
+                | "tiff"
+                | undefined;
+              frames: number;
+              gpsLat: null;
+              gpsLon: null;
+              hasAlpha: boolean;
+              height: number;
+              width: number;
+              iccProfile: string | null;
+              lensModel: null;
+              orientation: number | null;
+              createdAt: undefined;
+              updatedAt: undefined;
+            }
+          | undefined
+        )
+      ]
+    >();
+    let finalImgObj:
+      | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
+      | undefined;
     let openaiThinkingStartTime: number | null = null,
       openaiThinkingDuration = 0,
       openaiIsCurrentlyThinking = false,
       openaiThinkingAgg = "",
+      tInitial = 0,
+      openaiResId: string | null = null,
       openaiAgg = "",
       partialImgsRequested = false,
       outputFormat: "png" | "jpeg" | "webp" = "png",
-      partialImgAgg: [string, number] | undefined = undefined,
-      finalImgAgg: string | undefined = undefined,
+      partialImgAgg:
+        | [number, string, string, number, number, string]
+        | undefined = undefined,
       str: Stream<OpenAI.Responses.ResponseStreamEvent> & {
         _request_id?: string | null;
       };
@@ -117,17 +226,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
       });
     }
 
-    const tools = this.handleTooling(
-      m,
-      hasFiles,
-      loc,
-      vectorStoreId ? [vectorStoreId] : undefined
-    );
-
-    const reasoning = this.openaiReasoning(m, "medium", "auto");
+    const reasoning = this.openaiReasoning(m, "medium", "auto", imgGenEnabled);
 
     const resImg = this.responsesImgGen(
-      imgGenEnabled,
+      imgGenEnabled ?? false,
       m,
       imgGenFields,
       currentMsgBoundAssets
@@ -175,49 +277,61 @@ export class OpenAIService extends OpenAIServiceWorkup {
         instructions: this.buildInstructions(systemPrompt),
         store: false,
         model: m,
-        text: this.openAiVerbosity(m, "medium"),
+        text: this.openAiVerbosity(m, "medium", imgGenEnabled),
         temperature,
         max_output_tokens: max_tokens,
         top_p: topP,
         safety_identifier: userId,
+        include: ["message.input_image.image_url"],
+        truncation: "auto",
+        tool_choice: "required",
+        tools
+      });
+    } else {
+      const tools = this.handleTooling(
+        m,
+        hasFiles,
+        loc,
+        vectorStoreId ? [vectorStoreId] : undefined,
+        imgGenEnabled,
+        undefined
+      );
+      str = await client.responses.create({
+        stream: true,
+        input: formatted,
+        instructions: this.buildInstructions(systemPrompt),
+        store: false,
+        model: m,
+        text: this.openAiVerbosity(
+          model as OpenAiModelIdUnion,
+          "medium",
+          imgGenEnabled
+        ),
+        temperature,
         include: [
           "web_search_call.action.sources",
           "web_search_call.results",
           "message.input_image.image_url"
         ],
+        max_output_tokens: max_tokens,
+        top_p: topP,
+        safety_identifier: userId,
         truncation: "auto",
         reasoning,
         parallel_tool_calls: true,
         tools
       });
     }
-    str = await client.responses.create({
-      stream: true,
-      input: formatted,
-      instructions: this.buildInstructions(systemPrompt),
-      store: false,
-      model: m,
-      text: this.openAiVerbosity(model as OpenAiModelIdUnion, "medium"),
-      temperature,
-      include: [
-        "web_search_call.action.sources",
-        "web_search_call.results",
-        "message.input_image.image_url"
-      ],
-      max_output_tokens: max_tokens,
-      top_p: topP,
-      safety_identifier: userId,
-      truncation: "auto",
-      reasoning,
-      parallel_tool_calls: true,
-      tools
-    });
-
     for await (const s of str) {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
+        partialIndex: number | undefined,
         done = false;
+      let rtHelper;
 
+      if (s.type === "response.created" && tInitial === 0) {
+        tInitial = performance.now();
+      }
       if (
         s.type === "response.reasoning_text.delta" ||
         s.type === "response.reasoning_summary_text.delta"
@@ -233,32 +347,42 @@ export class OpenAIService extends OpenAIServiceWorkup {
         partialImgsRequested &&
         s.type === "response.image_generation_call.partial_image"
       ) {
-        // push to s3, get cdnUrl to pass to streamed res
-        partialImgAgg = [s.partial_image_b64, s.partial_image_index];
-        s.item_id;
-      }
-      if (s.type === "response.output_item.added") {
-        if (s.item.type === "image_generation_call") {
-          s.item.result;
-          if (s.item.result) {
-            const contentType =
-              outputFormat === "jpeg"
-                ? "image/jpeg"
-                : outputFormat === "png"
-                  ? "image/png"
-                  : "image/webp";
-
-            const _uploadingDirect = await this.s3.uploadDirect(s.item.result, {
-              contentType,
-              filename: s.item.id.concat(s.output_index.toString(10)),
-              origin: "GENERATED",
-              userId,
-              conversationId
-            });
-          }
-          s.item.id;
+        if (!partialIndex || partialIndex !== s.partial_image_index) {
+          partialIndex = s.partial_image_index;
+          const { width, height, format } =
+            this.extractor.img.getImageSpecsWorkup(
+              Buffer.from(s.partial_image_b64, "base64")
+            );
+          partialImgAgg = [
+            s.partial_image_index,
+            s.partial_image_b64,
+            s.item_id,
+            width,
+            height,
+            format as
+              | "apng"
+              | "png"
+              | "jpeg"
+              | "gif"
+              | "bmp"
+              | "webp"
+              | "avif"
+              | "heic"
+              | "svg"
+              | "ico"
+              | "tiff"
+              | "jpg"
+          ];
         }
       }
+      // if (s.type === "response.output_item.added") {
+      //   if (s.item.type === "image_generation_call" && s.item.result) {
+      //     if (s.item.status === "generating") {
+      //       console.log("generating in the response.output_item.added for loop!")
+      //       finalImgObj = s.item;
+      //     }
+      //   }
+      // }
 
       if (s.type === "response.output_text.delta") {
         if (
@@ -278,22 +402,173 @@ export class OpenAIService extends OpenAIServiceWorkup {
         done = true;
       }
       if (s.type === "response.completed") {
-        s.response.usage;
-        s.response.output;
+        openaiResId = s.response.id;
         for (const r of s.response.output) {
           if (r.type === "image_generation_call" && r.result) {
-            finalImgAgg = r.result;
+            if (r.result !== null) {
+              finalImgObj = r;
+              const rrr = r as {
+                /**
+                 * The unique ID of the image generation call.
+                 */
+                id: string;
+
+                /**
+                 * The generated image encoded in base64.
+                 */
+                result: string | null;
+
+                /**
+                 * The status of the image generation call.
+                 */
+                status: "in_progress" | "completed" | "generating" | "failed";
+
+                background: "opaque" | "transparent" | "auto";
+
+                output_format: "png" | "jpeg" | "webp";
+                quality: "high" | "medium" | "low" | "auto";
+
+                revised_prompt: string | null;
+
+                /**
+                 * The type of the image generation call. Always `image_generation_call`.
+                 */
+                type: "image_generation_call";
+              };
+
+              console.log(
+                `yes this item contains more fields than is reported! ` +
+                  rrr.revised_prompt || rrr.id
+              );
+              done = true;
+            }
           }
         }
       }
-      if (partialImgAgg) {
-        partialImgArr.push(partialImgAgg);
-        // b64url to upload to s3 -> get cdnUrl -> forward to client
-        const _partial = partialImgAgg[0];
-      }
-      if (finalImgAgg) {
-        // TODO UPLOAD WITH S3 TO GET CDN URL AND GET INFO ON width, height, etc via extractor service
-        const _toUpload = finalImgAgg;
+      if (imgGenEnabled) {
+        if (partialImgAgg) {
+          const itemId = partialImgAgg[2];
+          const partialIndex = partialImgAgg[0];
+          const ext = partialImgAgg[5] as
+            | "apng"
+            | "png"
+            | "jpeg"
+            | "gif"
+            | "bmp"
+            | "webp"
+            | "avif"
+            | "heic"
+            | "svg"
+            | "ico"
+            | "tiff"
+            | "jpg";
+          const mimeType =
+            ext === "png"
+              ? "image/png"
+              : ext === "webp"
+                ? "image/webp"
+                : ext === "jpeg"
+                  ? "jpg"
+                  : ext === "jpg"
+                    ? "jpg"
+                    : "application/octet-stream";
+          const filename = itemId
+            .concat("-")
+            .concat(partialIndex.toString(10))
+            .concat(`.${ext}`);
+          const b64 = partialImgAgg[1];
+
+          rtHelper = await this.s3.uploadGenerated(
+            Buffer.from(b64, "base64"),
+            this.isProd,
+            {
+              contentType: mimeType ?? this.getGenMime(outputFormat),
+              filename,
+              origin: "GENERATED",
+              userId,
+              conversationId
+            }
+          );
+
+          const getIt = (await this.extractor.extractRemote(
+            rtHelper.cdnUrl,
+            4096 * 24
+          )) as ExpandedImgSpecs;
+          const d = this.handleAssetMetadata(getIt).img;
+          partialImgArr.push([
+            partialIndex,
+            rtHelper.cdnUrl ?? "",
+            itemId,
+            getIt.width,
+            getIt.height,
+            getIt.contentType ??
+              rtHelper.contentType ??
+              mimeType ??
+              this.getGenMime(outputFormat),
+            rtHelper.bucket,
+            rtHelper.key,
+            rtHelper.versionId,
+            rtHelper.s3ObjectId,
+            filename,
+            rtHelper.extension,
+            rtHelper?.etag,
+            getIt?.byteSize ?? rtHelper?.size,
+            rtHelper?.lastModified,
+            rtHelper?.contentDisposition,
+            rtHelper?.cacheControl,
+            rtHelper?.checksum,
+            rtHelper?.storageClass,
+            itemId,
+            d
+          ]);
+
+          console.log(partialImgArr);
+          partialImgAgg = undefined;
+        }
+        ws.send(
+          JSON.stringify({
+            type: "ai_chat_chunk",
+            conversationId,
+            done: false,
+            userId,
+            model,
+            provider,
+            imgGenEnabled,
+            imgGenFields: {
+              partialImagesActual: partialImgArr.length,
+              partialImages: this.mapPartialImgGenArr(partialImgArr)
+            },
+            systemPrompt,
+            temperature,
+            title,
+            topP,
+            thinkingDuration: openaiThinkingStartTime
+              ? performance.now() - openaiThinkingStartTime
+              : undefined,
+            isThinking: true
+          } satisfies EventTypeMap["ai_chat_chunk"])
+        );
+        void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
+          type: "ai_chat_chunk",
+          conversationId,
+          userId,
+          model,
+          thinkingDuration: openaiThinkingStartTime
+            ? performance.now() - openaiThinkingStartTime
+            : undefined,
+          title,
+          systemPrompt,
+          imgGenFields: {
+            partialImagesActual: partialImgArr.length,
+            partialImages: this.mapPartialImgGenArr(partialImgArr)
+          },
+          temperature,
+          topP,
+          provider,
+          thinkingText: thinkingText,
+          isThinking: true,
+          done: false
+        });
       }
       if (thinkingText) {
         openaiThinkingAgg += thinkingText;
@@ -308,7 +583,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
             model,
             provider,
             imgGenEnabled,
-            imgGenFields: {},
+            imgGenFields: {
+              partialImagesActual: partialImgArr.length,
+              partialImages: this.mapPartialImgGenArr(partialImgArr)
+            },
             systemPrompt,
             temperature,
             title,
@@ -330,6 +608,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
             : undefined,
           title,
           systemPrompt,
+          imgGenFields: {
+            partialImagesActual: partialImgArr.length,
+            partialImages: this.mapPartialImgGenArr(partialImgArr)
+          },
           temperature,
           topP,
           provider,
@@ -348,8 +630,13 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             provider,
             title,
+            imgGenEnabled,
             model,
             systemPrompt,
+            imgGenFields: {
+              partialImagesActual: partialImgArr.length,
+              partialImages: this.mapPartialImgGenArr(partialImgArr)
+            },
             temperature,
             topP,
             chunk: text,
@@ -365,9 +652,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
           userId,
           model,
           title,
+          imgGenEnabled,
           systemPrompt,
           temperature,
           topP,
+          imgGenFields: {
+            partialImagesActual: partialImgArr.length,
+            partialImages: this.mapPartialImgGenArr(partialImgArr)
+          },
           provider,
           thinkingText:
             openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
@@ -396,64 +688,265 @@ export class OpenAIService extends OpenAIServiceWorkup {
         }
       }
 
-      if (done) {
-        await this.prisma.handleAiChatResponse({
-          chunk: openaiAgg,
-          conversationId,
-          done: true,
-          title,
-          temperature,
-          topP,
-          provider,
-          userId,
-          systemPrompt,
-          model,
-          thinkingText:
-            openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-          thinkingDuration:
-            openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
-        });
-        ws.send(
-          JSON.stringify({
+      if (done && openaiResId) {
+        console.log(openaiResId);
+
+        const duration = (performance.now() - tInitial) / 1000;
+        if (imgGenEnabled && finalImgObj?.result) {
+          const b64 = Buffer.from(finalImgObj.result, "base64");
+          const { format } = this.extractor.img.getImageSpecsWorkup(
+            b64,
+            4096 * 16
+          );
+
+          const filename = finalImgObj.id
+            .concat("-")
+            .concat(partialImgArr.length.toString(10))
+            .concat(`.${format}`);
+          const rt = await this.s3.uploadGenerated(b64, this.isProd, {
+            contentType: this.getGenMime(outputFormat),
+            filename: filename,
+            userId,
+            conversationId,
+            origin: "GENERATED"
+          });
+
+          const finalSpecs = (await this.extractor.extractRemote(
+            rt.cdnUrl,
+            4096 * 24
+          )) as ExpandedImgSpecs;
+
+          const generationGroupId = openaiResId;
+
+          const imgMeta = this.handleAssetMetadata(finalSpecs).img;
+
+          const imgFinal = {
+            cdnUrl: rt.cdnUrl,
+            index: partialImgArr.length,
+            itemId: finalImgObj.id,
+            width: finalSpecs.width,
+            height: finalSpecs.height,
+            mime:
+              finalSpecs.contentType ??
+              rt.contentType ??
+              this.getGenMime(outputFormat),
+            bucket: rt.bucket,
+            key: rt.key,
+            versionId: rt.versionId,
+            s3ObjectId: rt.s3ObjectId,
+            filename,
+            ext: format,
+            etag: rt.etag,
+            size: finalSpecs.byteSize ?? rt.size ?? undefined,
+            s3LastModified: rt.lastModified,
+            ContentDisposition: rt.contentDisposition,
+            CacheControl: rt.cacheControl,
+            Checksum: rt.checksum,
+            StorageClass: rt.storageClass,
+            generationGroupId,
+            image: imgMeta
+          } as const;
+
+          const image = [
+            {
+              cdnUrl: rt?.cdnUrl ?? "",
+              height: finalSpecs?.height ?? 0,
+              width: finalSpecs?.width ?? 0,
+              mime: finalSpecs?.contentType ?? this.getGenMime(outputFormat)
+            }
+          ];
+
+          const remapPartials = this.mapPersistenceImgGenArr(partialImgArr).map(
+            v => {
+              const { generationGroupId: _placeholder, ...rest } = v;
+              return {
+                ...rest,
+                generationGroupId
+              };
+            }
+          );
+
+          const height = finalSpecs?.height ?? 0,
+            width = finalSpecs?.width ?? 0;
+
+          await this.prisma.handleAiChatResponse({
+            chunk: openaiAgg,
+            conversationId,
+            done: true,
+            title,
+            temperature,
+            topP,
+            provider,
+            userId,
+            systemPrompt,
+            s3ObjectId: rt.s3ObjectId,
+            bucket: rt.bucket,
+            key: rt.key,
+            cdnUrl: rt.cdnUrl,
+            height: finalSpecs.height,
+            mime: rt.contentType,
+            size: rt.size ?? finalSpecs.byteSize,
+            versionId: rt.versionId,
+            width: finalSpecs.width,
+            model,
+            imgGenEnabled: true,
+            imgGenFields: {
+              duration,
+              revisedPrompt:
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : undefined,
+              actualCount: partialImgArr.length,
+              outputAspectRatio: width / height,
+              outputFormat: outputFormat,
+              partialImagesRequested:
+                imgGenFields?.output_partial_images ?? undefined,
+              requestedCount: imgGenFields?.n ?? 1,
+              outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
+              outputMime:
+                finalSpecs.contentType ?? this.getGenMime(outputFormat),
+              outputWidth: width,
+              outputHeight: height,
+              size: finalSpecs.byteSize ?? 0,
+              partialImagesActual: partialImgArr.length,
+              partialImages: remapPartials,
+              images: [imgFinal]
+            },
+            thinkingText:
+              openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+            thinkingDuration:
+              openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
+          });
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_response",
+              conversationId,
+              userId,
+              provider,
+              model,
+              title,
+              imgGenEnabled: true,
+              systemPrompt,
+              temperature,
+              imgGenFields: {
+                duration,
+                actualCount: partialImgArr.length,
+                outputAspectRatio: width / height,
+                outputFormat: outputFormat,
+                outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
+                outputMime: this.getGenMime(outputFormat),
+                outputWidth: width,
+                outputHeight: height,
+                size: finalSpecs.byteSize ?? 0,
+                partialImagesActual: partialImgArr.length,
+                partialImages: this.mapPartialImgGenArr(partialImgArr),
+                images: image
+              },
+              topP,
+              chunk: openaiAgg,
+              thinkingText:
+                openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+              thinkingDuration:
+                openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
+              done: true
+            } satisfies EventTypeMap["ai_chat_response"])
+          );
+          void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
             type: "ai_chat_response",
             conversationId,
             userId,
-            provider,
-            model,
-            title,
             systemPrompt,
             temperature,
-            topP,
-            chunk: openaiAgg,
+            imgGenEnabled,
+            imgGenFields: {
+              actualCount: partialImgArr.length,
+              outputAspectRatio: width / height,
+              outputFormat: outputFormat,
+              outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
+              outputMime: this.getGenMime(outputFormat),
+              outputWidth: width,
+              outputHeight: height,
+              size: finalSpecs.byteSize ?? 0,
+              partialImagesActual: partialImgArr.length,
+              partialImages: this.mapPartialImgGenArr(partialImgArr),
+              images: image
+            },
+            title,
             thinkingText:
               openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
             thinkingDuration:
               openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
+            topP,
+            provider,
+            model,
+            chunk: openaiAgg,
             done: true
-          } satisfies EventTypeMap["ai_chat_response"])
-        );
-        void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
-          type: "ai_chat_response",
-          conversationId,
-          userId,
-          systemPrompt,
-          temperature,
-          title,
-          thinkingText:
-            openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
-          thinkingDuration:
-            openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
-          topP,
-          provider,
-          model,
-          chunk: openaiAgg,
-          done: true
-        });
-        // Clear saved state on successful completion
-        void this.redis.del(`stream:state:${conversationId}`);
-        break;
+          });
+          // Clear saved state on successful completion
+          void this.redis.del(`stream:state:${conversationId}`);
+          break;
+        } else {
+          await this.prisma.handleAiChatResponse({
+            chunk: openaiAgg,
+            conversationId,
+            done: true,
+            title,
+            temperature,
+            topP,
+            provider,
+            userId,
+            systemPrompt,
+            model,
+            imgGenEnabled: false,
+            thinkingText:
+              openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+            thinkingDuration:
+              openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined
+          });
+          ws.send(
+            JSON.stringify({
+              type: "ai_chat_response",
+              conversationId,
+              userId,
+              provider,
+              model,
+              title,
+              imgGenEnabled: false,
+              imgGenFields: {},
+              systemPrompt,
+              temperature,
+              topP,
+              chunk: openaiAgg,
+              thinkingText:
+                openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+              thinkingDuration:
+                openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
+              done: true
+            } satisfies EventTypeMap["ai_chat_response"])
+          );
+          void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
+            type: "ai_chat_response",
+            conversationId,
+            userId,
+            systemPrompt,
+            temperature,
+            title,
+            thinkingText:
+              openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
+            thinkingDuration:
+              openaiThinkingDuration > 0 ? openaiThinkingDuration : undefined,
+            topP,
+            provider,
+            model,
+            chunk: openaiAgg,
+            done: true
+          });
+          // Clear saved state on successful completion
+          void this.redis.del(`stream:state:${conversationId}`);
+          break;
+        }
       }
     }
   }
 }
-

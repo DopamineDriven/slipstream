@@ -7,8 +7,18 @@
 export default {
   roots: ["<rootDir>"],
   testEnvironment: "node",
+  automock: true,
+  // Ensure Jest treats TS/MTS as ESM so `import` works in tests
+  extensionsToTreatAsEsm: [".ts", ".tsx", ".mts"],
   transform: {
-    "^.+\\.(mjs|cjs|js|jsx|ts|tsx|mts|cts)$": "ts-jest"
+    "^.+\\.(mjs|cjs|js|jsx|ts|tsx|mts|cts)$": [
+      "ts-jest",
+      { tsconfig: "<rootDir>/tsconfig.json", diagnostics: true, useESM: true }
+    ]
+  },
+  // Support workspace alias `@/*` -> `<rootDir>/src/*`
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1"
   },
   moduleFileExtensions: [
     "ts",
@@ -36,14 +46,7 @@ export default {
   ],
   preset: "ts-jest",
   cacheDirectory: "<rootDir>/node_modules/.cache/jest",
-  globals: {
-    "ts-jest": {
-      tsconfig: "<rootDir>/tsconfig.json",
-      diagnostics: true,
-      isolatedModules: true,
-      useESM: true
-    }
-  },
+  globals: {},
   testTimeout: 30000,
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
   coveragePathIgnorePatterns: [

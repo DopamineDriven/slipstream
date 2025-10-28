@@ -338,17 +338,18 @@ model Message {
 }
 
 model Attachment {
-  id             String       @id @default(cuid(2))
-  conversationId String?
-  draftId        String? // has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
-  batchId        String?
-  userId         String
-  messageId      String?
-  s3ObjectId     String?      @unique // "s3://bucket/key#<versionId|nov>"
-  origin         AssetOrigin  @default(UPLOAD)
-  status         AssetStatus  @default(REQUESTED)
-  uploadMethod   UploadMethod @default(SERVER) // "server" | "presigned" | "generated" | "fetched"
-  assetType      AssetType    @default(UNKNOWN)
+  id                String       @id @default(cuid(2))
+  conversationId    String?
+  draftId           String? // has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
+  batchId           String?
+  generationGroupId String? // GENERATED assets only (they don't have batchId or draftId)
+  userId            String
+  messageId         String?
+  s3ObjectId        String?      @unique // "s3://bucket/key#<versionId|nov>"
+  origin            AssetOrigin  @default(UPLOAD)
+  status            AssetStatus  @default(REQUESTED)
+  uploadMethod      UploadMethod @default(SERVER) // "server" | "presigned" | "generated" | "fetched"
+  assetType         AssetType    @default(UNKNOWN)
 
   uploadDuration Int? // milliseconds
   cdnUrl         String? // Cloudfront Url

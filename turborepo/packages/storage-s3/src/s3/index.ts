@@ -304,6 +304,23 @@ export class S3Storage extends S3Utils {
     }
   }
 
+  public async uploadGenerated(
+    data: Buffer | Uint8Array | string | Readable,
+    isProd: boolean,
+    meta: PresignMeta & { conversationId?: string },
+    options?: UploadOptions
+  ) {
+    try {
+      const res = await this.uploadDirect(data, meta, options);
+
+      return await this.finalize(res.bucket, res.key, isProd, res.versionId);
+    } catch (err) {
+      throw new Error(
+        err instanceof Error ? err.message : JSON.stringify(err, null, 2)
+      );
+    }
+  }
+
   private async performUpload(
     bucket: string,
     key: string,

@@ -156,15 +156,15 @@ export class WSServer {
       email: userEmail = email
     } = this.userDataMap.get(userId) ?? {
       email: "unknown email",
-      city: "unknown city",
-      country: "unknown country",
+      city: "Chicago",
+      country: "US",
       latlng: "unknown latlng",
-      tz: "unknown tz",
+      tz: "America/Chicago",
       ip: "0.0.0.0",
       ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
       locale: "en-US",
       postalCode: "unknown postal code",
-      region: "unknown"
+      region: "Illinois"
     };
 
     this.userMap.set(ws, userId);

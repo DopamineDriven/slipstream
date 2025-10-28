@@ -10,6 +10,341 @@ import type {
   RTC
 } from "@slipstream/types";
 
+
+export type HandleAiChatRequestRT = (ImageGenReqDbRes<true> | ConversationSingleton<true>) & {
+      assetCounts: number;
+      assets?: {
+        type: $Enums.AssetType;
+        compatStatus: $Enums.CompatStatus;
+        url: string;
+        mime: string;
+        ext: string;
+      }[];
+    };
+
+export type IncludeCreateConvoWithImgGenProps = {
+  conversationSettings: true;
+  messages: {
+    orderBy: {
+      createdAt: "asc";
+    };
+    include: {
+      imageGenJob: true;
+      attachments: {
+        orderBy: {
+          createdAt: "asc";
+        };
+        include: {
+          image: true;
+          document: true;
+        };
+      };
+    };
+  };
+};
+
+export type MessageDataWorkupProps = {
+  content: string;
+  provider: "OPENAI" | "GEMINI" | "GROK" | "ANTHROPIC" | "META" | "VERCEL";
+  senderType: "USER";
+  model: AllModelsUnion;
+  userId: string;
+  userKeyId: string | null;
+  imageGenJob: {
+    create: {
+      userKeyId: string | null;
+      userId: string;
+      inputFidelity: "low" | "high" | undefined;
+      moderation: "auto" | "low" | undefined;
+      negativePrompt: string | undefined;
+      nRequested: number | undefined;
+      nCompleted: 0;
+      outputBackground: "transparent" | "opaque" | "auto" | undefined;
+      outputCompression: number | undefined;
+      outputFormat: string;
+      partialImagesRequested: number | undefined;
+      outputSize: string | undefined;
+      progress: 0;
+      seed: number | undefined;
+      personGeneration: "DONT_ALLOW" | "ALLOW_ADULT" | "ALLOW_ALL" | undefined;
+      stage: "QUEUED";
+      outputQuality: string | undefined;
+      topP: number | undefined;
+      model: AllModelsUnion;
+      prompt: string;
+      provider: "OPENAI" | "GEMINI" | "GROK" | "ANTHROPIC" | "META" | "VERCEL";
+    };
+  };
+};
+
+export type ConversationSettingsCreateProps = {
+  maxTokens: number | undefined;
+  topP: number | undefined;
+  enableAssetGen: boolean;
+  systemPrompt: string | undefined;
+  temperature: number | undefined;
+};
+
+export type HandleAiChatReqCreateSansImgGenAndAttachmentsProps = {
+  batchId: string;
+  prompt: string;
+  provider: Provider;
+  model?: AllModelsUnion;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreatePropsSansImgGen;
+};
+
+
+export type HandleAiChatReqUpdateSansImgGenAndAttachmentsProps = {
+  batchId: string;
+  prompt: string;
+  conversationId: string;
+  provider: Provider;
+  model?: AllModelsUnion;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  update: ConversationSettingsCreatePropsSansImgGen;
+};
+
+export type HandleAiChatReqCreateSansImgGenSansAttachmentsProps = {
+  prompt: string;
+  provider: Provider;
+  model?: AllModelsUnion;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreatePropsSansImgGen;
+};
+
+export type HandleAiChatReqUpdateSansImgGenSansAttachmentsProps = {
+  prompt: string;
+  provider: Provider;
+  model?: AllModelsUnion;
+  conversationId: string;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  update: ConversationSettingsCreatePropsSansImgGen;
+};
+export type ConversationSettingsCreatePropsSansImgGen = {
+  maxTokens: number | undefined;
+  topP: number | undefined;
+  systemPrompt: string | undefined;
+  temperature: number | undefined;
+};
+
+export type HandleAiChatReqCreateWithImgGenAndAttachmentsProps = {
+  batchId: string;
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreateProps;
+  includeWithAttachments: IncludeCreateConvoWithImgGenProps;
+  messageData: MessageDataWorkupProps;
+};
+
+export type HandleAiChatReqUpdateWithImgGenAndAttachmentsProps = {
+  batchId: string;
+  userId: string;
+  conversationId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  update: ConversationSettingsCreateProps;
+  includeWithAttachments: IncludeCreateConvoWithImgGenProps;
+  messageData: MessageDataWorkupProps;
+};
+
+export type HandleAiChatReqCreateWithImgGenSansAttachmentsProps = {
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  create: ConversationSettingsCreateProps;
+  includeSansAttachments: IncludeCreateConvoWithImgGenProps;
+  messageData: MessageDataWorkupProps;
+};
+
+export type HandleAiChatReqUpdateWithImgGenSansAttachmentsProps = {
+  userId: string;
+  apiKey: string | null;
+  keyId: string | null;
+  conversationId: string;
+  update: ConversationSettingsCreateProps;
+  includeSansAttachments: IncludeCreateConvoWithImgGenProps;
+  messageData: MessageDataWorkupProps;
+};
+
+export type UploadToS3Rt = {
+  bucket: string;
+  key: string;
+  versionId: string;
+  contentDisposition: string | undefined;
+  cacheControl: string | undefined;
+  extension:
+    | "pdf"
+    | "jpg"
+    | "mp4"
+    | "mp3"
+    | "apng"
+    | "png"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | "mpd"
+    | "epub"
+    | "ttf"
+    | "gz"
+    | "jar"
+    | "json"
+    | "jsonld"
+    | "webmanifest"
+    | "doc"
+    | "node"
+    | "js"
+    | "bin"
+    | "obj"
+    | "ogx"
+    | "rtf"
+    | "sql"
+    | "toml"
+    | "azw"
+    | "mpkg"
+    | "m3u8"
+    | "pkpass"
+    | "xul"
+    | "xls"
+    | "eot"
+    | "ppt"
+    | "odp"
+    | "ods"
+    | "odt"
+    | "pptx"
+    | "xlsx"
+    | "docx"
+    | "rar"
+    | "vsd"
+    | "wasm"
+    | "7z"
+    | "abw"
+    | "bz"
+    | "bz2"
+    | "cda"
+    | "csh"
+    | "arc"
+    | "php"
+    | "mdx"
+    | "ndjson"
+    | "pyc"
+    | "sh"
+    | "tar"
+    | "zip"
+    | "xhtml"
+    | "xml"
+    | "yml"
+    | "aac"
+    | "mid"
+    | "m4a"
+    | "opus"
+    | "ogg"
+    | "wav"
+    | "weba"
+    | "midi"
+    | "otf"
+    | "woff"
+    | "woff2"
+    | "hjif"
+    | "hmpg"
+    | "ivs"
+    | "aces"
+    | "avci"
+    | "dpx"
+    | "emf"
+    | "ktx"
+    | "ktx2"
+    | "cur"
+    | "glb"
+    | "gltf"
+    | "usdz"
+    | "ics"
+    | "css"
+    | "csv"
+    | "sse"
+    | "html"
+    | "md"
+    | "txt"
+    | "rs"
+    | "ts"
+    | "vtt"
+    | "c"
+    | "cs"
+    | "cpp"
+    | "java"
+    | "py"
+    | "rb"
+    | "tex"
+    | "3gp"
+    | "3g2"
+    | "mpeg"
+    | "ogv"
+    | "webm"
+    | "avi"
+    | undefined;
+  expires: Date;
+  cdnUrl:
+    | `https://assets.aicoalesce.com/${string}`
+    | `https://assets-dev.aicoalesce.com/${string}`;
+  publicUrl: string;
+  presignedUrl: string;
+  presignedUrlExpiresAt: number;
+  storageClass:
+    | "DEEP_ARCHIVE"
+    | "EXPRESS_ONEZONE"
+    | "FSX_OPENZFS"
+    | "GLACIER"
+    | "GLACIER_IR"
+    | "INTELLIGENT_TIERING"
+    | "ONEZONE_IA"
+    | "OUTPOSTS"
+    | "REDUCED_REDUNDANCY"
+    | "SNOW"
+    | "STANDARD"
+    | "STANDARD_IA"
+    | undefined;
+  s3ObjectId: `s3://${string}/${string}#${string}`;
+  etag: string | undefined;
+  size: number | undefined;
+  contentType: string | undefined;
+  lastModified: string | undefined;
+  checksum:
+    | {
+        readonly algo: "SHA256";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC32C";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC32";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "SHA1";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC64NVME";
+        readonly value: string;
+      }
+    | undefined;
+};
+
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
 export type InferTopLevelMime<T extends string> =
@@ -260,15 +595,15 @@ export interface ProviderChatRequestEntity {
   chunks: string[];
   thinkingChunks: string[];
   imgGenEnabled?: boolean;
-  partialImgArr?: {b64image_url: string;}[]
+  partialImgArr?: { b64image_url: string }[];
   imgGenFields?: AIChatRequestImgGenFields;
 }
 
-export type OpenAIPartialImgSummary ={
+export type OpenAIPartialImgSummary = {
   seq: number;
   partial_index: number;
   length: number;
-}
+};
 
 export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
@@ -402,6 +737,7 @@ export type AttachmentSingleton<T extends boolean = false> = {
   compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;
   compatReadyAt: Date | null;
+  generationGroupId?: string | null;
   compatVersionId: string | null;
   compatS3ObjectId: string | null;
   compatMime: string | null;

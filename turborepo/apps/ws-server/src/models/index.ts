@@ -6,6 +6,7 @@ import type {
   Provider
 } from "@slipstream/types";
 import { ProviderValidation } from "@slipstream/img-gen";
+import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { providerModelChatApi } from "@slipstream/types";
 import { imageModelSets } from "@slipstream/types/models";
 
@@ -86,9 +87,133 @@ export class ModelService extends ProviderValidation {
       }
     }
   };
-
   public isValidUrl(url: string) {
     return URL.canParse(url);
+  }
+
+  public handleAssetMetadata(specs: ExpandedDocSpecs | ExpandedImgSpecs): {
+    type: "DOCUMENT" | "IMAGE";
+    doc:
+      | {
+          author: string | undefined;
+          createdAt: Date | undefined;
+          updatedAt: Date | undefined;
+          encoding: string | undefined;
+          format: string;
+          isEncrypted: boolean | undefined;
+          isSearchable: boolean | undefined;
+          keywords: string[] | undefined;
+          language: string | undefined;
+          lineCount: number | undefined;
+          pageCount: number | undefined;
+          pdfVersion: string | undefined;
+          subject: string | undefined;
+          textPreview: string | undefined;
+          title: undefined;
+          wordCount: number | undefined;
+        }
+      | undefined;
+    img:
+      | {
+          animated: boolean;
+          aspectRatio: number;
+          cameraMake: null;
+          cameraModel: null;
+          colorSpace:
+            | "unknown"
+            | "srgb"
+            | "display_p3"
+            | "adobe_rgb"
+            | "prophoto_rgb"
+            | "rec2020"
+            | "rec709"
+            | "cmyk"
+            | "lab"
+            | "xyz"
+            | "gray";
+          dominantColorHex: null;
+          exifDateTimeOriginal: Date | null;
+          format:
+            | "apng"
+            | "png"
+            | "jpeg"
+            | "gif"
+            | "bmp"
+            | "webp"
+            | "avif"
+            | "heic"
+            | "svg"
+            | "ico"
+            | "tiff"
+            | undefined;
+          frames: number;
+          gpsLat: null;
+          gpsLon: null;
+          hasAlpha: boolean;
+          height: number;
+          width: number;
+          iccProfile: string | null;
+          lensModel: null;
+          orientation: number | null;
+          createdAt: undefined;
+          updatedAt: undefined;
+        }
+      | undefined;
+  } {
+    return {
+      type: specs.type,
+      doc:
+        specs.type === "DOCUMENT"
+          ? {
+              author: specs.author ?? undefined,
+              createdAt: specs.createdDate
+                ? new Date(specs.createdDate)
+                : undefined,
+              updatedAt: specs.modifiedDate
+                ? new Date(specs.modifiedDate)
+                : undefined,
+              encoding: specs.encoding ?? undefined,
+              format: specs.format ?? "application/pdf",
+              isEncrypted: specs.isEncrypted ?? undefined,
+              isSearchable: specs.isSearchable ?? undefined,
+              keywords: specs.keywords ?? undefined,
+              language: specs.language ?? undefined,
+              lineCount: specs.lineCount ?? undefined,
+              pageCount: specs.pageCount ?? undefined,
+              pdfVersion: specs.pdfVersion ?? undefined,
+              subject: specs.subject ?? undefined,
+              textPreview: specs.textPreview ?? undefined,
+              title: undefined,
+              wordCount: specs.wordCount ?? undefined
+            }
+          : undefined,
+      img:
+        specs.type === "IMAGE"
+          ? {
+              animated: specs.animated,
+              aspectRatio: specs.aspectRatio,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: specs.colorSpace ?? null,
+              dominantColorHex: null,
+              exifDateTimeOriginal: specs.exifDateTimeOriginal
+                ? new Date(specs.exifDateTimeOriginal)
+                : null,
+              format: specs.format === "unknown" ? undefined : specs.format,
+              frames: specs.animated === true ? specs.frames : 1,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: specs.hasAlpha ?? false,
+              height: specs.height,
+              width: specs.width,
+              iccProfile: specs.iccProfile,
+              lensModel: null,
+              orientation: specs.orientation,
+              createdAt: undefined,
+              updatedAt: undefined
+            }
+          : undefined
+    };
   }
 
   public formatProvider(provider?: Provider) {

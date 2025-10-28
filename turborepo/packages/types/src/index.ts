@@ -1,6 +1,7 @@
 export type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFields,
+  AIChatResponseImgGenFieldsFinal,
   Dalle2ImgGenWorkupRT,
   Dalle2Opts,
   Dalle3ImgGenWorkupRT,
@@ -26,6 +27,8 @@ export type {
   OpenAIImageGenOpts,
   OpenAIImgCapableModels,
   OpenAISizeQualityOpts,
+  S3Checksum,
+  S3StorageClass,
   SharedOpenAIImageOpts
 } from "@/events-images.ts";
 
@@ -73,6 +76,7 @@ export type {
   AIChatRequest,
   AIChatResEntity,
   AIChatResponse,
+  AIChatResponseDb,
   AnyEvent,
   AnyEventTypeUnion,
   AssetAttachedToMessage,
@@ -113,6 +117,8 @@ export type {
   AllDisplayNamesUnion,
   AllImgGenFacilitatingModelsUnion,
   AllImgGenModelsUnion,
+  AllImgGenProviderModelMap,
+  AllImgGenProviderModels,
   AllModelsUnion,
   AnthropicChatModels,
   AnthropicDisplayNameUnion,
@@ -160,6 +166,7 @@ export type {
 
 export {
   allProviders,
+  allImgSupportingProviderModels,
   audioMimeSupportByProvider,
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
