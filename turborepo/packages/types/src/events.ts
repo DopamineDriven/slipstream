@@ -1,4 +1,10 @@
 import type {
+  AIChatRequestImgGenFields,
+  AIChatResponseImgGenFields,
+  AIChatResponseImgGenFieldsFinal,
+  ImgGenStage
+} from "@/events-images.ts";
+import type {
   AIChatEventTypeUnion,
   AssetOrigin,
   AssetStatus,
@@ -10,9 +16,9 @@ import type {
   UserMetadata,
   WithExpiry
 } from "@/events-workup.ts";
-import type {AIChatRequestImgGenFields,AIChatResponseImgGenFields, ImgGenStage,} from "@/events-images.ts";
 import type {
   GetModelUtilRT,
+  ImageGenFacilitatingModelsByProvider,
   ImageGenModelsByProvider,
   ImageGenProviders,
   Provider
@@ -71,6 +77,15 @@ export type AIChatResponse = DX<
     usage?: number;
     thinkingDuration?: number;
     thinkingText?: string;
+  }
+>;
+
+export type AIChatResponseDb = DX<
+  Rm<CTR<AIChatResEntity<"ai_chat_response">, "chunk">, "imgGenFields"> & {
+    usage?: number;
+    thinkingDuration?: number;
+    thinkingText?: string;
+    imgGenFields?: AIChatResponseImgGenFieldsFinal;
   }
 >;
 
@@ -413,7 +428,9 @@ export type ImageGenRequest = {
   model?:
     | ImageGenModelsByProvider<"gemini">
     | ImageGenModelsByProvider<"openai">
-    | ImageGenModelsByProvider<"grok">;
+    | ImageGenModelsByProvider<"grok">
+    | ImageGenFacilitatingModelsByProvider<"gemini">
+    | ImageGenFacilitatingModelsByProvider<"openai">;
   systemPrompt?: string;
   temperature?: number;
   topP?: number;

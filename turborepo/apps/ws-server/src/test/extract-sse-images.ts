@@ -96,6 +96,6 @@ class ExtractSSE extends Fs {
   }
 }
 
-const s = new ExtractSSE("src/test/openai/sse-chunks-responses.txt");
+const s = new ExtractSSE("src/test/openai/sse-chunks-3-responses.txt");
 
 s.exe("both").then(() => {});

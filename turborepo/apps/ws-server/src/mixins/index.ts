@@ -70,6 +70,7 @@ export interface ProviderDependencies {
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
   extract: ExtractService;
+  isProd:boolean;
   s3: S3Storage;
 }
 export type ProviderFactory<T> = (
@@ -288,6 +289,7 @@ export function OpenAIMixin<
               deps.prisma,
               deps.extract,
               deps.s3,
+              deps.isProd,
               deps.redis,
               this.#openaiApiKey ?? ""
             );

@@ -28,6 +28,32 @@ export const providerModelImageGenApi = {
   grok: ["grok-2-image-1212"]
 } as const;
 
+export const allImgSupportingProviderModels = {
+  openai: [
+    "gpt-image-1",
+    "gpt-image-1-mini",
+    "dall-e-2",
+    "dall-e-3",
+    "gpt-5",
+    "gpt-5-mini",
+    "gpt-5-nano",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "o3",
+    "gpt-4o",
+    "gpt-4o-mini"
+  ],
+  gemini: [
+    "gemini-2.5-flash-image",
+    "imagen-3.0-generate-002",
+    "imagen-4.0-fast-generate-001",
+    "imagen-4.0-generate-001",
+    "imagen-4.0-ultra-generate-001"
+  ],
+  grok: ["grok-2-image-1212"]
+} as const;
+
 export const providerModelImageGenFacilitatingApi = {
   openai: [
     "gpt-5",
@@ -54,6 +80,8 @@ export const imageModelFacilitatorSets = {
   openai: new Set(providerModelImageGenFacilitatingApi.openai)
 } as const;
 
+export type AllImgGenProviderModels<T extends keyof typeof allImgSupportingProviderModels> =Unenumerate<(typeof allImgSupportingProviderModels)[T]>;
+
 export const imageGenProviders = ["grok", "gemini", "openai"] as const;
 export const imageGenFacilitatingProviders = ["gemini", "openai"] as const;
 export type ImageGenProviders = keyof typeof providerModelImageGenApi;
@@ -64,6 +92,11 @@ export type ImageGenModelsByProvider<
   T extends keyof typeof providerModelImageGenApi
 > = Unenumerate<(typeof providerModelImageGenApi)[T]>;
 
+
+
+export type AllImgGenProviderModelMap = {
+  readonly [P in keyof typeof allImgSupportingProviderModels]: Unenumerate<(typeof allImgSupportingProviderModels)[P]>
+}
 export type ImageGenFacilitatingModelsByProvider<
   T extends keyof typeof providerModelImageGenFacilitatingApi
 > = Unenumerate<(typeof providerModelImageGenFacilitatingApi)[T]>;
@@ -82,8 +115,6 @@ export type ImgGenFacilitatingModelMap = {
 
 export type OpenAIImgGenModels = ImgGenModelMap["openai"];
 
-
-
 export type OpenAIImgGenFacilitatingModels =
   ImgGenFacilitatingModelMap["openai"];
 
@@ -100,7 +131,7 @@ export type AllImgGenFacilitatingModelsUnion =
 export type AllImgGenModelsUnion = ImgGenModelMap[ImageGenProviders];
 
 export type GetImgModelUtilRT<T = ImageGenProviders> = T extends "openai"
-  ? OpenAIImgGenModels
+  ? OpenAIImgGenModels | OpenAIImgGenFacilitatingModels
   : T extends "gemini"
     ? GeminiImgGenModels
     : T extends "grok"

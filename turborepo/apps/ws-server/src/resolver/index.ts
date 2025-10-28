@@ -3,6 +3,7 @@ import { ReadableStream } from "node:stream/web";
 import type {
   BigIntToCompatProps,
   BufferLike,
+  ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
 import OpenAI from "openai";
@@ -25,7 +26,6 @@ import type {
   Provider,
   RTC
 } from "@slipstream/types";
-import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 
@@ -307,7 +307,7 @@ export class Resolver extends ModelService {
       conversationId: conversationIdInitial,
       prompt,
       provider,
-      imgGenEnabled: false,
+      imgGenEnabled: isImgGenEnabled,
       hasProviderConfigured,
       maxTokens: max_tokens,
       isDefaultProvider,
@@ -318,6 +318,9 @@ export class Resolver extends ModelService {
       model,
       metadata: userData
     });
+
+
+
 
     const user_location = {
       type: "approximate",
@@ -378,7 +381,7 @@ export class Resolver extends ModelService {
           type: "ai_chat_chunk",
           conversationId,
           userId,
-          imgGenEnabled: false,
+          imgGenEnabled: isImgGenEnabled,
           chunk: chunks.join(""),
           thinkingText: thinkingAgg,
           thinkingDuration,
@@ -414,7 +417,7 @@ export class Resolver extends ModelService {
       isNewChat,
       msgs,
       imgGenFields,
-      imgGenEnabled: isImgGenEnabled ?? false,
+      imgGenEnabled: isImgGenEnabled,
       streamChannel,
       thinkingChunks,
       userId,
@@ -427,7 +430,7 @@ export class Resolver extends ModelService {
       temperature,
       title,
       topP
-    };
+    } satisfies ProviderChatRequestEntity;
     console.log(apiKey ?? "no api Key");
     try {
       switch (provider) {
@@ -1481,63 +1484,6 @@ export class Resolver extends ModelService {
     return size ? (size === 0n ? 0 : Number(size)) : undefined;
   }
 
-  private handleMetadata(specs: ExpandedDocSpecs | ExpandedImgSpecs) {
-    return {
-      type: specs.type,
-      doc:
-        specs.type === "DOCUMENT"
-          ? {
-              author: specs.author ?? undefined,
-              createdAt: specs.createdDate
-                ? new Date(specs.createdDate)
-                : undefined,
-              updatedAt: specs.modifiedDate
-                ? new Date(specs.modifiedDate)
-                : undefined,
-              encoding: specs.encoding ?? undefined,
-              format: specs.format ?? "application/pdf",
-              isEncrypted: specs.isEncrypted ?? undefined,
-              isSearchable: specs.isSearchable ?? undefined,
-              keywords: specs.keywords ?? undefined,
-              language: specs.language ?? undefined,
-              lineCount: specs.lineCount ?? undefined,
-              pageCount: specs.pageCount ?? undefined,
-              pdfVersion: specs.pdfVersion ?? undefined,
-              subject: specs.subject ?? undefined,
-              textPreview: specs.textPreview ?? undefined,
-              title: undefined,
-              wordCount: specs.wordCount ?? undefined
-            }
-          : undefined,
-      img:
-        specs.type === "IMAGE"
-          ? {
-              animated: specs.animated,
-              aspectRatio: specs.aspectRatio,
-              cameraMake: null,
-              cameraModel: null,
-              colorSpace: specs.colorSpace ?? null,
-              dominantColorHex: null,
-              exifDateTimeOriginal: specs.exifDateTimeOriginal
-                ? new Date(specs.exifDateTimeOriginal)
-                : null,
-              format: specs.format === "unknown" ? undefined : specs.format,
-              frames: specs.animated === true ? specs.frames : 1,
-              gpsLat: null,
-              gpsLon: null,
-              hasAlpha: specs.hasAlpha ?? false,
-              height: specs.height,
-              width: specs.width,
-              iccProfile: specs.iccProfile,
-              lensModel: null,
-              orientation: specs.orientation,
-              createdAt: undefined,
-              updatedAt: undefined
-            }
-          : undefined
-    };
-  }
-
   public async handleAssetUploadComplete(
     event: EventTypeMap["asset_upload_complete"],
     ws: WebSocket,
@@ -1642,7 +1588,7 @@ export class Resolver extends ModelService {
           mime: contentType,
           size: this.toBigInt(size, bytesUploaded)
         },
-        metadata: this.handleMetadata(specs)
+        metadata: this.handleAssetMetadata(specs)
       });
 
       const meta = (

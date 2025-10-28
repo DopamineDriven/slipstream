@@ -244,6 +244,7 @@ export const AttachmentScalarFieldEnum = {
   conversationId: 'conversationId',
   draftId: 'draftId',
   batchId: 'batchId',
+  generationGroupId: 'generationGroupId',
   userId: 'userId',
   messageId: 'messageId',
   s3ObjectId: 's3ObjectId',

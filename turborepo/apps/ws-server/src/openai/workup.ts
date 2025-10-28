@@ -14,7 +14,9 @@ import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatRequestImgGenFields,
   ImgGenWorkupResRT,
-  OpenAiModelIdUnion
+  OpenAiModelIdUnion,
+  S3Checksum,
+  S3StorageClass
 } from "@slipstream/types";
 
 export class OpenAIServiceWorkup extends ModelService {
@@ -93,7 +95,7 @@ export class OpenAIServiceWorkup extends ModelService {
             output_quality
           }) as "auto" | "hd" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.handleOutputSize(model, { output_size }) as
+          (this.handleOutputSize("openai", model, { output_size }) as
             | "auto"
             | "1024x1024"
             | "1792x1024"
@@ -119,14 +121,14 @@ export class OpenAIServiceWorkup extends ModelService {
          * 1 (min)
          * 10 (max)
          */
-        n: this.handleImgGenCount(model, { n }),
+        n: this.handleImgGenCount(model, { n }) ?? 1,
         model: "dall-e-2" as const,
         output_quality:
           (this.handleImgGenOutputQuality("openai", model, {
             output_quality
           }) as "auto" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.handleOutputSize(model, { output_size }) as
+          (this.handleOutputSize("openai", model, { output_size }) as
             | "auto"
             | "256x256"
             | "512x512"
@@ -172,7 +174,7 @@ export class OpenAIServiceWorkup extends ModelService {
           | "medium"
           | undefined) ?? ("high" as const),
       output_size:
-        (this.handleOutputSize(model, { output_size }) as
+        (this.handleOutputSize("openai", model, { output_size }) as
           | "1536x1024"
           | "1024x1536"
           | "1024x1024"
@@ -190,6 +192,7 @@ export class OpenAIServiceWorkup extends ModelService {
           ? this.handleInputFidelity("openai", model, { input_fidelity })
           : undefined
     };
+    console.log(sharedOpts);
     return sharedOpts as ImgGenWorkupResRT<typeof model>;
   }
   public async ensureAssetUploadedToOpenAI(
@@ -269,6 +272,187 @@ export class OpenAIServiceWorkup extends ModelService {
       );
       throw err;
     }
+  }
+
+  public mapPartialImgGenArr(
+    props: [
+      number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
+      string, // cdnUrl (cloudfront url returned post-s3 upload)
+      string, // itemId (shared by all partials and final image)
+      number, // width
+      number, // height
+      string, // mime type
+      string, // s3 bucket
+      string, // s3 key
+      string, // s3 versionId
+      string, // s3ObjectId
+      string | undefined, // filename
+      string | undefined, // extension
+      string | undefined, // etag
+      number | undefined, // size
+      string | undefined, // s3 last modified
+      string | undefined, // content disposition
+      string | undefined, // cache control
+      S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
+      S3StorageClass | undefined, // s3 storage class
+      string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
+      // ImageMetadata via extractor package
+      (
+        | {
+            animated: boolean;
+            aspectRatio: number;
+            cameraMake: null;
+            cameraModel: null;
+            colorSpace:
+              | "unknown"
+              | "srgb"
+              | "display_p3"
+              | "adobe_rgb"
+              | "prophoto_rgb"
+              | "rec2020"
+              | "rec709"
+              | "cmyk"
+              | "lab"
+              | "xyz"
+              | "gray";
+            dominantColorHex: null;
+            exifDateTimeOriginal: Date | null;
+            format:
+              | "apng"
+              | "png"
+              | "jpeg"
+              | "gif"
+              | "bmp"
+              | "webp"
+              | "avif"
+              | "heic"
+              | "svg"
+              | "ico"
+              | "tiff"
+              | undefined;
+            frames: number;
+            gpsLat: null;
+            gpsLon: null;
+            hasAlpha: boolean;
+            height: number;
+            width: number;
+            iccProfile: string | null;
+            lensModel: null;
+            orientation: number | null;
+            createdAt: undefined;
+            updatedAt: undefined;
+          }
+        | undefined
+      )
+    ][]
+  ) {
+    return props.map((t, o) => {
+      return {
+        index: t[0] ?? o,
+        cdnUrl: t[1],
+        width: t[3],
+        height: t[4],
+        mime: t[5]
+      };
+    });
+  }
+
+  public mapPersistenceImgGenArr(
+    props: [
+      number,
+      string,
+      string,
+      number,
+      number,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string | undefined,
+      string | undefined,
+      string | undefined,
+      number | undefined,
+      string | undefined,
+      string | undefined,
+      string | undefined,
+      S3Checksum | undefined,
+      S3StorageClass | undefined,
+      string,
+      (
+        | {
+            animated: boolean;
+            aspectRatio: number;
+            cameraMake: null;
+            cameraModel: null;
+            colorSpace:
+              | "unknown"
+              | "srgb"
+              | "display_p3"
+              | "adobe_rgb"
+              | "prophoto_rgb"
+              | "rec2020"
+              | "rec709"
+              | "cmyk"
+              | "lab"
+              | "xyz"
+              | "gray";
+            dominantColorHex: null;
+            exifDateTimeOriginal: Date | null;
+            format:
+              | "apng"
+              | "png"
+              | "jpeg"
+              | "gif"
+              | "bmp"
+              | "webp"
+              | "avif"
+              | "heic"
+              | "svg"
+              | "ico"
+              | "tiff"
+              | undefined;
+            frames: number;
+            gpsLat: null;
+            gpsLon: null;
+            hasAlpha: boolean;
+            height: number;
+            width: number;
+            iccProfile: string | null;
+            lensModel: null;
+            orientation: number | null;
+            createdAt: undefined;
+            updatedAt: undefined;
+          }
+        | undefined
+      )
+    ][]
+  ) {
+    return props.map((t, o) => {
+      return {
+        index: t[0] ?? o,
+        cdnUrl: t[1],
+        itemId: t[2],
+        width: t[3],
+        height: t[4],
+        mime: t[5],
+        bucket: t[6],
+        key: t[7],
+        versionId: t[8],
+        s3ObjectId: t[9],
+        filename: t[10],
+        ext: t[11],
+        etag: t[12],
+        size: t[13],
+        s3LastModified: t[14],
+        ContentDisposition: t[15],
+        CacheControl: t[16],
+        Checksum: t[17],
+        StorageClass: t[18],
+        generationGroupId: t[19],
+        image: t[20]
+      };
+    });
   }
 
   public async buildAttachmentContentAsync(
@@ -592,14 +776,7 @@ export class OpenAIServiceWorkup extends ModelService {
     const pureImgModel = this.canCallImageApi(model);
     if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [
-          { type: "file_search", vector_store_ids },
-          {
-            type: "web_search_preview",
-            user_location
-          },
-          { ...imgGen }
-        ] satisfies OpenAI.Responses.Tool[];
+        return [{ ...imgGen }] satisfies OpenAI.Responses.Tool[];
       }
       return [
         { type: "file_search", vector_store_ids },
@@ -610,13 +787,7 @@ export class OpenAIServiceWorkup extends ModelService {
       ] satisfies OpenAI.Responses.Tool[];
     } else {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [
-          {
-            type: "web_search_preview",
-            user_location
-          },
-          { ...imgGen }
-        ] satisfies OpenAI.Responses.Tool[];
+        return [{ ...imgGen }] satisfies OpenAI.Responses.Tool[];
       }
       return [
         {
@@ -630,7 +801,8 @@ export class OpenAIServiceWorkup extends ModelService {
   public openaiReasoning(
     model: OpenAiModelIdUnion,
     effort: Reasoning["effort"] = "medium",
-    summary: Reasoning["summary"] = "auto"
+    summary: Reasoning["summary"] = "auto",
+    imgGenEnabled = false
   ) {
     switch (model) {
       // gpt-5-pro is required to have high effort for reasoning and a detailed summary
@@ -645,6 +817,9 @@ export class OpenAIServiceWorkup extends ModelService {
       case "o3-mini":
       case "o3-pro":
       case "o4-mini": {
+        if (imgGenEnabled) {
+          return { effort: "minimal" } satisfies Reasoning;
+        }
         return { effort, summary } satisfies Reasoning;
       }
       case "gpt-3.5-turbo":
@@ -727,7 +902,11 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public openAiVerbosity(model: OpenAiModelIdUnion, verbosity?: string) {
+  public openAiVerbosity(
+    model: OpenAiModelIdUnion,
+    verbosity?: string,
+    imgGenEnabled = false
+  ) {
     switch (model) {
       case "gpt-5-pro": {
         return { verbosity: "high" } as const;
@@ -736,6 +915,9 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-5-mini":
       case "gpt-5-codex":
       case "gpt-5-nano": {
+        if (imgGenEnabled) {
+          return { verbosity: "low" } satisfies ResponseTextConfig;
+        }
         const v = verbosity
           ? (verbosity as ResponseTextConfig["verbosity"])
           : ("medium" satisfies ResponseTextConfig["verbosity"]);

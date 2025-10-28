@@ -1,11 +1,21 @@
 import type {
   BigIntToCompatProps,
+  HandleAiChatReqCreateSansImgGenAndAttachmentsProps,
+  HandleAiChatReqCreateSansImgGenSansAttachmentsProps,
+  HandleAiChatReqCreateWithImgGenAndAttachmentsProps,
+  HandleAiChatReqCreateWithImgGenSansAttachmentsProps,
+  HandleAiChatRequestRT,
+  HandleAiChatReqUpdateSansImgGenAndAttachmentsProps,
+  HandleAiChatReqUpdateSansImgGenSansAttachmentsProps,
+  HandleAiChatReqUpdateWithImgGenAndAttachmentsProps,
+  HandleAiChatReqUpdateWithImgGenSansAttachmentsProps,
   InferTopLevelMime,
   UpdateAttachment,
   UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata,
   UserData
 } from "@/types/index.ts";
+import { ExtractService } from "@/extract/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import type {
@@ -16,9 +26,11 @@ import type {
   ImageMetadata,
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
+import type { ExpandedImgSpecs } from "@slipstream/metadata";
 import type {
   AIChatRequest,
-  AIChatResponse,
+  AIChatResponseDb,
+  AllModelsUnion,
   CTR,
   ImageGenRequest,
   Providers,
@@ -32,9 +44,12 @@ import { EncryptionService } from "@slipstream/encryption";
 export class PrismaService extends ModelService {
   readonly prismaClient: PrismaClient;
   private encryption: EncryptionService;
+
   constructor(
     prisma: DbService,
-    public fs: Fs
+    public fs: Fs,
+    private extractor: ExtractService,
+    private isProd: boolean
   ) {
     super();
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
@@ -229,7 +244,6 @@ export class PrismaService extends ModelService {
     batchId,
     provider,
     model: m,
-    conversationId,
     hasProviderConfigured,
     ...data
   }: RTC<Rm<ImageGenRequest, "type">, "output_quality"> & { userId: string }) {
@@ -243,114 +257,26 @@ export class PrismaService extends ModelService {
       keyId = kId;
       apiKey = apiK;
     }
-    const model = this.fallbackImgGenModelByProvider(provider, m),
-      outputCompression = this.handleImgGenCompression(provider, model, {
-        output_compression: data.output_compression,
-        output_format: data.output_format
-      }),
-      outputBackground = this.handleImgGenBg(provider, model, {
-        background: data.output_background,
-        format:
-          (data.output_format as "jpeg" | "png" | "webp" | undefined) ?? "png"
-      }),
-      moderation = this.handleModeration(provider, model, {
-        moderation: data.moderation
-      }),
-      negativePrompt = data?.negativePrompt ?? undefined,
-      seed = data?.seed ?? undefined,
-      nRequested = this.handleImgGenCount(model, { n: data.n }),
-      inputFidelity = this.handleInputFidelity(provider, model, {
-        input_fidelity: data.input_fidelity
-      }),
-      personGeneration = this.handlePersonGeneration(provider, model, {
-        personGeneration: data.personGeneration
-      }),
-      progress = 0,
-      partialImagesRequested = this.handlePartialImgGen(provider, model, {
-        partialImagesRequested: data.output_partial_images
-      }),
-      outputFormat =
-        provider === "grok" ? "png" : (data?.output_format ?? "png"),
-      outputSize = this.handleOutputSize(model, {
-        output_size: data.output_size
-      }),
-      stage = "QUEUED",
-      prompt = data?.prompt,
-      topP = data?.topP,
-      nCompleted = 0,
-      temperature = data.temperature,
-      systemPrompt = data.systemPrompt,
-      maxTokens = data.maxTokens,
-      outputQuality = this.handleImgGenOutputQuality(provider, model, {
-        output_quality: data.output_quality
-      }),
-      userKeyId = keyId,
-      imageGenJob = {
-        create: {
-          userKeyId,
-          userId,
-          inputFidelity,
-          moderation,
-          negativePrompt,
-          nRequested,
-          nCompleted,
-          outputBackground,
-          outputCompression,
-          outputFormat,
-          partialImagesRequested,
-          outputSize,
-          progress,
-          seed,
-          personGeneration,
-          stage,
-          outputQuality,
-          topP,
-          model,
-          prompt,
-          provider: this.providerToPrismaFormat(provider)
-        }
-      } as const,
-      messageData = {
-        content: prompt,
-        provider: this.providerToPrismaFormat(provider),
-        senderType: "USER",
-        model,
-        userId,
-        userKeyId,
-        imageGenJob
-      } as const,
-      includeWithAttachments = {
-        conversationSettings: true,
-        messages: {
-          orderBy: { createdAt: "asc" },
-          include: {
-            imageGenJob: true,
-            attachments: {
-              orderBy: { createdAt: "asc" },
-              include: {
-                image: true,
-                document: true
-              }
-            }
-          }
-        }
-      } as const,
-      includeSansAttachments = {
-        conversationSettings: true,
-        messages: {
-          orderBy: { createdAt: "asc" },
-          include: {
-            imageGenJob: true,
-            attachments: {
-              orderBy: { createdAt: "asc" },
-              include: {
-                image: true,
-                document: true
-              }
-            }
-          }
-        }
-      } as const;
+
+    const {
+      conversationId,
+      includeSansAttachments,
+      topP,
+      includeWithAttachments,
+      maxTokens,
+      messageData,
+      systemPrompt,
+      temperature
+    } = this.handleAiChatRequestImgGenWorkup({
+      userId: userId,
+      batchId,
+      provider,
+      model: m,
+      hasProviderConfigured,
+      apiKey,
+      keyId,
+      ...data
+    });
 
     if (conversationId === "new-chat") {
       const conversationSettings = {
@@ -533,218 +459,675 @@ export class PrismaService extends ModelService {
     }
   }
 
+  private async handleAiChatReqCreateWithAttachments({
+    userId,
+    batchId
+  }: {
+    userId: string;
+    batchId: string;
+  }) {
+    return await this.prismaClient.$transaction(async pr => {
+      const attachments = await pr.attachment.findMany({
+        where: { batchId, userId },
+        take: 10,
+        orderBy: [{ createdAt: "desc" }],
+        include: { image: true, document: true }
+      });
+      const connectById = attachments.map(({ id }) => ({ id }));
+      const extended = attachments.map(t => {
+        const { compatStatus, assetType, compatCdnUrl, compatMime, compatExt } =
+          t;
+        return {
+          type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
+          compatStatus: compatStatus ?? "ALIASED",
+          url: compatCdnUrl ?? "",
+          mime: compatMime ?? "",
+          ext: compatExt ?? ""
+        };
+      });
+
+      const withAssetInfo = {
+        assetCounts: extended.length,
+        assets: extended
+      };
+      return { withAssetInfo, connectById };
+    });
+  }
+
+  private async handleAiChatReqUpdateWithAttachments({
+    batchId,
+    conversationId,
+    userId
+  }: {
+    userId: string;
+    batchId: string;
+    conversationId: string;
+  }) {
+    const attachments = await this.prismaClient.attachment.findMany({
+      where: { batchId, userId, conversationId, messageId: null },
+      take: 10,
+      orderBy: [{ createdAt: "desc" }],
+      include: { image: true, document: true }
+    });
+    const extended = attachments.map(t => {
+      const { compatStatus, assetType, compatCdnUrl, compatMime, compatExt } =
+        t;
+      return {
+        type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
+        compatStatus: compatStatus ?? "ALIASED",
+        url: compatCdnUrl ?? "",
+        mime: compatMime ?? "",
+        ext: compatExt ?? ""
+      };
+    });
+
+    const withAssetInfo = {
+      assetCounts: extended.length,
+      assets: extended
+    };
+    const connectById = attachments.map(({ id }) => ({ id }));
+    return { withAssetInfo, connectById };
+  }
+
+  private async handleAiChatReqCreateWithAttachmentsWithImgGen({
+    batchId,
+    create,
+    includeWithAttachments,
+    messageData,
+    userId,
+    apiKey,
+    keyId
+  }: HandleAiChatReqCreateWithImgGenAndAttachmentsProps) {
+    const conversationSettings = { create };
+    const { connectById, withAssetInfo } =
+      await this.handleAiChatReqCreateWithAttachments({ userId, batchId });
+
+    const createConvo = await this.prismaClient.conversation.create({
+      include: includeWithAttachments,
+      data: {
+        attachments: { connect: connectById },
+        messages: {
+          create: {
+            attachments: { connect: connectById },
+            ...messageData
+          }
+        },
+        conversationSettings,
+        userKeyId: keyId,
+        userId
+      }
+    });
+
+    return this.toCompatPropsExtened(
+      "image_gen_request",
+      this.bigintToNumber("image_gen_request", {
+        apiKey,
+        ...createConvo
+      }),
+      withAssetInfo
+    );
+  }
+
+  private async handleAiChatReqCreateSansAttachmentsWithImgGen({
+    create,
+    includeSansAttachments,
+    messageData,
+    userId,
+    apiKey,
+    keyId
+  }: HandleAiChatReqCreateWithImgGenSansAttachmentsProps) {
+    const conversationSettings = { create };
+    const p = await this.prismaClient.conversation.create({
+      include: includeSansAttachments,
+      data: {
+        messages: {
+          create: {
+            ...messageData
+          }
+        },
+        conversationSettings,
+        userKeyId: keyId,
+        userId
+      }
+    });
+    const apiKeyAndRes = { apiKey, ...p };
+
+    return this.toCompatPropsExtened(
+      "image_gen_request",
+      this.bigintToNumber("image_gen_request", apiKeyAndRes),
+      { assetCounts: 0, assets: undefined }
+    );
+  }
+
+  private async handleAiChatReqCreateSansAttachmentsSansImgGen({
+    apiKey,
+    create,
+    keyId,
+    prompt,
+    provider,
+    userId,
+    model
+  }: HandleAiChatReqCreateSansImgGenSansAttachmentsProps) {
+    const p = await this.prismaClient.conversation.create({
+      include: {
+        conversationSettings: true,
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                image: true,
+                document: true
+              }
+            }
+          }
+        }
+      },
+      data: {
+        messages: {
+          create: {
+            content: prompt,
+            provider: this.providerToPrismaFormat(provider),
+            senderType: "USER",
+            model,
+            userId,
+            userKeyId: keyId
+          }
+        },
+        conversationSettings: {
+          create
+        },
+        userKeyId: keyId,
+        userId
+      }
+    });
+    const apiKeyAndRes = { apiKey, ...p };
+    return this.toCompatPropsExtened(
+      "ai_chat_request",
+      this.bigintToNumber("ai_chat_request", apiKeyAndRes),
+      { assetCounts: 0, assets: undefined }
+    );
+  }
+
+  private async handleAiChatReqCreateWithAttachmentsSansImgGen({
+    batchId,
+    create,
+    prompt,
+    userId,
+    apiKey,
+    keyId,
+    provider,
+    model
+  }: HandleAiChatReqCreateSansImgGenAndAttachmentsProps) {
+    const { connectById, withAssetInfo } =
+      await this.handleAiChatReqCreateWithAttachments({ userId, batchId });
+
+    const includeConvoCreate = {
+      conversationSettings: true,
+      messages: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          attachments: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              image: true,
+              document: true
+            }
+          }
+        }
+      }
+    } as const;
+
+    const conversationSettings = { create };
+
+    const dataConvoCreate = {
+      attachments: { connect: connectById },
+      messages: {
+        create: {
+          attachments: { connect: connectById },
+          content: prompt,
+          provider: this.providerToPrismaFormat(provider),
+          senderType: "USER",
+          model: model ?? null,
+          userId,
+          userKeyId: keyId
+        }
+      },
+      conversationSettings,
+      userKeyId: keyId,
+      userId
+    } as const;
+    const dat = await this.prismaClient.conversation.create({
+      include: includeConvoCreate,
+      data: dataConvoCreate
+    });
+
+    return this.toCompatPropsExtened(
+      "ai_chat_request",
+      this.bigintToNumber("ai_chat_request", {
+        apiKey,
+        ...dat
+      }),
+      withAssetInfo
+    );
+  }
+
+  private async handleAiChatReqUpdateWithAttachmentsSansImageGen({
+    apiKey,
+    batchId,
+    conversationId,
+    update,
+    keyId,
+    prompt,
+    provider,
+    userId,
+    model
+  }: HandleAiChatReqUpdateSansImgGenAndAttachmentsProps) {
+    const { connectById, withAssetInfo } =
+      await this.handleAiChatReqUpdateWithAttachments({
+        batchId,
+        conversationId,
+        userId
+      });
+    const d = await this.prismaClient.conversation.update({
+      include: {
+        conversationSettings: true,
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                image: true,
+                document: true
+              }
+            }
+          }
+        }
+      },
+      where: { id: conversationId },
+      data: {
+        attachments: { connect: connectById },
+        messages: {
+          create: {
+            attachments: { connect: connectById },
+            content: prompt,
+            senderType: "USER",
+            provider: this.providerToPrismaFormat(provider),
+            model,
+            userId,
+            userKeyId: keyId
+          }
+        },
+        conversationSettings: {
+          update
+        },
+        userId,
+        userKeyId: keyId
+      }
+    });
+    return this.toCompatPropsExtened(
+      "ai_chat_request",
+      this.bigintToNumber("ai_chat_request", {
+        apiKey,
+        ...d
+      }),
+      withAssetInfo
+    );
+  }
+
+  private async handleAiChatReqUpdateWithAttachmentsWithImageGen({
+    apiKey,
+    batchId,
+    conversationId,
+    update,
+    includeWithAttachments,
+    keyId,
+    messageData,
+    userId
+  }: HandleAiChatReqUpdateWithImgGenAndAttachmentsProps) {
+    const conversationSettings = {
+      update
+    } as const;
+    const { connectById, withAssetInfo } =
+      await this.handleAiChatReqUpdateWithAttachments({
+        batchId,
+        conversationId,
+        userId
+      });
+    const updateConvo = await this.prismaClient.conversation.update({
+      include: includeWithAttachments,
+      where: { id: conversationId },
+      data: {
+        attachments: { connect: connectById },
+        messages: {
+          create: {
+            attachments: { connect: connectById },
+            ...messageData
+          }
+        },
+        conversationSettings,
+        userId,
+        userKeyId: keyId
+      }
+    });
+    return this.toCompatPropsExtened(
+      "image_gen_request",
+      this.bigintToNumber("image_gen_request", {
+        apiKey,
+        ...updateConvo
+      }),
+      withAssetInfo
+    );
+  }
+
+  private async handleAiChatReqUpdateSansAttachmentsWithImageGen({
+    apiKey,
+    conversationId,
+    includeSansAttachments,
+    keyId,
+    messageData,
+    update,
+    userId
+  }: HandleAiChatReqUpdateWithImgGenSansAttachmentsProps) {
+    const conversationSettings = {
+      update
+    } as const;
+    const pr = await this.prismaClient.conversation.update({
+      include: includeSansAttachments,
+      where: { id: conversationId },
+      data: {
+        messages: {
+          create: {
+            ...messageData
+          }
+        },
+        conversationSettings,
+        userId,
+        userKeyId: keyId
+      }
+    });
+    const apiKeyAndRes = { apiKey, ...pr };
+    return this.toCompatPropsExtened(
+      "image_gen_request",
+      this.bigintToNumber("image_gen_request", apiKeyAndRes),
+      { assetCounts: 0, assets: undefined }
+    );
+  }
+
+  private async handleAiChatReqUpdateSansAttachmentsSansImageGen({
+    apiKey,
+    keyId,
+    prompt,
+    provider,
+    update,
+    userId,
+    model,
+    conversationId
+  }: HandleAiChatReqUpdateSansImgGenSansAttachmentsProps) {
+    const pr = await this.prismaClient.conversation.update({
+      include: {
+        conversationSettings: true,
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                image: true,
+                document: true
+              }
+            }
+          }
+        }
+      },
+      where: { id: conversationId },
+      data: {
+        messages: {
+          create: {
+            content: prompt,
+            senderType: "USER",
+            provider: this.providerToPrismaFormat(provider),
+            model,
+            userId,
+            userKeyId: keyId
+          }
+        },
+        conversationSettings: {
+          update
+        },
+        userId,
+        userKeyId: keyId
+      }
+    });
+    const apiKeyAndRes = { apiKey, ...pr };
+    return this.toCompatPropsExtened(
+      "ai_chat_request",
+      this.bigintToNumber("ai_chat_request", apiKeyAndRes),
+      { assetCounts: 0, assets: undefined }
+    );
+  }
+
   public async handleAiChatRequest({
     userId,
     batchId,
     provider,
+    prompt,
     conversationId,
     ...data
   }: Rm<AIChatRequest, "type"> & {
     userId: string;
-  }) {
+  }): Promise<HandleAiChatRequestRT> {
     const { keyId, apiKey } = await this.handleApiKeyLookup(provider, userId);
+    const {
+      model: textModel,
+      topP,
+      maxTokens,
+      systemPrompt,
+      temperature
+    } = data;
+
+    if (provider === "gemini" || provider === "grok" || provider === "openai") {
+      const model =
+        typeof data?.model === "undefined" && data?.imgGenEnabled === true
+          ? (this.fallbackImgGenModelByProvider(provider) as AllModelsUnion)
+          : data?.model;
+
+      const { includeSansAttachments, includeWithAttachments, messageData } =
+        this.handleAiChatRequestImgGenWorkup({
+          userId: userId,
+          batchId,
+          prompt,
+          conversationId,
+          imgGenEnabled: data.imgGenEnabled,
+          provider,
+          model: model,
+          hasProviderConfigured: data.hasProviderConfigured,
+          apiKey,
+          keyId,
+          ...data
+        });
+      /** CREATE */
+      if (conversationId === "new-chat") {
+        /** CREATE, WITH ATTACHMENTS */
+        if (typeof batchId !== "undefined") {
+          /** CREATE, WITH ATTACHMENTS, WITH IMAGE GEN */
+          if (data.imgGenEnabled === true) {
+            return await this.handleAiChatReqCreateWithAttachmentsWithImgGen({
+              batchId,
+              create: {
+                maxTokens,
+                topP,
+                enableAssetGen: true,
+                systemPrompt,
+                temperature
+              },
+              apiKey,
+              includeWithAttachments,
+              keyId,
+              messageData,
+              userId
+            });
+          } else {
+            /** CREATE, WITH ATTACHMENTS, SANS IMAGE GEN */
+            return await this.handleAiChatReqCreateWithAttachmentsSansImgGen({
+              apiKey,
+              batchId,
+              create: { maxTokens, systemPrompt, temperature, topP },
+              keyId,
+              prompt,
+              provider,
+              userId,
+              model
+            });
+          }
+        } else {
+          /** CREATE, SANS ATTACHMENTS, WITH IMAGE GEN */
+          if (data.imgGenEnabled === true) {
+            return await this.handleAiChatReqCreateSansAttachmentsWithImgGen({
+              apiKey,
+              create: {
+                maxTokens,
+                enableAssetGen: true,
+                systemPrompt,
+                temperature,
+                topP
+              },
+              includeSansAttachments,
+              keyId,
+              messageData,
+              userId
+            });
+          }
+          /** CREATE, SANS ATTACHMENTS, SANS IMAGE GEN */
+          return await this.handleAiChatReqCreateSansAttachmentsSansImgGen({
+            apiKey,
+            create: { maxTokens, systemPrompt, temperature, topP },
+            keyId,
+            prompt,
+            provider,
+            userId,
+            model
+          });
+        }
+      } else {
+        /** UPDATE, WITH ATTACHMENTS*/
+        if (typeof batchId !== "undefined") {
+          /** UPDATE, WITH ATTACHMENTS, WITH IMAGE GEN */
+          if (data.imgGenEnabled === true) {
+            return await this.handleAiChatReqUpdateWithAttachmentsWithImageGen({
+              apiKey,
+              batchId,
+              conversationId,
+              update: {
+                enableAssetGen: true,
+                maxTokens,
+                systemPrompt,
+                temperature,
+                topP
+              },
+              includeWithAttachments,
+              keyId,
+              messageData,
+              userId
+            });
+          }
+          /** UPDATE, WITH ATTACHMENTS, SANS IMAGE GEN */
+          return await this.handleAiChatReqUpdateWithAttachmentsSansImageGen({
+            apiKey,
+            batchId,
+            conversationId,
+            keyId,
+            prompt,
+            provider,
+            update: { maxTokens, systemPrompt, temperature, topP },
+            userId,
+            model
+          });
+        }
+        /** UPDATE, SANS ATTACHMENTS, WITH IMAGE GEN */
+        if (data.imgGenEnabled === true) {
+          return await this.handleAiChatReqUpdateSansAttachmentsWithImageGen({
+            apiKey,
+            conversationId,
+            includeSansAttachments,
+            keyId,
+            messageData,
+            update: {
+              enableAssetGen: true,
+              maxTokens,
+              systemPrompt,
+              temperature,
+              topP
+            },
+            userId
+          });
+        }
+
+        /** UPDATE, SANS ATTACHMENTS, SANS IMAGE GEN */
+        return await this.handleAiChatReqUpdateSansAttachmentsSansImageGen({
+          apiKey,
+          conversationId,
+          keyId,
+          prompt,
+          provider,
+          update: { maxTokens, systemPrompt, temperature, topP },
+          userId,
+          model
+        });
+      }
+    }
     if (conversationId === "new-chat") {
       if (typeof batchId !== "undefined") {
-        const batchIt = await this.prismaClient.$transaction(async pr => {
-          const attachments = await pr.attachment.findMany({
-            where: { batchId, userId },
-            take: 10,
-            orderBy: [{ createdAt: "desc" }],
-            include: { image: true, document: true }
-          });
-          const connectById = attachments.map(({ id }) => ({ id }));
-
-          return await pr.conversation.create({
-            include: {
-              conversationSettings: true,
-              messages: {
-                orderBy: { createdAt: "asc" },
-                include: {
-                  attachments: {
-                    orderBy: { createdAt: "asc" },
-                    include: {
-                      image: true,
-                      document: true
-                    }
-                  }
-                }
-              }
-            },
-            data: {
-              attachments: { connect: connectById },
-              messages: {
-                create: {
-                  attachments: { connect: connectById },
-                  content: data.prompt,
-                  provider: this.providerToPrismaFormat(provider),
-                  senderType: "USER",
-                  model: data.model,
-                  userId,
-                  userKeyId: keyId
-                }
-              },
-              conversationSettings: {
-                create: {
-                  maxTokens: data.maxTokens,
-                  topP: data.topP,
-                  systemPrompt: data.systemPrompt,
-                  temperature: data.temperature
-                }
-              },
-              userKeyId: keyId,
-              userId
-            }
-          });
-        });
-        return this.bigintToNumber("ai_chat_request", {
+        /** CREATE, WITH ATTACHMENTS, SANS IMAGE GEN */
+        return await this.handleAiChatReqCreateWithAttachmentsSansImgGen({
           apiKey,
-          ...batchIt
-        });
-      }
-
-      const p = await this.prismaClient.conversation.create({
-        include: {
-          conversationSettings: true,
-          messages: {
-            orderBy: { createdAt: "asc" },
-            include: {
-              attachments: {
-                orderBy: { createdAt: "asc" },
-                include: {
-                  image: true,
-                  document: true
-                }
-              }
-            }
-          }
-        },
-        data: {
-          messages: {
-            create: {
-              content: data.prompt,
-              provider: this.providerToPrismaFormat(provider),
-              senderType: "USER",
-              model: data.model,
-              userId,
-              userKeyId: keyId
-            }
-          },
-          conversationSettings: {
-            create: {
-              maxTokens: data.maxTokens,
-              topP: data.topP,
-              systemPrompt: data.systemPrompt,
-              temperature: data.temperature
-            }
-          },
-          userKeyId: keyId,
-          userId
-        }
-      });
-      const apiKeyAndRes = { apiKey, ...p };
-      return this.bigintToNumber("ai_chat_request", apiKeyAndRes);
-    } else {
-      if (typeof batchId !== "undefined") {
-        const batchIt = await this.prismaClient.$transaction(async pr => {
-          const attachments = await pr.attachment.findMany({
-            where: { batchId, userId, conversationId, messageId: null },
-            take: 10,
-            orderBy: [{ createdAt: "desc" }],
-            include: { image: true, document: true }
-          });
-
-          const connectById = attachments.map(({ id }) => ({ id }));
-
-          return await pr.conversation.update({
-            include: {
-              conversationSettings: true,
-              messages: {
-                orderBy: { createdAt: "asc" },
-                include: {
-                  attachments: {
-                    orderBy: { createdAt: "asc" },
-                    include: {
-                      image: true,
-                      document: true
-                    }
-                  }
-                }
-              }
-            },
-            where: { id: conversationId },
-            data: {
-              attachments: { connect: connectById },
-              messages: {
-                create: {
-                  attachments: { connect: connectById },
-                  content: data.prompt,
-                  senderType: "USER",
-                  provider: this.providerToPrismaFormat(provider),
-                  model: data.model,
-                  userId,
-                  userKeyId: keyId
-                }
-              },
-              conversationSettings: {
-                update: {
-                  topP: data.topP,
-                  systemPrompt: data.systemPrompt,
-                  maxTokens: data.maxTokens,
-                  temperature: data.temperature
-                }
-              },
-              userId,
-              userKeyId: keyId
-            }
-          });
-        });
-        return this.bigintToNumber("ai_chat_request", {
-          apiKey,
-          ...batchIt
-        });
-      }
-      const pr = await this.prismaClient.conversation.update({
-        include: {
-          conversationSettings: true,
-          messages: {
-            orderBy: { createdAt: "asc" },
-            include: {
-              attachments: {
-                orderBy: { createdAt: "asc" },
-                include: {
-                  image: true,
-                  document: true
-                }
-              }
-            }
-          }
-        },
-        where: { id: conversationId },
-        data: {
-          messages: {
-            create: {
-              content: data.prompt,
-              senderType: "USER",
-              provider: this.providerToPrismaFormat(provider),
-              model: data.model,
-              userId,
-              userKeyId: keyId
-            }
-          },
-          conversationSettings: {
-            update: {
-              topP: data.topP,
-              systemPrompt: data.systemPrompt,
-              maxTokens: data.maxTokens,
-              temperature: data.temperature
-            }
-          },
+          batchId,
+          create: { maxTokens, systemPrompt, temperature, topP },
+          keyId,
+          prompt,
+          provider,
           userId,
-          userKeyId: keyId
-        }
+          model: textModel
+        });
+      }
+      /** CREATE, SANS ATTACHMENTS, SANS IMAGE GEN */
+      return await this.handleAiChatReqCreateSansAttachmentsSansImgGen({
+        apiKey,
+        create: { maxTokens, systemPrompt, temperature, topP },
+        keyId,
+        prompt,
+        provider,
+        userId,
+        model: textModel
       });
-      const apiKeyAndRes = { apiKey, ...pr };
-      return this.bigintToNumber("ai_chat_request", apiKeyAndRes);
+    } else {
+      /** UPDATE, WITH ATTACHMENTS, SANS IMAGE GEN */
+      if (typeof batchId !== "undefined") {
+        return await this.handleAiChatReqUpdateWithAttachmentsSansImageGen({
+          apiKey,
+          batchId,
+          conversationId,
+          keyId,
+          prompt,
+          provider,
+          update: { maxTokens, systemPrompt, temperature, topP },
+          userId,
+          model: textModel
+        });
+      }
+      /** UPDATE, SANS ATTACHMENTS, SANS IMAGE GEN */
+      return await this.handleAiChatReqUpdateSansAttachmentsSansImageGen({
+        apiKey,
+        conversationId,
+        keyId,
+        prompt,
+        provider,
+        update: { maxTokens, systemPrompt, temperature, topP },
+        userId,
+        model: textModel
+      });
     }
   }
 
@@ -767,26 +1150,97 @@ export class PrismaService extends ModelService {
     });
   }
 
+  private async handleImageData(cdnUrl: string) {
+    const specs = (await this.extractor.extractRemote(
+      cdnUrl,
+      4096 * 24
+    )) as ExpandedImgSpecs;
+    const v = this.handleAssetMetadata(specs);
+    if (v.type === "IMAGE" && v.img) {
+      return { ...v.img };
+    } else throw new Error("no image found");
+  }
+
   public async handleAiChatResponse({
     userId,
     provider,
     ...data
-  }: Rm<CTR<AIChatResponse, "provider">, "type">) {
+  }: Rm<CTR<AIChatResponseDb, "provider">, "type"> & {
+    bucket?: string;
+    key?: string;
+    versionId?: string;
+    cdnUrl?: string;
+    s3ObjectId?: string;
+    size?: number;
+    width?: number;
+    height?: number;
+    mime?: string;
+  }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
+
+    const mapImgs = data.imgGenFields?.images
+      ?.concat(data.imgGenFields?.partialImages ?? [])
+      ?.map(t => {
+        const da = {
+          bucket: t.bucket,
+          key: t.key,
+          versionId: t.versionId,
+          s3ObjectId: t.s3ObjectId,
+          cdnUrl: t.cdnUrl,
+          assetType: "IMAGE",
+          storageClass: t.StorageClass,
+          origin: "GENERATED",
+          compatMime: t.mime,
+          etag: t.etag,
+          compatCdnUrl: t.cdnUrl,
+          compatStatus: "ALIASED",
+          compatS3ObjectId: t.s3ObjectId,
+          compatVersionId: t.versionId,
+          compatKey: t.key,
+          compatExt: t.ext,
+          contentDisposition: t.ContentDisposition,
+          cacheControl: t.CacheControl,
+          ext: t.ext,
+          mime: t.mime,
+          region: "us-east-1",
+          status: "READY",
+          uploadMethod: "GENERATED",
+          generationGroupId: t.generationGroupId,
+          size: t.size ? BigInt(t.size) : undefined,
+          s3LastModified: t.s3LastModified
+            ? new Date(t.s3LastModified)
+            : new Date(Date.now()),
+          filename: t.filename,
+          compatReadyAt: new Date(Date.now()),
+          checksumAlgo: t.Checksum?.algo,
+          checksumSha256: t.Checksum?.value
+        } as const;
+
+        return {
+          ...da,
+          user: { connect: { id: userId } },
+          image: t.image ? { create: t.image } : undefined
+        };
+      });
+
     return this.prismaClient.conversation.update({
-      include: { messages: true, conversationSettings: true },
+      include: {
+        messages: true,
+        conversationSettings: true,
+        attachments: true
+      },
       where: { id: data.conversationId },
       data: {
         messages: {
           create: {
-            content: data.chunk,
+            attachments: mapImgs ? { create: mapImgs } : undefined,
             senderType: "AI",
             provider: this.providerToPrismaFormat(provider),
             model: data.model,
             thinkingDuration: data.thinkingDuration,
             thinkingText: data?.thinkingText,
-            userId,
-            userKeyId: keyId
+            userKeyId: keyId,
+            content: data.imgGenFields?.revisedPrompt ?? data.chunk
           }
         },
         userId,

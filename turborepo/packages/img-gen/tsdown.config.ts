@@ -22,7 +22,8 @@ export default defineConfig(
       ...options,
       entry: [
         "src/index.ts",
-        "src/provider-validation/index.ts"
+        "src/provider-validation/index.ts",
+        "!src/test/**/*.ts"
       ],
       cwd: process.cwd(),
       target: ["node25"],

@@ -42,6 +42,9 @@ async function exe() {
       logLevel: typeof process.env.IS_PROD === "undefined" ? "info" : "debug",
       isProd
     };
+        const { ExtractService } = await import("@/extract/index.ts");
+
+    const extract = new ExtractService();
 
     const logger = LoggerService.getLoggerInstance(loggerConfig),
       log = logger.getPinoInstance();
@@ -73,7 +76,7 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const prisma = new PrismaService(db, fs);
+    const prisma = new PrismaService(db, fs, extract, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
@@ -109,9 +112,7 @@ async function exe() {
 
     const { xAIService } = await import("@/xai/index.ts");
 
-    const { ExtractService } = await import("@/extract/index.ts");
 
-    const extract = new ExtractService();
 
     const xai = new xAIService(
       logger,
@@ -137,6 +138,7 @@ async function exe() {
       prisma,
       extract,
       s3,
+      isProd,
       redisInstance,
       cfg.OPENAI_API_KEY
     );
@@ -161,7 +163,14 @@ async function exe() {
         openai: cfg.OPENAI_API_KEY,
         vercel: cfg.V0_API_KEY
       },
-      dependencies: { extract, logger, prisma, redis: redisInstance, s3 },
+      dependencies: {
+        extract,
+        logger,
+        prisma,
+        redis: redisInstance,
+        s3,
+        isProd
+      },
       anthropic,
       gemini,
       grok: xai,

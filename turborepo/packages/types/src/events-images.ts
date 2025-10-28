@@ -35,29 +35,29 @@ export type OpenAISizeQualityOpts = {
 };
 
 export type GoogleImgSizeQualityOpts = {
-    size: {
-      "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-      "imagen-3.0-generate-002": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-      "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-      "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-      "gemini-2.5-flash-image":
-        | "1:1"
-        | "2:3"
-        | "3:2"
-        | "3:4"
-        | "4:3"
-        | "4:5"
-        | "5:4"
-        | "9:16"
-        | "16:9"
-        | "21:9";
-    };
-    quality: {
-      "imagen-4.0-fast-generate-001": "1K" | "2K";
-      "imagen-3.0-generate-002": "1K";
-      "imagen-4.0-generate-001": "1K" | "2K";
-      "imagen-4.0-ultra-generate-001": "1K" | "2K";
-    };
+  size: {
+    "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+    "imagen-3.0-generate-002": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+    "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+    "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+    "gemini-2.5-flash-image":
+      | "1:1"
+      | "2:3"
+      | "3:2"
+      | "3:4"
+      | "4:3"
+      | "4:5"
+      | "5:4"
+      | "9:16"
+      | "16:9"
+      | "21:9";
+  };
+  quality: {
+    "imagen-4.0-fast-generate-001": "1K" | "2K";
+    "imagen-3.0-generate-002": "1K";
+    "imagen-4.0-generate-001": "1K" | "2K";
+    "imagen-4.0-ultra-generate-001": "1K" | "2K";
+  };
 };
 
 export type GoogleImgOutputFormat = {
@@ -213,7 +213,7 @@ export interface GoogleImagenGenerateImagesConfig {
   guidanceScale?: number;
   /** Random seed for image generation. This is not available when
      ``add_watermark`` is set to true.
-     
+
      Accepted integer values: 1-2147483647 */
   seed?: number;
   /** Filter level for safety filtering. */
@@ -228,8 +228,8 @@ export interface GoogleImagenGenerateImagesConfig {
   includeRaiReason?: boolean;
   /** Language of the text in the prompt. */
   language?: keyof typeof GoogleImagePromptLanguage;
-  /** MIME type of the generated image.       
-   * 
+  /** MIME type of the generated image.
+   *
    *   "image/webp"
       | "image/gif"
       | "image/png"
@@ -794,6 +794,7 @@ export type AIChatResponseImgGenFields = {
   revisedPrompt?: string;
   partialImagesRequested?: number;
   partialImagesActual?: number;
+
   partialImages?: {
     index?: number;
     cdnUrl: string;
@@ -802,11 +803,155 @@ export type AIChatResponseImgGenFields = {
     mime: string;
   }[];
   images?: {
+    index?: number;
     cdnUrl: string;
     width: number;
     height: number;
     mime: string;
-    revisedPrompt?: string;
+  }[];
+};
+
+export type S3Checksum =
+  | {
+      readonly algo: "SHA256";
+      readonly value: string;
+    }
+  | {
+      readonly algo: "CRC32C";
+      readonly value: string;
+    }
+  | {
+      readonly algo: "CRC32";
+      readonly value: string;
+    }
+  | {
+      readonly algo: "SHA1";
+      readonly value: string;
+    }
+  | {
+      readonly algo: "CRC64NVME";
+      readonly value: string;
+    }
+  | undefined;
+
+export type S3StorageClass =
+  | "DEEP_ARCHIVE"
+  | "EXPRESS_ONEZONE"
+  | "FSX_OPENZFS"
+  | "GLACIER"
+  | "GLACIER_IR"
+  | "INTELLIGENT_TIERING"
+  | "ONEZONE_IA"
+  | "OUTPOSTS"
+  | "REDUCED_REDUNDANCY"
+  | "SNOW"
+  | "STANDARD"
+  | "STANDARD_IA"
+  | undefined;
+
+export type AIChatResponseImgGenFieldsFinal = {
+  outputSize?: string;
+  outputQuality?: string;
+  outputCompression?: number;
+  outputBackground?: string;
+  outputWidth?: number;
+  outputHeight?: number;
+  outputAspectRatio?: number;
+  size?: number;
+  requestedCount?: number;
+  actualCount?: number;
+  outputFormat?: string;
+  outputMime?: string;
+  duration?: number;
+  seed?: number;
+  revisedPrompt?: string;
+  partialImagesRequested?: number;
+  partialImagesActual?: number;
+  partialImages?: {
+    index?: number;
+    cdnUrl: string;
+    itemId: string;
+    width: number;
+    height: number;
+    mime: string;
+    bucket: string;
+    key: string;
+    versionId: string;
+    s3ObjectId: string;
+    filename?: string;
+    ext?: string;
+    etag?: string;
+    size?: number;
+    s3LastModified?: string;
+    ContentDisposition?: string;
+    CacheControl?: string;
+    Checksum?: S3Checksum;
+    StorageClass?: S3StorageClass;
+        generationGroupId: string;
+        image?: {
+    animated: boolean;
+    aspectRatio: number;
+    cameraMake: null;
+    cameraModel: null;
+    colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray";
+    dominantColorHex: null;
+    exifDateTimeOriginal: Date | null;
+    format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "heic" | "svg" | "ico" | "tiff" | undefined;
+    frames: number;
+    gpsLat: null;
+    gpsLon: null;
+    hasAlpha: boolean;
+    height: number;
+    width: number;
+    iccProfile: string | null;
+    lensModel: null;
+    orientation: number | null;
+    createdAt: undefined;
+    updatedAt: undefined;
+};
+  }[];
+  images?: {
+    index?: number;
+    cdnUrl: string;
+    itemId: string;
+    width: number;
+    height: number;
+    mime: string;
+    bucket: string;
+    key: string;
+    versionId: string;
+    s3ObjectId: string;
+    filename?: string;
+    ext?: string;
+    etag?: string;
+    size?: number;
+    s3LastModified?: string;
+    ContentDisposition?: string;
+    CacheControl?: string;
+    Checksum?: S3Checksum;
+    StorageClass?: S3StorageClass;
+        generationGroupId: string;
+        image?: {
+    animated: boolean;
+    aspectRatio: number;
+    cameraMake: null;
+    cameraModel: null;
+    colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray";
+    dominantColorHex: null;
+    exifDateTimeOriginal: Date | null;
+    format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "heic" | "svg" | "ico" | "tiff" | undefined;
+    frames: number;
+    gpsLat: null;
+    gpsLon: null;
+    hasAlpha: boolean;
+    height: number;
+    width: number;
+    iccProfile: string | null;
+    lensModel: null;
+    orientation: number | null;
+    createdAt: undefined;
+    updatedAt: undefined;
+}
   }[];
 };
 

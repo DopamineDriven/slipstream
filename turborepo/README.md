@@ -1,5 +1,9 @@
 # Slipstream — Turborepo
 
+
+![Simplified Overview](./misc/slipstream-simplified-overview.png)
+
+
 Monorepo for a multi‑provider AI chat application with streaming over WebSockets, resumable streams via Redis, and asset uploads to S3. Built with Next.js (web), a Node `ws` server, and shared TypeScript packages.
 
 ## Overview
