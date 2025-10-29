@@ -1,6 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
+import { Extract } from "@d0paminedriven/metadata";
 import * as dotenv from "dotenv";
-import { Extract } from "@slipstream/metadata";
 
 dotenv.config({ quiet: true });
 class Extractor extends Fs {
@@ -16,8 +16,8 @@ class Extractor extends Fs {
     try {
       prismaClient.$connect();
       return await prismaClient.attachment.findMany({
-        orderBy: {createdAt: "asc"},
-        select: { cdnUrl: true,publicUrl: true },
+        orderBy: { createdAt: "asc" },
+        select: { cdnUrl: true, publicUrl: true },
         where: { conversationId: id }
       });
     } catch (err) {

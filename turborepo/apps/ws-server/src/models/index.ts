@@ -1,3 +1,4 @@
+import { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
   GeminiImgGenModels,
   GetModelUtilRT,
@@ -6,7 +7,6 @@ import type {
   Provider
 } from "@slipstream/types";
 import { ProviderValidation } from "@slipstream/img-gen";
-import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { providerModelChatApi } from "@slipstream/types";
 import { imageModelSets } from "@slipstream/types/models";
 

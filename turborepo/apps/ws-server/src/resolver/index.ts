@@ -319,9 +319,6 @@ export class Resolver extends ModelService {
       metadata: userData
     });
 
-
-
-
     const user_location = {
       type: "approximate",
       city: userData?.city ?? "Barrington",
@@ -336,6 +333,8 @@ export class Resolver extends ModelService {
       msgs = res.messages satisfies MessageSingleton<true>[],
       conversationId = res.id,
       apiKey = res.apiKey ?? undefined,
+      jobId = res.jobId,
+      requestMessageId = res.requestMessageId,
       keyId = res.userKeyId,
       streamChannel = RedisChannels.conversationStream(conversationId),
       userChannel = RedisChannels.user(userId),
@@ -423,6 +422,8 @@ export class Resolver extends ModelService {
       userId,
       ws,
       apiKey,
+      jobId,
+      requestMessageId,
       keyId,
       max_tokens,
       model,

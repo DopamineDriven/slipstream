@@ -794,16 +794,15 @@ export type AIChatResponseImgGenFields = {
   revisedPrompt?: string;
   partialImagesRequested?: number;
   partialImagesActual?: number;
-
   partialImages?: {
-    index?: number;
+    index: number;
     cdnUrl: string;
     width: number;
     height: number;
     mime: string;
   }[];
   images?: {
-    index?: number;
+    index: number;
     cdnUrl: string;
     width: number;
     height: number;
@@ -848,6 +847,76 @@ export type S3StorageClass =
   | "STANDARD"
   | "STANDARD_IA"
   | undefined;
+export type ImgMetadataEntity = {
+  animated: boolean;
+  aspectRatio: number;
+  cameraMake: null;
+  cameraModel: null;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray";
+  dominantColorHex: null;
+  exifDateTimeOriginal: Date | null;
+  format:
+    | "apng"
+    | "png"
+    | "jpeg"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "heic"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | undefined;
+  frames: number;
+  gpsLat: null;
+  gpsLon: null;
+  hasAlpha: boolean;
+  height: number;
+  width: number;
+  iccProfile: string | null;
+  lensModel: null;
+  orientation: number | null;
+  createdAt: undefined;
+  updatedAt: undefined;
+};
+export type ImageGenPartialArr = [
+  number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
+  string, // cdnUrl (cloudfront url returned post-s3 upload)
+  string, // itemId (shared by all partials and final image)
+  number, // width
+  number, // height
+  string, // mime type
+  string, // s3 bucket
+  string, // s3 key
+  string, // s3 versionId
+  string, // s3ObjectId
+  string | undefined, // filename
+  string | undefined, // extension
+  string | undefined, // etag
+  number | undefined, // size
+  string | undefined, // s3 last modified
+  string | undefined, // content disposition
+  string | undefined, // cache control
+  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass | undefined, // s3 storage class
+  string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
+  ImgMetadataEntity | undefined, // ImageMetadata via extractor package
+  number | undefined, // upload duration
+  string | undefined, // requestMessageId
+  string | undefined // jobId
+];
 
 export type AIChatResponseImgGenFieldsFinal = {
   outputSize?: string;
@@ -868,7 +937,7 @@ export type AIChatResponseImgGenFieldsFinal = {
   partialImagesRequested?: number;
   partialImagesActual?: number;
   partialImages?: {
-    index?: number;
+    index: number;
     cdnUrl: string;
     itemId: string;
     width: number;
@@ -879,6 +948,7 @@ export type AIChatResponseImgGenFieldsFinal = {
     versionId: string;
     s3ObjectId: string;
     filename?: string;
+    uploadDuration?: number;
     ext?: string;
     etag?: string;
     size?: number;
@@ -887,31 +957,60 @@ export type AIChatResponseImgGenFieldsFinal = {
     CacheControl?: string;
     Checksum?: S3Checksum;
     StorageClass?: S3StorageClass;
-        generationGroupId: string;
-        image?: {
-    animated: boolean;
-    aspectRatio: number;
-    cameraMake: null;
-    cameraModel: null;
-    colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray";
-    dominantColorHex: null;
-    exifDateTimeOriginal: Date | null;
-    format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "heic" | "svg" | "ico" | "tiff" | undefined;
-    frames: number;
-    gpsLat: null;
-    gpsLon: null;
-    hasAlpha: boolean;
-    height: number;
-    width: number;
-    iccProfile: string | null;
-    lensModel: null;
-    orientation: number | null;
-    createdAt: undefined;
-    updatedAt: undefined;
-};
+    generationGroupId: string;
+    requestMessageId?: string;
+    kind?: "FINAL" | "PARTIAL";
+    jobId?: string;
+    jobIndex: number;
+    seriesIndex?: number;
+    seriesId?: string;
+    image?: {
+      animated: boolean;
+      aspectRatio: number;
+      cameraMake: null;
+      cameraModel: null;
+      colorSpace:
+        | "unknown"
+        | "srgb"
+        | "display_p3"
+        | "adobe_rgb"
+        | "prophoto_rgb"
+        | "rec2020"
+        | "rec709"
+        | "cmyk"
+        | "lab"
+        | "xyz"
+        | "gray";
+      dominantColorHex: null;
+      exifDateTimeOriginal: Date | null;
+      format:
+        | "apng"
+        | "png"
+        | "jpeg"
+        | "gif"
+        | "bmp"
+        | "webp"
+        | "avif"
+        | "heic"
+        | "svg"
+        | "ico"
+        | "tiff"
+        | undefined;
+      frames: number;
+      gpsLat: null;
+      gpsLon: null;
+      hasAlpha: boolean;
+      height: number;
+      width: number;
+      iccProfile: string | null;
+      lensModel: null;
+      orientation: number | null;
+      createdAt: undefined;
+      updatedAt: undefined;
+    };
   }[];
   images?: {
-    index?: number;
+    index: number;
     cdnUrl: string;
     itemId: string;
     width: number;
@@ -922,6 +1021,7 @@ export type AIChatResponseImgGenFieldsFinal = {
     versionId: string;
     s3ObjectId: string;
     filename?: string;
+    uploadDuration?: number;
     ext?: string;
     etag?: string;
     size?: number;
@@ -930,28 +1030,57 @@ export type AIChatResponseImgGenFieldsFinal = {
     CacheControl?: string;
     Checksum?: S3Checksum;
     StorageClass?: S3StorageClass;
-        generationGroupId: string;
-        image?: {
-    animated: boolean;
-    aspectRatio: number;
-    cameraMake: null;
-    cameraModel: null;
-    colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray";
-    dominantColorHex: null;
-    exifDateTimeOriginal: Date | null;
-    format: "apng" | "png" | "jpeg" | "gif" | "bmp" | "webp" | "avif" | "heic" | "svg" | "ico" | "tiff" | undefined;
-    frames: number;
-    gpsLat: null;
-    gpsLon: null;
-    hasAlpha: boolean;
-    height: number;
-    width: number;
-    iccProfile: string | null;
-    lensModel: null;
-    orientation: number | null;
-    createdAt: undefined;
-    updatedAt: undefined;
-}
+    generationGroupId: string;
+    requestMessageId?: string;
+    jobId?: string;
+    kind?: "FINAL" | "PARTIAL";
+    jobIndex: number;
+    seriesIndex?: number;
+    seriesId?: string;
+    image?: {
+      animated: boolean;
+      aspectRatio: number;
+      cameraMake: null;
+      cameraModel: null;
+      colorSpace:
+        | "unknown"
+        | "srgb"
+        | "display_p3"
+        | "adobe_rgb"
+        | "prophoto_rgb"
+        | "rec2020"
+        | "rec709"
+        | "cmyk"
+        | "lab"
+        | "xyz"
+        | "gray";
+      dominantColorHex: null;
+      exifDateTimeOriginal: Date | null;
+      format:
+        | "apng"
+        | "png"
+        | "jpeg"
+        | "gif"
+        | "bmp"
+        | "webp"
+        | "avif"
+        | "heic"
+        | "svg"
+        | "ico"
+        | "tiff"
+        | undefined;
+      frames: number;
+      gpsLat: null;
+      gpsLon: null;
+      hasAlpha: boolean;
+      height: number;
+      width: number;
+      iccProfile: string | null;
+      lensModel: null;
+      orientation: number | null;
+      createdAt: undefined;
+      updatedAt: undefined;
+    };
   }[];
 };
 

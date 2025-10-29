@@ -173,6 +173,17 @@ export const ImageGenStage = {
 export type ImageGenStage = (typeof ImageGenStage)[keyof typeof ImageGenStage]
 
 
+export const MessageType = {
+  AUDIO_GEN: 'AUDIO_GEN',
+  COMPUTER_USE: 'COMPUTER_USE',
+  IMAGE_GEN: 'IMAGE_GEN',
+  TEXT: 'TEXT',
+  VIDEO_GEN: 'VIDEO_GEN'
+} as const
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType]
+
+
 export const ImageGenOutputKind = {
   PARTIAL: 'PARTIAL',
   FINAL: 'FINAL'

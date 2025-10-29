@@ -1,10 +1,13 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
+import type {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs
+} from "@d0paminedriven/metadata";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
 import { cn } from "@/lib/utils";
-import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { Button, Card, CardContent, FileText, X } from "@slipstream/ui";
 
 interface AttachmentPreviewProps {

@@ -1,7 +1,7 @@
 import { Fs } from "@d0paminedriven/fs";
+import { GlobalFonts } from "@napi-rs/canvas";
 import * as dotenv from "dotenv";
 import type { Provider } from "@slipstream/types";
-import {createCanvas,GlobalFonts} from "@napi-rs/canvas";
 
 dotenv.config({ quiet: true });
 
@@ -27,7 +27,7 @@ type MapItRT =
 class ScriptGen extends Fs {
   constructor(public override cwd: string) {
     super(process.cwd() ?? cwd);
-    GlobalFonts
+    GlobalFonts;
   }
 
   private data = async (env: string, id: string) => {
@@ -42,7 +42,10 @@ class ScriptGen extends Fs {
         include: {
           messages: {
             orderBy: { createdAt: "asc" },
-            include: { attachments: true }
+            include: {
+              imageGenJob: true,
+              attachments: { include: { imageGenOutput: true, image: true } }
+            }
           }
         }
       });
@@ -268,7 +271,9 @@ header-includes: |
       return this.preprocessContent(line, emojiAnalysis?.replacements);
     });
     try {
-      await Promise.all([this.withWsAsync(processedData, toSlug, raw.title)]).then(() =>
+      await Promise.all([
+        this.withWsAsync(processedData, toSlug, raw.title)
+      ]).then(() =>
         this.wait(2000)
           .then(() => {
             if (this.exists(`src/test/__out__/condensed/${toSlug}.md`)) {

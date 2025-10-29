@@ -152,6 +152,14 @@ enum ImageGenStage {
   ABORTED
 }
 
+enum MessageType {
+  AUDIO_GEN
+  COMPUTER_USE
+  IMAGE_GEN
+  TEXT
+  VIDEO_GEN
+}
+
 enum ImageGenOutputKind {
   PARTIAL
   FINAL
@@ -326,6 +334,8 @@ model Message {
   content          String
   thinkingText     String?
   thinkingDuration Int?
+  isImageGen       Boolean      @default(false)
+  messageType      MessageType  @default(TEXT)
   liked            Boolean?     @default(false)
   disliked         Boolean?     @default(false)
   tryAgain         Boolean?     @default(false) // resubmit previous prompt to output a new (branched?) response
@@ -335,6 +345,10 @@ model Message {
   attachments      Attachment[]
   imageGenJob      ImageGenJob? @relation("ImageGenJobToMessage")
   conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([conversationId, isImageGen, createdAt(sort: Desc)])
+  @@index([conversationId, messageType, createdAt(sort: Desc)])
 }
 
 model Attachment {
@@ -342,7 +356,8 @@ model Attachment {
   conversationId    String?
   draftId           String? // has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
   batchId           String?
-  generationGroupId String? // GENERATED assets only (they don't have batchId or draftId)
+  generationGroupId String? // unique resp_id by provider -- eg, via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37
+  seriesId          String? // image_generation_call.id
   userId            String
   messageId         String?
   s3ObjectId        String?      @unique // "s3://bucket/key#<versionId|nov>"
@@ -408,6 +423,8 @@ model Attachment {
   @@index([draftId])
   @@index([batchId, conversationId])
   @@index([userId, createdAt])
+  @@index([generationGroupId, createdAt])
+  @@index([seriesId])
   @@index([compatStatus])
 }
 
@@ -629,21 +646,25 @@ model ImageGenJob {
 model ImageGenOutput {
   id            String             @id @default(cuid(2))
   jobId         String
-  index         Int // slot: 0..n-1
+  jobIndex      Int // 0..n-1 -- 0..0 (dall-e-3, n=1) -- 0..3 (all imagen- models, n <= 4) -- 0..9 (all other models, n <=10)
   kind          ImageGenOutputKind @default(FINAL)
-  partialIndex  Int? // 0..3 if PARTIAL (OpenAI)
+  seriesIndex   Int
+  seriesId      String  // mirror per-call lineage
+  isPartial     Boolean
   attachmentId  String             @unique
   width         Int?
   height        Int?
   mime          String?
+  ext           String?
   revisedPrompt String?
   createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
 
   job        ImageGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   attachment Attachment  @relation("ImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
 
-  @@unique([jobId, index, kind, partialIndex])
-  @@index([jobId, index, kind])
+  @@unique([jobId, seriesId, kind, seriesIndex])
+  @@index([jobId, jobIndex, kind])
 }
 
 model Verification {

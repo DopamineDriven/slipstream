@@ -7,20 +7,98 @@ import type {
   CTR,
   EventTypeMap,
   Provider,
-  RTC
+  RTC,
+  S3Checksum,
+  S3StorageClass
 } from "@slipstream/types";
 
+export type ImgMetadataEntity = {
+  animated: boolean;
+  aspectRatio: number;
+  cameraMake: null;
+  cameraModel: null;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray";
+  dominantColorHex: null;
+  exifDateTimeOriginal: Date | null;
+  format:
+    | "apng"
+    | "png"
+    | "jpeg"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "heic"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | undefined;
+  frames: number;
+  gpsLat: null;
+  gpsLon: null;
+  hasAlpha: boolean;
+  height: number;
+  width: number;
+  iccProfile: string | null;
+  lensModel: null;
+  orientation: number | null;
+  createdAt: undefined;
+  updatedAt: undefined;
+};
 
-export type HandleAiChatRequestRT = (ImageGenReqDbRes<true> | ConversationSingleton<true>) & {
-      assetCounts: number;
-      assets?: {
-        type: $Enums.AssetType;
-        compatStatus: $Enums.CompatStatus;
-        url: string;
-        mime: string;
-        ext: string;
-      }[];
-    };
+export type ImageGenPartialArr = [
+  number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
+  string, // cdnUrl (cloudfront url returned post-s3 upload)
+  string, // itemId (shared by all partials and final image)
+  number, // width
+  number, // height
+  string, // mime type
+  string, // s3 bucket
+  string, // s3 key
+  string, // s3 versionId
+  string, // s3ObjectId
+  string | undefined, // filename
+  string | undefined, // extension
+  string | undefined, // etag
+  number | undefined, // size
+  string | undefined, // s3 last modified
+  string | undefined, // content disposition
+  string | undefined, // cache control
+  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass | undefined, // s3 storage class
+  string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
+  ImgMetadataEntity | undefined, // ImageMetadata via extractor package
+number | undefined, // upload duration
+string | undefined, // requestMessageId
+string | undefined // jobId
+];
+
+export type HandleAiChatRequestRT = (
+  | ImageGenReqDbRes<true>
+  | ConversationSingleton<true>
+) & {
+  requestMessageId?: string;
+  jobId?: string;
+  assetCounts: number;
+  assets?: {
+    type: $Enums.AssetType;
+    compatStatus: $Enums.CompatStatus;
+    url: string;
+    mime: string;
+    ext: string;
+  }[];
+};
 
 export type IncludeCreateConvoWithImgGenProps = {
   conversationSettings: true;
@@ -95,7 +173,6 @@ export type HandleAiChatReqCreateSansImgGenAndAttachmentsProps = {
   keyId: string | null;
   create: ConversationSettingsCreatePropsSansImgGen;
 };
-
 
 export type HandleAiChatReqUpdateSansImgGenAndAttachmentsProps = {
   batchId: string;
@@ -595,6 +672,8 @@ export interface ProviderChatRequestEntity {
   chunks: string[];
   thinkingChunks: string[];
   imgGenEnabled?: boolean;
+  jobId?: string;
+  requestMessageId?: string;
   partialImgArr?: { b64image_url: string }[];
   imgGenFields?: AIChatRequestImgGenFields;
 }
@@ -706,6 +785,42 @@ export type ConvoSettingsSingleton = {
   usageAlerts: boolean | null;
 };
 
+export type ImageGenJobSingleton ={
+            id: string;
+            userKeyId: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            userId: string;
+            provider: $Enums.Provider;
+            model: string;
+            keyFingerprint: string | null;
+            prompt: string;
+            systemPrompt: string | null;
+            temperature: number | null;
+            topP: number | null;
+            nRequested: number;
+            nCompleted: number;
+            seed: number | null;
+            negativePrompt: string | null;
+            outputSize: string | null;
+            outputQuality: string | null;
+            outputFormat: string | null;
+            outputBackground: string | null;
+            outputCompression: number | null;
+            partialImagesRequested: number | null;
+            inputFidelity: string | null;
+            personGeneration: string | null;
+            moderation: string | null;
+            stage: $Enums.ImageGenStage;
+            progress: number;
+            etaSeconds: number | null;
+            durationMs: number | null;
+            usage: number | null;
+            revisedPrompt: string | null;
+            error: string | null;
+            requestMessageId: string;
+}
+
 export type AttachmentSingleton<T extends boolean = false> = {
   id: string;
   conversationId: string | null;
@@ -791,6 +906,7 @@ export type MessageSingleton<T extends boolean = false> = {
   liked: boolean | null;
   disliked: boolean | null;
   tryAgain: boolean | null;
+  imageGenJob?: ImageGenJobSingleton | null;
   attachments: AttachmentSingleton<T>[];
 };
 
@@ -920,6 +1036,7 @@ export type Signals =
   | "SIGXFSZ";
 
 export type ImageGenReqDbRes<T extends boolean = false> = {
+
   messages: ({
     attachments: ({
       image: {
@@ -1087,6 +1204,8 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     /**
      * count of assets bound to the current user messsage
      */
+            jobId?: string;
+        requestMessageId?: string;
     assetCounts: number;
     assets?: {
       type: $Enums.AssetType;

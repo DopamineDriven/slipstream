@@ -15,6 +15,7 @@ import type {
   UpdateAttachmentMetadata,
   UserData
 } from "@/types/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { ExtractService } from "@/extract/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { Fs } from "@d0paminedriven/fs";
@@ -26,7 +27,9 @@ import type {
   ImageMetadata,
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
-import type { ExpandedImgSpecs } from "@slipstream/metadata";
+import type {
+  ImageGenOutputCreateNestedOneWithoutAttachmentInput
+} from "@slipstream/db/node/generated/models";
 import type {
   AIChatRequest,
   AIChatResponseDb,
@@ -223,6 +226,8 @@ export class PrismaService extends ModelService {
       /**
        * count of assets bound to the current user messsage
        */
+      jobId?: string;
+      requestMessageId?: string;
       assetCounts: number;
       assets?: {
         type: $Enums.AssetType;
@@ -335,7 +340,9 @@ export class PrismaService extends ModelService {
               userId
             }
           });
-          return { create, withAssetInfo };
+          const requestMessageId = create.messages?.[0]?.id;
+          const imgGenJobId = create.messages?.[0]?.imageGenJob?.id;
+          return { create, withAssetInfo, imgGenJobId, requestMessageId };
         });
 
         return this.toCompatPropsExtened(
@@ -344,7 +351,11 @@ export class PrismaService extends ModelService {
             apiKey,
             ...batchIt.create
           }),
-          batchIt.withAssetInfo
+          {
+            jobId: batchIt.imgGenJobId,
+            requestMessageId: batchIt.requestMessageId,
+            ...batchIt.withAssetInfo
+          }
         );
       }
 
@@ -366,7 +377,12 @@ export class PrismaService extends ModelService {
       return this.toCompatPropsExtened(
         "image_gen_request",
         this.bigintToNumber("image_gen_request", apiKeyAndRes),
-        { assetCounts: 0, assets: undefined }
+        {
+          jobId: apiKeyAndRes.messages[0]?.imageGenJob?.id,
+          requestMessageId: apiKeyAndRes.messages[0]?.id,
+          assetCounts: 0,
+          assets: undefined
+        }
       );
     } else {
       const conversationSettings = {
@@ -425,7 +441,14 @@ export class PrismaService extends ModelService {
               userKeyId: keyId
             }
           });
-          return { create, withAssetInfo };
+          return {
+            create,
+            withAssetInfo: {
+              jobId: create.messages[0]?.imageGenJob?.id,
+              requestMessageId: create.messages[0]?.id,
+              ...withAssetInfo
+            }
+          };
         });
         return this.toCompatPropsExtened(
           "image_gen_request",
@@ -454,7 +477,12 @@ export class PrismaService extends ModelService {
       return this.toCompatPropsExtened(
         "image_gen_request",
         this.bigintToNumber("image_gen_request", apiKeyAndRes),
-        { assetCounts: 0, assets: undefined }
+        {
+          jobId: apiKeyAndRes.messages[0]?.imageGenJob?.id,
+          requestMessageId: apiKeyAndRes.messages[0]?.id,
+          assetCounts: 0,
+          assets: undefined
+        }
       );
     }
   }
@@ -557,14 +585,16 @@ export class PrismaService extends ModelService {
         userId
       }
     });
-
+    // surface these for all WithImgGen (for types of "img_gen_request" at the ORM level -- verifies an image gen request is in progress)
+    const requestMessageId = createConvo.messages?.[0]?.id;
+    const imgGenJobId = createConvo.messages?.[0]?.imageGenJob?.id;
     return this.toCompatPropsExtened(
       "image_gen_request",
       this.bigintToNumber("image_gen_request", {
         apiKey,
         ...createConvo
       }),
-      withAssetInfo
+      { jobId: imgGenJobId, requestMessageId, ...withAssetInfo }
     );
   }
 
@@ -590,12 +620,19 @@ export class PrismaService extends ModelService {
         userId
       }
     });
-    const apiKeyAndRes = { apiKey, ...p };
 
+    const apiKeyAndRes = { apiKey, ...p };
+    const requestMessageId = p.messages?.[0]?.id;
+    const imgGenJobId = p.messages?.[0]?.imageGenJob?.id;
     return this.toCompatPropsExtened(
       "image_gen_request",
       this.bigintToNumber("image_gen_request", apiKeyAndRes),
-      { assetCounts: 0, assets: undefined }
+      {
+        jobId: imgGenJobId,
+        requestMessageId,
+        assetCounts: 0,
+        assets: undefined
+      }
     );
   }
 
@@ -614,6 +651,7 @@ export class PrismaService extends ModelService {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
@@ -646,7 +684,12 @@ export class PrismaService extends ModelService {
     return this.toCompatPropsExtened(
       "ai_chat_request",
       this.bigintToNumber("ai_chat_request", apiKeyAndRes),
-      { assetCounts: 0, assets: undefined }
+      {
+        jobId: apiKeyAndRes.messages[0]?.imageGenJob?.id ?? undefined,
+        requestMessageId: apiKeyAndRes.messages[0]?.id,
+        assetCounts: 0,
+        assets: undefined
+      }
     );
   }
 
@@ -668,6 +711,7 @@ export class PrismaService extends ModelService {
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
+          imageGenJob: true,
           attachments: {
             orderBy: { createdAt: "asc" },
             include: {
@@ -709,7 +753,12 @@ export class PrismaService extends ModelService {
         apiKey,
         ...dat
       }),
-      withAssetInfo
+
+      {
+        jobId: dat.messages[0]?.imageGenJob?.id,
+        requestMessageId: dat.messages[0]?.id,
+        ...withAssetInfo
+      }
     );
   }
 
@@ -736,6 +785,7 @@ export class PrismaService extends ModelService {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
@@ -773,7 +823,11 @@ export class PrismaService extends ModelService {
         apiKey,
         ...d
       }),
-      withAssetInfo
+      {
+        jobId: d?.messages[0]?.imageGenJob?.id,
+        requestMessageId: d.messages[0]?.id,
+        ...withAssetInfo
+      }
     );
   }
 
@@ -818,7 +872,11 @@ export class PrismaService extends ModelService {
         apiKey,
         ...updateConvo
       }),
-      withAssetInfo
+      {
+        jobId: updateConvo.messages?.[0]?.imageGenJob?.id,
+        requestMessageId: updateConvo.messages?.[0]?.id,
+        ...withAssetInfo
+      }
     );
   }
 
@@ -852,7 +910,12 @@ export class PrismaService extends ModelService {
     return this.toCompatPropsExtened(
       "image_gen_request",
       this.bigintToNumber("image_gen_request", apiKeyAndRes),
-      { assetCounts: 0, assets: undefined }
+      {
+        jobId: apiKeyAndRes.messages?.[0]?.imageGenJob?.id,
+        requestMessageId: apiKeyAndRes.messages?.[0]?.id,
+        assetCounts: 0,
+        assets: undefined
+      }
     );
   }
 
@@ -872,6 +935,7 @@ export class PrismaService extends ModelService {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },
               include: {
@@ -905,7 +969,12 @@ export class PrismaService extends ModelService {
     return this.toCompatPropsExtened(
       "ai_chat_request",
       this.bigintToNumber("ai_chat_request", apiKeyAndRes),
-      { assetCounts: 0, assets: undefined }
+      {
+        jobId: apiKeyAndRes.messages?.[0]?.imageGenJob?.id,
+        requestMessageId: apiKeyAndRes.messages?.[0]?.id,
+        assetCounts: 0,
+        assets: undefined
+      }
     );
   }
 
@@ -1164,23 +1233,29 @@ export class PrismaService extends ModelService {
   public async handleAiChatResponse({
     userId,
     provider,
+    jobId,
+    requestMessageId,
     ...data
   }: Rm<CTR<AIChatResponseDb, "provider">, "type"> & {
     bucket?: string;
     key?: string;
     versionId?: string;
     cdnUrl?: string;
+    uploadDuration?: number;
     s3ObjectId?: string;
     size?: number;
+    requestMessageId?: string;
+    jobId?: string;
     width?: number;
     height?: number;
     mime?: string;
   }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
-
+    let agg: Record<string, number> = {};
     const mapImgs = data.imgGenFields?.images
       ?.concat(data.imgGenFields?.partialImages ?? [])
       ?.map(t => {
+        agg[t.itemId] = (agg[t.itemId] ?? 0) + 1;
         const da = {
           bucket: t.bucket,
           key: t.key,
@@ -1194,6 +1269,7 @@ export class PrismaService extends ModelService {
           etag: t.etag,
           compatCdnUrl: t.cdnUrl,
           compatStatus: "ALIASED",
+          uploadDuration: t.uploadDuration,
           compatS3ObjectId: t.s3ObjectId,
           compatVersionId: t.versionId,
           compatKey: t.key,
@@ -1202,6 +1278,7 @@ export class PrismaService extends ModelService {
           cacheControl: t.CacheControl,
           ext: t.ext,
           mime: t.mime,
+          seriesId: t.itemId,
           region: "us-east-1",
           status: "READY",
           uploadMethod: "GENERATED",
@@ -1213,41 +1290,100 @@ export class PrismaService extends ModelService {
           filename: t.filename,
           compatReadyAt: new Date(Date.now()),
           checksumAlgo: t.Checksum?.algo,
-          checksumSha256: t.Checksum?.value
+          checksumSha256: t.Checksum?.value,
+          image: t.image ? { create: t.image } : undefined,
+          imageGenOutput: t.jobId
+            ? ({
+                create: {
+                  mime: t.mime,
+                  revisedPrompt: data.imgGenFields?.revisedPrompt,
+                  kind: t.kind,
+                  ext: t.ext,
+                  height: t.image?.height,
+                  width: t.image?.width,
+                  jobId: t.jobId,
+                  isPartial: t.kind === "FINAL" ? false : true,
+                  jobIndex: 0,
+                  seriesId: t.itemId,
+                  seriesIndex: t.index
+                }
+              } satisfies ImageGenOutputCreateNestedOneWithoutAttachmentInput)
+            : undefined
         } as const;
-
         return {
           ...da,
-          user: { connect: { id: userId } },
-          image: t.image ? { create: t.image } : undefined
+          user: { connect: { id: userId } }
         };
       });
 
-    return this.prismaClient.conversation.update({
-      include: {
-        messages: true,
-        conversationSettings: true,
-        attachments: true
-      },
-      where: { id: data.conversationId },
-      data: {
-        messages: {
-          create: {
-            attachments: mapImgs ? { create: mapImgs } : undefined,
-            senderType: "AI",
-            provider: this.providerToPrismaFormat(provider),
-            model: data.model,
-            thinkingDuration: data.thinkingDuration,
-            thinkingText: data?.thinkingText,
-            userKeyId: keyId,
-            content: data.imgGenFields?.revisedPrompt ?? data.chunk
-          }
+    const transaction = await this.prismaClient.$transaction(async t => {
+      const persist = await t.conversation.update({
+        include: {
+          messages: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            include: { attachments: true }
+          },
+          conversationSettings: true
         },
-        userId,
-        title: data.title,
-        userKeyId: keyId
-      }
+        where: { id: data.conversationId },
+        data: {
+          messages: {
+            create: {
+              messageType: data?.imgGenEnabled === true ? "IMAGE_GEN" : "TEXT",
+              attachments: mapImgs ? { create: mapImgs } : undefined,
+              senderType: "AI",
+              provider: this.providerToPrismaFormat(provider),
+              model: data.model,
+              thinkingDuration: data.thinkingDuration,
+              thinkingText: data?.thinkingText,
+              isImageGen: data.imgGenEnabled ?? false,
+              userKeyId: keyId,
+              content: data.imgGenFields?.revisedPrompt ?? data.chunk
+            }
+          },
+          userId,
+          title: data.title,
+          userKeyId: keyId
+        }
+      });
+
+      const msg = persist.messages[0];
+      if (!msg) throw new Error("AIChatResponse Message was not created");
+
+      if (data.imgGenEnabled === true) {
+        if (!jobId || !data.imgGenFields?.images)
+          throw new Error("no jobid to associate image gen with");
+        const s = data.imgGenFields.images;
+        if (data.imgGenFields.partialImages)
+          s.concat(data.imgGenFields.partialImages);
+        await t.imageGenJob.update({
+          where: { id: jobId },
+          data: {
+            stage: "COMPLETED",
+            outputSize: data.imgGenFields.outputSize,
+            provider: this.providerToPrismaFormat(provider),
+            durationMs: data.imgGenFields.duration,
+            outputBackground: data.imgGenFields.outputBackground,
+            usage: data.usage,
+            temperature: data.temperature,
+            topP: data.topP,
+            systemPrompt: data.systemPrompt,
+            outputCompression: data.imgGenFields.outputCompression,
+            outputFormat: data.imgGenFields.outputFormat,
+            requestMessageId,
+            progress: 100,
+            nCompleted: s.filter(v => v.kind === "FINAL")?.length ?? 1,
+            model: data.model,
+            outputQuality: data.imgGenFields.outputQuality,
+            revisedPrompt: data.imgGenFields.revisedPrompt
+          }
+        });
+        return persist;
+      } else return persist;
     });
+
+    return transaction;
   }
 
   public convoId(conversationId?: string | null) {

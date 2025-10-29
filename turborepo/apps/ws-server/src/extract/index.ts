@@ -1,4 +1,5 @@
-import { Extract, ImageSpecs } from "@slipstream/metadata";
+import type { ImageSpecs } from "@d0paminedriven/metadata";
+import { Extract } from "@d0paminedriven/metadata";
 
 export class ExtractService extends Extract {
   constructor() {
