@@ -229,6 +229,8 @@ export const MessageScalarFieldEnum = {
   content: 'content',
   thinkingText: 'thinkingText',
   thinkingDuration: 'thinkingDuration',
+  isImageGen: 'isImageGen',
+  messageType: 'messageType',
   liked: 'liked',
   disliked: 'disliked',
   tryAgain: 'tryAgain',
@@ -245,6 +247,7 @@ export const AttachmentScalarFieldEnum = {
   draftId: 'draftId',
   batchId: 'batchId',
   generationGroupId: 'generationGroupId',
+  seriesId: 'seriesId',
   userId: 'userId',
   messageId: 'messageId',
   s3ObjectId: 's3ObjectId',
@@ -450,15 +453,19 @@ export type ImageGenJobScalarFieldEnum = (typeof ImageGenJobScalarFieldEnum)[key
 export const ImageGenOutputScalarFieldEnum = {
   id: 'id',
   jobId: 'jobId',
-  index: 'index',
+  jobIndex: 'jobIndex',
   kind: 'kind',
-  partialIndex: 'partialIndex',
+  seriesIndex: 'seriesIndex',
+  seriesId: 'seriesId',
+  isPartial: 'isPartial',
   attachmentId: 'attachmentId',
   width: 'width',
   height: 'height',
   mime: 'mime',
+  ext: 'ext',
   revisedPrompt: 'revisedPrompt',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ImageGenOutputScalarFieldEnum = (typeof ImageGenOutputScalarFieldEnum)[keyof typeof ImageGenOutputScalarFieldEnum]

@@ -1,6 +1,6 @@
+import type { ImageSpecs } from "@d0paminedriven/metadata";
 import { Fs } from "@d0paminedriven/fs";
-import type { ImageSpecs } from "@slipstream/metadata";
-import { ImgMetadataExtractor } from "@slipstream/metadata";
+import { ImgMetadataExtractor } from "@d0paminedriven/metadata";
 
 const res = {
   data: [
@@ -196,7 +196,7 @@ const imgSpecs = async () => {
       index: 10
     });
   for (const d of expandedData) {
-    const specs = await extract.extractRemote(d.url, 64*1024);
+    const specs = await extract.extractRemote(d.url, 64 * 1024);
     arr.push({ index: d.index, imgSpecs: specs });
   }
   return arr;
@@ -225,11 +225,13 @@ imgSpecs().then(v => {
 
 const fs = new Fs(process.cwd());
 
-const paths = fs.readDir("src/test/chapters").map((v)=> `src/test/chapters/${v}`);
+const paths = fs
+  .readDir("src/test/chapters")
+  .map(v => `src/test/chapters/${v}`);
 
-fs.withWs("src/test/chapters/paths.json", JSON.stringify(paths,null,2))
+fs.withWs("src/test/chapters/paths.json", JSON.stringify(paths, null, 2));
 
-console.log(fs.readDir("src/test/chapters"))
+console.log(fs.readDir("src/test/chapters"));
 // prettier-ignore
 const _template = (name: string) => `curl -X POST "https://api.anthropic.com/v1/files" \
      -H "x-api-key: $ANTHROPIC_API_KEY" \

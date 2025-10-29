@@ -12,8 +12,8 @@ import {
 } from "react";
 import { useChatWebSocketContext } from "@/context/chat-ws-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type { AssetOrigin, EventTypeMap } from "@slipstream/types";
-import { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
 import { createDraftId } from "@slipstream/types";
 
 /** Public context shape — intentionally small (mirrors AIChatContext vibe) */

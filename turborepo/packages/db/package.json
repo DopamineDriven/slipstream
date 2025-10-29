@@ -45,6 +45,11 @@
       "import": "./dist/client-node.js",
       "default": "./dist/client-node.js"
     },
+    "./node/generated/models": {
+      "types": "./dist/models-node.d.ts",
+      "import": "./dist/models-node.js",
+      "default": "./dist/models-node.js"
+    },
     "./enums-node": {
       "types": "./dist/enums-node.d.ts",
       "import": "./dist/enums-node.js",

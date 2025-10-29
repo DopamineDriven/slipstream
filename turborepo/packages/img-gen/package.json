@@ -50,7 +50,7 @@
     "test": "node --test --import tsx --test-reporter spec"
   },
   "dependencies": {
-    "@slipstream/metadata": "workspace:*",
+    "@d0paminedriven/metadata": "^3.2.0",
     "@slipstream/types": "workspace:*"
   },
   "devDependencies": {

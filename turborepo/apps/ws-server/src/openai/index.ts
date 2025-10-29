@@ -1,19 +1,19 @@
-import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
+import type {
+  ImageGenPartialArr,
+  ProviderOpenaiRequestEntity
+} from "@/types/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { init } from "@paralleldrive/cuid2";
 import type {
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
-  OpenAiModelIdUnion,
-  S3Checksum,
-  S3StorageClass
+  OpenAiModelIdUnion
 } from "@slipstream/types";
-import { ExpandedImgSpecs } from "@slipstream/metadata";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 import { OpenAIServiceWorkup } from "./workup.ts";
@@ -54,15 +54,6 @@ export class OpenAIService extends OpenAIServiceWorkup {
     return client;
   }
 
-  public generatorGroupId(convoId: string, timestamp: number) {
-    const createId = init({
-      fingerprint: `openai-${convoId}-${timestamp}`,
-      random: () => Math.random(),
-      length: 10
-    });
-    return createId();
-  }
-
   public getGenMime(target: "png" | "webp" | "jpeg") {
     return target === "jpeg"
       ? "image/jpeg"
@@ -82,6 +73,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
     ws,
     apiKey,
     max_tokens,
+    jobId,
+    requestMessageId,
     keyId,
     model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
     systemPrompt,
@@ -93,98 +86,18 @@ export class OpenAIService extends OpenAIServiceWorkup {
     imgGenFields,
     user_location
   }: ProviderOpenaiRequestEntity) {
+    // use most recent message id for image gen requests to update Im
+
     const m = model as OpenAiModelIdUnion;
+
     const provider = "openai" as const;
-    /**
-     *
-    cdnUrl: string;
-    index: number;
-    itemId: string;
-    filename?: string;
-    ext?: string | undefined;
-    etag?: string | undefined;
-    size?: number | undefined;
-    s3LastModified?: string | undefined;
-    ContentDisposition?: string | undefined;
-    CacheControl?: string | undefined;
-    Checksum?: S3Checksum;
-    StorageClass?: S3StorageClass;
-     */
-    const partialImgArr = Array.of<
-      [
-        number,
-        string,
-        string,
-        number,
-        number,
-        string,
-        string,
-        string,
-        string,
-        string,
-        string | undefined,
-        string | undefined,
-        string | undefined,
-        number | undefined,
-        string | undefined,
-        string | undefined,
-        string | undefined,
-        S3Checksum | undefined,
-        S3StorageClass | undefined,
-        string,
-        (
-          | {
-              animated: boolean;
-              aspectRatio: number;
-              cameraMake: null;
-              cameraModel: null;
-              colorSpace:
-                | "unknown"
-                | "srgb"
-                | "display_p3"
-                | "adobe_rgb"
-                | "prophoto_rgb"
-                | "rec2020"
-                | "rec709"
-                | "cmyk"
-                | "lab"
-                | "xyz"
-                | "gray";
-              dominantColorHex: null;
-              exifDateTimeOriginal: Date | null;
-              format:
-                | "apng"
-                | "png"
-                | "jpeg"
-                | "gif"
-                | "bmp"
-                | "webp"
-                | "avif"
-                | "heic"
-                | "svg"
-                | "ico"
-                | "tiff"
-                | undefined;
-              frames: number;
-              gpsLat: null;
-              gpsLon: null;
-              hasAlpha: boolean;
-              height: number;
-              width: number;
-              iccProfile: string | null;
-              lensModel: null;
-              orientation: number | null;
-              createdAt: undefined;
-              updatedAt: undefined;
-            }
-          | undefined
-        )
-      ]
-    >();
+
+    const partialImgArr = Array.of<ImageGenPartialArr>();
+
     let finalImgObj:
-      | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
-      | undefined;
-    let openaiThinkingStartTime: number | null = null,
+        | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
+        | undefined,
+      openaiThinkingStartTime: number | null = null,
       openaiThinkingDuration = 0,
       openaiIsCurrentlyThinking = false,
       openaiThinkingAgg = "",
@@ -198,7 +111,9 @@ export class OpenAIService extends OpenAIServiceWorkup {
         | undefined = undefined,
       str: Stream<OpenAI.Responses.ResponseStreamEvent> & {
         _request_id?: string | null;
-      };
+      },
+      uploadtInitial = 0,
+      uploadtDelta = 0;
 
     const client = this.getClient(apiKey ?? undefined);
 
@@ -478,6 +393,12 @@ export class OpenAIService extends OpenAIServiceWorkup {
             .concat(`.${ext}`);
           const b64 = partialImgAgg[1];
 
+          const getIt = (await this.extractor.extractRemote(
+            Buffer.from(b64, "base64"),
+            4096 * 48
+          )) as ExpandedImgSpecs;
+
+          uploadtInitial = performance.now();
           rtHelper = await this.s3.uploadGenerated(
             Buffer.from(b64, "base64"),
             this.isProd,
@@ -486,14 +407,12 @@ export class OpenAIService extends OpenAIServiceWorkup {
               filename,
               origin: "GENERATED",
               userId,
+              size: getIt.byteSize,
               conversationId
             }
           );
+          uploadtDelta = performance.now() - uploadtInitial;
 
-          const getIt = (await this.extractor.extractRemote(
-            rtHelper.cdnUrl,
-            4096 * 24
-          )) as ExpandedImgSpecs;
           const d = this.handleAssetMetadata(getIt).img;
           partialImgArr.push([
             partialIndex,
@@ -519,10 +438,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
             rtHelper?.checksum,
             rtHelper?.storageClass,
             itemId,
-            d
+            d,
+            uploadtDelta,
+            requestMessageId,
+            jobId
           ]);
-
           console.log(partialImgArr);
+          uploadtInitial = 0;
+          uploadtDelta = 0;
           partialImgAgg = undefined;
         }
         ws.send(
@@ -694,27 +617,29 @@ export class OpenAIService extends OpenAIServiceWorkup {
         const duration = (performance.now() - tInitial) / 1000;
         if (imgGenEnabled && finalImgObj?.result) {
           const b64 = Buffer.from(finalImgObj.result, "base64");
-          const { format } = this.extractor.img.getImageSpecsWorkup(
+          const finalSpecs = (await this.extractor.extractRemote(
             b64,
-            4096 * 16
-          );
+            4096 * 48
+          )) as ExpandedImgSpecs;
+          const format = finalSpecs.format;
 
           const filename = finalImgObj.id
             .concat("-")
             .concat(partialImgArr.length.toString(10))
             .concat(`.${format}`);
+
+          uploadtInitial = performance.now();
+
           const rt = await this.s3.uploadGenerated(b64, this.isProd, {
             contentType: this.getGenMime(outputFormat),
             filename: filename,
             userId,
+            size: finalSpecs.byteSize,
             conversationId,
             origin: "GENERATED"
           });
 
-          const finalSpecs = (await this.extractor.extractRemote(
-            rt.cdnUrl,
-            4096 * 24
-          )) as ExpandedImgSpecs;
+          uploadtDelta = performance.now() - uploadtInitial;
 
           const generationGroupId = openaiResId;
 
@@ -735,7 +660,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             versionId: rt.versionId,
             s3ObjectId: rt.s3ObjectId,
             filename,
-            ext: format,
+            ext: finalSpecs.format,
             etag: rt.etag,
             size: finalSpecs.byteSize ?? rt.size ?? undefined,
             s3LastModified: rt.lastModified,
@@ -744,11 +669,19 @@ export class OpenAIService extends OpenAIServiceWorkup {
             Checksum: rt.checksum,
             StorageClass: rt.storageClass,
             generationGroupId,
-            image: imgMeta
+            image: imgMeta,
+            uploadDuration: uploadtDelta,
+            requestMessageId,
+            jobId,
+            jobIndex: 0,
+            seriesId: finalImgObj.id,
+            seriesIndex: partialImgArr.length,
+            kind: "FINAL"
           } as const;
 
           const image = [
             {
+              index: imgFinal.index,
               cdnUrl: rt?.cdnUrl ?? "",
               height: finalSpecs?.height ?? 0,
               width: finalSpecs?.width ?? 0,
@@ -784,6 +717,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             key: rt.key,
             cdnUrl: rt.cdnUrl,
             height: finalSpecs.height,
+            jobId,
+            requestMessageId,
             mime: rt.contentType,
             size: rt.size ?? finalSpecs.byteSize,
             versionId: rt.versionId,
@@ -797,9 +732,23 @@ export class OpenAIService extends OpenAIServiceWorkup {
                 typeof finalImgObj.revised_prompt === "string"
                   ? finalImgObj.revised_prompt
                   : undefined,
+              outputQuality:
+                "quality" in finalImgObj &&
+                typeof finalImgObj.quality === "string"
+                  ? finalImgObj.quality
+                  : undefined,
               actualCount: partialImgArr.length,
               outputAspectRatio: width / height,
-              outputFormat: outputFormat,
+              outputFormat:
+                "output_format" in finalImgObj &&
+                typeof finalImgObj.output_format === "string"
+                  ? finalImgObj.output_format
+                  : outputFormat,
+              outputBackground:
+                "background" in finalImgObj &&
+                typeof finalImgObj.background === "string"
+                  ? finalImgObj.background
+                  : undefined,
               partialImagesRequested:
                 imgGenFields?.output_partial_images ?? undefined,
               requestedCount: imgGenFields?.n ?? 1,

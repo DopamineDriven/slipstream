@@ -1,8 +1,11 @@
 "use client";
 
+import type {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs
+} from "@d0paminedriven/metadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@slipstream/metadata";
-import { Extract } from "@slipstream/metadata";
+import { Extract } from "@d0paminedriven/metadata";
 
 export interface AttachmentPreview {
   id: string;

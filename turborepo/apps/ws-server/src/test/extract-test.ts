@@ -1,15 +1,15 @@
 import { Fs } from "@d0paminedriven/fs";
+import {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs,
+  Extract
+} from "@d0paminedriven/metadata";
 import * as dotenv from "dotenv";
 import type {
   $Enums,
   DocumentMetadata,
   ImageMetadata
 } from "@slipstream/db/node/generated/client";
-import {
-  ExpandedDocSpecs,
-  ExpandedImgSpecs,
-  Extract
-} from "@slipstream/metadata";
 
 type UserDrivenEnvRT = {
   assetType: $Enums.AssetType;

@@ -1,4 +1,5 @@
 import type {
+    ImageGenPartialArr,
   InferPromiseRT,
   MessageSingleton,
   ProviderOpenaiRequestEntity
@@ -14,9 +15,7 @@ import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatRequestImgGenFields,
   ImgGenWorkupResRT,
-  OpenAiModelIdUnion,
-  S3Checksum,
-  S3StorageClass
+  OpenAiModelIdUnion
 } from "@slipstream/types";
 
 export class OpenAIServiceWorkup extends ModelService {
@@ -275,76 +274,7 @@ export class OpenAIServiceWorkup extends ModelService {
   }
 
   public mapPartialImgGenArr(
-    props: [
-      number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
-      string, // cdnUrl (cloudfront url returned post-s3 upload)
-      string, // itemId (shared by all partials and final image)
-      number, // width
-      number, // height
-      string, // mime type
-      string, // s3 bucket
-      string, // s3 key
-      string, // s3 versionId
-      string, // s3ObjectId
-      string | undefined, // filename
-      string | undefined, // extension
-      string | undefined, // etag
-      number | undefined, // size
-      string | undefined, // s3 last modified
-      string | undefined, // content disposition
-      string | undefined, // cache control
-      S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
-      S3StorageClass | undefined, // s3 storage class
-      string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
-      // ImageMetadata via extractor package
-      (
-        | {
-            animated: boolean;
-            aspectRatio: number;
-            cameraMake: null;
-            cameraModel: null;
-            colorSpace:
-              | "unknown"
-              | "srgb"
-              | "display_p3"
-              | "adobe_rgb"
-              | "prophoto_rgb"
-              | "rec2020"
-              | "rec709"
-              | "cmyk"
-              | "lab"
-              | "xyz"
-              | "gray";
-            dominantColorHex: null;
-            exifDateTimeOriginal: Date | null;
-            format:
-              | "apng"
-              | "png"
-              | "jpeg"
-              | "gif"
-              | "bmp"
-              | "webp"
-              | "avif"
-              | "heic"
-              | "svg"
-              | "ico"
-              | "tiff"
-              | undefined;
-            frames: number;
-            gpsLat: null;
-            gpsLon: null;
-            hasAlpha: boolean;
-            height: number;
-            width: number;
-            iccProfile: string | null;
-            lensModel: null;
-            orientation: number | null;
-            createdAt: undefined;
-            updatedAt: undefined;
-          }
-        | undefined
-      )
-    ][]
+    props: ImageGenPartialArr[]
   ) {
     return props.map((t, o) => {
       return {
@@ -358,75 +288,7 @@ export class OpenAIServiceWorkup extends ModelService {
   }
 
   public mapPersistenceImgGenArr(
-    props: [
-      number,
-      string,
-      string,
-      number,
-      number,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string | undefined,
-      string | undefined,
-      string | undefined,
-      number | undefined,
-      string | undefined,
-      string | undefined,
-      string | undefined,
-      S3Checksum | undefined,
-      S3StorageClass | undefined,
-      string,
-      (
-        | {
-            animated: boolean;
-            aspectRatio: number;
-            cameraMake: null;
-            cameraModel: null;
-            colorSpace:
-              | "unknown"
-              | "srgb"
-              | "display_p3"
-              | "adobe_rgb"
-              | "prophoto_rgb"
-              | "rec2020"
-              | "rec709"
-              | "cmyk"
-              | "lab"
-              | "xyz"
-              | "gray";
-            dominantColorHex: null;
-            exifDateTimeOriginal: Date | null;
-            format:
-              | "apng"
-              | "png"
-              | "jpeg"
-              | "gif"
-              | "bmp"
-              | "webp"
-              | "avif"
-              | "heic"
-              | "svg"
-              | "ico"
-              | "tiff"
-              | undefined;
-            frames: number;
-            gpsLat: null;
-            gpsLon: null;
-            hasAlpha: boolean;
-            height: number;
-            width: number;
-            iccProfile: string | null;
-            lensModel: null;
-            orientation: number | null;
-            createdAt: undefined;
-            updatedAt: undefined;
-          }
-        | undefined
-      )
-    ][]
+    props: ImageGenPartialArr[]
   ) {
     return props.map((t, o) => {
       return {
@@ -450,8 +312,15 @@ export class OpenAIServiceWorkup extends ModelService {
         Checksum: t[17],
         StorageClass: t[18],
         generationGroupId: t[19],
-        image: t[20]
-      };
+        image: t[20],
+        uploadDuration: t[21],
+        requestMessageId: t[22],
+        jobId: t[23],
+        jobIndex: 0,
+        seriesIndex: t[0],
+        seriesId: t[2],
+        kind: "PARTIAL"
+      } as const;
     });
   }
 

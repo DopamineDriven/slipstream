@@ -44,6 +44,8 @@ export type MessageMinAggregateOutputType = {
   content: string | null
   thinkingText: string | null
   thinkingDuration: number | null
+  isImageGen: boolean | null
+  messageType: $Enums.MessageType | null
   liked: boolean | null
   disliked: boolean | null
   tryAgain: boolean | null
@@ -62,6 +64,8 @@ export type MessageMaxAggregateOutputType = {
   content: string | null
   thinkingText: string | null
   thinkingDuration: number | null
+  isImageGen: boolean | null
+  messageType: $Enums.MessageType | null
   liked: boolean | null
   disliked: boolean | null
   tryAgain: boolean | null
@@ -80,6 +84,8 @@ export type MessageCountAggregateOutputType = {
   content: number
   thinkingText: number
   thinkingDuration: number
+  isImageGen: number
+  messageType: number
   liked: number
   disliked: number
   tryAgain: number
@@ -108,6 +114,8 @@ export type MessageMinAggregateInputType = {
   content?: true
   thinkingText?: true
   thinkingDuration?: true
+  isImageGen?: true
+  messageType?: true
   liked?: true
   disliked?: true
   tryAgain?: true
@@ -126,6 +134,8 @@ export type MessageMaxAggregateInputType = {
   content?: true
   thinkingText?: true
   thinkingDuration?: true
+  isImageGen?: true
+  messageType?: true
   liked?: true
   disliked?: true
   tryAgain?: true
@@ -144,6 +154,8 @@ export type MessageCountAggregateInputType = {
   content?: true
   thinkingText?: true
   thinkingDuration?: true
+  isImageGen?: true
+  messageType?: true
   liked?: true
   disliked?: true
   tryAgain?: true
@@ -249,6 +261,8 @@ export type MessageGroupByOutputType = {
   content: string
   thinkingText: string | null
   thinkingDuration: number | null
+  isImageGen: boolean
+  messageType: $Enums.MessageType
   liked: boolean | null
   disliked: boolean | null
   tryAgain: boolean | null
@@ -290,6 +304,8 @@ export type MessageWhereInput = {
   content?: Prisma.StringFilter<"Message"> | string
   thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
   thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
@@ -312,6 +328,8 @@ export type MessageOrderByWithRelationInput = {
   content?: Prisma.SortOrder
   thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder
+  isImageGen?: Prisma.SortOrder
+  messageType?: Prisma.SortOrder
   liked?: Prisma.SortOrderInput | Prisma.SortOrder
   disliked?: Prisma.SortOrderInput | Prisma.SortOrder
   tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -337,6 +355,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   content?: Prisma.StringFilter<"Message"> | string
   thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
   thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
@@ -359,6 +379,8 @@ export type MessageOrderByWithAggregationInput = {
   content?: Prisma.SortOrder
   thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder
+  isImageGen?: Prisma.SortOrder
+  messageType?: Prisma.SortOrder
   liked?: Prisma.SortOrderInput | Prisma.SortOrder
   disliked?: Prisma.SortOrderInput | Prisma.SortOrder
   tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -385,6 +407,8 @@ export type MessageScalarWhereWithAggregatesInput = {
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
   thinkingText?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   thinkingDuration?: Prisma.IntNullableWithAggregatesFilter<"Message"> | number | null
+  isImageGen?: Prisma.BoolWithAggregatesFilter<"Message"> | boolean
+  messageType?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
   liked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
   disliked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
   tryAgain?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
@@ -401,6 +425,8 @@ export type MessageCreateInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -423,6 +449,8 @@ export type MessageUncheckedCreateInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -441,6 +469,8 @@ export type MessageUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -463,6 +493,8 @@ export type MessageUncheckedUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -483,6 +515,8 @@ export type MessageCreateManyInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -499,6 +533,8 @@ export type MessageUpdateManyMutationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -517,6 +553,8 @@ export type MessageUncheckedUpdateManyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -545,6 +583,8 @@ export type MessageCountOrderByAggregateInput = {
   content?: Prisma.SortOrder
   thinkingText?: Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrder
+  isImageGen?: Prisma.SortOrder
+  messageType?: Prisma.SortOrder
   liked?: Prisma.SortOrder
   disliked?: Prisma.SortOrder
   tryAgain?: Prisma.SortOrder
@@ -567,6 +607,8 @@ export type MessageMaxOrderByAggregateInput = {
   content?: Prisma.SortOrder
   thinkingText?: Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrder
+  isImageGen?: Prisma.SortOrder
+  messageType?: Prisma.SortOrder
   liked?: Prisma.SortOrder
   disliked?: Prisma.SortOrder
   tryAgain?: Prisma.SortOrder
@@ -585,6 +627,8 @@ export type MessageMinOrderByAggregateInput = {
   content?: Prisma.SortOrder
   thinkingText?: Prisma.SortOrder
   thinkingDuration?: Prisma.SortOrder
+  isImageGen?: Prisma.SortOrder
+  messageType?: Prisma.SortOrder
   liked?: Prisma.SortOrder
   disliked?: Prisma.SortOrder
   tryAgain?: Prisma.SortOrder
@@ -694,6 +738,10 @@ export type EnumSenderTypeFieldUpdateOperationsInput = {
   set?: $Enums.SenderType
 }
 
+export type EnumMessageTypeFieldUpdateOperationsInput = {
+  set?: $Enums.MessageType
+}
+
 export type MessageCreateNestedOneWithoutAttachmentsInput = {
   create?: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput>
   connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAttachmentsInput
@@ -733,6 +781,8 @@ export type MessageCreateWithoutUserKeyInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -753,6 +803,8 @@ export type MessageUncheckedCreateWithoutUserKeyInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -802,6 +854,8 @@ export type MessageScalarWhereInput = {
   content?: Prisma.StringFilter<"Message"> | string
   thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
   thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
   tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
@@ -818,6 +872,8 @@ export type MessageCreateWithoutConversationInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -838,6 +894,8 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -882,6 +940,8 @@ export type MessageCreateWithoutAttachmentsInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -903,6 +963,8 @@ export type MessageUncheckedCreateWithoutAttachmentsInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -936,6 +998,8 @@ export type MessageUpdateWithoutAttachmentsInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -957,6 +1021,8 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -974,6 +1040,8 @@ export type MessageCreateWithoutImageGenJobInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -995,6 +1063,8 @@ export type MessageUncheckedCreateWithoutImageGenJobInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -1028,6 +1098,8 @@ export type MessageUpdateWithoutImageGenJobInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1049,6 +1121,8 @@ export type MessageUncheckedUpdateWithoutImageGenJobInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1067,6 +1141,8 @@ export type MessageCreateManyUserKeyInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -1083,6 +1159,8 @@ export type MessageUpdateWithoutUserKeyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1103,6 +1181,8 @@ export type MessageUncheckedUpdateWithoutUserKeyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1122,6 +1202,8 @@ export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1139,6 +1221,8 @@ export type MessageCreateManyConversationInput = {
   content: string
   thinkingText?: string | null
   thinkingDuration?: number | null
+  isImageGen?: boolean
+  messageType?: $Enums.MessageType
   liked?: boolean | null
   disliked?: boolean | null
   tryAgain?: boolean | null
@@ -1155,6 +1239,8 @@ export type MessageUpdateWithoutConversationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1175,6 +1261,8 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1194,6 +1282,8 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1243,6 +1333,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   content?: boolean
   thinkingText?: boolean
   thinkingDuration?: boolean
+  isImageGen?: boolean
+  messageType?: boolean
   liked?: boolean
   disliked?: boolean
   tryAgain?: boolean
@@ -1266,6 +1358,8 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   content?: boolean
   thinkingText?: boolean
   thinkingDuration?: boolean
+  isImageGen?: boolean
+  messageType?: boolean
   liked?: boolean
   disliked?: boolean
   tryAgain?: boolean
@@ -1286,6 +1380,8 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   content?: boolean
   thinkingText?: boolean
   thinkingDuration?: boolean
+  isImageGen?: boolean
+  messageType?: boolean
   liked?: boolean
   disliked?: boolean
   tryAgain?: boolean
@@ -1306,6 +1402,8 @@ export type MessageSelectScalar = {
   content?: boolean
   thinkingText?: boolean
   thinkingDuration?: boolean
+  isImageGen?: boolean
+  messageType?: boolean
   liked?: boolean
   disliked?: boolean
   tryAgain?: boolean
@@ -1313,7 +1411,7 @@ export type MessageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "thinkingText" | "thinkingDuration" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "thinkingText" | "thinkingDuration" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
   attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
@@ -1349,6 +1447,8 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     content: string
     thinkingText: string | null
     thinkingDuration: number | null
+    isImageGen: boolean
+    messageType: $Enums.MessageType
     liked: boolean | null
     disliked: boolean | null
     tryAgain: boolean | null
@@ -1791,6 +1891,8 @@ export interface MessageFieldRefs {
   readonly content: Prisma.FieldRef<"Message", 'String'>
   readonly thinkingText: Prisma.FieldRef<"Message", 'String'>
   readonly thinkingDuration: Prisma.FieldRef<"Message", 'Int'>
+  readonly isImageGen: Prisma.FieldRef<"Message", 'Boolean'>
+  readonly messageType: Prisma.FieldRef<"Message", 'MessageType'>
   readonly liked: Prisma.FieldRef<"Message", 'Boolean'>
   readonly disliked: Prisma.FieldRef<"Message", 'Boolean'>
   readonly tryAgain: Prisma.FieldRef<"Message", 'Boolean'>

@@ -833,6 +833,7 @@ export class ProviderValidation {
         provider: this.providerToPrismaFormat(provider),
         senderType: "USER",
         model,
+        messageType: "IMAGE_GEN",
         userId,
         userKeyId,
         imageGenJob
