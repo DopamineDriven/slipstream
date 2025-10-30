@@ -5,10 +5,124 @@ import type {
   OpenAiResponse
 } from "@/types.ts";
 import { Provider } from "@/models.ts";
+import { XOR } from "@/utils.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
+
+/**
+ const providerModelChatApi = {
+  openai: [
+    "gpt-5",
+    "gpt-5-codex",
+    "gpt-5-mini",
+    "gpt-5-nano",
+    "gpt-5-pro",
+    "gpt-5-chat-latest",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "gpt-4o",
+    "gpt-4o-mini",
+    "chatgpt-4o-latest",
+    "o3",
+    "o3-mini",
+    "o3-deep-research",
+    "o3-pro",
+    "o4-mini",
+    "o4-mini-deep-research",
+    "o1-pro",
+    "gpt-4-turbo",
+    "gpt-3.5-turbo",
+    "gpt-image-1",
+    "gpt-image-1-mini",
+    "dall-e-3",
+    "dall-e-2",
+    "computer-use-preview",
+    "sora-2",
+    "sora-2-pro"
+  ],
+  gemini: [
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-image",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "imagen-4.0-generate-001",
+    "imagen-4.0-fast-generate-001",
+    "imagen-4.0-ultra-generate-001",
+    "imagen-3.0-generate-002",
+    "veo-3.1-generate-preview",
+    "veo-3.1-fast-generate-preview",
+    "veo-3.0-generate-001",
+    "veo-3.0-fast-generate-001",
+    "veo-2.0-generate-001",
+    "gemini-2.5-computer-use-preview-10-2025"
+  ],
+  grok: [
+    "grok-4-0709",
+    "grok-code-fast-1",
+    "grok-4-fast-reasoning",
+    "grok-4-fast-non-reasoning",
+    "grok-2-image-1212",
+    "grok-3",
+    "grok-3-fast",
+    "grok-3-mini",
+    "grok-3-mini-fast",
+    "grok-2-vision-1212"
+  ],
+  anthropic: [
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-5-20250929",
+    "claude-opus-4-1-20250805",
+    "claude-opus-4-20250514",
+    "claude-sonnet-4-20250514",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-5-haiku-20241022",
+    "claude-3-haiku-20240307"
+  ],
+  meta: [
+    "Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "Llama-4-Scout-17B-16E-Instruct-FP8",
+    "Llama-3.3-70B-Instruct",
+    "Llama-3.3-8B-Instruct",
+    "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
+    "Cerebras-Llama-4-Scout-17B-16E-Instruct",
+    "Groq-Llama-4-Maverick-17B-128E-Instruct"
+  ],
+  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
+} as const;
+
+ */
+
+const providerModelImagesApi = {
+  openai: [
+    "gpt-5",
+    "gpt-5-codex",
+    "gpt-5-mini",
+    "gpt-5-nano",
+    "gpt-5-pro",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "gpt-4o",
+    "gpt-4o-mini",
+    "gpt-image-1",
+    "gpt-image-1-mini",
+    "dall-e-3",
+    "dall-e-2"
+  ],
+  gemini: [
+    "gemini-2.5-flash-image",
+    "imagen-4.0-generate-001",
+    "imagen-4.0-fast-generate-001",
+    "imagen-4.0-ultra-generate-001",
+    "imagen-3.0-generate-002"
+  ],
+  grok: ["grok-2-image-1212"]
+} as const;
 
 const providerModelChatApi = {
   openai: [
@@ -75,8 +189,6 @@ const providerModelChatApi = {
     "claude-sonnet-4-20250514",
     "claude-3-7-sonnet-20250219",
     "claude-3-5-haiku-20241022",
-    "claude-3-5-sonnet-20241022",
-    "claude-3-5-sonnet-20240620",
     "claude-3-haiku-20240307"
   ],
   meta: [
@@ -108,7 +220,7 @@ async function openAiFetcher() {
   });
 }
 async function _llamaFetcher() {
-  const  res =  await fetch("https://api.llama.com/v1/models", {
+  const res = await fetch("https://api.llama.com/v1/models", {
     method: "GET",
     headers: {
       Authorization: `Bearer ` + (process.env.LLAMA_API_KEY ?? ""),
@@ -116,7 +228,7 @@ async function _llamaFetcher() {
     }
   });
   console.log(res.headers);
-  return res
+  return res;
 }
 async function _v0Fetcher() {
   return await fetch("https://api.v0.dev/v1/models", {
@@ -344,101 +456,155 @@ const modelMapper = async (modelKeys = true) => {
   const openAiData = await openAiFetcher();
   const geminiData = await geminiFetcher();
   const grokData = await grokFetcher();
-  const parseGemini = formattedGemini(
-    JSON.parse(await geminiData.text()) as GeminiResponse
-  );
-  const parseOpenAi = formattedOpenAi(
-    JSON.parse(await openAiData.text()) as OpenAiResponse
-  );
-  const _parseGrok = formattedGrok(
-    JSON.parse(await grokData.text()) as GrokModelsResponse
-  );
-  const parseIt = formattedAnthropic(
-    JSON.parse(await data.text()) as AnthropicResponse
-  );
-  return Object.entries(providerModelChatApi).map(([provider, models]) => {
-    const p = provider as keyof typeof providerModelChatApi;
-    switch (p) {
-      case "anthropic": {
-        let helper = Array.of<[string, string]>();
-        models.forEach(function (model) {
-          modelKeys === true
-            ? helper.push([
-                model,
-                parseIt.find(t => t.id === model)?.display_name ?? model
-              ])
-            : helper.push([
-                parseIt.find(t => t.id === model)?.display_name ?? model,
-                model
-              ]);
-        });
-        return helper;
-      }
-      case "gemini": {
-        let helper = Array.of<[string, string]>();
-        models.forEach(function (model) {
-          modelKeys === true
-            ? helper.push([
-                model,
-                parseGemini.find(t => t.name === `models/${model}`)
-                  ?.displayName ?? model
-              ])
-            : helper.push([
-                parseGemini.find(t => t.name === `models/${model}`)
-                  ?.displayName ?? model,
-                model
-              ]);
-        });
-        return helper;
-      }
-      case "meta": {
-        let Helper = Array.of<[string, string]>();
-
-        models.forEach(function (model) {
-          modelKeys === true
-            ? Helper.push([model, formatMeta(model)])
-            : Helper.push([formatMeta(model), model]);
-        });
-        return Helper;
-      }
-      case "vercel": {
-        let Helper = Array.of<[string, string]>();
-
-        models.forEach(function (model) {
-          modelKeys === true
-            ? Helper.push([model, displayNameV0(model)])
-            : Helper.push([displayNameV0(model), model]);
-        });
-        return Helper;
-      }
-      case "grok": {
-        let helper = Array.of<[string, string]>();
-        models.forEach(function (model) {
-          const name = grokDisplayName(model);
-          modelKeys === true
-            ? helper.push([model, name])
-            : helper.push([name, model]);
-        });
-        return helper;
-      }
-      default: {
-        let helper = Array.of<[string, string]>();
-        models.forEach(function (model) {
-          modelKeys === true
-            ? helper.push([
-                model,
-                parseOpenAi.find(t => t.id === `${model}`)?.displayName ?? model
-              ])
-            : helper.push([
-                parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
+  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
+  const _parseGrok = formattedGrok(JSON.parse(await grokData.text()));
+  const parseIt = formattedAnthropic(JSON.parse(await data.text()));
+  return Array.from(Object.entries(providerModelChatApi)).map(
+    ([provider, models]) => {
+      const p = provider as keyof typeof providerModelChatApi;
+      switch (p) {
+        case "anthropic": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
                   model,
-                model
-              ]);
-        });
-        return helper;
+                  parseIt.find(t => t.id === model)?.display_name ?? model
+                ])
+              : helper.push([
+                  parseIt.find(t => t.id === model)?.display_name ?? model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+        case "gemini": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model
+                ])
+              : helper.push([
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+        case "meta": {
+          let Helper = Array.of<[string, string]>();
+
+          models.forEach(function (model) {
+            modelKeys === true
+              ? Helper.push([model, formatMeta(model)])
+              : Helper.push([formatMeta(model), model]);
+          });
+          return Helper;
+        }
+        case "vercel": {
+          let Helper = Array.of<[string, string]>();
+
+          models.forEach(function (model) {
+            modelKeys === true
+              ? Helper.push([model, displayNameV0(model)])
+              : Helper.push([displayNameV0(model), model]);
+          });
+          return Helper;
+        }
+        case "grok": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = grokDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        default: {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model
+                ])
+              : helper.push([
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model,
+                  model
+                ]);
+          });
+          return helper;
+        }
       }
     }
-  });
+  );
+};
+
+const imageModelMapper = async (modelKeys = true) => {
+  const openAiData = await openAiFetcher();
+  const geminiData = await geminiFetcher();
+  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
+  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
+  return Array.from(Object.entries(providerModelImagesApi)).map(
+    ([provider, models]) => {
+      const p = provider as keyof typeof providerModelImagesApi;
+      switch (p) {
+        case "gemini": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model
+                ])
+              : helper.push([
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+        case "grok": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            const name = grokDisplayName(model);
+            modelKeys === true
+              ? helper.push([model, name])
+              : helper.push([name, model]);
+          });
+          return helper;
+        }
+        case "openai":
+        default: {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model
+                ])
+              : helper.push([
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+      }
+    }
+  );
 };
 
 async function displayNameModelIdGen<
@@ -511,47 +677,210 @@ async function displayNameModelIdGen<
   };
 }
 
-(async () => {
-  const displayNameToModelId = await displayNameModelIdGen("keys=display-name");
-
-  const displayNameOnly = await displayNameModelIdGen(
-    "keys=display-name",
-    "display-name-only"
+async function displayNameModelIdGenImages<
+  const T extends "keys=model-id" | "keys=display-name",
+  const V extends "model-id-only" | "display-name-only"
+>(target: T, arrayOnly?: V) {
+  const mapper = await imageModelMapper(
+    target === "keys=display-name" ? false : true
   );
+  const openai = mapper[0];
+  const gemini = mapper[1];
+  const grok = mapper[2];
 
-  // prettier-ignore
-  const displayNameToModelIdTemplate = `export const displayNameToModelId = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`
+  if (!openai || !gemini || !grok)
+    throw new Error("empty data in displayNameModelIdGen");
 
-  // prettier-ignore
-  const displayNameOnlyTemplate = `export const displayNameModelsByProvider = ${JSON.stringify(displayNameOnly, null, 2)} as const;`
+  if (typeof arrayOnly !== "undefined") {
+    if (arrayOnly === "display-name-only") {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _]) => keys)
+        };
+      } else {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals)
+        };
+      }
+    } else {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals),
+          grok: grok.map(([_, vals]) => vals)
+        };
+      } else {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys),
+          grok: grok.map(([keys, _]) => keys)
+        };
+      }
+    }
+  }
+  return {
+    openai: Object.fromEntries(openai),
+    gemini: Object.fromEntries(gemini),
+    grok: Object.fromEntries(grok)
+  };
+}
 
-  const modelIdToDisplayName = await displayNameModelIdGen("keys=model-id");
+async function Multimodal<
+  const S extends "default" | "img",
+  const T extends "keys=model-id" | "keys=display-name",
+  const V extends "model-id-only" | "display-name-only"
+>(
+  mode: S,
+  target: T,
+  arrayOnly?: V
+): Promise<
+  XOR<
+    | {
+        openai: string[];
+        gemini: string[];
+        grok: string[];
+      }
+    | {
+        openai: {
+          [k: string]: string;
+        };
+        gemini: {
+          [k: string]: string;
+        };
+        grok: {
+          [k: string]: string;
+        };
+      },
+    | {
+        openai: string[];
+        gemini: string[];
+        grok: string[];
+        anthropic: string[];
+        meta: string[];
+        vercel: string[];
+      }
+    | {
+        openai: {
+          [k: string]: string;
+        };
+        gemini: {
+          [k: string]: string;
+        };
+        grok: {
+          [k: string]: string;
+        };
+        anthropic: {
+          [k: string]: string;
+        };
+        meta: {
+          [k: string]: string;
+        };
+        vercel: {
+          [k: string]: string;
+        };
+      }
+  >
+> {
+  switch (mode) {
+    case "img": {
+      return await (arrayOnly
+        ? displayNameModelIdGenImages(target, arrayOnly)
+        : displayNameModelIdGenImages(target));
+    }
+    case "default": {
+      return await (arrayOnly
+        ? displayNameModelIdGen(target, arrayOnly)
+        : displayNameModelIdGen(target));
+    }
+    default: {
+      throw new Error("must select a target of img or default");
+    }
+  }
+}
 
-  const modelIdsOnly = await displayNameModelIdGen(
-    "keys=model-id",
-    "model-id-only"
-  );
+if (process.argv[3] === "img" || process.argv[3] === "default") {
+  (async (target: "img" | "default") => {
+    const displayNameToModelId = await Multimodal(target, "keys=display-name");
 
-  // prettier-ignore
-  const modelIdsOnlyTemplate = `export const modelIdsByProvider = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`
+    const displayNameOnly = await Multimodal(
+      target,
+      "keys=display-name",
+      "display-name-only"
+    );
 
-  // prettier-ignore
-  const modelIdToDisplayNameTemplate = `export const modelIdToDisplayName = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`
+    // prettier-ignore
+    const imgDisplayToModelId = `export const displayNameToModelIdImgGen = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`
+    // prettier-ignore
+    const defaultDisplayToModelId = `export const displayNameToModelId = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`;
 
-  fs.withWs(
-    "src/codegen/__gen__/display-name-to-model-id.ts",
-    displayNameToModelIdTemplate
-  );
-  fs.withWs(
-    "src/codegen/__gen__/display-names-by-provider.ts",
-    displayNameOnlyTemplate
-  );
-  fs.withWs(
-    "src/codegen/__gen__/model-id-to-display-name.ts",
-    modelIdToDisplayNameTemplate
-  );
-  fs.withWs(
-    "src/codegen/__gen__/model-ids-by-provider.ts",
-    modelIdsOnlyTemplate
-  );
-})();
+    const displayNameToModelIdTemplate =
+      target === "default" ? defaultDisplayToModelId : imgDisplayToModelId;
+
+    // prettier-ignore
+    const imgGenDisplayNameOnlyTemplate =`export const displayNameModelsByProviderImgGen = ${JSON.stringify(displayNameOnly, null, 2)} as const;`;
+    // prettier-ignore
+    const defaultDisplayNameOnlyTemplate =`export const displayNameModelsByProvider = ${JSON.stringify(displayNameOnly, null, 2)} as const;`;
+
+    const displayNameOnlyTemplate =
+      target === "default"
+        ? defaultDisplayNameOnlyTemplate
+        : imgGenDisplayNameOnlyTemplate;
+
+    const modelIdToDisplayName = await Multimodal(target, "keys=model-id");
+
+    const modelIdsOnly = await Multimodal(
+      target,
+      "keys=model-id",
+      "model-id-only"
+    );
+
+    // prettier-ignore
+    const imgGenModelIdsOnlyTemplate  = `export const modelIdsByProviderImgGen = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`
+    // prettier-ignore
+    const defaultmodelIdsOnlyTemplate  = `export const modelIdsByProvider = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`;
+
+    const modelIdsOnlyTemplate =
+      target === "default"
+        ? defaultmodelIdsOnlyTemplate
+        : imgGenModelIdsOnlyTemplate;
+
+    // prettier-ignore
+    const imgGenModelIdToDisplayNameTemplate  = `export const modelIdToDisplayNameImgGen = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`;
+    // prettier-ignore
+    const defaultModelIdToDisplayNameTemplate  = `export const modelIdToDisplayName = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`;
+
+    const modelIdToDisplayNameTemplate =
+      target === "default"
+        ? defaultModelIdToDisplayNameTemplate
+        : imgGenModelIdToDisplayNameTemplate;
+
+    const displayNameToModelIdPath = {
+      default: "src/codegen/__gen__/display-name-to-model-id.ts",
+      img: "src/codegen/__gen__/display-name-to-model-id-img-gen.ts"
+    } as const;
+
+    const displayNameOnlyPath = {
+      default: "src/codegen/__gen__/display-names-by-provider.ts",
+      img: "src/codegen/__gen__/display-names-by-provider-img-gen.ts"
+    } as const;
+
+    const modelIdToDisplayNamePath = {
+      default: "src/codegen/__gen__/model-id-to-display-name.ts",
+      img: "src/codegen/__gen__/model-id-to-display-name-img-gen.ts"
+    } as const;
+
+    const modelIdsOnlyPath = {
+      default: "src/codegen/__gen__/model-ids-by-provider.ts",
+      img: "src/codegen/__gen__/model-ids-by-provider-img-gen.ts"
+    } as const;
+
+    fs.withWs(displayNameToModelIdPath[target], displayNameToModelIdTemplate);
+    fs.withWs(displayNameOnlyPath[target], displayNameOnlyTemplate);
+    fs.withWs(modelIdToDisplayNamePath[target], modelIdToDisplayNameTemplate);
+    fs.withWs(modelIdsOnlyPath[target], modelIdsOnlyTemplate);
+  })(process.argv[3]);
+}

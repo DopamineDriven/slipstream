@@ -37,7 +37,6 @@ export type OpenAiError = {
   };
 };
 
-
 export type AnthropicError = {
   type: "error";
   error: {
@@ -92,8 +91,6 @@ export type OpenAiResponse = XOR<OpenAiError, SuccessResponse>;
 
 export type GeminiResponse = XOR<GeminiError, GeminiSuccess>;
 
-
-
 export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
   : bigint;
@@ -122,7 +119,33 @@ export type ImageSingleton = {
   createdAt: Date;
   updatedAt: Date;
   attachmentId: string;
-  format: "apng" | "png" | "gif" | "bmp" | "webp" | "avif" | "svg" | "ico" | "tiff" | "jpeg" | "heic" | "unknown" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze";
+  format:
+    | "apng"
+    | "png"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | "jpeg"
+    | "heic"
+    | "unknown"
+    | "jxl"
+    | "jp2"
+    | "jpx"
+    | "jxr"
+    | "jls"
+    | "raw"
+    | "dng"
+    | "cr2"
+    | "nef"
+    | "arw"
+    | "hdr"
+    | "pic"
+    | "rgbe"
+    | "xyze";
   width: number;
   height: number;
   aspectRatio: number | null;
@@ -130,7 +153,19 @@ export type ImageSingleton = {
   hasAlpha: boolean | null;
   animated: boolean;
   orientation: number | null;
-  colorSpace:  "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | null;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray"
+    | null;
   exifDateTimeOriginal: Date | null;
   cameraMake: string | null;
   cameraModel: string | null;
@@ -165,8 +200,25 @@ export type AttachmentSingleton<T extends boolean = false> = {
   userId: string;
   messageId: string | null;
   s3ObjectId: string | null;
-  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
-  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+  origin:
+    | "UPLOAD"
+    | "REMOTE"
+    | "GENERATED"
+    | "PASTED"
+    | "SCREENSHOT"
+    | "IMPORTED"
+    | "SCRAPED";
+  status:
+    | "REQUESTED"
+    | "PLANNED"
+    | "UPLOADING"
+    | "STORED"
+    | "SCANNING"
+    | "READY"
+    | "FAILED"
+    | "QUARANTINED"
+    | "ATTACHED"
+    | "DELETED";
   compatKey: string | null;
   compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;
@@ -217,7 +269,7 @@ export type MessageSingleton<T extends boolean = false> = {
   userKeyId: string | null;
   conversationId: string;
   model: string | null;
-  senderType:  "USER" | "AI" | "SYSTEM";
+  senderType: "USER" | "AI" | "SYSTEM";
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -273,8 +325,25 @@ export type AssetReadyPayload = {
   batchId: string | null;
   userId: string;
   messageId: string | null;
-  origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
-  status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+  origin:
+    | "UPLOAD"
+    | "REMOTE"
+    | "GENERATED"
+    | "PASTED"
+    | "SCREENSHOT"
+    | "IMPORTED"
+    | "SCRAPED";
+  status:
+    | "REQUESTED"
+    | "PLANNED"
+    | "UPLOADING"
+    | "STORED"
+    | "SCANNING"
+    | "READY"
+    | "FAILED"
+    | "QUARANTINED"
+    | "ATTACHED"
+    | "DELETED";
   uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
   assetType: "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN";
   uploadDuration: number | null;

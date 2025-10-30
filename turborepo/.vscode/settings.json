@@ -8,6 +8,7 @@
   "[css]": {
     "editor.defaultFormatter": "bradlc.vscode-tailwindcss"
   },
+  "tailwindCSS.codeLens": true,
   "tailwindCSS.lint.invalidApply": "warning",
   "tailwindCSS.validate": true,
   "[typescript]": {
@@ -36,6 +37,7 @@
   "svg.preview.autoShow": false,
   "js/ts.hover.maximumLength": 500,
   "typescript.experimental.useTsgo": false,
+  "tailwindcss-intellisense.trace.server": "messages",
   "svg.preview.disable": true,
   "svg.preview.mode": "svg",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -77,8 +79,8 @@
     ".*variant.*",
     ".*Styles.*"
   ],
-  "cursor.composer.shouldChimeAfterChatFinishes": true,
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "tailwindCSS.colorDecorators": true,
   "typescript.tsserver.web.typeAcquisition.enabled": true,
   "typescript.implementationsCodeLens.enabled": true,
   "typescript.implementationsCodeLens.showOnInterfaceMethods": true,
@@ -99,5 +101,6 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma-insider"
-  }
+  },
+  "python.analysis.enableColorPicker": false
 }

@@ -1,19 +1,20 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Unenumerate } from "@slipstream/types";
 import {
   Button,
   Card,
-  ArrowDownCircle as Download,
+  Download,
   Eye,
   FileText,
   ImageIcon,
   X
 } from "@slipstream/ui";
+import { Extract } from "@d0paminedriven/metadata"
 
 // Define attachment types based on the Prisma schema
 export type MessageAttachment = Unenumerate<UIMessage["attachments"]>;
@@ -23,53 +24,52 @@ interface AttachmentDisplayProps {
   className?: string;
   compact?: boolean;
 }
-  const formatFileSize = (bytes?: bigint | number): string => {
-    if (!bytes) return "Unknown size";
-    const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
-    const units = ["B", "KB", "MB", "GB"];
-    let unitIndex = 0;
-    let fileSize = size;
+const formatFileSize = (bytes?: bigint | number): string => {
+  if (!bytes) return "Unknown size";
+  const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
+  const units = ["B", "KB", "MB", "GB"];
+  let unitIndex = 0;
+  let fileSize = size;
 
-    while (fileSize >= 1024 && unitIndex < units.length - 1) {
-      fileSize /= 1024;
-      unitIndex++;
-    }
+  while (fileSize >= 1024 && unitIndex < units.length - 1) {
+    fileSize /= 1024;
+    unitIndex++;
+  }
 
-    return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
-  };
+  return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
+};
 
-  const getFileIcon = (attachment: MessageAttachment) => {
-    switch (attachment?.assetType) {
-      case "IMAGE":
-        return <ImageIcon className="h-4 w-4" />;
-      case "DOCUMENT":
-        return <FileText className="h-4 w-4" />;
-      case "AUDIO":
-      case "UNKNOWN":
-      case "VIDEO":
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
-  // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
-  const getDisplayUrl = (attachment: MessageAttachment): string | null => {
-    return attachment?.cdnUrl ?? null;
-  };
+const getFileIcon = (attachment: MessageAttachment) => {
+  switch (attachment?.assetType) {
+    case "IMAGE":
+      return <ImageIcon className="h-4 w-4" />;
+    case "DOCUMENT":
+      return <FileText className="h-4 w-4" />;
+    case "AUDIO":
+    case "UNKNOWN":
+    case "VIDEO":
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+};
+// Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
+const getDisplayUrl = (attachment: MessageAttachment): string | null => {
+  return attachment?.cdnUrl ?? null;
+};
 
-
-  const handleDownload = (attachment: MessageAttachment) => {
-    const url = getDisplayUrl(attachment);
-    if (url) {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noreferrer noopener";
-      link.download = attachment?.filename ?? "download";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+const handleDownload = (attachment: MessageAttachment) => {
+  const url = getDisplayUrl(attachment);
+  if (url) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    link.download = attachment?.filename ?? "download";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
 export function AttachmentDisplay({
   attachments,
   className,
@@ -80,32 +80,21 @@ export function AttachmentDisplay({
     kind: "image" | "pdf";
   } | null>(null);
 
-
-
   const handlePreview = useCallback((url: string, kind: "image" | "pdf") => {
     setExpanded({ url, kind });
-  },[]);
+  }, []);
 
-  const handleDownload = (attachment: MessageAttachment) => {
-    const url = getDisplayUrl(attachment);
-    if (url) {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noreferrer noopener";
-      link.download = attachment?.filename ?? "download";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-  if (!attachments || attachments.length === 0) {
+  const _extract = useMemo(() => new Extract(),[]);
+
+  if (!attachments) {
     return null;
   }
   return (
     <>
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
+
+
           const displayUrl = getDisplayUrl(attachment);
           const isImage =
             attachment.mime?.startsWith("image/") ??
@@ -230,10 +219,7 @@ export function AttachmentDisplay({
                 className="pointer-events-auto relative h-full w-full select-none"
                 onClick={e => e.stopPropagation()}>
                 <Image
-                  src={
-                    expanded.url ??
-                    "/doge-404.jpg"
-                  }
+                  src={expanded.url ?? "/doge-404.jpg"}
                   alt="Expanded attachment"
                   fill
                   sizes="96dvw"

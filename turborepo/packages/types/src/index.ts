@@ -128,18 +128,25 @@ export type {
   DisplayNameModelMap,
   GeminiChatModels,
   GeminiDisplayNameUnion,
+  GeminiDisplayNameUnionImgGen,
   GeminiImgGenFacilitatingModels,
   GetImgGenFacilitatingModelUtilRT,
   GeminiImgGenModels,
   GeminiModelIdUnion,
+  GeminiModelIdUnionImgGen,
   GetDisplayNamesForProviderRT,
+  GetDisplayNamesForProviderRTImgGen,
   GetImgModelUtilRT,
+  GetAllImgGenModelUtilRt,
   GetModelsForProviderRT,
+  GetModelsForProviderRTImgGen,
   GetModelUtilRT,
   GrokChatModels,
   GrokDisplayNameUnion,
+  GrokDisplayNameUnionImgGen,
   GrokImgGenModels,
   GrokModelIdUnion,
+  GrokModelIdUnionImgGen,
   ImageGenFacilitatingModelsByProvider,
   ImageGenFacilitatingProviders,
   ImgGenFacilitatingModelMap,
@@ -151,13 +158,17 @@ export type {
   MetaDisplayNameUnion,
   MetaModelIdUnion,
   ModelDisplayNameToModelId,
+  ModelDisplayNameToModelIdImgGen,
   ModelIdToModelDisplayName,
+  ModelIdToModelDisplayNameImgGen,
   ModelMap,
   Models,
   OpenAIChatModels,
   OpenAiDisplayNameUnion,
+  OpenAiDisplayNameUnionImgGen,
   OpenAIImgGenFacilitatingModels,
   OpenAIImgGenModels,
+  OpenAiModelIdUnionImgGen,
   OpenAiModelIdUnion,
   Provider,
   Providers,
@@ -168,18 +179,24 @@ export type {
 
 export {
   allProviders,
+  allImgGenProviders,
   allImgSupportingProviderModels,
   audioMimeSupportByProvider,
   defaultModelDisplayNameByProvider,
   defaultModelIdByProvider,
   displayNameModelsByProvider,
   displayNameToModelId,
+  displayNameModelsByProviderImgGen,
+  displayNameToModelIdImgGen,
   docMimeSupportByProvider,
   getAllProviders,
+  getAllImgGenProviders,
   getDisplayNameByModelId,
   getDisplayNamesForProvider,
+  getDisplayNamesForProviderImgGen,
   getModelIdByDisplayName,
   getModelsForProvider,
+  getModelsForProviderImgGen,
   imageGenFacilitatingProviders,
   imageGenProviders,
   imgMimeSupportByProvider,
@@ -187,6 +204,8 @@ export {
   imageModelSets,
   modelIdsByProvider,
   modelIdToDisplayName,
+  modelIdToDisplayNameImgGen,
+  modelIdsByProviderImgGen,
   providerModelChatApi,
   providerModelImageGenApi,
   providerModelImageGenFacilitatingApi,
@@ -253,3 +272,15 @@ export type {
   Signals,
   SuccessResponse
 } from "@/types.ts";
+
+declare global {
+  interface JSON {
+    parse<T = unknown>(
+      text: string,
+      reviver?: (this: any, key: string, value: any) => any
+    ): T;
+  }
+  interface Body {
+    json<T = unknown>(): Promise<T>;
+  }
+}

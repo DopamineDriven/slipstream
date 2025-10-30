@@ -1,7 +1,11 @@
 import type { Unenumerate } from "@/utils.ts";
+import { displayNameToModelIdImgGen } from "@/codegen/__gen__/display-name-to-model-id-img-gen.ts";
 import { displayNameToModelId } from "@/codegen/__gen__/display-name-to-model-id.ts";
+import { displayNameModelsByProviderImgGen } from "@/codegen/__gen__/display-names-by-provider-img-gen.ts";
 import { displayNameModelsByProvider } from "@/codegen/__gen__/display-names-by-provider.ts";
+import { modelIdToDisplayNameImgGen } from "@/codegen/__gen__/model-id-to-display-name-img-gen.ts";
 import { modelIdToDisplayName } from "@/codegen/__gen__/model-id-to-display-name.ts";
+import { modelIdsByProviderImgGen } from "@/codegen/__gen__/model-ids-by-provider-img-gen.ts";
 import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
 
 export type ImageGenModels =
@@ -80,7 +84,9 @@ export const imageModelFacilitatorSets = {
   openai: new Set(providerModelImageGenFacilitatingApi.openai)
 } as const;
 
-export type AllImgGenProviderModels<T extends keyof typeof allImgSupportingProviderModels> =Unenumerate<(typeof allImgSupportingProviderModels)[T]>;
+export type AllImgGenProviderModels<
+  T extends keyof typeof allImgSupportingProviderModels
+> = Unenumerate<(typeof allImgSupportingProviderModels)[T]>;
 
 export const imageGenProviders = ["grok", "gemini", "openai"] as const;
 export const imageGenFacilitatingProviders = ["gemini", "openai"] as const;
@@ -92,11 +98,11 @@ export type ImageGenModelsByProvider<
   T extends keyof typeof providerModelImageGenApi
 > = Unenumerate<(typeof providerModelImageGenApi)[T]>;
 
-
-
 export type AllImgGenProviderModelMap = {
-  readonly [P in keyof typeof allImgSupportingProviderModels]: Unenumerate<(typeof allImgSupportingProviderModels)[P]>
-}
+  readonly [P in keyof typeof allImgSupportingProviderModels]: Unenumerate<
+    (typeof allImgSupportingProviderModels)[P]
+  >;
+};
 export type ImageGenFacilitatingModelsByProvider<
   T extends keyof typeof providerModelImageGenFacilitatingApi
 > = Unenumerate<(typeof providerModelImageGenFacilitatingApi)[T]>;
@@ -145,6 +151,14 @@ export type GetImgGenFacilitatingModelUtilRT<
   : T extends "gemini"
     ? GeminiImgGenFacilitatingModels
     : never;
+
+export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
+  ? GetImgModelUtilRT<"grok">
+  : T extends "gemini"
+    ? GetImgModelUtilRT<"gemini"> | GetImgGenFacilitatingModelUtilRT<"gemini">
+    : T extends "openai"
+      ? GetImgModelUtilRT<"openai"> | GetImgGenFacilitatingModelUtilRT<"openai">
+      : never;
 
 export const providerModelChatApi = modelIdsByProvider;
 
@@ -356,6 +370,28 @@ export type ModelDisplayNameToModelId<T extends Provider> =
 export type ModelIdToModelDisplayName<T extends Provider> =
   keyof (typeof modelIdToDisplayName)[T];
 
+export type ModelDisplayNameToModelIdImgGen<T extends ImageGenProviders> =
+  keyof (typeof displayNameToModelIdImgGen)[T];
+
+export type ModelIdToModelDisplayNameImgGen<T extends ImageGenProviders> =
+  keyof (typeof modelIdToDisplayNameImgGen)[T];
+
+/**
+ * valid image gen capable openai model display names
+ */
+export type OpenAiDisplayNameUnionImgGen =
+  ModelDisplayNameToModelIdImgGen<"openai">;
+/**
+ * valid image gen capable gemini model display names
+ */
+export type GeminiDisplayNameUnionImgGen =
+  ModelDisplayNameToModelIdImgGen<"gemini">;
+/**
+ * valid image gen grok model display names
+ */
+export type GrokDisplayNameUnionImgGen =
+  ModelDisplayNameToModelIdImgGen<"grok">;
+
 /**
  * valid grok model display names
  */
@@ -380,6 +416,21 @@ export type MetaDisplayNameUnion = ModelDisplayNameToModelId<"meta">;
  * valid v0 model display names
  */
 export type VercelDisplayNameUnion = ModelDisplayNameToModelId<"vercel">;
+
+/**
+ * valid grok models to call
+ */
+export type GrokModelIdUnionImgGen = ModelIdToModelDisplayNameImgGen<"grok">;
+/**
+ * valid openai models to call
+ */
+export type OpenAiModelIdUnionImgGen =
+  ModelIdToModelDisplayNameImgGen<"openai">;
+/**
+ * valid gemini models to call
+ */
+export type GeminiModelIdUnionImgGen =
+  ModelIdToModelDisplayNameImgGen<"gemini">;
 
 /**
  * valid grok models to call
@@ -410,8 +461,42 @@ export {
   modelIdToDisplayName,
   displayNameToModelId,
   displayNameModelsByProvider,
-  modelIdsByProvider
+  modelIdsByProvider,
+  modelIdToDisplayNameImgGen,
+  modelIdsByProviderImgGen,
+  displayNameModelsByProviderImgGen,
+  displayNameToModelIdImgGen
 };
+
+export type GetModelsForProviderRTImgGen<T extends Provider> =
+  T extends "gemini"
+    ? GeminiModelIdUnionImgGen
+    : T extends "grok"
+      ? GrokModelIdUnionImgGen
+      : T extends "openai"
+        ? OpenAiModelIdUnionImgGen
+        : T extends "anthropic"
+          ? undefined
+          : T extends "meta"
+            ? undefined
+            : T extends "vercel"
+              ? undefined
+              : never;
+
+export type GetDisplayNamesForProviderRTImgGen<T extends Provider> =
+  T extends "gemini"
+    ? GeminiDisplayNameUnionImgGen
+    : T extends "grok"
+      ? GrokDisplayNameUnionImgGen
+      : T extends "openai"
+        ? OpenAiDisplayNameUnionImgGen
+        : T extends "anthropic"
+          ? undefined
+          : T extends "meta"
+            ? undefined
+            : T extends "vercel"
+              ? undefined
+              : never;
 
 export type GetModelsForProviderRT<T extends Provider> = T extends "anthropic"
   ? AnthropicModelIdUnion
@@ -450,6 +535,19 @@ export function getModelsForProvider<const T extends Provider>(provider: T) {
     .map(([_tt, vv]) => vv);
 }
 
+export function getModelsForProviderImgGen<const T extends Provider>(
+  provider: T
+) {
+  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+    return undefined;
+  const p = provider as ImageGenProviders;
+  return Object.entries(displayNameToModelIdImgGen[p])
+    .map(([t, v]) => {
+      return [t as T, v as GetModelsForProviderRTImgGen<T>] as const;
+    })
+    .map(([_tt, vv]) => vv);
+}
+
 export function getDisplayNamesForProvider<const T extends Provider>(
   provider: T
 ) {
@@ -460,12 +558,31 @@ export function getDisplayNamesForProvider<const T extends Provider>(
     .map(([_kk, vv]) => vv);
 }
 
+export function getDisplayNamesForProviderImgGen<
+  const V extends Provider = Provider
+>(provider: V) {
+  if (!(provider === "gemini" || provider === "openai" || provider === "grok"))
+    return undefined;
+  const p = provider as ImageGenProviders;
+  return Object.entries(modelIdToDisplayNameImgGen[p])
+    .map(([k, v]) => {
+      return [k as V, v as GetDisplayNamesForProviderRTImgGen<V>] as const;
+    })
+    .map(([_kk, vv]) => vv);
+}
+
 export function allProviders() {
   return ["anthropic", "gemini", "grok", "openai", "meta", "vercel"] as const;
 }
-
+export function allImgGenProviders() {
+  return ["gemini", "grok", "openai"] as const;
+}
 export function getAllProviders() {
   return allProviders();
+}
+
+export function getAllImgGenProviders() {
+  return allImgGenProviders();
 }
 
 export const imgMimeSupportByProvider = {

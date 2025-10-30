@@ -164,7 +164,6 @@ export type RequireNested<
     ? Rm<T, Path> & Record<Path, Required<T>[Path]>
     : T;
 
-
 export function createDraftId(
   userId: string,
   conversationId: string,
