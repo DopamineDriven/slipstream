@@ -88,7 +88,11 @@
   "typescript.referencesCodeLens.enabled": true,
   "typescript.referencesCodeLens.showOnAllFunctions": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "yaml.hover": true,
+  "yaml.hover": true,"markdown-pdf.emoji": true,
+  "markdown-pdf.stylesRelativePathFile": false,
+  "markdown-pdf.styles": [
+    "./misc/markdown-pdf.css"
+  ],
   "yaml.validate": true,
   "workbench.editor.autoLockGroups": {
     "default": false
