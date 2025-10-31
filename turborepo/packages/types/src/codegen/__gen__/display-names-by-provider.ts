@@ -59,8 +59,6 @@ export const displayNameModelsByProvider = {
     "Claude Sonnet 4",
     "Claude Sonnet 3.7",
     "Claude Haiku 3.5",
-    "Claude Sonnet 3.5 (New)",
-    "Claude Sonnet 3.5 (Old)",
     "Claude Haiku 3"
   ],
   meta: [

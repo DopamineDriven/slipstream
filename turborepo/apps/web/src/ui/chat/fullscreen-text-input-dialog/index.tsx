@@ -54,7 +54,7 @@ export function FullscreenTextInputDialog({
             <X className="h-5 w-5" />
           </Button>
         </DialogHeader>
-        <div className="flex-grow overflow-hidden p-4">
+        <div className="grow overflow-hidden p-4">
           <Textarea
             value={text}
             onChange={e => setText(e.target.value)}

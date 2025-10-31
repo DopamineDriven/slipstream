@@ -32,7 +32,6 @@ export function AttachmentPopover({ onFilesSelected }: AttachmentPopoverProps) {
   const handleFileSelection = useCallback(
     (files: FileList | null) => {
       if (!files || files.length === 0) return;
-
       const fileArray = Array.from(files);
       onFilesSelected?.(fileArray);
     },

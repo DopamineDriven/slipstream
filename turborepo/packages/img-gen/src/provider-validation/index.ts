@@ -803,6 +803,7 @@ export class ProviderValidation {
       apiKey = data.apiKey,
       keyId = data.keyId,
       userKeyId = keyId,
+      isImageGen = true,
       imageGenJob = {
         create: {
           userKeyId,
@@ -836,6 +837,7 @@ export class ProviderValidation {
         messageType: "IMAGE_GEN",
         userId,
         userKeyId,
+        isImageGen,
         imageGenJob
       } as const,
       includeWithAttachments = {

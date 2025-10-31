@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentPropsWithRef } from "react";
+import type { CustomComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
 import * as LabelPrimitive from "@radix-ui/react-label";
 
@@ -8,7 +8,7 @@ function Label({
   className,
   ref,
   ...props
-}: ComponentPropsWithRef<typeof LabelPrimitive.Root>) {
+}: CustomComponentPropsWithRef<typeof LabelPrimitive.Root>) {
   return (
     <LabelPrimitive.Root
       data-slot="label"

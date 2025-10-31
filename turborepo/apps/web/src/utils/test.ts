@@ -1,3 +1,4 @@
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 
 /**
  *
@@ -93,3 +94,62 @@ const testing = () => {
 };
 
 console.log(testing());
+
+function gcd(u: number, v: number): number {
+  if (u === v) return u;
+  if (u === 0) return v;
+  if (v === 0) return u;
+
+  if (~u & 1)
+    if (v & 1) return gcd(u >> 1, v);
+    else return gcd(u >> 1, v >> 1) << 1;
+
+  if (~v & 1) return gcd(u, v >> 1);
+
+  if (u > v) return gcd((u - v) >> 1, v);
+
+  return gcd((v - u) >> 1, u) as number;
+}
+
+function ratio(w: number, h: number) {
+  const p = gcd(w, h);
+  return [w / p, h / p] as const;
+}
+
+const arr = Array.of<{ src: string; ratio: readonly [number, number] }>();
+async function toMotionProps() {
+  const [{ Extract }, { Fs }] = await Promise.all([
+    import("@d0paminedriven/metadata"),
+    import("@d0paminedriven/fs")
+  ] as const);
+  const fs = new Fs(process.cwd());
+  const extract = new Extract();
+
+  const readIt = fs
+    .readDir("src/assets", { recursive: true })
+    .map(t => [t, fs.fileToBuffer(`src/assets/${t}`)] as const);
+
+  for (const [src, buf] of readIt) {
+    const specs = (await extract.extractRemote(
+      buf,
+      4096 * 32
+    )) as ExpandedImgSpecs;
+
+    // const[n,d] = ratio(specs.width, specs.height);
+
+    fs.withWs(`public/ui/${src}`, buf);
+
+    arr.push({ src: `/ui/${src}`, ratio: ratio(specs.width, specs.height) });
+  }
+  // const ratios = [`${ratio[0]}/${ratio[1]}`, ratio[0]/ratio[1]]
+  const template = JSON.stringify(
+    arr.map(({ ratio, src }) => ({ src, ratio: ratio[0] / ratio[1] })),
+    null,
+    2
+  );
+  fs.withWs(
+    `src/ui/atoms/stack/generated.tsx`,
+    `export const defaultImages = ` + template
+  );
+}
+toMotionProps();

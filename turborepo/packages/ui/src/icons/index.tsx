@@ -16,6 +16,7 @@ import { CirclePlus } from "@/icons/circle-plus";
 import { Code } from "@/icons/code";
 import { Compass } from "@/icons/compass";
 import { Copy } from "@/icons/copy";
+import { Download } from "@/icons/download";
 import { Edit } from "@/icons/edit";
 import { EditIcon } from "@/icons/edit-icon";
 import { EllipsisHorizontal } from "@/icons/ellipsis-horizontal";
@@ -30,6 +31,7 @@ import { Github } from "@/icons/github";
 import { GoogleIcon } from "@/icons/google";
 import { GripVertical } from "@/icons/grip-vertical";
 import { History } from "@/icons/history";
+import { ImageGen } from "@/icons/image-gen";
 import { ImageIcon } from "@/icons/image-icon";
 import { Key } from "@/icons/key";
 import { KeyRound } from "@/icons/key-round";
@@ -98,6 +100,7 @@ const IconComponents = {
   Code,
   Compass,
   Copy,
+  Download,
   Edit,
   EditIcon,
   EllipsisHorizontal,
@@ -112,6 +115,7 @@ const IconComponents = {
   GoogleIcon,
   GripVertical,
   History,
+  ImageGen,
   ImageIcon,
   Key,
   KeyRound,
@@ -214,6 +218,7 @@ export {
   Code,
   Compass,
   Copy,
+  Download,
   Edit,
   EditIcon,
   EllipsisHorizontal,
@@ -228,6 +233,7 @@ export {
   GoogleIcon,
   GripVertical,
   History,
+  ImageGen,
   ImageIcon,
   Key,
   KeyRound,

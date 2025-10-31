@@ -113,7 +113,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
         _request_id?: string | null;
       },
       uploadtInitial = 0,
-      uploadtDelta = 0;
+      uploadtDelta = 0,
+      usage = 0;
 
     const client = this.getClient(apiKey ?? undefined);
 
@@ -318,6 +319,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
       }
       if (s.type === "response.completed") {
         openaiResId = s.response.id;
+
         for (const r of s.response.output) {
           if (r.type === "image_generation_call" && r.result) {
             if (r.result !== null) {
@@ -359,6 +361,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             }
           }
         }
+        if (s.response.usage?.total_tokens)
+          usage = s.response.usage.total_tokens;
       }
       if (imgGenEnabled) {
         if (partialImgAgg) {
@@ -715,6 +719,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             s3ObjectId: rt.s3ObjectId,
             bucket: rt.bucket,
             key: rt.key,
+            usage,
             cdnUrl: rt.cdnUrl,
             height: finalSpecs.height,
             jobId,
@@ -776,16 +781,39 @@ export class OpenAIService extends OpenAIServiceWorkup {
               model,
               title,
               imgGenEnabled: true,
+              usage,
               systemPrompt,
               temperature,
               imgGenFields: {
                 duration,
                 actualCount: partialImgArr.length,
                 outputAspectRatio: width / height,
-                outputFormat: outputFormat,
                 outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
                 outputMime: this.getGenMime(outputFormat),
+                revisedPrompt:
+                  "revised_prompt" in finalImgObj &&
+                  typeof finalImgObj.revised_prompt === "string"
+                    ? finalImgObj.revised_prompt
+                    : undefined,
+                outputFormat:
+                  "output_format" in finalImgObj &&
+                  typeof finalImgObj.output_format === "string"
+                    ? finalImgObj.output_format
+                    : outputFormat,
+                requestedCount: imgGenFields?.n,
+
+                partialImagesRequested: partialImgArr.length,
+                outputBackground:
+                  "background" in finalImgObj &&
+                  typeof finalImgObj.background === "string"
+                    ? finalImgObj.background
+                    : undefined,
                 outputWidth: width,
+                outputQuality:
+                  "quality" in finalImgObj &&
+                  typeof finalImgObj.quality === "string"
+                    ? finalImgObj.quality
+                    : undefined,
                 outputHeight: height,
                 size: finalSpecs.byteSize ?? 0,
                 partialImagesActual: partialImgArr.length,
@@ -807,6 +835,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             systemPrompt,
             temperature,
+            usage,
             imgGenEnabled,
             imgGenFields: {
               actualCount: partialImgArr.length,

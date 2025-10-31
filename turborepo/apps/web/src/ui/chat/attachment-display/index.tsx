@@ -1,14 +1,15 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { useCallback, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ExpandedImgSpecs, Extract } from "@d0paminedriven/metadata";
 import type { Unenumerate } from "@slipstream/types";
 import {
   Button,
   Card,
-  ArrowDownCircle as Download,
+  Download,
   Eye,
   FileText,
   ImageIcon,
@@ -23,53 +24,56 @@ interface AttachmentDisplayProps {
   className?: string;
   compact?: boolean;
 }
-  const formatFileSize = (bytes?: bigint | number): string => {
-    if (!bytes) return "Unknown size";
-    const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
-    const units = ["B", "KB", "MB", "GB"];
-    let unitIndex = 0;
-    let fileSize = size;
+const formatFileSize = (bytes?: bigint | number): string => {
+  if (!bytes) return "Unknown size";
+  const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
+  const units = ["B", "KB", "MB", "GB"];
+  let unitIndex = 0;
+  let fileSize = size;
 
-    while (fileSize >= 1024 && unitIndex < units.length - 1) {
-      fileSize /= 1024;
-      unitIndex++;
-    }
+  while (fileSize >= 1024 && unitIndex < units.length - 1) {
+    fileSize /= 1024;
+    unitIndex++;
+  }
 
-    return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
-  };
+  return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
+};
 
-  const getFileIcon = (attachment: MessageAttachment) => {
-    switch (attachment?.assetType) {
-      case "IMAGE":
-        return <ImageIcon className="h-4 w-4" />;
-      case "DOCUMENT":
-        return <FileText className="h-4 w-4" />;
-      case "AUDIO":
-      case "UNKNOWN":
-      case "VIDEO":
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
-  // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
-  const getDisplayUrl = (attachment: MessageAttachment): string | null => {
-    return attachment?.cdnUrl ?? null;
-  };
+function isNextImageCompat(props: ExpandedImgSpecs["format"]) {
+  return /^(png|jpeg|jpg|webp|avif|svg)$/gm.test(props);
+}
 
+const getFileIcon = (attachment: MessageAttachment) => {
+  switch (attachment?.assetType) {
+    case "IMAGE":
+      return <ImageIcon className="h-4 w-4" />;
+    case "DOCUMENT":
+      return <FileText className="h-4 w-4" />;
+    case "AUDIO":
+    case "UNKNOWN":
+    case "VIDEO":
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+};
+// Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
+const getDisplayUrl = (attachment: MessageAttachment): string | null => {
+  return attachment?.cdnUrl ?? null;
+};
 
-  const handleDownload = (attachment: MessageAttachment) => {
-    const url = getDisplayUrl(attachment);
-    if (url) {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noreferrer noopener";
-      link.download = attachment?.filename ?? "download";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+const handleDownload = (attachment: MessageAttachment) => {
+  const url = getDisplayUrl(attachment);
+  if (url) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    link.download = attachment?.filename ?? "download";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
 export function AttachmentDisplay({
   attachments,
   className,
@@ -80,51 +84,50 @@ export function AttachmentDisplay({
     kind: "image" | "pdf";
   } | null>(null);
 
-
-
   const handlePreview = useCallback((url: string, kind: "image" | "pdf") => {
     setExpanded({ url, kind });
-  },[]);
+  }, []);
 
-  const handleDownload = (attachment: MessageAttachment) => {
-    const url = getDisplayUrl(attachment);
-    if (url) {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noreferrer noopener";
-      link.download = attachment?.filename ?? "download";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-  if (!attachments || attachments.length === 0) {
+  const extract = useMemo(() => new Extract(), []);
+  const clickcb = useCallback(
+    (_e: React.MouseEvent<HTMLButtonElement | SVGSVGElement, MouseEvent>) => {
+      setExpanded(null);
+    },
+    []
+  );
+  if (!attachments) {
     return null;
   }
   return (
     <>
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
+          const meta = use(
+            extract.extractRemote(attachment.cdnUrl ?? "", 4096 * 32)
+          );
+
           const displayUrl = getDisplayUrl(attachment);
-          const isImage =
-            attachment.mime?.startsWith("image/") ??
-            attachment.assetType === "IMAGE";
-          const isPdf =
-            attachment.mime?.toLowerCase().includes("application/pdf") ??
-            attachment.ext?.toLowerCase() === "pdf";
+          const isImage = meta.type === "IMAGE";
+
+          const isPdf = meta.type === "DOCUMENT" && meta.format === "pdf";
 
           // Full image preview only when we have a real URL
-          if (isImage && !compact && displayUrl) {
+          if (meta.type === "IMAGE" && !compact && attachment.cdnUrl !== null) {
             return (
               <div
                 key={attachment.id}
                 className="relative inline-block h-64 w-full max-w-[90dvw] cursor-pointer rounded-lg border md:max-w-sm"
-                onClick={() => handlePreview(displayUrl, "image")}>
+                onClick={() =>
+                  attachment.cdnUrl
+                    ? handlePreview(attachment.cdnUrl, "image")
+                    : () => {}
+                }>
                 <Image
-                  src={displayUrl}
+                  src={attachment.cdnUrl}
+                  unoptimized={!isNextImageCompat(meta.format)}
+                  width={meta.width}
+                  height={meta.height}
                   alt={attachment.filename ?? "Attachment"}
-                  fill
                   sizes="(max-width: 768px) 90dvw, 24rem"
                   className="rounded-lg object-contain transition-opacity hover:opacity-90"
                 />
@@ -135,7 +138,9 @@ export function AttachmentDisplay({
                     className="h-6 w-6 border-none bg-black/50 text-white hover:bg-black/70"
                     onClick={e => {
                       e.stopPropagation();
-                      handlePreview(displayUrl, "image");
+                      attachment.cdnUrl
+                        ? handlePreview(attachment.cdnUrl, "image")
+                        : null;
                     }}>
                     <Eye className="h-3 w-3" />
                   </Button>
@@ -162,11 +167,13 @@ export function AttachmentDisplay({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">
-                    {attachment.filename ?? "Untitled"}
+                    {`${attachment.filename ?? "Untitled"} | ${formatFileSize(meta.byteSize)}`}
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {formatFileSize(attachment?.size ?? undefined)}
-                    {attachment.ext && ` • ${attachment.ext.toUpperCase()}`}
+                    {meta.type === "IMAGE"
+                      ? meta.colorSpace
+                      : meta.pageCount?.toString(10).concat(" pages")}
+                    {meta.format && ` • ${meta.format.toUpperCase()}`}
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -176,8 +183,12 @@ export function AttachmentDisplay({
                       size="icon"
                       className="h-8 w-8"
                       onClick={() =>
-                        displayUrl &&
-                        handlePreview(displayUrl, isPdf ? "pdf" : "image")
+                        attachment.cdnUrl
+                          ? handlePreview(
+                              attachment.cdnUrl,
+                              isPdf ? "pdf" : "image"
+                            )
+                          : () => {}
                       }
                       disabled={!displayUrl}>
                       <Eye className="h-4 w-4" />
@@ -215,12 +226,9 @@ export function AttachmentDisplay({
             variant="secondary"
             size="icon"
             className="absolute top-4 right-4 border-none bg-black/60 text-white hover:bg-black/70"
-            onClick={e => {
-              e.stopPropagation();
-              setExpanded(null);
-            }}
+            onClick={clickcb}
             aria-label="Close preview">
-            <X className="h-4 w-4" />
+            <X onClick={clickcb} className="h-4 w-4" />
           </Button>
 
           {/* Content container */}
@@ -230,10 +238,7 @@ export function AttachmentDisplay({
                 className="pointer-events-auto relative h-full w-full select-none"
                 onClick={e => e.stopPropagation()}>
                 <Image
-                  src={
-                    expanded.url ??
-                    "/doge-404.jpg"
-                  }
+                  src={expanded.url ?? "/doge-404.jpg"}
                   alt="Expanded attachment"
                   fill
                   sizes="96dvw"

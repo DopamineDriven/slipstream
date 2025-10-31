@@ -64,6 +64,23 @@ interface AIChatContextValue {
   // Status flags
   isWaitingForRealId: boolean;
   isConnected: boolean;
+
+  // Live image generation (progressive) state
+  imgGenEnabled: boolean;
+  imgGenPartial: {
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  } | null;
+  imgGenFinals: {
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  }[] | null;
 }
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
@@ -108,6 +125,23 @@ export function AIChatProvider({
   const [thinkingText, setThinkingText] = useState<string>("");
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [thinkingDuration, setThinkingDuration] = useState<number | null>(null);
+
+  // Live image-gen progressive state
+  const [imgGenEnabled, setImgGenEnabled] = useState<boolean>(false);
+  const [imgGenPartial, setImgGenPartial] = useState<{
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  } | null>(null);
+  const [imgGenFinals, setImgGenFinals] = useState<{
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  }[] | null>(null);
 
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
@@ -255,6 +289,22 @@ export function AIChatProvider({
 
       setIsComplete(false);
 
+      // Image generation progressive updates (partial images)
+      if (evt.imgGenEnabled) {
+        setImgGenEnabled(true);
+        const p = evt.imgGenFields?.partialImages;
+        if (p && p.length > 0) {
+          const last = p[p.length - 1]!;
+          setImgGenPartial({
+            index: last.index,
+            cdnUrl: last.cdnUrl,
+            width: last.width,
+            height: last.height,
+            mime: last.mime
+          });
+        }
+      }
+
       // Update streaming message with all relevant data using refs
       setCurrentStreamingMessage({
         id: `stream-${evt.conversationId}`,
@@ -305,6 +355,22 @@ export function AIChatProvider({
     };
 
     const handleResponse = (evt: EventTypeMap["ai_chat_response"]) => {
+      // Image generation final images
+      if (evt.imgGenEnabled) {
+        setImgGenEnabled(true);
+        const imgs = evt.imgGenFields?.images;
+        if (imgs && imgs.length > 0) {
+          setImgGenFinals(
+            imgs.map(i => ({
+              index: i.index,
+              cdnUrl: i.cdnUrl,
+              width: i.width,
+              height: i.height,
+              mime: i.mime
+            }))
+          );
+        }
+      }
       setIsComplete(evt.done);
       if (evt.done) {
         console.log("[AIChatContext] Stream completed");
@@ -458,6 +524,9 @@ export function AIChatProvider({
       setIsThinking(false);
       setThinkingDuration(null);
       setError(null);
+      setImgGenEnabled(false);
+      setImgGenPartial(null);
+      setImgGenFinals(null);
       setIsComplete(false);
       setIsStreaming(true);
       setCurrentStreamingMessage(null);
@@ -556,7 +625,10 @@ export function AIChatProvider({
         clearError,
         resetStreamingState,
         isWaitingForRealId,
-        isConnected
+        isConnected,
+        imgGenEnabled,
+        imgGenPartial,
+        imgGenFinals
       }}>
       {children}
     </AIChatContext.Provider>

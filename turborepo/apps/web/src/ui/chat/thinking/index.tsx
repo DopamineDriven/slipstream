@@ -140,7 +140,7 @@ export function ThinkingSection({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="flex-shrink-0"
+                className="shrink-0"
                 animate={{ rotate: isExpanded ? 90 : 0 }}
                 transition={{
                   type: "spring",
@@ -166,7 +166,7 @@ export function ThinkingSection({
                     ease: "easeInOut"
                   }
                 }}>
-                <Sparkles className="h-4 w-4 flex-shrink-0" />
+                <Sparkles className="h-4 w-4 shrink-0" />
               </motion.div>
               <span className="flex items-center gap-1 text-sm">
                 <span>{isThinking ? "Thinking for" : "Thought for"}</span>

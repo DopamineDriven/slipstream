@@ -399,7 +399,12 @@ export function ChatInput({
       const created = await assets.handlePaste(e);
       if (created && created.length > 0) {
         const convId = activeConversationId ?? "new-chat";
-        assetUpload.registerAssets(created, convId, "PASTED");
+        const enriched = created.map(a => ({
+          ...a,
+          metadata: assets.metadata[a.id] ?? a.metadata,
+          size: assets.metadata[a.id]?.byteSize ?? a.size
+        }));
+        assetUpload.registerAssets(enriched, convId, "PASTED");
       }
     },
     [assets, assetUpload, activeConversationId]
@@ -417,7 +422,12 @@ export function ChatInput({
         if (added) created.push(added);
       }
       if (created.length) {
-        assetUpload.registerAssets(created, convId, "UPLOAD", batchId);
+        const enriched = created.map(a => ({
+          ...a,
+          metadata: assets.metadata[a.id] ?? a.metadata,
+          size: assets.metadata[a.id]?.byteSize ?? a.size
+        }));
+        assetUpload.registerAssets(enriched, convId, "UPLOAD", batchId);
       }
       setOpenAttach(false);
     },
@@ -574,7 +584,7 @@ export function ChatInput({
           )}
           {/* Scroll to bottom button */}
           <div className="relative">
-            <div className="pointer-events-none absolute top-[-40px] flex w-full items-center justify-center">
+            <div className="pointer-events-none absolute -top-10 flex w-full items-center justify-center">
               <Button
                 variant="secondary"
                 size="icon"
