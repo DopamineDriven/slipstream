@@ -40,12 +40,12 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
     async (file: File): Promise<ExpandedDocSpecs | null> => {
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const specs = extractor.getDocumentSpecsWorkup(
-          buffer,
-          file.type || "application/octet-stream"
-        );
-        return specs;
+        const meta = (await extractor.extractRemote(
+          Buffer.from(arrayBuffer),
+          96 * 1024
+        )) as ExpandedDocSpecs;
+
+        return meta;
       } catch (err) {
         console.warn("Failed to extract document metadata:", err);
         return null;
@@ -59,8 +59,12 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       return;
     }
     attachments.forEach(attachment => {
+      // Skip if already processed
+      if (metadata[attachment.id]) return;
       // Images → thumbnail + rich image metadata
       if (attachment.mime.startsWith("image/")) {
+
+
         const reader = new FileReader();
         reader.onload = e => {
           if (e.target?.result) {
@@ -73,21 +77,22 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
             (async () => {
               try {
                 const arrayBuffer = await attachment.file.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-
-                const imageSpecs = extractor.getImageSpecsWorkup(buffer);
+                const meta = (await extractor.extractRemote(
+                  Buffer.from(arrayBuffer),
+                  96 * 1024
+                )) as ExpandedImgSpecs;
 
                 setMetadata(prev => ({
                   ...prev,
-                  [attachment.id]: { ...imageSpecs }
+                  [attachment.id]: { ...meta }
                 }));
                 setSize(prev => ({
                   ...prev,
-                  [attachment.id]: attachment.size
+                  [attachment.id]: meta.byteSize ?? attachment.size
                 }));
               } catch (error) {
                 console.warn(
-                  `Failed to extract advanced metadata for ${attachment.filename}: `,
+                  `Failed to extract metadata for ${attachment.filename}: `,
                   error
                 );
               }
@@ -127,7 +132,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
         })();
       }
     });
-  }, [attachments, thumbnails, getDocumentSpecsWorkup, extractor]);
+  }, [attachments, extractor, getDocumentSpecsWorkup, metadata]);
 
   const formatFileSize = useCallback((bytes: number) => {
     if (bytes === 0) return "0 B";

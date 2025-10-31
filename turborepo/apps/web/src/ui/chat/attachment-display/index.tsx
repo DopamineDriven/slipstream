@@ -1,9 +1,10 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { useCallback, useMemo, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ExpandedImgSpecs, Extract } from "@d0paminedriven/metadata";
 import type { Unenumerate } from "@slipstream/types";
 import {
   Button,
@@ -14,7 +15,6 @@ import {
   ImageIcon,
   X
 } from "@slipstream/ui";
-import { Extract } from "@d0paminedriven/metadata"
 
 // Define attachment types based on the Prisma schema
 export type MessageAttachment = Unenumerate<UIMessage["attachments"]>;
@@ -38,6 +38,10 @@ const formatFileSize = (bytes?: bigint | number): string => {
 
   return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
 };
+
+function isNextImageCompat(props: ExpandedImgSpecs["format"]) {
+  return /^(png|jpeg|jpg|webp|avif|svg)$/gm.test(props);
+}
 
 const getFileIcon = (attachment: MessageAttachment) => {
   switch (attachment?.assetType) {
@@ -84,8 +88,13 @@ export function AttachmentDisplay({
     setExpanded({ url, kind });
   }, []);
 
-  const _extract = useMemo(() => new Extract(),[]);
-
+  const extract = useMemo(() => new Extract(), []);
+  const clickcb = useCallback(
+    (_e: React.MouseEvent<HTMLButtonElement | SVGSVGElement, MouseEvent>) => {
+      setExpanded(null);
+    },
+    []
+  );
   if (!attachments) {
     return null;
   }
@@ -93,27 +102,32 @@ export function AttachmentDisplay({
     <>
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
-
+          const meta = use(
+            extract.extractRemote(attachment.cdnUrl ?? "", 4096 * 32)
+          );
 
           const displayUrl = getDisplayUrl(attachment);
-          const isImage =
-            attachment.mime?.startsWith("image/") ??
-            attachment.assetType === "IMAGE";
-          const isPdf =
-            attachment.mime?.toLowerCase().includes("application/pdf") ??
-            attachment.ext?.toLowerCase() === "pdf";
+          const isImage = meta.type === "IMAGE";
+
+          const isPdf = meta.type === "DOCUMENT" && meta.format === "pdf";
 
           // Full image preview only when we have a real URL
-          if (isImage && !compact && displayUrl) {
+          if (meta.type === "IMAGE" && !compact && attachment.cdnUrl !== null) {
             return (
               <div
                 key={attachment.id}
                 className="relative inline-block h-64 w-full max-w-[90dvw] cursor-pointer rounded-lg border md:max-w-sm"
-                onClick={() => handlePreview(displayUrl, "image")}>
+                onClick={() =>
+                  attachment.cdnUrl
+                    ? handlePreview(attachment.cdnUrl, "image")
+                    : () => {}
+                }>
                 <Image
-                  src={displayUrl}
+                  src={attachment.cdnUrl}
+                  unoptimized={!isNextImageCompat(meta.format)}
+                  width={meta.width}
+                  height={meta.height}
                   alt={attachment.filename ?? "Attachment"}
-                  fill
                   sizes="(max-width: 768px) 90dvw, 24rem"
                   className="rounded-lg object-contain transition-opacity hover:opacity-90"
                 />
@@ -124,7 +138,9 @@ export function AttachmentDisplay({
                     className="h-6 w-6 border-none bg-black/50 text-white hover:bg-black/70"
                     onClick={e => {
                       e.stopPropagation();
-                      handlePreview(displayUrl, "image");
+                      attachment.cdnUrl
+                        ? handlePreview(attachment.cdnUrl, "image")
+                        : null;
                     }}>
                     <Eye className="h-3 w-3" />
                   </Button>
@@ -151,11 +167,13 @@ export function AttachmentDisplay({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">
-                    {attachment.filename ?? "Untitled"}
+                    {`${attachment.filename ?? "Untitled"} | ${formatFileSize(meta.byteSize)}`}
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {formatFileSize(attachment?.size ?? undefined)}
-                    {attachment.ext && ` • ${attachment.ext.toUpperCase()}`}
+                    {meta.type === "IMAGE"
+                      ? meta.colorSpace
+                      : meta.pageCount?.toString(10).concat(" pages")}
+                    {meta.format && ` • ${meta.format.toUpperCase()}`}
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -165,8 +183,12 @@ export function AttachmentDisplay({
                       size="icon"
                       className="h-8 w-8"
                       onClick={() =>
-                        displayUrl &&
-                        handlePreview(displayUrl, isPdf ? "pdf" : "image")
+                        attachment.cdnUrl
+                          ? handlePreview(
+                              attachment.cdnUrl,
+                              isPdf ? "pdf" : "image"
+                            )
+                          : () => {}
                       }
                       disabled={!displayUrl}>
                       <Eye className="h-4 w-4" />
@@ -204,12 +226,9 @@ export function AttachmentDisplay({
             variant="secondary"
             size="icon"
             className="absolute top-4 right-4 border-none bg-black/60 text-white hover:bg-black/70"
-            onClick={e => {
-              e.stopPropagation();
-              setExpanded(null);
-            }}
+            onClick={clickcb}
             aria-label="Close preview">
-            <X className="h-4 w-4" />
+            <X onClick={clickcb} className="h-4 w-4" />
           </Button>
 
           {/* Content container */}

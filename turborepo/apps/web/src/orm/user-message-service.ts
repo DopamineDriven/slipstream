@@ -1,10 +1,11 @@
 import type { PrismaClientWithAccelerate } from "@/lib/prisma";
+import { ErrorHelperService } from "@/orm/err-helper";
 import type {
+  $Enums,
   Conversation,
   ConversationSettings,
   Message
 } from "@slipstream/db/edge-client";
-import { ErrorHelperService } from "@/orm/err-helper";
 
 export type GetMessagesByConversationIdRT =
   | null
@@ -54,30 +55,237 @@ export class PrismaUserMessageService extends ErrorHelperService {
     });
   }
 
-  public async getMessagesByConversationIdWithAssets(conversationId: string) {
+  public async getMessagesByConversationIdWithAssets(
+    conversationId: string
+  ): Promise<
+    | ({
+        conversationSettings: {
+          id: string;
+          createdAt: Date;
+          updatedAt: Date;
+          conversationId: string;
+          systemPrompt: string | null;
+          enableThinking: boolean | null;
+          trackUsage: boolean | null;
+          enableWebSearch: boolean | null;
+          enableAssetGen: boolean | null;
+          reasoningEffort: $Enums.ReasoningEffort | null;
+          outputVerbosity: $Enums.OutputVerbosity | null;
+          maxTokens: number | null;
+          usageAlerts: boolean | null;
+          temperature: number | null;
+          topP: number | null;
+        } | null;
+        messages: ({
+          imageGenJob: {
+            id: string;
+            userId: string;
+            userKeyId: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            provider: $Enums.Provider;
+            model: string;
+            systemPrompt: string | null;
+            temperature: number | null;
+            topP: number | null;
+            error: string | null;
+            requestMessageId: string;
+            keyFingerprint: string | null;
+            prompt: string;
+            nRequested: number;
+            nCompleted: number;
+            seed: number | null;
+            negativePrompt: string | null;
+            outputSize: string | null;
+            outputQuality: string | null;
+            outputFormat: string | null;
+            outputBackground: string | null;
+            outputCompression: number | null;
+            partialImagesRequested: number | null;
+            inputFidelity: string | null;
+            personGeneration: string | null;
+            moderation: string | null;
+            stage: $Enums.ImageGenStage;
+            progress: number;
+            etaSeconds: number | null;
+            durationMs: number | null;
+            usage: number | null;
+            revisedPrompt: string | null;
+          } | null;
+          attachments: ({
+            imageGenOutput: {
+              id: string;
+              createdAt: Date;
+              updatedAt: Date;
+              revisedPrompt: string | null;
+              seriesId: string;
+              ext: string | null;
+              mime: string | null;
+              jobId: string;
+              jobIndex: number;
+              kind: $Enums.ImageGenOutputKind;
+              seriesIndex: number;
+              isPartial: boolean;
+              attachmentId: string;
+              width: number | null;
+              height: number | null;
+            } | null;
+            image: {
+              createdAt: Date;
+              updatedAt: Date;
+              attachmentId: string;
+              width: number;
+              height: number;
+              format: $Enums.ImageFormat;
+              aspectRatio: number | null;
+              frames: number;
+              hasAlpha: boolean | null;
+              animated: boolean;
+              orientation: number | null;
+              colorSpace: $Enums.ColorSpace | null;
+              exifDateTimeOriginal: Date | null;
+              cameraMake: string | null;
+              cameraModel: string | null;
+              lensModel: string | null;
+              gpsLat: number | null;
+              gpsLon: number | null;
+              dominantColorHex: string | null;
+              iccProfile: string | null;
+            } | null;
+            document: {
+              title: string | null;
+              createdAt: Date;
+              updatedAt: Date;
+              attachmentId: string;
+              format: string;
+              pageCount: number | null;
+              wordCount: number | null;
+              language: string | null;
+              author: string | null;
+              subject: string | null;
+              keywords: string[];
+              pdfVersion: string | null;
+              isEncrypted: boolean;
+              isSearchable: boolean;
+              encoding: string | null;
+              lineCount: number | null;
+              textPreview: string | null;
+            } | null;
+          } & {
+            id: string;
+            userId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            conversationId: string | null;
+            draftId: string | null;
+            batchId: string | null;
+            generationGroupId: string | null;
+            seriesId: string | null;
+            messageId: string | null;
+            s3ObjectId: string | null;
+            origin: $Enums.AssetOrigin;
+            status: $Enums.AssetStatus;
+            uploadMethod: $Enums.UploadMethod;
+            assetType: $Enums.AssetType;
+            uploadDuration: number | null;
+            cdnUrl: string | null;
+            publicUrl: string | null;
+            sourceUrl: string | null;
+            thumbnailKey: string | null;
+            compatMime: string | null;
+            compatExt: string | null;
+            compatVersionId: string | null;
+            compatKey: string | null;
+            compatS3ObjectId: string | null;
+            compatStatus: $Enums.CompatStatus | null;
+            compatReadyAt: Date | null;
+            compatCdnUrl: string | null;
+            bucket: string;
+            key: string;
+            versionId: string | null;
+            region: string;
+            cacheControl: string | null;
+            contentDisposition: string | null;
+            contentEncoding: string | null;
+            expiresAt: Date | null;
+            size: bigint | null;
+            filename: string | null;
+            ext: string | null;
+            mime: string | null;
+            etag: string | null;
+            checksumAlgo: $Enums.ChecksumAlgo;
+            checksumSha256: string | null;
+            storageClass: string | null;
+            sseAlgorithm: string | null;
+            sseKmsKeyId: string | null;
+            s3LastModified: Date | null;
+            deletedAt: Date | null;
+          })[];
+        } & {
+          id: string;
+          userId: string | null;
+          userKeyId: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+          conversationId: string;
+          senderType: $Enums.SenderType;
+          provider: $Enums.Provider;
+          model: string | null;
+          content: string;
+          thinkingText: string | null;
+          thinkingDuration: number | null;
+          isImageGen: boolean;
+          messageType: $Enums.MessageType;
+          liked: boolean | null;
+          disliked: boolean | null;
+          tryAgain: boolean | null;
+        })[];
+      } & {
+        id: string;
+        userId: string;
+        userKeyId: string | null;
+        title: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        branchId: string | null;
+        parentId: string | null;
+        isShared: boolean;
+        shareToken: string | null;
+      })
+    | null
+  > {
     return await this.prismaClient.conversation.findUnique({
       where: { id: conversationId },
       include: {
         messages: {
           orderBy: { createdAt: "asc" },
+
           include: {
+            imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },
-              select: {
-                messageId: true,
-                conversationId: true,
-                versionId: true,
-                createdAt: true,
-                id: true,
-                filename: true,
-                mime: true,
-                size: true,
-                cdnUrl: true,
-                publicUrl: true,
-                assetType: true,
-                ext: true,
-                draftId: true
-              }
+              include: { image: true, document: true, imageGenOutput: true }
+              // select: {
+              //   messageId: true,
+              //   conversationId: true,
+              //   versionId: true,
+              //   uploadMethod: true,
+              //   createdAt: true,
+              //   id: true,
+              //   filename: true,
+              //   mime: true,
+              //   size: true,
+              //   cdnUrl: true,
+              //   publicUrl: true,
+              //   assetType: true,
+              //   imageGenOutput: true,
+              //   ext: true,
+              //   draftId: true,
+              //   batchId: true,
+              //   generationGroupId: true,
+              //   document: true,
+              //   image: true
+              // }
             }
           }
         },
@@ -113,3 +321,195 @@ export class PrismaUserMessageService extends ErrorHelperService {
     });
   }
 }
+/**
+ * : Promise<
+    | ({
+        conversationSettings: {
+          id: string;
+          createdAt: Date;
+          updatedAt: Date;
+          conversationId: string;
+          systemPrompt: string | null;
+          enableThinking: boolean | null;
+          trackUsage: boolean | null;
+          enableWebSearch: boolean | null;
+          enableAssetGen: boolean | null;
+          reasoningEffort:
+            | $Enums.ReasoningEffort
+            | null;
+          outputVerbosity:
+            | $Enums.OutputVerbosity
+            | null;
+          maxTokens: number | null;
+          usageAlerts: boolean | null;
+          temperature: number | null;
+          topP: number | null;
+        } | null;
+        messages: ({
+          imageGenJob:
+            | ({
+                outputs: {
+                  id: string;
+                  createdAt: Date;
+                  updatedAt: Date;
+                  seriesId: string;
+                  ext: string | null;
+                  mime: string | null;
+                  revisedPrompt: string | null;
+                  jobId: string;
+                  jobIndex: number;
+                  kind: $Enums.ImageGenOutputKind;
+                  seriesIndex: number;
+                  isPartial: boolean;
+                  attachmentId: string;
+                  width: number | null;
+                  height: number | null;
+                }[];
+              } & {
+                id: string;
+                userId: string;
+                userKeyId: string | null;
+                createdAt: Date;
+                updatedAt: Date;
+                provider: $Enums.Provider;
+                model: string;
+                systemPrompt: string | null;
+                temperature: number | null;
+                topP: number | null;
+                error: string | null;
+                requestMessageId: string;
+                keyFingerprint: string | null;
+                prompt: string;
+                nRequested: number;
+                nCompleted: number;
+                seed: number | null;
+                negativePrompt: string | null;
+                outputSize: string | null;
+                outputQuality: string | null;
+                outputFormat: string | null;
+                outputBackground: string | null;
+                outputCompression: number | null;
+                partialImagesRequested: number | null;
+                inputFidelity: string | null;
+                personGeneration: string | null;
+                moderation: string | null;
+                stage: $Enums.ImageGenStage;
+                progress: number;
+                etaSeconds: number | null;
+                durationMs: number | null;
+                usage: number | null;
+                revisedPrompt: string | null;
+              })
+            | null;
+          attachments: {
+            id: string;
+            createdAt: Date;
+            conversationId: string | null;
+            imageGenOutput: {
+              id: string;
+              createdAt: Date;
+              updatedAt: Date;
+              seriesId: string;
+              ext: string | null;
+              mime: string | null;
+              revisedPrompt: string | null;
+              jobId: string;
+              jobIndex: number;
+              kind: $Enums.ImageGenOutputKind;
+              seriesIndex: number;
+              isPartial: boolean;
+              attachmentId: string;
+              width: number | null;
+              height: number | null;
+            } | null;
+            draftId: string | null;
+            batchId: string | null;
+            generationGroupId: string | null;
+            messageId: string | null;
+            uploadMethod: $Enums.UploadMethod;
+            assetType: $Enums.AssetType;
+            cdnUrl: string | null;
+            publicUrl: string | null;
+            versionId: string | null;
+            size: bigint | null;
+            filename: string | null;
+            ext: string | null;
+            mime: string | null;
+            image: {
+              createdAt: Date;
+              updatedAt: Date;
+              attachmentId: string;
+              width: number;
+              height: number;
+              format: $Enums.ImageFormat;
+              aspectRatio: number | null;
+              frames: number;
+              hasAlpha: boolean | null;
+              animated: boolean;
+              orientation: number | null;
+              colorSpace:
+                | $Enums.ColorSpace
+                | null;
+              exifDateTimeOriginal: Date | null;
+              cameraMake: string | null;
+              cameraModel: string | null;
+              lensModel: string | null;
+              gpsLat: number | null;
+              gpsLon: number | null;
+              dominantColorHex: string | null;
+              iccProfile: string | null;
+            } | null;
+            document: {
+              title: string | null;
+              createdAt: Date;
+              updatedAt: Date;
+              attachmentId: string;
+              format: string;
+              pageCount: number | null;
+              wordCount: number | null;
+              language: string | null;
+              author: string | null;
+              subject: string | null;
+              keywords: string[];
+              pdfVersion: string | null;
+              isEncrypted: boolean;
+              isSearchable: boolean;
+              encoding: string | null;
+              lineCount: number | null;
+              textPreview: string | null;
+            } | null;
+          }[];
+        } & {
+          id: string;
+          userId: string | null;
+          userKeyId: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+          conversationId: string;
+          senderType: $Enums.SenderType;
+          provider: $Enums.Provider;
+          model: string | null;
+          content: string;
+          thinkingText: string | null;
+          thinkingDuration: number | null;
+          isImageGen: boolean;
+          messageType: $Enums.MessageType;
+          liked: boolean | null;
+          disliked: boolean | null;
+          tryAgain: boolean | null;
+        })[];
+      } & {
+        id: string;
+        userId: string;
+        userKeyId: string | null;
+        title: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        branchId: string | null;
+        parentId: string | null;
+        isShared: boolean;
+        shareToken: string | null;
+      })
+    | null
+  >
+ */

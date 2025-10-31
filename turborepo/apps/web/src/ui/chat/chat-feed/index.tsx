@@ -10,6 +10,7 @@ import { smoothScrollToBottom } from "@/lib/helpers";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
+import { useAIChatContext } from "@/context/ai-chat-context";
 
 interface ChatFeedProps {
   messages: UIMessage[];
@@ -40,6 +41,7 @@ export function ChatFeed({
   thinkingDuration,
   children
 }: ChatFeedProps) {
+  const ai = useAIChatContext();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   
   const [isScrolling, setIsScrolling] = useState(false);
@@ -181,6 +183,22 @@ export function ChatFeed({
               liveThinkingDuration={
                 isStreaming && message.id.startsWith("streaming-")
                   ? thinkingDuration
+                  : undefined
+              }
+              // Progressive image-gen data for streaming message
+              liveImgGenEnabled={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? ai.imgGenEnabled
+                  : undefined
+              }
+              liveImgPartial={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? ai.imgGenPartial ?? undefined
+                  : undefined
+              }
+              liveImgFinals={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? ai.imgGenFinals ?? undefined
                   : undefined
               }
             />

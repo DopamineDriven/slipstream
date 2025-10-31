@@ -16,6 +16,8 @@ import { AnimatedCopyButton } from "@/ui/atoms/animated-copy-button";
 import { MessageAttachments } from "@/ui/chat/message-attachments";
 import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { ThinkingSection } from "@/ui/chat/thinking";
+import { ImageGenerationCanvas } from "@/ui/chat/image-gen/image-generation-canvas";
+import { ImageGenSeries, ImageGenSeriesItem, ImageGenSeriesStack } from "@/ui/chat/image-gen/series-stack";
 import { useTheme } from "next-themes";
 import type { AllModelsUnion } from "@slipstream/types";
 import {
@@ -44,6 +46,22 @@ interface ChatMessageProps {
   liveThinkingText?: string;
   liveIsThinking?: boolean;
   liveThinkingDuration?: number;
+  // Live image generation (progressive) data
+  liveImgGenEnabled?: boolean;
+  liveImgPartial?: {
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  };
+  liveImgFinals?: {
+    index: number;
+    cdnUrl: string;
+    width: number;
+    height: number;
+    mime: string;
+  }[];
 }
 
 // Global cache for processed markdown
@@ -57,7 +75,10 @@ export function MessageBubble({
   liveThinkingText,
   attachments,
   liveIsThinking,
-  liveThinkingDuration
+  liveThinkingDuration,
+  liveImgGenEnabled,
+  liveImgPartial,
+  liveImgFinals
 }: ChatMessageProps) {
   const isMobile = useIsMobile();
   const [showMobileActions, setShowMobileActions] = useState(false);
@@ -124,6 +145,101 @@ export function MessageBubble({
   const locale = get("locale") ?? "en-US";
 
   const contentToCopy = message.content;
+
+  // Derive live image generation canvas props when streaming image-gen
+  const canvasHasFinal = Boolean(liveImgFinals && liveImgFinals.length > 0);
+  const canvasHasPartial = Boolean(liveImgPartial?.cdnUrl);
+  const canvasShouldRender = Boolean(liveImgGenEnabled && (canvasHasPartial || canvasHasFinal));
+  const canvasFinal = canvasHasFinal ? liveImgFinals![0] : undefined;
+  const canvasCdnFinal = canvasFinal?.cdnUrl ?? null;
+  const canvasCdnPartial = liveImgPartial?.cdnUrl ?? null;
+  const canvasWidth = canvasFinal?.width ?? liveImgPartial?.width ?? 1024;
+  const canvasHeight = canvasFinal?.height ?? liveImgPartial?.height ?? 1024;
+  const canvasMime = canvasFinal?.mime ?? liveImgPartial?.mime ?? "image/png";
+
+  // Completed IMAGE_GEN messages: derive series finals from attachments
+  const completedImageGenSeries = useMemo(() => {
+    if (isStreaming) return [] as { final: any; partial?: any }[];
+    if (!isAI) return [] as { final: any; partial?: any }[];
+    if (!Array.isArray(attachments) || attachments.length === 0)
+      return [] as { final: any; partial?: any }[];
+
+    // Group by imageGenOutput.seriesId where present
+    type AnyAtt = any;
+    const gens = attachments.filter(a => (a as AnyAtt)?.imageGenOutput);
+    if (gens.length === 0) return [] as { final: any; partial?: any }[];
+
+    const bySeries = new Map<string, { finals: AnyAtt[]; partials: AnyAtt[] }>();
+    for (const att of gens as AnyAtt[]) {
+      const igo = att.imageGenOutput;
+      const sid: string | undefined = igo?.seriesId;
+      if (!sid) continue;
+      const bucket = bySeries.get(sid) ?? { finals: [], partials: [] };
+      if (igo?.isPartial || igo?.kind === "PARTIAL") bucket.partials.push(att);
+      else bucket.finals.push(att);
+      bySeries.set(sid, bucket);
+    }
+
+    const seriesList: { final: AnyAtt; partial?: AnyAtt }[] = [];
+    for (const [, grp] of bySeries) {
+      // Pick the first final (if multiple, prefer lowest jobIndex then lowest seriesIndex)
+      const final = grp.finals.sort((a, b) => {
+        const ai = a.imageGenOutput?.jobIndex ?? 0;
+        const bi = b.imageGenOutput?.jobIndex ?? 0;
+        if (ai !== bi) return ai - bi;
+        return (a.imageGenOutput?.seriesIndex ?? 0) - (b.imageGenOutput?.seriesIndex ?? 0);
+      })[0];
+      if (!final) continue;
+      const partial = grp.partials.sort(
+        (a, b) => (a.imageGenOutput?.seriesIndex ?? 0) - (b.imageGenOutput?.seriesIndex ?? 0)
+      ).at(-1);
+      seriesList.push({ final, partial });
+    }
+    return seriesList;
+  }, [attachments, isAI, isStreaming]);
+  const hasCompletedImageGen = completedImageGenSeries.length > 0;
+
+  // Build series stack data structure for richer UI (stack/replay)
+  const seriesStackData = useMemo(() => {
+    if (isStreaming) return [] as ImageGenSeries[];
+    if (!isAI) return [] as ImageGenSeries[];
+    if (!Array.isArray(attachments) || attachments.length === 0)
+      return [] as ImageGenSeries[];
+
+    type AnyAtt = any;
+    const gens = attachments.filter(a => (a as AnyAtt)?.imageGenOutput) as AnyAtt[];
+    const bySeries = new Map<string, AnyAtt[]>();
+    for (const att of gens) {
+      const sid = att.imageGenOutput?.seriesId;
+      if (!sid) continue;
+      const arr = bySeries.get(sid) ?? [];
+      arr.push(att);
+      bySeries.set(sid, arr);
+    }
+    const out: ImageGenSeries[] = [];
+    for (const [sid, arr] of bySeries) {
+      const sorted = arr.sort(
+        (a, b) => (a.imageGenOutput?.seriesIndex ?? 0) - (b.imageGenOutput?.seriesIndex ?? 0)
+      );
+      const items: ImageGenSeriesItem[] = sorted.map(a => ({
+        cdnUrl: a.cdnUrl,
+        width: a.imageGenOutput?.width ?? a.image?.width ?? 1024,
+        height: a.imageGenOutput?.height ?? a.image?.height ?? 1024,
+        mime: a.imageGenOutput?.mime ?? a.mime ?? "image/png",
+        isPartial: a.imageGenOutput?.isPartial ?? a.imageGenOutput?.kind === "PARTIAL",
+        index: a.imageGenOutput?.seriesIndex,
+        generationGroupId: a.generationGroupId,
+        seriesId: sid,
+        revisedPrompt: a.imageGenOutput?.revisedPrompt ?? null
+      }));
+      const jobId = sorted[0]?.imageGenOutput?.jobId;
+      const jobIndex = sorted[0]?.imageGenOutput?.jobIndex;
+      const generationGroupId = sorted[0]?.generationGroupId;
+      const revisedPrompt = sorted.find(x => !x.imageGenOutput?.isPartial)?.imageGenOutput?.revisedPrompt ?? null;
+      out.push({ seriesId: sid, items, jobId, jobIndex, generationGroupId, revisedPrompt });
+    }
+    return out.sort((a, b) => (a.jobIndex ?? 0) - (b.jobIndex ?? 0));
+  }, [attachments, isAI, isStreaming]);
 
   // Lightweight, derived thinking content during live streaming to avoid setState in effects
   const streamingThinkingRenderedContent = useMemo(() => {
@@ -289,6 +405,41 @@ export function MessageBubble({
               <span className="sr-only">Message options</span>
             </Button>
           )}
+          {canvasShouldRender && (
+            <div className="mb-2">
+              <ImageGenerationCanvas
+                isGenerating={!canvasHasFinal}
+                cdnUrl={canvasCdnFinal}
+                cdnUrlPartial={canvasCdnPartial}
+                width={canvasWidth}
+                height={canvasHeight}
+                mime={canvasMime}
+                prompt={message.content}
+              />
+            </div>
+          )}
+          {!canvasShouldRender && hasCompletedImageGen && (
+            seriesStackData.length > 1 ? (
+              <div className="mb-2">
+                <ImageGenSeriesStack seriesList={seriesStackData} />
+              </div>
+            ) : (
+              <div className="mb-2 space-y-3">
+                {completedImageGenSeries.map(({ final, partial }, idx) => (
+                  <ImageGenerationCanvas
+                    key={final?.id ?? idx}
+                    isGenerating={false}
+                    cdnUrl={final?.cdnUrl ?? null}
+                    cdnUrlPartial={partial?.cdnUrl ?? null}
+                    width={final?.imageGenOutput?.width ?? partial?.imageGenOutput?.width ?? 1024}
+                    height={final?.imageGenOutput?.height ?? partial?.imageGenOutput?.height ?? 1024}
+                    mime={final?.imageGenOutput?.mime ?? partial?.imageGenOutput?.mime ?? final?.mime ?? "image/png"}
+                    prompt={final?.imageGenOutput?.revisedPrompt ?? message.content}
+                  />
+                ))}
+              </div>
+            )
+          )}
           {liveIsThinking || liveThinkingText ? (
             <ThinkingSection
               isThinking={liveIsThinking}
@@ -323,7 +474,19 @@ export function MessageBubble({
               ? streamingRenderedContent
               : (renderedContent ?? message.content)}
           </div>
-          <MessageAttachments attachments={attachments} isUser={isUser} />
+          {(() => {
+            // If we rendered completed image-gen canvases for AI messages, suppress attachments for that message.
+            if (!isUser && hasCompletedImageGen) return null;
+            const finalUrl = canvasCdnFinal;
+            const hasDuplicateFinal =
+              !!finalUrl &&
+              Array.isArray(attachments) &&
+              attachments.some(att => att.cdnUrl === finalUrl);
+            if (canvasShouldRender && hasDuplicateFinal) return null;
+            return (
+              <MessageAttachments attachments={attachments} isUser={isUser} />
+            );
+          })()}
           <div
             className={cn(
               "mt-2 flex items-center justify-between pt-1 text-xs",

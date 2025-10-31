@@ -76,8 +76,6 @@ export class AnthropicService {
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
       case "claude-3-5-haiku-20241022":
-      case "claude-3-5-sonnet-20240620":
-      case "claude-3-5-sonnet-20241022":
       case "claude-3-haiku-20240307":
       case "claude-3-7-sonnet-20250219":
       case "claude-opus-4-1-20250805":
@@ -244,11 +242,9 @@ export class AnthropicService {
     return {
       "claude-3-haiku-20240307": 4096,
       "claude-3-5-haiku-20241022": 8192,
-      "claude-3-5-sonnet-20240620": 8192,
-      "claude-3-5-sonnet-20241022": 8192,
       "claude-opus-4-20250514": 32000,
       "claude-opus-4-1-20250805": 32000,
-      "claude-haiku-4-5-20251001": 32000,
+      "claude-haiku-4-5-20251001": 64000,
       "claude-sonnet-4-20250514": 64000,
       "claude-sonnet-4-5-20250929": 64000,
       "claude-3-7-sonnet-20250219": 64000
@@ -517,8 +513,6 @@ export class AnthropicService {
         }
       }
       case "claude-3-5-haiku-20241022":
-      case "claude-3-5-sonnet-20240620":
-      case "claude-3-5-sonnet-20241022":
       case "claude-3-haiku-20240307":
       default: {
         return { type: "disabled" } as const satisfies BetaThinkingConfigParam;
@@ -626,7 +620,7 @@ export class AnthropicService {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
         webSearchRes: BetaWebSearchResultBlock | null = null,
-        done: BetaStopReason | null = null; 
+        done: BetaStopReason | null = null;
 
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "server_tool_use") {

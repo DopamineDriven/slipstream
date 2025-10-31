@@ -1,9 +1,11 @@
 "use client";
 
 import type { ImageGenProps } from "@/ui/chat/image-gen/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ImageGenerationCanvas } from "@/ui/chat/image-gen/image-generation-canvas";
-import { Button, Sparkles } from "@slipstream/ui";
+import { Button, ImageGen } from "@slipstream/ui";
+
+
 
 export function ImgGenComponent({
   realtimeStreamingData
@@ -25,14 +27,26 @@ export function ImgGenComponent({
     (a, b) => a.imageGenOutput.seriesIndex - b.imageGenOutput.seriesIndex
   );
 
-  // Separate partial and final images
-  const partialImages = sortedAttachments
-    .filter(att => att.imageGenOutput.isPartial)
-    .map(att => att.cdnUrl);
+  // Separate partial and final images with dimensions/mime
+  const partials = useMemo(
+    () =>
+      sortedAttachments
+        .filter(att => att.imageGenOutput.isPartial)
+        .map(att => ({
+          cdnUrl: att.cdnUrl,
+          width: att.imageGenOutput.width,
+          height: att.imageGenOutput.height,
+          mime: att.mime
+        })),
+    [sortedAttachments]
+  );
 
-  const finalImage = sortedAttachments.find(
-    att => !att.imageGenOutput.isPartial
-  )?.cdnUrl;
+  const final = useMemo(
+    () =>
+      sortedAttachments
+        .find(att => !att.imageGenOutput.isPartial),
+    [sortedAttachments]
+  );
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -41,14 +55,13 @@ export function ImgGenComponent({
     setGeneratedImage(null);
     setPartialImage(null);
 
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    for (let i = 0; i < partialImages.length; i++) {
+    for (let i = 0; i < partials.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      setPartialImage(partialImages[i]);
+      setPartialImage(partials[i]?.cdnUrl ?? null);
     }
 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setGeneratedImage(finalImage ?? null);
+    setGeneratedImage(final?.cdnUrl ?? null);
     setPartialImage(null);
     setIsGenerating(false);
   };
@@ -85,15 +98,18 @@ export function ImgGenComponent({
               disabled={isGenerating || !prompt.trim()}
               size="lg"
               className="gap-2">
-              <Sparkles className="h-4 w-4" />
+              <ImageGen className="h-4 w-4" />
               Generate
             </Button>
           </div>
 
           <ImageGenerationCanvas
             isGenerating={isGenerating}
-            imageUrl={generatedImage}
-            partialImageUrl={partialImage}
+            cdnUrl={generatedImage}
+            cdnUrlPartial={partialImage}
+            width={final?.imageGenOutput.width ?? partials.at(-1)?.width ?? 1024}
+            height={final?.imageGenOutput.height ?? partials.at(-1)?.height ?? 1024}
+            mime={final?.mime ?? partials.at(-1)?.mime ?? "image/png"}
             prompt={prompt || realPrompt}
           />
         </div>
