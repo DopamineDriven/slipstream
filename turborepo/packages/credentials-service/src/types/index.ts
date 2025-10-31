@@ -68,6 +68,7 @@ export interface CredentialEntity {
   TAVILY_API_KEY?: string;
   OPTIMIZE_API_KEY?: string;
   PRISMA_SERVICE_TOKEN?: string;
+  OPENAI_WEBHOOK_DEEP_REASONING?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"
