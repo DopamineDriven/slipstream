@@ -4,28 +4,18 @@ import { useEffect, useState } from "react";
 import * as Slider from "@radix-ui/react-slider";
 import { AnimateNumber } from "motion-plus/react";
 import { useMotionValue, useSpring, useVelocity } from "motion/react";
-import {
-  ImageGenProviders,
-  modelIdsByProviderImgGen,
-  Unenumerate
-} from "@slipstream/types";
 
 interface ImageGenCostSliderProps {
-  provider: ImageGenProviders;
-  model: Unenumerate<
-    (typeof modelIdsByProviderImgGen)[keyof typeof modelIdsByProviderImgGen]
-  >;
-  initialValue: number;
+  value: number;
+  onValueChange: (value: number) => void;
   min?: number;
   max?: number;
   costPerImage?: number;
 }
 
 export function ImageGenCostSlider({
-  initialValue = 1,
+  value: initialValue,
   min = 1,
-  provider = "openai",
-  model = "gpt-5",
   max = 10,
   costPerImage = 0.04
 }: ImageGenCostSliderProps) {
@@ -41,6 +31,11 @@ export function ImageGenCostSlider({
 
     scaled.set(scale(value[0]));
   }, [value, scaled]);
+
+  // const handleValueChange = (newValue: number[]) => {
+  //   if (!newValue?.[0]) return;
+  //   onValueChange(newValue[0]);
+  // };
 
   return (
     <div className="space-y-2">
@@ -88,7 +83,7 @@ export function ImageGenCostSlider({
           }}>
           {value?.[0] ? value[0] * costPerImage : costPerImage}
         </AnimateNumber>
-      </div> 
+      </div>
     </div>
   );
 }

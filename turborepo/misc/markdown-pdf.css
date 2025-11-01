@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Apple Color Emoji';
+    src: url('./AppleColorEmoji_WindowsCompatible.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Basis Grotesque Pro';
+    src: url('./BasisGrotesquePro-Light.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Basis Grotesque Pro';
+    src: url('./BasisGrotesquePro-Regular.ttf') format('truetype');
+}
+
+
+body {
+  font-family: sans-serif, "Basis Grotesque Pro", "Apple Color Emoji";
+}
+

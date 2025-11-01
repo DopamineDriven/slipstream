@@ -1,5 +1,4 @@
 import { Fs } from "@d0paminedriven/fs";
-import { GlobalFonts } from "@napi-rs/canvas";
 import * as dotenv from "dotenv";
 import type { Provider } from "@slipstream/types";
 
@@ -27,7 +26,6 @@ type MapItRT =
 class ScriptGen extends Fs {
   constructor(public override cwd: string) {
     super(process.cwd() ?? cwd);
-    GlobalFonts;
   }
 
   private data = async (env: string, id: string) => {
@@ -42,10 +40,7 @@ class ScriptGen extends Fs {
         include: {
           messages: {
             orderBy: { createdAt: "asc" },
-            include: {
-              imageGenJob: true,
-              attachments: { include: { imageGenOutput: true, image: true } }
-            }
+            include: { attachments: true }
           }
         }
       });
@@ -194,6 +189,8 @@ class ScriptGen extends Fs {
           })
           .join("\n\n");
       };
+      if (p.model ==="grok-2-image-1212" && p.content.includes(`(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`)) p.content.replace(`(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`, "https://assets-dev.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1761729305749-ig_0d3912d56a96ce82016901dab7fa2c81a1886deddf5b1edfd1-4.png")
+
       const agg =
         p.sender === "AI"
           ? withThinking === "true"
@@ -237,7 +234,7 @@ header-includes: |
   \\renewcommand{\\sectionmark}[1]{\\markboth{#1}{}}
 ---\n\n${content}`};
 
-  private withWsAsync(data: string[], toSlug: string, title: string) {
+  private withWsAsyncs(data: string[], toSlug: string, title: string) {
     return new Promise(res =>
       res(
         this.withWs(
@@ -253,8 +250,6 @@ header-includes: |
     id?: string,
     withThinking = "false"
   ) {
-    const emojiAnalysis = await this.analyzeEmojis(target, id);
-
     const [data, raw] = await Promise.all([
       this.out(target, id, withThinking),
       this.targeted(target, id)
@@ -262,18 +257,9 @@ header-includes: |
     if (!data) return;
     if (!raw) return;
     if (!raw.title) return;
-    const toSlug = raw.title
-      .replace(/ /gim, "-")
-      .replace(/:/gim, "--")
-      .replace(/'/gim, "");
-
-    const processedData = data.map(line => {
-      return this.preprocessContent(line, emojiAnalysis?.replacements);
-    });
+    const toSlug = raw.title.replace(/ /gim, "-").replace(/:/gmi, "--").replace(/'/gmi, "");
     try {
-      await Promise.all([
-        this.withWsAsync(processedData, toSlug, raw.title)
-      ]).then(() =>
+      await Promise.all([this.withWsAsyncs(data, toSlug, raw.title)]).then(() =>
         this.wait(2000)
           .then(() => {
             if (this.exists(`src/test/__out__/condensed/${toSlug}.md`)) {
@@ -286,7 +272,7 @@ header-includes: |
           })
           .then(() =>
             this.executeCommand({
-              command: `pandoc -i src/test/__out__/condensed/${toSlug}.md -o src/test/__out__/condensed/${toSlug}.pdf --pdf-engine=lualatex`,
+              command: `pandoc -i src/test/__out__/condensed/${toSlug}.md -o src/test/__out__/condensed/${toSlug}.pdf --pdf-engine=xelatex`,
               cwd: this.cwd
             })
           )
@@ -302,102 +288,6 @@ header-includes: |
         )
       );
     }
-  }
-
-  private extractEmojiStats(content: string) {
-    // Comprehensive emoji regex pattern
-    const emojiRegex =
-      /[\u{1F300}-\u{1F9FF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]|[\u{1F1E6}-\u{1F1FF}]/gu;
-
-    const emojiCounts: Record<string, number> = {};
-
-    // Find all emojis
-    const matches = content.match(emojiRegex);
-
-    if (matches) {
-      matches.forEach(emoji => {
-        // Get Unicode code point(s)
-        const codePoints = Array.from(emoji)
-          .map(char => {
-            const code = char.codePointAt(0);
-            return code
-              ? `U+${code.toString(16).toUpperCase().padStart(4, "0")}`
-              : "";
-          })
-          .join(" ");
-
-        // Create key in the format you want
-        const key = `${emoji} (${codePoints})`;
-
-        // Count occurrences
-        emojiCounts[key] = (emojiCounts[key] ?? 0) + 1;
-      });
-    }
-
-    return emojiCounts;
-  }
-
-  // Method to analyze emojis across all messages
-  private async analyzeEmojis(target: "dev" | "prod", id?: string) {
-    const data = await this.mapIt(target, id);
-    if (!data) return;
-
-    const allContent = data.map(msg => msg.content).join(" ");
-    const emojiStats = this.extractEmojiStats(allContent);
-
-    // Sort by count (most frequent first)
-    const sortedEmojis = Object.entries(emojiStats)
-      .sort(([, a], [, b]) => b - a)
-      .reduce(
-        (acc, [key, value]) => {
-          acc[key] = value;
-          return acc;
-        },
-        {} as Record<string, number>
-      );
-
-    // Write to file
-    this.withWs(
-      `src/test/__out__/aggregate/emoji-stats.json`,
-      JSON.stringify(sortedEmojis, null, 2)
-    );
-
-    // Create emoji replacement map for LaTeX
-    const emojiReplacementMap: Record<string, string> = {};
-    Object.keys(sortedEmojis).forEach(key => {
-      const emoji = key.split(" ")?.[0] ?? "";
-      const unicodeDesc = key.match(/\((.*?)\)/)?.[1] ?? "";
-      emojiReplacementMap[emoji] = `[emoji:${unicodeDesc}]`;
-    });
-
-    this.withWs(
-      `src/test/__out__/aggregate/emoji-replacements.json`,
-      JSON.stringify(emojiReplacementMap, null, 2)
-    );
-
-    return { stats: sortedEmojis, replacements: emojiReplacementMap };
-  }
-
-  // Enhanced preprocessor using the generated map
-  private preprocessContent(
-    content: string,
-    emojiMap?: Record<string, string>
-  ) {
-    // Use provided map or a default one
-    const replacements = emojiMap ?? {
-      "🍷": "[wine U+1F377]",
-      "😼": "[cat-smirk U+1F63C]",
-      "💅": "[nails U+1F485]",
-      "✨": "[sparkles U+2728]",
-      "🎨": "[art U+1F3A8]"
-      // Will be expanded by analyzeEmojis
-    };
-
-    let processed = content;
-    for (const [emoji, replacement] of Object.entries(replacements)) {
-      processed = processed.replace(new RegExp(emoji, "g"), replacement);
-    }
-    return processed;
   }
 }
 

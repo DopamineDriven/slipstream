@@ -1,6 +1,6 @@
 "use client";
 
-import type { CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { Check } from "@/icons/check";
 import { cn } from "@/lib/utils";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
@@ -8,7 +8,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 function Checkbox({
   className,
   ...props
-}: CustomComponentPropsWithRef<typeof CheckboxPrimitive.Root>) {
+}: ComponentPropsWithRef<typeof CheckboxPrimitive.Root>) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"

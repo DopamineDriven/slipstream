@@ -24,12 +24,11 @@ const tsupConfig = (
       "src/icons/*.tsx",
       "src/lib/*.ts",
       "src/ui/*.tsx",
-      "src/ui/base/progress.tsx",
       "!src/services/icon-workup.ts",
       "!src/services/postbuild.ts"
     ],
     dts: true,
-    external: ["react"],
+    external: ["react", "react-dom"],
     watch: process.env.NODE_ENV === "development",
     keepNames: true,
     target: ["esnext"],

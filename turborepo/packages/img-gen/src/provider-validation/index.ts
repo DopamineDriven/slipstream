@@ -560,7 +560,7 @@ export class ProviderValidation {
         return "grok-2-imagine-1212";
       }
       case "openai": {
-        return "gpt-image-1";
+        return "gpt-5";
       }
       case "anthropic":
       case "meta":

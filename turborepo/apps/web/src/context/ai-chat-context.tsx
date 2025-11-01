@@ -20,6 +20,7 @@ import { getModel } from "@/lib/get-model";
 import { pathParser } from "@/lib/path-parser";
 import type {
   AIChatRequest,
+  AIChatRequestImgGenFields,
   UserMetadata as AIChatRequestUserMetadata,
   AllModelsUnion,
   EventTypeMap,
@@ -56,7 +57,12 @@ interface AIChatContextValue {
 
   // Actions
   // Optionally accept an explicit batchId to associate attachments deterministically
-  sendChat: (prompt: string, explicitBatchId?: string) => void;
+  sendChat: (
+    prompt: string,
+    explicitBatchId?: string,
+    imgGenEnabled?: boolean,
+    imgGenFields?: AIChatRequestImgGenFields
+  ) => void;
   setActiveConversationId: (id: string | null) => void;
   clearError: () => void;
   resetStreamingState: () => void;
@@ -74,13 +80,15 @@ interface AIChatContextValue {
     height: number;
     mime: string;
   } | null;
-  imgGenFinals: {
-    index: number;
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-  }[] | null;
+  imgGenFinals:
+    | {
+        index: number;
+        cdnUrl: string;
+        width: number;
+        height: number;
+        mime: string;
+      }[]
+    | null;
 }
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
@@ -135,13 +143,16 @@ export function AIChatProvider({
     height: number;
     mime: string;
   } | null>(null);
-  const [imgGenFinals, setImgGenFinals] = useState<{
-    index: number;
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-  }[] | null>(null);
+  const [imgGenFinals, setImgGenFinals] = useState<
+    | {
+        index: number;
+        cdnUrl: string;
+        width: number;
+        height: number;
+        mime: string;
+      }[]
+    | null
+  >(null);
 
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
@@ -294,14 +305,16 @@ export function AIChatProvider({
         setImgGenEnabled(true);
         const p = evt.imgGenFields?.partialImages;
         if (p && p.length > 0) {
-          const last = p[p.length - 1]!;
-          setImgGenPartial({
-            index: last.index,
-            cdnUrl: last.cdnUrl,
-            width: last.width,
-            height: last.height,
-            mime: last.mime
-          });
+          const last = p[p.length - 1];
+          if (last) {
+            setImgGenPartial({
+              index: last.index,
+              cdnUrl: last.cdnUrl,
+              width: last.width,
+              height: last.height,
+              mime: last.mime
+            });
+          }
         }
       }
 
@@ -461,7 +474,12 @@ export function AIChatProvider({
   }, [city, country, latlng, postalCode, region, tz, locale]);
 
   const sendChat = useCallback(
-    (prompt: string, explicitBatchId?: string) => {
+    (
+      prompt: string,
+      explicitBatchId?: string,
+      imgGenEnabled?: boolean,
+      imgGenFields?: AIChatRequestImgGenFields
+    ) => {
       if (!userId) {
         console.warn("[AIChatContext] Cannot send chat without userId");
         return;
@@ -569,7 +587,9 @@ export function AIChatProvider({
         topP: undefined,
         // Use the explicit batchId from the input when provided so that
         // the message uses the same batch as the registered attachments.
-        batchId: batchIdUsed
+        batchId: batchIdUsed,
+        imgGenEnabled,
+        imgGenFields: imgGenEnabled === true ? imgGenFields : undefined
       } satisfies AIChatRequest);
 
       // Immediately rotate to a fresh batch for the NEXT message.

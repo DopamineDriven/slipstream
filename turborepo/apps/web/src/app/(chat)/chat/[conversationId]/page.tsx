@@ -1,4 +1,3 @@
-import type { DynamicChatRouteProps } from "@/types/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
@@ -47,7 +46,7 @@ export default async function ChatPage({
   if (!session?.user?.id) redirect("/auth/login");
 
   // Fetch data directly on the server
-  let messages: DynamicChatRouteProps | null = null,
+  let messages,
     conversationTitle: string | null = null,
     lastActiveProvider: null | Provider = null,
     lastActiveModel: string | null = null;
@@ -56,10 +55,10 @@ export default async function ChatPage({
     const data =
       await prismaConversationService.getMessagesByConversationIdWithAssets(
         conversationId
-      );
+      )
 
     if (data) {
-      messages = data.messages.map((t, o) => {
+      const m = data.messages.map((t, o) => {
         if (o === data.messages.length - 1) {
           lastActiveProvider = t.provider.toLowerCase() as Provider;
           lastActiveModel = t.model;
@@ -71,6 +70,7 @@ export default async function ChatPage({
         }));
         return { ...rest, attachments: cleanAttachments };
       });
+      messages = m
       conversationTitle = data.title;
     }
   }
@@ -78,7 +78,7 @@ export default async function ChatPage({
   return (
     <Suspense fallback={<ChatAreaSkeleton />}>
       <ChatInterface
-        initialMessages={messages}
+        initialMessages={messages ?? null}
         conversationTitle={conversationTitle}
         conversationId={conversationId}
         lastModel={lastActiveModel}

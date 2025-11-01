@@ -62,6 +62,175 @@ export class OpenAIService extends OpenAIServiceWorkup {
         : "image/webp";
   }
 
+  // public async handleOpenaiAiNativeImageRequest({
+  //   chunks,
+  //   conversationId,
+  //   isNewChat,
+  //   msgs,
+  //   streamChannel,
+  //   thinkingChunks,
+  //   userId,
+  //   ws,
+  //   apiKey,
+  //   max_tokens,
+  //   jobId,
+  //   requestMessageId,
+  //   keyId,
+  //   model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
+  //   systemPrompt,
+  //   temperature,
+  //   title,
+  //   topP,
+  //   currentMsgBoundAssets,
+  //   imgGenEnabled,
+  //   imgGenFields,
+  //   user_location
+  // }: ProviderOpenaiRequestEntity) {
+  //   // use most recent message id for image gen requests to update Im
+
+  //   const m = model as OpenAiModelIdUnion;
+
+  //   const provider = "openai" as const;
+
+  //   const partialImgArr = Array.of<ImageGenPartialArr>();
+
+  //   let finalImgObj:
+  //       | OpenAI.Responses.ResponseOutputItem.ImageGenerationCall
+  //       | undefined,
+  //     tInitial = 0,
+  //     openaiResId: string | null = null,
+  //     openaiAgg = "",
+  //     partialImgsRequested = false,
+  //     outputFormat: "png" | "jpeg" | "webp" = "png",
+  //     partialImgAgg:
+  //       | [number, string, string, number, number, string]
+  //       | undefined = undefined,
+  //     uploadtInitial = 0,
+  //     uploadtDelta = 0,
+  //     usage = 0;
+
+  //   const client = this.getClient(apiKey ?? undefined);
+
+  //   const formatted = await this.formatOpenAiWithUploads(
+  //     isNewChat,
+  //     msgs,
+  //     client,
+  //     userId,
+  //     keyId ?? undefined
+  //   );
+
+  //   const loc = this.normalizeLocation(user_location);
+
+  //   const _hasImages = this.hasImages(formatted);
+
+  //   const hasFiles = this.hasFiles(formatted);
+
+  //   const fileIds = this.fileIds(formatted);
+
+  //   let vectorStoreId: string | undefined;
+  //   if (fileIds.length > 0) {
+  //     vectorStoreId = await this.ensureUserVectorStoreId(client, null, userId);
+  //     await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
+  //       file_ids: fileIds
+  //     });
+  //   }
+
+  //   const reasoning = this.openaiReasoning(m, "medium", "auto", imgGenEnabled);
+
+  //   const resImg = this.responsesImgGen(
+  //     imgGenEnabled ?? false,
+  //     m,
+  //     imgGenFields,
+  //     currentMsgBoundAssets
+  //   );
+
+  //   if (typeof resImg === "undefined")
+  //     throw new Error(
+  //       "image options must be defined for the image endpoint api!"
+  //     );
+
+  //   if (
+  //     ((m === "gpt-image-1" || m === "gpt-image-1-mini") &&
+  //       this.isImgGenModel("openai", m) &&
+  //       resImg.model === "gpt-image-1") ||
+  //     resImg.model === "gpt-image-1-mini"
+  //   ) {
+  //     const r = resImg satisfies GptImageAndFacilitatorsImgGenWorkupRT;
+  //     partialImgsRequested = typeof r.partialImagesRequested !== "undefined";
+  //     outputFormat = r.output_format;
+
+  //     const o = await client.images.generate(
+  //       {
+  //         prompt: msgs?.[0]?.content ?? "",
+  //         background: r.output_background,
+  //         output_compression: r.output_compression,
+  //         user: userId,
+  //         output_format: r.output_format,
+  //         model: m,
+  //         moderation: r.moderation,
+  //         n: r.n,
+  //         partial_images: r.partialImagesRequested,
+  //         quality: r.output_quality,
+  //         size: r.output_size,
+  //         stream: true
+  //       },
+  //       { stream: true }
+  //     );
+
+  //     for await (const stream of o) {
+  //       o?._request_id;
+
+  //               let partialIndex: number | undefined,
+  //       done = false;
+  //     let rtHelper;
+
+  //     if (stream.type ==="image_generation.partial_image") {
+  //        partialIndex = stream.partial_image_index;
+  //         const { width, height, format } =
+  //           this.extractor.img.getImageSpecsWorkup(
+  //             Buffer.from(stream.b64_json, "base64")
+  //           );
+  //         partialImgAgg = [
+  //           stream.partial_image_index,
+  //           stream.b64_json,
+  //           stream.created_at.toString(),
+  //           width,
+  //           height,
+  //           format as
+  //             | "apng"
+  //             | "png"
+  //             | "jpeg"
+  //             | "gif"
+  //             | "bmp"
+  //             | "webp"
+  //             | "avif"
+  //             | "heic"
+  //             | "svg"
+  //             | "ico"
+  //             | "tiff"
+  //             | "jpg"
+  //         ];
+  //     }
+
+  //     if (stream.type ==="image_generation.completed") {
+  //       stream
+  //     }
+  //     }
+
+  //   } else if (m === "dall-e-2" && resImg.model === "dall-e-2") {
+  //     const x = await client.images.generate({
+  //       quality: "standard",
+  //       stream: false,
+  //       prompt: msgs?.[0]?.content ?? "",
+  //       model: m,
+  //       user: userId,
+  //       response_format: "b64_json",
+  //       n: resImg.n,
+  //       size: resImg.output_size
+  //     });
+  //   }
+  // }
+
   public async handleOpenaiAiChatRequest({
     chunks,
     conversationId,
@@ -227,7 +396,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
         include: [
           "web_search_call.action.sources",
           "web_search_call.results",
-          "message.input_image.image_url"
+          "message.input_image.image_url",
+          "file_search_call.results"
         ],
         max_output_tokens: max_tokens,
         top_p: topP,

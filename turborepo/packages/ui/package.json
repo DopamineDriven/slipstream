@@ -73,7 +73,7 @@
     "./icons/*": "./dist/icons/*.js",
     "./lib/*": "./dist/lib/*.js",
     "./ui/*": "./dist/ui/*.js",
-    "./ui/base/progress": "./dist/ui/base/progress.js"
+    "./ui/base/*": "./dist/ui/base/*.js"
   },
   "scripts": {
     "lint": "eslint",
