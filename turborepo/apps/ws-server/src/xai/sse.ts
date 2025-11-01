@@ -68,7 +68,7 @@ export interface xAIBaseEntity {
 
 export interface xAIImgGenResponse {
   data: {
-    url: string;
+    b64_json: string;
     revised_prompt: string;
   }[];
 }

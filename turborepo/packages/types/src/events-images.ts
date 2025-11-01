@@ -915,7 +915,8 @@ export type ImageGenPartialArr = [
   ImgMetadataEntity | undefined, // ImageMetadata via extractor package
   number | undefined, // upload duration
   string | undefined, // requestMessageId
-  string | undefined // jobId
+  string | undefined, // jobId
+  string | undefined // revised_prompt
 ];
 
 export type AIChatResponseImgGenFieldsFinal = {
@@ -964,6 +965,7 @@ export type AIChatResponseImgGenFieldsFinal = {
     jobIndex: number;
     seriesIndex?: number;
     seriesId?: string;
+    revisedPrompt?: string;
     image?: {
       animated: boolean;
       aspectRatio: number;
@@ -1037,6 +1039,7 @@ export type AIChatResponseImgGenFieldsFinal = {
     jobIndex: number;
     seriesIndex?: number;
     seriesId?: string;
+    revisedPrompt?: string;
     image?: {
       animated: boolean;
       aspectRatio: number;
@@ -1135,6 +1138,8 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
     | "gpt-5-mini"
     | "gpt-5-nano"
     | "gpt-4.1"
+    | "gpt-5-pro"
+    | "gpt-5-chat-latest"
     | "gpt-4.1-mini"
     | "gpt-4.1-nano"
     | "o3"
@@ -1156,6 +1161,8 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-image-1"
           | "gpt-image-1-mini"
           | "gpt-5"
+          | "gpt-5-chat-latest"
+          | "gpt-5-pro"
           | "gpt-5-mini"
           | "gpt-5-nano"
           | "gpt-4.1"
@@ -1166,10 +1173,16 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-4o-mini"
       ? GptImageAndFacilitatorsImgGenWorkupRT
       : T extends
-            | "gpt-5-pro"
             | "gpt-5-codex"
             | "gpt-3.5-turbo"
             | "gpt-4-turbo"
+            | "chatgpt-4o-latest"
+            | "o1-pro"
+            | "o1"
+            | "sora-2"
+            | "sora-2-pro"
+            | "o3-deep-research"
+            | "o4-mini-deep-research"
             | "o3-pro"
             | "o4-mini"
         ? undefined
@@ -1186,13 +1199,21 @@ export type ImgGenWorkupRTObj = {
   "gpt-5": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5-nano": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   o3: GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o-mini": GptImageAndFacilitatorsImgGenWorkupRT;
-  "gpt-5-pro": undefined;
+  "gpt-5-chat-latest": GptImageAndFacilitatorsImgGenWorkupRT;
+  o1: undefined;
+  "o1-pro": undefined;
+  "sora-2": undefined;
+  "sora-2-pro": undefined;
   "gpt-5-codex": undefined;
   "gpt-4-turbo": undefined;
   "gpt-3.5-turbo": undefined;
+  "chatgpt-4o-latest": undefined;
+  "o3-deep-research": undefined;
+  "o4-mini-deep-research": undefined;
   "gpt-4": undefined;
   "o3-pro": undefined;
   "o3-mini": undefined;

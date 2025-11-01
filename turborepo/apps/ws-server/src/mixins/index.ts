@@ -70,7 +70,7 @@ export interface ProviderDependencies {
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
   extract: ExtractService;
-  isProd:boolean;
+  isProd: boolean;
   s3: S3Storage;
 }
 export type ProviderFactory<T> = (
@@ -357,6 +357,8 @@ export function GrokMixin<
               deps.prisma,
               deps.redis,
               deps.extract,
+              deps.s3,
+              deps.isProd,
               this.#grokApiKey ?? ""
             );
         }

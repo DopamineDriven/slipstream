@@ -1237,17 +1237,9 @@ export class PrismaService extends ModelService {
     requestMessageId,
     ...data
   }: Rm<CTR<AIChatResponseDb, "provider">, "type"> & {
-    bucket?: string;
-    key?: string;
-    versionId?: string;
-    cdnUrl?: string;
     uploadDuration?: number;
-    s3ObjectId?: string;
-    size?: number;
     requestMessageId?: string;
     jobId?: string;
-    width?: number;
-    height?: number;
     mime?: string;
   }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);

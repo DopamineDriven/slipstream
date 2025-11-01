@@ -37,10 +37,14 @@ class ScriptGen extends Fs {
       prismaClient.$connect();
       return await prismaClient.conversation.findUnique({
         where: { id: id },
+
         include: {
           messages: {
             orderBy: { createdAt: "asc" },
-            include: { attachments: true }
+            include: {
+              imageGenJob: true,
+              attachments: { include: { imageGenOutput: true } }
+            }
           }
         }
       });
@@ -189,7 +193,16 @@ class ScriptGen extends Fs {
           })
           .join("\n\n");
       };
-      if (p.model ==="grok-2-image-1212" && p.content.includes(`(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`)) p.content.replace(`(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`, "https://assets-dev.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1761729305749-ig_0d3912d56a96ce82016901dab7fa2c81a1886deddf5b1edfd1-4.png")
+      if (
+        p.model === "grok-2-image-1212" &&
+        p.content.includes(
+          `(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`
+        )
+      )
+        p.content.replace(
+          `(https://imgen.x.ai/xai-imgen/xai-tmp-imgen-8a2c7f9b-ef9a-4da8-aa79-db47b2ee4d0e.jpeg)`,
+          "https://assets-dev.aicoalesce.com/generated/nrr6h4r4480f6kviycyo1zhf/1761729305749-ig_0d3912d56a96ce82016901dab7fa2c81a1886deddf5b1edfd1-4.png"
+        );
 
       const agg =
         p.sender === "AI"
@@ -257,7 +270,10 @@ header-includes: |
     if (!data) return;
     if (!raw) return;
     if (!raw.title) return;
-    const toSlug = raw.title.replace(/ /gim, "-").replace(/:/gmi, "--").replace(/'/gmi, "");
+    const toSlug = raw.title
+      .replace(/ /gim, "-")
+      .replace(/:/gim, "--")
+      .replace(/'/gim, "");
     try {
       await Promise.all([this.withWsAsyncs(data, toSlug, raw.title)]).then(() =>
         this.wait(2000)

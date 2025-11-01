@@ -1,5 +1,5 @@
 import type {
-    ImageGenPartialArr,
+  ImageGenPartialArr,
   InferPromiseRT,
   MessageSingleton,
   ProviderOpenaiRequestEntity
@@ -15,6 +15,8 @@ import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatRequestImgGenFields,
   ImgGenWorkupResRT,
+  OpenAIImgGenFacilitatingModels,
+  OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
 
@@ -30,7 +32,7 @@ export class OpenAIServiceWorkup extends ModelService {
     model: OpenAiModelIdUnion,
     imgFields?: AIChatRequestImgGenFields,
     currentMsgBoundAssets?: ProviderOpenaiRequestEntity["currentMsgBoundAssets"]
-  ): ImgGenWorkupResRT<OpenAiModelIdUnion> {
+  ): ImgGenWorkupResRT<OpenAIImgGenFacilitatingModels | OpenAIImgGenModels> {
     if (imgGenEnabled === false) return undefined;
     if (!imgFields) return undefined;
     if (
@@ -38,10 +40,16 @@ export class OpenAIServiceWorkup extends ModelService {
       model === "gpt-4" ||
       model === "gpt-4-turbo" ||
       model === "gpt-5-codex" ||
-      model === "gpt-5-pro" ||
       model === "o3-mini" ||
+      model === "o1" ||
+      model === "o3-deep-research" ||
+      model === "o4-mini-deep-research" ||
       model === "o4-mini" ||
-      model === "o3-pro"
+      model === "o3-pro" ||
+      model === "chatgpt-4o-latest" ||
+      model === "sora-2" ||
+      model === "sora-2-pro" ||
+      model === "o1-pro"
     )
       return undefined;
 
@@ -120,7 +128,7 @@ export class OpenAIServiceWorkup extends ModelService {
          * 1 (min)
          * 10 (max)
          */
-        n: this.handleImgGenCount(model, { n }) ?? 1,
+        n: this.handleImgGenCount("openai", model, { n }) ?? 1,
         model: "dall-e-2" as const,
         output_quality:
           (this.handleImgGenOutputQuality("openai", model, {
@@ -155,7 +163,7 @@ export class OpenAIServiceWorkup extends ModelService {
             ? true
             : false,
       msgBoundImgAssets,
-      n: this.handleImgGenCount(model, { n }),
+      n: this.handleImgGenCount("openai", model, { n }),
       moderation: moderate,
       output_format: outputFormat,
       output_compression: this.handleImgGenCompression("openai", model, {
@@ -273,9 +281,7 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public mapPartialImgGenArr(
-    props: ImageGenPartialArr[]
-  ) {
+  public mapPartialImgGenArr(props: ImageGenPartialArr[]) {
     return props.map((t, o) => {
       return {
         index: t[0] ?? o,
@@ -287,9 +293,7 @@ export class OpenAIServiceWorkup extends ModelService {
     });
   }
 
-  public mapPersistenceImgGenArr(
-    props: ImageGenPartialArr[]
-  ) {
+  public mapPersistenceImgGenArr(props: ImageGenPartialArr[]) {
     return props.map((t, o) => {
       return {
         index: t[0] ?? o,
@@ -319,6 +323,7 @@ export class OpenAIServiceWorkup extends ModelService {
         jobIndex: 0,
         seriesIndex: t[0],
         seriesId: t[2],
+        revisedPrompt: t[24],
         kind: "PARTIAL"
       } as const;
     });
@@ -681,14 +686,21 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano":
-      case "gpt-5-codex":
-      case "o3":
-      case "o3-mini":
-      case "o3-pro":
-      case "o4-mini": {
+      case "gpt-5-chat-latest":
+      case "o3": {
         if (imgGenEnabled) {
           return { effort: "minimal" } satisfies Reasoning;
         }
+        return { effort, summary } satisfies Reasoning;
+      }
+      case "gpt-5-codex":
+      case "o1":
+      case "o3-mini":
+      case "o3-pro":
+      case "o1-pro":
+      case "o3-deep-research":
+      case "o4-mini-deep-research":
+      case "o4-mini": {
         return { effort, summary } satisfies Reasoning;
       }
       case "gpt-3.5-turbo":
@@ -698,6 +710,9 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4.1-mini":
       case "gpt-4.1-nano":
       case "gpt-4o":
+      case "sora-2":
+      case "sora-2-pro":
+      case "chatgpt-4o-latest":
       case "gpt-4o-mini":
       case "dall-e-2":
       case "dall-e-3":
@@ -748,8 +763,10 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4.1":
       case "gpt-4.1-mini":
       case "gpt-4.1-nano":
+      case "gpt-5-pro":
       case "o3":
       case "gpt-4o":
+      case "gpt-5-chat-latest":
       case "gpt-4o-mini": {
         return true;
       }
@@ -757,8 +774,14 @@ export class OpenAIServiceWorkup extends ModelService {
       case "dall-e-3":
       case "gpt-image-1":
       case "gpt-image-1-mini":
-      case "gpt-5-pro":
       case "gpt-5-codex":
+      case "chatgpt-4o-latest":
+      case "o1":
+      case "o1-pro":
+      case "o3-deep-research":
+      case "o4-mini-deep-research":
+      case "sora-2":
+      case "sora-2-pro":
       case "o3-mini":
       case "o3-pro":
       case "o4-mini":
@@ -782,6 +805,7 @@ export class OpenAIServiceWorkup extends ModelService {
       }
       case "gpt-5":
       case "gpt-5-mini":
+      case "gpt-5-chat-latest":
       case "gpt-5-codex":
       case "gpt-5-nano": {
         if (imgGenEnabled) {
@@ -801,6 +825,11 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4-turbo":
       case "gpt-4.1":
       case "dall-e-2":
+      case "chatgpt-4o-latest":
+      case "o1":
+      case "o1-pro":
+      case "sora-2-pro":
+      case "sora-2":
       case "dall-e-3":
       case "gpt-image-1":
       case "gpt-image-1-mini":

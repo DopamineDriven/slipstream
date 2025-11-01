@@ -166,7 +166,10 @@ describe("handleImgGenCount", () => {
     "should return 4 for imagen-4.0-ultra-generate-001 model with n=undefined",
     {},
     () => {
-      assert.equal(p.handleImgGenCount("imagen-4.0-ultra-generate-001"), 4);
+      assert.equal(
+        p.handleImgGenCount("gemini", "imagen-4.0-ultra-generate-001"),
+        4
+      );
     }
   );
   it(
@@ -174,8 +177,38 @@ describe("handleImgGenCount", () => {
     {},
     () => {
       assert.equal(
-        p.handleImgGenCount("gemini-2.5-flash-image", { n: -11 }),
+        p.handleImgGenCount("gemini", "gemini-2.5-flash-image", { n: -11 }),
         1
+      );
+    }
+  );
+  it(
+    "should return 10 for gemini-2.5-flash-image model with n=11 set as input",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenCount("gemini", "gemini-2.5-flash-image", { n: 11 }),
+        10
+      );
+    }
+  );
+  it(
+    "should return 1 for grok-2-image-1212 model with n=-11 set as input",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenCount("grok", "grok-2-image-1212", { n: -11 }),
+        1
+      );
+    }
+  );
+  it(
+    "should return 10 for grok-2-image-1212 model with n=11 set as input",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenCount("grok", "grok-2-image-1212", { n: 11 }),
+        10
       );
     }
   );
@@ -183,14 +216,17 @@ describe("handleImgGenCount", () => {
     "should return 7 for gpt-image-1 or gpt-image-1-mini with n=7 set as input",
     {},
     () => {
-      assert.equal(p.handleImgGenCount("gpt-image-1", { n: 7 }), 7);
+      assert.equal(p.handleImgGenCount("openai", "gpt-image-1", { n: 7 }), 7);
     }
   );
-  it("should return 1 for dall-e-3 model with n=2 as input", {}, () => {
-    assert.equal(p.handleImgGenCount("dall-e-3", { n: 2 }), 1);
+  it("should return 1 for gpt-5 with n=7 set as input", {}, () => {
+    assert.equal(p.handleImgGenCount("openai", "gpt-5", { n: 7 }), 1);
   });
-  it("should return 10 for dall-e-3 with n=2000 set", {}, () => {
-    assert.equal(p.handleImgGenCount("dall-e-2", { n: 2000 }), 10);
+  it("should return 1 for dall-e-3 model with n=2 as input", {}, () => {
+    assert.equal(p.handleImgGenCount("openai", "dall-e-3", { n: 2 }), 1);
+  });
+  it("should return 10 for dall-e-2 with n=2000 set", {}, () => {
+    assert.equal(p.handleImgGenCount("openai", "dall-e-2", { n: 2000 }), 10);
   });
 });
 
@@ -254,6 +290,220 @@ describe("isImgGenCapableModel", () => {
           "Llama-4-Maverick-17B-128E-Instruct-FP8"
         ),
         false
+      );
+    }
+  );
+});
+describe("isPureImgGenModel", () => {
+  it(
+    "should return true for provider=gemini, model=imagen-4.0-ultra-generate-001",
+    {},
+    () => {
+      assert.equal(
+        p.isPureImgGenModel("gemini", "imagen-4.0-ultra-generate-001"),
+        true
+      );
+    }
+  );
+  it(
+    "should return false for provider=gemini, model=gemini-2.5-pro",
+    {},
+    () => {
+      assert.equal(p.isPureImgGenModel("gemini", "gemini-2.5-pro"), false);
+    }
+  );
+  it("should return false for provider=grok, model=grok-4-0709", {}, () => {
+    assert.equal(p.isPureImgGenModel("grok", "grok-4-0709"), false);
+  });
+  it(
+    "should return true for provider=grok, model=grok-2-image-1212",
+    {},
+    () => {
+      assert.equal(p.isPureImgGenModel("grok", "grok-2-image-1212"), true);
+    }
+  );
+  it("should return false for provider=openai, model=gpt-5", {}, () => {
+    assert.equal(p.isPureImgGenModel("openai", "gpt-5"), false);
+  });
+  it("should return true for provider=openai, model=gpt-image-1", {}, () => {
+    assert.equal(p.isPureImgGenModel("openai", "gpt-image-1"), true);
+  });
+  it("should return false for provider=openai, model=gpt-3.5-turbo", {}, () => {
+    assert.equal(p.isPureImgGenModel("openai", "gpt-3.5-turbo"), false);
+  });
+  it(
+    "should return false for provider=anthropic, model=claude-sonnet-4-5-20250929",
+    {},
+    () => {
+      assert.equal(
+        p.isPureImgGenModel("anthropic", "claude-sonnet-4-5-20250929"),
+        false
+      );
+    }
+  );
+  it("should return false for provider=vercel, model=v0-1.5-md", {}, () => {
+    assert.equal(p.isPureImgGenModel("vercel", "v0-1.5-md"), false);
+  });
+  it(
+    "should return false for provider=meta, model=Llama-4-Maverick-17B-128E-Instruct-FP8",
+    {},
+    () => {
+      assert.equal(
+        p.isPureImgGenModel("meta", "Llama-4-Maverick-17B-128E-Instruct-FP8"),
+        false
+      );
+    }
+  );
+});
+
+describe("handleImgGenBg", () => {
+  it(
+    "should return undefined for provider=gemini, model=imagen-4.0-ultra-generate-001",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("gemini", "imagen-4.0-ultra-generate-001"),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=gemini, model=gemini-2.5-flash-image,background=auto, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("gemini", "gemini-2.5-flash-image", {
+          background: "auto",
+          format: "webp"
+        }),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=grok, model=grok-4-0709,  background=auto, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("grok", "grok-4-0709", {
+          background: "auto",
+          format: "webp"
+        }),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=openai, model=dall-e-3, background=auto, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "dall-e-3", {
+          background: "auto",
+          format: "webp"
+        }),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return opaque for provider=openai, model=gpt-5, background=opaque, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-5", {
+          background: "opaque",
+          format: "webp"
+        }),
+        "opaque"
+      );
+    }
+  );
+  it(
+    "should return transparent for provider=openai, model=gpt-5, background=transparent, format=png",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-5", {
+          background: "transparent",
+          format: "png"
+        }),
+        "transparent"
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=openai, model=gpt-5, format=jpeg, background=transparent",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-5", {
+          background: "transparent",
+          format: "jpeg"
+        }),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return auto for provider=openai, model=gpt-image-1, background=auto, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-image-1", {
+          background: "auto",
+          format: "webp"
+        }),
+        "auto"
+      );
+    }
+  );
+  it(
+    "should return auto for provider=openai, model=gpt-image-1, background=undefined, format=webp",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-image-1", {
+          background: undefined,
+          format: "webp"
+        }),
+        "auto"
+      );
+    }
+  );
+  it(
+    "should return auto for provider=openai, model=gpt-image-1, background=undefined, format=png",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-image-1", {
+          background: undefined,
+          format: "png"
+        }),
+        "auto"
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=openai, model=gpt-image-1, background=undefined, format=jpeg",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("openai", "gpt-image-1", {
+          background: undefined,
+          format: "jpeg"
+        }),
+        undefined
+      );
+    }
+  );
+  it(
+    "should return undefined for provider=anthropic, model=claude-sonnet-4-5-20250929",
+    {},
+    () => {
+      assert.equal<ReturnType<typeof p.handleImgGenBg>>(
+        p.handleImgGenBg("anthropic", "claude-sonnet-4-5-20250929"),
+        undefined
       );
     }
   );

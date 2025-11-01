@@ -321,6 +321,137 @@ export class S3Storage extends S3Utils {
     }
   }
 
+  public async uploadGeneratedFromUrl(
+    url: string,
+    isProd: boolean,
+    meta: PresignMeta & { conversationId?: string },
+    options?: UploadOptions
+  ) {
+    try {
+      // Fetch with keepalive for connection reuse
+      const res = await fetch(url, { keepalive: true });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch URL: ${res.status} ${res.statusText}`);
+      }
+
+      // Extract content-type from response if not provided in meta
+      const contentType = res.headers.get("content-type");
+      if (contentType && !meta.contentType) {
+        meta.contentType = contentType;
+      }
+
+      // Get content-length if available for progress tracking
+      const contentLength = res.headers.get("content-length");
+      if (contentLength && !meta.size) {
+        meta.size = parseInt(contentLength, 10);
+      }
+
+      // For Node.js 18+, we can use native stream conversion
+      // This is memory-efficient as it doesn't load the entire file into memory
+      const stream = res.body
+        ? Readable.fromWeb(res.body as import("stream/web").ReadableStream)
+        : null;
+
+      if (!stream) {
+        throw new Error("Failed to create readable stream from response body");
+      }
+
+      // Use uploadDirect with the stream for efficient S3 upload
+      const uploadResult = await this.uploadDirect(stream, meta, options);
+
+      // Finalize the upload with CDN URL generation
+      return await this.finalize(
+        uploadResult.bucket,
+        uploadResult.key,
+        isProd,
+        uploadResult.versionId
+      );
+    } catch (err) {
+      // Enhanced error handling with context
+      const errorMessage =
+        err instanceof Error
+          ? `uploadGeneratedFromUrl failed for ${url}: ${err.message}`
+          : `uploadGeneratedFromUrl failed for ${url}: ${JSON.stringify(err, null, 2)}`;
+
+      throw new Error(errorMessage);
+    }
+  }
+
+  public async finalize(
+    bucket: string,
+    key: string,
+    isProd: boolean,
+    versionId = "nov"
+  ) {
+    const head = await this.client.send(
+      new HeadObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        ChecksumMode: "ENABLED"
+      })
+    );
+    const {
+      ContentDisposition,
+      StorageClass,
+      ExpiresString,
+      ContentType,
+      CacheControl,
+      ETag,
+      LastModified,
+      ContentLength,
+      VersionId
+    } = head;
+    let v = VersionId;
+
+    if (typeof v === "undefined" || (v !== versionId && versionId !== "nov")) {
+      v = versionId;
+    }
+
+    const s3ObjectId = `s3://${bucket}/${key}#${v ?? "nov"}` as const;
+
+    const checksum = this.checksum(head);
+
+    const expires = this.handleExpires(ExpiresString);
+    const extension = this.contentTypeToExt(ContentType);
+    const publicUrl = this.publicUrl(bucket, key);
+
+    const getCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      VersionId: v !== "nov" ? v : undefined
+    });
+
+    const presignedUrl = await getSignedUrl(
+      this.client,
+      getCommand,
+      { expiresIn: 604800 } // 7 days
+    );
+    const cdnUrl = this.getCfUrl(isProd, key);
+    return {
+      bucket,
+      key,
+      versionId: v,
+      contentDisposition: ContentDisposition,
+      cacheControl: CacheControl,
+      extension,
+      expires,
+      /***
+       * the public url
+       */
+      cdnUrl,
+      publicUrl,
+      presignedUrl,
+      presignedUrlExpiresAt: Date.now() + 604800 * 1000, // 7 days in ms
+      storageClass: StorageClass,
+      s3ObjectId,
+      etag: this.stripQuotes(ETag),
+      size: ContentLength ?? undefined,
+      contentType: ContentType ?? undefined,
+      lastModified: LastModified?.toISOString(),
+      checksum
+    } satisfies FinalizeResult;
+  }
   private async performUpload(
     bucket: string,
     key: string,
@@ -567,81 +698,6 @@ export class S3Storage extends S3Utils {
 
   public getCfUrl(isProd: boolean, key: string) {
     return `https://assets${isProd ? "" : "-dev"}.aicoalesce.com/${key}` as const;
-  }
-
-  public async finalize(
-    bucket: string,
-    key: string,
-    isProd: boolean,
-    versionId = "nov"
-  ) {
-    const head = await this.client.send(
-      new HeadObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        ChecksumMode: "ENABLED"
-      })
-    );
-    const {
-      ContentDisposition,
-      StorageClass,
-      ExpiresString,
-      ContentType,
-      CacheControl,
-      ETag,
-      LastModified,
-      ContentLength,
-      VersionId
-    } = head;
-    let v = VersionId;
-
-    if (typeof v === "undefined" || (v !== versionId && versionId !== "nov")) {
-      v = versionId;
-    }
-
-    const s3ObjectId = `s3://${bucket}/${key}#${v ?? "nov"}` as const;
-
-    const checksum = this.checksum(head);
-
-    const expires = this.handleExpires(ExpiresString);
-    const extension = this.contentTypeToExt(ContentType);
-    const publicUrl = this.publicUrl(bucket, key);
-
-    const getCommand = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      VersionId: v !== "nov" ? v : undefined
-    });
-
-    const presignedUrl = await getSignedUrl(
-      this.client,
-      getCommand,
-      { expiresIn: 604800 } // 7 days
-    );
-    const cdnUrl = this.getCfUrl(isProd, key);
-    return {
-      bucket,
-      key,
-      versionId: v,
-      contentDisposition: ContentDisposition,
-      cacheControl: CacheControl,
-      extension,
-      expires,
-      /***
-       * the public url
-       */
-      cdnUrl,
-      publicUrl,
-      presignedUrl,
-      presignedUrlExpiresAt: Date.now() + 604800 * 1000, // 7 days in ms
-      storageClass: StorageClass,
-      s3ObjectId,
-      etag: this.stripQuotes(ETag),
-      size: ContentLength ?? undefined,
-      contentType: ContentType ?? undefined,
-      lastModified: LastModified?.toISOString(),
-      checksum
-    } satisfies FinalizeResult;
   }
 
   public async signDownloadById(
