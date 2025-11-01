@@ -1,11 +1,11 @@
 "use client";
 
-import type { CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { cn } from "@/lib/utils";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 type ScrollAreaProps<T extends "Root" | "ScrollAreaScrollbar"> = {
-  [P in T]: CustomComponentPropsWithRef<(typeof ScrollAreaPrimitive)[T]>;
+  [P in T]: ComponentPropsWithRef<(typeof ScrollAreaPrimitive)[T]>;
 }[T];
 
 function ScrollArea({

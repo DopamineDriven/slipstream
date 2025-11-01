@@ -18,6 +18,8 @@ export function createUserMessage(params: {
   tryAgain?: boolean;
   thinkingDuration?: number;
   thinkingText?: string;
+  isImageGen?: boolean;
+  messageType?: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN"
 }): UIMessage {
   return {
     thinkingText: params.thinkingText ?? null,
@@ -34,7 +36,9 @@ export function createUserMessage(params: {
     updatedAt: new Date(),
     userId: params.userId,
     userKeyId: null,
-    conversationId: params.conversationId
+    conversationId: params.conversationId,
+    isImageGen: params.isImageGen ?? false,
+    messageType: params.messageType ?? "TEXT"
   };
 }
 
@@ -54,6 +58,8 @@ export function createAIMessage(params: {
   tryAgain?: boolean;
   thinkingText?: string;
   thinkingDuration?: number;
+  isImageGen?: boolean;
+  messageType?: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN"
 }): UIMessage {
   return {
     liked: params?.liked ?? false,
@@ -70,7 +76,9 @@ export function createAIMessage(params: {
     userKeyId: null,
     conversationId: params.conversationId,
     thinkingText: params.thinkingText ?? null,
-    thinkingDuration: params.thinkingDuration ?? null
+    thinkingDuration: params.thinkingDuration ?? null,
+    isImageGen: params.isImageGen ?? false,
+    messageType: params.messageType ?? "TEXT"
   };
 }
 

@@ -5,8 +5,7 @@ import { cn } from "@/lib/utils";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 interface SeparatorProps
-  extends React.CustomComponentPropsWithRef<typeof SeparatorPrimitive.Root> {}
-
+  extends React.ComponentPropsWithRef<typeof SeparatorPrimitive.Root> {}
 
 function Separator({
   className,
@@ -25,7 +24,7 @@ function Separator({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export { Separator, type SeparatorProps };

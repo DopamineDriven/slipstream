@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentPropsWithRef, CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { Check } from "@/icons/check";
 import { ChevronRight } from "@/icons/chevron-right";
 import { Circle } from "@/icons/circle";
@@ -24,11 +24,11 @@ type DropdownMenuProps<
     | "SubTrigger"
     | "Trigger"
 > = T extends "Label" | "SubTrigger"
-  ? CustomComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]> & {
+  ? ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]> & {
       inset?: boolean;
     }
   : T extends "Item"
-    ? CustomComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]> & {
+    ? ComponentPropsWithRef<(typeof DropdownMenuPrimitive)[T]> & {
         inset?: boolean;
         variant?: "default" | "destructive";
       }

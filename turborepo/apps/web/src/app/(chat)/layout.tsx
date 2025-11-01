@@ -6,6 +6,7 @@ import { SettingsDrawerProvider } from "@/context/settings-drawer-context";
 import { AssetProvider } from "@/context/asset-context";
 import { ChatWebSocketProvider } from "@/context/chat-ws-context";
 import { ModelSelectionProvider } from "@/context/model-selection-context";
+import { ImageGenProvider } from "@/context/image-gen-context";
 import { prismaClient } from "@/lib/prisma";
 import { ormHandler } from "@/orm";
 import { getSession } from "@/utils/auth";
@@ -31,7 +32,9 @@ export default async function AuthedLayout({
         <ApiKeysProvider userId={session.user.id} fallbackData={fallbackData}>
           <SettingsDrawerProvider>
             <AssetProvider userId={session.user.id}>
-              <AIChatProvider userId={session.user.id}>{children}</AIChatProvider>
+              <ImageGenProvider>
+                <AIChatProvider userId={session.user.id}>{children}</AIChatProvider>
+              </ImageGenProvider>
             </AssetProvider>
           </SettingsDrawerProvider>
         </ApiKeysProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentPropsWithRef, CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { Check, ChevronDown, ChevronUp } from "@/icons";
 import { cn } from "@/lib/utils";
 import * as SelectPrimitive from "@radix-ui/react-select";
@@ -19,7 +19,7 @@ type SelectProps<
     | "Separator"
 > = T extends "Trigger"
   ? {
-      [P in T]: CustomComponentPropsWithRef<(typeof SelectPrimitive)[T]>;
+      [P in T]: ComponentPropsWithRef<(typeof SelectPrimitive)[T]>;
     }[T] & { size?: "sm" | "default" }
   : {
       [P in T]: ComponentPropsWithRef<(typeof SelectPrimitive)[T]>;

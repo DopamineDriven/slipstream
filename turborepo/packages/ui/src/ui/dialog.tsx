@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentPropsWithRef, CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { X } from "@/icons/x";
 import { cn } from "@/lib/utils";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -16,7 +16,7 @@ type DialogProps<
     | "Title"
     | "Description"
 > = T extends "Content"
-  ? { [P in T]: CustomComponentPropsWithRef<(typeof DialogPrimitive)[P]> }[T] & {
+  ? { [P in T]: ComponentPropsWithRef<(typeof DialogPrimitive)[P]> }[T] & {
       showCloseButton?: boolean;
       closeButtonClassName?: string;
     }

@@ -78,17 +78,17 @@ export class PrismaUserMessageService extends ErrorHelperService {
         } | null;
         messages: ({
           imageGenJob: {
+            error: string | null;
+            model: string;
             id: string;
             userId: string;
             userKeyId: string | null;
             createdAt: Date;
             updatedAt: Date;
-            provider: $Enums.Provider;
-            model: string;
             systemPrompt: string | null;
             temperature: number | null;
             topP: number | null;
-            error: string | null;
+            provider: $Enums.Provider;
             requestMessageId: string;
             keyFingerprint: string | null;
             prompt: string;
@@ -222,6 +222,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
             deletedAt: Date | null;
           })[];
         } & {
+          model: string | null;
           id: string;
           userId: string | null;
           userKeyId: string | null;
@@ -230,7 +231,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
           conversationId: string;
           senderType: $Enums.SenderType;
           provider: $Enums.Provider;
-          model: string | null;
           content: string;
           thinkingText: string | null;
           thinkingDuration: number | null;
@@ -242,6 +242,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
         })[];
       } & {
         id: string;
+        shareToken: string | null;
         userId: string;
         userKeyId: string | null;
         title: string | null;
@@ -250,7 +251,6 @@ export class PrismaUserMessageService extends ErrorHelperService {
         branchId: string | null;
         parentId: string | null;
         isShared: boolean;
-        shareToken: string | null;
       })
     | null
   > {

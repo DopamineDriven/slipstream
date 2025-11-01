@@ -400,10 +400,14 @@ export function ChatInterface({
       setMessages(prev => [...prev, userMsgWithAttachments]);
       lastUserMessageRef.current = content.trim();
       setIsAwaitingFirstChunk(true);
-
-      // Send to AI - pass through the batchId from the input so the
-      // server associates the correct attachments to this message
-      sendChat(content.trim(), payload.batchId);
+      // To continue this session, run codex resume 019a346c-971d-7c53-b1db-d01ed0b8a58c
+      // Send to AI — include batchId and image-gen options (when present)
+      sendChat(
+        content.trim(),
+        payload.batchId,
+        payload.imgGenEnabled,
+        payload.imgGenFields
+      );
     },
     [activeConversationId, selectedModel, sendChat, user, assetUpload]
   );

@@ -1,15 +1,16 @@
 "use client";
 
 import type { AttachmentPreview } from "@/hooks/use-asset-metadata";
-import type { Properties } from "csstype";
 import type { User } from "@/utils/auth-client";
+import type { Properties } from "csstype";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssetUpload } from "@/context/asset-context";
-import { useSettingsDrawer } from "@/context/settings-drawer-context";
+import { useImageGen } from "@/context/image-gen-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
+import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useAssets } from "@/hooks/use-assets";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { providerMetadata } from "@/lib/models";
@@ -18,12 +19,14 @@ import { AttachmentPreviewComponent } from "@/ui/chat/attachment-preview";
 import { FullscreenTextInputDialog } from "@/ui/chat/fullscreen-text-input-dialog";
 import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawer";
 import { motion } from "motion/react";
+import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
   Button,
   Camera,
   ChevronDown,
   Expand,
   FileText,
+  ImageGen,
   ImageIcon,
   Loader,
   Mic,
@@ -54,6 +57,8 @@ interface UnifiedChatInputProps {
     content: string;
     attachments?: AttachmentPreview[];
     batchId?: string;
+    imgGenEnabled?: boolean;
+    imgGenFields?: AIChatRequestImgGenFields;
   }) => void;
   disabled?: boolean;
   placeholder?: string;
@@ -89,6 +94,7 @@ export function ChatInput({
   const [openAttach, setOpenAttach] = useState(false);
 
   const { selectedModel, openDrawer } = useModelSelection();
+
   const { openToTab: openSettingsToTab } = useSettingsDrawer();
 
   const assetUpload = useAssetUpload();
@@ -102,6 +108,7 @@ export function ChatInput({
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const [message, setMessage] = useState("");
+  const imgGen = useImageGen();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -347,10 +354,22 @@ export function ChatInput({
         const optimistic = attachmentsRef.current;
         const batchId =
           optimistic.length > 0 ? assetUpload.getBatchId() : undefined;
+
+        const imgGenOpenAI = imgGen.enabled
+          ? selectedModel.provider === "openai"
+            ? {
+                ...imgGen.fields,
+                output_partial_images: 3,
+                output_quality: "high"
+              }
+            : imgGen.fields
+          : undefined;
         onUserMessage?.({
           content: composed,
           attachments: optimistic,
-          batchId
+          batchId,
+          imgGenEnabled: imgGen.enabled || undefined,
+          imgGenFields: imgGen.enabled ? imgGenOpenAI : undefined
         });
 
         setMessage("");
@@ -377,8 +396,11 @@ export function ChatInput({
       quotes,
       isSubmitting,
       message,
+      selectedModel.provider,
       router,
       isHome,
+      imgGen.enabled,
+      imgGen.fields,
       assetUpload,
       onUserMessage,
       disabled,
@@ -635,8 +657,6 @@ export function ChatInput({
                     </Button>
                   )}
                 </div>
-
-                {/* Controls Row - matching empty-chat-shell exactly */}
                 <div className="bg-muted/20 flex items-center justify-between border-t px-3 py-2">
                   <div className="flex items-center space-x-2">
                     <Popover open={openAttach} onOpenChange={setOpenAttach}>
@@ -689,15 +709,37 @@ export function ChatInput({
                     </Button>
                     <Button
                       type="button"
+                      variant={imgGen.enabled ? "default" : "ghost"}
+                      size="icon"
+                      title={
+                        imgGen.enabled
+                          ? "Disable image generation"
+                          : "Enable image generation"
+                      }
+                      className={cn(
+                        "hover:bg-accent h-8",
+                        imgGen.enabled
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                      onClick={() => {
+                        imgGen.setEnabled(!imgGen.enabled);
+                        if (!imgGen.enabled) imgGen.updateFields({ n: 1 });
+                      }}>
+                      <ImageGen className="size-4" />
+                      <span className="sr-only">Toggle Image Generation</span>
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      type="button"
                       variant="ghost"
                       size="icon"
                       title="Voice to text"
                       className="text-muted-foreground hover:text-foreground hover:bg-accent h-8">
                       <Mic className="size-4" />
-                      <span className="sr-only">Voice input</span>
+                      <span className="sr-only">Voice Input</span>
                     </Button>
-                  </div>
-                  <div className="flex items-center space-x-2">
                     <Button
                       type="button"
                       variant="ghost"

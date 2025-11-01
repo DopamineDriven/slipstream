@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import CardStack from "@/ui/atoms/stack/generated";
 import { Button } from "@slipstream/ui";
+import CardStack from "@/ui/atoms/stack/generated";
 import { ImageGenerationCanvas } from "@/ui/chat/image-gen/image-generation-canvas";
 
 export type ImageGenSeriesItem = {
@@ -33,7 +33,17 @@ interface ImageGenSeriesStackProps {
   className?: string;
 }
 
-export function ImageGenSeriesStack({ seriesList, className }: ImageGenSeriesStackProps) {
+function seriesHelper(seriesList: ImageGenSeries[], activeSeries: number) {
+  const target = seriesList[Math.min(activeSeries, seriesList.length - 1)];
+
+  if (!target) throw new Error("no seriesList");
+  else return target;
+}
+
+export function ImageGenSeriesStack({
+  seriesList,
+  className
+}: ImageGenSeriesStackProps) {
   const [mode, setMode] = useState<"stack" | "replay">(
     seriesList.length > 1 ? "stack" : "replay"
   );
@@ -47,7 +57,10 @@ export function ImageGenSeriesStack({ seriesList, className }: ImageGenSeriesSta
           .sort((a, b) => (a?.isPartial ? 1 : 0) - (b?.isPartial ? 1 : 0))
           .find(i => !i.isPartial);
         if (!final) return null;
-        return { src: final.cdnUrl, ratio: final.width / Math.max(1, final.height) };
+        return {
+          src: final.cdnUrl,
+          ratio: final.width / Math.max(1, final.height)
+        };
       })
       .filter(Boolean) as { src: string; ratio: number }[];
   }, [seriesList]);
@@ -62,17 +75,15 @@ export function ImageGenSeriesStack({ seriesList, className }: ImageGenSeriesSta
         <div className="mb-2 flex items-center justify-between">
           <div className="bg-muted/50 inline-flex rounded-md p-1">
             <Button
-              size="sm"
+              size="icon"
               variant={mode === "stack" ? "default" : "ghost"}
-              onClick={() => setMode("stack")}
-            >
+              onClick={() => setMode("stack")}>
               Stack
             </Button>
             <Button
-              size="sm"
+              size="icon"
               variant={mode === "replay" ? "default" : "ghost"}
-              onClick={() => setMode("replay")}
-            >
+              onClick={() => setMode("replay")}>
               Replay
             </Button>
           </div>
@@ -81,10 +92,9 @@ export function ImageGenSeriesStack({ seriesList, className }: ImageGenSeriesSta
               {seriesList.map((_, i) => (
                 <Button
                   key={i}
-                  size="xs"
+                  size="sm"
                   variant={activeSeries === i ? "default" : "secondary"}
-                  onClick={() => onSelectSeries(i)}
-                >
+                  onClick={() => onSelectSeries(i)}>
                   Series {i + 1}
                 </Button>
               ))}
@@ -98,7 +108,9 @@ export function ImageGenSeriesStack({ seriesList, className }: ImageGenSeriesSta
           <CardStack images={cards} />
         </div>
       ) : (
-        <ReplayPlayer series={seriesList[Math.min(activeSeries, seriesList.length - 1)]} />
+        seriesList && (
+          <ReplayPlayer series={seriesHelper(seriesList, activeSeries)} />
+        )
       )}
     </div>
   );
@@ -135,14 +147,17 @@ function ReplayPlayer({ series }: { series: ImageGenSeries }) {
   return (
     <div className="relative">
       <div className="mb-2 flex items-center gap-2">
-        <Button size="sm" variant="secondary" onClick={() => setIsPlaying(p => !p)}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => setIsPlaying(p => !p)}>
           {isPlaying ? "Pause" : "Play"}
         </Button>
         <div className="flex items-center gap-1">
           {[1, 2, 3, 5].map(s => (
             <Button
               key={s}
-              size="xs"
+              size="icon"
               variant={speed === (s as 1 | 2 | 3 | 5) ? "default" : "secondary"}
               onClick={() => setSpeed(s as 1 | 2 | 3 | 5)}>
               {s}x
@@ -166,4 +181,3 @@ function ReplayPlayer({ series }: { series: ImageGenSeries }) {
     </div>
   );
 }
-

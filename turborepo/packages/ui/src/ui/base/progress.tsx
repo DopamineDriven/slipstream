@@ -1,12 +1,12 @@
 "use client";
 
-import type { CustomComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 
 interface UploadProgressProps
-  extends CustomComponentPropsWithRef<typeof motion.circle> {
+  extends ComponentPropsWithRef<typeof motion.circle> {
   progress: number;
   size?: "sm" | "md" | "lg";
   showPercentage?: boolean;
