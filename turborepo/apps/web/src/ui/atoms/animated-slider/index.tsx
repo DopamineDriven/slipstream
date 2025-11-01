@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import * as Slider from "@radix-ui/react-slider";
 import { AnimateNumber } from "motion-plus/react";
 import { useMotionValue, useSpring, useVelocity } from "motion/react";
+import { AllModelsUnion, Provider } from "@slipstream/types";
 
 interface ImageGenCostSliderProps {
   value: number;
-  onValueChange: (value: number) => void;
+  onValueChange?: (value: number) => void;
   min?: number;
   max?: number;
   costPerImage?: number;
+  model?: AllModelsUnion
+  provider?: Provider
 }
 
 export function ImageGenCostSlider({

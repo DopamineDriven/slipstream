@@ -179,7 +179,7 @@ export function ImageGenControls({
                         Count
                       </Label>
                       <ImageGenCostSlider
-                        initialValue={settings.n ?? 1}
+                        value={settings?.n ?? 0}
                         model={model}
                         provider={provider}
                         min={1}

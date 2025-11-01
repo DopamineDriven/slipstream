@@ -54,7 +54,7 @@ export function ImgGenComponent({
     setIsGenerating(true);
     setGeneratedImage(null);
     setPartialImage(null);
-
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
     for (let i = 0; i < partials.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setPartialImage(partials[i]?.cdnUrl ?? null);
