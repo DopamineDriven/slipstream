@@ -19,6 +19,7 @@ const tsupConfig = (
 ) =>
   ({
     entry: [
+      "src/base/*.tsx",
       "src/globals.css",
       "src/index.ts",
       "src/icons/*.tsx",

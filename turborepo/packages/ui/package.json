@@ -17,6 +17,9 @@
         "dist/*.d.cts",
         "dist/*/index.d.ts"
       ],
+      "base": [
+        "dist/base/*.d.ts"
+      ],
       "globals.css": [
         "dist/globals.d.ts"
       ],
@@ -29,9 +32,6 @@
       ],
       "ui": [
         "dist/ui/*.d.ts"
-      ],
-      "ui/base": [
-        "dist/ui/base/*.d.ts"
       ]
     }
   },
@@ -43,6 +43,9 @@
           "dist/*.d.ts",
           "dist/*.d.cts",
           "dist/*/index.d.ts"
+        ],
+        "base": [
+          "dist/base/*.d.ts"
         ],
         "globals.css": [
           "dist/globals.d.ts"
@@ -56,9 +59,6 @@
         ],
         "ui": [
           "dist/ui/*.d.ts"
-        ],
-        "ui/base": [
-          "dist/ui/base/*.d.ts"
         ]
       }
     }
@@ -69,11 +69,11 @@
   "exports": {
     ".": "./dist/index.js",
     "./icons": "./dist/icons/index.js",
+    "./base/*": "./dist/base/*.js",
     "./globals.css": "./dist/globals.css",
     "./icons/*": "./dist/icons/*.js",
     "./lib/*": "./dist/lib/*.js",
-    "./ui/*": "./dist/ui/*.js",
-    "./ui/base/*": "./dist/ui/base/*.js"
+    "./ui/*": "./dist/ui/*.js"
   },
   "scripts": {
     "lint": "eslint",
