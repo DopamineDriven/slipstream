@@ -10,6 +10,7 @@ import type {
 import type { Logger as PinoLogger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
+import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   createXAISSEParser,
@@ -18,10 +19,46 @@ import {
   isReasoningDelta,
   isStartDelta
 } from "@/xai/sse.ts";
-import type { EventTypeMap, GrokModelIdUnion } from "@slipstream/types";
+import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type {
+  EventTypeMap,
+  GrokModelIdUnion,
+  ImgMetadataEntity,
+  S3Checksum,
+  S3StorageClass
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import { S3Storage } from "@slipstream/storage-s3";
 
-export class xAIService {
+type ImageGenPartialArr = [
+  number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
+  string, // cdnUrl (cloudfront url returned post-s3 upload)
+  string, // itemId (shared by all partials and final image)
+  number, // width
+  number, // height
+  string, // mime type
+  string, // s3 bucket
+  string, // s3 key
+  string, // s3 versionId
+  string, // s3ObjectId
+  string | undefined, // filename
+  string | undefined, // extension
+  string | undefined, // etag
+  number | undefined, // size
+  string | undefined, // s3 last modified
+  string | undefined, // content disposition
+  string | undefined, // cache control
+  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass | undefined, // s3 storage class
+  string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
+  ImgMetadataEntity | undefined, // ImageMetadata via extractor package
+  number | undefined, // upload duration
+  string | undefined, // requestMessageId
+  string | undefined, // jobId
+  string | undefined // revised_prompt
+];
+
+export class xAIService extends ModelService {
   private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
   private readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
   private logger: PinoLogger;
@@ -31,8 +68,11 @@ export class xAIService {
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     private extract: ExtractService,
+    private s3: S3Storage,
+    private isProd: boolean,
     private apiKey?: string
   ) {
+    super();
     this.logger = logger
       .getPinoInstance()
       .child(
@@ -136,6 +176,7 @@ export class xAIService {
 
   private async handleImgGen(
     model = "grok-2-image-1212" satisfies GrokModelIdUnion,
+    n = 1,
     messages: readonly (
       | {
           role: "user";
@@ -154,6 +195,7 @@ export class xAIService {
         }
       | { role: "system" | "assistant"; content: string }
     )[],
+    userId: string,
     apiKey?: string
   ) {
     const mostRecentMsg = messages.slice(-1)?.[0];
@@ -168,7 +210,9 @@ export class xAIService {
         body: JSON.stringify({
           model: "grok-2-image-1212" satisfies GrokModelIdUnion,
           prompt: this.handleMostRecentMsgForImg(mostRecentMsg),
-          n: 1
+          n,
+          response_format: "b64_json",
+          user: userId
         })
       });
       if (!imgResponse.ok) {
@@ -226,6 +270,7 @@ export class xAIService {
 
   private xAiFormat(
     isNewChat: boolean,
+    model: GrokModelIdUnion,
     msgs: ProviderChatRequestEntity["msgs"],
     systemPrompt?: ProviderChatRequestEntity["systemPrompt"],
     detail: "low" | "medium" | "high" = "medium"
@@ -249,7 +294,10 @@ export class xAIService {
     | { role: "assistant"; content: string }
   )[] {
     // Helper to build content parts from a message's attachments + text
-    const buildUserContent = (m: MessageSingleton<true>) => {
+    const buildUserContent = (
+      m: MessageSingleton<true>,
+      model: GrokModelIdUnion
+    ) => {
       const parts: (
         | { type: "text"; text: string }
         | {
@@ -257,7 +305,15 @@ export class xAIService {
             image_url: { url: string; detail?: "low" | "medium" | "high" };
           }
       )[] = [];
-      if (m.attachments && m.attachments.length > 0) {
+      if (
+        (model === "grok-2-image-1212" ||
+          model === "grok-2-vision-1212" ||
+          model === "grok-4-0709" ||
+          model === "grok-4-fast-non-reasoning" ||
+          model === "grok-4-fast-reasoning") &&
+        m.attachments &&
+        m.attachments.length > 0
+      ) {
         for (const att of m.attachments) {
           const url = att.cdnUrl ?? att.sourceUrl;
           if (url && att.mime?.startsWith("image/")) {
@@ -280,7 +336,7 @@ export class xAIService {
             ] as const)
           : ([{ role: "user", content: "" }] as const);
       }
-      const parts = buildUserContent(first);
+      const parts = buildUserContent(first, model);
       const userMsg =
         parts.length === 1 && parts?.[0] && parts?.[0].type === "text"
           ? ({ role: "user", content: parts?.[0]?.text } as const)
@@ -297,7 +353,7 @@ export class xAIService {
     if (last?.senderType === "USER") {
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const base = this.formatMsgs(history, systemPrompt);
-      const parts = buildUserContent(last);
+      const parts = buildUserContent(last, model);
       const userMsg =
         parts.length === 1 && parts?.[0]?.type === "text"
           ? ({ role: "user", content: parts?.[0].text } as const)
@@ -311,6 +367,143 @@ export class xAIService {
       systemPrompt
     );
     return formatted;
+  }
+
+  public async handleS3Upload(
+    url: string,
+    userId: string,
+    conversationId: string,
+    i: number,
+    itemId: string,
+    jobId: string,
+    requestMessageId: string
+  ) {
+    const [res, specs] = await Promise.all<
+      [Promise<Response>, Promise<ExpandedImgSpecs>]
+    >([
+      fetch(url, { keepalive: true }),
+      this.extract.extractRemote(url, 4096 * 32) as Promise<ExpandedImgSpecs>
+    ]);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch URL: ${res.status} ${res.statusText}`);
+    }
+
+    // Extract content-type from response if not provided in meta
+
+    // For Node.js 18+, we can use native stream conversion
+    // This is memory-efficient as it doesn't load the entire file into memory
+    const reader = res.body?.getReader();
+    if (reader) {
+      const chunks = Array.of<Uint8Array>();
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+        if (value) chunks.push(value);
+      }
+      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+      const completeBuffer = new Uint8Array(totalLength);
+      const uploadStart = performance.now();
+      const rt = await this.s3.uploadGenerated(completeBuffer, this.isProd, {
+        contentType: specs.contentType ?? "application/octet-stream",
+        filename: "",
+        origin: "GENERATED",
+        userId,
+        conversationId,
+        size: specs.byteSize
+      });
+      const uploadDelta = performance.now() - uploadStart;
+
+      const imgMeta = this.handleAssetMetadata(specs)?.img;
+      return {
+        index: i,
+        cdnUrl: rt.cdnUrl ?? "",
+        itemId: "",
+        width: specs.width,
+        height: specs.height,
+        mime: specs.contentType ?? rt.contentType ?? "application/octet-stream",
+        bucket: rt.bucket,
+        key: rt.key,
+        versionId: rt.versionId,
+        s3ObjectId: rt.s3ObjectId,
+        filename: "",
+        ext: specs.format,
+        etag: rt.etag,
+        size: specs.byteSize ?? rt.size,
+        s3LastModified: rt.lastModified,
+        ContentDisposition: rt.contentDisposition,
+        CacheControl: rt.cacheControl,
+        Checksum: rt.checksum,
+        StorageClass: rt.storageClass,
+        generationGroupId: "grok-group", // Assuming res has an ID
+        image: imgMeta,
+        uploadDuration: uploadDelta,
+        requestMessageId,
+        jobId,
+        jobIndex: 0,
+        seriesId: itemId,
+        seriesIndex: i,
+        kind: "FINAL" // Or "PARTIAL" if handling partials
+      };
+    }
+  }
+
+  private async generateId(target: "seriesId" | "generationGroupId") {
+    const { nanoid } = await import("nanoid");
+    if (target === "generationGroupId") {
+      const generationGroupId = "resp_" + nanoid();
+      return generationGroupId;
+    } else return nanoid();
+  }
+
+  private mapPersistenceImgGenArr(props: ImageGenPartialArr[]) {
+    return props.map((t, o) => {
+      return {
+        index: t[0] ?? o,
+        cdnUrl: t[1],
+        itemId: t[2],
+        width: t[3],
+        height: t[4],
+        mime: t[5],
+        bucket: t[6],
+        key: t[7],
+        versionId: t[8],
+        s3ObjectId: t[9],
+        filename: t[10],
+        ext: t[11],
+        etag: t[12],
+        size: t[13],
+        s3LastModified: t[14],
+        ContentDisposition: t[15],
+        CacheControl: t[16],
+        Checksum: t[17],
+        StorageClass: t[18],
+        generationGroupId: t[19],
+        image: t[20],
+        uploadDuration: t[21],
+        requestMessageId: t[22],
+        jobId: t[23],
+        jobIndex: 0,
+        seriesIndex: t[0],
+        seriesId: t[2],
+
+        kind: "FINAL"
+      } as const;
+    });
+  }
+
+  private mapImgGenArr(props: ImageGenPartialArr[]) {
+    return props.map((t, o) => {
+      return {
+        index: t[0] ?? o,
+        cdnUrl: t[1],
+        width: t[3],
+        height: t[4],
+        mime: t[5]
+      };
+    });
   }
 
   public async handleXAIAiChatRequest({
@@ -327,9 +520,17 @@ export class xAIService {
     model = "grok-4-0709" satisfies GrokModelIdUnion,
     systemPrompt,
     temperature,
+    imgGenEnabled,
+    imgGenFields,
+    requestMessageId,
+    jobId,
     title,
     topP
   }: ProviderChatRequestEntity) {
+    let partialImgArr = Array.of<ImageGenPartialArr>(),
+      tInitial = 0,
+      tDelta = 0,
+      totalDur = 0;
     const provider = "grok" as const;
     let grokThinkingStartTime: number | null = null,
       grokThinkingDuration = 0,
@@ -338,13 +539,22 @@ export class xAIService {
       grokAgg = "",
       iThink = 0,
       hasAggregateFinal = false;
-    if (model === ("grok-2-image-1212" satisfies GrokModelIdUnion)) {
+    const m = model as GrokModelIdUnion;
+    if (m === "grok-2-image-1212" && imgGenEnabled) {
+      const generationGroupId = await this.generateId("generationGroupId");
+      const n = this.handleImgGenCount(provider, m, {
+        n: imgGenFields?.n
+      });
+      totalDur = performance.now();
       const res = await this.handleImgGen(
-        model,
-        this.xAiFormat(isNewChat, msgs, systemPrompt, "medium"),
+        m,
+        n,
+        this.xAiFormat(isNewChat, m, msgs, systemPrompt, "high"),
+        userId,
         apiKey ?? undefined
       );
       grokAgg += "*Image Gen In Process...*";
+      // fire off the very first message for UX
       ws.send(
         JSON.stringify({
           type: "ai_chat_chunk",
@@ -357,7 +567,7 @@ export class xAIService {
           thinkingDuration: undefined,
           isThinking: false,
           topP,
-          model,
+          model: m,
           chunk: grokAgg,
           done: false
         })
@@ -368,7 +578,7 @@ export class xAIService {
             type: "ai_chat_error",
             provider: provider,
             conversationId,
-            model,
+            model: m,
             systemPrompt,
             temperature,
             topP,
@@ -382,7 +592,7 @@ export class xAIService {
           type: "ai_chat_error",
           provider,
           conversationId,
-          model,
+          model: m,
           title,
           systemPrompt,
           temperature,
@@ -393,8 +603,84 @@ export class xAIService {
         });
         return;
       } else {
-        grokAgg += this.extract.grokContent(this.extract.grokMapper(res.data));
+        let i = 0,
+          a;
+        i < (n ?? 1);
 
+        for (const d of res.data) {
+          i++;
+          const b64 = Buffer.from(d.b64_json, "base64");
+
+          const [getIt, seriesId] = await Promise.all([
+            this.extract.extractRemote(
+              b64,
+              4096 * 48
+            ) as Promise<ExpandedImgSpecs>,
+            this.generateId("seriesId")
+          ]);
+          const itemId = seriesId.concat(`-${0}`);
+          const filename = itemId
+            .concat("-")
+            .concat("0")
+            .concat(`.${getIt.format}`);
+
+          tInitial = performance.now();
+          const rtHelper = await this.s3.uploadGenerated(b64, this.isProd, {
+            contentType: getIt.contentType ?? "image/jpeg",
+            filename,
+            origin: "GENERATED",
+            userId,
+            size: getIt.byteSize,
+            conversationId
+          });
+          a = rtHelper;
+          tDelta = performance.now() - tInitial;
+
+          const imgMeta = this.handleAssetMetadata(getIt).img;
+          const uploadTime = tDelta;
+          partialImgArr.push([
+            0,
+            rtHelper.cdnUrl ?? "",
+            itemId,
+            getIt.width,
+            getIt.height,
+            getIt.contentType ?? rtHelper.contentType ?? "",
+            rtHelper.bucket,
+            rtHelper.key,
+            rtHelper.versionId,
+            rtHelper.s3ObjectId,
+            filename,
+            rtHelper.extension,
+            rtHelper?.etag,
+            getIt?.byteSize ?? rtHelper?.size,
+            rtHelper?.lastModified,
+            rtHelper?.contentDisposition,
+            rtHelper?.cacheControl,
+            rtHelper?.checksum,
+            rtHelper?.storageClass,
+            itemId,
+            imgMeta,
+            uploadTime,
+            requestMessageId,
+            jobId,
+            d.revised_prompt
+          ]);
+          tInitial = 0;
+          tDelta = 0;
+          continue;
+        }
+        const remapFinals = this.mapPersistenceImgGenArr(partialImgArr).map(
+          v => {
+            const { generationGroupId: _placeholder, ...rest } = v;
+            return {
+              ...rest,
+              generationGroupId
+            };
+          }
+        );
+
+        const rem = this.mapImgGenArr(partialImgArr);
+        const dur = (performance.now() - totalDur);
         await this.prisma.handleAiChatResponse({
           chunk: grokAgg,
           conversationId,
@@ -402,12 +688,39 @@ export class xAIService {
           provider,
           title,
           userId,
-          model,
+          model: m,
           systemPrompt,
           thinkingDuration: undefined,
           thinkingText: undefined,
           temperature,
-          topP
+          topP,
+          imgGenEnabled: true,
+          jobId,
+          uploadDuration: dur,
+          requestMessageId,
+          usage: undefined,
+          imgGenFields: {
+            partialImages: undefined,
+            images: remapFinals,
+            actualCount: remapFinals.length,
+            duration: dur,
+            outputAspectRatio:
+              (remapFinals[0]?.width ?? 0) / (remapFinals[0]?.height ?? 0),
+            outputBackground: undefined,
+            outputCompression: undefined,
+            outputFormat: a?.extension,
+            outputHeight: remapFinals[0]?.height,
+            outputWidth: remapFinals[0]?.width,
+            outputMime: remapFinals[0]?.mime,
+            outputQuality: undefined,
+            outputSize: undefined,
+            partialImagesActual: 0,
+            partialImagesRequested: 0,
+            requestedCount: imgGenFields?.n,
+            revisedPrompt: partialImgArr?.[0]?.[24],
+            seed: undefined,
+            size: a?.size
+          }
         });
 
         ws.send(
@@ -422,9 +735,32 @@ export class xAIService {
             title,
             temperature,
             topP,
-            model,
+            model: m,
             chunk: grokAgg,
-            done: true
+            done: true,
+            imgGenEnabled: true,
+            imgGenFields: {
+              partialImages: undefined,
+              images: rem,
+              actualCount: remapFinals.length,
+              duration: dur,
+              outputAspectRatio:
+                (remapFinals[0]?.width ?? 0) / (remapFinals[0]?.height ?? 0),
+              outputBackground: undefined,
+              outputCompression: undefined,
+              outputFormat: a?.extension,
+              outputHeight: remapFinals[0]?.height,
+              outputWidth: remapFinals[0]?.width,
+              outputMime: remapFinals[0]?.mime,
+              outputQuality: undefined,
+              outputSize: undefined,
+              partialImagesActual: 0,
+              partialImagesRequested: 0,
+              requestedCount: imgGenFields?.n,
+              revisedPrompt: partialImgArr?.[0]?.[24],
+              seed: undefined,
+              size: a?.size
+            }
           } satisfies EventTypeMap["ai_chat_response"])
         );
         void this.redis.publishTypedEvent(streamChannel, "ai_chat_response", {
@@ -439,9 +775,32 @@ export class xAIService {
           thinkingText: grokThinkingAgg,
           topP,
           provider,
-          model,
+          model: m,
           chunk: grokAgg,
-          done: true
+          done: true,
+          imgGenEnabled: true,
+          imgGenFields: {
+            partialImages: undefined,
+            images: rem,
+            actualCount: remapFinals.length,
+            duration: dur,
+            outputAspectRatio:
+              (remapFinals[0]?.width ?? 0) / (remapFinals[0]?.height ?? 0),
+            outputBackground: undefined,
+            outputCompression: undefined,
+            outputFormat: a?.extension,
+            outputHeight: remapFinals[0]?.height,
+            outputWidth: remapFinals[0]?.width,
+            outputMime: remapFinals[0]?.mime,
+            outputQuality: undefined,
+            outputSize: undefined,
+            partialImagesActual: 0,
+            partialImagesRequested: 0,
+            requestedCount: imgGenFields?.n,
+            revisedPrompt: partialImgArr?.[0]?.[24],
+            seed: undefined,
+            size: a?.size
+          }
         });
 
         // Clear saved state on successful completion
@@ -450,15 +809,20 @@ export class xAIService {
       }
     }
     try {
-      const formatted = this.xAiFormat(isNewChat, msgs, systemPrompt, "medium");
+      const formatted = this.xAiFormat(
+        isNewChat,
+        m,
+        msgs,
+        systemPrompt,
+        "high"
+      );
 
       // this.logger.debug(JSON.stringify(formatted, null, 2));
-      const streamer = this.stream(
-        model as GrokModelIdUnion,
-        formatted,
-        apiKey ?? undefined,
-        { max_tokens, top_p: topP, temperature }
-      );
+      const streamer = this.stream(m, formatted, apiKey ?? undefined, {
+        max_tokens,
+        top_p: topP,
+        temperature
+      });
 
       for await (const chunk of streamer) {
         let text: string | undefined = undefined,
@@ -517,24 +881,12 @@ export class xAIService {
         if (
           thinkingText &&
           grokIsCurrentlyThinking &&
-          (model === ("grok-code-fast-1" satisfies GrokModelIdUnion) ||
-            model === ("grok-3-mini-fast" satisfies GrokModelIdUnion) ||
-            model === ("grok-3-mini" satisfies GrokModelIdUnion) ||
-            model === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))
+          (m === ("grok-code-fast-1" satisfies GrokModelIdUnion) ||
+            m === ("grok-3-mini" satisfies GrokModelIdUnion) ||
+            m === ("grok-4-0709" satisfies GrokModelIdUnion) ||
+            m === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))
         ) {
           iThink++;
-          // if (
-          //   model === "grok-code-fast-1" &&
-          //   iThink > 3 &&
-          //   Math.abs(grokThinkingAgg.length - thinkingText.length) <= 4 * iThink
-          // ) {
-          //   hasAggregateFinal = true;
-          //   const prependNew = `\n` + thinkingText;
-          //   finalThinkingChunk =
-          //     grokThinkingAgg.length < prependNew.length
-          //       ? prependNew.substring(grokThinkingAgg.length)
-          //       : "";
-          // }
           console.info(`[${iThink}]: ${thinkingText}`);
           if (hasAggregateFinal) {
             grokThinkingAgg += finalThinkingChunk;
@@ -561,7 +913,7 @@ export class xAIService {
                 ? performance.now() - grokThinkingStartTime
                 : undefined,
               topP,
-              model,
+              model: m,
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
           );
@@ -570,7 +922,7 @@ export class xAIService {
             type: "ai_chat_chunk",
             conversationId,
             userId,
-            model,
+            model: m,
             title,
             isThinking: grokIsCurrentlyThinking,
             thinkingDuration: grokThinkingStartTime
@@ -603,7 +955,7 @@ export class xAIService {
                 grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
               isThinking: false,
               topP,
-              model,
+              model: m,
               chunk: text,
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
@@ -613,7 +965,7 @@ export class xAIService {
             type: "ai_chat_chunk",
             conversationId,
             userId,
-            model,
+            model: m,
             title,
             thinkingDuration:
               grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
@@ -632,7 +984,7 @@ export class xAIService {
               conversationId,
               chunks,
               {
-                model,
+                model: m,
                 provider,
                 title,
                 totalChunks: chunks.length,
@@ -654,7 +1006,7 @@ export class xAIService {
             provider,
             title,
             userId,
-            model,
+            model: m,
             systemPrompt,
             thinkingDuration:
               grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
@@ -676,7 +1028,7 @@ export class xAIService {
               title,
               temperature,
               topP,
-              model,
+              model: m,
               chunk: grokAgg,
               done
             } satisfies EventTypeMap["ai_chat_response"])
@@ -694,7 +1046,7 @@ export class xAIService {
             thinkingText: grokThinkingAgg,
             topP,
             provider,
-            model,
+            model: m,
             chunk: grokAgg,
             done
           });
@@ -711,7 +1063,7 @@ export class xAIService {
           type: "ai_chat_error",
           provider: provider,
           conversationId,
-          model,
+          model: m,
           systemPrompt,
           temperature,
           topP,
@@ -725,7 +1077,7 @@ export class xAIService {
         type: "ai_chat_error",
         provider,
         conversationId,
-        model,
+        model: m,
         title,
         systemPrompt,
         temperature,
@@ -738,7 +1090,7 @@ export class xAIService {
         conversationId,
         chunks,
         {
-          model,
+          model: m,
           provider,
           title,
           totalChunks: chunks.length,

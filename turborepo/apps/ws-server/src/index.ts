@@ -119,6 +119,8 @@ async function exe() {
       prisma,
       redisInstance,
       extract,
+      s3,
+      isProd,
       cfg.X_AI_KEY
     );
 

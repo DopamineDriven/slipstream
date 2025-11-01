@@ -81,7 +81,8 @@ export type ImageGenPartialArr = [
   ImgMetadataEntity | undefined, // ImageMetadata via extractor package
 number | undefined, // upload duration
 string | undefined, // requestMessageId
-string | undefined // jobId
+string | undefined, // jobId
+string | undefined // revised_prompt
 ];
 
 export type HandleAiChatRequestRT = (

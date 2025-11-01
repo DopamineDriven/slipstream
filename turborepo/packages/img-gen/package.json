@@ -43,6 +43,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "prebuild":"pnpm test",
     "dev": "pnpm build",
     "lint": "eslint",
     "clean": "git clean -xdf .turbo dist node_modules",

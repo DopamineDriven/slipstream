@@ -1,6 +1,7 @@
 import type {
   AIChatRequest,
   AllModelsUnion,
+  GetModelUtilRT,
   GoogleImagenGenerateImagesConfig,
   GoogleSafetyFilterLevel,
   Provider,
@@ -8,25 +9,27 @@ import type {
 } from "@slipstream/types";
 
 export class ProviderValidation {
-  public isImgGenCapableModel(provider: Provider, model?: AllModelsUnion) {
-    if (!model) return false;
-    switch (provider) {
+  public isImgGenCapableModel<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<T>
+  ) {
+    const p = provider as Provider;
+    if (typeof model === "undefined") return false;
+    switch (p) {
       case "anthropic":
       case "meta":
       case "vercel": {
         return false;
       }
       case "grok": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "grok-2-image-1212": {
             return true;
           }
           case "grok-2-vision-1212":
           case "grok-3":
-          case "grok-3-fast":
           case "grok-3-mini":
-          case "grok-3-mini-fast":
-          case "grok-4-0709":
           case "grok-4-fast-non-reasoning":
           case "grok-4-fast-reasoning":
           case "grok-code-fast-1":
@@ -36,7 +39,8 @@ export class ProviderValidation {
         }
       }
       case "gemini": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "gemini-2.5-flash-image":
           case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
@@ -60,7 +64,8 @@ export class ProviderValidation {
         }
       }
       case "openai": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "dall-e-2":
           case "dall-e-3":
           case "gpt-image-1":
@@ -71,6 +76,8 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "o3":
+          case "gpt-5-pro":
+          case "gpt-5-chat-latest":
           case "gpt-5-mini":
           case "gpt-5-nano":
           case "gpt-5": {
@@ -78,9 +85,15 @@ export class ProviderValidation {
           }
           case "gpt-3.5-turbo":
           case "gpt-4":
+          case "chatgpt-4o-latest":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
           case "gpt-4-turbo":
           case "gpt-5-codex":
-          case "gpt-5-pro":
           case "o3-mini":
           case "o3-pro":
           case "o4-mini":
@@ -95,24 +108,27 @@ export class ProviderValidation {
     }
   }
 
-  public isPureImgGenModel(provider: Provider, model?: AllModelsUnion) {
+  public isPureImgGenModel<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<T>
+  ) {
+    const p = provider as Provider;
     if (!model) return false;
-    switch (provider) {
+    switch (p) {
       case "anthropic":
       case "meta":
       case "vercel": {
         return false;
       }
       case "grok": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "grok-2-image-1212": {
             return true;
           }
           case "grok-2-vision-1212":
           case "grok-3":
-          case "grok-3-fast":
           case "grok-3-mini":
-          case "grok-3-mini-fast":
           case "grok-4-0709":
           case "grok-4-fast-non-reasoning":
           case "grok-4-fast-reasoning":
@@ -123,7 +139,8 @@ export class ProviderValidation {
         }
       }
       case "gemini": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "gemini-2.5-flash-image":
           case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
@@ -147,7 +164,8 @@ export class ProviderValidation {
         }
       }
       case "openai": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
           case "dall-e-2":
           case "dall-e-3":
           case "gpt-image-1":
@@ -167,6 +185,14 @@ export class ProviderValidation {
           case "gpt-5-mini":
           case "gpt-5-nano":
           case "gpt-5-pro":
+          case "chatgpt-4o-latest":
+          case "gpt-5-chat-latest":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
           case "o3":
           case "o3-mini":
           case "o3-pro":
@@ -201,106 +227,200 @@ export class ProviderValidation {
     }
   }
 
-  public handleImgGenCount = (
-    model?: AllModelsUnion,
+  public handleImgGenCount<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<typeof provider>,
     data?: { n?: number }
-  ) => {
+  ) {
+    const p = provider as Provider;
     if (!model) return undefined;
-    if (
-      !(
-        model === "gpt-4.1" ||
-        model === "dall-e-2" ||
-        model === "dall-e-3" ||
-        model === "imagen-3.0-generate-002" ||
-        model === "imagen-4.0-fast-generate-001" ||
-        model === "imagen-4.0-generate-001" ||
-        model === "imagen-4.0-ultra-generate-001" ||
-        model === "gemini-2.5-flash-image" ||
-        model === "grok-2-image-1212" ||
-        model === "gpt-4.1-mini" ||
-        model === "gpt-4.1-nano" ||
-        model === "gpt-5" ||
-        model === "gpt-5-mini" ||
-        model === "gpt-5-nano" ||
-        model === "gpt-4o" ||
-        model === "gpt-4o-mini" ||
-        model === "o3" ||
-        model === "gpt-image-1" ||
-        model === "gpt-image-1-mini"
-      )
-    )
-      return undefined;
-    switch (model) {
-      case "dall-e-3": {
-        if (data?.n && data?.n > 0 && data.n < 2) {
-          return data.n;
-        } else return 1;
+    switch (p) {
+      case "anthropic":
+      case "meta":
+      case "vercel": {
+        return undefined;
       }
-      case "imagen-3.0-generate-002":
-      case "imagen-4.0-fast-generate-001":
-      case "imagen-4.0-generate-001":
-      case "imagen-4.0-ultra-generate-001": {
-        if (data?.n && data.n >= 1 && data.n < 5) {
-          return data.n;
-        } else return 4;
+      case "grok": {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
+          case "grok-2-image-1212": {
+            if (data?.n) {
+              if (data.n < 1) return 1;
+              if (data.n > 10) return 10;
+              return data.n;
+            } else return 1;
+          }
+          case "grok-2-vision-1212":
+          case "grok-3":
+          case "grok-3-mini":
+          case "grok-4-0709":
+          case "grok-4-fast-non-reasoning":
+          case "grok-4-fast-reasoning":
+          case "grok-code-fast-1":
+          default: {
+            return undefined;
+          }
+        }
       }
-      case "dall-e-2":
-      case "gemini-2.5-flash-image":
-      case "gpt-4.1":
-      case "gpt-4.1-mini":
-      case "gpt-4.1-nano":
-      case "gpt-4o":
-      case "gpt-4o-mini":
-      case "gpt-5":
-      case "gpt-5-mini":
-      case "gpt-5-nano":
-      case "gpt-image-1":
-      case "gpt-image-1-mini":
-      case "grok-2-image-1212":
-      case "o3":
+      case "gemini": {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
+          case "imagen-3.0-generate-002":
+          case "imagen-4.0-fast-generate-001":
+          case "imagen-4.0-generate-001":
+          case "imagen-4.0-ultra-generate-001": {
+            if (data?.n) {
+              if (data.n < 1) return 1;
+              if (data.n > 4) return 4;
+              return data.n;
+            } else return 4;
+          }
+          case "gemini-2.5-flash-image": {
+            if (data?.n) {
+              if (data.n < 1) return 1;
+              if (data.n > 10) return 10;
+              return data.n;
+            } else return 1;
+          }
+          case "gemini-2.0-flash":
+          case "gemini-2.0-flash-lite":
+          case "gemini-2.5-flash":
+          case "gemini-2.5-flash-lite":
+          case "gemini-2.5-pro":
+          case "veo-2.0-generate-001":
+          case "veo-3.0-fast-generate-001":
+          case "veo-3.0-generate-001":
+          case "veo-3.1-fast-generate-preview":
+          case "veo-3.1-generate-preview":
+          default: {
+            return undefined;
+          }
+        }
+      }
+      case "openai": {
+        const m = model as GetModelUtilRT<typeof p>;
+        /**
+         * dall-e-3 and image_generation tool invoking recruiters via the responses api only handle n=1
+         */
+        switch (m) {
+          case "dall-e-3":
+          case "gpt-4.1":
+          case "gpt-4.1-mini":
+          case "gpt-4.1-nano":
+          case "gpt-4o":
+          case "gpt-4o-mini":
+          case "o3":
+          case "gpt-5-pro":
+          case "gpt-5-mini":
+          case "gpt-5-nano":
+          case "gpt-5-chat-latest":
+          case "gpt-5": {
+            if (data?.n) {
+              if (data.n < 1) return 1;
+              if (data.n > 1) return 1;
+              return data.n;
+            } else return 1;
+          }
+          case "dall-e-2":
+          case "gpt-image-1":
+          case "gpt-image-1-mini": {
+            if (data?.n) {
+              if (data.n < 1) return 1;
+              if (data.n > 10) return 10;
+              return data.n;
+            } else return 1;
+          }
+          case "chatgpt-4o-latest":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
+          case "gpt-3.5-turbo":
+          case "gpt-4":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
+          case "gpt-4-turbo":
+          case "gpt-5-codex":
+          case "o3-mini":
+          case "o3-pro":
+          case "o4-mini":
+          default: {
+            return undefined;
+          }
+        }
+      }
       default: {
-        if (data?.n) {
-          if (data.n < 1) return 1;
-          if (data.n > 10) return 10;
-          return data.n;
-        } else return 1;
+        return undefined;
       }
     }
-  };
+  }
 
-  public handleImgGenBg(
+  public handleImgGenBg<const T extends Provider = Provider>(
     provider: Provider,
-    model?: AllModelsUnion,
+    model?: GetModelUtilRT<T>,
     data?: {
       background?: "transparent" | "opaque" | "auto" | undefined;
       format?: "png" | "jpeg" | "webp";
     }
   ) {
-    if (provider !== "openai") return undefined;
-    if (!model) return undefined;
-    if (
-      !(
-        model === "gpt-4.1" ||
-        model === "gpt-4.1-mini" ||
-        model === "gpt-4.1-nano" ||
-        model === "gpt-5" ||
-        model === "gpt-5-mini" ||
-        model === "gpt-5-nano" ||
-        model === "gpt-4o" ||
-        model === "gpt-4o-mini" ||
-        model === "o3" ||
-        model === "gpt-image-1" ||
-        model === "gpt-image-1-mini"
-      )
-    )
-      return undefined;
-    if (!(data?.format === "png" || data?.format === "webp")) return undefined;
-    if (
-      typeof data?.background !== "undefined" &&
-      /^(transparent|opaque|auto)$/gm.test(data.background)
-    ) {
-      return data?.background;
-    } else return "auto";
+    const p = provider as Provider;
+    if (typeof model === "undefined") return undefined;
+    switch (p) {
+      case "openai": {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
+          case "gpt-image-1":
+          case "gpt-image-1-mini":
+          case "gpt-4.1":
+          case "gpt-4.1-mini":
+          case "gpt-4.1-nano":
+          case "gpt-4o":
+          case "gpt-4o-mini":
+          case "o3":
+          case "gpt-5-chat-latest":
+          case "gpt-5-pro":
+          case "gpt-5-mini":
+          case "gpt-5-nano":
+          case "gpt-5": {
+            if (!(data?.format === "png" || data?.format === "webp"))
+              return undefined;
+            if (
+              typeof data?.background !== "undefined" &&
+              /^(transparent|opaque|auto)$/gm.test(data.background)
+            ) {
+              return data?.background;
+            } else return "auto";
+          }
+          case "dall-e-2":
+          case "dall-e-3":
+          case "gpt-3.5-turbo":
+          case "gpt-4":
+          case "chatgpt-4o-latest":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
+          case "gpt-4-turbo":
+          case "gpt-5-codex":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
+          case "o3-mini":
+          case "o3-pro":
+          case "o4-mini":
+          default: {
+            return undefined;
+          }
+        }
+      }
+      case "anthropic":
+      case "gemini":
+      case "grok":
+      case "meta":
+      case "vercel":
+      default: {
+        return undefined;
+      }
+    }
   }
 
   /**
@@ -322,6 +442,8 @@ export class ProviderValidation {
         model === "gpt-5" ||
         model === "gpt-5-mini" ||
         model === "gpt-5-nano" ||
+        model === "gpt-5-chat-latest" ||
+        model === "gpt-5-pro" ||
         model === "gpt-4o" ||
         model === "gpt-4o-mini" ||
         model === "o3" ||
@@ -345,35 +467,42 @@ export class ProviderValidation {
       output_format?: string;
     }
   ) {
+    if (!(provider === "openai" || provider === "gemini")) return undefined;
+
     if (!model) return undefined;
+
+    const m = model as GetModelUtilRT<typeof provider>;
+
     if (
       !(
-        model === "gpt-4.1" ||
-        model === "imagen-3.0-generate-002" ||
-        model === "imagen-4.0-fast-generate-001" ||
-        model === "imagen-4.0-generate-001" ||
-        model === "imagen-4.0-ultra-generate-001" ||
-        model === "gpt-4.1-mini" ||
-        model === "gpt-4.1-nano" ||
-        model === "gpt-5" ||
-        model === "gpt-5-mini" ||
-        model === "gpt-5-nano" ||
-        model === "gpt-4o" ||
-        model === "gpt-4o-mini" ||
-        model === "o3" ||
-        model === "gpt-image-1" ||
-        model === "gpt-image-1-mini"
+        m === "gpt-4.1" ||
+        m === "imagen-3.0-generate-002" ||
+        m === "imagen-4.0-fast-generate-001" ||
+        m === "imagen-4.0-generate-001" ||
+        m === "imagen-4.0-ultra-generate-001" ||
+        m === "gpt-4.1-mini" ||
+        m === "gpt-4.1-nano" ||
+        m === "gpt-5-chat-latest" ||
+        m === "gpt-5-pro" ||
+        m === "gpt-5" ||
+        m === "gpt-5-mini" ||
+        m === "gpt-5-nano" ||
+        m === "gpt-4o" ||
+        m === "gpt-4o-mini" ||
+        m === "o3" ||
+        m === "gpt-image-1" ||
+        m === "gpt-image-1-mini"
       )
-    )
+    ) {
       return undefined;
-    if (!(provider === "openai" || provider === "gemini")) return undefined;
+    }
     const f = data?.output_format as "png" | "jpeg" | "webp" | undefined;
 
     if (
-      model === "imagen-3.0-generate-002" ||
-      model === "imagen-4.0-fast-generate-001" ||
-      model === "imagen-4.0-generate-001" ||
-      model === "imagen-4.0-ultra-generate-001"
+      m === "imagen-3.0-generate-002" ||
+      m === "imagen-4.0-fast-generate-001" ||
+      m === "imagen-4.0-generate-001" ||
+      m === "imagen-4.0-ultra-generate-001"
     ) {
       if (typeof data?.output_compression === "undefined") return 75;
       return data?.output_compression >= 0 && data?.output_compression <= 100
@@ -404,6 +533,8 @@ export class ProviderValidation {
         model === "gpt-4.1" ||
         model === "gpt-4.1-mini" ||
         model === "gpt-4.1-nano" ||
+        model === "gpt-5-chat-latest" ||
+        model === "gpt-5-pro" ||
         model === "gpt-5" ||
         model === "gpt-5-mini" ||
         model === "gpt-5-nano" ||
@@ -460,7 +591,23 @@ export class ProviderValidation {
         return undefined;
       }
       case "gemini": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof provider>;
+        switch (m) {
+          case "imagen-3.0-generate-002": {
+            if (data?.output_quality && /^1K$/gm.test(data.output_quality)) {
+              return data.output_quality as "1K";
+            } else return "1K";
+          }
+          case "imagen-4.0-fast-generate-001":
+          case "imagen-4.0-generate-001":
+          case "imagen-4.0-ultra-generate-001": {
+            if (
+              data?.output_quality &&
+              /^(1|2)K$/gm.test(data.output_quality)
+            ) {
+              return data.output_quality as "1K" | "2K";
+            } else return "1K";
+          }
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -471,37 +618,22 @@ export class ProviderValidation {
           case "veo-3.0-generate-001":
           case "veo-3.1-fast-generate-preview":
           case "veo-3.1-generate-preview":
-          case "gemini-2.5-flash-image": {
-            return undefined;
-          }
-          case "imagen-3.0-generate-002": {
-            if (data?.output_quality && /^1K$/gm.test(data.output_quality)) {
-              return data.output_quality;
-            } else return "1K";
-          }
-          case "imagen-4.0-fast-generate-001":
-          case "imagen-4.0-generate-001":
-          case "imagen-4.0-ultra-generate-001": {
-            if (
-              data?.output_quality &&
-              /^(1|2)K$/gm.test(data.output_quality)
-            ) {
-              return data.output_quality;
-            } else return "1K";
-          }
+          case "gemini-2.5-flash-image":
           default: {
             return undefined;
           }
         }
       }
       case "openai": {
-        switch (model) {
+        if (!model) return "auto";
+        const m = model as GetModelUtilRT<typeof provider>;
+        switch (m) {
           case "dall-e-2": {
             if (
               data?.output_quality &&
               /^(standard|auto)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality;
+              return data.output_quality as "standard" | "auto";
             } else return "auto";
           }
           case "dall-e-3": {
@@ -509,7 +641,7 @@ export class ProviderValidation {
               data?.output_quality &&
               /^(standard|auto|hd)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality;
+              return data.output_quality as "standard" | "hd" | "auto";
             } else return "auto";
           }
           case "gpt-4.1":
@@ -519,6 +651,8 @@ export class ProviderValidation {
           case "gpt-4o-mini":
           case "gpt-5":
           case "gpt-5-mini":
+          case "gpt-5-chat-latest":
+          case "gpt-5-pro":
           case "gpt-5-nano":
           case "gpt-image-1":
           case "gpt-image-1-mini":
@@ -527,14 +661,20 @@ export class ProviderValidation {
               data?.output_quality &&
               /^(high|medium|low|auto)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality;
+              return data.output_quality as "high" | "medium" | "low" | "auto";
             } else return "auto";
           }
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "gpt-4-turbo":
+          case "chatgpt-4o-latest":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
           case "gpt-5-codex":
-          case "gpt-5-pro":
           case "o3-mini":
           case "o3-pro":
           case "o4-mini": {
@@ -587,9 +727,15 @@ export class ProviderValidation {
             case "o4-mini":
             case "gpt-3.5-turbo":
             case "gpt-4":
+            case "chatgpt-4o-latest":
+            case "o3-deep-research":
+            case "o4-mini-deep-research":
+            case "o1-pro":
+            case "sora-2":
+            case "sora-2-pro":
             case "gpt-4-turbo":
             case "gpt-5-codex":
-            case "gpt-5-pro": {
+            case "o1": {
               return undefined;
             }
             case "gpt-4.1":
@@ -597,6 +743,8 @@ export class ProviderValidation {
             case "gpt-4.1-nano":
             case "gpt-4o":
             case "gpt-4o-mini":
+            case "gpt-5-chat-latest":
+            case "gpt-5-pro":
             case "gpt-5":
             case "gpt-5-mini":
             case "gpt-5-nano":
@@ -641,7 +789,8 @@ export class ProviderValidation {
         return undefined;
       }
       case "gemini": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof provider> | undefined;
+        switch (m) {
           case "gemini-2.5-flash-image": {
             if (
               data?.output_size &&
@@ -675,13 +824,15 @@ export class ProviderValidation {
           case "veo-3.1-generate-preview": {
             return undefined;
           }
+          case undefined:
           default: {
             return "1:1";
           }
         }
       }
       case "openai": {
-        switch (model) {
+        const m = model as GetModelUtilRT<typeof provider> | undefined;
+        switch (m) {
           case "dall-e-2": {
             if (
               data?.output_size &&
@@ -704,6 +855,8 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "gpt-5":
+          case "gpt-5-pro":
+          case "gpt-5-chat-latest":
           case "gpt-5-mini":
           case "gpt-5-nano":
           case "gpt-image-1":
@@ -719,13 +872,20 @@ export class ProviderValidation {
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "gpt-4-turbo":
+          case "chatgpt-4o-latest":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
           case "gpt-5-codex":
-          case "gpt-5-pro":
           case "o3-mini":
           case "o3-pro":
           case "o4-mini": {
             return undefined;
           }
+          case undefined:
           default: {
             return "auto";
           }
@@ -772,7 +932,9 @@ export class ProviderValidation {
       }),
       negativePrompt = data?.imgGenFields?.negativePrompt ?? undefined,
       seed = data?.imgGenFields?.seed ?? undefined,
-      nRequested = this.handleImgGenCount(model, { n: data.imgGenFields?.n }),
+      nRequested = this.handleImgGenCount(provider, model, {
+        n: data.imgGenFields?.n
+      }),
       inputFidelity = this.handleInputFidelity(provider, model, {
         input_fidelity: data.imgGenFields?.input_fidelity
       }),

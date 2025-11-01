@@ -11,104 +11,19 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
 
-/**
- const providerModelChatApi = {
-  openai: [
-    "gpt-5",
-    "gpt-5-codex",
-    "gpt-5-mini",
-    "gpt-5-nano",
-    "gpt-5-pro",
-    "gpt-5-chat-latest",
-    "gpt-4.1",
-    "gpt-4.1-mini",
-    "gpt-4.1-nano",
-    "gpt-4o",
-    "gpt-4o-mini",
-    "chatgpt-4o-latest",
-    "o3",
-    "o3-mini",
-    "o3-deep-research",
-    "o3-pro",
-    "o4-mini",
-    "o4-mini-deep-research",
-    "o1-pro",
-    "gpt-4-turbo",
-    "gpt-3.5-turbo",
-    "gpt-image-1",
-    "gpt-image-1-mini",
-    "dall-e-3",
-    "dall-e-2",
-    "computer-use-preview",
-    "sora-2",
-    "sora-2-pro"
-  ],
-  gemini: [
-    "gemini-2.5-pro",
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-image",
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-ultra-generate-001",
-    "imagen-3.0-generate-002",
-    "veo-3.1-generate-preview",
-    "veo-3.1-fast-generate-preview",
-    "veo-3.0-generate-001",
-    "veo-3.0-fast-generate-001",
-    "veo-2.0-generate-001",
-    "gemini-2.5-computer-use-preview-10-2025"
-  ],
-  grok: [
-    "grok-4-0709",
-    "grok-code-fast-1",
-    "grok-4-fast-reasoning",
-    "grok-4-fast-non-reasoning",
-    "grok-2-image-1212",
-    "grok-3",
-    "grok-3-fast",
-    "grok-3-mini",
-    "grok-3-mini-fast",
-    "grok-2-vision-1212"
-  ],
-  anthropic: [
-    "claude-haiku-4-5-20251001",
-    "claude-sonnet-4-5-20250929",
-    "claude-opus-4-1-20250805",
-    "claude-opus-4-20250514",
-    "claude-sonnet-4-20250514",
-    "claude-3-7-sonnet-20250219",
-    "claude-3-5-haiku-20241022",
-    "claude-3-haiku-20240307"
-  ],
-  meta: [
-    "Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "Llama-4-Scout-17B-16E-Instruct-FP8",
-    "Llama-3.3-70B-Instruct",
-    "Llama-3.3-8B-Instruct",
-    "Cerebras-Llama-4-Maverick-17B-128E-Instruct",
-    "Cerebras-Llama-4-Scout-17B-16E-Instruct",
-    "Groq-Llama-4-Maverick-17B-128E-Instruct"
-  ],
-  vercel: ["v0-1.5-md", "v0-1.5-lg", "v0-1.0-md"]
-} as const;
-
- */
-
 const providerModelImagesApi = {
   openai: [
     "gpt-5",
-    "gpt-5-codex",
     "gpt-5-mini",
     "gpt-5-nano",
+    "gpt-5-chat-latest",
     "gpt-5-pro",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "o3",
     "gpt-image-1",
     "gpt-image-1-mini",
     "dall-e-3",
@@ -124,6 +39,17 @@ const providerModelImagesApi = {
   grok: ["grok-2-image-1212"]
 } as const;
 
+const providerModelVideosApi = {
+  openai: ["sora-2", "sora-2-pro"],
+  gemini: [
+    "veo-3.1-generate-preview",
+    "veo-3.1-fast-generate-preview",
+    "veo-3.0-generate-001",
+    "veo-3.0-fast-generate-001",
+    "veo-2.0-generate-001"
+  ]
+} as const;
+
 const providerModelChatApi = {
   openai: [
     "gpt-5",
@@ -131,22 +57,30 @@ const providerModelChatApi = {
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5-pro",
+    "gpt-5-chat-latest",
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
+    "gpt-4o",
+    "gpt-4o-mini",
+    "gpt-image-1",
+    "gpt-image-1-mini",
+    "dall-e-3",
+    "dall-e-2",
+    "chatgpt-4o-latest",
     "o4-mini",
+    "o4-mini-deep-research",
+    "o3-deep-research",
     "o3",
     "o3-pro",
     "o3-mini",
-    "gpt-image-1",
-    "gpt-image-1-mini",
-    "gpt-4o",
-    "gpt-4o-mini",
+    "o1",
+    "o1-pro",
     "gpt-4",
     "gpt-4-turbo",
     "gpt-3.5-turbo",
-    "dall-e-3",
-    "dall-e-2"
+    "sora-2",
+    "sora-2-pro"
   ],
   gemini: [
     "gemini-2.5-pro",
@@ -172,9 +106,7 @@ const providerModelChatApi = {
     "grok-4-fast-non-reasoning",
     "grok-2-image-1212",
     "grok-3",
-    "grok-3-fast",
     "grok-3-mini",
-    "grok-3-mini-fast",
     "grok-2-vision-1212"
   ],
   /**
@@ -435,6 +367,14 @@ function formattedOpenAi(props: OpenAiResponse) {
       return { id, displayName: "GPT Image 1 mini", ...rest };
     if (id === "dall-e-3") return { id, displayName: "DALL·E 3", ...rest };
     if (id === "dall-e-2") return { id, displayName: "DALL·E 2", ...rest };
+    if (id === "sora-2") return { id, displayName: "Sora 2", ...rest };
+    if (id === "sora-2-pro") return { id, displayName: "Sora 2 Pro", ...rest };
+    if (id === "o4-mini-deep-research") return { id, displayName: id, ...rest };
+    if (id === "o3-deep-research") return { id, displayName: id, ...rest };
+    if (id === "chatgpt-4o-latest")
+      return { id, displayName: "ChatGPT-4o", ...rest };
+    if (id === "gpt-5-chat-latest")
+      return { id, displayName: "GPT-5 Chat", ...rest };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });
@@ -607,6 +547,55 @@ const imageModelMapper = async (modelKeys = true) => {
   );
 };
 
+const videoModelMapper = async (modelKeys = true) => {
+  const openAiData = await openAiFetcher();
+  const geminiData = await geminiFetcher();
+  const parseGemini = formattedGemini(JSON.parse(await geminiData.text()));
+  const parseOpenAi = formattedOpenAi(JSON.parse(await openAiData.text()));
+  return Array.from(Object.entries(providerModelVideosApi)).map(
+    ([provider, models]) => {
+      const p = provider as keyof typeof providerModelVideosApi;
+      switch (p) {
+        case "gemini": {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model
+                ])
+              : helper.push([
+                  parseGemini.find(t => t.name === `models/${model}`)
+                    ?.displayName ?? model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+        case "openai":
+        default: {
+          let helper = Array.of<[string, string]>();
+          models.forEach(function (model) {
+            modelKeys === true
+              ? helper.push([
+                  model,
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model
+                ])
+              : helper.push([
+                  parseOpenAi.find(t => t.id === `${model}`)?.displayName ??
+                    model,
+                  model
+                ]);
+          });
+          return helper;
+        }
+      }
+    }
+  );
+};
+
 async function displayNameModelIdGen<
   const T extends "keys=model-id" | "keys=display-name",
   const V extends "model-id-only" | "display-name-only"
@@ -728,9 +717,53 @@ async function displayNameModelIdGenImages<
     grok: Object.fromEntries(grok)
   };
 }
+async function displayNameModelIdGenVideos<
+  const T extends "keys=model-id" | "keys=display-name",
+  const V extends "model-id-only" | "display-name-only"
+>(target: T, arrayOnly?: V) {
+  const mapper = await videoModelMapper(
+    target === "keys=display-name" ? false : true
+  );
+  const openai = mapper[0];
+  const gemini = mapper[1];
 
+  if (!openai || !gemini)
+    throw new Error("empty data in displayNameModelIdGen");
+
+  if (typeof arrayOnly !== "undefined") {
+    if (arrayOnly === "display-name-only") {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys)
+        };
+      } else {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals)
+        };
+      }
+    } else {
+      if (target === "keys=display-name") {
+        return {
+          openai: openai.map(([_, vals]) => vals),
+          gemini: gemini.map(([_, vals]) => vals)
+        };
+      } else {
+        return {
+          openai: openai.map(([keys, _v]) => keys),
+          gemini: gemini.map(([keys, _v]) => keys)
+        };
+      }
+    }
+  }
+  return {
+    openai: Object.fromEntries(openai),
+    gemini: Object.fromEntries(gemini)
+  };
+}
 async function Multimodal<
-  const S extends "default" | "img",
+  const S extends "default" | "img" | "video",
   const T extends "keys=model-id" | "keys=display-name",
   const V extends "model-id-only" | "display-name-only"
 >(
@@ -739,22 +772,36 @@ async function Multimodal<
   arrayOnly?: V
 ): Promise<
   XOR<
-    | {
-        openai: string[];
-        gemini: string[];
-        grok: string[];
-      }
-    | {
-        openai: {
-          [k: string]: string;
-        };
-        gemini: {
-          [k: string]: string;
-        };
-        grok: {
-          [k: string]: string;
-        };
-      },
+    XOR<
+      | {
+          openai: string[];
+          gemini: string[];
+          grok: string[];
+        }
+      | {
+          openai: {
+            [k: string]: string;
+          };
+          gemini: {
+            [k: string]: string;
+          };
+          grok: {
+            [k: string]: string;
+          };
+        },
+      | {
+          openai: string[];
+          gemini: string[];
+        }
+      | {
+          openai: {
+            [k: string]: string;
+          };
+          gemini: {
+            [k: string]: string;
+          };
+        }
+    >,
     | {
         openai: string[];
         gemini: string[];
@@ -791,6 +838,11 @@ async function Multimodal<
         ? displayNameModelIdGenImages(target, arrayOnly)
         : displayNameModelIdGenImages(target));
     }
+    case "video": {
+      return await (arrayOnly
+        ? displayNameModelIdGenVideos(target, arrayOnly)
+        : displayNameModelIdGenVideos(target));
+    }
     case "default": {
       return await (arrayOnly
         ? displayNameModelIdGen(target, arrayOnly)
@@ -802,8 +854,12 @@ async function Multimodal<
   }
 }
 
-if (process.argv[3] === "img" || process.argv[3] === "default") {
-  (async (target: "img" | "default") => {
+if (
+  process.argv[3] === "img" ||
+  process.argv[3] === "default" ||
+  process.argv[3] === "video"
+) {
+  (async (target: "img" | "default" | "video") => {
     const displayNameToModelId = await Multimodal(target, "keys=display-name");
 
     const displayNameOnly = await Multimodal(
@@ -811,24 +867,6 @@ if (process.argv[3] === "img" || process.argv[3] === "default") {
       "keys=display-name",
       "display-name-only"
     );
-
-    // prettier-ignore
-    const imgDisplayToModelId = `export const displayNameToModelIdImgGen = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`
-    // prettier-ignore
-    const defaultDisplayToModelId = `export const displayNameToModelId = ${JSON.stringify(displayNameToModelId, null, 2)} as const;`;
-
-    const displayNameToModelIdTemplate =
-      target === "default" ? defaultDisplayToModelId : imgDisplayToModelId;
-
-    // prettier-ignore
-    const imgGenDisplayNameOnlyTemplate =`export const displayNameModelsByProviderImgGen = ${JSON.stringify(displayNameOnly, null, 2)} as const;`;
-    // prettier-ignore
-    const defaultDisplayNameOnlyTemplate =`export const displayNameModelsByProvider = ${JSON.stringify(displayNameOnly, null, 2)} as const;`;
-
-    const displayNameOnlyTemplate =
-      target === "default"
-        ? defaultDisplayNameOnlyTemplate
-        : imgGenDisplayNameOnlyTemplate;
 
     const modelIdToDisplayName = await Multimodal(target, "keys=model-id");
 
@@ -838,49 +876,88 @@ if (process.argv[3] === "img" || process.argv[3] === "default") {
       "model-id-only"
     );
 
-    // prettier-ignore
-    const imgGenModelIdsOnlyTemplate  = `export const modelIdsByProviderImgGen = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`
-    // prettier-ignore
-    const defaultmodelIdsOnlyTemplate  = `export const modelIdsByProvider = ${JSON.stringify(modelIdsOnly, null, 2)} as const;`;
-
-    const modelIdsOnlyTemplate =
-      target === "default"
-        ? defaultmodelIdsOnlyTemplate
-        : imgGenModelIdsOnlyTemplate;
-
-    // prettier-ignore
-    const imgGenModelIdToDisplayNameTemplate  = `export const modelIdToDisplayNameImgGen = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`;
-    // prettier-ignore
-    const defaultModelIdToDisplayNameTemplate  = `export const modelIdToDisplayName = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;`;
-
-    const modelIdToDisplayNameTemplate =
-      target === "default"
-        ? defaultModelIdToDisplayNameTemplate
-        : imgGenModelIdToDisplayNameTemplate;
-
-    const displayNameToModelIdPath = {
-      default: "src/codegen/__gen__/display-name-to-model-id.ts",
-      img: "src/codegen/__gen__/display-name-to-model-id-img-gen.ts"
+    const format = {
+      default: "",
+      img: "ImgGen",
+      video: "VideoGen"
     } as const;
 
-    const displayNameOnlyPath = {
-      default: "src/codegen/__gen__/display-names-by-provider.ts",
-      img: "src/codegen/__gen__/display-names-by-provider-img-gen.ts"
+    const displayNameToModelIdsScaffold = (t: "default" | "video" | "img") =>
+      `export const displayNameToModelId${format[t]} = ${JSON.stringify(displayNameToModelId, null, 2)} as const;` as const;
+
+    const displayNameOnlyScaffold = (t: "default" | "video" | "img") =>
+      `export const displayNameModelsByProvider${format[t]} = ${JSON.stringify(displayNameOnly, null, 2)} as const;` as const;
+
+    const modelIdsOnlyScaffold = (t: "default" | "video" | "img") =>
+      `export const modelIdsByProvider${format[t]} = ${JSON.stringify(modelIdsOnly, null, 2)} as const;` as const;
+
+    const modelIdToDisplayNameScaffold = (t: "default" | "video" | "img") =>
+      `export const modelIdToDisplayName${format[t]} = ${JSON.stringify(modelIdToDisplayName, null, 2)} as const;` as const;
+
+    const displayNameToModelIdObj = {
+      template: {
+        default: displayNameToModelIdsScaffold("default"),
+        img: displayNameToModelIdsScaffold("img"),
+        video: displayNameToModelIdsScaffold("video")
+      },
+      path: {
+        default: "src/codegen/__gen__/display-name-to-model-id.ts",
+        img: "src/codegen/__gen__/display-name-to-model-id-img-gen.ts",
+        video: "src/codegen/__gen__/display-name-to-model-id-video-gen.ts"
+      }
     } as const;
 
-    const modelIdToDisplayNamePath = {
-      default: "src/codegen/__gen__/model-id-to-display-name.ts",
-      img: "src/codegen/__gen__/model-id-to-display-name-img-gen.ts"
+    const displayNameOnlyObj = {
+      template: {
+        default: displayNameOnlyScaffold("default"),
+        img: displayNameOnlyScaffold("img"),
+        video: displayNameOnlyScaffold("video")
+      },
+      path: {
+        default: "src/codegen/__gen__/display-names-by-provider.ts",
+        img: "src/codegen/__gen__/display-names-by-provider-img-gen.ts",
+        video: "src/codegen/__gen__/display-names-by-provider-video-gen.ts"
+      }
     } as const;
 
-    const modelIdsOnlyPath = {
-      default: "src/codegen/__gen__/model-ids-by-provider.ts",
-      img: "src/codegen/__gen__/model-ids-by-provider-img-gen.ts"
+    const modelIdToDisplayNameObj = {
+      template: {
+        default: modelIdToDisplayNameScaffold("default"),
+        img: modelIdToDisplayNameScaffold("img"),
+        video: modelIdToDisplayNameScaffold("video")
+      },
+      path: {
+        default: "src/codegen/__gen__/model-id-to-display-name.ts",
+        img: "src/codegen/__gen__/model-id-to-display-name-img-gen.ts",
+        video: "src/codegen/__gen__/model-id-to-display-name-video-gen.ts"
+      }
     } as const;
 
-    fs.withWs(displayNameToModelIdPath[target], displayNameToModelIdTemplate);
-    fs.withWs(displayNameOnlyPath[target], displayNameOnlyTemplate);
-    fs.withWs(modelIdToDisplayNamePath[target], modelIdToDisplayNameTemplate);
-    fs.withWs(modelIdsOnlyPath[target], modelIdsOnlyTemplate);
+    const modelIdsOnlyObj = {
+      template: {
+        default: modelIdsOnlyScaffold("default"),
+        img: modelIdsOnlyScaffold("img"),
+        video: modelIdsOnlyScaffold("video")
+      },
+      path: {
+        default: "src/codegen/__gen__/model-ids-by-provider.ts",
+        img: "src/codegen/__gen__/model-ids-by-provider-img-gen.ts",
+        video: "src/codegen/__gen__/model-ids-by-provider-video-gen.ts"
+      }
+    } as const;
+
+    fs.withWs(
+      displayNameToModelIdObj.path[target],
+      displayNameToModelIdObj.template[target]
+    );
+    fs.withWs(
+      displayNameOnlyObj.path[target],
+      displayNameOnlyObj.template[target]
+    );
+    fs.withWs(
+      modelIdToDisplayNameObj.path[target],
+      modelIdToDisplayNameObj.template[target]
+    );
+    fs.withWs(modelIdsOnlyObj.path[target], modelIdsOnlyObj.template[target]);
   })(process.argv[3]);
 }
