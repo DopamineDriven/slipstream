@@ -88,10 +88,10 @@ export { XAiIcon } from "@/icons/xai";
 export { Zap } from "@/icons/zap";
 // lib
 export { cn } from "@/lib/utils";
-// ui/base
-export { UploadProgress } from "@/ui/base/progress";
+// ui - base components
+export { UploadProgress } from "@/base/progress";
 
-// ui
+// ui - radix components
 export {
   Accordion,
   AccordionContent,
