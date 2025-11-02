@@ -38,6 +38,9 @@
       "openai": [
         "dist/openai/index.d.ts"
       ],
+      "openai/types": [
+        "src/openai/types.d.ts"
+      ],
       "openai/workup": [
         "src/openai/workup.d.ts"
       ],

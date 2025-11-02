@@ -12,6 +12,162 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
+export type S3FinalizePayload = {
+  bucket: string;
+  key: string;
+  versionId: string;
+  contentDisposition: string | undefined;
+  cacheControl: string | undefined;
+  extension:
+    | "pdf"
+    | "jpg"
+    | "mp4"
+    | "mp3"
+    | "apng"
+    | "png"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | "mpd"
+    | "epub"
+    | "ttf"
+    | "gz"
+    | "jar"
+    | "json"
+    | "jsonld"
+    | "webmanifest"
+    | "doc"
+    | "node"
+    | "js"
+    | "bin"
+    | "obj"
+    | "ogx"
+    | "rtf"
+    | "sql"
+    | "toml"
+    | "azw"
+    | "mpkg"
+    | "m3u8"
+    | "pkpass"
+    | "xul"
+    | "xls"
+    | "eot"
+    | "ppt"
+    | "odp"
+    | "ods"
+    | "odt"
+    | "pptx"
+    | "xlsx"
+    | "docx"
+    | "rar"
+    | "vsd"
+    | "wasm"
+    | "7z"
+    | "abw"
+    | "bz"
+    | "bz2"
+    | "cda"
+    | "csh"
+    | "arc"
+    | "php"
+    | "mdx"
+    | "ndjson"
+    | "pyc"
+    | "sh"
+    | "tar"
+    | "zip"
+    | "xhtml"
+    | "xml"
+    | "yml"
+    | "aac"
+    | "mid"
+    | "m4a"
+    | "opus"
+    | "ogg"
+    | "wav"
+    | "weba"
+    | "midi"
+    | "otf"
+    | "woff"
+    | "woff2"
+    | "hjif"
+    | "hmpg"
+    | "ivs"
+    | "aces"
+    | "avci"
+    | "dpx"
+    | "emf"
+    | "ktx"
+    | "ktx2"
+    | "cur"
+    | "glb"
+    | "gltf"
+    | "usdz"
+    | "ics"
+    | "css"
+    | "csv"
+    | "sse"
+    | "html"
+    | "md"
+    | "txt"
+    | "rs"
+    | "ts"
+    | "vtt"
+    | "c"
+    | "cs"
+    | "cpp"
+    | "java"
+    | "py"
+    | "rb"
+    | "tex"
+    | "3gp"
+    | "3g2"
+    | "mpeg"
+    | "ogv"
+    | "webm"
+    | "avi"
+    | undefined;
+  expires: Date;
+  cdnUrl:
+    | `https://assets.aicoalesce.com/${string}`
+    | `https://assets-dev.aicoalesce.com/${string}`;
+  publicUrl: string;
+  presignedUrl: string;
+  presignedUrlExpiresAt: number;
+  storageClass: S3StorageClass | undefined;
+  s3ObjectId: `s3://${string}/${string}#${string}`;
+  etag: string | undefined;
+  size: number | undefined;
+  contentType: string | undefined;
+  lastModified: string | undefined;
+  checksum:
+    | {
+        readonly algo: "SHA256";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC32C";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC32";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "SHA1";
+        readonly value: string;
+      }
+    | {
+        readonly algo: "CRC64NVME";
+        readonly value: string;
+      }
+    | undefined;
+};
+
 export type ImgMetadataEntity = {
   animated: boolean;
   aspectRatio: number;
@@ -79,10 +235,10 @@ export type ImageGenPartialArr = [
   S3StorageClass | undefined, // s3 storage class
   string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
   ImgMetadataEntity | undefined, // ImageMetadata via extractor package
-number | undefined, // upload duration
-string | undefined, // requestMessageId
-string | undefined, // jobId
-string | undefined // revised_prompt
+  number | undefined, // upload duration
+  string | undefined, // requestMessageId
+  string | undefined, // jobId
+  string | undefined // revised_prompt
 ];
 
 export type HandleAiChatRequestRT = (
@@ -786,41 +942,41 @@ export type ConvoSettingsSingleton = {
   usageAlerts: boolean | null;
 };
 
-export type ImageGenJobSingleton ={
-            id: string;
-            userKeyId: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            userId: string;
-            provider: $Enums.Provider;
-            model: string;
-            keyFingerprint: string | null;
-            prompt: string;
-            systemPrompt: string | null;
-            temperature: number | null;
-            topP: number | null;
-            nRequested: number;
-            nCompleted: number;
-            seed: number | null;
-            negativePrompt: string | null;
-            outputSize: string | null;
-            outputQuality: string | null;
-            outputFormat: string | null;
-            outputBackground: string | null;
-            outputCompression: number | null;
-            partialImagesRequested: number | null;
-            inputFidelity: string | null;
-            personGeneration: string | null;
-            moderation: string | null;
-            stage: $Enums.ImageGenStage;
-            progress: number;
-            etaSeconds: number | null;
-            durationMs: number | null;
-            usage: number | null;
-            revisedPrompt: string | null;
-            error: string | null;
-            requestMessageId: string;
-}
+export type ImageGenJobSingleton = {
+  id: string;
+  userKeyId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  provider: $Enums.Provider;
+  model: string;
+  keyFingerprint: string | null;
+  prompt: string;
+  systemPrompt: string | null;
+  temperature: number | null;
+  topP: number | null;
+  nRequested: number;
+  nCompleted: number;
+  seed: number | null;
+  negativePrompt: string | null;
+  outputSize: string | null;
+  outputQuality: string | null;
+  outputFormat: string | null;
+  outputBackground: string | null;
+  outputCompression: number | null;
+  partialImagesRequested: number | null;
+  inputFidelity: string | null;
+  personGeneration: string | null;
+  moderation: string | null;
+  stage: $Enums.ImageGenStage;
+  progress: number;
+  etaSeconds: number | null;
+  durationMs: number | null;
+  usage: number | null;
+  revisedPrompt: string | null;
+  error: string | null;
+  requestMessageId: string;
+};
 
 export type AttachmentSingleton<T extends boolean = false> = {
   id: string;
@@ -1037,7 +1193,6 @@ export type Signals =
   | "SIGXFSZ";
 
 export type ImageGenReqDbRes<T extends boolean = false> = {
-
   messages: ({
     attachments: ({
       image: {
@@ -1205,8 +1360,8 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     /**
      * count of assets bound to the current user messsage
      */
-            jobId?: string;
-        requestMessageId?: string;
+    jobId?: string;
+    requestMessageId?: string;
     assetCounts: number;
     assets?: {
       type: $Enums.AssetType;

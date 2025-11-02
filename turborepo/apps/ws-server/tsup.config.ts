@@ -14,6 +14,7 @@ const tsupConfig = (options: Options) =>
       "src/mixins/index.ts",
       "src/models/index.ts",
       "src/openai/index.ts",
+            "src/openai/types.ts",
       "src/openai/workup.ts",
       "src/pdf/index.ts",
       "src/prisma/index.ts",

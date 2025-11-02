@@ -293,6 +293,24 @@ export class OpenAIServiceWorkup extends ModelService {
     });
   }
 
+    public getGenMime(target: string) {
+    return target === "jpeg"
+      ? "image/jpeg"
+      : target === "jpg"
+        ? "image/jpeg"
+        : target === "png"
+          ? "image/png"
+          : target === "webp"
+            ? "image/webp"
+            : "application/octet-stream";
+  }
+  public async generateId(target: "itemId" | "generationGroupId") {
+    const { nanoid } = await import("nanoid");
+    if (target === "generationGroupId") {
+      const generationGroupId = "resp_" + nanoid();
+      return generationGroupId;
+    } else return nanoid();
+  }
   public mapPersistenceImgGenArr(props: ImageGenPartialArr[]) {
     return props.map((t, o) => {
       return {
