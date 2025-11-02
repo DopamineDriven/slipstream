@@ -1,10 +1,11 @@
 "use client";
 
-import type { RxnUnion, UIMessage } from "@/types/shared";
+import type { RxnUnion } from "@/types/shared";
 import { useState, useTransition } from "react";
 import { rxnAction } from "@/app/actions/message-actions";
+import { MessageSingleton } from "@slipstream/types";
 
-export function useReaction(message: UIMessage) {
+export function useReaction(message: MessageSingleton<true>) {
   const [reactionState, setReactionState] = useState({
     liked: message.liked ?? false,
     disliked: message.disliked ?? false

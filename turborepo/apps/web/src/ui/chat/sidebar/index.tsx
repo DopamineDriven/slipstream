@@ -338,7 +338,7 @@ export function EnhancedSidebar({
                             <div
                               role="button"
                               className={cn(
-                                `flex h-auto min-h-[44px] w-full items-center justify-start rounded-md px-3 py-2 pr-20 transition-colors`,
+                                `flex h-auto min-h-11 w-full items-center justify-start rounded-md px-3 py-2 pr-20 transition-colors`,
                                 isActiveConversation(thread.id)
                                   ? "bg-brand-primary/20 text-brand-text"
                                   : "text-brand-text-muted hover:bg-brand-component hover:text-brand-text"

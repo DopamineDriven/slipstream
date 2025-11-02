@@ -1,6 +1,5 @@
 "use client";
 
-import type { UIMessage } from "@/types/shared";
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -10,10 +9,10 @@ import { smoothScrollToBottom } from "@/lib/helpers";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
-import { useAIChatContext } from "@/context/ai-chat-context";
+import type { MessageSingleton } from "@slipstream/types";
 
 interface ChatFeedProps {
-  messages: UIMessage[];
+  messages: MessageSingleton<true>[];
   isHome: boolean;
   user?: User;
   className?: string;
@@ -37,13 +36,13 @@ export function ChatFeed({
   isStreaming,
   streamedText,
   thinkingText,
-  isThinking,isHome,
+  isThinking,
+  isHome,
   thinkingDuration,
   children
 }: ChatFeedProps) {
-  const ai = useAIChatContext();
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  
+
   const [isScrolling, setIsScrolling] = useState(false);
 
   const { rect, quote, clear } = useSelectionQuote("[data-chat-feed]");
@@ -165,11 +164,9 @@ export function ChatFeed({
             <MessageBubble
               key={message.id}
               message={message}
-              attachments={message.attachments}
               user={user}
               onUpdateMessage={onUpdateMessage}
               isStreaming={isStreaming && message.id.startsWith("streaming-")}
-              // Pass live thinking data for the currently streaming message
               liveThinkingText={
                 isStreaming && message.id.startsWith("streaming-")
                   ? thinkingText
@@ -186,21 +183,21 @@ export function ChatFeed({
                   : undefined
               }
               // Progressive image-gen data for streaming message
-              liveImgGenEnabled={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? ai.imgGenEnabled
-                  : undefined
-              }
-              liveImgPartial={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? ai.imgGenPartial ?? undefined
-                  : undefined
-              }
-              liveImgFinals={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? ai.imgGenFinals ?? undefined
-                  : undefined
-              }
+              // liveImgGenEnabled={
+              //   isStreaming && message.id.startsWith("streaming-")
+              //     ? ai.imgGenEnabled
+              //     : undefined
+              // }
+              // liveImgPartial={
+              //   isStreaming && message.id.startsWith("streaming-")
+              //     ? ai.imgGenPartial ?? undefined
+              //     : undefined
+              // }
+              // liveImgFinals={
+              //   isStreaming && message.id.startsWith("streaming-")
+              //     ? ai.imgGenFinals ?? undefined
+              //     : undefined
+              // }
             />
           ))}
           {isStreaming && isAwaitingFirstChunk === true && (
@@ -240,7 +237,6 @@ export function ChatFeed({
       )}
       {rect && quote && (
         <SelectionToolbar
-
           rect={rect}
           onQuoteAction={handleQuote}
           onCopyAction={handleCopy}

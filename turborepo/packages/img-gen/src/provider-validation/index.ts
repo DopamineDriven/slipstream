@@ -1007,6 +1007,7 @@ export class ProviderValidation {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
+            userKey: true,
             imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },

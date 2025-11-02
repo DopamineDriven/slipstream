@@ -1,11 +1,10 @@
 "use client";
 
-import type { UIMessage } from "@/types/shared";
 import { useCallback, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
-import type { Unenumerate } from "@slipstream/types";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { AttachmentSingleton } from "@slipstream/types";
 import {
   Button,
   Card,
@@ -16,14 +15,12 @@ import {
   X
 } from "@slipstream/ui";
 
-// Define attachment types based on the Prisma schema
-export type MessageAttachment = Unenumerate<UIMessage["attachments"]>;
-
 interface AttachmentDisplayProps {
-  attachments: UIMessage["attachments"];
+  attachments: AttachmentSingleton<true>[];
   className?: string;
   compact?: boolean;
 }
+
 const formatFileSize = (bytes?: bigint | number): string => {
   if (!bytes) return "Unknown size";
   const size = typeof bytes === "bigint" ? Number(bytes) : bytes;
@@ -43,7 +40,7 @@ function isNextImageCompat(props: ExpandedImgSpecs["format"]) {
   return /^(png|jpeg|jpg|webp|avif|svg)$/gm.test(props);
 }
 
-const getFileIcon = (attachment: MessageAttachment) => {
+const getFileIcon = (attachment: AttachmentSingleton<true>) => {
   switch (attachment?.assetType) {
     case "IMAGE":
       return <ImageIcon className="h-4 w-4" />;
@@ -57,11 +54,11 @@ const getFileIcon = (attachment: MessageAttachment) => {
   }
 };
 // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
-const getDisplayUrl = (attachment: MessageAttachment): string | null => {
+const getDisplayUrl = (attachment: AttachmentSingleton<true>): string | null => {
   return attachment?.cdnUrl ?? null;
 };
 
-const handleDownload = (attachment: MessageAttachment) => {
+const handleDownload = (attachment: AttachmentSingleton<true>) => {
   const url = getDisplayUrl(attachment);
   if (url) {
     const link = document.createElement("a");

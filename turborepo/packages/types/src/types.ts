@@ -90,7 +90,6 @@ export type AnthropicResponse = XOR<AnthropicError, AnthropicSuccess>;
 export type OpenAiResponse = XOR<OpenAiError, SuccessResponse>;
 
 export type GeminiResponse = XOR<GeminiError, GeminiSuccess>;
-
 export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
   : bigint;
@@ -178,9 +177,9 @@ export type ImageSingleton = {
 
 export type ConvoSettingsSingleton = {
   id: string;
+  conversationId: string;
   createdAt: Date;
   updatedAt: Date;
-  conversationId: string;
   systemPrompt: string | null;
   temperature: number | null;
   topP: number | null;
@@ -189,7 +188,73 @@ export type ConvoSettingsSingleton = {
   trackUsage: boolean | null;
   enableWebSearch: boolean | null;
   enableAssetGen: boolean | null;
+  reasoningEffort: "minimal" | "low" | "medium" | "high" | null;
+  outputVerbosity: "low" | "high" | "medium" | null;
   usageAlerts: boolean | null;
+};
+
+export type ImageGenJobSingleton = {
+  id: string;
+  userKeyId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
+  model: string;
+  keyFingerprint: string | null;
+  prompt: string;
+  systemPrompt: string | null;
+  temperature: number | null;
+  topP: number | null;
+  nRequested: number;
+  nCompleted: number;
+  seed: number | null;
+  negativePrompt: string | null;
+  outputSize: string | null;
+  outputQuality: string | null;
+  outputFormat: string | null;
+  outputBackground: string | null;
+  outputCompression: number | null;
+  partialImagesRequested: number | null;
+  inputFidelity: string | null;
+  personGeneration: string | null;
+  moderation: string | null;
+  stage:
+    | "FAILED"
+    | "QUEUED"
+    | "PROCESSING"
+    | "PERSISTING"
+    | "FINALIZING"
+    | "COMPLETED"
+    | "REFUSAL"
+    | "ABORTED";
+  progress: number;
+  etaSeconds: number | null;
+  durationMs: number | null;
+  usage: number | null;
+  revisedPrompt: string | null;
+  error: string | null;
+  requestMessageId: string;
+  outputs?: ImageGenOutputSingleton[];
+  userKey?: UserKeySingleton;
+};
+
+export type ImageGenOutputSingleton = {
+  id: string;
+  seriesId: string;
+  ext: string | null;
+  mime: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  jobId: string;
+  jobIndex: number;
+  kind: "FINAL" | "PARTIAL";
+  seriesIndex: number;
+  isPartial: boolean;
+  attachmentId: string;
+  width: number | null;
+  height: number | null;
+  revisedPrompt: string | null;
 };
 
 export type AttachmentSingleton<T extends boolean = false> = {
@@ -223,6 +288,7 @@ export type AttachmentSingleton<T extends boolean = false> = {
   compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;
   compatReadyAt: Date | null;
+  generationGroupId?: string | null;
   compatVersionId: string | null;
   compatS3ObjectId: string | null;
   compatMime: string | null;
@@ -258,6 +324,20 @@ export type AttachmentSingleton<T extends boolean = false> = {
   updatedAt: Date;
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
+  imageGenOutput: ImageGenOutputSingleton | null;
+};
+
+export type UserKeySingleton = {
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
+  apiKey: string;
+  iv: string;
+  authTag: string;
+  label: string | null;
+  isDefault: boolean;
 };
 
 export type MessageSingleton<T extends boolean = false> = {
@@ -276,6 +356,8 @@ export type MessageSingleton<T extends boolean = false> = {
   liked: boolean | null;
   disliked: boolean | null;
   tryAgain: boolean | null;
+  imageGenJob?: ImageGenJobSingleton | null;
+  userKey?: UserKeySingleton | null;
   attachments: AttachmentSingleton<T>[];
 };
 

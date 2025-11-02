@@ -286,13 +286,16 @@ export type {
   GeminiResponse,
   GeminiSuccess,
   GrokModelsResponse,
+  ImageGenJobSingleton,
+  ImageGenOutputSingleton,
   ImageSingleton,
   ListModelsSingleton,
   MessageSingleton,
   OpenAiError,
   OpenAiResponse,
   Signals,
-  SuccessResponse
+  SuccessResponse,
+  UserKeySingleton
 } from "@/types.ts";
 
 declare global {
