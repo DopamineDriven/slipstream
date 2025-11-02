@@ -47,14 +47,14 @@
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.9.2",
     "dotenv": "^17.2.3",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.0",
     "husky": "^9.1.7",
     "knip": "^5.66.4",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
-    "turbo": "^2.5.8",
+    "turbo": "^2.6.0",
     "typescript": "^5.9.3",
-    "vercel": "^48.6.7"
+    "vercel": "^48.8.0"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {
