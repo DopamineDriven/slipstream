@@ -30,7 +30,7 @@ export function MessageAttachments({
           ? "Attachment"
           : `${attachments.length} Attachments`}
       </div>
-      <AttachmentDisplay attachments={attachments} />
+      <AttachmentDisplay  attachments={attachments} />
     </div>
   );
 }

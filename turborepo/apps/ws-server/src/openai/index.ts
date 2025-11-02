@@ -317,7 +317,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
         }
         text = s.delta;
       }
-      if (s.type === "response.output_text.done") {
+      if (s.type === "response.output_text.done" && imgGenEnabled ===false) {
         done = true;
       }
       if (s.type === "response.completed") {
@@ -355,19 +355,17 @@ export class OpenAIService extends OpenAIServiceWorkup {
                  */
                 type: "image_generation_call";
               };
-
+              done = true;
               console.log(
                 `yes this item contains more fields than is reported! ` +
                   rrr.revised_prompt || rrr.id
               );
             }
           }
-          continue;
         }
         if (s.response.usage?.total_tokens) {
           usage = s.response.usage.total_tokens;
         }
-        done = true;
       }
       if (imgGenEnabled) {
         if (partialImgAgg) {

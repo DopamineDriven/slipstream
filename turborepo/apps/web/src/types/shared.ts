@@ -5,6 +5,85 @@ export type ClientWorkupProps = {
   isSet: Record<Providers, boolean>;
   isDefault: Record<Providers, boolean>;
 };
+ export type ImageSingleton = {
+  createdAt: Date;
+  updatedAt: Date;
+  attachmentId: string;
+  format:
+    | "apng"
+    | "png"
+    | "gif"
+    | "bmp"
+    | "webp"
+    | "avif"
+    | "svg"
+    | "ico"
+    | "tiff"
+    | "jpeg"
+    | "heic"
+    | "unknown"
+    | "jxl"
+    | "jp2"
+    | "jpx"
+    | "jxr"
+    | "jls"
+    | "raw"
+    | "dng"
+    | "cr2"
+    | "nef"
+    | "arw"
+    | "hdr"
+    | "pic"
+    | "rgbe"
+    | "xyze";
+  width: number;
+  height: number;
+  aspectRatio: number | null;
+  frames: number;
+  hasAlpha: boolean | null;
+  animated: boolean;
+  orientation: number | null;
+  colorSpace:
+    | "unknown"
+    | "srgb"
+    | "display_p3"
+    | "adobe_rgb"
+    | "prophoto_rgb"
+    | "rec2020"
+    | "rec709"
+    | "cmyk"
+    | "lab"
+    | "xyz"
+    | "gray"
+    | null;
+  exifDateTimeOriginal: Date | null;
+  cameraMake: string | null;
+  cameraModel: string | null;
+  lensModel: string | null;
+  gpsLat: number | null;
+  gpsLon: number | null;
+  dominantColorHex: string | null;
+  iccProfile: string | null;
+};
+export type DocumentSingleton = {
+  title: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  attachmentId: string;
+  format: string;
+  pageCount: number | null;
+  wordCount: number | null;
+  language: string | null;
+  author: string | null;
+  subject: string | null;
+  keywords: string[];
+  pdfVersion: string | null;
+  isEncrypted: boolean;
+  isSearchable: boolean;
+  encoding: string | null;
+  lineCount: number | null;
+  textPreview: string | null;
+};
 
 export type AttachmentSingleton = {
   size: number | null;
@@ -20,6 +99,9 @@ export type AttachmentSingleton = {
   filename: string | null;
   ext: string | null;
   mime: string | null;
+  image?: ImageSingleton;
+  document?: DocumentSingleton
+
 };
 
 export type UIMessage = RTC<MessagePrisma, "conversationId"> & {
