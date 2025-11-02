@@ -432,7 +432,6 @@ export class Resolver extends ModelService {
       title,
       topP
     } satisfies ProviderChatRequestEntity;
-    console.log(apiKey ?? "no api Key");
     try {
       switch (provider) {
         case "gemini": {

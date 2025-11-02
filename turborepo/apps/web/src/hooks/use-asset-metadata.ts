@@ -33,16 +33,15 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   >({});
   const [size, setSize] = useState<Record<string, number>>({});
 
-  const extractor = useMemo(() => new Extract(), []);
+  const extractor = useMemo(() => new Extract({}), []);
 
   // Helper: produce document specs using the client-side extractor
   const getDocumentSpecsWorkup = useCallback(
     async (file: File): Promise<ExpandedDocSpecs | null> => {
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const meta = (await extractor.extractRemote(
-          Buffer.from(arrayBuffer),
-          96 * 1024
+        const meta = (extractor.getDocumentSpecsWorkup(
+          Buffer.from(arrayBuffer)
         )) as ExpandedDocSpecs;
 
         return meta;
@@ -77,7 +76,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
             (async () => {
               try {
                 const arrayBuffer = await attachment.file.arrayBuffer();
-                const meta = (await extractor.extractRemote(
+                const meta = (extractor.img.getImageSpecsWorkup(
                   Buffer.from(arrayBuffer),
                   96 * 1024
                 )) as ExpandedImgSpecs;

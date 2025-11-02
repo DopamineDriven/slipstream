@@ -100,7 +100,7 @@ export function ImageGenerationCanvas({
           )}>
           <Button
             size="icon"
-            variant="secondary"
+            variant="ghost"
             className="bg-white/90 backdrop-blur-sm hover:bg-white"
             onClick={() => {
               if (!cdnUrl) return;
@@ -113,7 +113,7 @@ export function ImageGenerationCanvas({
           </Button>
           <Button
             size="icon"
-            variant="secondary"
+            variant="ghost"
             className="bg-white/90 backdrop-blur-sm hover:bg-white"
             onClick={() => {
               setShowImage(false);

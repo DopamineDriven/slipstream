@@ -1,10 +1,10 @@
 "use client";
 
 import type { UIMessage } from "@/types/shared";
-import { use, useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ExpandedImgSpecs, Extract } from "@d0paminedriven/metadata";
+import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type { Unenumerate } from "@slipstream/types";
 import {
   Button,
@@ -88,7 +88,6 @@ export function AttachmentDisplay({
     setExpanded({ url, kind });
   }, []);
 
-  const extract = useMemo(() => new Extract(), []);
   const clickcb = useCallback(
     (_e: React.MouseEvent<HTMLButtonElement | SVGSVGElement, MouseEvent>) => {
       setExpanded(null);
@@ -102,17 +101,19 @@ export function AttachmentDisplay({
     <>
       <div className={cn("mt-2 space-y-2", className)}>
         {attachments.map(attachment => {
-          const meta = use(
-            extract.extractRemote(attachment.cdnUrl ?? "", 4096 * 32)
-          );
-
           const displayUrl = getDisplayUrl(attachment);
-          const isImage = meta.type === "IMAGE";
+          const isImage = attachment.assetType === "IMAGE";
 
-          const isPdf = meta.type === "DOCUMENT" && meta.format === "pdf";
+          const isPdf =
+            attachment.assetType === "DOCUMENT" && attachment.ext === "pdf";
 
           // Full image preview only when we have a real URL
-          if (meta.type === "IMAGE" && !compact && attachment.cdnUrl !== null) {
+          if (
+            attachment.assetType === "IMAGE" &&
+            attachment.ext &&
+            !compact &&
+            attachment.cdnUrl !== null
+          ) {
             return (
               <div
                 key={attachment.id}
@@ -124,9 +125,12 @@ export function AttachmentDisplay({
                 }>
                 <Image
                   src={attachment.cdnUrl}
-                  unoptimized={!isNextImageCompat(meta.format)}
-                  width={meta.width}
-                  height={meta.height}
+                  unoptimized={
+                    !isNextImageCompat(
+                      attachment.ext as ExpandedImgSpecs["format"]
+                    )
+                  }
+                  fill
                   alt={attachment.filename ?? "Attachment"}
                   sizes="(max-width: 768px) 90dvw, 24rem"
                   className="rounded-lg object-contain transition-opacity hover:opacity-90"
@@ -167,13 +171,15 @@ export function AttachmentDisplay({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">
-                    {`${attachment.filename ?? "Untitled"} | ${formatFileSize(meta.byteSize)}`}
+                    {`${attachment.filename ?? "Untitled"} | ${attachment.size ? formatFileSize(attachment.size) : ""}`}
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {meta.type === "IMAGE"
-                      ? meta.colorSpace
-                      : meta.pageCount?.toString(10).concat(" pages")}
-                    {meta.format && ` • ${meta.format.toUpperCase()}`}
+                    {attachment.assetType === "IMAGE"
+                      ? attachment.image?.colorSpace
+                      : attachment.document?.pageCount
+                          ?.toString(10)
+                          .concat(" pages")}
+                    {attachment.ext && ` • ${attachment.ext.toUpperCase()}`}
                   </div>
                 </div>
                 <div className="flex gap-1">
