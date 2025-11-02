@@ -61,6 +61,7 @@ class ScriptGen extends Fs {
     const env = await cred.get("DIRECT_URL");
     return await this.data(env, id).then(s => {
       if (!s) return;
+      console.log(s.title);
       const { messages, ...rest } = s;
       const cleanS = messages.map(t => {
         const { attachments, ...rest } = t;
@@ -81,7 +82,7 @@ class ScriptGen extends Fs {
   public async Dev(id = "tsc8ukfhxdddj4pykubzix1i") {
     return await this.data(process.env.DIRECT_URL ?? "", id).then(s => {
       if (!s) return;
-
+      console.log(s.title);
       const { messages, ...rest } = s;
       const cleanS = messages.map(t => {
         const { attachments, ...rest } = t;

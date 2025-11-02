@@ -465,7 +465,7 @@ export class Resolver extends ModelService {
         case "openai":
         default: {
           const svc = this.providers.getRequiredInstance("openai");
-          await svc.handleOpenaiAiChatRequest({
+          await svc.routeOpenAI({
             ...commonProps,
             user_location
           });
