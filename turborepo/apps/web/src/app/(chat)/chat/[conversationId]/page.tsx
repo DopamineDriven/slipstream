@@ -55,7 +55,7 @@ export default async function ChatPage({
     const data =
       await prismaConversationService.getMessagesByConversationIdWithAssets(
         conversationId
-      )
+      );
 
     if (data) {
       const m = data.messages.map((t, o) => {
@@ -66,11 +66,13 @@ export default async function ChatPage({
         const { attachments, ...rest } = t;
         const cleanAttachments = attachments.map(att => ({
           ...att,
+          image: att.image ?? undefined,
+          document: att.document ?? undefined,
           size: att.size ? Number(att.size) : null
         }));
         return { ...rest, attachments: cleanAttachments };
       });
-      messages = m
+      messages = m;
       conversationTitle = data.title;
     }
   }
