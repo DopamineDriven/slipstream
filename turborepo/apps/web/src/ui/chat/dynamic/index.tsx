@@ -1,7 +1,6 @@
 // src/ui/chat/dynamic/index.tsx
 "use client";
 
-import type { AttachmentSingleton, UIMessage } from "@/types/shared";
 import type { User } from "@/utils/auth-client";
 import React, {
   Suspense,
@@ -26,10 +25,11 @@ import { cn } from "@/lib/utils";
 import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
-import type { Provider } from "@slipstream/types";
+import type { MessageSingleton,AttachmentSingleton,  Provider } from "@slipstream/types";
+import {  toPrismaFormat } from "@slipstream/types";
 
 interface ChatInterfaceProps {
-  initialMessages?: UIMessage[] | null;
+  initialMessages?: MessageSingleton<true>[] | null;
   conversationTitle?: string | null;
   conversationId: string; // From the dynamic route param - not used, context drives everything
   user: User;
@@ -61,7 +61,9 @@ export function ChatInterface({
   const { selectedModel } = useModelSelection();
   const assetUpload = useAssetUpload();
   const { isHome } = usePathnameContext();
-  const [messages, setMessages] = useState<UIMessage[]>(initialMessages ?? []);
+  const [messages, setMessages] = useState<MessageSingleton<true>[]>(
+    initialMessages ?? []
+  );
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
   const lastUserMessageRef = useRef<string>("");
@@ -169,21 +171,29 @@ export function ChatInterface({
         id: `new-chat-user-${Date.now()}`,
         content: queuedPrompt,
         userId: user.id,
-        provider: selectedModel.provider,
+        provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
-        conversationId: activeConversationId
+        conversationId: activeConversationId ?? "new-chat",
+        disliked: null,
+        createdAt: new Date(),
+        liked: null,
+        senderType: "USER",
+        thinkingDuration: null,
+        thinkingText: null,
+        attachments: [],
+        tryAgain: null,
+        updatedAt: new Date(),
+        userKeyId: null,
+        imageGenJob: null
       });
 
-      const withAttachments = {
+      // Set initial message with attachments
+      const initialMessage = {
         ...userMsg,
-        attachments: optimisticAttachments.length
-          ? optimisticAttachments
-          : undefined
-      } as typeof userMsg & {
-        attachments?: ReturnType<typeof buildOptimisticAttachment>[];
+        attachments: optimisticAttachments
       };
 
-      setMessages([withAttachments]);
+      setMessages([initialMessage]);
       lastUserMessageRef.current = queuedPrompt;
 
       // Send to AI
@@ -227,7 +237,7 @@ export function ChatInterface({
       if (idx === -1) return prev;
       const realIndex = prev.length - 1 - idx;
       const msg = prev[realIndex];
-      if (!msg || !msg.attachments || msg.attachments.length === 0) return prev;
+      if (!msg?.attachments || msg.attachments.length === 0) return prev;
 
       const byDraft = new Map(uploads.map(u => [u.draftId, u] as const));
       const updatedAttachments = msg.attachments.map(att => {
@@ -275,15 +285,24 @@ export function ChatInterface({
         id: `streaming-${activeConversationId}`,
         content: streamedText,
         userId: user.id,
-        provider: selectedModel.provider,
+        provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
         conversationId: activeConversationId,
         thinkingText: isThinking
           ? thinkingText
           : thinkingDuration
             ? thinkingText
-            : undefined,
-        thinkingDuration: thinkingDuration ?? undefined
+            : null,
+        thinkingDuration: thinkingDuration ?? null,
+        createdAt: new Date(),
+        disliked: null,
+        attachments: [],
+        liked: null,
+        senderType: "AI",
+        tryAgain: null,
+        updatedAt: new Date(),
+        userKeyId: null,
+        imageGenJob: null
       });
 
       if (existingStreamIndex >= 0) {
@@ -317,7 +336,7 @@ export function ChatInterface({
         if (streamingIndex >= 0) {
           const updated = [...prev];
           const streamingMsg = updated[streamingIndex];
-          if (streamingMsg) {
+          if (streamingMsg && updated?.[streamingIndex]) {
             updated[streamingIndex] = finalizeStreamingMessage(
               streamingMsg,
               streamedText,
@@ -378,26 +397,30 @@ export function ChatInterface({
             size: info?.size ?? undefined
           }
         );
-      }) as AttachmentSingleton[];
+      }) as AttachmentSingleton<true>[];
 
       // Add optimistic user message with optional attachments
       const userMsg = createUserMessage({
         id: `user-${Date.now()}-${Math.random()}`,
         content: content.trim(),
         userId: user.id,
-        provider: selectedModel.provider,
+        provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
-        conversationId: activeConversationId
+        conversationId: activeConversationId ?? "new-chat",
+        createdAt: new Date(),
+        disliked: null,
+        liked: null,
+        senderType: "USER",
+        thinkingDuration: null,
+        thinkingText: null,
+        tryAgain: null,
+        attachments: optimisticAttachments,
+        updatedAt: new Date(),
+        userKeyId: null,
+        imageGenJob: null
       });
 
-      const userMsgWithAttachments = {
-        ...userMsg,
-        attachments: optimisticAttachments.length
-          ? optimisticAttachments
-          : undefined
-      } satisfies UIMessage;
-
-      setMessages(prev => [...prev, userMsgWithAttachments]);
+      setMessages(prev => [...prev, userMsg]);
       lastUserMessageRef.current = content.trim();
       setIsAwaitingFirstChunk(true);
       // To continue this session, run codex resume 019a346c-971d-7c53-b1db-d01ed0b8a58c

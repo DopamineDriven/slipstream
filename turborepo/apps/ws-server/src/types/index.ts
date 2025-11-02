@@ -272,6 +272,7 @@ export type IncludeCreateConvoWithImgGenProps = {
         include: {
           image: true;
           document: true;
+          imageGenOutput: true
         };
       };
     };
@@ -280,7 +281,7 @@ export type IncludeCreateConvoWithImgGenProps = {
 
 export type MessageDataWorkupProps = {
   content: string;
-  provider: "OPENAI" | "GEMINI" | "GROK" | "ANTHROPIC" | "META" | "VERCEL";
+  provider: $Enums.Provider;
   senderType: "USER";
   model: AllModelsUnion;
   userId: string;
@@ -307,7 +308,7 @@ export type MessageDataWorkupProps = {
       topP: number | undefined;
       model: AllModelsUnion;
       prompt: string;
-      provider: "OPENAI" | "GEMINI" | "GROK" | "ANTHROPIC" | "META" | "VERCEL";
+      provider: $Enums.Provider;
     };
   };
 };
@@ -927,19 +928,21 @@ export type ImageSingleton = {
 };
 
 export type ConvoSettingsSingleton = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  conversationId: string;
-  systemPrompt: string | null;
-  temperature: number | null;
-  topP: number | null;
-  maxTokens: number | null;
-  enableThinking: boolean | null;
-  trackUsage: boolean | null;
-  enableWebSearch: boolean | null;
-  enableAssetGen: boolean | null;
-  usageAlerts: boolean | null;
+    id: string;
+    conversationId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    systemPrompt: string | null;
+    temperature: number | null;
+    topP: number | null;
+    maxTokens: number | null;
+    enableThinking: boolean | null;
+    trackUsage: boolean | null;
+    enableWebSearch: boolean | null;
+    enableAssetGen: boolean | null;
+    reasoningEffort: $Enums.ReasoningEffort | null;
+    outputVerbosity: $Enums.OutputVerbosity | null;
+    usageAlerts: boolean | null;
 };
 
 export type ImageGenJobSingleton = {
@@ -976,7 +979,27 @@ export type ImageGenJobSingleton = {
   revisedPrompt: string | null;
   error: string | null;
   requestMessageId: string;
+  outputs?: ImageGenOutputSingleton[];
+  userKey?: UserKeySingleton;
 };
+
+export type ImageGenOutputSingleton = {
+    id: string;
+    seriesId: string;
+    ext: string | null;
+    mime: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    jobId: string;
+    jobIndex: number;
+    kind: $Enums.ImageGenOutputKind;
+    seriesIndex: number;
+    isPartial: boolean;
+    attachmentId: string;
+    width: number | null;
+    height: number | null;
+    revisedPrompt: string | null;
+}
 
 export type AttachmentSingleton<T extends boolean = false> = {
   id: string;
@@ -1045,7 +1068,21 @@ export type AttachmentSingleton<T extends boolean = false> = {
   updatedAt: Date;
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
+  imageGenOutput: ImageGenOutputSingleton | null;
 };
+
+export type UserKeySingleton = {
+    id: string;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    provider: $Enums.Provider;
+    apiKey: string;
+    iv: string;
+    authTag: string;
+    label: string | null;
+    isDefault: boolean;
+}
 
 export type MessageSingleton<T extends boolean = false> = {
   id: string;
@@ -1064,6 +1101,7 @@ export type MessageSingleton<T extends boolean = false> = {
   disliked: boolean | null;
   tryAgain: boolean | null;
   imageGenJob?: ImageGenJobSingleton | null;
+  userKey?: UserKeySingleton | null;
   attachments: AttachmentSingleton<T>[];
 };
 
@@ -1195,6 +1233,23 @@ export type Signals =
 export type ImageGenReqDbRes<T extends boolean = false> = {
   messages: ({
     attachments: ({
+      imageGenOutput: {
+        id: string;
+        seriesId: string;
+        ext: string | null;
+        mime: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        jobId: string;
+        jobIndex: number;
+        kind: $Enums.ImageGenOutputKind;
+        seriesIndex: number;
+        isPartial: boolean;
+        attachmentId: string;
+        width: number | null;
+        height: number | null;
+        revisedPrompt: string | null;
+      } | null;
       image: {
         createdAt: Date;
         updatedAt: Date;

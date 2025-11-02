@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button, Download, X } from "@slipstream/ui";
@@ -13,6 +13,34 @@ interface ImageGenerationCanvasProps {
   mime: string;
   cdnUrlPartial?: string | null;
   prompt: string;
+  // Add optional unique identifier for proper keying
+  generationId?: string;
+}
+
+// Helper function to extract series info from CDN URL
+function extractSeriesInfo(url: string | null): { seriesId: string; seriesIndex: number; timestamp: number } | null {
+  if (!url) return null;
+
+  try {
+    const filename = url.split('/').pop();
+    if (!filename) return null;
+
+    // Pattern: {timestamp}-{seriesId}-{seriesIndex}.png
+    const parts = filename.split('-');
+    if (parts.length < 3) return null;
+    if (!parts[0]) return null;
+    const timestamp = parseInt(parts[0]);
+    const seriesId = parts[1];
+    if (!seriesId) return null;
+    const seriesIndexWithExt = parts[parts.length - 1]; // Use last part to handle seriesIds with hyphens
+    const seriesIndex = parseInt(seriesIndexWithExt?.split('.')?.[0] ??'0');
+
+    if (!seriesId || isNaN(timestamp) || isNaN(seriesIndex)) return null;
+
+    return { seriesId, seriesIndex, timestamp };
+  } catch {
+    return null;
+  }
 }
 
 export function ImageGenerationCanvas({
@@ -21,61 +49,106 @@ export function ImageGenerationCanvas({
   width,
   cdnUrl,
   cdnUrlPartial,
-  prompt
+  prompt,
+  generationId
 }: ImageGenerationCanvasProps) {
-  const [showImage, setShowImage] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [showPartial, setShowPartial] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
 
+  // Track previous URL to detect changes
+  const prevUrlRef = useRef<string | null>(null);
+  const prevGenerationIdRef = useRef<string | undefined>(undefined);
+
+  // Determine what URL to display
+  const displayUrl = cdnUrl ?? (isGenerating && cdnUrlPartial ? cdnUrlPartial : null);
+  const isPartialDisplay = !cdnUrl && isGenerating && !!cdnUrlPartial;
+  const shouldShowImage = !!displayUrl && !isClosed;
+
+  // Extract series information for better keying
+  const seriesInfo = extractSeriesInfo(displayUrl);
+  const imageKey = seriesInfo
+    ? `${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
+    : `${generationId ?? 'gen'}-${displayUrl}`;
+  const imageId = seriesInfo
+    ? `img-${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
+    : `img-${generationId ?? 'gen'}-${isPartialDisplay ? 'partial' : 'final'}`;
+
+  // Reset state when generation changes
   useEffect(() => {
-    if (cdnUrl) {
-      // eslint-disable-next-line
-      setShowImage(true);
-      setImageLoaded(false);
-      setShowPartial(false);
+    if (generationId !== prevGenerationIdRef.current) {
+      prevGenerationIdRef.current = generationId;
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => {
+        setIsClosed(false);
+        setImageLoaded(false);
+      }, 0);
     }
-  }, [cdnUrl]);
+  }, [generationId]);
 
+  // Reset loaded state when URL changes
   useEffect(() => {
-    if (cdnUrlPartial && isGenerating) {
-      //eslint-disable-next-line
-      setShowPartial(true);
-    } else if (!isGenerating) {
-      setShowPartial(false);
+    if (displayUrl !== prevUrlRef.current) {
+      prevUrlRef.current = displayUrl;
+      if (displayUrl) {
+        // Use setTimeout to avoid synchronous setState in effect
+        setTimeout(() => setImageLoaded(false), 0);
+      }
     }
-  }, [cdnUrlPartial, isGenerating]);
+  }, [displayUrl]);
 
-  const displayImageUrl = cdnUrl ?? (showPartial ? cdnUrlPartial : null);
-  const isPartialImage = showPartial && !cdnUrl;
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  const handleDownload = () => {
+    if (!cdnUrl) return;
+    const link = document.createElement("a");
+    link.href = cdnUrl;
+    link.download = seriesInfo
+      ? `generated-${seriesInfo.seriesId}-final.png`
+      : `generated-${Date.now()}.png`;
+    link.click();
+  };
+
+  const handleClose = () => {
+    setIsClosed(true);
+  };
 
   return (
     <div className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
+      {/* Ripple animation for generating state without image */}
       <div
         className={cn(
           "absolute inset-0 transition-opacity duration-500",
-          isGenerating && !showPartial ? "opacity-100" : "opacity-0"
+          isGenerating && !shouldShowImage ? "opacity-100" : "opacity-0"
         )}>
         <div className="ripple-container" />
       </div>
 
-      {displayImageUrl && (
+      {/* Image display */}
+      {shouldShowImage && displayUrl && (
         <div
           className={cn(
             "absolute inset-0 transition-all duration-700 ease-out",
-            (showImage && imageLoaded) || showPartial
+            imageLoaded || isPartialDisplay
               ? "scale-100 opacity-100"
               : "scale-95 opacity-0"
           )}>
           <Image
-            src={displayImageUrl || "/placeholder.svg"}
+            key={imageKey} // Use series-aware key
+            id={imageId} // Use series-aware ID
+            src={displayUrl}
             alt={prompt}
             height={height}
             width={width}
             className="h-full w-full object-cover"
-            onLoad={() => setImageLoaded(true)}
+            onLoad={handleImageLoad}
+            priority={isPartialDisplay} // Prioritize loading partials
+            unoptimized={isPartialDisplay} // Skip optimization for partials to load faster
           />
 
-          {isPartialImage && (
+          {/* Partial image overlay effects */}
+          {isPartialDisplay && (
             <>
               <div className="scanning-line" />
               <div className="border-primary/30 animate-pulse-glow absolute inset-0 border-2" />
@@ -85,9 +158,17 @@ export function ImageGenerationCanvas({
               <div className="border-primary animate-pulse-glow absolute right-2 bottom-2 h-8 w-8 border-r-2 border-b-2" />
             </>
           )}
+
+          {/* Add series index indicator for debugging */}
+          {seriesInfo && process.env.NODE_ENV === 'development' && (
+            <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-xs text-white">
+              {isPartialDisplay ? `Partial ${seriesInfo.seriesIndex}/3` : 'Final (4)'}
+            </div>
+          )}
         </div>
       )}
 
+      {/* Action buttons overlay */}
       <div
         className={cn(
           "absolute inset-0 bg-black/0 transition-colors duration-300 hover:bg-black/20",
@@ -102,35 +183,23 @@ export function ImageGenerationCanvas({
             size="icon"
             variant="ghost"
             className="bg-white/90 backdrop-blur-sm hover:bg-white"
-            onClick={() => {
-              if (!cdnUrl) return;
-              const link = document.createElement("a");
-              link.href = cdnUrl;
-              link.download = `generated-${Date.now()}.png`;
-              link.click();
-            }}>
+            onClick={handleDownload}>
             <Download className="h-4 w-4" />
           </Button>
           <Button
             size="icon"
             variant="ghost"
             className="bg-white/90 backdrop-blur-sm hover:bg-white"
-            onClick={() => {
-              setShowImage(false);
-              setImageLoaded(false);
-            }}>
+            onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {isGenerating && (
+      {/* Generating status overlay */}
+      {isGenerating && !shouldShowImage && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div
-            className={cn(
-              "animate-fade-in space-y-4 text-center transition-opacity duration-500",
-              showPartial ? "opacity-0" : "opacity-100"
-            )}>
+          <div className="animate-fade-in space-y-4 text-center">
             <div className="bg-background/80 border-border inline-flex items-center gap-2 rounded-full border px-4 py-2 backdrop-blur-sm">
               <div className="bg-primary h-2 w-2 animate-pulse rounded-full" />
               <span className="text-sm font-medium">Generating image...</span>
@@ -144,7 +213,8 @@ export function ImageGenerationCanvas({
         </div>
       )}
 
-      {!isGenerating && !cdnUrl && (
+      {/* Ready to generate state */}
+      {!isGenerating && !shouldShowImage && !cdnUrl && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-muted-foreground space-y-2 text-center">
             <p className="text-lg font-medium">Ready to generate</p>

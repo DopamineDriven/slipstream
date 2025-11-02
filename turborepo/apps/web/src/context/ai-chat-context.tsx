@@ -625,6 +625,10 @@ export function AIChatProvider({
     setIsStreaming(false);
     setIsComplete(false);
     setError(null);
+    // Reset image generation state
+    setImgGenEnabled(false);
+    setImgGenPartial(null);
+    setImgGenFinals(null);
   }, []);
 
   return (

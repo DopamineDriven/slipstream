@@ -661,7 +661,8 @@ export class PrismaService extends ModelService {
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }
@@ -711,24 +712,6 @@ export class PrismaService extends ModelService {
   }: HandleAiChatReqCreateSansImgGenAndAttachmentsProps) {
     const { connectById, withAssetInfo } =
       await this.handleAiChatReqCreateWithAttachments({ userId, batchId });
-
-    const includeConvoCreate = {
-      conversationSettings: true,
-      messages: {
-        orderBy: { createdAt: "asc" },
-        include: {
-          imageGenJob: true,
-          attachments: {
-            orderBy: { createdAt: "asc" },
-            include: {
-              image: true,
-              document: true
-            }
-          }
-        }
-      }
-    } as const;
-
     const conversationSettings = { create };
 
     const dataConvoCreate = {
@@ -749,7 +732,23 @@ export class PrismaService extends ModelService {
       userId
     } as const;
     const dat = await this.prismaClient.conversation.create({
-      include: includeConvoCreate,
+      include: {
+        conversationSettings: true,
+        messages: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            imageGenJob: true,
+            attachments: {
+              orderBy: { createdAt: "asc" },
+              include: {
+                imageGenOutput: true,
+                image: true,
+                document: true
+              }
+            }
+          }
+        }
+      },
       data: dataConvoCreate
     });
     const lastMsg = dat.messages.at(-1);
@@ -796,7 +795,8 @@ export class PrismaService extends ModelService {
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }
@@ -950,7 +950,8 @@ export class PrismaService extends ModelService {
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }

@@ -88,7 +88,7 @@ export function ImgGenComponent({
               type="text"
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleGenerate()}
+              onKeyDown={e => e.key === "Enter" && handleGenerate}
               placeholder={realPrompt}
               className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-ring flex-1 rounded-lg border px-4 py-3 focus:ring-2 focus:outline-none"
               disabled={isGenerating}
