@@ -1007,14 +1007,24 @@ export class ProviderValidation {
         messages: {
           orderBy: { createdAt: "asc" },
           include: {
-            userKey: true,
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
-                imageGenOutput: true,
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }
@@ -1027,11 +1037,22 @@ export class ProviderValidation {
           include: {
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
-                imageGenOutput: true,
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }

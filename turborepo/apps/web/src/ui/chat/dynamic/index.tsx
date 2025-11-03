@@ -55,7 +55,9 @@ export function ChatInterface({
     resetStreamingState,
     thinkingText,
     isThinking,
-    thinkingDuration
+    thinkingDuration,
+    imgGenEnabled,
+    imgGenFields
   } = useAIChatContext();
   const router = useRouter();
   const { selectedModel } = useModelSelection();
@@ -451,6 +453,8 @@ export function ChatInterface({
         isHome={isHome}
         thinkingText={thinkingText}
         thinkingDuration={thinkingDuration ?? undefined}
+        imgGenEnabled={imgGenEnabled}
+        imgGenFields={imgGenFields ?? undefined}
         user={user}>
         <ChatHero
           user={user}

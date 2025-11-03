@@ -25,6 +25,24 @@ interface ChatFeedProps {
   isStreaming?: boolean;
   children?: ReactNode;
   activeConversationId?: string;
+  imgGenEnabled?: boolean;
+  imgGenFields?: {
+    outputFormat?: string;
+    partialImages?: {
+      index: number;
+      cdnUrl: string;
+      width: number;
+      height: number;
+      mime: string;
+    }[];
+    images?: {
+      index: number;
+      cdnUrl: string;
+      width: number;
+      height: number;
+      mime: string;
+    }[];
+  };
 }
 
 export function ChatFeed({
@@ -39,6 +57,8 @@ export function ChatFeed({
   isThinking,
   isHome,
   thinkingDuration,
+  imgGenEnabled,
+  imgGenFields,
   children
 }: ChatFeedProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -183,21 +203,16 @@ export function ChatFeed({
                   : undefined
               }
               // Progressive image-gen data for streaming message
-              // liveImgGenEnabled={
-              //   isStreaming && message.id.startsWith("streaming-")
-              //     ? ai.imgGenEnabled
-              //     : undefined
-              // }
-              // liveImgPartial={
-              //   isStreaming && message.id.startsWith("streaming-")
-              //     ? ai.imgGenPartial ?? undefined
-              //     : undefined
-              // }
-              // liveImgFinals={
-              //   isStreaming && message.id.startsWith("streaming-")
-              //     ? ai.imgGenFinals ?? undefined
-              //     : undefined
-              // }
+              liveImgGenEnabled={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? imgGenEnabled
+                  : undefined
+              }
+              liveImgGenFields={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? imgGenFields ?? undefined
+                  : undefined
+              }
             />
           ))}
           {isStreaming && isAwaitingFirstChunk === true && (

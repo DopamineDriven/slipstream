@@ -22,6 +22,7 @@ import type {
   AIChatRequest,
   AIChatRequestImgGenFields,
   UserMetadata as AIChatRequestUserMetadata,
+  AIChatResponseImgGenFields,
   AllModelsUnion,
   EventTypeMap,
   Provider
@@ -36,6 +37,8 @@ interface StreamingMessage {
   isUser: boolean;
   thinkingText?: string;
   thinkingDuration?: number;
+  imgGenEnabled?: boolean;
+  imgGenFields?: AIChatResponseImgGenFields | null;
 }
 
 interface AIChatContextValue {
@@ -71,24 +74,9 @@ interface AIChatContextValue {
   isWaitingForRealId: boolean;
   isConnected: boolean;
 
-  // Live image generation (progressive) state
+  // Live image generation (progressive) state - complete server shape
   imgGenEnabled: boolean;
-  imgGenPartial: {
-    index: number;
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-  } | null;
-  imgGenFinals:
-    | {
-        index: number;
-        cdnUrl: string;
-        width: number;
-        height: number;
-        mime: string;
-      }[]
-    | null;
+  imgGenFields: AIChatResponseImgGenFields | null;
 }
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
@@ -136,23 +124,8 @@ export function AIChatProvider({
 
   // Live image-gen progressive state
   const [imgGenEnabled, setImgGenEnabled] = useState<boolean>(false);
-  const [imgGenPartial, setImgGenPartial] = useState<{
-    index: number;
-    cdnUrl: string;
-    width: number;
-    height: number;
-    mime: string;
-  } | null>(null);
-  const [imgGenFinals, setImgGenFinals] = useState<
-    | {
-        index: number;
-        cdnUrl: string;
-        width: number;
-        height: number;
-        mime: string;
-      }[]
-    | null
-  >(null);
+  const [imgGenFields, setImgGenFields] =
+    useState<AIChatResponseImgGenFields | null>(null);
 
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
@@ -198,6 +171,8 @@ export function AIChatProvider({
   const isStreamingRef = useRef(isStreaming);
   const titleRef = useRef<string | null>(null);
   const activeUserStreamsRef = useRef<Set<string>>(new Set());
+  const imgGenEnabledRef = useRef(imgGenEnabled);
+  const imgGenFieldsRef = useRef(imgGenFields);
 
   // Update refs when state changes
   useEffect(() => {
@@ -225,6 +200,15 @@ export function AIChatProvider({
   useEffect(() => {
     titleRef.current = title;
   }, [title]);
+
+  // Keep refs for imgGen state
+  useEffect(() => {
+    imgGenEnabledRef.current = imgGenEnabled;
+  }, [imgGenEnabled]);
+
+  useEffect(() => {
+    imgGenFieldsRef.current = imgGenFields;
+  }, [imgGenFields]);
 
   // Stable helper to update title state only when changed
   const updateTitle = useCallback((nextTitle?: string | null) => {
@@ -300,21 +284,19 @@ export function AIChatProvider({
 
       setIsComplete(false);
 
-      // Image generation progressive updates (partial images)
+      // Image generation progressive updates - accumulate the complete fields
       if (evt.imgGenEnabled) {
         setImgGenEnabled(true);
-        const p = evt.imgGenFields?.partialImages;
-        if (p && p.length > 0) {
-          const last = p[p.length - 1];
-          if (last) {
-            setImgGenPartial({
-              index: last.index,
-              cdnUrl: last.cdnUrl,
-              width: last.width,
-              height: last.height,
-              mime: last.mime
-            });
-          }
+        if (evt.imgGenFields) {
+          console.log(evt.imgGenFields);
+          // Merge new fields with existing, preserving all partial images
+          setImgGenFields(prev => ({
+            ...prev,
+            ...evt.imgGenFields,
+            // Accumulate partial images array if it exists
+            partialImages:
+              evt.imgGenFields?.partialImages ?? prev?.partialImages
+          }));
         }
       }
 
@@ -328,7 +310,9 @@ export function AIChatProvider({
         provider: evt.provider ?? selectedModel.provider,
         model: evt.model ?? selectedModel.modelId,
         timestamp: new Date(),
-        isUser: false
+        isUser: false,
+        imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
+        imgGenFields: imgGenFieldsRef.current
       });
     };
 
@@ -368,20 +352,12 @@ export function AIChatProvider({
     };
 
     const handleResponse = (evt: EventTypeMap["ai_chat_response"]) => {
-      // Image generation final images
+      // Image generation final response - complete fields with final images
       if (evt.imgGenEnabled) {
         setImgGenEnabled(true);
-        const imgs = evt.imgGenFields?.images;
-        if (imgs && imgs.length > 0) {
-          setImgGenFinals(
-            imgs.map(i => ({
-              index: i.index,
-              cdnUrl: i.cdnUrl,
-              width: i.width,
-              height: i.height,
-              mime: i.mime
-            }))
-          );
+        if (evt.imgGenFields) {
+          // Set the complete final fields, including all images
+          setImgGenFields(evt.imgGenFields);
         }
       }
       setIsComplete(evt.done);
@@ -543,8 +519,7 @@ export function AIChatProvider({
       setThinkingDuration(null);
       setError(null);
       setImgGenEnabled(false);
-      setImgGenPartial(null);
-      setImgGenFinals(null);
+      setImgGenFields(null);
       setIsComplete(false);
       setIsStreaming(true);
       setCurrentStreamingMessage(null);
@@ -627,8 +602,7 @@ export function AIChatProvider({
     setError(null);
     // Reset image generation state
     setImgGenEnabled(false);
-    setImgGenPartial(null);
-    setImgGenFinals(null);
+    setImgGenFields(null);
   }, []);
 
   return (
@@ -651,8 +625,7 @@ export function AIChatProvider({
         isWaitingForRealId,
         isConnected,
         imgGenEnabled,
-        imgGenPartial,
-        imgGenFinals
+        imgGenFields
       }}>
       {children}
     </AIChatContext.Provider>

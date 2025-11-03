@@ -19,7 +19,6 @@ import type {
   DocSpecs,
   DocumentSingleton,
   EventTypeMap,
-  ImageGenModels,
   ImageSingleton,
   ImageSpecs,
   MessageSingleton,
@@ -76,10 +75,6 @@ export class Resolver extends ModelService {
     this.wsServer.on(
       "asset_upload_progress",
       this.handleAssetProgress.bind(this)
-    );
-    this.wsServer.on(
-      "image_gen_request",
-      this.handleImageGenRequest.bind(this)
     );
   }
 
@@ -527,113 +522,6 @@ export class Resolver extends ModelService {
     }
   }
 
-  public async handleImageGenRequest(
-    event: EventTypeMap["image_gen_request"],
-    ws: WebSocket,
-    userId: string,
-    userData?: UserData
-  ) {
-    const provider = event.provider,
-      model = this.getModel(
-        provider,
-        event?.model as ImageGenModels | undefined
-      ),
-      topP = event.topP,
-      temperature = event.temperature,
-      systemPrompt = event.systemPrompt;
-
-    const { type: _type, model: _m, ...rest } = event,
-      isNewChat = rest.conversationId.startsWith("new-chat");
-
-    const res = await this.wsServer.prisma.handleImageGenRequest({
-      userId,
-      model,
-      ...rest
-    });
-
-    const _user_location = {
-      type: "approximate",
-      city: userData?.city ?? "Barrington",
-      country: userData?.country ?? "US",
-      region: userData?.region ?? "Illinois",
-      timezone: userData?.tz
-        ? decodeURIComponent(userData?.tz)
-        : "America/Chicago"
-    } as const;
-
-    const _msgs = res.messages,
-      conversationId = res.id,
-      // apiKey = res.apiKey ?? undefined,
-      // keyId = res.userKeyId,
-      streamChannel = RedisChannels.conversationStream(conversationId),
-      // userChannel = RedisChannels.user(userId),
-      existingState = await this.wsServer.redis.getStreamState(conversationId),
-      // createdAt = res.createdAt,
-      _title = isNewChat
-        ? await this.titleGenUtil("image_gen_request", {
-            prompt: event.prompt,
-            ...res
-          })
-        : (res.title ??
-          (await this.titleGenUtil("image_gen_request", {
-            prompt: event.prompt,
-            ...res
-          })));
-
-    let chunks = Array.of<string>(),
-      // thinkingChunks = Array.of<string>(),
-      resumedFromChunk = 0;
-    // thinkingAgg = "",
-    // thinkingDuration = 0,
-    // partialImageGenOut = Array.of<Buffer>(),
-    // partialImageGenAgg: Buffer | null = null,
-    // revisedPromptAgg = "",
-    // revisedPromptChunks = Array.of<string>(),
-    // cdnUrlAgg = "",
-    // cdnUrlChunks = Array.of<string>(),
-    // imageGenOut = Array.of<Buffer | string>(),
-    // imageGenAgg: Buffer | string | null = null;
-
-    if (existingState && !existingState.metadata.completed) {
-      chunks = existingState.chunks;
-      resumedFromChunk = chunks.length;
-      if (existingState.thinkingChunks)
-        // thinkingChunks = existingState.thinkingChunks;
-        // Send resume event
-        void this.wsServer.redis.publishTypedEvent(
-          streamChannel,
-          "stream:resumed",
-          {
-            type: "stream:resumed",
-            conversationId,
-            resumedAt: resumedFromChunk,
-            chunks,
-            title: existingState.metadata.title,
-            model: existingState.metadata.model,
-            provider: existingState.metadata.provider
-          }
-        );
-
-      // Send the accumulated chunks as a single ai_chat_chunk to catch up
-      ws.send(
-        JSON.stringify({
-          type: "image_gen_progress",
-          conversationId,
-          duration: 0,
-          progress: 0,
-          requested_count: 1,
-          userId,
-          done: false,
-          model: existingState.metadata.model ?? model,
-          provider: existingState.metadata.provider as Provider,
-          title: existingState.metadata.title,
-          systemPrompt,
-          temperature,
-          topP
-        } satisfies EventTypeMap["image_gen_progress"])
-      );
-    }
-  }
   /** Dispatches incoming events to handlers */
   public async handleRawMessage(
     ws: WebSocket,
@@ -670,9 +558,6 @@ export class Resolver extends ModelService {
         break;
       case "asset_attached":
         await this.handleAssetAttached(event, ws, userId, userData);
-        break;
-      case "image_gen_request":
-        await this.handleImageGenRequest(event, ws, userId, userData);
         break;
       default:
         await this.wsServer.redis.publish(
