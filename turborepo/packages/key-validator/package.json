@@ -60,7 +60,7 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.0",
