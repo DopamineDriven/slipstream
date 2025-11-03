@@ -9,7 +9,10 @@ import { getInitials } from "@/lib/helpers";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
+import { AttachmentDisplay } from "@/ui/chat/attachment-display";
+import { ImageGenerationCanvas } from "@/ui/chat/image-gen/image-generation-canvas";
 import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
+import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
 import type {
@@ -23,9 +26,6 @@ import {
   Button,
   EllipsisHorizontal
 } from "@slipstream/ui";
-import { AttachmentDisplay } from "../attachment-display";
-import { ImageGenerationCanvas } from "../image-gen/image-generation-canvas";
-import { MessageIcons } from "./message-icons";
 
 // Note: processMarkdownToReact is dynamically imported in the useEffect to reduce bundle size
 
@@ -346,8 +346,9 @@ export function MessageBubble({
                       liveImgGenFields.partialImages
                         .filter(
                           t =>
+                            liveImgGenFields?.partialImages &&
                             t.index ===
-                            liveImgGenFields.partialImages.length - 1
+                              liveImgGenFields?.partialImages.length - 1
                         )
                         .map(t => (
                           <ImageGenerationCanvas
