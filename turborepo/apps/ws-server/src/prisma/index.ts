@@ -33,7 +33,6 @@ import type {
   AIChatResponseDb,
   AllModelsUnion,
   CTR,
-  ImageGenRequest,
   Providers,
   Rm,
   RTC,
@@ -242,254 +241,6 @@ export class PrismaService extends ModelService {
     } satisfies BigIntToCompatProps<typeof target>["rtExtended"];
   }
 
-  public async handleImageGenRequest({
-    userId,
-    batchId,
-    provider,
-    model: m,
-    hasProviderConfigured,
-    ...data
-  }: RTC<Rm<ImageGenRequest, "type">, "output_quality"> & { userId: string }) {
-    let keyId: string | null = null,
-      apiKey: string | null = null;
-    if (hasProviderConfigured) {
-      const { keyId: kId, apiKey: apiK } = await this.handleApiKeyLookup(
-        provider,
-        userId
-      );
-      keyId = kId;
-      apiKey = apiK;
-    }
-
-    const {
-      conversationId,
-      includeSansAttachments,
-      topP,
-      includeWithAttachments,
-      maxTokens,
-      messageData,
-      systemPrompt,
-      temperature
-    } = this.handleAiChatRequestImgGenWorkup({
-      userId: userId,
-      batchId,
-      provider,
-      model: m,
-      hasProviderConfigured,
-      apiKey,
-      keyId,
-      ...data
-    });
-
-    if (conversationId === "new-chat") {
-      const conversationSettings = {
-        create: {
-          maxTokens,
-          topP,
-          enableAssetGen: true,
-          systemPrompt,
-          temperature
-        }
-      } as const;
-      if (typeof batchId !== "undefined") {
-        const batchIt = await this.prismaClient.$transaction(async pr => {
-          const attachments = await pr.attachment.findMany({
-            where: { batchId, userId },
-            take: 10,
-            orderBy: [{ createdAt: "desc" }],
-            include: { image: true, document: true }
-          });
-          const extended = attachments.map(t => {
-            const {
-              compatStatus,
-              assetType,
-              compatCdnUrl,
-              compatMime,
-              compatExt
-            } = t;
-            return {
-              type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
-              compatStatus: compatStatus ?? "ALIASED",
-              url: compatCdnUrl ?? "",
-              mime: compatMime ?? "",
-              ext: compatExt ?? ""
-            };
-          });
-
-          const withAssetInfo = {
-            assetCounts: extended.length,
-            assets: extended
-          };
-
-          const connectById = attachments.map(({ id }) => ({ id }));
-
-          const create = await pr.conversation.create({
-            include: includeWithAttachments,
-            data: {
-              attachments: { connect: connectById },
-              messages: {
-                create: {
-                  attachments: { connect: connectById },
-                  ...messageData
-                }
-              },
-              conversationSettings,
-              userKeyId: keyId,
-              userId
-            }
-          });
-          const lastMsg = create.messages.at(-1);
-          return {
-            create,
-            withAssetInfo,
-            imgGenJobId: lastMsg?.imageGenJob?.id,
-            requestMessageId: lastMsg?.id
-          };
-        });
-        return this.toCompatPropsExtened(
-          "image_gen_request",
-          this.bigintToNumber("image_gen_request", {
-            apiKey,
-            ...batchIt.create
-          }),
-          {
-            jobId: batchIt.imgGenJobId,
-            requestMessageId: batchIt.requestMessageId,
-            ...batchIt.withAssetInfo
-          }
-        );
-      }
-
-      const p = await this.prismaClient.conversation.create({
-        include: includeSansAttachments,
-        data: {
-          messages: {
-            create: {
-              ...messageData
-            }
-          },
-          conversationSettings,
-          userKeyId: keyId,
-          userId
-        }
-      });
-      const apiKeyAndRes = { apiKey, ...p };
-      const lastMsg = apiKeyAndRes.messages.at(-1);
-      return this.toCompatPropsExtened(
-        "image_gen_request",
-        this.bigintToNumber("image_gen_request", apiKeyAndRes),
-        {
-          jobId: lastMsg?.imageGenJob?.id,
-          requestMessageId: lastMsg?.id,
-          assetCounts: 0,
-          assets: undefined
-        }
-      );
-    } else {
-      const conversationSettings = {
-        update: {
-          maxTokens,
-          topP,
-          enableAssetGen: true,
-          systemPrompt,
-          temperature
-        }
-      } as const;
-      if (typeof batchId !== "undefined") {
-        const batchIt = await this.prismaClient.$transaction(async pr => {
-          const attachments = await pr.attachment.findMany({
-            where: { batchId, userId, conversationId, messageId: null },
-            take: 10,
-            orderBy: [{ createdAt: "desc" }],
-            include: { image: true, document: true }
-          });
-          const extended = attachments.map(t => {
-            const {
-              compatStatus,
-              assetType,
-              compatCdnUrl,
-              compatMime,
-              compatExt
-            } = t;
-            return {
-              type: assetType === "IMAGE" ? assetType : ("DOCUMENT" as const),
-              compatStatus: compatStatus ?? "ALIASED",
-              url: compatCdnUrl ?? "",
-              mime: compatMime ?? "",
-              ext: compatExt ?? ""
-            };
-          });
-
-          const withAssetInfo = {
-            assetCounts: extended.length,
-            assets: extended
-          };
-
-          const connectById = attachments.map(({ id }) => ({ id }));
-          const create = await pr.conversation.update({
-            include: includeWithAttachments,
-            where: { id: conversationId },
-            data: {
-              attachments: { connect: connectById },
-              messages: {
-                create: {
-                  attachments: { connect: connectById },
-                  ...messageData
-                }
-              },
-              conversationSettings,
-              userId,
-              userKeyId: keyId
-            }
-          });
-          const lastMsg = create.messages.at(-1);
-          return {
-            create,
-            withAssetInfo: {
-              jobId: lastMsg?.imageGenJob?.id,
-              requestMessageId: lastMsg?.id,
-              ...withAssetInfo
-            }
-          };
-        });
-        return this.toCompatPropsExtened(
-          "image_gen_request",
-          this.bigintToNumber("image_gen_request", {
-            apiKey,
-            ...batchIt.create
-          }),
-          batchIt.withAssetInfo
-        );
-      }
-      const pr = await this.prismaClient.conversation.update({
-        include: includeSansAttachments,
-        where: { id: conversationId },
-        data: {
-          messages: {
-            create: {
-              ...messageData
-            }
-          },
-          conversationSettings,
-          userId,
-          userKeyId: keyId
-        }
-      });
-      const apiKeyAndRes = { apiKey, ...pr };
-      const lastMsg = apiKeyAndRes.messages.at(-1);
-      return this.toCompatPropsExtened(
-        "image_gen_request",
-        this.bigintToNumber("image_gen_request", apiKeyAndRes),
-        {
-          jobId: lastMsg?.imageGenJob?.id,
-          requestMessageId: lastMsg?.id,
-          assetCounts: 0,
-          assets: undefined
-        }
-      );
-    }
-  }
-
   private async handleAiChatReqCreateWithAttachments({
     userId,
     batchId
@@ -658,6 +409,17 @@ export class PrismaService extends ModelService {
           include: {
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
@@ -739,11 +501,22 @@ export class PrismaService extends ModelService {
           include: {
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
-                imageGenOutput: true,
                 image: true,
-                document: true
+                document: true,
+                imageGenOutput: true
               }
             }
           }
@@ -792,6 +565,17 @@ export class PrismaService extends ModelService {
           include: {
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
@@ -947,6 +731,17 @@ export class PrismaService extends ModelService {
           include: {
             imageGenJob: true,
             attachments: {
+              where: {
+                OR: [
+                  { origin: { not: "GENERATED" } },
+                  {
+                    AND: [
+                      { origin: "GENERATED" },
+                      { imageGenOutput: { kind: "FINAL" } }
+                    ]
+                  }
+                ]
+              },
               orderBy: { createdAt: "asc" },
               include: {
                 image: true,
@@ -2095,17 +1890,6 @@ export class PrismaService extends ModelService {
         state: "FAILED",
         errorMessage,
         lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async getNestedAssets(conversationId: string) {
-    return await this.prismaClient.conversation.findUnique({
-      where: { id: conversationId },
-      include: {
-        attachments: { where: { conversationId } },
-        messages: { orderBy: { createdAt: "asc" } },
-        conversationSettings: true
       }
     });
   }

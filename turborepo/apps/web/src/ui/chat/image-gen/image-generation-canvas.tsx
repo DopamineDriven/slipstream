@@ -1,9 +1,89 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button, Download, X } from "@slipstream/ui";
+
+
+/**
+ IMPORTANT
+
+ // TODO
+
+ type AIChatResponse = {
+    type: "ai_chat_response";
+    conversationId: string;
+    userId: string;
+    done: true;
+    data?: string | undefined;
+    provider?: Provider | undefined;
+    title?: string | undefined;
+    model?: string | undefined;
+    systemPrompt?: string | undefined;
+    temperature?: number | undefined;
+    topP?: number | undefined;
+    imgGenEnabled?: boolean | undefined;
+    imgGenFields?: AIChatResponseImgGenFields | undefined;
+    chunk: string;
+    usage?: number | undefined;
+    thinkingDuration?: number | undefined;
+    thinkingText?: string | undefined;
+}
+ type AIChatChunk = {
+    type: "ai_chat_chunk";
+    conversationId: string;
+    userId: string;
+    chunk?: string | undefined;
+    done: boolean;
+    data?: string | undefined;
+    provider?: Provider | undefined;
+    title?: string | undefined;
+    model?: string | undefined;
+    systemPrompt?: string | undefined;
+    temperature?: number | undefined;
+    topP?: number | undefined;
+    imgGenEnabled?: boolean | undefined;
+    imgGenFields?: AIChatResponseImgGenFields | undefined;
+    isThinking?: boolean | undefined;
+    thinkingDuration?: number | undefined;
+    thinkingText?: string | undefined;
+}
+
+ type AIChatResponseImgGenFields = {
+    outputSize?: string;
+    outputQuality?: string;
+    outputCompression?: number;
+    outputBackground?: string;
+    outputWidth?: number;
+    outputHeight?: number;
+    outputAspectRatio?: number;
+    size?: number;
+    requestedCount?: number;
+    actualCount?: number;
+    outputFormat?: string;
+    outputMime?: string;
+    duration?: number;
+    seed?: number;
+    revisedPrompt?: string;
+    partialImagesRequested?: number;
+    partialImagesActual?: number;
+    partialImages?: {
+        index: number;
+        cdnUrl: string;
+        width: number;
+        height: number;
+        mime: string;
+    }[];
+    images?: {
+        index: number;
+        cdnUrl: string;
+        width: number;
+        height: number;
+        mime: string;
+    }[];
+}
+ */
 
 interface ImageGenerationCanvasProps {
   isGenerating: boolean;
@@ -18,22 +98,24 @@ interface ImageGenerationCanvasProps {
 }
 
 // Helper function to extract series info from CDN URL
-function extractSeriesInfo(url: string | null): { seriesId: string; seriesIndex: number; timestamp: number } | null {
+function extractSeriesInfo(
+  url: string | null
+): { seriesId: string; seriesIndex: number; timestamp: number } | null {
   if (!url) return null;
 
   try {
-    const filename = url.split('/').pop();
+    const filename = url.split("/").pop();
     if (!filename) return null;
 
     // Pattern: {timestamp}-{seriesId}-{seriesIndex}.png
-    const parts = filename.split('-');
+    const parts = filename.split("-");
     if (parts.length < 3) return null;
     if (!parts[0]) return null;
     const timestamp = parseInt(parts[0]);
     const seriesId = parts[1];
     if (!seriesId) return null;
     const seriesIndexWithExt = parts[parts.length - 1]; // Use last part to handle seriesIds with hyphens
-    const seriesIndex = parseInt(seriesIndexWithExt?.split('.')?.[0] ??'0');
+    const seriesIndex = parseInt(seriesIndexWithExt?.split(".")?.[0] ?? "0");
 
     if (!seriesId || isNaN(timestamp) || isNaN(seriesIndex)) return null;
 
@@ -60,7 +142,8 @@ export function ImageGenerationCanvas({
   const prevGenerationIdRef = useRef<string | undefined>(undefined);
 
   // Determine what URL to display
-  const displayUrl = cdnUrl ?? (isGenerating && cdnUrlPartial ? cdnUrlPartial : null);
+  const displayUrl =
+    cdnUrl ?? (isGenerating && cdnUrlPartial ? cdnUrlPartial : null);
   const isPartialDisplay = !cdnUrl && isGenerating && !!cdnUrlPartial;
   const shouldShowImage = !!displayUrl && !isClosed;
 
@@ -68,10 +151,10 @@ export function ImageGenerationCanvas({
   const seriesInfo = extractSeriesInfo(displayUrl);
   const imageKey = seriesInfo
     ? `${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
-    : `${generationId ?? 'gen'}-${displayUrl}`;
+    : `${generationId ?? "gen"}-${displayUrl}`;
   const imageId = seriesInfo
     ? `img-${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
-    : `img-${generationId ?? 'gen'}-${isPartialDisplay ? 'partial' : 'final'}`;
+    : `img-${generationId ?? "gen"}-${isPartialDisplay ? "partial" : "final"}`;
 
   // Reset state when generation changes
   useEffect(() => {
@@ -104,6 +187,8 @@ export function ImageGenerationCanvas({
     if (!cdnUrl) return;
     const link = document.createElement("a");
     link.href = cdnUrl;
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
     link.download = seriesInfo
       ? `generated-${seriesInfo.seriesId}-final.png`
       : `generated-${Date.now()}.png`;
@@ -113,6 +198,8 @@ export function ImageGenerationCanvas({
   const handleClose = () => {
     setIsClosed(true);
   };
+
+  // const nextRef = useRef<ComponentRef<typeof Image>>(null);
 
   return (
     <div className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
@@ -135,7 +222,7 @@ export function ImageGenerationCanvas({
               : "scale-95 opacity-0"
           )}>
           <Image
-            key={imageKey} // Use series-aware key
+            key={imageKey} // Use series-aware key SHOULD WE REALLY be setting this here?
             id={imageId} // Use series-aware ID
             src={displayUrl}
             alt={prompt}
@@ -160,9 +247,11 @@ export function ImageGenerationCanvas({
           )}
 
           {/* Add series index indicator for debugging */}
-          {seriesInfo && process.env.NODE_ENV === 'development' && (
-            <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-xs text-white">
-              {isPartialDisplay ? `Partial ${seriesInfo.seriesIndex}/3` : 'Final (4)'}
+          {seriesInfo && process.env.VERCEL_ENV === "development" && (
+            <div className="absolute bottom-2 left-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
+              {isPartialDisplay
+                ? `Partial ${seriesInfo.seriesIndex}/3`
+                : "Final (4)"}
             </div>
           )}
         </div>
@@ -182,16 +271,16 @@ export function ImageGenerationCanvas({
           <Button
             size="icon"
             variant="ghost"
-            className="bg-white/90 backdrop-blur-sm hover:bg-white"
+            className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm"
             onClick={handleDownload}>
-            <Download className="h-4 w-4" />
+            <Download className="size-4" />
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="bg-white/90 backdrop-blur-sm hover:bg-white"
+            className="bg-foreground/90 text-background hover:bg-foreground backdrop-blur-sm"
             onClick={handleClose}>
-            <X className="h-4 w-4" />
+            <X className="size-4" />
           </Button>
         </div>
       </div>
