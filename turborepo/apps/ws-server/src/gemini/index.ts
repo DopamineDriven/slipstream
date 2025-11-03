@@ -15,8 +15,14 @@ import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { GoogleGenAI } from "@google/genai";
+import {
+  GoogleGenAI,
+  HarmBlockMethod,
+  HarmBlockThreshold,
+  HarmCategory
+} from "@google/genai";
 import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
+import { CompatStatus } from "@slipstream/db/enums-node";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderGeminiChatRequestEntity
@@ -174,30 +180,76 @@ export class GeminiService extends ModelService {
     return Buffer.concat(chunks);
   }
 
-  private async formatHistoryForSession(msgs: MessageSingleton<true>[]) {
+  private async formatHistoryForSession(
+    msgs: MessageSingleton<true>[],
+    gemini: GoogleGenAI,
+    keyFingerprint: string,
+    keyId?: string,
+    apiKey?: string
+  ) {
     const formatted = Array.of<Content>();
 
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
 
-        // Important: do NOT inject request attachments into history.
-        // Only the current prompt should include its attachments.
-        // Historical attachments, if needed, should be fetched per-message from DB.
+        // For historical USER messages, we only include text
+        // Attachments are handled separately in the current message
         partArr.push({ text: msg.content });
 
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
+        // AI message - may have AI-generated attachments
+        const partArr = Array.of<Part>();
         const provider = msg.provider.toLowerCase();
         const model = msg.model ?? "unknown";
         const modelIdentifier = `[${provider}/${model}]`;
+
+        // Handle AI-generated attachments if they exist
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const attachment of msg.attachments) {
+            try {
+              // AI-generated assets should have these fields populated
+              if (
+                attachment?.cdnUrl &&
+                attachment?.mime &&
+                attachment.origin === "GENERATED"
+              ) {
+                const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                  {
+                    cdnUrl: attachment.cdnUrl,
+                    compatCdnUrl: attachment.compatCdnUrl,
+                    compatMime: attachment.compatMime,
+                    filename: attachment.filename,
+                    compatStatus: attachment.compatStatus ?? "ALIASED",
+                    id: attachment.id,
+                    mime: attachment.mime
+                  },
+                  gemini,
+                  keyFingerprint,
+                  keyId,
+                  apiKey
+                );
+                partArr.push({
+                  fileData: { fileUri, mimeType }
+                });
+              }
+            } catch (err) {
+              this.logger.warn(
+                `Error uploading AI-generated attachment in history: ${attachment.id} - ${this.safeErrMsg(err)}`
+              );
+            }
+          }
+        }
+
+        // Add the text content with model identifier
+        partArr.push({
+          text: `${modelIdentifier}\n${msg.content}`
+        });
+
         formatted.push({
           role: "model",
-          parts: [
-            {
-              text: `${modelIdentifier}\n${msg.content}`
-            }
-          ]
+          parts: partArr
         } as const);
       }
     }
@@ -223,7 +275,11 @@ export class GeminiService extends ModelService {
   public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
-    systemPrompt?: string
+    gemini: GoogleGenAI,
+    keyFingerprint: string,
+    systemPrompt?: string,
+    keyId?: string,
+    apiKey?: string
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
@@ -241,7 +297,13 @@ export class GeminiService extends ModelService {
     } else {
       const historyMsgs = msgs.slice(0, -1);
       return {
-        history: await this.formatHistoryForSession(historyMsgs),
+        history: await this.formatHistoryForSession(
+          historyMsgs,
+          gemini,
+          keyFingerprint,
+          keyId,
+          apiKey
+        ),
         systemInstruction
       };
     }
@@ -266,6 +328,7 @@ export class GeminiService extends ModelService {
     attachment: {
       cdnUrl: string | null;
       compatCdnUrl: string | null;
+      compatStatus: CompatStatus;
       compatMime: string | null;
       filename: string | null;
       mime: string | null;
@@ -286,7 +349,9 @@ export class GeminiService extends ModelService {
       return {
         fileUri: cached.fileUri,
         mimeType:
-          attachment.compatMime ?? attachment.mime ?? "application/octet-stream"
+          (attachment?.compatStatus === "ALIASED"
+            ? attachment.mime
+            : attachment.compatMime) ?? "application/octet-stream"
       };
     }
 
@@ -396,6 +461,53 @@ export class GeminiService extends ModelService {
     }
   }
 
+  private mediaModalities(model: GeminiModelIdUnion) {
+    if (!(model === "gemini-2.5-flash-image")) {
+      return ["TEXT"];
+    } else return ["TEXT", "IMAGE"];
+  }
+
+  private candidateCount(model: GeminiModelIdUnion, n = 1) {
+    if (!(model === "gemini-2.5-flash-image")) {
+      return undefined;
+    } else return this.handleImgGenCount("gemini", model, { n });
+  }
+
+  private handleSafetySettings() {
+    return [
+      {
+        category: HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
+        threshold: HarmBlockThreshold.OFF
+      }
+    ];
+  }
+
   public async handleGeminiAiChatRequest({
     chunks,
     conversationId,
@@ -412,6 +524,11 @@ export class GeminiService extends ModelService {
     systemPrompt,
     temperature,
     title,
+    imgGenFields,
+    // imgGenEnabled,
+    // jobId,
+    // partialImgArr,
+    // requestMessageId,
     topP,
     userData
   }: ProviderGeminiChatRequestEntity) {
@@ -430,7 +547,11 @@ export class GeminiService extends ModelService {
     const { history, systemInstruction } = await this.getHistoryAndInstruction(
       isNewChat,
       msgs,
-      systemPrompt
+      gemini,
+      keyFingerprint,
+      systemPrompt,
+      keyId ?? undefined,
+      apiKey
     );
 
     const currentPartArr = Array.of<Part>();
@@ -438,7 +559,11 @@ export class GeminiService extends ModelService {
       try {
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
-            if (attachment?.cdnUrl && attachment?.mime) {
+            if (
+              attachment?.cdnUrl &&
+              attachment?.mime &&
+              attachment.compatStatus
+            ) {
               // Use the new ensureAssetUploaded method
               const { fileUri, mimeType } = await this.ensureAssetUploaded(
                 {
@@ -446,6 +571,7 @@ export class GeminiService extends ModelService {
                   compatCdnUrl: attachment.compatCdnUrl,
                   compatMime: attachment.compatMime,
                   filename: attachment.filename,
+                  compatStatus: attachment.compatStatus,
                   id: attachment.id,
                   mime: attachment.mime
                 },
@@ -476,7 +602,16 @@ export class GeminiService extends ModelService {
       fullContent,
       "debugging full content on first message to gemini"
     );
-
+    const _safetySettings = this.handleSafetySettings();
+    const responseModalities = this.mediaModalities(
+      model as GeminiModelIdUnion
+    );
+    // const imagen = await gemini.models.generateImages({model: "imagen-4.0-generate-001" satisfies GeminiModelIdUnion,prompt: "",config: {includeRaiReason: true,}})
+    // const s = await gemini.models.generateContentStream({contents: fullContent,model: "gemini-2.5-flash-image",config: {responseModalities: ["TEXT", "IMAGE"],imageConfig: {aspectRatio:"21:9"},thinkingConfig: {includeThoughts: true, thinkingBudget: -1},systemInstruction,mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH}})
+    const candidateCount = this.candidateCount(
+      model as GeminiModelIdUnion,
+      imgGenFields?.n
+    );
     const stream = (await gemini.models.generateContentStream({
       contents: fullContent,
       model,
@@ -485,8 +620,12 @@ export class GeminiService extends ModelService {
         toolConfig: {
           retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
         },
+        responseModalities,
         tools: [{ googleSearch: {} }, { urlContext: {} }],
         topP,
+        candidateCount,
+        // safetySettings,
+        // imageConfig: { aspectRatio: "21:9" },
         temperature,
         systemInstruction,
         thinkingConfig: { includeThoughts: true, thinkingBudget: -1 }
@@ -526,7 +665,11 @@ export class GeminiService extends ModelService {
                   textPart = part.text;
                 }
               }
+              if (part.fileData) {
+                this.logger.debug(part.fileData, "part.fileData");
+              }
               if (part.inlineData) {
+                this.logger.debug(part.inlineData, "part.inlineData");
                 dataPart = part.inlineData;
               }
             }

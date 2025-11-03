@@ -51,7 +51,7 @@
     "test": "node --test --import tsx --test-reporter spec"
   },
   "dependencies": {
-    "@d0paminedriven/metadata": "^3.4.0",
+    "@d0paminedriven/metadata": "^4.0.1",
     "@slipstream/types": "workspace:*"
   },
   "devDependencies": {
@@ -59,7 +59,7 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.0",
