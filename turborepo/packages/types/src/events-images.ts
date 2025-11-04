@@ -5,6 +5,53 @@ import type {
   OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@/models.ts";
+import type {
+  DocumentSingleton,
+  ImageGenOutputSingleton,
+  ImageSingleton
+} from "@/types.ts";
+import { Rm } from "./utils.ts";
+
+export type NanoBananaOutputSize =
+  | "1:1"
+  | "2:3"
+  | "3:2"
+  | "3:4"
+  | "4:3"
+  | "4:5"
+  | "5:4"
+  | "9:16"
+  | "16:9"
+  | "21:9"
+  | undefined;
+
+export type GptImageOutputSize =
+  | "1024x1024"
+  | "1536x1024"
+  | "1024x1536"
+  | "auto"
+  | undefined;
+
+export type Dalle3OutputSize =
+  | "1024x1024"
+  | "1792x1024"
+  | "1024x1792"
+  | "auto"
+  | undefined;
+
+export type Dalle2OutputSize =
+  | "256x256"
+  | "512x512"
+  | "1024x1024"
+  | "auto"
+  | undefined;
+export type ImagenOutputSize =
+  | "1:1"
+  | "9:16"
+  | "16:9"
+  | "3:4"
+  | "4:3"
+  | undefined;
 
 export type OpenAIImgCapableModels =
   | OpenAIImgGenFacilitatingModels
@@ -919,6 +966,76 @@ export type ImageGenPartialArr = [
   string | undefined // revised_prompt
 ];
 
+export type AIChatResponseImgGenSubFields = {
+  index: number;
+  itemId?: string;
+  width: number;
+  height: number;
+  draftId: string | null;
+  batchId: string | null;
+  s3ObjectId: string | null;
+  userId: string;
+  origin: "GENERATED";
+  status:
+    | "REQUESTED"
+    | "PLANNED"
+    | "UPLOADING"
+    | "STORED"
+    | "SCANNING"
+    | "READY"
+    | "FAILED"
+    | "QUARANTINED"
+    | "ATTACHED"
+    | "DELETED";
+  size: number | null;
+
+  compatKey: string | null;
+  compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
+  compatCdnUrl: string | null;
+  compatReadyAt: Date | null;
+  compatVersionId: string | null;
+  compatS3ObjectId: string | null;
+  compatMime: string | null;
+  compatExt: string | null;
+  uploadDuration: number | null;
+  cdnUrl: string | null;
+  publicUrl: string | null;
+  sourceUrl: string | null;
+  thumbnailKey: string | null;
+  bucket: string;
+  key: string;
+  versionId: string | null;
+  region: string;
+  cacheControl: string | null;
+  contentDisposition: string | null;
+  contentEncoding: string | null;
+  expiresAt: Date | null;
+  filename: string | null;
+  ext: string | null;
+  mime: string | null;
+  etag: string | null;
+  checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
+  checksumSha256: string | null;
+  storageClass: string | null;
+  sseAlgorithm: string | null;
+  sseKmsKeyId: string | null;
+  s3LastModified: Date | null;
+  deletedAt: Date | null;
+  image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt"> | null;
+  document: Rm<DocumentSingleton, "attachmentId" | "createdAt" | "updatedAt"> | null;
+  imageGenOutput: Rm<ImageGenOutputSingleton, "id" | "attachmentId" | "createdAt" | "updatedAt"> | null;
+  generationGroupId: string;
+  requestMessageId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  kind: "FINAL" | "PARTIAL";
+  jobId: string;
+  jobIndex: number;
+  seriesIndex?: number;
+  seriesId: string | null;
+  revisedPrompt?: string;
+};
+
 export type AIChatResponseImgGenFieldsFinal = {
   outputSize?: string;
   outputQuality?: string;
@@ -937,154 +1054,9 @@ export type AIChatResponseImgGenFieldsFinal = {
   revisedPrompt?: string;
   partialImagesRequested?: number;
   partialImagesActual?: number;
-  partialImages?: {
-    index: number;
-    cdnUrl: string;
-    itemId: string;
-    width: number;
-    height: number;
-    mime: string;
-    bucket: string;
-    key: string;
-    versionId: string;
-    s3ObjectId: string;
-    filename?: string;
-    uploadDuration?: number;
-    ext?: string;
-    etag?: string;
-    size?: number;
-    s3LastModified?: string;
-    ContentDisposition?: string;
-    CacheControl?: string;
-    Checksum?: S3Checksum;
-    StorageClass?: S3StorageClass;
-    generationGroupId: string;
-    requestMessageId?: string;
-    kind?: "FINAL" | "PARTIAL";
-    jobId?: string;
-    jobIndex: number;
-    seriesIndex?: number;
-    seriesId?: string;
-    revisedPrompt?: string;
-    image?: {
-      animated: boolean;
-      aspectRatio: number;
-      cameraMake: null;
-      cameraModel: null;
-      colorSpace:
-        | "unknown"
-        | "srgb"
-        | "display_p3"
-        | "adobe_rgb"
-        | "prophoto_rgb"
-        | "rec2020"
-        | "rec709"
-        | "cmyk"
-        | "lab"
-        | "xyz"
-        | "gray";
-      dominantColorHex: null;
-      exifDateTimeOriginal: Date | null;
-      format:
-        | "apng"
-        | "png"
-        | "jpeg"
-        | "gif"
-        | "bmp"
-        | "webp"
-        | "avif"
-        | "heic"
-        | "svg"
-        | "ico"
-        | "tiff"
-        | undefined;
-      frames: number;
-      gpsLat: null;
-      gpsLon: null;
-      hasAlpha: boolean;
-      height: number;
-      width: number;
-      iccProfile: string | null;
-      lensModel: null;
-      orientation: number | null;
-      createdAt: undefined;
-      updatedAt: undefined;
-    };
-  }[];
-  images?: {
-    index: number;
-    cdnUrl: string;
-    itemId: string;
-    width: number;
-    height: number;
-    mime: string;
-    bucket: string;
-    key: string;
-    versionId: string;
-    s3ObjectId: string;
-    filename?: string;
-    uploadDuration?: number;
-    ext?: string;
-    etag?: string;
-    size?: number;
-    s3LastModified?: string;
-    ContentDisposition?: string;
-    CacheControl?: string;
-    Checksum?: S3Checksum;
-    StorageClass?: S3StorageClass;
-    generationGroupId: string;
-    requestMessageId?: string;
-    jobId?: string;
-    kind?: "FINAL" | "PARTIAL";
-    jobIndex: number;
-    seriesIndex?: number;
-    seriesId?: string;
-    revisedPrompt?: string;
-    image?: {
-      animated: boolean;
-      aspectRatio: number;
-      cameraMake: null;
-      cameraModel: null;
-      colorSpace:
-        | "unknown"
-        | "srgb"
-        | "display_p3"
-        | "adobe_rgb"
-        | "prophoto_rgb"
-        | "rec2020"
-        | "rec709"
-        | "cmyk"
-        | "lab"
-        | "xyz"
-        | "gray";
-      dominantColorHex: null;
-      exifDateTimeOriginal: Date | null;
-      format:
-        | "apng"
-        | "png"
-        | "jpeg"
-        | "gif"
-        | "bmp"
-        | "webp"
-        | "avif"
-        | "heic"
-        | "svg"
-        | "ico"
-        | "tiff"
-        | undefined;
-      frames: number;
-      gpsLat: null;
-      gpsLon: null;
-      hasAlpha: boolean;
-      height: number;
-      width: number;
-      iccProfile: string | null;
-      lensModel: null;
-      orientation: number | null;
-      createdAt: undefined;
-      updatedAt: undefined;
-    };
-  }[];
+  activeImage?: AIChatResponseImgGenSubFields;
+  partialImages?: AIChatResponseImgGenSubFields[];
+  images?: AIChatResponseImgGenSubFields[];
 };
 
 export type ImgGenStage =

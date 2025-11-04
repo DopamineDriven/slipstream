@@ -1050,12 +1050,14 @@ export class PrismaService extends ModelService {
     mime?: string;
   }) {
     const { keyId } = await this.handleApiKeyLookup(provider, userId);
-    let agg: Record<string, number> = {};
     const mapImgs = data.imgGenFields?.images
       ?.concat(data.imgGenFields?.partialImages ?? [])
       ?.map(t => {
+        const p = t.cdnUrl?.split(/\//gm);
+        const filename = p?.at(-1);
+        const pathFragments = filename?.split(/-/gm);
+        const seriesId = t.itemId ?? t.seriesId ?? pathFragments?.[1] ?? "";
         console.log({ [`t.jobId`]: t.jobId, jobId: jobId });
-        agg[t.itemId] = (agg[t.itemId] ?? 0) + 1;
         const da = {
           bucket: t.bucket,
           key: t.key,
@@ -1063,7 +1065,7 @@ export class PrismaService extends ModelService {
           s3ObjectId: t.s3ObjectId,
           cdnUrl: t.cdnUrl,
           assetType: "IMAGE",
-          storageClass: t.StorageClass,
+          storageClass: t.storageClass ?? undefined,
           origin: "GENERATED",
           compatMime: t.mime,
           etag: t.etag,
@@ -1074,8 +1076,8 @@ export class PrismaService extends ModelService {
           compatVersionId: t.versionId,
           compatKey: t.key,
           compatExt: t.ext,
-          contentDisposition: t.ContentDisposition,
-          cacheControl: t.CacheControl,
+          contentDisposition: t.contentDisposition,
+          cacheControl: t.cacheControl,
           ext: t.ext,
           mime: t.mime,
           seriesId: t.itemId,
@@ -1089,8 +1091,8 @@ export class PrismaService extends ModelService {
             : new Date(Date.now()),
           filename: t.filename,
           compatReadyAt: new Date(Date.now()),
-          checksumAlgo: t.Checksum?.algo,
-          checksumSha256: t.Checksum?.value,
+          checksumAlgo: t?.checksumAlgo,
+          checksumSha256: t.checksumSha256,
           image: t.image ? { create: t.image } : undefined,
           imageGenOutput: t.jobId
             ? ({
@@ -1104,7 +1106,7 @@ export class PrismaService extends ModelService {
                   jobId: t.jobId,
                   isPartial: t.kind === "FINAL" ? false : true,
                   jobIndex: 0,
-                  seriesId: t.itemId,
+                  seriesId: t.imageGenOutput?.seriesId ?? seriesId,
                   seriesIndex: t.index
                 }
               } satisfies ImageGenOutputCreateNestedOneWithoutAttachmentInput)
@@ -1120,7 +1122,7 @@ export class PrismaService extends ModelService {
                     jobId,
                     isPartial: t.kind === "FINAL" ? false : true,
                     jobIndex: 0,
-                    seriesId: t.itemId,
+                    seriesId: t.itemId ?? seriesId,
                     seriesIndex: t.index
                   }
                 } satisfies ImageGenOutputCreateNestedOneWithoutAttachmentInput)
@@ -1138,7 +1140,9 @@ export class PrismaService extends ModelService {
           messages: {
             orderBy: { createdAt: "desc" },
             take: 1,
-            include: { attachments: true }
+            include: {
+              attachments: { include: { imageGenOutput: true, image: true } }
+            }
           },
           conversationSettings: true
         },

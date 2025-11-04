@@ -16,7 +16,7 @@ import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
 import type {
-  AIChatResponseImgGenFields,
+  AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
 import {
@@ -39,7 +39,7 @@ interface ChatMessageProps {
   liveIsThinking?: boolean;
   liveThinkingDuration?: number;
   liveImgGenEnabled?: boolean;
-  liveImgGenFields?: AIChatResponseImgGenFields;
+  liveImgGenFields?: AIChatResponseImgGenFieldsFinal;
 }
 
 // Global cache for processed markdown
@@ -327,6 +327,34 @@ export function MessageBubble({
               />
             </div>
           )}
+          {message.senderType === "AI" && (
+            <div className="mt-3">
+              {message.attachments &&
+                message.attachments.length > 0 &&
+                message.attachments
+                  .filter(
+                    t =>
+                      t.imageGenOutput &&
+                      t.imageGenOutput?.seriesIndex ===
+                        message.attachments.length - 1 &&
+                      t.imageGenOutput.kind === "PARTIAL"
+                  )
+                  .map(t => (
+                    <ImageGenerationCanvas
+                      key={t.imageGenOutput?.seriesIndex}
+                      isGenerating={true}
+                      cdnUrl={t.cdnUrl}
+                      cdnUrlPartial={t.cdnUrl}
+                      width={t.image?.width ?? t.imageGenOutput?.width ?? 1024}
+                      height={
+                        t?.image?.height ?? t.imageGenOutput?.height ?? 1024
+                      }
+                      mime={t.mime ?? "image/jpeg"}
+                      prompt={"image gen in progress..."}
+                    />
+                  ))}
+            </div>
+          )}
           {liveImgGenFields?.partialImages &&
             liveImgGenFields.partialImages.length > 0 && (
               <div className={cn("mt-3", className)}>
@@ -358,7 +386,7 @@ export function MessageBubble({
                             cdnUrlPartial={t.cdnUrl}
                             width={t.width}
                             height={t.height}
-                            mime={t.mime}
+                            mime={t.mime ?? "image/jpeg"}
                             prompt={"image gen in progress..."}
                           />
                         ))}

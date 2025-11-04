@@ -131,6 +131,13 @@ class ScriptGen extends Fs {
                 filename: t.filename,
                 batchId: t.batchId
               });
+            } else if (t.cdnUrl && t.filename && t.seriesId) {
+              assetUrl.push({
+                cdnUrl: t.cdnUrl,
+                msgId: id,
+                filename: t.filename,
+                batchId: t.seriesId
+              });
             }
           })
         : null;
@@ -207,11 +214,13 @@ class ScriptGen extends Fs {
 
       const agg =
         p.sender === "AI"
+        ? p.assetUrl
           ? withThinking === "true"
             ? p.thinking
-              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${d}\n`
-              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
-            : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${d}\n`
+              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+            :`${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${d}\n`
           : p.assetUrl.length > 0
             ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
