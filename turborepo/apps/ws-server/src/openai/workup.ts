@@ -1,5 +1,4 @@
 import type {
-  ImageGenPartialArr,
   InferPromiseRT,
   MessageSingleton,
   ProviderOpenaiRequestEntity
@@ -11,9 +10,13 @@ import type {
 import type { Reasoning } from "openai/resources/shared.mjs";
 import { OpenAI, toFile } from "openai";
 import { ModelService } from "@/models/index.ts";
+import { ImageGenPartialArr } from "@/openai/types.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatRequestImgGenFields,
+  AIChatResponseImgGenSubFields,
+  AIChatResRT,
+  ConversationSingleton,
   ImgGenWorkupResRT,
   OpenAIImgGenFacilitatingModels,
   OpenAIImgGenModels,
@@ -293,7 +296,7 @@ export class OpenAIServiceWorkup extends ModelService {
     });
   }
 
-    public getGenMime(target: string) {
+  public getGenMime(target: string) {
     return target === "jpeg"
       ? "image/jpeg"
       : target === "jpg"
@@ -311,8 +314,15 @@ export class OpenAIServiceWorkup extends ModelService {
       return generationGroupId;
     } else return nanoid();
   }
-  public mapPersistenceImgGenArr(props: ImageGenPartialArr[]) {
+  public mapPersistenceImgGenArr(userId: string, props: ImageGenPartialArr[]) {
     return props.map((t, o) => {
+      const rt = t[25];
+      const expImg = t[26];
+      const p = rt.cdnUrl?.split(/\//gm);
+      const filename = p?.at(-1);
+      const pathFragments = filename?.split(/-/gm);
+      const _timestamp = pathFragments?.[0];
+      const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
       return {
         index: t[0] ?? o,
         cdnUrl: t[1],
@@ -324,25 +334,206 @@ export class OpenAIServiceWorkup extends ModelService {
         key: t[7],
         versionId: t[8],
         s3ObjectId: t[9],
-        filename: t[10],
-        ext: t[11],
-        etag: t[12],
-        size: t[13],
-        s3LastModified: t[14],
-        ContentDisposition: t[15],
-        CacheControl: t[16],
-        Checksum: t[17],
-        StorageClass: t[18],
+        filename: t[10] ?? null,
+        batchId: null,
+        draftId: null,
+        cacheControl: rt.cacheControl ?? null,
+        checksumAlgo: rt?.checksum?.algo ?? "CRC32",
+        checksumSha256: rt.checksum?.value ?? null,
+        compatCdnUrl: rt.cdnUrl,
+        compatExt: rt.extension ?? t?.[11] ?? expImg.format,
+        compatKey: rt.key,
+        compatS3ObjectId: rt.s3ObjectId,
+        compatMime:
+          rt.contentType ??
+          this.getGenMime(rt.extension ?? t[11] ?? expImg.format),
+        compatReadyAt: null,
+        compatStatus: "ALIASED",
+        compatVersionId: rt.versionId,
+        contentDisposition: rt.contentDisposition ?? null,
+        contentEncoding: null,
+        createdAt: new Date(Date.now()),
+        ext: t[11] ?? rt.extension ?? expImg.format,
+        deletedAt: null,
+        document: null,
+        expiresAt: rt.expires,
+        origin: "GENERATED",
+        publicUrl: rt.publicUrl,
+        region: "us-east-1",
+        sourceUrl: "buffer",
+        sseAlgorithm: null,
+        sseKmsKeyId: null,
+        status: "READY",
+        storageClass: rt.storageClass ?? null,
+        thumbnailKey: null,
+        updatedAt: new Date(Date.now()),
+        userId,
+        etag: rt.etag ?? null,
+        size: t?.[13] ?? null,
+        s3LastModified: rt.lastModified ? new Date(rt.lastModified) : null,
         generationGroupId: t[19],
-        image: t[20],
-        uploadDuration: t[21],
+        image: {
+          animated: expImg.animated,
+          width: expImg.width,
+          height: expImg.height,
+          aspectRatio: expImg.width / expImg.height,
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: expImg.colorSpace,
+          dominantColorHex: null,
+          exifDateTimeOriginal: expImg.exifDateTimeOriginal
+            ? new Date(expImg.exifDateTimeOriginal)
+            : null,
+          format: expImg.format,
+          frames: expImg.frames,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: expImg.hasAlpha,
+          iccProfile: expImg.iccProfile,
+          lensModel: null,
+          orientation: expImg.orientation
+        },
+        imageGenOutput: {
+          ext: expImg.format,
+          height: expImg.height,
+          width: expImg.width,
+          jobId: t[23] ?? "",
+          isPartial: true,
+          jobIndex: 0,
+          kind: "PARTIAL",
+          mime: expImg.contentType ?? this.getGenMime(expImg.format),
+          revisedPrompt: null,
+          seriesId: t[2],
+          seriesIndex: seriesIndex ? Number.parseInt(seriesIndex, 10) : o++
+        },
+        uploadDuration: t[21] ?? null,
         requestMessageId: t[22],
-        jobId: t[23],
+        jobId: t[23] ?? "",
         jobIndex: 0,
         seriesIndex: t[0],
         seriesId: t[2],
         revisedPrompt: t[24],
         kind: "PARTIAL"
+      } as const satisfies AIChatResponseImgGenSubFields;
+    });
+  }
+
+  public transformConvoSingleton(data: ConversationSingleton<true>) {
+    const cdnUrls = Array.of<string>();
+    const timeAndIndexArr = Array.of<readonly [number, number]>();
+    try {
+      for (const alpha of data.messages) {
+        if (!alpha.attachments) continue;
+        for (const beta of alpha.attachments) {
+          if (beta.cdnUrl) cdnUrls.push(beta.cdnUrl);
+          continue;
+        }
+      }
+    } finally {
+      for (const url of cdnUrls) {
+        const p = url.split(/\//gm);
+        const filename = p.at(-1);
+        if (!filename) continue;
+        const pathFragments = filename.split(/-/gm);
+
+        const timestamp = pathFragments[0];
+        const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
+
+        if (!timestamp || !seriesIndex) continue;
+        timeAndIndexArr.push([
+          Number.parseInt(timestamp),
+          Number.parseInt(seriesIndex)
+        ]);
+        continue;
+      }
+      const sorted = timeAndIndexArr
+        .sort(([_aa, aaa], [_bb, bbb]) => aaa - bbb)
+        .sort(([aa, _aaa], [bb, _bbb]) => aa - bb);
+
+      return sorted.map((t, o) =>
+        o === sorted.length - 1
+          ? [t[0], "FINAL" as const, t[1]]
+          : [t[0], "PARTIAL" as const, t[1]]
+      ) as [number, "PARTIAL" | "FINAL", number][];
+    }
+  }
+
+  public mapToCompletionImgGenArr(props: AIChatResRT) {
+    const s = props.messages[0];
+
+    if (!s) throw new Error("returned db res has no attachments for image gen");
+
+    return s.attachments.map((t, o) => {
+      const p = t.cdnUrl?.split(/\//gm);
+      const filename = p?.at(-1);
+      const ext = filename?.split(".")?.at(-1) ?? null;
+      const pathFragments = filename?.split(/-/gm);
+      const _timestamp = pathFragments?.[0];
+      const seriesId = pathFragments?.[1] ?? null;
+      const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
+      const kind = o === s.attachments?.length - 1 ? "FINAL" : "PARTIAL";
+      return {
+        cdnUrl: t.cdnUrl ?? "",
+        seriesId: t.seriesId ?? seriesId,
+        width: t.image?.width ?? 0,
+        height: t.image?.height ?? 0,
+        checksumSha256: t.checksumSha256,
+        compatCdnUrl: t.cdnUrl,
+        compatExt: t.ext ?? ext,
+        compatKey: t.key,
+        compatMime: t.mime,
+        compatReadyAt: t.s3LastModified,
+        compatS3ObjectId: t.s3ObjectId,
+        compatStatus: "ALIASED",
+        compatVersionId: t.versionId,
+        createdAt: t.createdAt,
+        deletedAt: t.deletedAt,
+        index: seriesIndex,
+        itemId: t.seriesId ?? "",
+        origin: "GENERATED",
+        publicUrl: t.publicUrl,
+        region: t.region,
+        sourceUrl: t.sourceUrl,
+        status: "READY",
+        thumbnailKey: t.thumbnailKey,
+        updatedAt: t.updatedAt,
+        userId: t.userId,
+        batchId: t.batchId,
+        checksumAlgo: t.checksumAlgo,
+        expiresAt: t?.expiresAt,
+        jobId: "",
+        s3LastModified: t.s3LastModified,
+        size: t.size ? Number(t.size) : null,
+        sseAlgorithm: t.sseAlgorithm,
+        sseKmsKeyId: t.sseKmsKeyId,
+        storageClass: t.storageClass,
+        uploadDuration: t.uploadDuration,
+        requestMessageId: "",
+        revisedPrompt: "",
+        seriesIndex: 0,
+        draftId: t.draftId,
+        cacheControl: t.cacheControl,
+        mime: t.mime ?? "",
+        assetType: t.assetType,
+        conversationId: t.conversationId,
+        id: t.id,
+        messageId: t.messageId,
+        uploadMethod: "GENERATED",
+        contentDisposition: t.contentDisposition,
+        contentEncoding: t.contentEncoding,
+        document: null,
+        bucket: t.bucket,
+        generationGroupId: t.generationGroupId ?? "",
+        jobIndex: 0,
+        key: t.key,
+        s3ObjectId: t.s3ObjectId ?? "",
+        versionId: t.versionId ?? "",
+        etag: t.etag,
+        ext: t.ext,
+        filename: t.filename,
+        image: t.image,
+        imageGenOutput: t.imageGenOutput,
+        kind: t.imageGenOutput?.kind ?? kind
       } as const;
     });
   }

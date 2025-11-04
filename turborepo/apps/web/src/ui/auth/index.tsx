@@ -16,8 +16,8 @@ export function AuthUI({
   target: "sign_in" | "sign_up";
 }) {
   return (
-    <div className="text-foreground grid min-h-[100dvh] grid-cols-1 bg-transparent lg:grid-cols-2">
-      <div className="via-background/95 flex flex-1 items-center justify-center bg-gradient-to-b from-gray-900 to-gray-900 px-6 py-12 sm:px-10 lg:px-20">
+    <div className="text-foreground grid min-h-dvh grid-cols-1 bg-transparent lg:grid-cols-2">
+      <div className="via-background/95 flex flex-1 items-center justify-center bg-linear-to-b from-gray-900 to-gray-900 px-6 py-12 sm:px-10 lg:px-20">
         <div className="w-full max-w-md">
           <div className="select-none">
             <Logo className="text-foreground stroke-foreground size-12" />
@@ -69,7 +69,7 @@ export function AuthUI({
           </div>
         </div>
       </div>
-      <div className="via-background/95 relative z-10 flex-1 bg-gradient-to-b from-gray-900 to-gray-900 inset-shadow-gray-100 lg:block">
+      <div className="via-background/95 relative z-10 flex-1 bg-linear-to-b from-gray-900 to-gray-900 inset-shadow-gray-100 lg:block">
         <Image
           width={img.width}
           height={img.height}

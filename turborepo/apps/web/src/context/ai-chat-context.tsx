@@ -22,7 +22,7 @@ import type {
   AIChatRequest,
   AIChatRequestImgGenFields,
   UserMetadata as AIChatRequestUserMetadata,
-  AIChatResponseImgGenFields,
+  AIChatResponseImgGenFieldsFinal,
   AllModelsUnion,
   EventTypeMap,
   Provider
@@ -38,7 +38,7 @@ interface StreamingMessage {
   thinkingText?: string;
   thinkingDuration?: number;
   imgGenEnabled?: boolean;
-  imgGenFields?: AIChatResponseImgGenFields | null;
+  imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
 }
 
 interface AIChatContextValue {
@@ -76,7 +76,7 @@ interface AIChatContextValue {
 
   // Live image generation (progressive) state - complete server shape
   imgGenEnabled: boolean;
-  imgGenFields: AIChatResponseImgGenFields | null;
+  imgGenFields: AIChatResponseImgGenFieldsFinal | null;
 }
 
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
@@ -125,7 +125,7 @@ export function AIChatProvider({
   // Live image-gen progressive state
   const [imgGenEnabled, setImgGenEnabled] = useState<boolean>(false);
   const [imgGenFields, setImgGenFields] =
-    useState<AIChatResponseImgGenFields | null>(null);
+    useState<AIChatResponseImgGenFieldsFinal | null>(null);
 
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);

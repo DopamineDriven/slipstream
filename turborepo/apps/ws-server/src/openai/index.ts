@@ -1,9 +1,9 @@
 import type {
+  ImageGenPartialArr,
   OpenAIImgApiStreamFinal,
   OpenAIImgApiStreamPartial
 } from "@/openai/types.ts";
 import type {
-  ImageGenPartialArr,
   ProviderOpenaiRequestEntity,
   S3FinalizePayload
 } from "@/types/index.ts";
@@ -15,6 +15,7 @@ import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
+  AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
   OpenAiModelIdUnion
@@ -218,8 +219,6 @@ export class OpenAIService extends OpenAIServiceWorkup {
           });
           tDelta = performance.now() - tInitial;
 
-          const d = this.handleAssetMetadata(imgSpecs).img;
-
           partialImgArr.push([
             streamPartial.partial_image_index,
             rtHelper.cdnUrl ?? "",
@@ -242,11 +241,35 @@ export class OpenAIService extends OpenAIServiceWorkup {
             rtHelper.checksum,
             rtHelper.storageClass,
             itemId,
-            d,
+            {
+              animated: imgSpecs.animated,
+              aspectRatio: imgSpecs.width / imgSpecs.height,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: imgSpecs.colorSpace,
+              dominantColorHex: null,
+              exifDateTimeOriginal: imgSpecs.exifDateTimeOriginal
+                ? new Date(imgSpecs.exifDateTimeOriginal)
+                : null,
+              format: imgSpecs.format !== "unknown" ? imgSpecs.format : "jpeg",
+              frames: imgSpecs.frames,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: imgSpecs.hasAlpha ?? false,
+              height: imgSpecs.height,
+              width: imgSpecs.width,
+              iccProfile: imgSpecs.iccProfile ?? null,
+              lensModel: null,
+              orientation: imgSpecs.orientation,
+              createdAt: undefined,
+              updatedAt: undefined
+            },
             tDelta,
             requestMessageId,
             jobId,
-            undefined
+            undefined,
+            rtHelper,
+            imgSpecs
           ]);
 
           ws.send(
@@ -273,7 +296,17 @@ export class OpenAIService extends OpenAIServiceWorkup {
                 outputSize: streamPartial.size,
                 size: imgSpecs.byteSize,
                 partialImagesActual: partialImgArr.length,
-                partialImages: this.mapPartialImgGenArr(partialImgArr)
+                revisedPrompt: undefined,
+                seed: undefined,
+                partialImages: this.mapPersistenceImgGenArr(
+                  userId,
+                  partialImgArr
+                ),
+                images: undefined,
+                activeImage: this.mapPersistenceImgGenArr(
+                  userId,
+                  partialImgArr
+                ).find(t => t.index === partialImgArr.length - 1)
               },
               systemPrompt,
               chunk: openaiAgg,
@@ -294,8 +327,31 @@ export class OpenAIService extends OpenAIServiceWorkup {
             title,
             systemPrompt,
             imgGenFields: {
+              outputWidth: imgSpecs.width,
+              outputHeight: imgSpecs.height,
+              duration: performance.now() - uploadtInitial,
+              outputAspectRatio: imgSpecs.width / imgSpecs.height,
+              outputBackground: streamPartial.background,
+              outputFormat: streamPartial.output_format,
+              outputMime: this.getGenMime(streamPartial.output_format),
+              outputQuality: streamPartial.quality,
+              partialImagesRequested: imgGenFields?.output_partial_images,
+              requestedCount: imgGenFields?.n,
+              outputCompression: imgGenFields?.output_compression,
+              outputSize: streamPartial.size,
+              size: imgSpecs.byteSize,
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr)
+              revisedPrompt: undefined,
+              seed: undefined,
+              partialImages: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ),
+              images: undefined,
+              activeImage: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1)
             },
             temperature,
             imgGenEnabled: true,
@@ -329,7 +385,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
               systemPrompt,
               imgGenFields: {
                 partialImagesActual: partialImgArr.length,
-                partialImages: this.mapPartialImgGenArr(partialImgArr)
+                partialImages: this.mapPersistenceImgGenArr(
+                  userId,
+                  partialImgArr
+                ),
+                activeImage: this.mapPersistenceImgGenArr(
+                  userId,
+                  partialImgArr
+                ).find(t => t.index === partialImgArr.length - 1)
               },
               temperature,
               topP,
@@ -351,7 +414,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
             topP,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr)
+              partialImages: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ),
+              activeImage: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1)
             },
             provider,
 
@@ -421,18 +491,41 @@ export class OpenAIService extends OpenAIServiceWorkup {
             s3ObjectId: rt.s3ObjectId,
             filename,
             ext: getIt.format ?? finalImgObj.output_format,
-            etag: rt.etag,
-            size: getIt.byteSize ?? rt.size ?? undefined,
-            s3LastModified: rt.lastModified,
-            ContentDisposition: rt.contentDisposition,
-            CacheControl: rt.cacheControl,
-            Checksum: rt.checksum,
-            StorageClass: rt.storageClass,
+            etag: rt.etag ?? null,
+            size: getIt.byteSize ?? rt.size ?? null,
+            s3LastModified: rt?.lastModified ? new Date(rt.lastModified) : null,
+            contentDisposition: rt.contentDisposition ?? null,
+            cacheControl: rt.cacheControl ?? null,
+            checksumAlgo: rt.checksum?.algo ?? "CRC32",
+            checksumSha256: rt.checksum?.value ?? null,
+            storageClass: rt.storageClass ?? null,
             generationGroupId,
-            image: imgMeta,
+            image: {
+              ...imgMeta,
+              width: getIt.width,
+              height: getIt.height,
+              animated: getIt.animated,
+              aspectRatio: getIt.width / getIt.height,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: getIt.colorSpace,
+              dominantColorHex: null,
+              exifDateTimeOriginal: getIt.exifDateTimeOriginal
+                ? new Date(getIt.exifDateTimeOriginal)
+                : null,
+              frames: getIt.frames,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: getIt.hasAlpha,
+              iccProfile: getIt.iccProfile,
+              lensModel: null,
+              orientation: getIt.orientation,
+              format: imgMeta?.format ?? "jpeg"
+            },
+            document: null,
             uploadDuration: uploadtDelta,
             requestMessageId,
-            jobId,
+            jobId: jobId ?? "",
             jobIndex: 0,
             seriesId: itemId,
             seriesIndex: partialImgArr.length,
@@ -441,39 +534,70 @@ export class OpenAIService extends OpenAIServiceWorkup {
               "revised_prompt" in finalImgObj &&
               typeof finalImgObj.revised_prompt === "string"
                 ? finalImgObj.revised_prompt
-                : undefined
-          } as const;
-
-          const image = [
-            {
-              index: imgFinal.index,
-              cdnUrl: rt?.cdnUrl ?? "",
-              height: getIt?.height ?? 0,
-              width: getIt?.width ?? 0,
-              mime:
-                getIt?.contentType ?? this.getGenMime(finalImgObj.output_format)
+                : undefined,
+            region: "us-east-1",
+            batchId: null,
+            compatCdnUrl: rt.cdnUrl,
+            compatExt: rt.extension ?? getIt.format,
+            compatKey: rt.key,
+            compatMime: rt.contentType ?? this.getGenMime(getIt.format),
+            compatReadyAt: null,
+            compatStatus: "ALIASED",
+            compatS3ObjectId: rt.s3ObjectId,
+            compatVersionId: rt.versionId,
+            contentEncoding: null,
+            createdAt: new Date(Date.now()),
+            updatedAt: new Date(Date.now()),
+            deletedAt: null,
+            origin: "GENERATED",
+            publicUrl: rt.publicUrl,
+            sourceUrl: "buffer",
+            sseAlgorithm: null,
+            sseKmsKeyId: null,
+            status: "READY",
+            thumbnailKey: null,
+            userId,
+            draftId: null,
+            expiresAt: rt.expires,
+            imageGenOutput: {
+              ext: getIt.format ?? finalImgObj.output_format,
+              height: getIt.height,
+              width: getIt.width,
+              isPartial: false,
+              jobId: jobId ?? "",
+              jobIndex: 0,
+              kind: "FINAL",
+              mime: rt.contentType ?? this.getGenMime(getIt.format),
+              revisedPrompt:
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : null,
+              seriesId: itemId,
+              seriesIndex: partialImgArr.length
             }
-          ];
+          } as const satisfies AIChatResponseImgGenSubFields;
 
-          const remapPartials = this.mapPersistenceImgGenArr(partialImgArr).map(
-            v => {
-              const {
-                generationGroupId: _placeholder,
-                revisedPrompt: _r,
-                ...rest
-              } = v;
-              return {
-                ...rest,
-                revisedPrompt:
-                  finalImgObj &&
-                  "revised_prompt" in finalImgObj &&
-                  typeof finalImgObj.revised_prompt === "string"
-                    ? finalImgObj.revised_prompt
-                    : undefined,
-                generationGroupId
-              };
-            }
-          );
+          const remapPartials = this.mapPersistenceImgGenArr(
+            userId,
+            partialImgArr
+          ).map(v => {
+            const {
+              generationGroupId: _placeholder,
+              revisedPrompt: _r,
+              ...rest
+            } = v;
+            return {
+              ...rest,
+              revisedPrompt:
+                finalImgObj &&
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : undefined,
+              generationGroupId
+            };
+          });
 
           const height = getIt?.height ?? 1024,
             width = getIt?.width ?? 1024,
@@ -565,7 +689,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
                 size: getIt.byteSize ?? 0,
                 partialImagesActual: partialImgArr.length,
                 partialImages: remapPartials,
-                images: image
+                images: [imgFinal],
+                activeImage: imgFinal
               },
               topP,
               chunk: openaiAgg,
@@ -609,7 +734,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
               size: getIt.byteSize ?? 0,
               partialImagesActual: partialImgArr.length,
               partialImages: remapPartials,
-              images: image
+              images: [imgFinal],
+              activeImage: imgFinal
             },
             title,
             thinkingText: undefined,
@@ -953,7 +1079,6 @@ export class OpenAIService extends OpenAIServiceWorkup {
           );
           uploadtDelta = performance.now() - uploadtInitial;
 
-          const d = this.handleAssetMetadata(getIt).img;
           partialImgArr.push([
             partialIndex,
             rtHelper.cdnUrl ?? "",
@@ -978,11 +1103,35 @@ export class OpenAIService extends OpenAIServiceWorkup {
             rtHelper?.checksum,
             rtHelper?.storageClass,
             itemId,
-            d,
+            {
+              animated: getIt.animated,
+              aspectRatio: getIt.width / getIt.height,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: getIt.colorSpace,
+              dominantColorHex: null,
+              exifDateTimeOriginal: getIt.exifDateTimeOriginal
+                ? new Date(getIt.exifDateTimeOriginal)
+                : null,
+              format: getIt.format !== "unknown" ? getIt.format : "jpeg",
+              frames: getIt.frames,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: getIt.hasAlpha ?? false,
+              height: getIt.height,
+              width: getIt.width,
+              iccProfile: getIt.iccProfile ?? null,
+              lensModel: null,
+              orientation: getIt.orientation,
+              createdAt: undefined,
+              updatedAt: undefined
+            },
             uploadtDelta,
             requestMessageId,
             jobId,
-            undefined
+            undefined,
+            rtHelper,
+            getIt
           ]);
           console.log(partialImgArr);
           uploadtInitial = 0;
@@ -1000,7 +1149,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
             imgGenEnabled,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr)
+              partialImages: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ),
+              activeImage: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1)
             },
             systemPrompt,
             temperature,
@@ -1024,7 +1180,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
           systemPrompt,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPartialImgGenArr(partialImgArr)
+            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
+            activeImage: this.mapPersistenceImgGenArr(
+              userId,
+              partialImgArr
+            ).find(t => t.index === partialImgArr.length - 1)
           },
           temperature,
           topP,
@@ -1049,7 +1209,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
             imgGenEnabled,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr)
+              partialImages: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ),
+              activeImage: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1)
             },
             systemPrompt,
             temperature,
@@ -1074,7 +1241,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
           systemPrompt,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPartialImgGenArr(partialImgArr)
+            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
+            activeImage: this.mapPersistenceImgGenArr(
+              userId,
+              partialImgArr
+            ).find(t => t.index === partialImgArr.length - 1)
           },
           temperature,
           topP,
@@ -1099,7 +1270,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
             systemPrompt,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr)
+              partialImages: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ),
+              activeImage: this.mapPersistenceImgGenArr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1)
             },
             temperature,
             topP,
@@ -1122,7 +1300,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
           topP,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPartialImgGenArr(partialImgArr)
+            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
+            activeImage: this.mapPersistenceImgGenArr(
+              userId,
+              partialImgArr
+            ).find(t => t.index === partialImgArr.length - 1)
           },
           provider,
           thinkingText:
@@ -1159,11 +1341,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
           const duration = performance.now() - tInitial;
 
           const b64 = Buffer.from(finalImgObj.result, "base64");
-          const finalSpecs = (await this.extractor.extractRemote(
+          const getIt = (await this.extractor.extractRemote(
             b64,
             4096 * 48
           )) as ExpandedImgSpecs;
-          const format = finalSpecs.format;
+          const format = getIt.format;
 
           const filename = finalImgObj.id
             .concat("-")
@@ -1176,7 +1358,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             contentType: this.getGenMime(outputFormat),
             filename: filename,
             userId,
-            size: finalSpecs.byteSize,
+            size: getIt.byteSize,
             conversationId,
             origin: "GENERATED"
           });
@@ -1185,16 +1367,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
 
           const generationGroupId = openaiResId;
 
-          const imgMeta = this.handleAssetMetadata(finalSpecs).img;
+          const imgMeta = this.handleAssetMetadata(getIt).img;
 
           const imgFinal = {
             cdnUrl: rt.cdnUrl,
             index: partialImgArr.length,
             itemId: finalImgObj.id,
-            width: finalSpecs.width,
-            height: finalSpecs.height,
+            width: getIt.width,
+            height: getIt.height,
             mime:
-              finalSpecs.contentType ??
+              getIt.contentType ??
               rt.contentType ??
               this.getGenMime(outputFormat),
             bucket: rt.bucket,
@@ -1202,19 +1384,42 @@ export class OpenAIService extends OpenAIServiceWorkup {
             versionId: rt.versionId,
             s3ObjectId: rt.s3ObjectId,
             filename,
-            ext: finalSpecs.format,
-            etag: rt.etag,
-            size: finalSpecs.byteSize ?? rt.size ?? undefined,
-            s3LastModified: rt.lastModified,
-            ContentDisposition: rt.contentDisposition,
-            CacheControl: rt.cacheControl,
-            Checksum: rt.checksum,
-            StorageClass: rt.storageClass,
+            ext: getIt.format,
+            etag: rt.etag ?? null,
+            size: getIt.byteSize ?? rt.size ?? null,
+            s3LastModified: rt?.lastModified ? new Date(rt.lastModified) : null,
+            contentDisposition: rt.contentDisposition ?? null,
+            cacheControl: rt.cacheControl ?? null,
+            checksumAlgo: rt.checksum?.algo ?? "CRC32",
+            checksumSha256: rt.checksum?.value ?? null,
+            storageClass: rt.storageClass ?? null,
             generationGroupId,
-            image: imgMeta,
+            image: {
+              ...imgMeta,
+              width: getIt.width,
+              height: getIt.height,
+              animated: getIt.animated,
+              aspectRatio: getIt.width / getIt.height,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: getIt.colorSpace,
+              dominantColorHex: null,
+              exifDateTimeOriginal: getIt.exifDateTimeOriginal
+                ? new Date(getIt.exifDateTimeOriginal)
+                : null,
+              frames: getIt.frames,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: getIt.hasAlpha,
+              iccProfile: getIt.iccProfile,
+              lensModel: null,
+              orientation: getIt.orientation,
+              format: imgMeta?.format ?? "jpeg"
+            },
+            document: null,
             uploadDuration: uploadtDelta,
             requestMessageId,
-            jobId,
+            jobId: jobId ?? "",
             jobIndex: 0,
             seriesId: finalImgObj.id,
             seriesIndex: partialImgArr.length,
@@ -1223,41 +1428,73 @@ export class OpenAIService extends OpenAIServiceWorkup {
               "revised_prompt" in finalImgObj &&
               typeof finalImgObj.revised_prompt === "string"
                 ? finalImgObj.revised_prompt
-                : undefined
-          } as const;
-
-          const image = [
-            {
-              index: imgFinal.index,
-              cdnUrl: rt?.cdnUrl ?? "",
-              height: finalSpecs?.height ?? 0,
-              width: finalSpecs?.width ?? 0,
-              mime: finalSpecs?.contentType ?? this.getGenMime(outputFormat)
+                : undefined,
+            region: "us-east-1",
+            batchId: null,
+            compatCdnUrl: rt.cdnUrl,
+            compatExt: rt.extension ?? getIt.format,
+            compatKey: rt.key,
+            compatMime: rt.contentType ?? this.getGenMime(getIt.format),
+            compatReadyAt: null,
+            compatStatus: "ALIASED",
+            compatS3ObjectId: rt.s3ObjectId,
+            compatVersionId: rt.versionId,
+            contentEncoding: null,
+            createdAt: new Date(Date.now()),
+            updatedAt: new Date(Date.now()),
+            deletedAt: null,
+            origin: "GENERATED",
+            publicUrl: rt.publicUrl,
+            sourceUrl: "buffer",
+            sseAlgorithm: null,
+            sseKmsKeyId: null,
+            status: "READY",
+            thumbnailKey: null,
+            userId,
+            draftId: null,
+            expiresAt: rt.expires,
+            imageGenOutput: {
+              ext: getIt.format,
+              height: getIt.height,
+              width: getIt.width,
+              isPartial: false,
+              jobId: jobId ?? "",
+              jobIndex: 0,
+              kind: "FINAL",
+              mime: rt.contentType ?? this.getGenMime(getIt.format),
+              revisedPrompt:
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : null,
+              seriesId: finalImgObj.id,
+              seriesIndex: partialImgArr.length
             }
-          ];
+          } as const satisfies AIChatResponseImgGenSubFields;
 
-          const remapPartials = this.mapPersistenceImgGenArr(partialImgArr).map(
-            v => {
-              const {
-                generationGroupId: _placeholder,
-                revisedPrompt: _r,
-                ...rest
-              } = v;
-              return {
-                ...rest,
-                revisedPrompt:
-                  finalImgObj &&
-                  "revised_prompt" in finalImgObj &&
-                  typeof finalImgObj.revised_prompt === "string"
-                    ? finalImgObj.revised_prompt
-                    : undefined,
-                generationGroupId
-              };
-            }
-          );
+          const remapPartials = this.mapPersistenceImgGenArr(
+            userId,
+            partialImgArr
+          ).map(v => {
+            const {
+              generationGroupId: _placeholder,
+              revisedPrompt: _r,
+              ...rest
+            } = v;
+            return {
+              ...rest,
+              revisedPrompt:
+                finalImgObj &&
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : undefined,
+              generationGroupId
+            };
+          });
 
-          const height = finalSpecs?.height ?? 0,
-            width = finalSpecs?.width ?? 0;
+          const height = getIt?.height ?? 0,
+            width = getIt?.width ?? 0;
 
           await this.prisma.handleAiChatResponse({
             chunk: openaiAgg,
@@ -1303,13 +1540,13 @@ export class OpenAIService extends OpenAIServiceWorkup {
               partialImagesRequested:
                 imgGenFields?.output_partial_images ?? undefined,
               requestedCount: imgGenFields?.n ?? 1,
-              outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
-              outputMime:
-                finalSpecs.contentType ?? this.getGenMime(outputFormat),
+              outputSize: getIt.byteSize?.toString(10) ?? "0",
+              outputMime: getIt.contentType ?? this.getGenMime(outputFormat),
               outputWidth: width,
               outputHeight: height,
-              size: finalSpecs.byteSize ?? 0,
+              size: getIt.byteSize ?? 0,
               partialImagesActual: partialImgArr.length,
+              activeImage: imgFinal,
               partialImages: remapPartials,
               images: [{ ...imgFinal }]
             },
@@ -1334,7 +1571,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
                 duration,
                 actualCount: partialImgArr.length,
                 outputAspectRatio: width / height,
-                outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
+                outputSize: getIt.byteSize?.toString(10) ?? "0",
                 outputMime: this.getGenMime(outputFormat),
                 revisedPrompt:
                   "revised_prompt" in finalImgObj &&
@@ -1363,10 +1600,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
                     ? finalImgObj.quality
                     : undefined,
                 outputHeight: height,
-                size: finalSpecs.byteSize ?? 0,
+                size: getIt.byteSize ?? 0,
                 partialImagesActual: partialImgArr.length,
-                partialImages: this.mapPartialImgGenArr(partialImgArr),
-                images: image
+                partialImages: remapPartials,
+                activeImage: imgFinal,
+                images: [imgFinal]
               },
               topP,
               chunk: openaiAgg,
@@ -1389,14 +1627,15 @@ export class OpenAIService extends OpenAIServiceWorkup {
               actualCount: partialImgArr.length,
               outputAspectRatio: width / height,
               outputFormat: outputFormat,
-              outputSize: finalSpecs.byteSize?.toString(10) ?? "0",
+              outputSize: getIt.byteSize?.toString(10) ?? "0",
               outputMime: this.getGenMime(outputFormat),
               outputWidth: width,
               outputHeight: height,
-              size: finalSpecs.byteSize ?? 0,
+              size: getIt.byteSize ?? 0,
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPartialImgGenArr(partialImgArr),
-              images: image
+              partialImages: remapPartials,
+              activeImage: imgFinal,
+              images: [imgFinal]
             },
             title,
             thinkingText:

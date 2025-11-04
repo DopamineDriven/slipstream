@@ -96,8 +96,6 @@ export class ModelService extends ProviderValidation {
     doc:
       | {
           author: string | undefined;
-          createdAt: Date | undefined;
-          updatedAt: Date | undefined;
           encoding: string | undefined;
           format: string;
           isEncrypted: boolean | undefined;
@@ -155,8 +153,6 @@ export class ModelService extends ProviderValidation {
           iccProfile: string | null;
           lensModel: null;
           orientation: number | null;
-          createdAt: undefined;
-          updatedAt: undefined;
         }
       | undefined;
   } {
@@ -166,12 +162,6 @@ export class ModelService extends ProviderValidation {
         specs.type === "DOCUMENT"
           ? {
               author: specs.author ?? undefined,
-              createdAt: specs.createdDate
-                ? new Date(specs.createdDate)
-                : undefined,
-              updatedAt: specs.modifiedDate
-                ? new Date(specs.modifiedDate)
-                : undefined,
               encoding: specs.encoding ?? undefined,
               format: specs.format ?? "application/pdf",
               isEncrypted: specs.isEncrypted ?? undefined,
@@ -199,7 +189,7 @@ export class ModelService extends ProviderValidation {
               exifDateTimeOriginal: specs.exifDateTimeOriginal
                 ? new Date(specs.exifDateTimeOriginal)
                 : null,
-              format: specs.format === "unknown" ? undefined : specs.format,
+              format: specs.format !== "unknown" ? specs.format : "jpeg",
               frames: specs.animated === true ? specs.frames : 1,
               gpsLat: null,
               gpsLon: null,
@@ -208,9 +198,7 @@ export class ModelService extends ProviderValidation {
               width: specs.width,
               iccProfile: specs.iccProfile,
               lensModel: null,
-              orientation: specs.orientation,
-              createdAt: undefined,
-              updatedAt: undefined
+              orientation: specs.orientation
             }
           : undefined
     };

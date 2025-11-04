@@ -1,6 +1,5 @@
 import type {
   AIChatRequestImgGenFields,
-  AIChatResponseImgGenFields,
   AIChatResponseImgGenFieldsFinal,
   ImgGenStage
 } from "@/events-images.ts";
@@ -39,7 +38,7 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   temperature?: number;
   topP?: number;
   imgGenEnabled?: boolean;
-  imgGenFields?: AIChatResponseImgGenFields;
+  imgGenFields?: AIChatResponseImgGenFieldsFinal;
 }
 
 export type AIChatRequest = {
@@ -784,3 +783,144 @@ export type EventTypeMap = {
 export type EventMap<T extends keyof EventTypeMap> = {
   [P in T]: EventTypeMap[P];
 }[T];
+
+export type AIChatResRT = {
+  conversationSettings: {
+    createdAt: Date;
+    id: string;
+    updatedAt: Date;
+    conversationId: string;
+    systemPrompt: string | null;
+    temperature: number | null;
+    topP: number | null;
+    enableThinking: boolean | null;
+    trackUsage: boolean | null;
+    enableWebSearch: boolean | null;
+    enableAssetGen: boolean | null;
+    reasoningEffort: "minimal" | "low" | "medium" | "high" | null;
+    outputVerbosity: ("low" | "medium" | "high") | null
+    maxTokens: number | null;
+    usageAlerts: boolean | null;
+  } | null;
+  messages: ({
+    attachments: ({
+      imageGenOutput: {
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+        jobId: string;
+        mime: string | null;
+        jobIndex: number;
+        kind: "PARTIAL" | "FINAL";
+        seriesIndex: number;
+        seriesId: string;
+        isPartial: boolean;
+        width: number | null;
+        height: number | null;
+        ext: string | null;
+        revisedPrompt: string | null;
+        attachmentId: string;
+      } | null;
+      image: {
+        createdAt: Date;
+        updatedAt: Date;
+        width: number;
+        height: number;
+        format: "jpeg" | "png" | "gif" | "webp" | "avif" | "heic" | "apng" | "bmp" | "tiff" | "ico" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "svg" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze" | "unknown";
+        aspectRatio: number | null;
+        frames: number;
+        hasAlpha: boolean | null;
+        animated: boolean;
+        orientation: number | null;
+        colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | null;
+        exifDateTimeOriginal: Date | null;
+        cameraMake: string | null;
+        cameraModel: string | null;
+        lensModel: string | null;
+        gpsLat: number | null;
+        gpsLon: number | null;
+        dominantColorHex: string | null;
+        iccProfile: string | null;
+        attachmentId: string;
+      } | null;
+    } & {
+      createdAt: Date;
+      id: string;
+      userId: string;
+      updatedAt: Date;
+      conversationId: string | null;
+      uploadDuration: number | null;
+      mime: string | null;
+      seriesId: string | null;
+      ext: string | null;
+      draftId: string | null;
+      batchId: string | null;
+      generationGroupId: string | null;
+      s3ObjectId: string | null;
+      origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
+      status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+      uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
+      assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
+      cdnUrl: string | null;
+      publicUrl: string | null;
+      sourceUrl: string | null;
+      thumbnailKey: string | null;
+      compatMime: string | null;
+      compatExt: string | null;
+      compatVersionId: string | null;
+      compatKey: string | null;
+      compatS3ObjectId: string | null;
+      compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
+      compatReadyAt: Date | null;
+      compatCdnUrl: string | null;
+      bucket: string;
+      key: string;
+      versionId: string | null;
+      region: string;
+      cacheControl: string | null;
+      contentDisposition: string | null;
+      contentEncoding: string | null;
+      expiresAt: Date | null;
+      size: bigint | null;
+      filename: string | null;
+      etag: string | null;
+      checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
+      checksumSha256: string | null;
+      storageClass: string | null;
+      sseAlgorithm: string | null;
+      sseKmsKeyId: string | null;
+      s3LastModified: Date | null;
+      deletedAt: Date | null;
+      messageId: string | null;
+    })[];
+  } & {
+    createdAt: Date;
+    id: string;
+    userId: string | null;
+    userKeyId: string | null;
+    updatedAt: Date;
+    conversationId: string;
+    provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
+    model: string | null;
+    thinkingDuration: number | null;
+    thinkingText: string | null;
+    senderType: "USER" | "AI" | "SYSTEM";
+    content: string;
+    isImageGen: boolean;
+    messageType: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN";
+    liked: boolean | null;
+    disliked: boolean | null;
+    tryAgain: boolean | null;
+  })[];
+} & {
+  createdAt: Date;
+  id: string;
+  shareToken: string | null;
+  userId: string;
+  userKeyId: string | null;
+  title: string | null;
+  updatedAt: Date;
+  branchId: string | null;
+  parentId: string | null;
+  isShared: boolean;
+};

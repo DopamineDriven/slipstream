@@ -1,12 +1,14 @@
 import type {
   MessageSingleton,
-  ProviderChatRequestEntity
+  ProviderChatRequestEntity,
+  S3FinalizePayload
 } from "@/types/index.ts";
 import type {
   xAIChatCompletionsRes,
   xAIChoiceActive,
   xAIImgGenResponse
 } from "@/xai/sse.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type { Logger as PinoLogger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
@@ -19,8 +21,8 @@ import {
   isReasoningDelta,
   isStartDelta
 } from "@/xai/sse.ts";
-import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
+  AIChatResponseImgGenSubFields,
   EventTypeMap,
   GrokModelIdUnion,
   ImgMetadataEntity,
@@ -55,7 +57,9 @@ type ImageGenPartialArr = [
   number | undefined, // upload duration
   string | undefined, // requestMessageId
   string | undefined, // jobId
-  string | undefined // revised_prompt
+  string | undefined, // revised_prompt
+  S3FinalizePayload,
+  ExpandedImgSpecs
 ];
 
 export class xAIService extends ModelService {
@@ -369,87 +373,6 @@ export class xAIService extends ModelService {
     return formatted;
   }
 
-  public async handleS3Upload(
-    url: string,
-    userId: string,
-    conversationId: string,
-    i: number,
-    itemId: string,
-    jobId: string,
-    requestMessageId: string
-  ) {
-    const [res, specs] = await Promise.all<
-      [Promise<Response>, Promise<ExpandedImgSpecs>]
-    >([
-      fetch(url, { keepalive: true }),
-      this.extract.extractRemote(url, 4096 * 32) as Promise<ExpandedImgSpecs>
-    ]);
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch URL: ${res.status} ${res.statusText}`);
-    }
-
-    // Extract content-type from response if not provided in meta
-
-    // For Node.js 18+, we can use native stream conversion
-    // This is memory-efficient as it doesn't load the entire file into memory
-    const reader = res.body?.getReader();
-    if (reader) {
-      const chunks = Array.of<Uint8Array>();
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) break;
-        if (value) chunks.push(value);
-      }
-      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-      const completeBuffer = new Uint8Array(totalLength);
-      const uploadStart = performance.now();
-      const rt = await this.s3.uploadGenerated(completeBuffer, this.isProd, {
-        contentType: specs.contentType ?? "application/octet-stream",
-        filename: "",
-        origin: "GENERATED",
-        userId,
-        conversationId,
-        size: specs.byteSize
-      });
-      const uploadDelta = performance.now() - uploadStart;
-
-      const imgMeta = this.handleAssetMetadata(specs)?.img;
-      return {
-        index: i,
-        cdnUrl: rt.cdnUrl ?? "",
-        itemId: "",
-        width: specs.width,
-        height: specs.height,
-        mime: specs.contentType ?? rt.contentType ?? "application/octet-stream",
-        bucket: rt.bucket,
-        key: rt.key,
-        versionId: rt.versionId,
-        s3ObjectId: rt.s3ObjectId,
-        filename: "",
-        ext: specs.format,
-        etag: rt.etag,
-        size: specs.byteSize ?? rt.size,
-        s3LastModified: rt.lastModified,
-        ContentDisposition: rt.contentDisposition,
-        CacheControl: rt.cacheControl,
-        Checksum: rt.checksum,
-        StorageClass: rt.storageClass,
-        generationGroupId: "grok-group", // Assuming res has an ID
-        image: imgMeta,
-        uploadDuration: uploadDelta,
-        requestMessageId,
-        jobId,
-        jobIndex: 0,
-        seriesId: itemId,
-        seriesIndex: i,
-        kind: "FINAL" // Or "PARTIAL" if handling partials
-      };
-    }
-  }
-
   private async generateId(target: "seriesId" | "generationGroupId") {
     const { nanoid } = await import("nanoid");
     if (target === "generationGroupId") {
@@ -494,15 +417,105 @@ export class xAIService extends ModelService {
     });
   }
 
-  private mapImgGenArr(props: ImageGenPartialArr[]) {
+  public mapPersistenceImgGenArrr(userId: string, props: ImageGenPartialArr[]) {
     return props.map((t, o) => {
+      const rt = t[25];
+      const expImg = t[26];
+      const p = rt.cdnUrl?.split(/\//gm);
+      const filename = p?.at(-1);
+      const pathFragments = filename?.split(/-/gm);
+      const _timestamp = pathFragments?.[0];
+      const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
       return {
-        index: t[0] ?? o,
-        cdnUrl: t[1],
+        index: t[0],
+        cdnUrl: rt.cdnUrl,
+        itemId: t[2],
         width: t[3],
         height: t[4],
-        mime: t[5]
-      };
+        mime: t[5],
+        bucket: t[6],
+        key: t[7],
+        versionId: t[8],
+        s3ObjectId: t[9],
+        filename: t[10] ?? null,
+        batchId: null,
+        draftId: null,
+        cacheControl: rt.cacheControl ?? null,
+        checksumAlgo: rt?.checksum?.algo ?? "CRC32",
+        checksumSha256: rt.checksum?.value ?? null,
+        compatCdnUrl: rt.cdnUrl,
+        compatExt: rt.extension ?? t?.[11] ?? expImg.format,
+        compatKey: rt.key,
+        compatS3ObjectId: rt.s3ObjectId,
+        compatMime: t[5],
+        compatReadyAt: null,
+        compatStatus: "ALIASED",
+        compatVersionId: rt.versionId,
+        contentDisposition: rt.contentDisposition ?? null,
+        contentEncoding: null,
+        createdAt: new Date(Date.now()),
+        ext: t[11] ?? rt.extension ?? expImg.format,
+        deletedAt: null,
+        document: null,
+        expiresAt: rt.expires,
+        origin: "GENERATED",
+        publicUrl: rt.publicUrl,
+        region: "us-east-1",
+        sourceUrl: "buffer",
+        sseAlgorithm: null,
+        sseKmsKeyId: null,
+        status: "READY",
+        storageClass: rt.storageClass ?? null,
+        thumbnailKey: null,
+        updatedAt: new Date(Date.now()),
+        userId,
+        etag: rt.etag ?? null,
+        size: t?.[13] ?? null,
+        s3LastModified: rt.lastModified ? new Date(rt.lastModified) : null,
+        generationGroupId: t[19],
+        image: {
+          animated: expImg.animated,
+          width: expImg.width,
+          height: expImg.height,
+          aspectRatio: expImg.width / expImg.height,
+          cameraMake: null,
+          cameraModel: null,
+          colorSpace: expImg.colorSpace,
+          dominantColorHex: null,
+          exifDateTimeOriginal: expImg.exifDateTimeOriginal
+            ? new Date(expImg.exifDateTimeOriginal)
+            : null,
+          format: expImg.format,
+          frames: expImg.frames,
+          gpsLat: null,
+          gpsLon: null,
+          hasAlpha: expImg.hasAlpha,
+          iccProfile: expImg.iccProfile,
+          lensModel: null,
+          orientation: expImg.orientation
+        },
+        imageGenOutput: {
+          ext: expImg.format,
+          height: expImg.height,
+          width: expImg.width,
+          jobId: t[23] ?? "",
+          isPartial: true,
+          jobIndex: 0,
+          kind: "FINAL",
+          mime: t[5],
+          revisedPrompt: null,
+          seriesId: t[2],
+          seriesIndex: seriesIndex ? Number.parseInt(seriesIndex, 10) : o++
+        },
+        uploadDuration: t[21] ?? null,
+        requestMessageId: t[22],
+        jobId: t[23] ?? "",
+        jobIndex: 0,
+        seriesIndex: t[0],
+        seriesId: t[2],
+        revisedPrompt: t[24],
+        kind: "FINAL"
+      } as const satisfies AIChatResponseImgGenSubFields;
     });
   }
 
@@ -635,8 +648,6 @@ export class xAIService extends ModelService {
           });
           a = rtHelper;
           tDelta = performance.now() - tInitial;
-
-          const imgMeta = this.handleAssetMetadata(getIt).img;
           const uploadTime = tDelta;
           partialImgArr.push([
             0,
@@ -659,11 +670,35 @@ export class xAIService extends ModelService {
             rtHelper?.checksum,
             rtHelper?.storageClass,
             itemId,
-            imgMeta,
+            {
+              animated: getIt.animated,
+              aspectRatio: getIt.width / getIt.height,
+              cameraMake: null,
+              cameraModel: null,
+              colorSpace: getIt.colorSpace,
+              dominantColorHex: null,
+              exifDateTimeOriginal: getIt.exifDateTimeOriginal
+                ? new Date(getIt.exifDateTimeOriginal)
+                : null,
+              format: getIt.format !== "unknown" ? getIt.format : "jpeg",
+              frames: getIt.frames,
+              gpsLat: null,
+              gpsLon: null,
+              hasAlpha: getIt.hasAlpha ?? false,
+              height: getIt.height,
+              width: getIt.width,
+              iccProfile: getIt.iccProfile ?? null,
+              lensModel: null,
+              orientation: getIt.orientation,
+              createdAt: undefined,
+              updatedAt: undefined
+            },
             uploadTime,
             requestMessageId,
             jobId,
-            d.revised_prompt
+            d.revised_prompt,
+            rtHelper,
+            getIt
           ]);
           tInitial = 0;
           tDelta = 0;
@@ -679,8 +714,7 @@ export class xAIService extends ModelService {
           }
         );
 
-        const rem = this.mapImgGenArr(partialImgArr);
-        const dur = (performance.now() - totalDur);
+        const dur = performance.now() - totalDur;
         await this.prisma.handleAiChatResponse({
           chunk: grokAgg,
           conversationId,
@@ -701,7 +735,11 @@ export class xAIService extends ModelService {
           usage: undefined,
           imgGenFields: {
             partialImages: undefined,
-            images: remapFinals,
+            images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+            activeImage: this.mapPersistenceImgGenArrr(
+              userId,
+              partialImgArr
+            ).find(t => t.index === partialImgArr.length - 1),
             actualCount: remapFinals.length,
             duration: dur,
             outputAspectRatio:
@@ -741,7 +779,11 @@ export class xAIService extends ModelService {
             imgGenEnabled: true,
             imgGenFields: {
               partialImages: undefined,
-              images: rem,
+              images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+              activeImage: this.mapPersistenceImgGenArrr(
+                userId,
+                partialImgArr
+              ).find(t => t.index === partialImgArr.length - 1),
               actualCount: remapFinals.length,
               duration: dur,
               outputAspectRatio:
@@ -781,7 +823,11 @@ export class xAIService extends ModelService {
           imgGenEnabled: true,
           imgGenFields: {
             partialImages: undefined,
-            images: rem,
+            images: this.mapPersistenceImgGenArrr(userId, partialImgArr),
+            activeImage: this.mapPersistenceImgGenArrr(
+              userId,
+              partialImgArr
+            ).find(t => t.index === partialImgArr.length - 1),
             actualCount: remapFinals.length,
             duration: dur,
             outputAspectRatio:

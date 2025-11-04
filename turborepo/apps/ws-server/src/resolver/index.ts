@@ -1427,7 +1427,6 @@ export class Resolver extends ModelService {
                 : "PENDING";
 
       const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
-
       const attachment = await this.wsServer.prisma.updateAttachment({
         data: {
           bucket: finalBucket,
@@ -1473,7 +1472,62 @@ export class Resolver extends ModelService {
           mime: contentType,
           size: this.toBigInt(size, bytesUploaded)
         },
-        metadata: this.handleAssetMetadata(specs)
+        metadata:
+          specs?.type === "IMAGE"
+            ? {
+                type: "IMAGE",
+                img: {
+                  animated: specs.animated,
+                  aspectRatio: specs.width / specs.height,
+                  cameraMake: null,
+                  cameraModel: null,
+                  colorSpace: specs.colorSpace,
+                  createdAt: undefined,
+                  updatedAt: undefined,
+                  lensModel: null,
+                  iccProfile: specs.iccProfile,
+                  orientation: specs.orientation,
+                  dominantColorHex: null,
+                  exifDateTimeOriginal: specs.exifDateTimeOriginal
+                    ? new Date(specs.exifDateTimeOriginal)
+                    : null,
+                  format: specs.format !== "unknown" ? specs.format : "jpeg",
+                  frames: specs.frames,
+                  gpsLat: null,
+                  gpsLon: null,
+                  hasAlpha: specs.hasAlpha ?? false,
+                  width: specs.width,
+                  height: specs.height
+                },
+                doc: undefined
+              }
+            : {
+                type: "DOCUMENT",
+                img: undefined,
+                doc: {
+                  author: specs.author ?? undefined,
+                  createdAt: specs.createdDate
+                    ? new Date(specs.createdDate)
+                    : undefined,
+                  updatedAt: specs.modifiedDate
+                    ? new Date(specs.modifiedDate)
+                    : undefined,
+                  encoding: specs.encoding ?? undefined,
+                  format: specs.format ?? "pdf",
+                  isEncrypted: specs.isEncrypted ?? undefined,
+                  language: specs.language ?? undefined,
+                  subject: specs.subject ?? undefined,
+                  textPreview: specs.textPreview ?? undefined,
+                  title: undefined,
+                  isSearchable: specs.isSearchable ?? undefined,
+                  wordCount: specs.wordCount ?? undefined,
+                  lineCount: specs.lineCount ?? undefined,
+
+                  keywords: specs.keywords ?? undefined,
+                  pageCount: specs.pageCount ?? undefined,
+                  pdfVersion: specs.pdfVersion ?? undefined
+                }
+              }
       });
 
       const meta = (

@@ -9,7 +9,7 @@ import { smoothScrollToBottom } from "@/lib/helpers";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
-import type { MessageSingleton } from "@slipstream/types";
+import type { AIChatResponseImgGenFieldsFinal, MessageSingleton } from "@slipstream/types";
 
 interface ChatFeedProps {
   messages: MessageSingleton<true>[];
@@ -26,23 +26,7 @@ interface ChatFeedProps {
   children?: ReactNode;
   activeConversationId?: string;
   imgGenEnabled?: boolean;
-  imgGenFields?: {
-    outputFormat?: string;
-    partialImages?: {
-      index: number;
-      cdnUrl: string;
-      width: number;
-      height: number;
-      mime: string;
-    }[];
-    images?: {
-      index: number;
-      cdnUrl: string;
-      width: number;
-      height: number;
-      mime: string;
-    }[];
-  };
+  imgGenFields?: AIChatResponseImgGenFieldsFinal
 }
 
 export function ChatFeed({

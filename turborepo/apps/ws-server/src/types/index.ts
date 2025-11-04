@@ -12,6 +12,8 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
+
+
 export type S3FinalizePayload = {
   bucket: string;
   key: string;
@@ -272,7 +274,7 @@ export type IncludeCreateConvoWithImgGenProps = {
         include: {
           image: true;
           document: true;
-          imageGenOutput: true
+          imageGenOutput: true;
         };
       };
     };
@@ -590,47 +592,6 @@ export type UpdateAttachment = CTR<
   "id" | "userId" | "conversationId" | "bucket" | "key" | "versionId"
 >;
 
-export type NanoBananaOutputSize =
-  | "1:1"
-  | "2:3"
-  | "3:2"
-  | "3:4"
-  | "4:3"
-  | "4:5"
-  | "5:4"
-  | "9:16"
-  | "16:9"
-  | "21:9"
-  | undefined;
-
-export type GptImageOutputSize =
-  | "1024x1024"
-  | "1536x1024"
-  | "1024x1536"
-  | "auto"
-  | undefined;
-
-export type Dalle3OutputSize =
-  | "1024x1024"
-  | "1792x1024"
-  | "1024x1792"
-  | "auto"
-  | undefined;
-
-export type Dalle2OutputSize =
-  | "256x256"
-  | "512x512"
-  | "1024x1024"
-  | "auto"
-  | undefined;
-export type ImagenOutputSize =
-  | "1:1"
-  | "9:16"
-  | "16:9"
-  | "3:4"
-  | "4:3"
-  | undefined;
-
 export type BigIntToCompatProps<
   T extends "image_gen_request" | "ai_chat_request"
 > = T extends "image_gen_request"
@@ -928,21 +889,21 @@ export type ImageSingleton = {
 };
 
 export type ConvoSettingsSingleton = {
-    id: string;
-    conversationId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    systemPrompt: string | null;
-    temperature: number | null;
-    topP: number | null;
-    maxTokens: number | null;
-    enableThinking: boolean | null;
-    trackUsage: boolean | null;
-    enableWebSearch: boolean | null;
-    enableAssetGen: boolean | null;
-    reasoningEffort: $Enums.ReasoningEffort | null;
-    outputVerbosity: $Enums.OutputVerbosity | null;
-    usageAlerts: boolean | null;
+  id: string;
+  conversationId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  systemPrompt: string | null;
+  temperature: number | null;
+  topP: number | null;
+  maxTokens: number | null;
+  enableThinking: boolean | null;
+  trackUsage: boolean | null;
+  enableWebSearch: boolean | null;
+  enableAssetGen: boolean | null;
+  reasoningEffort: $Enums.ReasoningEffort | null;
+  outputVerbosity: $Enums.OutputVerbosity | null;
+  usageAlerts: boolean | null;
 };
 
 export type ImageGenJobSingleton = {
@@ -984,22 +945,22 @@ export type ImageGenJobSingleton = {
 };
 
 export type ImageGenOutputSingleton = {
-    id: string;
-    seriesId: string;
-    ext: string | null;
-    mime: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    jobId: string;
-    jobIndex: number;
-    kind: $Enums.ImageGenOutputKind;
-    seriesIndex: number;
-    isPartial: boolean;
-    attachmentId: string;
-    width: number | null;
-    height: number | null;
-    revisedPrompt: string | null;
-}
+  id: string;
+  seriesId: string;
+  ext: string | null;
+  mime: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  jobId: string;
+  jobIndex: number;
+  kind: $Enums.ImageGenOutputKind;
+  seriesIndex: number;
+  isPartial: boolean;
+  attachmentId: string;
+  width: number | null;
+  height: number | null;
+  revisedPrompt: string | null;
+};
 
 export type AttachmentSingleton<T extends boolean = false> = {
   id: string;
@@ -1072,17 +1033,17 @@ export type AttachmentSingleton<T extends boolean = false> = {
 };
 
 export type UserKeySingleton = {
-    id: string;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    provider: $Enums.Provider;
-    apiKey: string;
-    iv: string;
-    authTag: string;
-    label: string | null;
-    isDefault: boolean;
-}
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  provider: $Enums.Provider;
+  apiKey: string;
+  iv: string;
+  authTag: string;
+  label: string | null;
+  isDefault: boolean;
+};
 
 export type MessageSingleton<T extends boolean = false> = {
   id: string;
