@@ -9,7 +9,10 @@ import { smoothScrollToBottom } from "@/lib/helpers";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
-import type { AIChatResponseImgGenFieldsFinal, MessageSingleton } from "@slipstream/types";
+import type {
+  AIChatResponseImgGenFieldsFinal,
+  MessageSingleton
+} from "@slipstream/types";
 
 interface ChatFeedProps {
   messages: MessageSingleton<true>[];
@@ -26,7 +29,7 @@ interface ChatFeedProps {
   children?: ReactNode;
   activeConversationId?: string;
   imgGenEnabled?: boolean;
-  imgGenFields?: AIChatResponseImgGenFieldsFinal
+  imgGenFields?: AIChatResponseImgGenFieldsFinal;
 }
 
 export function ChatFeed({
@@ -46,6 +49,16 @@ export function ChatFeed({
   children
 }: ChatFeedProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    console.log({
+      ["chat-feed-has-image-gen-fields-data"]: JSON.stringify(
+        imgGenFields,
+        null,
+        2
+      )
+    });
+  }, [imgGenFields]);
 
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -192,14 +205,10 @@ export function ChatFeed({
                   ? imgGenEnabled
                   : undefined
               }
-              liveImgGenFields={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? imgGenFields ?? undefined
-                  : undefined
-              }
+              liveImgGenFields={isStreaming ? imgGenFields ?? undefined : undefined}
             />
           ))}
-          {isStreaming && isAwaitingFirstChunk === true && (
+          {isStreaming && isAwaitingFirstChunk && (!imgGenFields?.partialImages || imgGenFields.partialImages.length === 0) && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

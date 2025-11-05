@@ -5,86 +5,6 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button, Download, X } from "@slipstream/ui";
 
-
-/**
- IMPORTANT
-
- // TODO
-
- type AIChatResponse = {
-    type: "ai_chat_response";
-    conversationId: string;
-    userId: string;
-    done: true;
-    data?: string | undefined;
-    provider?: Provider | undefined;
-    title?: string | undefined;
-    model?: string | undefined;
-    systemPrompt?: string | undefined;
-    temperature?: number | undefined;
-    topP?: number | undefined;
-    imgGenEnabled?: boolean | undefined;
-    imgGenFields?: AIChatResponseImgGenFields | undefined;
-    chunk: string;
-    usage?: number | undefined;
-    thinkingDuration?: number | undefined;
-    thinkingText?: string | undefined;
-}
- type AIChatChunk = {
-    type: "ai_chat_chunk";
-    conversationId: string;
-    userId: string;
-    chunk?: string | undefined;
-    done: boolean;
-    data?: string | undefined;
-    provider?: Provider | undefined;
-    title?: string | undefined;
-    model?: string | undefined;
-    systemPrompt?: string | undefined;
-    temperature?: number | undefined;
-    topP?: number | undefined;
-    imgGenEnabled?: boolean | undefined;
-    imgGenFields?: AIChatResponseImgGenFields | undefined;
-    isThinking?: boolean | undefined;
-    thinkingDuration?: number | undefined;
-    thinkingText?: string | undefined;
-}
-
- type AIChatResponseImgGenFields = {
-    outputSize?: string;
-    outputQuality?: string;
-    outputCompression?: number;
-    outputBackground?: string;
-    outputWidth?: number;
-    outputHeight?: number;
-    outputAspectRatio?: number;
-    size?: number;
-    requestedCount?: number;
-    actualCount?: number;
-    outputFormat?: string;
-    outputMime?: string;
-    duration?: number;
-    seed?: number;
-    revisedPrompt?: string;
-    partialImagesRequested?: number;
-    partialImagesActual?: number;
-    partialImages?: {
-        index: number;
-        cdnUrl: string;
-        width: number;
-        height: number;
-        mime: string;
-    }[];
-    images?: {
-        index: number;
-        cdnUrl: string;
-        width: number;
-        height: number;
-        mime: string;
-    }[];
-}
- */
-
 interface ImageGenerationCanvasProps {
   isGenerating: boolean;
   cdnUrl: string | null;
@@ -149,12 +69,12 @@ export function ImageGenerationCanvas({
 
   // Extract series information for better keying
   const seriesInfo = extractSeriesInfo(displayUrl);
-  const imageKey = seriesInfo
-    ? `${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
-    : `${generationId ?? "gen"}-${displayUrl}`;
-  const imageId = seriesInfo
-    ? `img-${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
-    : `img-${generationId ?? "gen"}-${isPartialDisplay ? "partial" : "final"}`;
+  // const imageKey = seriesInfo
+  //   ? `${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
+  //   : `${generationId ?? "gen"}-${displayUrl}`;
+  // const imageId = seriesInfo
+  //   ? `img-${seriesInfo.seriesId}-${seriesInfo.seriesIndex}`
+  //   : `img-${generationId ?? "gen"}-${isPartialDisplay ? "partial" : "final"}`;
 
   // Reset state when generation changes
   useEffect(() => {
@@ -213,7 +133,7 @@ export function ImageGenerationCanvas({
       </div>
 
       {/* Image display */}
-      {shouldShowImage && displayUrl && (
+      {displayUrl && (
         <div
           className={cn(
             "absolute inset-0 transition-all duration-700 ease-out",
@@ -222,8 +142,6 @@ export function ImageGenerationCanvas({
               : "scale-95 opacity-0"
           )}>
           <Image
-            key={imageKey} // Use series-aware key SHOULD WE REALLY be setting this here?
-            id={imageId} // Use series-aware ID
             src={displayUrl}
             alt={prompt}
             height={height}
@@ -298,16 +216,6 @@ export function ImageGenerationCanvas({
                 {prompt}
               </p>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Ready to generate state */}
-      {!isGenerating && !shouldShowImage && !cdnUrl && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-muted-foreground space-y-2 text-center">
-            <p className="text-lg font-medium">Ready to generate</p>
-            <p className="text-sm">Enter a prompt and click Generate</p>
           </div>
         </div>
       )}

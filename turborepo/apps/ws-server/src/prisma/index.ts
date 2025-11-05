@@ -1100,13 +1100,13 @@ export class PrismaService extends ModelService {
                   mime: t.mime,
                   revisedPrompt: data.imgGenFields?.revisedPrompt,
                   kind: t.kind,
-                  ext: t.ext,
+                  ext: t.ext, 
                   height: t.image?.height,
                   width: t.image?.width,
                   jobId: t.jobId,
                   isPartial: t.kind === "FINAL" ? false : true,
                   jobIndex: 0,
-                  seriesId: t.imageGenOutput?.seriesId ?? seriesId,
+                  seriesId: t.itemId ?? t.imageGenOutput?.seriesId ?? seriesId,
                   seriesIndex: t.index
                 }
               } satisfies ImageGenOutputCreateNestedOneWithoutAttachmentInput)

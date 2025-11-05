@@ -286,18 +286,19 @@ export function AIChatProvider({
 
       // Image generation progressive updates - accumulate the complete fields
       if (evt.imgGenEnabled) {
+        setImgGenEnabled(evt.imgGenEnabled);
+      }
+      if (evt.imgGenFields) {
         setImgGenEnabled(true);
-        if (evt.imgGenFields) {
-          console.log(evt.imgGenFields);
-          // Merge new fields with existing, preserving all partial images
-          setImgGenFields(prev => ({
-            ...prev,
-            ...evt.imgGenFields,
-            // Accumulate partial images array if it exists
-            partialImages:
-              evt.imgGenFields?.partialImages ?? prev?.partialImages
-          }));
-        }
+        console.log(evt.imgGenFields);
+            if (!firstChunkReceivedRef.current) firstChunkReceivedRef.current = true;
+        // Merge new fields with existing, preserving all partial images
+        setImgGenFields(prev => ({
+          ...prev,
+          ...evt.imgGenFields,
+          // Accumulate partial images array if it exists
+          partialImages: evt.imgGenFields?.partialImages ?? prev?.partialImages
+        }));
       }
 
       // Update streaming message with all relevant data using refs
@@ -312,7 +313,7 @@ export function AIChatProvider({
         timestamp: new Date(),
         isUser: false,
         imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
-        imgGenFields: imgGenFieldsRef.current
+        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields
       });
     };
 

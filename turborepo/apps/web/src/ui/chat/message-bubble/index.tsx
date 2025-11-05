@@ -6,17 +6,19 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { getInitials } from "@/lib/helpers";
+import { normalizeImgGenFields } from "@/lib/img-gen-to-attachment";
 import { processStreamingMarkdown } from "@/lib/markdown-streaming";
 import { providerMetadata } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { AttachmentDisplay } from "@/ui/chat/attachment-display";
-import { ImageGenerationCanvas } from "@/ui/chat/image-gen/image-generation-canvas";
+import { ImageGenerationCanvasTest } from "@/ui/chat/image-gen/test";
 import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
 import type {
   AIChatResponseImgGenFieldsFinal,
+  AttachmentSingleton,
   MessageSingleton
 } from "@slipstream/types";
 import {
@@ -58,14 +60,25 @@ export function MessageBubble({
   liveThinkingText,
   liveIsThinking,
   liveThinkingDuration,
-  liveImgGenEnabled,
   liveImgGenFields
 }: ChatMessageProps) {
+  useEffect(() => {
+    console.log({
+      ["message-bubble-has-image-gen-fields-data"]: JSON.stringify(
+        liveImgGenFields,
+        null,
+        2
+      )
+    });
+  }, [liveImgGenFields]);
+
   const isMobile = useIsMobile();
   const [showMobileActions, setShowMobileActions] = useState(false);
+
   const [renderedContent, setRenderedContent] = useState<ReactNode | null>(
     null
   );
+
   const [renderedThinkingContent, setRenderedThinkingContent] =
     useState<ReactNode | null>(null);
 
@@ -75,43 +88,11 @@ export function MessageBubble({
 
   const { resolvedTheme } = useTheme();
 
-  // Extract the latest partial or final image for display
-  const currentImageGenData = useMemo(() => {
-    if (!liveImgGenEnabled || !liveImgGenFields) return null;
-
-    // If we have final images, use the first one
-    if (liveImgGenFields.images && liveImgGenFields.images.length > 0) {
-      const final = liveImgGenFields.images[0];
-      return {
-        cdnUrl: final?.cdnUrl,
-        width: final?.width ?? 1024,
-        height: final?.height ?? 1024,
-        mime: final?.mime,
-        isFinal: true
-      };
-    }
-
-    // Otherwise use the latest partial (highest index)
-    if (
-      liveImgGenFields.partialImages &&
-      liveImgGenFields.partialImages.length > 0
-    ) {
-      // Get the partial with the highest index (most recent)
-      const partial = liveImgGenFields.partialImages.reduce(
-        (latest, current) =>
-          !latest || current.index > latest.index ? current : latest
-      );
-      return {
-        cdnUrl: partial.cdnUrl,
-        width: partial.width,
-        height: partial.height,
-        mime: partial.mime,
-        isFinal: false
-      };
-    }
-
-    return null;
-  }, [liveImgGenEnabled, liveImgGenFields]);
+  const imageDataCacheRef = useRef<{
+    images: string[];
+    currentImageIndex: number;
+    isGenerating: boolean;
+  } | null>(null);
 
   const providerInfo = useMemo(
     () => providerMetadata[message.provider.toLowerCase() as Provider],
@@ -139,6 +120,127 @@ export function MessageBubble({
     () => (isStreaming ? processStreamingMarkdown(message.content) : null),
     [isStreaming, message.content]
   );
+
+  const imageGenerationData = useMemo(() => {
+    const imageUrls: string[] = [];
+    let isGenerating = true;
+    let prompt = "";
+
+    // First, try to get images from streaming data
+    if (liveImgGenFields) {
+      const normalized = normalizeImgGenFields(liveImgGenFields);
+      if (normalized) {
+        // Collect all images in order (partials then finals)
+        const allImages: AttachmentSingleton<true>[] = [];
+
+        if (normalized?.partialImages && normalized.partialImages?.length > 0) {
+          const partials = normalized?.partialImages?.filter(
+            t => typeof t !== "undefined"
+          );
+          if (partials.length > 0) allImages.push(...partials);
+        }
+        if (normalized?.images && normalized.images.length > 0) {
+          const finals = normalized?.images?.filter(
+            t => typeof t !== "undefined"
+          );
+          if (finals.length > 0) allImages.push(...finals);
+        }
+        // Sort by seriesIndex to ensure proper order
+        allImages.sort((a, b) => {
+          const aIndex = a.imageGenOutput?.seriesIndex ?? 0;
+          const bIndex = b.imageGenOutput?.seriesIndex ?? 0;
+          return aIndex - bIndex;
+        });
+
+        // Build URL array, avoiding duplicates
+        for (const img of allImages) {
+          if (img.cdnUrl && !imageUrls.includes(img.cdnUrl)) {
+            imageUrls.push(img.cdnUrl);
+            // Update prompt from the latest image
+            prompt = img.imageGenOutput?.revisedPrompt ?? prompt;
+            // If we have a final image, we're no longer generating
+            if (img.imageGenOutput?.kind === "FINAL") {
+              isGenerating = false;
+            }
+          }
+        }
+      }
+    }
+
+    // If no streaming data, check message attachments
+    if (
+      imageUrls.length === 0 &&
+      message.attachments &&
+      message.senderType === "AI"
+    ) {
+      const imageGenAttachments = message.attachments
+        .filter(att => att.imageGenOutput !== null)
+        .sort((a, b) => {
+          const aIndex = a.imageGenOutput?.seriesIndex ?? 0;
+          const bIndex = b.imageGenOutput?.seriesIndex ?? 0;
+          return aIndex - bIndex;
+        });
+
+      for (const att of imageGenAttachments) {
+        if (att.cdnUrl && !imageUrls.includes(att.cdnUrl)) {
+          imageUrls.push(att.cdnUrl);
+          prompt = att.imageGenOutput?.revisedPrompt ?? prompt;
+          if (att.imageGenOutput?.kind === "FINAL") {
+            isGenerating = false;
+          }
+        }
+      }
+    }
+
+    // If we have data, update the cache
+    if (imageUrls.length > 0) {
+      const newData = {
+        images: imageUrls,
+        currentImageIndex: imageUrls.length - 1,
+        isGenerating
+      };
+      imageDataCacheRef.current = newData;
+      return newData;
+    }
+
+    // If no data but we have cached data, check if it's still relevant
+    // This handles the router transition moment
+    if (imageDataCacheRef.current) {
+      // Check if the cached data is for the same message
+      // by comparing the final image URL with message attachments
+      const cachedFinalUrl = imageDataCacheRef.current.images.at(-1);
+
+      if (cachedFinalUrl) {
+        const messageHasThisImage = message.attachments?.some(
+          att => att.cdnUrl === cachedFinalUrl
+        );
+        if (messageHasThisImage) {
+          // The cache is still valid for this message
+          return imageDataCacheRef.current;
+        }
+      }
+    }
+
+    return null;
+  }, [liveImgGenFields, message.attachments, message.senderType]);
+
+  useEffect(() => {
+    // Clear cache if we're looking at a different message
+    return () => {
+      if (imageDataCacheRef.current) {
+        const lastUrl =
+          imageDataCacheRef.current.images[
+            imageDataCacheRef.current.images.length - 1
+          ];
+        const stillRelevant = message.attachments?.some(
+          att => lastUrl && att.cdnUrl === lastUrl
+        );
+        if (!stillRelevant) {
+          imageDataCacheRef.current = null;
+        }
+      }
+    };
+  }, [message.id, message.attachments]);
 
   // Process markdown content
   useEffect(() => {
@@ -304,97 +406,13 @@ export function MessageBubble({
               ? streamingRenderedContent
               : (renderedContent ?? message.content)}
           </div>
-
-          {/* Image Generation Canvas - shows during streaming */}
-          {currentImageGenData && (
-            <div className="mt-3">
-              <ImageGenerationCanvas
-                isGenerating={isStreaming && !currentImageGenData.isFinal}
-                cdnUrl={
-                  currentImageGenData.isFinal
-                    ? (currentImageGenData.cdnUrl ?? null)
-                    : null
-                }
-                cdnUrlPartial={
-                  !currentImageGenData.isFinal
-                    ? currentImageGenData.cdnUrl
-                    : null
-                }
-                width={currentImageGenData.width ?? 1024}
-                height={currentImageGenData.height ?? 1024}
-                mime={currentImageGenData.mime ?? "image/png"}
-                prompt={liveImgGenFields?.revisedPrompt ?? message.content}
-              />
-            </div>
+          {imageGenerationData && (
+            <ImageGenerationCanvasTest
+              isGenerating={imageGenerationData.isGenerating}
+              currentImageIndex={imageGenerationData.currentImageIndex}
+              images={imageGenerationData.images}
+            />
           )}
-          {message.senderType === "AI" && (
-            <div className="mt-3">
-              {message.attachments &&
-                message.attachments.length > 0 &&
-                message.attachments
-                  .filter(
-                    t =>
-                      t.imageGenOutput &&
-                      t.imageGenOutput?.seriesIndex ===
-                        message.attachments.length - 1 &&
-                      t.imageGenOutput.kind === "PARTIAL"
-                  )
-                  .map(t => (
-                    <ImageGenerationCanvas
-                      key={t.imageGenOutput?.seriesIndex}
-                      isGenerating={true}
-                      cdnUrl={t.cdnUrl}
-                      cdnUrlPartial={t.cdnUrl}
-                      width={t.image?.width ?? t.imageGenOutput?.width ?? 1024}
-                      height={
-                        t?.image?.height ?? t.imageGenOutput?.height ?? 1024
-                      }
-                      mime={t.mime ?? "image/jpeg"}
-                      prompt={"image gen in progress..."}
-                    />
-                  ))}
-            </div>
-          )}
-          {liveImgGenFields?.partialImages &&
-            liveImgGenFields.partialImages.length > 0 && (
-              <div className={cn("mt-3", className)}>
-                <div
-                  className={cn(
-                    "mb-2 text-xs font-medium",
-                    message.senderType === "USER"
-                      ? "text-foreground/80"
-                      : "sr-only"
-                  )}>
-                  {formatAttmntLabel(message)}
-                </div>
-                {message.senderType === "AI" && (
-                  <div className="mt-3">
-                    {liveImgGenFields?.partialImages &&
-                      liveImgGenFields.partialImages.length > 0 &&
-                      liveImgGenFields.partialImages
-                        .filter(
-                          t =>
-                            liveImgGenFields?.partialImages &&
-                            t.index ===
-                              liveImgGenFields?.partialImages.length - 1
-                        )
-                        .map(t => (
-                          <ImageGenerationCanvas
-                            key={t.index}
-                            isGenerating={false}
-                            cdnUrl={t.cdnUrl}
-                            cdnUrlPartial={t.cdnUrl}
-                            width={t.width}
-                            height={t.height}
-                            mime={t.mime ?? "image/jpeg"}
-                            prompt={"image gen in progress..."}
-                          />
-                        ))}
-                  </div>
-                )}
-              </div>
-            )}
-          {/* Regular attachments - only show when NOT actively generating images */}
           {message.attachments && message.attachments.length > 0 && (
             <div className={cn("mt-3", className)}>
               <div
@@ -408,38 +426,6 @@ export function MessageBubble({
               </div>
               {message.senderType === "USER" && (
                 <AttachmentDisplay attachments={message.attachments} />
-              )}
-              {!currentImageGenData && message.senderType === "AI" && (
-                <div className="mt-3">
-                  {message.attachments
-                    .filter(t => t.imageGenOutput?.kind === "FINAL")
-                    .map(t => (
-                      <ImageGenerationCanvas
-                        key={t.id}
-                        isGenerating={false}
-                        cdnUrl={
-                          t.imageGenOutput?.kind === "FINAL" ? t.cdnUrl : null
-                        }
-                        cdnUrlPartial={
-                          t.imageGenOutput?.kind === "FINAL"
-                            ? t.compatCdnUrl
-                            : null
-                        }
-                        width={
-                          t.imageGenOutput?.kind === "FINAL"
-                            ? (t.image?.width ?? 1024)
-                            : 1024
-                        }
-                        height={
-                          t.imageGenOutput?.kind === "FINAL"
-                            ? (t.image?.height ?? 1024)
-                            : 1024
-                        }
-                        mime={t.mime ?? "image/png"}
-                        prompt={t.imageGenOutput?.revisedPrompt ?? ""}
-                      />
-                    ))}
-                </div>
               )}
             </div>
           )}
