@@ -43,7 +43,25 @@ class ScriptGen extends Fs {
             orderBy: { createdAt: "asc" },
             include: {
               imageGenJob: true,
-              attachments: { include: { imageGenOutput: true } }
+              attachments: {
+                where: {
+                  OR: [
+                    { origin: { not: "GENERATED" } },
+                    {
+                      AND: [
+                        { origin: "GENERATED" },
+                        { imageGenOutput: { kind: "FINAL" } }
+                      ]
+                    }
+                  ]
+                },
+                orderBy: { createdAt: "asc" },
+                include: {
+                  image: true,
+                  document: true,
+                  imageGenOutput: true
+                }
+              }
             }
           }
         }
@@ -214,13 +232,13 @@ class ScriptGen extends Fs {
 
       const agg =
         p.sender === "AI"
-        ? p.assetUrl
-          ? withThinking === "true"
-            ? p.thinking
-              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-            :`${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${d}\n`
+          ? p.assetUrl
+            ? withThinking === "true"
+              ? p.thinking
+                ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+                : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${d}\n`
           : p.assetUrl.length > 0
             ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
