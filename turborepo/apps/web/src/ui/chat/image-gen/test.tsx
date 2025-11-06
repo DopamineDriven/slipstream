@@ -79,8 +79,8 @@ export function ImageGenerationCanvasTest({
         )}>
         <div
           className={cn(
-            "absolute top-4 right-4 flex gap-2 opacity-0 transition-opacity duration-300",
-            !isGenerating && isFinalImage && "group-hover:opacity-100"
+            "absolute top-4 right-4 flex gap-2 opacity-30 transition-opacity duration-300",
+            !isGenerating && isFinalImage && "group-hover:opacity-100 focus:opacity-100"
           )}>
           <Button
             size="icon"
