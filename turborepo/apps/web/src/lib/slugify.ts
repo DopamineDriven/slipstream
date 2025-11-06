@@ -1,4 +1,6 @@
-import type { Unenumerate } from "@/types/helpers";
+export type Unenumerate<T> = T extends readonly (infer U)[] | (infer U)[]
+  ? U
+  : T;
 
 type CollapseSpaces<S extends string> =
   S extends `${infer T}  ${infer U}` ? CollapseSpaces<`${T} ${U}`> : S;

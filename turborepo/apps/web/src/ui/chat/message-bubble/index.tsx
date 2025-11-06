@@ -370,9 +370,9 @@ export function MessageBubble({
         <div
           className={cn(
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
-            imageGenerationData && message.senderType !== "USER" && isStreaming
-              ? "min-w-auto"
-              : message.attachments.length > 0 && message.senderType ==="USER" ? "min-w-auto flex-auto" : "min-w-0",
+            (imageGenerationData && message.senderType !== "USER" && isStreaming || message.attachments.length > 0 && message.senderType !=="USER")
+              ? "min-w-auto flex-auto"
+              : message.attachments.length > 0 && message.senderType ==="USER" ? "min-w-auto! flex-auto" : "min-w-0",
             message.senderType === "USER"
               ? "bg-muted text-foreground"
               : resolvedTheme === "light"

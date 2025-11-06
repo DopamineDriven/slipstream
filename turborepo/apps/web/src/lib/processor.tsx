@@ -42,27 +42,23 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
     const slug = typeof children === "string" ? slugify(children) : "";
     const target =
       `h${level}` as const satisfies keyof React.JSX.IntrinsicElements;
-
-    return createElement(
-      target,
-      {
-        id: slug,
-        className:
-          "[h1]:text-5xl [h2]:text-4xl [h3]:text-3xl [h4]:text-2xl [h5]:text-xl [h6]:text-lg",
-        ...rest
-      },
-      [
-        createElement(
-          "a",
-          {
-            href: `#${slug}`,
-            key: `link-${slug}`,
-            className: "anchor hover:underline"
-          },
-          [children]
-        )
-      ]
-    );
+    const createElementHeadingStyles = {
+      id: slug,
+      className:
+        "[h1]:text-5xl [h2]:text-4xl [h3]:text-3xl [h4]:text-2xl [h5]:text-xl [h6]:text-lg wrap-break-word whitespace-normal",
+      ...rest
+    };
+    return createElement(target, createElementHeadingStyles, [
+      createElement(
+        "a",
+        {
+          href: `#${slug}`,
+          key: `link-${slug}`,
+          className: "anchor hover:underline wrap-break-word "
+        },
+        [children]
+      )
+    ]);
   };
   Heading.displayName = `Heading${level}`;
 
@@ -72,7 +68,13 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
 function CustomLink({ href, children, ...props }: ComponentPropsWithRef<"a">) {
   if (href?.startsWith("/")) {
     return (
-      <Link href={href} {...props}>
+      <Link
+        href={href}
+        className={cn(
+          props.className,
+          "overflow-x-hidden wrap-break-word whitespace-normal"
+        )}
+        {...props}>
         {children}
       </Link>
     );
@@ -80,14 +82,28 @@ function CustomLink({ href, children, ...props }: ComponentPropsWithRef<"a">) {
 
   if (href?.startsWith("#")) {
     return (
-      <Link href={href} {...props}>
+      <Link
+        href={href}
+        className={cn(
+          props.className,
+          "overflow-x-hidden wrap-break-word whitespace-normal"
+        )}
+        {...props}>
         {children}
       </Link>
     );
   }
 
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+    <a
+      href={href}
+      className={cn(
+        props.className,
+        "overflow-x-hidden wrap-break-word whitespace-normal"
+      )}
+      target="_blank"
+      rel="noopener noreferrer"
+      {...props}>
       {children}
     </a>
   );
@@ -122,7 +138,10 @@ function CustomImage({
 }: CustomImageProps) {
   return (
     <Image
-      src={src || "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"}
+      src={
+        src ||
+        "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
+      }
       alt={alt}
       width={width}
       height={height}
@@ -138,19 +157,18 @@ const components = {
   pre: ({ children, ...props }: ComponentPropsWithRef<"pre">) => {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
-  code: ({children, ...props}: ComponentPropsWithRef<"pre">) => {
-       <div className="relative m-0 w-full p-0">
-          <pre
-            className={cn(
-
-              `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`,
-
-            )}
-            {...props}>
-            {children}
-          </pre>
-
-        </div>
+  code: ({ children, ...props }: ComponentPropsWithRef<"code">) => {
+    return (
+      <div className="relative m-0 w-full p-0">
+        <code
+          className={cn(
+            `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
+          )}
+          {...props}>
+          {children}
+        </code>
+      </div>
+    );
   },
   h1: createHeading(1),
   h2: createHeading(2),
@@ -234,13 +252,13 @@ const components = {
   ),
   table: ({ className, ...props }: ComponentPropsWithRef<"table">) => (
     <div
-      className="-mx-3 my-3 overflow-x-auto overscroll-x-contain px-3 [-webkit-overflow-scrolling:touch] md:mx-0"
+      className="-mx-3 my-3 overflow-x-auto overscroll-x-contain px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] md:mx-0 [&::-webkit-scrollbar]:hidden"
       role="region"
       aria-label="Scrollable table">
       <table
         className={cn(
-          "mb-4 w-full min-w-[80dvw] table-fixed border-collapse",
-          "border",
+          "mb-4 w-full min-w-[80dvw] table-auto border-collapse",
+          "border text-sm",
           className
         )}
         {...props}>
@@ -277,9 +295,9 @@ const components = {
     <td
       {...props}
       className={cn(
-        "px-3 py-1.5 align-top text-sm",
-        "wrap-break-words whitespace-normal",
-        "[&_a]:wrap-break-words [&_code]:wrap-break-words [&_li]:wrap-break-words",
+        "px-3 py-1.5 align-top text-xs",
+        "wrap-break-word hyphens-auto whitespace-normal",
+        "[&_a]:wrap-break-word [&_code]:wrap-break-word [&_li]:wrap-break-word",
         className
       )}>
       {props.children}
@@ -288,8 +306,8 @@ const components = {
   th: ({ className, ...props }: ComponentPropsWithRef<"th">) => (
     <th
       className={cn(
-        "px-2.5 py-2 text-left align-top text-sm",
-        "wrap-break-words whitespace-normal",
+        "border px-2.5 py-2 text-left align-top text-xs font-semibold",
+        "wrap-break-word whitespace-normal",
         className
       )}
       {...props}>
@@ -298,10 +316,24 @@ const components = {
   )
 };
 
+// export function preprocessMathDelimiters(content: string) {
+//   const inlineMath = /\\\((.*?)\\\)/gs; // matches \( … \)
+//   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
+//   const result = content
+//     .replace(displayMath, (_match, expr: string) => {
+//       return `\n$$\n${expr}\n$$\n`;
+//     })
+//     .replace(inlineMath, (_match, expr: string) => {
+//       return `$$${expr}$$`;
+//     });
+//   return result;
+// }
 export function preprocessMathDelimiters(content: string) {
-  const inlineMath = /\\\((.*?)\\\)/gs; // matches \( … \)
+  const currencyEscaped = content.replace(/\$(\d[\d,]*(?:\.\d+)?)/g, "\\$$$1");
+
+  const inlineMath = /\\\((.*?)\\\)/gs; // matches $$ … $$
   const displayMath = /\\\[(.*?)\\\]/gs; // matches \[ … \]
-  const result = content
+  const result = currencyEscaped
     .replace(displayMath, (_match, expr: string) => {
       return `\n$$\n${expr}\n$$\n`;
     })
@@ -310,7 +342,6 @@ export function preprocessMathDelimiters(content: string) {
     });
   return result;
 }
-
 const sanitizeSchema = {
   allowComments: true,
   allowDoctypes: true,
@@ -373,7 +404,7 @@ export async function processMarkdownToReact(content: string) {
   const processor = unified();
   processor.use(remarkParse);
   processor.use(remarkGfm);
-  processor.use(remarkMath, Object.freeze({ singleDollarTextMath: false }));
+  processor.use(remarkMath, Object.freeze({ singleDollarTextMath: true }));
   processor.use(remarkRehype, {
     allowDangerousHtml: true
   } satisfies RemarkRehypeOptions);
