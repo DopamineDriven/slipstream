@@ -940,6 +940,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
       let rtHelper;
 
       if (s.type === "response.created" && tInitial === 0) {
+        text = "Image generation in progress...";
         tInitial = performance.now();
       }
       if (
@@ -1149,14 +1150,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
             imgGenEnabled,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ),
-              activeImage: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ).find(t => t.index === partialImgArr.length - 1)
+              partialImages:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  : undefined,
+              activeImage:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                      t => t.index === partialImgArr.length - 1
+                    )
+                  : undefined
             },
             systemPrompt,
             temperature,
@@ -1180,11 +1183,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
           systemPrompt,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
-            activeImage: this.mapPersistenceImgGenArr(
-              userId,
-              partialImgArr
-            ).find(t => t.index === partialImgArr.length - 1)
+            partialImages:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                : undefined,
+            activeImage:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                    t => t.index === partialImgArr.length - 1
+                  )
+                : undefined
           },
           temperature,
           topP,
@@ -1209,14 +1217,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
             imgGenEnabled,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ),
-              activeImage: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ).find(t => t.index === partialImgArr.length - 1)
+              partialImages:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  : undefined,
+              activeImage:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                      t => t.index === partialImgArr.length - 1
+                    )
+                  : undefined
             },
             systemPrompt,
             temperature,
@@ -1241,11 +1251,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
           systemPrompt,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
-            activeImage: this.mapPersistenceImgGenArr(
-              userId,
-              partialImgArr
-            ).find(t => t.index === partialImgArr.length - 1)
+            partialImages:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                : undefined,
+            activeImage:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                    t => t.index === partialImgArr.length - 1
+                  )
+                : undefined
           },
           temperature,
           topP,
@@ -1254,7 +1269,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
           isThinking: true,
           done: false
         });
-      } // Handle regular text chunks
+      }
+
       if (text) {
         openaiAgg += text;
         chunks.push(text);
@@ -1270,14 +1286,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
             systemPrompt,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
-              partialImages: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ),
-              activeImage: this.mapPersistenceImgGenArr(
-                userId,
-                partialImgArr
-              ).find(t => t.index === partialImgArr.length - 1)
+              partialImages:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                  : undefined,
+              activeImage:
+                partialImgArr.length > 0
+                  ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                      t => t.index === partialImgArr.length - 1
+                    )
+                  : undefined
             },
             temperature,
             topP,
@@ -1300,11 +1318,16 @@ export class OpenAIService extends OpenAIServiceWorkup {
           topP,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
-            partialImages: this.mapPersistenceImgGenArr(userId, partialImgArr),
-            activeImage: this.mapPersistenceImgGenArr(
-              userId,
-              partialImgArr
-            ).find(t => t.index === partialImgArr.length - 1)
+            partialImages:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr)
+                : undefined,
+            activeImage:
+              partialImgArr.length > 0
+                ? this.mapPersistenceImgGenArr(userId, partialImgArr).find(
+                    t => t.index === partialImgArr.length - 1
+                  )
+                : undefined
           },
           provider,
           thinkingText:

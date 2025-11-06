@@ -222,7 +222,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0 z-30 h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -250,7 +250,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentPropsWithRef<typeof Button>) {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar,open } = useSidebar();
 
   return (
     <Button
@@ -258,7 +258,7 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("size-7", className)}
+      className={cn("size-7", open ? "sm:ml-20" : "sm:ml-0", className)}
       onClick={event => {
         onClick?.(event);
         toggleSidebar();
@@ -285,7 +285,7 @@ function SidebarRail({
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        "hover:after:bg-sidebar-border absolute inset-y-0 z-30 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
+        "hover:after:bg-sidebar-border absolute inset-y-0 z-50 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 sm:flex",
         "group-data-[side=left]:-right-2 group-data-[side=right]:-left-2",
         "group-data-[state=collapsed]:group-data-[side=left]:-right-4 group-data-[state=collapsed]:group-data-[side=right]:-left-4",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

@@ -3,18 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Button, Download, X } from "@slipstream/ui";
+import { Button, Download, Eye } from "@slipstream/ui";
 
 interface ImageGenerationCanvasProps {
   isGenerating: boolean;
   images: string[];
   currentImageIndex: number;
+  width: number;
+  height: number;
   prompt?: string;
 }
 
 export function ImageGenerationCanvasTest({
   isGenerating,
   images,
+  height,
+  width,
   currentImageIndex,
   prompt
 }: ImageGenerationCanvasProps) {
@@ -47,12 +51,11 @@ export function ImageGenerationCanvasTest({
           <Image
             src={currentImageUrl ?? "/placeholder.svg"}
             alt={"/placeholder.svg"}
-            width={1024}
-            height={1024}
+            width={width}
+            height={height}
             className="h-full w-full object-cover"
             onLoad={() => setImageLoaded(true)}
             onLoadStart={() => setImageLoaded(false)}
-            unoptimized={isPartialImage ? true : false}
             priority
           />
 
@@ -82,23 +85,24 @@ export function ImageGenerationCanvasTest({
           <Button
             size="icon"
             variant="ghost"
+            className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm">
+            <Eye className="size-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
             className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm"
             onClick={() => {
               if (!currentImageUrl) return;
               const link = document.createElement("a");
               link.href = currentImageUrl;
+              link.target = "_blank";
+              link.rel = "noreferrer noopener";
               const ext = currentImageUrl.split(/\./g).at(-1) ?? "png";
               link.download = `generated-${Date.now()}.${ext}`;
               link.click();
             }}>
-            <Download className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="secondary"
-            className="bg-white/90 backdrop-blur-sm hover:bg-white"
-            onClick={() => setImageLoaded(false)}>
-            <X className="h-4 w-4" />
+            <Download className="size-4" />
           </Button>
         </div>
       </div>

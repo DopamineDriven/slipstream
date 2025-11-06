@@ -40,8 +40,8 @@ import {
   UploadProgress
 } from "@slipstream/ui";
 
-const MAX_TEXTAREA_HEIGHT_PX = 120;
-const INITIAL_TEXTAREA_HEIGHT_PX = 24;
+const MAX_TEXTAREA_HEIGHT_PX = 144;
+const INITIAL_TEXTAREA_HEIGHT_PX = 48;
 type QuoteDraft = {
   messageId: string;
   excerpt: string;
@@ -638,7 +638,7 @@ export function ChatInput({
                       "min-h-[60px] w-full resize-none border-none bg-transparent p-0 text-base leading-6 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
                       isDisabled ? "cursor-not-allowed" : ""
                     )}
-                    rows={2}
+                    rows={3}
                     style={{
                       maxHeight: `${MAX_TEXTAREA_HEIGHT_PX}px`
                     }}

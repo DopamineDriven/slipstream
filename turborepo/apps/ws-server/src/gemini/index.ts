@@ -7,6 +7,7 @@ import type {
   Blob,
   Content,
   ContentUnion,
+  File,
   FinishReason,
   GenerateContentResponse,
   Part
@@ -21,8 +22,8 @@ import {
   HarmBlockThreshold,
   HarmCategory
 } from "@google/genai";
+import type { CompatStatus } from "@slipstream/db/enums-node";
 import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
-import { CompatStatus } from "@slipstream/db/enums-node";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export interface ProviderGeminiChatRequestEntity
@@ -32,6 +33,7 @@ export interface ProviderGeminiChatRequestEntity
 export class GeminiService extends ModelService {
   private defaultClient: GoogleGenAI;
   private logger: Logger;
+  private apiVersion = "v1alpha" as const;
   // Simple in-memory cache for the session/lifecycle
   private assetCache = new Map<string, { fileUri: string; expiresAt: Date }>();
   constructor(
@@ -49,13 +51,16 @@ export class GeminiService extends ModelService {
       );
     this.defaultClient = new GoogleGenAI({
       apiKey: this.apiKey,
-      apiVersion: "v1alpha"
+      apiVersion: this.apiVersion
     });
   }
 
   public getClient(overrideKey?: string) {
     if (overrideKey) {
-      return new GoogleGenAI({ apiKey: overrideKey, apiVersion: "v1alpha" });
+      return new GoogleGenAI({
+        apiKey: overrideKey,
+        apiVersion: this.apiVersion
+      });
     }
     return this.defaultClient;
   }
@@ -130,7 +135,7 @@ export class GeminiService extends ModelService {
 
       // Preflight: if file already exists, reuse it
       try {
-        const existing = await ai.files.get({ name: deterministicName });
+        const existing = await this.getFileByName(deterministicName, apiKey);
         if (existing?.state?.includes("ACTIVE") && existing.uri) {
           return existing;
         }
@@ -182,7 +187,6 @@ export class GeminiService extends ModelService {
 
   private async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
-    gemini: GoogleGenAI,
     keyFingerprint: string,
     keyId?: string,
     apiKey?: string
@@ -225,7 +229,6 @@ export class GeminiService extends ModelService {
                     id: attachment.id,
                     mime: attachment.mime
                   },
-                  gemini,
                   keyFingerprint,
                   keyId,
                   apiKey
@@ -275,7 +278,6 @@ export class GeminiService extends ModelService {
   public async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
-    gemini: GoogleGenAI,
     keyFingerprint: string,
     systemPrompt?: string,
     keyId?: string,
@@ -299,7 +301,6 @@ export class GeminiService extends ModelService {
       return {
         history: await this.formatHistoryForSession(
           historyMsgs,
-          gemini,
           keyFingerprint,
           keyId,
           apiKey
@@ -309,15 +310,21 @@ export class GeminiService extends ModelService {
     }
   }
 
+  private async getFileByName(name: string, apiKey?: string) {
+    const ai = this.getClient(apiKey);
+    return await ai.files.get({
+      name
+    });
+  }
+
   private async pollForActiveState(
     fileName: string,
-    client: GoogleGenAI,
-    maxRetries = 5
+    maxRetries = 5,
+    apiKey?: string
   ): Promise<void> {
+    const file = await this.getFileByName(fileName, apiKey);
     for (let i = 0; i < maxRetries; i++) {
-      const file = await client.files.get({ name: fileName });
       if (file.state?.includes("ACTIVE")) return;
-
       // Exponential backoff
       await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, i)));
     }
@@ -334,17 +341,15 @@ export class GeminiService extends ModelService {
       mime: string | null;
       id: string;
     },
-    client: GoogleGenAI,
     keyFingerprint: string,
     keyId?: string,
     apiKey?: string
-  ): Promise<{ fileUri: string; mimeType: string }> {
+  ) {
     const cacheKey = `${keyFingerprint}:${attachment.id}`;
     const now = new Date();
-
     // 0. Check in-memory cache first
     const cached = this.assetCache.get(cacheKey);
-    if (cached && cached.expiresAt > now) {
+    if (cached && new Date(cached.expiresAt).getTime() > now.getTime()) {
       this.logger.debug(`Reusing cached Gemini asset: ${attachment.id}`);
       return {
         fileUri: cached.fileUri,
@@ -388,7 +393,7 @@ export class GeminiService extends ModelService {
       // Preflight: attempt to find on Google before uploading
       try {
         const name = this.getGoogleFileName(attachment.id);
-        const existing = await client.files.get({ name });
+        const existing = await this.getFileByName(name, apiKey);
         if (existing?.state?.includes("ACTIVE") && existing.uri) {
           const expiresAt = new Date(Date.now() + 47 * 60 * 60 * 1000);
           await this.prisma.finalizeGeminiAsset(
@@ -408,7 +413,7 @@ export class GeminiService extends ModelService {
       }
 
       // Upload using deterministic naming (attachment.id only)
-      let uploadedFile;
+      let uploadedFile: File;
       try {
         uploadedFile = await this.uploadRemoteAssetToGoogle(attachment, apiKey);
       } catch (e) {
@@ -419,7 +424,7 @@ export class GeminiService extends ModelService {
           /already\s+exists/i.test(msg)
         ) {
           const name = this.getGoogleFileName(attachment.id);
-          const existing = await client.files.get({ name });
+          const existing = await this.getFileByName(name, apiKey);
           if (existing?.uri) {
             uploadedFile = existing;
           } else {
@@ -430,23 +435,34 @@ export class GeminiService extends ModelService {
         }
       }
 
-      // Wait for file to be active
-      await this.pollForActiveState(uploadedFile.name ?? "", client);
+      if (uploadedFile.state && !uploadedFile.state.includes("ACTIVE")) {
+        await this.pollForActiveState(uploadedFile.name ?? "", 5, apiKey);
+      }
 
-      // Mark as active with 47-hour expiry
-      const expiresAt = new Date(Date.now() + 47 * 60 * 60 * 1000);
-      await this.prisma.finalizeGeminiAsset(
-        mapping.id,
-        uploadedFile.uri ?? "",
-        uploadedFile.name ?? "",
-        expiresAt
-      );
+      if (
+        uploadedFile.uri &&
+        uploadedFile.name &&
+        uploadedFile.expirationTime &&
+        uploadedFile.mimeType
+      ) {
+        await this.prisma.finalizeGeminiAsset(
+          mapping.id,
+          uploadedFile.uri,
+          uploadedFile.name,
+          new Date(uploadedFile.expirationTime)
+        );
 
-      // Update in-memory cache
-      this.assetCache.set(cacheKey, {
-        fileUri: uploadedFile.uri ?? "",
-        expiresAt
-      });
+        // Update in-memory cache
+        this.assetCache.set(cacheKey, {
+          fileUri: uploadedFile.uri,
+          expiresAt: new Date(uploadedFile.expirationTime)
+        });
+
+        return {
+          fileUri: uploadedFile.uri,
+          mimeType: uploadedFile.mimeType
+        };
+      }
 
       return {
         fileUri: uploadedFile.uri ?? "",
@@ -457,7 +473,9 @@ export class GeminiService extends ModelService {
         mapping.id,
         this.safeErrMsg(error)
       );
-      throw error;
+      throw new Error(
+        error instanceof Error ? error.message : JSON.stringify(error, null, 2)
+      );
     }
   }
 
@@ -547,7 +565,6 @@ export class GeminiService extends ModelService {
     const { history, systemInstruction } = await this.getHistoryAndInstruction(
       isNewChat,
       msgs,
-      gemini,
       keyFingerprint,
       systemPrompt,
       keyId ?? undefined,
@@ -575,7 +592,6 @@ export class GeminiService extends ModelService {
                   id: attachment.id,
                   mime: attachment.mime
                 },
-                gemini,
                 keyFingerprint,
                 keyId ?? undefined,
                 apiKey
@@ -602,7 +618,7 @@ export class GeminiService extends ModelService {
       fullContent,
       "debugging full content on first message to gemini"
     );
-    const _safetySettings = this.handleSafetySettings();
+
     const responseModalities = this.mediaModalities(
       model as GeminiModelIdUnion
     );
