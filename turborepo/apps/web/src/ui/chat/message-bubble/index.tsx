@@ -91,6 +91,8 @@ export function MessageBubble({
   const imageDataCacheRef = useRef<{
     images: string[];
     currentImageIndex: number;
+    width: number;
+    height: number;
     isGenerating: boolean;
   } | null>(null);
 
@@ -125,6 +127,8 @@ export function MessageBubble({
     const imageUrls: string[] = [];
     let isGenerating = true;
     let prompt = "";
+    let width = 0;
+    let height = 0;
 
     // First, try to get images from streaming data
     if (liveImgGenFields) {
@@ -154,6 +158,13 @@ export function MessageBubble({
 
         // Build URL array, avoiding duplicates
         for (const img of allImages) {
+          if (img.image?.width) {
+            width = img.image?.width;
+          }
+
+          if (img?.image?.height) {
+            height = img.image.height;
+          }
           if (img.cdnUrl && !imageUrls.includes(img.cdnUrl)) {
             imageUrls.push(img.cdnUrl);
             // Update prompt from the latest image
@@ -182,11 +193,17 @@ export function MessageBubble({
         });
 
       for (const att of imageGenAttachments) {
+        if (att.image?.width) {
+          width = att.image.width;
+        }
+        if (att.image?.height) {
+          height = att.image.height;
+        }
         if (att.cdnUrl && !imageUrls.includes(att.cdnUrl)) {
           imageUrls.push(att.cdnUrl);
           prompt = att.imageGenOutput?.revisedPrompt ?? prompt;
           if (att.imageGenOutput?.kind === "FINAL") {
-            isGenerating = false;
+            isGenerating = isStreaming;
           }
         }
       }
@@ -197,7 +214,9 @@ export function MessageBubble({
       const newData = {
         images: imageUrls,
         currentImageIndex: imageUrls.length - 1,
-        isGenerating
+        isGenerating,
+        width,
+        height
       };
       imageDataCacheRef.current = newData;
       return newData;
@@ -222,7 +241,7 @@ export function MessageBubble({
     }
 
     return null;
-  }, [liveImgGenFields, message.attachments, message.senderType]);
+  }, [liveImgGenFields, message.attachments, message.senderType, isStreaming]);
 
   useEffect(() => {
     // Clear cache if we're looking at a different message
@@ -350,7 +369,10 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
+            "group relative max-w-[85%] rounded-2xl px-4 py-3 text-sm",
+            imageGenerationData && message.senderType !== "USER" && isStreaming
+              ? "flex-1"
+              : message.attachments.length > 0 && message.senderType ==="USER" ? "min-w-[42.5%]" : "min-w-0",
             message.senderType === "USER"
               ? "bg-muted text-foreground"
               : resolvedTheme === "light"
@@ -406,11 +428,13 @@ export function MessageBubble({
               ? streamingRenderedContent
               : (renderedContent ?? message.content)}
           </div>
-          {imageGenerationData && (
+          {imageGenerationData && message.senderType !== "USER" && (
             <ImageGenerationCanvasTest
               isGenerating={imageGenerationData.isGenerating}
               currentImageIndex={imageGenerationData.currentImageIndex}
               images={imageGenerationData.images}
+              width={imageGenerationData.width}
+              height={imageGenerationData.height}
             />
           )}
           {message.attachments && message.attachments.length > 0 && (

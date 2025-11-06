@@ -71,6 +71,7 @@ export function ChatInterface({
   const [messages, setMessages] = useState<MessageSingleton<true>[]>(
     initialMessages ?? []
   );
+
   const processedRef = useRef(false);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
   const lastUserMessageRef = useRef<string>("");
@@ -278,7 +279,7 @@ export function ChatInterface({
   useEffect(() => {
     if (!activeConversationId) return;
 
-    if (!streamedText && !thinkingText && !isThinking) return;
+    if (!streamedText && !thinkingText && !isThinking && !imgGenFields) return;
 
     setIsAwaitingFirstChunk(false);
 
@@ -287,6 +288,21 @@ export function ChatInterface({
       const existingStreamIndex = prev.findIndex(m =>
         m.id.startsWith("streaming-")
       );
+
+      const arr = Array.of<AttachmentSingleton<true>>();
+
+      const partials = normalizeImgGenFields(imgGenFields)?.partialImages;
+
+      const finals = normalizeImgGenFields(imgGenFields)?.images;
+
+      if (partials && partials.length > 0) {
+        const filter = partials.filter(t => typeof t !== "undefined");
+        if (filter.length > 0) arr.push(...filter);
+      }
+      if (finals && finals?.length > 0) {
+        const filter = finals.filter(t => typeof t !== "undefined");
+        if (filter.length > 0) arr.push(...filter);
+      }
 
       const streamingMsg = createAIMessage({
         id: `streaming-${activeConversationId}`,
@@ -303,10 +319,7 @@ export function ChatInterface({
         thinkingDuration: thinkingDuration ?? null,
         createdAt: new Date(),
         disliked: null,
-        attachments: imgGenFields
-          ? (normalizeImgGenFields(imgGenFields)
-              ?.partialImages as AttachmentSingleton<true>[])
-          : [],
+        attachments: arr.length > 0 ? arr : [],
         liked: null,
         senderType: "AI",
         tryAgain: null,

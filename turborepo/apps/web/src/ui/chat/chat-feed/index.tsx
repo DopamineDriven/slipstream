@@ -205,42 +205,49 @@ export function ChatFeed({
                   ? imgGenEnabled
                   : undefined
               }
-              liveImgGenFields={isStreaming ? imgGenFields ?? undefined : undefined}
+              liveImgGenFields={
+                isStreaming && message.id.startsWith("streaming-")
+                  ? (imgGenFields ?? undefined)
+                  : undefined
+              }
             />
           ))}
-          {isStreaming && isAwaitingFirstChunk && (!imgGenFields?.partialImages || imgGenFields.partialImages.length === 0) && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="mx-auto flex w-full max-w-dvw justify-start gap-3 sm:max-w-3xl md:max-w-4xl">
-              <div className="flex items-center gap-3">
-                {/* AI Avatar */}
-                <div className="mt-1 shrink-0">
-                  <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full sm:size-8">
-                    <div className="border-primary-foreground/20 border-t-primary-foreground/40 size-4 animate-spin rounded-full border-2" />
+          {isStreaming &&
+            isAwaitingFirstChunk &&
+            (!imgGenFields?.partialImages ||
+              imgGenFields.partialImages.length === 0) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="mx-auto flex w-full max-w-dvw justify-start gap-3 sm:max-w-3xl md:max-w-4xl">
+                <div className="flex items-center gap-3">
+                  {/* AI Avatar */}
+                  <div className="mt-1 shrink-0">
+                    <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full sm:size-8">
+                      <div className="border-primary-foreground/20 border-t-primary-foreground/40 size-4 animate-spin rounded-full border-2" />
+                    </div>
+                  </div>
+                  <div className="bg-muted rounded-2xl px-4 py-3">
+                    <div className="flex gap-1">
+                      <span
+                        className="bg-muted-foreground/70 size-2 animate-bounce rounded-full"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="bg-muted-foreground/60 size-2 animate-bounce rounded-full"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <span
+                        className="bg-muted-foreground/50 size-2 animate-bounce rounded-full"
+                        style={{ animationDelay: "300ms" }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="bg-muted rounded-2xl px-4 py-3">
-                  <div className="flex gap-1">
-                    <span
-                      className="bg-muted-foreground/70 size-2 animate-bounce rounded-full"
-                      style={{ animationDelay: "0ms" }}
-                    />
-                    <span
-                      className="bg-muted-foreground/60 size-2 animate-bounce rounded-full"
-                      style={{ animationDelay: "150ms" }}
-                    />
-                    <span
-                      className="bg-muted-foreground/50 size-2 animate-bounce rounded-full"
-                      style={{ animationDelay: "300ms" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
         </div>
       )}
       {rect && quote && (

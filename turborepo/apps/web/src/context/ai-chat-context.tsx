@@ -303,7 +303,7 @@ export function AIChatProvider({
 
       // Update streaming message with all relevant data using refs
       setCurrentStreamingMessage({
-        id: `stream-${evt.conversationId}`,
+        id: `streaming-${evt.conversationId}`,
         content: streamedTextRef.current + (evt.chunk ?? ""),
         thinkingText: thinkingTextRef.current + (evt.thinkingText ?? ""),
         thinkingDuration:

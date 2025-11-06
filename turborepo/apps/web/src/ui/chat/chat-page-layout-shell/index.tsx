@@ -104,7 +104,7 @@ export function ChatLayoutShell({
             <div className="flex h-dvh flex-col">
               <header className="border-border bg-background relative flex h-14 shrink-0 items-center justify-between border-b px-4">
                 <div className="flex min-w-0 items-center">
-                  <SidebarTrigger className="z-30 -ml-2">
+                  <SidebarTrigger className="z-100">
                     <PanelLeft className="size-5" />
                     <span className="sr-only">Toggle Sidebar</span>
                   </SidebarTrigger>
