@@ -138,6 +138,20 @@ const components = {
   pre: ({ children, ...props }: ComponentPropsWithRef<"pre">) => {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
+  code: ({children, ...props}: ComponentPropsWithRef<"pre">) => {
+       <div className="relative m-0 w-full p-0">
+          <pre
+            className={cn(
+
+              `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`,
+
+            )}
+            {...props}>
+            {children}
+          </pre>
+
+        </div>
+  },
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),
