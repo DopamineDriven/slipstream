@@ -53,7 +53,7 @@ export function ImageGenerationCanvasTest({
             alt={"/placeholder.svg"}
             width={width}
             height={height}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover flex-1"
             onLoad={() => setImageLoaded(true)}
             onLoadStart={() => setImageLoaded(false)}
             priority
