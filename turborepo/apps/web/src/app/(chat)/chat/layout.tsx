@@ -20,13 +20,18 @@ export default async function ChatLayout({
   const session = await getSession();
 
   if (!session?.user) redirect("/auth/login");
-  const [fallbackData, _initialApiKeyData] = await Promise.all([
+  const [fallbackData, apiKeyData] = await Promise.all([
     prismaConversationService.getSidebarData(session.user.id),
     prismaApiKeyService.getClientApiKeys(session.user.id)
   ]);
   return (
-    <ChatLayoutShell fallbackData={fallbackData} userId={session.user.id}>
+    <ChatLayoutShell
+      fallbackData={fallbackData}
+      apiKeyData={apiKeyData}
+      user={session.user}
+    >
       {children}
     </ChatLayoutShell>
   );
 }
+
