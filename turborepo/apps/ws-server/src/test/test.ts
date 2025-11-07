@@ -232,18 +232,19 @@ class ScriptGen extends Fs {
 
       const agg =
         p.sender === "AI"
-          ? p.assetUrl
-            ? withThinking === "true"
-              ? p.thinking
-                ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-                : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-              : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${d}\n`
+          ? withThinking === "true"
+            ? p.thinking
+              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
           : p.assetUrl.length > 0
             ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
+
       arr.push(agg);
     }
+
+    this.withWs("src/test/__out__/testing/the-genesis-log.md", arr.join(`\n`));
 
     return arr;
   }

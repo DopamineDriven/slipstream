@@ -19,6 +19,3 @@ onlyBuiltDependencies:
   - puppeteer
   - sharp
   - unrs-resolver
-
-patchedDependencies:
-  openai@6.7.0: patches/openai@6.7.0.patch
