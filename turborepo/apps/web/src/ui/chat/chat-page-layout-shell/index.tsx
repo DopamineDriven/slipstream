@@ -8,6 +8,8 @@ import { useCookiesCtx } from "@/context/cookie-context";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useResolvedTheme } from "@/hooks/use-resolved-theme";
 import { SidebarProps } from "@/types/ui";
+import type { ClientWorkupProps } from "@/types/shared";
+import type { User } from "@/utils/auth-client";
 import {
   Sidebar,
   SidebarInset,
@@ -34,7 +36,8 @@ const ThemeToggle = dynamic(
 interface ChatLayoutShellProps {
   children: React.ReactNode;
   fallbackData?: SidebarProps[];
-  userId?: string;
+  apiKeyData?: ClientWorkupProps;
+  user?: User;
 }
 
 function HeaderActions() {
@@ -70,7 +73,9 @@ function HeaderActions() {
 
 export function ChatLayoutShell({
   children,
-  fallbackData
+  fallbackData,
+  apiKeyData,
+  user
 }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -119,7 +124,12 @@ export function ChatLayoutShell({
         </div>
       </SidebarProvider>
       <MobileModelSelectorDrawer />
-      <SettingsDrawer />
+      {apiKeyData && (
+        <SettingsDrawer
+          initialData={apiKeyData}
+          user={user}
+        />
+      )}
     </div>
   );
 }

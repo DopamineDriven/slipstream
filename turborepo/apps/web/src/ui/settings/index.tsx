@@ -368,7 +368,7 @@ export default function SettingsScaffold({
               activeSection={activeSection}
               onNavigate={handleNavigation}
               isCollapsed={isLeftSidebarEffectivelyCollapsed}
-              className="flex-grow overflow-y-auto"
+              className="grow overflow-y-auto"
             />
             <div
               className={cn(
