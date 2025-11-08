@@ -1,35 +1,31 @@
 import type {
-  MessageSingleton,
-  ProviderChatRequestEntity,
-  UserData
-} from "@/types/index.ts";
+  GenerateContentResponseProps,
+  ProviderGeminiChatRequestEntity
+} from "@/gemini/types.ts";
+import type { MessageSingleton } from "@/types/index.ts";
 import type {
   Blob,
   Content,
   ContentUnion,
   File,
   FinishReason,
+  GenerateContentParameters,
   GenerateContentResponse,
-  Part
+  Part,
+  ThinkingConfig,
+  ToolConfig,
+  ToolListUnion
 } from "@google/genai";
 import type { Logger } from "pino";
+import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import {
-  GoogleGenAI,
-  HarmBlockMethod,
-  HarmBlockThreshold,
-  HarmCategory
-} from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { CompatStatus } from "@slipstream/db/enums-node";
 import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
-export interface ProviderGeminiChatRequestEntity
-  extends ProviderChatRequestEntity {
-  userData?: UserData;
-}
 export class GeminiService extends ModelService {
   private defaultClient: GoogleGenAI;
   private logger: Logger;
@@ -42,6 +38,7 @@ export class GeminiService extends ModelService {
     logger: LoggerService,
     private prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
+    private extractor: ExtractService,
     private apiKey: string
   ) {
     super();
@@ -71,11 +68,20 @@ export class GeminiService extends ModelService {
     return typeof size === "bigint" ? 10n * 1024n * 1024n : 10 * 1024 * 1024;
   }
 
+  private async getSizeBytes(url: string, size: number | bigint | null) {
+    if (size === null || size === 0) {
+      const meta = await this.extractor.extractRemote(url, 4096 * 36);
+      return meta.byteSize ?? 0;
+    } else return size;
+  }
+
   public async fetchAssetForGenAI(
     url: string,
-    knownSizeBytes: number | bigint,
+    sizeBytes: number | bigint | null,
     mime: string | null
   ) {
+    const knownSizeBytes = await this.getSizeBytes(url, sizeBytes);
+
     const TEN_MB = this.handleNumBigIntUnion(knownSizeBytes);
 
     const mimeType = mime ?? "application/octet-stream";
@@ -85,7 +91,7 @@ export class GeminiService extends ModelService {
       throw new Error(`Failed to fetch asset: ${response.statusText}`);
     }
 
-    let buffer: Buffer;
+    let buffer: Buffer<ArrayBuffer>;
 
     if (knownSizeBytes < TEN_MB) {
       // For smaller files, buffer them into memory directly.
@@ -99,16 +105,6 @@ export class GeminiService extends ModelService {
     return { buffer, mimeType };
   }
 
-  // Build a Google-compliant file ID (<= 40 chars, [a-z0-9-], no leading/trailing dash)
-  private getGoogleFileName(attachmentId: string) {
-    let out = (attachmentId || "").toLowerCase();
-    out = out.replace(/[^a-z0-9-]/g, "-");
-    out = out.replace(/^-+/, "").replace(/-+$/, "");
-    if (!out) out = "x";
-    if (out.length > 40) out = out.slice(0, 40);
-    return out;
-  }
-
   public async uploadRemoteAssetToGoogle(
     attachment: {
       compatCdnUrl: string | null;
@@ -116,6 +112,7 @@ export class GeminiService extends ModelService {
       cdnUrl: string | null;
       filename: string | null;
       mime: string | null;
+      size: number | bigint | null;
       id: string;
     },
     apiKey?: string
@@ -123,21 +120,22 @@ export class GeminiService extends ModelService {
     try {
       const url = attachment.compatCdnUrl ?? attachment.cdnUrl ?? "";
       // 1. Fetch the remote file and get its buffer
-      const response = await fetch(url, { method: "GET" });
-      if (!response.ok || !response.body) {
-        throw new Error(
-          `Failed to fetch asset from ${url}: ${response.statusText}`
-        );
-      }
-      const buffer = await this.streamToBuffer(response.body);
+      const { buffer, mimeType } = await this.fetchAssetForGenAI(
+        url,
+        attachment.size ?? 0,
+        attachment.mime
+      );
 
       // 2. Upload the buffer to Google's File API
       const ai = this.getClient(apiKey);
-      const deterministicName = this.getGoogleFileName(attachment.id);
+      const deterministicName = attachment.id;
 
       // Preflight: if file already exists, reuse it
       try {
-        const existing = await this.getFileByName(deterministicName, apiKey);
+        const existing = await this.getFileByName(
+          `files/${deterministicName}`,
+          apiKey
+        );
         if (existing?.state?.includes("ACTIVE") && existing.uri) {
           return existing;
         }
@@ -148,10 +146,7 @@ export class GeminiService extends ModelService {
       const uploadedFile = await ai.files.upload({
         file: new Blob([buffer]),
         config: {
-          mimeType:
-            attachment.compatMime ??
-            attachment.mime ??
-            "application/octet-stream",
+          mimeType,
           name: deterministicName,
           displayName: attachment.filename ?? undefined
         }
@@ -198,11 +193,41 @@ export class GeminiService extends ModelService {
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
-
-        // For historical USER messages, we only include text
-        // Attachments are handled separately in the current message
+        if (msg.attachments.length > 0) {
+          for (const attachment of msg.attachments) {
+            try {
+              if (
+                attachment?.cdnUrl &&
+                attachment?.mime &&
+                attachment.compatStatus
+              ) {
+                const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                  {
+                    cdnUrl: attachment.cdnUrl,
+                    compatCdnUrl: attachment.compatCdnUrl,
+                    compatMime: attachment.compatMime,
+                    size: attachment.size,
+                    filename: attachment.filename,
+                    compatStatus: attachment.compatStatus,
+                    id: attachment.id,
+                    mime: attachment.mime
+                  },
+                  keyFingerprint,
+                  keyId ?? undefined,
+                  apiKey
+                );
+                partArr.push({
+                  fileData: { fileUri, mimeType }
+                });
+              }
+            } catch (err) {
+              this.logger.warn(
+                "error in gemini attachment upload: " + this.safeErrMsg(err)
+              );
+            }
+          }
+        }
         partArr.push({ text: msg.content });
-
         formatted.push({ role: "user", parts: partArr } as const);
       } else {
         // AI message - may have AI-generated attachments
@@ -212,7 +237,11 @@ export class GeminiService extends ModelService {
         const modelIdentifier = `[${provider}/${model}]`;
 
         // Handle AI-generated attachments if they exist
-        if (msg.attachments && msg.attachments.length > 0) {
+        if (
+          msg.attachments &&
+          msg.attachments.length > 0 &&
+          msg.senderType === "AI"
+        ) {
           for (const attachment of msg.attachments) {
             try {
               // AI-generated assets should have these fields populated
@@ -227,6 +256,7 @@ export class GeminiService extends ModelService {
                     compatCdnUrl: attachment.compatCdnUrl,
                     compatMime: attachment.compatMime,
                     filename: attachment.filename,
+                    size: attachment.size,
                     compatStatus: attachment.compatStatus ?? "ALIASED",
                     id: attachment.id,
                     mime: attachment.mime
@@ -247,7 +277,6 @@ export class GeminiService extends ModelService {
           }
         }
 
-        // Add the text content with model identifier
         partArr.push({
           text: `${modelIdentifier}\n${msg.content}`
         });
@@ -261,16 +290,13 @@ export class GeminiService extends ModelService {
     return formatted;
   }
 
-  /**
-   * Formats the system prompt with a contextual note for continued conversations.
-   */
   private formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
     if (isNewChat) {
       return systemPrompt;
     }
 
     const note =
-      "Note: Previous responses in this conversation may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
 
     return (
       systemPrompt ? `${systemPrompt}\n\n${note}` : note
@@ -289,27 +315,17 @@ export class GeminiService extends ModelService {
       isNewChat,
       systemPrompt
     );
-    if (isNewChat) {
-      this.logger.debug(
-        msgs,
-        `new chat msgs object in getHistoryAndInstruction has length ${msgs.length}`
-      );
-      return {
-        history: undefined,
-        systemInstruction
-      };
-    } else {
-      const historyMsgs = msgs.slice(0, -1);
-      return {
-        history: await this.formatHistoryForSession(
-          historyMsgs,
-          keyFingerprint,
-          keyId,
-          apiKey
-        ),
-        systemInstruction
-      };
-    }
+
+    const history = await this.formatHistoryForSession(
+      msgs,
+      keyFingerprint,
+      keyId,
+      apiKey
+    );
+    return {
+      history,
+      systemInstruction
+    };
   }
 
   private async getFileByName(name: string, apiKey?: string) {
@@ -324,20 +340,6 @@ export class GeminiService extends ModelService {
     });
   }
 
-  private async pollForActiveState(
-    fileName: string,
-    maxRetries = 5,
-    apiKey?: string
-  ): Promise<void> {
-    const file = await this.getFileByName(fileName, apiKey);
-    for (let i = 0; i < maxRetries; i++) {
-      if (file.state?.includes("ACTIVE")) return;
-      // Exponential backoff
-      await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, i)));
-    }
-    throw new Error(`File ${fileName} not active after ${maxRetries} retries`);
-  }
-
   private async checkPrisma(keyFingerprint: string) {
     return await this.prisma.getGeminiProviderAttachments(keyFingerprint);
   }
@@ -350,6 +352,7 @@ export class GeminiService extends ModelService {
       compatMime: string | null;
       filename: string | null;
       mime: string | null;
+      size: number | bigint | null;
       id: string;
     },
     keyFingerprint: string,
@@ -385,7 +388,7 @@ export class GeminiService extends ModelService {
     );
 
     if (existing?.providerUri) {
-      this.logger.debug(`Reusing Gemini asset: ${attachment.id}`);
+      this.logger.info(`Reusing Gemini asset: ${attachment.id}`);
       // hydrate cache from DB
       if (existing.expiresAt) {
         this.assetCache.set(cacheKey, {
@@ -410,15 +413,22 @@ export class GeminiService extends ModelService {
     try {
       // Preflight: attempt to find on Google before uploading
       try {
-        const name = this.getGoogleFileName(attachment.id);
-        const existing = await this.getFileByName(name, apiKey);
-        if (existing?.state?.includes("ACTIVE") && existing.uri) {
-          const expiresAt = new Date(Date.now() + 47 * 60 * 60 * 1000);
+        const name = attachment.id;
+        const existing = await this.getFileByName(`files/${name}`, apiKey);
+        if (
+          existing?.state?.includes("ACTIVE") &&
+          existing.uri &&
+          existing.name &&
+          existing.expirationTime &&
+          existing.sizeBytes
+        ) {
+          const expiresAt = new Date(existing.expirationTime);
           await this.prisma.finalizeGeminiAsset(
             mapping.id,
             existing.uri,
-            name,
-            expiresAt
+            existing.name,
+            expiresAt,
+            Number.parseInt(existing.sizeBytes)
           );
           this.assetCache.set(cacheKey, { fileUri: existing.uri, expiresAt });
           return {
@@ -441,7 +451,7 @@ export class GeminiService extends ModelService {
           /ALREADY_EXISTS|exists/i.test(msg) ||
           /already\s+exists/i.test(msg)
         ) {
-          const name = this.getGoogleFileName(attachment.id);
+          const name = `files/${attachment.id}`;
           const existing = await this.getFileByName(name, apiKey);
           if (existing?.uri) {
             uploadedFile = existing;
@@ -453,21 +463,19 @@ export class GeminiService extends ModelService {
         }
       }
 
-      if (uploadedFile.state && !uploadedFile.state.includes("ACTIVE")) {
-        await this.pollForActiveState(uploadedFile.name ?? "", 5, apiKey);
-      }
-
       if (
         uploadedFile.uri &&
         uploadedFile.name &&
         uploadedFile.expirationTime &&
-        uploadedFile.mimeType
+        uploadedFile.mimeType &&
+        uploadedFile.sizeBytes
       ) {
         await this.prisma.finalizeGeminiAsset(
           mapping.id,
           uploadedFile.uri,
           uploadedFile.name,
-          new Date(uploadedFile.expirationTime)
+          new Date(uploadedFile.expirationTime),
+          Number.parseInt(uploadedFile.sizeBytes)
         );
 
         // Update in-memory cache
@@ -509,39 +517,71 @@ export class GeminiService extends ModelService {
     } else return this.handleImgGenCount("gemini", model, { n });
   }
 
-  private handleSafetySettings() {
-    return [
-      {
-        category: HarmCategory.HARM_CATEGORY_UNSPECIFIED,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        method: HarmBlockMethod.HARM_BLOCK_METHOD_UNSPECIFIED,
-        threshold: HarmBlockThreshold.OFF
+  private getToolConfig(latlng?: string) {
+    const [lat, lng] = this.handleLatLng(latlng);
+
+    return {
+      retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
+    } satisfies ToolConfig;
+  }
+
+  private getTools() {
+    return [{ googleSearch: {} }, { urlContext: {} }] satisfies ToolListUnion;
+  }
+
+  private getThinkingConfig() {
+    return {
+      includeThoughts: true,
+      thinkingBudget: -1
+    } satisfies ThinkingConfig;
+  }
+
+  private async contentGen({
+    isNewChat,
+    keyId,
+    model,
+    msgs,
+    apiKey,
+    latlng,
+    topP,
+    temperature,
+    max_tokens,
+    systemPrompt,
+    imgGenFields
+  }: GenerateContentResponseProps) {
+    const m = model as GeminiModelIdUnion;
+    const keyFingerprint = keyId ?? "server";
+    const toolConfig = this.getToolConfig(latlng);
+    const tools = this.getTools();
+    const thinkingConfig = this.getThinkingConfig();
+    const maxOutputTokens = max_tokens;
+    const { history: contents, systemInstruction } =
+      await this.getHistoryAndInstruction(
+        isNewChat,
+        msgs,
+        keyFingerprint,
+        systemPrompt,
+        keyId ?? undefined,
+        apiKey
+      );
+    const responseModalities = this.mediaModalities(m);
+    const candidateCount = this.candidateCount(m, imgGenFields?.n);
+    return {
+      contents,
+      model,
+      config: {
+        maxOutputTokens,
+        toolConfig,
+        responseModalities,
+        tools,
+        topP,
+        candidateCount,
+        // imageConfig: { aspectRatio: "21:9" },
+        temperature,
+        systemInstruction,
+        thinkingConfig
       }
-    ];
+    } satisfies GenerateContentParameters;
   }
 
   public async handleGeminiAiChatRequest({
@@ -569,8 +609,21 @@ export class GeminiService extends ModelService {
     userData
   }: ProviderGeminiChatRequestEntity) {
     const provider = "gemini" as const;
-    const keyFingerprint = keyId ?? "server";
-    const [lat, lng] = this.handleLatLng(userData?.latlng);
+
+    const params = await this.contentGen({
+      isNewChat,
+      keyId,
+      model,
+      msgs,
+      apiKey,
+      imgGenFields,
+      latlng: userData?.latlng,
+      max_tokens,
+      systemPrompt,
+      temperature,
+      topP
+    });
+
     let geminiThinkingStartTime: number | null = null,
       geminiThinkingDuration = 0,
       geminiIsCurrentlyThinking = false,
@@ -580,91 +633,12 @@ export class GeminiService extends ModelService {
 
     const gemini = this.getClient(apiKey);
 
-    const { history, systemInstruction } = await this.getHistoryAndInstruction(
-      isNewChat,
-      msgs,
-      keyFingerprint,
-      systemPrompt,
-      keyId ?? undefined,
-      apiKey
-    );
-
-    const currentPartArr = Array.of<Part>();
-    for (const msg of msgs) {
-      try {
-        if (msg.attachments && msg.attachments.length > 0) {
-          for (const attachment of msg.attachments) {
-            if (
-              attachment?.cdnUrl &&
-              attachment?.mime &&
-              attachment.compatStatus
-            ) {
-              // Use the new ensureAssetUploaded method
-              const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                {
-                  cdnUrl: attachment.cdnUrl,
-                  compatCdnUrl: attachment.compatCdnUrl,
-                  compatMime: attachment.compatMime,
-                  filename: attachment.filename,
-                  compatStatus: attachment.compatStatus,
-                  id: attachment.id,
-                  mime: attachment.mime
-                },
-                keyFingerprint,
-                keyId ?? undefined,
-                apiKey
-              );
-              currentPartArr.push({
-                fileData: { fileUri, mimeType }
-              });
-            }
-          }
-        }
-      } catch (err) {
-        this.logger.warn(
-          "error in gemini attachment upload: " + this.safeErrMsg(err)
-        );
-      } finally {
-        currentPartArr.push({ text: msg.content });
-      }
-    }
-    const fullContent = [
-      ...(history ?? []),
-      { role: "user", parts: currentPartArr }
-    ] as const satisfies Content[];
-    this.logger.debug(
-      fullContent,
-      "debugging full content on first message to gemini"
-    );
-
-    const responseModalities = this.mediaModalities(
-      model as GeminiModelIdUnion
-    );
     // const imagen = await gemini.models.generateImages({model: "imagen-4.0-generate-001" satisfies GeminiModelIdUnion,prompt: "",config: {includeRaiReason: true,}})
     // const s = await gemini.models.generateContentStream({contents: fullContent,model: "gemini-2.5-flash-image",config: {responseModalities: ["TEXT", "IMAGE"],imageConfig: {aspectRatio:"21:9"},thinkingConfig: {includeThoughts: true, thinkingBudget: -1},systemInstruction,mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH}})
-    const candidateCount = this.candidateCount(
-      model as GeminiModelIdUnion,
-      imgGenFields?.n
-    );
-    const stream = (await gemini.models.generateContentStream({
-      contents: fullContent,
-      model,
-      config: {
-        maxOutputTokens: max_tokens,
-        toolConfig: {
-          retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
-        },
-        responseModalities,
-        tools: [{ googleSearch: {} }, { urlContext: {} }],
-        topP,
-        candidateCount,
-        // safetySettings,
-        // imageConfig: { aspectRatio: "21:9" },
-        temperature,
-        systemInstruction,
-        thinkingConfig: { includeThoughts: true, thinkingBudget: -1 }
-      }
-    })) satisfies AsyncGenerator<GenerateContentResponse>;
+
+    const stream = (await gemini.models.generateContentStream(
+      params
+    )) satisfies AsyncGenerator<GenerateContentResponse>;
 
     for await (const chunk of stream) {
       let dataPart: Blob | undefined = undefined,
@@ -923,7 +897,6 @@ export class GeminiService extends ModelService {
           chunk: geminiAgg,
           done: true
         });
-        // Clear saved state on successful completion
         void this.redis.del(`stream:state:${conversationId}`);
         break;
       }

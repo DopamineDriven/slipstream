@@ -23,6 +23,9 @@
       "gemini": [
         "dist/gemini/index.d.ts"
       ],
+      "gemini/types": [
+        "dist/gemini/types.d.ts"
+      ],
       "logger": [
         "dist/logger/index.d.ts"
       ],

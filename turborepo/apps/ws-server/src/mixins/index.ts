@@ -222,6 +222,7 @@ export function GeminiMixin<
               deps.logger,
               deps.prisma,
               deps.redis,
+              deps.extract,
               this.#geminiApiKey ?? ""
             );
         }
