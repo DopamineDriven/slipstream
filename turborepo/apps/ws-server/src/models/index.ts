@@ -1,3 +1,5 @@
+import fsSync from "fs";
+import { join, relative, resolve } from "path";
 import { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
   GeminiImgGenModels,
@@ -266,118 +268,323 @@ export class ModelService extends ProviderValidation {
   public providerToPrismaFormat<const T extends Provider>(provider: T) {
     return provider.toUpperCase() as Uppercase<T>;
   }
-
+  /**
+   *
+   * @param target path to the file or directory to check for existence
+   * @returns true if the file or directory exists, false otherwise
+   * @example
+   * ```ts
+   * const fs = new Fs(process.cwd());
+   * const exists = fs.exists("my-file.txt");
+   * console.log(exists); // true if the file exists, false otherwise
+   * ```
+   * @description
+   * This method checks if a file or directory exists at the specified path input
+   *
+   * Additional Note:
+   *
+   * say you have a directory that begins with a dot, such as `.turbo`;
+   *
+   * in this scenario, both `./.turbo` and `.turbo` will return true if the directory exists
+   *
+   */
+  public exists<const T extends string>(target: T) {
+    if (!/\//gm.test(target)) {
+      if (/\./g.test(target)) {
+        return fsSync.existsSync(resolve(join(process.cwd(), target)));
+      } else {
+        const statsSync = fsSync.statSync(
+          resolve(join(process.cwd(), target)),
+          {
+            throwIfNoEntry: false
+          }
+        );
+        const isDir = statsSync?.isDirectory();
+        if (isDir) {
+          return isDir;
+        } else return false;
+      }
+    } else {
+      if (/\./g.test(target)) {
+        return fsSync.existsSync(relative(process.cwd(), target));
+      } else {
+        const statsSync = fsSync.statSync(relative(process.cwd(), target), {
+          throwIfNoEntry: false
+        });
+        const isDir = statsSync?.isDirectory();
+        if (isDir) {
+          return isDir;
+        } else return false;
+      }
+    }
+  }
   public mimeToExt = {
-    "audio/aac": ["aac"],
-    "application/x-abiword": ["abw"],
-    "image/aces": ["aces"],
-    "image/apng": ["apng"],
-    "application/x-freearc": ["arc"],
-    "image/avci": ["avci"],
-    "image/avif": ["avif"],
-    "video/x-msvideo": ["avi"],
-    "application/vnd.amazon.ebook": ["azw"],
-    "application/octet-stream": ["bin", "obj"],
-    "multipart/voice-message": ["bin"],
-    "image/bmp": ["bmp"],
-    "application/x-bzip": ["bz"],
-    "application/x-bzip2": ["bz2"],
-    "application/x-cdf": ["cda"],
-    "text/javascript": ["cjs", "js", "mjs"],
-    "application/x-csh": ["csh"],
-    "text/css": ["css"],
-    "text/csv": ["csv"],
-    "application/msword": ["doc"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
-      "docx"
-    ],
-    "image/dpx": ["dpx"],
-    "image/emf": ["emf"],
-    "application/vnd.ms-fontobject": ["eot"],
+    "application/dash+xml": ["mpd"],
     "application/epub+zip": ["epub"],
-    "image/gif": ["gif"],
-    "model/gltf-binary": ["glb"],
-    "model/gltf+json": ["gltf"],
+    "application/font-sfnt": ["ttf"],
     "application/gzip": ["gz"],
-    "application/node": ["node", "js"],
-    "application/x-gzip": ["gz"],
-    "haptics/hjif": ["hjif"],
-    "haptics/hmpg": ["hmpg"],
-    "text/html": ["html", "htm"],
-    "image/vnd.microsoft.icon": ["ico"],
-    "text/calendar": ["ics"],
-    "haptics/ivs": ["ivs", "ivt"],
     "application/java-archive": ["jar"],
-    "image/jpeg": ["jpg"],
-    "application/json": ["json"],
+    "application/json": ["json", "jsonc"],
+    "application/jsonc": ["jsonc"],
+    "application/json5": ["json5"],
     "application/ld+json": ["jsonld"],
-    "image/ktx": ["ktx"],
-    "image/ktx2": ["ktx2"],
-    "application/vnd.apple.mpegurl": ["m3u8"],
-    "audio/mp4": ["m4a"],
-    "video/mp4": ["mp4"],
-    "text/markdown": ["md"],
-    "application/x-mdx": ["mdx"],
-    "audio/midi": ["mid"],
-    "audio/x-midi": ["midi"],
-    "audio/mpeg": ["mp3"],
-    "video/mpeg": ["mpeg"],
+    "application/manifest+json": ["webmanifest"],
+    "application/msword": ["doc"],
+    "application/node": ["node", "js"],
+    "application/octet-stream": ["bin", "obj"],
+    "application/ogg": ["ogx"],
+    "application/pdf": ["pdf"],
+    "application/rtf": ["rtf"],
+    "application/sql": ["sql"],
+    "application/toml": ["toml"],
+    "application/vnd.amazon.ebook": ["azw"],
     "application/vnd.apple.installer+xml": ["mpkg"],
-    "application/x-ndjson": ["ndjson"],
-    "model/obj": ["obj"],
+    "application/vnd.apple.mpegurl": ["m3u8"],
+    "application/vnd.apple.pkpass": ["pkpass"],
+    "application/vnd.json5": ["json5"],
+    "application/vnd.mozilla.xul+xml": ["xul"],
+    "application/vnd.ms-excel": ["xls"],
+    "application/vnd.ms-fontobject": ["eot"],
+    "application/vnd.ms-powerpoint": ["ppt"],
     "application/vnd.oasis.opendocument.presentation": ["odp"],
     "application/vnd.oasis.opendocument.spreadsheet": ["ods"],
     "application/vnd.oasis.opendocument.text": ["odt"],
-    "audio/ogg": ["opus", "ogg", "oga"],
-    "video/ogg": ["ogv"],
-    "application/ogg": ["ogx"],
-    "font/otf": ["otf"],
-    "image/png": ["png"],
-    "application/pdf": ["pdf"],
-    "application/x-httpd-php": ["php"],
-    "application/vnd.apple.pkpass": ["pkpass"],
-    "application/vnd.ms-powerpoint": ["ppt"],
     "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       ["pptx"],
-    "text/x-python": ["py"],
-    "application/x-python-code": ["pyc"],
-    "application/vnd.rar": ["rar"],
-    "application/rtf": ["rtf"],
-    "application/x-sh": ["sh"],
-    "application/sql": ["sql"],
-    "text/event-stream": ["sse", "ts", "rs", "py", "txt"],
-    "image/svg+xml": ["svg"],
-    "application/x-tar": ["tar"],
-    "image/tiff": ["tiff"],
-    "application/toml": ["toml"],
-    "video/vnd.dlna.mpeg-tts": ["ts"],
-    "video/mp2t": ["ts"],
-    "text/typescript": ["ts"],
-    "application/font-sfnt": ["ttf"],
-    "font/ttf": ["ttf"],
-    "text/plain": ["txt"],
-    "model/vnd.usdz+zip": ["usdz"],
-    "application/vnd.visio": ["vsd"],
-    "text/vtt": ["vtt"],
-    "application/wasm": ["wasm"],
-    "audio/wav": ["wav"],
-    "video/webm": ["weba"],
-    "image/webp": ["webp"],
-    "font/woff": ["woff"],
-    "font/woff2": ["woff2"],
-    "application/xhtml+xml": ["xhtml"],
-    "application/vnd.ms-excel": ["xls"],
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
       "xlsx"
     ],
-    "application/xml": ["xml"],
-    "application/vnd.mozilla.xul+xml": ["xul"],
-    "application/yaml": ["yml", "yaml"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+      "docx"
+    ],
+    "application/vnd.rar": ["rar"],
+    "application/vnd.visio": ["vsd"],
+    "application/wasm": ["wasm"],
+    "application/x-7z-compressed": ["7z"],
+    "application/x-abiword": ["abw"],
+    "application/x-bzip": ["bz"],
+    "application/x-bzip2": ["bz2"],
+    "application/x-cdf": ["cda"],
+    "application/x-csh": ["csh"],
+    "application/x-freearc": ["arc"],
+    "application/x-gzip": ["gz"],
+    "application/x-httpd-php": ["php"],
+    "application/x-mdx": ["mdx"],
+    "application/x-ndjson": ["ndjson"],
+    "application/x-python-code": ["pyc"],
+    "application/x-sh": ["sh"],
+    "application/x-tar": ["tar"],
     "application/x-zip-compressed": ["zip"],
+    "application/xhtml+xml": ["xhtml"],
+    "application/xml": ["xml"],
+    "application/yaml": ["yml", "yaml"],
     "application/zip": ["zip"],
+    "audio/aac": ["aac"],
+    "audio/midi": ["mid"],
+    "audio/mp4": ["m4a"],
+    "audio/mpeg": ["mp3"],
+    "audio/ogg": ["opus", "ogg", "oga"],
+    "audio/wav": ["wav"],
+    "audio/webm": ["weba"],
+    "audio/x-midi": ["midi"],
+    "font/otf": ["otf"],
+    "font/ttf": ["ttf"],
+    "font/woff": ["woff"],
+    "font/woff2": ["woff2"],
+    "haptics/hjif": ["hjif"],
+    "haptics/hmpg": ["hmpg"],
+    "haptics/ivs": ["ivs", "ivt"],
+    "image/aces": ["aces"],
+    "image/apng": ["apng"],
+    "image/avci": ["avci"],
+    "image/avif": ["avif"],
+    "image/bmp": ["bmp"],
+    "image/dpx": ["dpx"],
+    "image/emf": ["emf"],
+    "image/gif": ["gif"],
+    "image/jpeg": ["jpg"],
+    "image/ktx": ["ktx"],
+    "image/ktx2": ["ktx2"],
+    "image/png": ["png"],
+    "image/svg+xml": ["svg"],
+    "image/tiff": ["tiff"],
+    "image/vnd.microsoft.icon": ["ico"],
+    "image/webp": ["webp"],
+    "image/x-icon": ["ico", "cur"],
+    "model/gltf-binary": ["glb"],
+    "model/gltf+json": ["gltf"],
+    "model/obj": ["obj"],
+    "model/vnd.usdz+zip": ["usdz"],
+    "multipart/voice-message": ["bin"],
+    "text/calendar": ["ics"],
+    "text/css": ["css"],
+    "text/csv": ["csv"],
+    "text/event-stream": ["sse", "ts", "rs", "py", "txt"],
+    "text/html": ["html", "htm"],
+    "text/javascript": ["cjs", "js", "mjs"],
+    "text/markdown": ["md"],
+    "text/plain": ["txt"],
+    "text/rust": ["rs"],
+    "text/typescript": ["ts"],
+    "text/vtt": ["vtt"],
+    "text/x-c": ["c"],
+    "text/x-c++": ["cpp"],
+    "text/x-csharp": ["cs"],
+    "text/x-java": ["java"],
+    "text/x-php": ["php"],
+    "text/x-python": ["py"],
+    "text/x-ruby": ["rb"],
+    "text/x-script.python": ["py"],
+    "text/x-tex": ["tex"],
+    "text/xml": ["xml"],
     "video/3gpp": ["3gp"],
     "video/3gpp2": ["3g2"],
-    "application/x-7z-compressed": ["7z"]
+    "video/mp2t": ["ts"],
+    "video/mp4": ["mp4"],
+    "video/mpeg": ["mpeg"],
+    "video/ogg": ["ogv"],
+    "video/vnd.dlna.mpeg-tts": ["ts"],
+    "video/webm": ["weba"],
+    "video/x-msvideo": ["avi"]
+  } as const;
+
+  public extToMime = {
+    aac: ["audio/aac"],
+    abw: ["application/x-abiword"],
+    aces: ["image/aces"],
+    apng: ["image/apng"],
+    arc: ["application/x-freearc"],
+    avci: ["image/avci"],
+    avif: ["image/avif"],
+    avi: ["video/x-msvideo"],
+    azw: ["application/vnd.amazon.ebook"],
+    bin: ["application/octet-stream", "multipart/voice-message"],
+    bmp: ["image/bmp"],
+    bz: ["application/x-bzip"],
+    bz2: ["application/x-bzip2"],
+    c: ["text/x-c"],
+    cda: ["application/x-cdf"],
+    cjs: ["text/javascript", "application/node"],
+    cpp: ["text/x-c++"],
+    cs: ["text/x-csharp"],
+    csh: ["application/x-csh"],
+    css: ["text/css"],
+    csv: ["text/csv"],
+    cur: ["image/x-icon"],
+    doc: ["application/msword"],
+    docx: [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ],
+    dpx: ["image/dpx"],
+    emf: ["image/emf"],
+    eot: ["application/vnd.ms-fontobject"],
+    epub: ["application/epub+zip"],
+    gif: ["image/gif"],
+    glb: ["model/gltf-binary"],
+    gltf: ["model/gltf+json"],
+    gz: ["application/gzip", "application/x-gzip"],
+    hjif: ["haptics/hjif"],
+    hmpg: ["haptics/hmpg"],
+    htm: ["text/html"],
+    html: ["text/html"],
+    ico: ["image/vnd.microsoft.icon", "image/x-icon"],
+    ics: ["text/calendar"],
+    ivs: ["haptics/ivs"],
+    ivt: ["haptics/ivs"],
+    jar: ["application/java-archive"],
+    java: ["text/x-java"],
+    jfif: ["image/jpeg"],
+    jif: ["image/jpeg"],
+    jpe: ["image/jpeg"],
+    jpeg: ["image/jpeg"],
+    jpg: ["image/jpeg"],
+    js: ["text/javascript", "application/node"],
+    json: ["application/json"],
+    jsonld: ["application/ld+json"],
+    ktx: ["image/ktx"],
+    ktx2: ["image/ktx2"],
+    m3u8: ["application/vnd.apple.mpegurl"],
+    m4a: ["audio/mp4"],
+    m4v: ["video/mp4"],
+    md: ["text/markdown"],
+    mdx: ["application/x-mdx"],
+    mid: ["audio/midi"],
+    midi: ["audio/x-midi"],
+    mjs: ["text/javascript"],
+    mp3: ["audio/mpeg"],
+    mp4: ["video/mp4"],
+    mpd: ["application/dash+xml"],
+    mpeg: ["video/mpeg"],
+    mpkg: ["application/vnd.apple.installer+xml"],
+    mtlx: ["application/xml"],
+    ndjson: ["application/x-ndjson"],
+    node: ["application/node", "text/javascript"],
+    obj: ["model/obj", "application/octet-stream", "text/plain"],
+    odp: ["application/vnd.oasis.opendocument.presentation"],
+    ods: ["application/vnd.oasis.opendocument.spreadsheet"],
+    odt: ["application/vnd.oasis.opendocument.text"],
+    oga: ["audio/ogg"],
+    ogg: ["audio/ogg"],
+    ogv: ["video/ogg"],
+    ogx: ["application/ogg"],
+    opus: ["audio/ogg"],
+    otf: ["font/otf"],
+    pk1: ["application/octet-stream"],
+    png: ["image/png"],
+    pdf: ["application/pdf"],
+    php: ["text/x-php", "application/x-httpd-php"],
+    pjp: ["image/jpeg"],
+    pjpeg: ["image/jpeg"],
+    pkpass: ["application/vnd.apple.pkpass"],
+    ppt: ["application/vnd.ms-powerpoint"],
+    pptx: [
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    ],
+    py: ["text/x-python", "text/x-script.python"],
+    pyc: ["application/x-python-code"],
+    rar: ["application/vnd.rar"],
+    rb: ["text/x-ruby"],
+    rs: ["text/rust"],
+    rtf: ["application/rtf"],
+    sh: ["application/x-sh"],
+    sql: ["application/sql"],
+    sse: ["text/event-stream"],
+    svg: ["image/svg+xml"],
+    tar: ["application/x-tar"],
+    tex: ["text/x-tex"],
+    tif: ["image/tiff"],
+    tiff: ["image/tiff"],
+    toml: ["application/toml"],
+    ts: [
+      "text/typescript",
+      "application/typescript",
+      "video/mp2t",
+      "video/vnd.dlna.mpeg-tts"
+    ],
+    ttf: ["application/font-sfnt", "font/ttf"],
+    txt: ["text/plain"],
+    usdz: ["model/vnd.usdz+zip"],
+    vsd: ["application/vnd.visio"],
+    vtt: ["text/vtt"],
+    wasm: ["application/wasm"],
+    wav: ["audio/wav"],
+    weba: ["audio/webm"],
+    webm: ["video/webm"],
+    webmanifest: ["application/manifest+json"],
+    webp: ["image/webp"],
+    woff: ["font/woff"],
+    woff2: ["font/woff2"],
+    xhtml: ["application/xhtml+xml"],
+    xls: ["application/vnd.ms-excel"],
+    xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    xml: ["application/xml", "text/xml"],
+    xul: ["application/vnd.mozilla.xul+xml"],
+    yaml: ["application/yaml"],
+    yml: ["application/yaml"],
+    zip: ["application/zip", "application/x-zip-compressed"],
+    "3gp": ["video/3gpp"],
+    "3g2": ["video/3gpp2"],
+    "7z": ["application/x-7z-compressed"]
   } as const;
 
   public isSupportedType(
@@ -393,6 +600,7 @@ export class ModelService extends ProviderValidation {
             "jpeg",
             "jpg",
             "heic",
+            "heif",
             "svg",
             "ico",
             "gif",
@@ -512,5 +720,115 @@ export class ModelService extends ProviderValidation {
         return false;
       }
     }
+  }
+
+  private units = {
+    PB: 5,
+    TB: 4,
+    GB: 3,
+    MB: 2,
+    KB: 1,
+    B: 0
+  } as const;
+  private u = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
+
+  public autoFileSizeRaw(size: number | bigint) {
+    let s = typeof size === "bigint" ? Number(size) : size;
+    let i = 0;
+    while (s >= 1024 && i < this.u.length - 1) {
+      s /= 1024;
+      i++;
+    }
+    return { value: s, unit: this.u[i] };
+  }
+
+  public getSize<
+    const S extends
+      | keyof typeof this.units
+      | Lowercase<keyof typeof this.units>
+      | "auto"
+  >(
+    size: number | bigint,
+    target: S,
+    opts: { decimals?: number; includeUnits?: boolean } = {
+      decimals: 4,
+      includeUnits: true
+    }
+  ) {
+    const { decimals, includeUnits } = opts;
+
+    if (target === "auto") {
+      const { value, unit } = this.autoFileSizeRaw(size);
+      const rounded = value.toFixed(decimals);
+      return includeUnits ? `${rounded} ${unit}` : Number.parseFloat(rounded);
+    }
+
+    const key = (
+      target as Exclude<S, "auto">
+    ).toUpperCase() as keyof typeof this.units;
+    const exp = this.units[key];
+    const divisor =
+      typeof size === "bigint" ? 1024n ** BigInt(exp) : 1024 ** exp;
+    let v = 0;
+    if (typeof size === "bigint" || typeof divisor === "bigint") {
+      if (typeof size === "bigint" && typeof divisor === "bigint")
+        v = Number(size / divisor);
+      else if (typeof size !== "bigint" && typeof divisor === "bigint")
+        v = size / Number(divisor);
+      else if (typeof size === "bigint" && typeof divisor !== "bigint")
+        v = Number(size) / divisor;
+    } else if (typeof size === "number" && typeof divisor === "number") {
+      v = size / divisor;
+    }
+    const rounded = v.toFixed(decimals);
+
+    return includeUnits
+      ? (`${rounded} ${key}` as const)
+      : Number.parseFloat(rounded);
+  }
+
+  public fileSizeMb<const T extends string>(path: T) {
+    return fsSync.statSync(relative(process.cwd(), path)).size / (1024 * 1024);
+  }
+
+  public fileSize<
+    const T extends string,
+    const S extends
+      | keyof typeof this.units
+      | Lowercase<keyof typeof this.units>
+      | "auto"
+  >(path: T, target: S, opts?: { decimals?: number; includeUnits?: boolean }) {
+    if (!this.exists(path)) throw new Error(`path ${path} does not exist`);
+    else {
+      return this.getSize(
+        fsSync.statSync(relative(process.cwd(), path)).size,
+        target,
+        opts
+      );
+    }
+  }
+
+  public chunkArray<T extends number>(arr: string[], maxChunkLength: T) {
+    const chunks = Array.of<string[]>();
+    let currentChunkLength = 0;
+    let currentChunk = Array.of<string>();
+
+    for (const [index, val] of arr.entries()) {
+      if (val.length + currentChunkLength >= maxChunkLength) {
+        if (currentChunk.length) {
+          chunks.push(currentChunk);
+        }
+        currentChunkLength = val.length;
+        currentChunk = [val];
+      } else {
+        currentChunk.push(val);
+        currentChunkLength += val.length + 1; // for comma
+      }
+
+      if (arr.length === index + 1) {
+        chunks.push(currentChunk);
+      }
+    }
+    return chunks.length ? chunks : [arr];
   }
 }

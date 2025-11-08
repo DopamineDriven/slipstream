@@ -42,7 +42,7 @@ async function exe() {
       logLevel: typeof process.env.IS_PROD === "undefined" ? "info" : "debug",
       isProd
     };
-        const { ExtractService } = await import("@/extract/index.ts");
+    const { ExtractService } = await import("@/extract/index.ts");
 
     const extract = new ExtractService();
 
@@ -76,7 +76,7 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const prisma = new PrismaService(db, fs, extract, isProd);
+    const prisma = new PrismaService(db, extract, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
@@ -111,8 +111,6 @@ async function exe() {
     );
 
     const { xAIService } = await import("@/xai/index.ts");
-
-
 
     const xai = new xAIService(
       logger,

@@ -83,18 +83,18 @@ export class Resolver extends ModelService {
   };
   private contentTypeToExt(contentType?: string) {
     return contentType
-      ? this.wsServer.prisma.fs.mimeToExt(
-          contentType as keyof typeof this.wsServer.prisma.fs.toExtObj
-        )
+      ? this.wsServer.prisma.mimeToExt[
+          contentType as keyof typeof this.wsServer.prisma.mimeToExt
+      ][0]
       : undefined;
   }
 
   private extToContentType(metadata?: ImageSpecs | DocSpecs) {
     return metadata?.format && metadata.format !== "unknown"
       ? metadata.type === "IMAGE"
-        ? this.s3Service.fs.getMimes(
+        ? this.extToMime[
             metadata.format === "heic" ? "avif" : metadata.format
-          )[0]
+        ][0]
         : metadata.type === "DOCUMENT"
           ? (metadata.mimeType ?? "")
           : ""
@@ -722,12 +722,9 @@ export class Resolver extends ModelService {
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-      const [cType, cTypePkg] = [
-        mime,
-        this.s3Service.fs.getMimeTypeForPath(filename)
-      ];
 
-      const mimeType = cType ?? cTypePkg;
+
+      const mimeType = mime;
 
       const extension = this.contentTypeToExt(mime) ?? "bin";
 
@@ -736,7 +733,7 @@ export class Resolver extends ModelService {
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.s3Service.fs.getSize(size ?? 0, "auto", {
+      const sizeInfo = this.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
@@ -937,14 +934,10 @@ export class Resolver extends ModelService {
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-      const [cType, cTypePkg] = [
-        mime,
-        this.s3Service.fs.getMimeTypeForPath(filename)
-      ];
 
-      console.log({ cType, cTypePkg });
 
-      const mimeType = cType ?? cTypePkg;
+
+      const mimeType = mime;
 
       const extension = this.contentTypeToExt(mimeType) ?? "bin";
 
@@ -953,7 +946,7 @@ export class Resolver extends ModelService {
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.s3Service.fs.getSize(size ?? 0, "auto", {
+      const sizeInfo = this.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
@@ -1668,7 +1661,7 @@ export class Resolver extends ModelService {
 
     // Process in parallel with concurrency limit
     const CONCURRENCY_LIMIT = 3;
-    const chunks = this.wsServer.prisma.fs.chunkArray(urls, CONCURRENCY_LIMIT);
+    const chunks = this.chunkArray(urls, CONCURRENCY_LIMIT);
 
     for (const chunk of chunks) {
       const results = await Promise.allSettled(
@@ -1707,47 +1700,6 @@ export class Resolver extends ModelService {
     return { successful, failed };
   }
 
-  private isSupportedFileType(url: string): boolean {
-    const extension = this.wsServer.prisma.fs.assetType(url);
-    if (!extension) return false;
-
-    // Define supported file types
-    const supportedTypes = [
-      // Images
-      "jpg",
-      "jpeg",
-      "png",
-      "apng",
-      "gif",
-      "webp",
-      "svg",
-      "bmp",
-      "ico",
-      "avif",
-      "tiff",
-      // Documents
-      "pdf",
-      "doc",
-      "docx",
-      "txt",
-      "md",
-      "csv",
-      "json",
-      "xml",
-      // Archives (for future)
-      "zip",
-      "tar",
-      "gz",
-      // Media (for future)
-      "mp3",
-      "mp4",
-      "weba",
-      "webm",
-      "ogg"
-    ];
-
-    return supportedTypes.includes(extension);
-  }
   public async handleTyping(
     event: EventTypeMap["typing"],
     _ws: WebSocket,
