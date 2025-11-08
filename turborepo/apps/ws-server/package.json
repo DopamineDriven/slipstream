@@ -50,6 +50,9 @@
       "prisma": [
         "dist/prisma/index.d.ts"
       ],
+      "prisma/attachment-provider": [
+        "dist/prisma/attachment-provider.d.ts"
+      ],
       "providers": [
         "src/providers/index.d.ts"
       ],
@@ -149,7 +152,7 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "terser": "^5.44.1",
-       "tsdown": "^0.15.2",
+    "tsdown": "^0.15.2",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
     "typescript-eslint": "^8.46.3",

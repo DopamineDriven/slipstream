@@ -18,6 +18,7 @@ const tsupConfig = (options: Options) =>
       "src/openai/types.ts",
       "src/openai/workup.ts",
       "src/pdf/index.ts",
+      "src/prisma/attachment-provider.ts",
       "src/prisma/index.ts",
       "src/providers/index.ts",
       "src/resolver/index.ts",

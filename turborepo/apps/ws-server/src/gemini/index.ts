@@ -36,6 +36,8 @@ export class GeminiService extends ModelService {
   private apiVersion = "v1alpha" as const;
   // Simple in-memory cache for the session/lifecycle
   private assetCache = new Map<string, { fileUri: string; expiresAt: Date }>();
+
+  // private googleFilesList = new Map<string, {}>();
   constructor(
     logger: LoggerService,
     private prisma: PrismaService,
@@ -312,6 +314,11 @@ export class GeminiService extends ModelService {
 
   private async getFileByName(name: string, apiKey?: string) {
     const ai = this.getClient(apiKey);
+    if (!name.startsWith("files/") && !name.includes("/")) {
+      return await ai.files.get({
+        name: `files/${name}`
+      });
+    }
     return await ai.files.get({
       name
     });
@@ -329,6 +336,10 @@ export class GeminiService extends ModelService {
       await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, i)));
     }
     throw new Error(`File ${fileName} not active after ${maxRetries} retries`);
+  }
+
+  private async checkPrisma(keyFingerprint: string) {
+    return await this.prisma.getGeminiProviderAttachments(keyFingerprint);
   }
 
   private async ensureAssetUploaded(
@@ -349,8 +360,15 @@ export class GeminiService extends ModelService {
     const now = new Date();
     // 0. Check in-memory cache first
     const cached = this.assetCache.get(cacheKey);
-    if (cached && new Date(cached.expiresAt).getTime() > now.getTime()) {
-      this.logger.debug(`Reusing cached Gemini asset: ${attachment.id}`);
+
+    const checkPrisma = await this.checkPrisma(keyFingerprint);
+
+    if (
+      cached &&
+      checkPrisma.includes(cached.fileUri) &&
+      new Date(cached.expiresAt).getTime() > now.getTime()
+    ) {
+      this.logger.info(`Reusing cached Gemini asset: ${attachment.id}`);
       return {
         fileUri: cached.fileUri,
         mimeType:

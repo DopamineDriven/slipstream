@@ -11,14 +11,10 @@ import type {
   HandleAiChatReqUpdateWithImgGenSansAttachmentsProps,
   InferTopLevelMime,
   UpdateAttachment,
-  UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata,
   UserData
 } from "@/types/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { ExtractService } from "@/extract/index.ts";
-import { ModelService } from "@/models/index.ts";
-import { Fs } from "@d0paminedriven/fs";
 import type {
   $Enums,
   Attachment,
@@ -40,18 +36,18 @@ import type {
 } from "@slipstream/types";
 import { DbService, PrismaClient } from "@slipstream/db/node";
 import { EncryptionService } from "@slipstream/encryption";
+import {PrismaAttachmentProviderService} from "@/prisma/attachment-provider.ts";
 
-export class PrismaService extends ModelService {
+export class PrismaService extends PrismaAttachmentProviderService {
   readonly prismaClient: PrismaClient;
   private encryption: EncryptionService;
 
   constructor(
     prisma: DbService,
-    public fs: Fs,
     private extractor: ExtractService,
     private isProd: boolean
   ) {
-    super();
+    super(prisma);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
     this.prismaClient = prisma.prismaClient;
   }
@@ -1026,17 +1022,6 @@ export class PrismaService extends ModelService {
     });
   }
 
-  private async handleImageData(cdnUrl: string) {
-    const specs = (await this.extractor.extractRemote(
-      cdnUrl,
-      4096 * 24
-    )) as ExpandedImgSpecs;
-    const v = this.handleAssetMetadata(specs);
-    if (v.type === "IMAGE" && v.img) {
-      return { ...v.img };
-    } else throw new Error("no image found");
-  }
-
   public async handleAiChatResponse({
     userId,
     provider,
@@ -1100,7 +1085,7 @@ export class PrismaService extends ModelService {
                   mime: t.mime,
                   revisedPrompt: data.imgGenFields?.revisedPrompt,
                   kind: t.kind,
-                  ext: t.ext, 
+                  ext: t.ext,
                   height: t.image?.height,
                   width: t.image?.width,
                   jobId: t.jobId,
@@ -1335,7 +1320,7 @@ export class PrismaService extends ModelService {
 
   public contentTypeToExt(contentType?: string) {
     return contentType
-      ? this.fs.mimeToExt(contentType as keyof typeof this.fs.toExtObj)
+      ? this.mimeToExt[contentType as keyof typeof this.mimeToExt][0]
       : undefined;
   }
 
@@ -1586,56 +1571,6 @@ export class PrismaService extends ModelService {
     } | null;
   }
 
-  /**
-   * Update attachment metadata
-   */
-  async updateAttachmentMetadata(attachmentId: string): Promise<Attachment> {
-    const attachment = await this.getAttachment(attachmentId);
-
-    if (!attachment) {
-      throw new Error("Attachment not found");
-    }
-    if (!attachment.cdnUrl)
-      throw new Error("cdn url not available for metadata extraction");
-
-    const {
-      aspectRatio,
-      width,
-      height,
-      colorSpace,
-      frames,
-      format,
-      iccProfile,
-      orientation,
-      hasAlpha,
-      animated,
-      exifDateTimeOriginal
-    } = await this.fs.getImageSpecsFlexi(attachment.cdnUrl);
-
-    return this.prismaClient.attachment.update({
-      where: { id: attachmentId },
-      data: {
-        image: {
-          connectOrCreate: {
-            where: { attachmentId },
-            create: {
-              aspectRatio,
-              format,
-              height,
-              width,
-              animated,
-              colorSpace,
-              exifDateTimeOriginal,
-              frames,
-              hasAlpha,
-              iccProfile,
-              orientation
-            }
-          }
-        }
-      }
-    });
-  }
 
   public getTopLevelMime(
     target: keyof typeof this.mimeToExt
@@ -1714,266 +1649,5 @@ export class PrismaService extends ModelService {
       oldestAttachment: attachments[0]?.createdAt,
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
-  }
-
-  public async findActiveOpenAIAsset(
-    attachmentId: string,
-    keyFingerprint = "server"
-  ) {
-    return this.prismaClient.attachmentProvider.findFirst({
-      where: {
-        attachmentId,
-        provider: "OPENAI",
-        keyFingerprint,
-        state: "ACTIVE"
-        // no TTL for OpenAI files; they persist until you delete them
-      }
-    });
-  }
-
-  public async findUniqueAttachment(attachmentId: string) {
-    return await this.prismaClient.attachment.findUnique({
-      where: { id: attachmentId }
-    });
-  }
-
-  public async updateAttachmentCompat({
-    attachmentId,
-    compatCdnUrl,
-    compatKey,
-    compatReadyAt,
-    compatStatus,
-    compatExt,
-    compatMime,
-    compatS3ObjectId,
-    compatVersionId
-  }: UpdateAttachmentCompatProps) {
-    return await this.prismaClient.attachment.update({
-      where: { id: attachmentId },
-      data: {
-        compatCdnUrl,
-        compatStatus,
-        compatReadyAt,
-        compatKey,
-        compatExt,
-        compatMime,
-        compatVersionId,
-        compatS3ObjectId
-      }
-    });
-  }
-
-  public async findActiveGeminiAsset(
-    attachmentId: string,
-    keyFingerprint: string
-  ) {
-    return this.prismaClient.attachmentProvider.findFirst({
-      where: {
-        attachmentId,
-        provider: "GEMINI",
-        keyFingerprint,
-        state: "ACTIVE",
-        expiresAt: { gt: new Date() }
-      }
-    });
-  }
-
-  public async upsertOpenAIAssetMapping(
-    attachmentId: string,
-    keyFingerprint = "server",
-    mime: string,
-    keyId?: string
-  ) {
-    return this.prismaClient.attachmentProvider.upsert({
-      where: {
-        attachmentId_provider_keyFingerprint: {
-          attachmentId,
-          provider: "OPENAI",
-          keyFingerprint
-        }
-      },
-      update: {
-        state: "PENDING",
-        errorCode: null,
-        errorMessage: null,
-        lastCheckedAt: new Date(Date.now())
-      },
-      create: {
-        attachmentId,
-        provider: "OPENAI",
-        userKeyId: keyId,
-        keyFingerprint,
-        state: "PENDING",
-        mime
-      }
-    });
-  }
-
-  public async upsertGeminiAssetMapping(
-    attachmentId: string,
-    keyFingerprint = "server",
-    mime: string,
-    keyId?: string
-  ) {
-    return this.prismaClient.attachmentProvider.upsert({
-      where: {
-        attachmentId_provider_keyFingerprint: {
-          attachmentId: attachmentId,
-          provider: "GEMINI",
-          keyFingerprint
-        }
-      },
-      update: {
-        state: "PENDING",
-        errorCode: null,
-        errorMessage: null,
-        lastCheckedAt: new Date(Date.now())
-      },
-      create: {
-        attachmentId: attachmentId,
-        provider: "GEMINI",
-        userKeyId: keyId,
-        keyFingerprint,
-        state: "PENDING",
-        mime
-      }
-    });
-  }
-
-  public async finalizeOpenAIAsset(
-    mappingId: string,
-    providerRef: string,
-    size?: bigint
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerRef, // store openai file_id here
-        size,
-        readyAt: new Date(Date.now()),
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async finalizeGeminiAsset(
-    mappingId: string,
-    providerUri: string,
-    providerRef: string,
-    expiresAt: Date
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerUri,
-        providerRef,
-        expiresAt,
-        readyAt: new Date(Date.now()),
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async markOpenAIAssetFailed(mappingId: string, errorMessage: string) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async markGeminiAssetFailed(mappingId: string, errorMessage: string) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async findActiveAnthropicAsset(
-    attachmentId: string,
-    keyFingerprint = "server"
-  ) {
-    return this.prismaClient.attachmentProvider.findFirst({
-      where: {
-        attachmentId,
-        provider: "ANTHROPIC",
-        keyFingerprint,
-        state: "ACTIVE",
-        expiresAt: { gt: new Date() }
-      }
-    });
-  }
-
-  public async upsertAnthropicAssetMapping(
-    attachmentId: string,
-    keyFingerprint = "server",
-    mime: string,
-    keyId?: string
-  ) {
-    return this.prismaClient.attachmentProvider.upsert({
-      where: {
-        attachmentId_provider_keyFingerprint: {
-          attachmentId,
-          provider: "ANTHROPIC",
-          keyFingerprint
-        }
-      },
-      update: {
-        state: "PENDING",
-        errorCode: null,
-        errorMessage: null,
-        lastCheckedAt: new Date()
-      },
-      create: {
-        attachmentId,
-        provider: "ANTHROPIC",
-        userKeyId: keyId,
-        keyFingerprint,
-        state: "PENDING",
-        mime
-      }
-    });
-  }
-
-  public async finalizeAnthropicAsset(
-    mappingId: string,
-    fileId: string,
-    expiresAt: Date,
-    size?: bigint
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerRef: fileId,
-        expiresAt,
-        size,
-        readyAt: new Date(),
-        lastCheckedAt: new Date()
-      }
-    });
-  }
-
-  public async markAnthropicAssetFailed(
-    mappingId: string,
-    errorMessage: string
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date()
-      }
-    });
   }
 }
