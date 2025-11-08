@@ -43,6 +43,12 @@ export class PrismaAttachmentProviderService extends ModelService {
     return arr;
   }
 
+  public async findUniqueAttachment(attachmentId: string) {
+    return await this.prismaClient.attachment.findUnique({
+      where: { id: attachmentId }
+    });
+  }
+
   public async updateAttachmentCompat({
     attachmentId,
     compatCdnUrl,
@@ -167,7 +173,8 @@ export class PrismaAttachmentProviderService extends ModelService {
     mappingId: string,
     providerUri: string,
     providerRef: string,
-    expiresAt: Date
+    expiresAt: Date,
+    sizeBytes: number
   ) {
     await this.prismaClient.attachmentProvider.update({
       where: { id: mappingId },
@@ -177,7 +184,8 @@ export class PrismaAttachmentProviderService extends ModelService {
         providerRef,
         expiresAt,
         readyAt: new Date(Date.now()),
-        lastCheckedAt: new Date(Date.now())
+        lastCheckedAt: new Date(Date.now()),
+        size: sizeBytes
       }
     });
   }

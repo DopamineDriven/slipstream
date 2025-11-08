@@ -149,6 +149,7 @@ async function exe() {
       logger,
       prisma,
       redisInstance,
+      extract,
       cfg.GOOGLE_API_KEY
     );
 
