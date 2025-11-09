@@ -140,6 +140,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
               aspectRatio: number | null;
               frames: number;
               hasAlpha: boolean | null;
+              colorModel: $Enums.ColorModel | null;
               animated: boolean;
               orientation: number | null;
               colorSpace: $Enums.ColorSpace | null;
@@ -167,6 +168,7 @@ export class PrismaUserMessageService extends ErrorHelperService {
               pdfVersion: string | null;
               isEncrypted: boolean;
               isSearchable: boolean;
+              isLinearized: boolean | null;
               encoding: string | null;
               lineCount: number | null;
               textPreview: string | null;
@@ -259,33 +261,11 @@ export class PrismaUserMessageService extends ErrorHelperService {
       include: {
         messages: {
           orderBy: { createdAt: "asc" },
-
           include: {
             imageGenJob: true,
             attachments: {
               orderBy: { createdAt: "asc" },
               include: { image: true, document: true, imageGenOutput: true }
-              // select: {
-              //   messageId: true,
-              //   conversationId: true,
-              //   versionId: true,
-              //   uploadMethod: true,
-              //   createdAt: true,
-              //   id: true,
-              //   filename: true,
-              //   mime: true,
-              //   size: true,
-              //   cdnUrl: true,
-              //   publicUrl: true,
-              //   assetType: true,
-              //   imageGenOutput: true,
-              //   ext: true,
-              //   draftId: true,
-              //   batchId: true,
-              //   generationGroupId: true,
-              //   document: true,
-              //   image: true
-              // }
             }
           }
         },

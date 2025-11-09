@@ -99,6 +99,20 @@ enum ImageFormat {
   unknown
 }
 
+enum ColorModel {
+  rgb
+  rgba
+  grayscale
+  grayscale_alpha
+  indexed
+  cmyk
+  ycbcr
+  ycck
+  vector
+  lab
+  unknown
+}
+
 enum ColorSpace {
   srgb
   display_p3
@@ -474,6 +488,7 @@ model ImageMetadata {
 
   orientation Int?        @db.SmallInt // EXIF orientation if preserved
   colorSpace  ColorSpace?
+  colorModel  ColorModel?
 
   // optional EXIF bits
   exifDateTimeOriginal DateTime?
@@ -573,6 +588,7 @@ model DocumentMetadata {
   pdfVersion   String? // "1.4", "1.7", etc.
   isEncrypted  Boolean @default(false)
   isSearchable Boolean @default(true) // has text layer
+  isLinearized Boolean?
 
   // For text documents
   encoding  String? // UTF-8, etc.
@@ -649,7 +665,7 @@ model ImageGenOutput {
   jobIndex      Int // 0..n-1 -- 0..0 (dall-e-3, n=1) -- 0..3 (all imagen- models, n <= 4) -- 0..9 (all other models, n <=10)
   kind          ImageGenOutputKind @default(FINAL)
   seriesIndex   Int
-  seriesId      String  // mirror per-call lineage
+  seriesId      String // mirror per-call lineage
   isPartial     Boolean
   attachmentId  String             @unique
   width         Int?

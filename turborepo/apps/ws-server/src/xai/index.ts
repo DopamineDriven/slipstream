@@ -477,6 +477,10 @@ export class xAIService extends ModelService {
           animated: expImg.animated,
           width: expImg.width,
           height: expImg.height,
+          colorModel:
+            expImg.colorModel === "grayscale-alpha"
+              ? "grayscale_alpha"
+              : expImg.colorModel,
           aspectRatio: expImg.width / expImg.height,
           cameraMake: null,
           cameraModel: null,

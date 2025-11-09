@@ -649,6 +649,7 @@ export type UpdateAttachmentMetadata = {
           | "lab"
           | "xyz"
           | "gray";
+          colorModel: $Enums.ColorModel | null;
         dominantColorHex: null;
         exifDateTimeOriginal: Date | null;
         format:
@@ -689,6 +690,7 @@ export type UpdateAttachmentMetadata = {
         keywords: string[] | undefined;
         language: string | undefined;
         lineCount: number | undefined;
+        isLinearized: boolean | undefined;
         pageCount: number | undefined;
         pdfVersion: string | undefined;
         subject: string | undefined;
@@ -820,6 +822,7 @@ export type DocumentSingleton = {
   subject: string | null;
   keywords: string[];
   pdfVersion: string | null;
+  isLinearized: boolean | null;
   isEncrypted: boolean;
   isSearchable: boolean;
   encoding: string | null;
@@ -865,19 +868,8 @@ export type ImageSingleton = {
   hasAlpha: boolean | null;
   animated: boolean;
   orientation: number | null;
-  colorSpace:
-    | "unknown"
-    | "srgb"
-    | "display_p3"
-    | "adobe_rgb"
-    | "prophoto_rgb"
-    | "rec2020"
-    | "rec709"
-    | "cmyk"
-    | "lab"
-    | "xyz"
-    | "gray"
-    | null;
+  colorModel: $Enums.ColorModel | null;
+  colorSpace: $Enums.ColorSpace | null;
   exifDateTimeOriginal: Date | null;
   cameraMake: string | null;
   cameraModel: string | null;
@@ -1221,6 +1213,7 @@ export type ImageGenReqDbRes<T extends boolean = false> = {
         aspectRatio: number | null;
         frames: number;
         hasAlpha: boolean | null;
+        colorModel: $Enums.ColorModel | null;
         animated: boolean;
         orientation: number | null;
         colorSpace: $Enums.ColorSpace | null;

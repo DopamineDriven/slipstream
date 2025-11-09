@@ -50,6 +50,7 @@ export type DocumentMetadataMinAggregateOutputType = {
   pdfVersion: string | null
   isEncrypted: boolean | null
   isSearchable: boolean | null
+  isLinearized: boolean | null
   encoding: string | null
   lineCount: number | null
   textPreview: string | null
@@ -69,6 +70,7 @@ export type DocumentMetadataMaxAggregateOutputType = {
   pdfVersion: string | null
   isEncrypted: boolean | null
   isSearchable: boolean | null
+  isLinearized: boolean | null
   encoding: string | null
   lineCount: number | null
   textPreview: string | null
@@ -89,6 +91,7 @@ export type DocumentMetadataCountAggregateOutputType = {
   pdfVersion: number
   isEncrypted: number
   isSearchable: number
+  isLinearized: number
   encoding: number
   lineCount: number
   textPreview: number
@@ -122,6 +125,7 @@ export type DocumentMetadataMinAggregateInputType = {
   pdfVersion?: true
   isEncrypted?: true
   isSearchable?: true
+  isLinearized?: true
   encoding?: true
   lineCount?: true
   textPreview?: true
@@ -141,6 +145,7 @@ export type DocumentMetadataMaxAggregateInputType = {
   pdfVersion?: true
   isEncrypted?: true
   isSearchable?: true
+  isLinearized?: true
   encoding?: true
   lineCount?: true
   textPreview?: true
@@ -161,6 +166,7 @@ export type DocumentMetadataCountAggregateInputType = {
   pdfVersion?: true
   isEncrypted?: true
   isSearchable?: true
+  isLinearized?: true
   encoding?: true
   lineCount?: true
   textPreview?: true
@@ -268,6 +274,7 @@ export type DocumentMetadataGroupByOutputType = {
   pdfVersion: string | null
   isEncrypted: boolean
   isSearchable: boolean
+  isLinearized: boolean | null
   encoding: string | null
   lineCount: number | null
   textPreview: string | null
@@ -311,6 +318,7 @@ export type DocumentMetadataWhereInput = {
   pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
   isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
   isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null
   encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
   lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
   textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
@@ -332,6 +340,7 @@ export type DocumentMetadataOrderByWithRelationInput = {
   pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   isEncrypted?: Prisma.SortOrder
   isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder
   encoding?: Prisma.SortOrderInput | Prisma.SortOrder
   lineCount?: Prisma.SortOrderInput | Prisma.SortOrder
   textPreview?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -356,6 +365,7 @@ export type DocumentMetadataWhereUniqueInput = Prisma.AtLeast<{
   pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
   isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
   isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null
   encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
   lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
   textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
@@ -377,6 +387,7 @@ export type DocumentMetadataOrderByWithAggregationInput = {
   pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   isEncrypted?: Prisma.SortOrder
   isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder
   encoding?: Prisma.SortOrderInput | Prisma.SortOrder
   lineCount?: Prisma.SortOrderInput | Prisma.SortOrder
   textPreview?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -405,6 +416,7 @@ export type DocumentMetadataScalarWhereWithAggregatesInput = {
   pdfVersion?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
   isEncrypted?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean
   isSearchable?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableWithAggregatesFilter<"DocumentMetadata"> | boolean | null
   encoding?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
   lineCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null
   textPreview?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
@@ -424,6 +436,7 @@ export type DocumentMetadataCreateInput = {
   pdfVersion?: string | null
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean | null
   encoding?: string | null
   lineCount?: number | null
   textPreview?: string | null
@@ -445,6 +458,7 @@ export type DocumentMetadataUncheckedCreateInput = {
   pdfVersion?: string | null
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean | null
   encoding?: string | null
   lineCount?: number | null
   textPreview?: string | null
@@ -464,6 +478,7 @@ export type DocumentMetadataUpdateInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -485,6 +500,7 @@ export type DocumentMetadataUncheckedUpdateInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -505,6 +521,7 @@ export type DocumentMetadataCreateManyInput = {
   pdfVersion?: string | null
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean | null
   encoding?: string | null
   lineCount?: number | null
   textPreview?: string | null
@@ -524,6 +541,7 @@ export type DocumentMetadataUpdateManyMutationInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -544,6 +562,7 @@ export type DocumentMetadataUncheckedUpdateManyInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -577,6 +596,7 @@ export type DocumentMetadataCountOrderByAggregateInput = {
   pdfVersion?: Prisma.SortOrder
   isEncrypted?: Prisma.SortOrder
   isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
   encoding?: Prisma.SortOrder
   lineCount?: Prisma.SortOrder
   textPreview?: Prisma.SortOrder
@@ -602,6 +622,7 @@ export type DocumentMetadataMaxOrderByAggregateInput = {
   pdfVersion?: Prisma.SortOrder
   isEncrypted?: Prisma.SortOrder
   isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
   encoding?: Prisma.SortOrder
   lineCount?: Prisma.SortOrder
   textPreview?: Prisma.SortOrder
@@ -621,6 +642,7 @@ export type DocumentMetadataMinOrderByAggregateInput = {
   pdfVersion?: Prisma.SortOrder
   isEncrypted?: Prisma.SortOrder
   isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
   encoding?: Prisma.SortOrder
   lineCount?: Prisma.SortOrder
   textPreview?: Prisma.SortOrder
@@ -687,6 +709,7 @@ export type DocumentMetadataCreateWithoutAttachmentInput = {
   pdfVersion?: string | null
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean | null
   encoding?: string | null
   lineCount?: number | null
   textPreview?: string | null
@@ -706,6 +729,7 @@ export type DocumentMetadataUncheckedCreateWithoutAttachmentInput = {
   pdfVersion?: string | null
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean | null
   encoding?: string | null
   lineCount?: number | null
   textPreview?: string | null
@@ -741,6 +765,7 @@ export type DocumentMetadataUpdateWithoutAttachmentInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -760,6 +785,7 @@ export type DocumentMetadataUncheckedUpdateWithoutAttachmentInput = {
   pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -782,6 +808,7 @@ export type DocumentMetadataSelect<ExtArgs extends runtime.Types.Extensions.Inte
   pdfVersion?: boolean
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean
   encoding?: boolean
   lineCount?: boolean
   textPreview?: boolean
@@ -803,6 +830,7 @@ export type DocumentMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   pdfVersion?: boolean
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean
   encoding?: boolean
   lineCount?: boolean
   textPreview?: boolean
@@ -824,6 +852,7 @@ export type DocumentMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   pdfVersion?: boolean
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean
   encoding?: boolean
   lineCount?: boolean
   textPreview?: boolean
@@ -845,6 +874,7 @@ export type DocumentMetadataSelectScalar = {
   pdfVersion?: boolean
   isEncrypted?: boolean
   isSearchable?: boolean
+  isLinearized?: boolean
   encoding?: boolean
   lineCount?: boolean
   textPreview?: boolean
@@ -852,7 +882,7 @@ export type DocumentMetadataSelectScalar = {
   updatedAt?: boolean
 }
 
-export type DocumentMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "pageCount" | "wordCount" | "language" | "title" | "author" | "subject" | "keywords" | "pdfVersion" | "isEncrypted" | "isSearchable" | "encoding" | "lineCount" | "textPreview" | "createdAt" | "updatedAt", ExtArgs["result"]["documentMetadata"]>
+export type DocumentMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "pageCount" | "wordCount" | "language" | "title" | "author" | "subject" | "keywords" | "pdfVersion" | "isEncrypted" | "isSearchable" | "isLinearized" | "encoding" | "lineCount" | "textPreview" | "createdAt" | "updatedAt", ExtArgs["result"]["documentMetadata"]>
 export type DocumentMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
@@ -881,6 +911,7 @@ export type $DocumentMetadataPayload<ExtArgs extends runtime.Types.Extensions.In
     pdfVersion: string | null
     isEncrypted: boolean
     isSearchable: boolean
+    isLinearized: boolean | null
     encoding: string | null
     lineCount: number | null
     textPreview: string | null
@@ -1322,6 +1353,7 @@ export interface DocumentMetadataFieldRefs {
   readonly pdfVersion: Prisma.FieldRef<"DocumentMetadata", 'String'>
   readonly isEncrypted: Prisma.FieldRef<"DocumentMetadata", 'Boolean'>
   readonly isSearchable: Prisma.FieldRef<"DocumentMetadata", 'Boolean'>
+  readonly isLinearized: Prisma.FieldRef<"DocumentMetadata", 'Boolean'>
   readonly encoding: Prisma.FieldRef<"DocumentMetadata", 'String'>
   readonly lineCount: Prisma.FieldRef<"DocumentMetadata", 'Int'>
   readonly textPreview: Prisma.FieldRef<"DocumentMetadata", 'String'>

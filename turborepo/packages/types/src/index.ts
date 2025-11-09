@@ -277,6 +277,15 @@ export { createDraftId, parseDraftId } from "@/utils.ts";
  */
 
 export type {
+  AccountSingleton,
+  AttachmentChecksumAlgo,
+  AttachmentCompatStatus,
+  AttachmentOrigin,
+  AttachmentProviderSingleton,
+  AttachmentProviderState,
+  AttachmentStatus,
+  AttachmentType,
+  AttachmentUploadMethod,
   AnthropicError,
   AnthropicModel,
   AnthropicResponse,
@@ -285,7 +294,9 @@ export type {
   AttachmentSingleton,
   BigIntOrNumber,
   ConversationSingleton,
+  ConvoSettingsReasoningEffort,
   ConvoSettingsSingleton,
+  ConvoSettingsVerbosity,
   DocumentSingleton,
   FlexiProvider,
   GeminiError,
@@ -294,15 +305,27 @@ export type {
   GeminiSuccess,
   GrokModelsResponse,
   ImageGenJobSingleton,
+  ImageGenJobStage,
+  ImageGenOutputKind,
   ImageGenOutputSingleton,
+  ImageMetadataColorModel,
+  ImageMetadataColorSpace,
+  ImageMetadataFormat,
   ImageSingleton,
   ListModelsSingleton,
+  MessageSenderType,
   MessageSingleton,
+  PrismaProvider,
+  ProfileSingleton,
   OpenAiError,
   OpenAiResponse,
+  SessionSingleton,
+  SettingsSingleton,
+  SettingsTheme,
   Signals,
   SuccessResponse,
-  UserKeySingleton
+  UserKeySingleton,
+  UserSingleton
 } from "@/types.ts";
 
 declare global {
