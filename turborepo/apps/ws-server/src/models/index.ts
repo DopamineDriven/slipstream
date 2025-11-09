@@ -1,6 +1,10 @@
 import fsSync from "fs";
 import { join, relative, resolve } from "path";
-import { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs
+} from "@d0paminedriven/metadata";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   GeminiImgGenModels,
   GetModelUtilRT,
@@ -105,6 +109,7 @@ export class ModelService extends ProviderValidation {
           keywords: string[] | undefined;
           language: string | undefined;
           lineCount: number | undefined;
+          isLinearized: boolean | undefined;
           pageCount: number | undefined;
           pdfVersion: string | undefined;
           subject: string | undefined;
@@ -131,6 +136,7 @@ export class ModelService extends ProviderValidation {
             | "lab"
             | "xyz"
             | "gray";
+          colorModel: $Enums.ColorModel | null;
           dominantColorHex: null;
           exifDateTimeOriginal: Date | null;
           format:
@@ -168,6 +174,7 @@ export class ModelService extends ProviderValidation {
               format: specs.format ?? "application/pdf",
               isEncrypted: specs.isEncrypted ?? undefined,
               isSearchable: specs.isSearchable ?? undefined,
+              isLinearized: specs.isLinearized ?? undefined,
               keywords: specs.keywords ?? undefined,
               language: specs.language ?? undefined,
               lineCount: specs.lineCount ?? undefined,
@@ -186,6 +193,10 @@ export class ModelService extends ProviderValidation {
               aspectRatio: specs.aspectRatio,
               cameraMake: null,
               cameraModel: null,
+              colorModel:
+                specs.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : specs.colorModel,
               colorSpace: specs.colorSpace ?? null,
               dominantColorHex: null,
               exifDateTimeOriginal: specs.exifDateTimeOriginal

@@ -14,4 +14,4 @@ export class DbService {
   }
 }
 
-export type { PrismaClient } from './generated/prisma/client'
+export type { PrismaClient } from "./generated/prisma/client";

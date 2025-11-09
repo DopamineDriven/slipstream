@@ -103,6 +103,23 @@ export const ImageFormat = {
 export type ImageFormat = (typeof ImageFormat)[keyof typeof ImageFormat]
 
 
+export const ColorModel = {
+  rgb: 'rgb',
+  rgba: 'rgba',
+  grayscale: 'grayscale',
+  grayscale_alpha: 'grayscale_alpha',
+  indexed: 'indexed',
+  cmyk: 'cmyk',
+  ycbcr: 'ycbcr',
+  ycck: 'ycck',
+  vector: 'vector',
+  lab: 'lab',
+  unknown: 'unknown'
+} as const
+
+export type ColorModel = (typeof ColorModel)[keyof typeof ColorModel]
+
+
 export const ColorSpace = {
   srgb: 'srgb',
   display_p3: 'display_p3',

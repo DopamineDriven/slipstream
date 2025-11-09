@@ -505,6 +505,13 @@ export type EnumColorSpaceNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel> | $Enums.ColorSpace | null
 }
 
+export type EnumColorModelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ColorModel | Prisma.EnumColorModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel> | $Enums.ColorModel | null
+}
+
 export type EnumImageFormatWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.ImageFormat | Prisma.EnumImageFormatFieldRefInput<$PrismaModel>
   in?: $Enums.ImageFormat[] | Prisma.ListEnumImageFormatFieldRefInput<$PrismaModel>
@@ -539,6 +546,16 @@ export type EnumColorSpaceNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
+}
+
+export type EnumColorModelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ColorModel | Prisma.EnumColorModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumColorModelNullableWithAggregatesFilter<$PrismaModel> | $Enums.ColorModel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
 }
 
 export type EnumImageGenStageFilter<$PrismaModel = never> = {
@@ -1057,6 +1074,13 @@ export type NestedEnumColorSpaceNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel> | $Enums.ColorSpace | null
 }
 
+export type NestedEnumColorModelNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.ColorModel | Prisma.EnumColorModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel> | $Enums.ColorModel | null
+}
+
 export type NestedEnumImageFormatWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.ImageFormat | Prisma.EnumImageFormatFieldRefInput<$PrismaModel>
   in?: $Enums.ImageFormat[] | Prisma.ListEnumImageFormatFieldRefInput<$PrismaModel>
@@ -1102,6 +1126,16 @@ export type NestedEnumColorSpaceNullableWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumColorSpaceNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumColorModelNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ColorModel | Prisma.EnumColorModelFieldRefInput<$PrismaModel> | null
+  in?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.ColorModel[] | Prisma.ListEnumColorModelFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumColorModelNullableWithAggregatesFilter<$PrismaModel> | $Enums.ColorModel | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumColorModelNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumImageGenStageFilter<$PrismaModel = never> = {

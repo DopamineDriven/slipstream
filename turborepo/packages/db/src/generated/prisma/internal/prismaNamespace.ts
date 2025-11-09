@@ -2047,6 +2047,7 @@ export const ImageMetadataScalarFieldEnum = {
   animated: 'animated',
   orientation: 'orientation',
   colorSpace: 'colorSpace',
+  colorModel: 'colorModel',
   exifDateTimeOriginal: 'exifDateTimeOriginal',
   cameraMake: 'cameraMake',
   cameraModel: 'cameraModel',
@@ -2119,6 +2120,7 @@ export const DocumentMetadataScalarFieldEnum = {
   pdfVersion: 'pdfVersion',
   isEncrypted: 'isEncrypted',
   isSearchable: 'isSearchable',
+  isLinearized: 'isLinearized',
   encoding: 'encoding',
   lineCount: 'lineCount',
   textPreview: 'textPreview',
@@ -2515,6 +2517,20 @@ export type EnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'ColorSpace[]'
  */
 export type ListEnumColorSpaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorSpace[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ColorModel'
+ */
+export type EnumColorModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorModel'>
+    
+
+
+/**
+ * Reference to a field of type 'ColorModel[]'
+ */
+export type ListEnumColorModelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ColorModel[]'>
     
 
 

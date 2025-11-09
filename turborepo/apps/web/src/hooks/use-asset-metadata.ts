@@ -5,7 +5,7 @@ import type {
   ExpandedImgSpecs
 } from "@d0paminedriven/metadata";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Extract } from "@d0paminedriven/metadata";
+import { ExtractClient } from "@d0paminedriven/metadata";
 
 export interface AttachmentPreview {
   id: string;
@@ -33,16 +33,16 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
   >({});
   const [size, setSize] = useState<Record<string, number>>({});
 
-  const extractor = useMemo(() => new Extract({}), []);
+  const extractor = useMemo(() => new ExtractClient(), []);
 
   // Helper: produce document specs using the client-side extractor
   const getDocumentSpecsWorkup = useCallback(
     async (file: File): Promise<ExpandedDocSpecs | null> => {
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const meta = (extractor.getDocumentSpecsWorkup(
+        const meta = extractor.extractFromBuffer(
           Buffer.from(arrayBuffer)
-        )) as ExpandedDocSpecs;
+        ) as ExpandedDocSpecs;
 
         return meta;
       } catch (err) {
@@ -62,8 +62,6 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       if (metadata[attachment.id]) return;
       // Images → thumbnail + rich image metadata
       if (attachment.mime.startsWith("image/")) {
-
-
         const reader = new FileReader();
         reader.onload = e => {
           if (e.target?.result) {
@@ -76,10 +74,9 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
             (async () => {
               try {
                 const arrayBuffer = await attachment.file.arrayBuffer();
-                const meta = (extractor.img.getImageSpecsWorkup(
-                  Buffer.from(arrayBuffer),
-                  96 * 1024
-                )) as ExpandedImgSpecs;
+                const meta = extractor.extractFromBuffer(
+                  Buffer.from(arrayBuffer)
+                ) as ExpandedImgSpecs;
 
                 setMetadata(prev => ({
                   ...prev,

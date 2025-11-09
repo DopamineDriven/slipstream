@@ -2,7 +2,7 @@ import type {
   GenerateContentResponseProps,
   ProviderGeminiChatRequestEntity
 } from "@/gemini/types.ts";
-import type { MessageSingleton } from "@/types/index.ts";
+import type { MessageSingleton } from "@slipstream/types";
 import type {
   Blob,
   Content,

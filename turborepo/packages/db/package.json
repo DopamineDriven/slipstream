@@ -90,7 +90,7 @@
     "@prisma/adapter-pg": "^6.19.0",
     "@prisma/client": "^6.19.0",
     "@prisma/extension-accelerate": "^2.0.2",
-    "@prisma/extension-optimize": "^2.0.0",
+    "@prisma/extension-optimize": "^2.0.1",
     "@prisma/instrumentation": "^6.19.0"
   },
   "devDependencies": {

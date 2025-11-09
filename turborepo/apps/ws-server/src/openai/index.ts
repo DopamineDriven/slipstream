@@ -508,6 +508,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
               aspectRatio: getIt.width / getIt.height,
               cameraMake: null,
               cameraModel: null,
+              colorModel:
+                getIt.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : getIt.colorModel,
               colorSpace: getIt.colorSpace,
               dominantColorHex: null,
               exifDateTimeOriginal: getIt.exifDateTimeOriginal
@@ -1422,6 +1426,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
               width: getIt.width,
               height: getIt.height,
               animated: getIt.animated,
+              colorModel:
+                getIt.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : getIt.colorModel,
               aspectRatio: getIt.width / getIt.height,
               cameraMake: null,
               cameraModel: null,

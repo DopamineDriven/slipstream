@@ -3,6 +3,7 @@ import { ReadableStream } from "node:stream/web";
 import type {
   BigIntToCompatProps,
   BufferLike,
+  MessageSingleton,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
@@ -21,7 +22,6 @@ import type {
   EventTypeMap,
   ImageSingleton,
   ImageSpecs,
-  MessageSingleton,
   Provider,
   RTC
 } from "@slipstream/types";
@@ -85,7 +85,7 @@ export class Resolver extends ModelService {
     return contentType
       ? this.wsServer.prisma.mimeToExt[
           contentType as keyof typeof this.wsServer.prisma.mimeToExt
-      ][0]
+        ][0]
       : undefined;
   }
 
@@ -94,7 +94,7 @@ export class Resolver extends ModelService {
       ? metadata.type === "IMAGE"
         ? this.extToMime[
             metadata.format === "heic" ? "avif" : metadata.format
-        ][0]
+          ][0]
         : metadata.type === "DOCUMENT"
           ? (metadata.mimeType ?? "")
           : ""
@@ -722,8 +722,6 @@ export class Resolver extends ModelService {
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-
-
       const mimeType = mime;
 
       const extension = this.contentTypeToExt(mime) ?? "bin";
@@ -771,6 +769,10 @@ export class Resolver extends ModelService {
                 hasAlpha: metadata?.hasAlpha ?? false,
                 iccProfile: metadata?.iccProfile ?? null,
                 lensModel: null,
+                colorModel:
+                  metadata.colorModel === "grayscale-alpha"
+                    ? "grayscale_alpha"
+                    : metadata.colorModel,
                 orientation: metadata?.orientation ?? null,
                 updatedAt: undefined,
                 exifDateTimeOriginal: metadata?.exifDateTimeOriginal
@@ -785,26 +787,27 @@ export class Resolver extends ModelService {
                 "attachmentId" | "createdAt" | "updatedAt"
               >
             }
-          : (metadata?.type === "DOCUMENT" &&
-                mimeType.startsWith("application")) ||
-              mimeType.startsWith("text")
+          : metadata?.type === "DOCUMENT" &&
+              (mimeType.startsWith("application") ||
+                mimeType.startsWith("text"))
             ? {
                 document: {
                   title: filename,
                   attachmentId: undefined,
+                  isLinearized: metadata.isLinearized,
                   format: extension,
-                  pageCount: null,
-                  wordCount: null,
-                  language: null,
-                  author: null,
-                  subject: null,
-                  keywords: [""],
-                  pdfVersion: null,
-                  isEncrypted: false,
-                  isSearchable: false,
-                  encoding: null,
-                  lineCount: null,
-                  textPreview: null
+                  pageCount: metadata.pageCount,
+                  wordCount: metadata.wordCount,
+                  language: metadata.language,
+                  author: metadata.author,
+                  subject: metadata.subject,
+                  keywords: metadata.keywords ?? [""],
+                  pdfVersion: metadata.pdfVersion,
+                  isEncrypted: metadata.isEncrypted ?? false,
+                  isSearchable: metadata.isSearchable ?? false,
+                  encoding: metadata.encoding,
+                  lineCount: metadata.lineCount,
+                  textPreview: metadata.textPreview
                 } satisfies RTC<
                   DocumentSingleton,
                   "attachmentId" | "createdAt" | "updatedAt"
@@ -934,9 +937,6 @@ export class Resolver extends ModelService {
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-
-
-
       const mimeType = mime;
 
       const extension = this.contentTypeToExt(mimeType) ?? "bin";
@@ -980,6 +980,10 @@ export class Resolver extends ModelService {
                 frames: metadata?.frames ?? 1,
                 gpsLat: null,
                 gpsLon: null,
+                colorModel:
+                  metadata.colorModel === "grayscale-alpha"
+                    ? "grayscale_alpha"
+                    : metadata.colorModel,
                 hasAlpha: metadata?.hasAlpha ?? false,
                 iccProfile: metadata?.iccProfile ?? null,
                 lensModel: null,
@@ -990,8 +994,8 @@ export class Resolver extends ModelService {
                   : null,
                 animated: metadata?.animated ?? false,
                 aspectRatio: metadata?.aspectRatio ?? (1.0 as const),
-                width: width ?? 0,
-                height: height ?? 0
+                width: width ?? metadata.width,
+                height: height ?? metadata.height
               } satisfies RTC<
                 ImageSingleton,
                 "attachmentId" | "createdAt" | "updatedAt"
@@ -1005,18 +1009,19 @@ export class Resolver extends ModelService {
                   title: filename,
                   attachmentId: undefined,
                   format: metadata?.format ?? extension,
-                  pageCount: null,
-                  wordCount: null,
-                  language: null,
-                  author: null,
-                  subject: null,
-                  keywords: [""],
-                  pdfVersion: null,
-                  isEncrypted: false,
-                  isSearchable: false,
-                  encoding: null,
-                  lineCount: null,
-                  textPreview: null
+                  pageCount: metadata.pageCount,
+                  wordCount: metadata.wordCount,
+                  language: metadata.language,
+                  author: metadata.author,
+                  isLinearized: metadata.isLinearized ?? false,
+                  subject: metadata.subject,
+                  keywords: metadata.keywords ?? [""],
+                  pdfVersion: metadata.pdfVersion,
+                  isEncrypted: metadata.isEncrypted ?? false,
+                  isSearchable: metadata.isSearchable ?? true,
+                  encoding: metadata.encoding,
+                  lineCount: metadata.lineCount,
+                  textPreview: metadata.textPreview
                 } satisfies RTC<
                   DocumentSingleton,
                   "attachmentId" | "createdAt" | "updatedAt"
@@ -1478,6 +1483,10 @@ export class Resolver extends ModelService {
                   createdAt: undefined,
                   updatedAt: undefined,
                   lensModel: null,
+                  colorModel:
+                    specs.colorModel === "grayscale-alpha"
+                      ? "grayscale_alpha"
+                      : (specs.colorModel ?? null),
                   iccProfile: specs.iccProfile,
                   orientation: specs.orientation,
                   dominantColorHex: null,
@@ -1508,14 +1517,14 @@ export class Resolver extends ModelService {
                   encoding: specs.encoding ?? undefined,
                   format: specs.format ?? "pdf",
                   isEncrypted: specs.isEncrypted ?? undefined,
+                  isLinearized: specs.isLinearized ?? false,
                   language: specs.language ?? undefined,
                   subject: specs.subject ?? undefined,
                   textPreview: specs.textPreview ?? undefined,
                   title: undefined,
-                  isSearchable: specs.isSearchable ?? undefined,
+                  isSearchable: specs.isSearchable ?? true,
                   wordCount: specs.wordCount ?? undefined,
                   lineCount: specs.lineCount ?? undefined,
-
                   keywords: specs.keywords ?? undefined,
                   pageCount: specs.pageCount ?? undefined,
                   pdfVersion: specs.pdfVersion ?? undefined

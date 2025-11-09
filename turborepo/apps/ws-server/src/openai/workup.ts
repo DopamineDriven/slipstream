@@ -380,6 +380,10 @@ export class OpenAIServiceWorkup extends ModelService {
           cameraMake: null,
           cameraModel: null,
           colorSpace: expImg.colorSpace,
+          colorModel:
+            expImg.colorModel === "grayscale-alpha"
+              ? "grayscale_alpha"
+              : expImg.colorModel,
           dominantColorHex: null,
           exifDateTimeOriginal: expImg.exifDateTimeOriginal
             ? new Date(expImg.exifDateTimeOriginal)

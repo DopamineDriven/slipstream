@@ -57,6 +57,7 @@ export type ImageMetadataMinAggregateOutputType = {
   animated: boolean | null
   orientation: number | null
   colorSpace: $Enums.ColorSpace | null
+  colorModel: $Enums.ColorModel | null
   exifDateTimeOriginal: Date | null
   cameraMake: string | null
   cameraModel: string | null
@@ -80,6 +81,7 @@ export type ImageMetadataMaxAggregateOutputType = {
   animated: boolean | null
   orientation: number | null
   colorSpace: $Enums.ColorSpace | null
+  colorModel: $Enums.ColorModel | null
   exifDateTimeOriginal: Date | null
   cameraMake: string | null
   cameraModel: string | null
@@ -103,6 +105,7 @@ export type ImageMetadataCountAggregateOutputType = {
   animated: number
   orientation: number
   colorSpace: number
+  colorModel: number
   exifDateTimeOriginal: number
   cameraMake: number
   cameraModel: number
@@ -148,6 +151,7 @@ export type ImageMetadataMinAggregateInputType = {
   animated?: true
   orientation?: true
   colorSpace?: true
+  colorModel?: true
   exifDateTimeOriginal?: true
   cameraMake?: true
   cameraModel?: true
@@ -171,6 +175,7 @@ export type ImageMetadataMaxAggregateInputType = {
   animated?: true
   orientation?: true
   colorSpace?: true
+  colorModel?: true
   exifDateTimeOriginal?: true
   cameraMake?: true
   cameraModel?: true
@@ -194,6 +199,7 @@ export type ImageMetadataCountAggregateInputType = {
   animated?: true
   orientation?: true
   colorSpace?: true
+  colorModel?: true
   exifDateTimeOriginal?: true
   cameraMake?: true
   cameraModel?: true
@@ -304,6 +310,7 @@ export type ImageMetadataGroupByOutputType = {
   animated: boolean
   orientation: number | null
   colorSpace: $Enums.ColorSpace | null
+  colorModel: $Enums.ColorModel | null
   exifDateTimeOriginal: Date | null
   cameraMake: string | null
   cameraModel: string | null
@@ -350,6 +357,7 @@ export type ImageMetadataWhereInput = {
   animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
   orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null
   colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null
   cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
@@ -374,6 +382,7 @@ export type ImageMetadataOrderByWithRelationInput = {
   animated?: Prisma.SortOrder
   orientation?: Prisma.SortOrderInput | Prisma.SortOrder
   colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder
   exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -401,6 +410,7 @@ export type ImageMetadataWhereUniqueInput = Prisma.AtLeast<{
   animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
   orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null
   colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null
   cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
@@ -425,6 +435,7 @@ export type ImageMetadataOrderByWithAggregationInput = {
   animated?: Prisma.SortOrder
   orientation?: Prisma.SortOrderInput | Prisma.SortOrder
   colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder
   exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder
   cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -456,6 +467,7 @@ export type ImageMetadataScalarWhereWithAggregatesInput = {
   animated?: Prisma.BoolWithAggregatesFilter<"ImageMetadata"> | boolean
   orientation?: Prisma.IntNullableWithAggregatesFilter<"ImageMetadata"> | number | null
   colorSpace?: Prisma.EnumColorSpaceNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.DateTimeNullableWithAggregatesFilter<"ImageMetadata"> | Date | string | null
   cameraMake?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
   cameraModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
@@ -478,6 +490,7 @@ export type ImageMetadataCreateInput = {
   animated?: boolean
   orientation?: number | null
   colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
   exifDateTimeOriginal?: Date | string | null
   cameraMake?: string | null
   cameraModel?: string | null
@@ -502,6 +515,7 @@ export type ImageMetadataUncheckedCreateInput = {
   animated?: boolean
   orientation?: number | null
   colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
   exifDateTimeOriginal?: Date | string | null
   cameraMake?: string | null
   cameraModel?: string | null
@@ -524,6 +538,7 @@ export type ImageMetadataUpdateInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -548,6 +563,7 @@ export type ImageMetadataUncheckedUpdateInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -571,6 +587,7 @@ export type ImageMetadataCreateManyInput = {
   animated?: boolean
   orientation?: number | null
   colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
   exifDateTimeOriginal?: Date | string | null
   cameraMake?: string | null
   cameraModel?: string | null
@@ -593,6 +610,7 @@ export type ImageMetadataUpdateManyMutationInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -616,6 +634,7 @@ export type ImageMetadataUncheckedUpdateManyInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -644,6 +663,7 @@ export type ImageMetadataCountOrderByAggregateInput = {
   animated?: Prisma.SortOrder
   orientation?: Prisma.SortOrder
   colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
   exifDateTimeOriginal?: Prisma.SortOrder
   cameraMake?: Prisma.SortOrder
   cameraModel?: Prisma.SortOrder
@@ -677,6 +697,7 @@ export type ImageMetadataMaxOrderByAggregateInput = {
   animated?: Prisma.SortOrder
   orientation?: Prisma.SortOrder
   colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
   exifDateTimeOriginal?: Prisma.SortOrder
   cameraMake?: Prisma.SortOrder
   cameraModel?: Prisma.SortOrder
@@ -700,6 +721,7 @@ export type ImageMetadataMinOrderByAggregateInput = {
   animated?: Prisma.SortOrder
   orientation?: Prisma.SortOrder
   colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
   exifDateTimeOriginal?: Prisma.SortOrder
   cameraMake?: Prisma.SortOrder
   cameraModel?: Prisma.SortOrder
@@ -770,6 +792,10 @@ export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
   set?: $Enums.ColorSpace | null
 }
 
+export type NullableEnumColorModelFieldUpdateOperationsInput = {
+  set?: $Enums.ColorModel | null
+}
+
 export type ImageMetadataCreateWithoutAttachmentInput = {
   format?: $Enums.ImageFormat
   width: number
@@ -780,6 +806,7 @@ export type ImageMetadataCreateWithoutAttachmentInput = {
   animated?: boolean
   orientation?: number | null
   colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
   exifDateTimeOriginal?: Date | string | null
   cameraMake?: string | null
   cameraModel?: string | null
@@ -802,6 +829,7 @@ export type ImageMetadataUncheckedCreateWithoutAttachmentInput = {
   animated?: boolean
   orientation?: number | null
   colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
   exifDateTimeOriginal?: Date | string | null
   cameraMake?: string | null
   cameraModel?: string | null
@@ -840,6 +868,7 @@ export type ImageMetadataUpdateWithoutAttachmentInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -862,6 +891,7 @@ export type ImageMetadataUncheckedUpdateWithoutAttachmentInput = {
   animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
   orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
   exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -887,6 +917,7 @@ export type ImageMetadataSelect<ExtArgs extends runtime.Types.Extensions.Interna
   animated?: boolean
   orientation?: boolean
   colorSpace?: boolean
+  colorModel?: boolean
   exifDateTimeOriginal?: boolean
   cameraMake?: boolean
   cameraModel?: boolean
@@ -911,6 +942,7 @@ export type ImageMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   animated?: boolean
   orientation?: boolean
   colorSpace?: boolean
+  colorModel?: boolean
   exifDateTimeOriginal?: boolean
   cameraMake?: boolean
   cameraModel?: boolean
@@ -935,6 +967,7 @@ export type ImageMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   animated?: boolean
   orientation?: boolean
   colorSpace?: boolean
+  colorModel?: boolean
   exifDateTimeOriginal?: boolean
   cameraMake?: boolean
   cameraModel?: boolean
@@ -959,6 +992,7 @@ export type ImageMetadataSelectScalar = {
   animated?: boolean
   orientation?: boolean
   colorSpace?: boolean
+  colorModel?: boolean
   exifDateTimeOriginal?: boolean
   cameraMake?: boolean
   cameraModel?: boolean
@@ -971,7 +1005,7 @@ export type ImageMetadataSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ImageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "frames" | "hasAlpha" | "animated" | "orientation" | "colorSpace" | "exifDateTimeOriginal" | "cameraMake" | "cameraModel" | "lensModel" | "gpsLat" | "gpsLon" | "dominantColorHex" | "iccProfile" | "createdAt" | "updatedAt", ExtArgs["result"]["imageMetadata"]>
+export type ImageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "frames" | "hasAlpha" | "animated" | "orientation" | "colorSpace" | "colorModel" | "exifDateTimeOriginal" | "cameraMake" | "cameraModel" | "lensModel" | "gpsLat" | "gpsLon" | "dominantColorHex" | "iccProfile" | "createdAt" | "updatedAt", ExtArgs["result"]["imageMetadata"]>
 export type ImageMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
@@ -998,6 +1032,7 @@ export type $ImageMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
     animated: boolean
     orientation: number | null
     colorSpace: $Enums.ColorSpace | null
+    colorModel: $Enums.ColorModel | null
     exifDateTimeOriginal: Date | null
     cameraMake: string | null
     cameraModel: string | null
@@ -1442,6 +1477,7 @@ export interface ImageMetadataFieldRefs {
   readonly animated: Prisma.FieldRef<"ImageMetadata", 'Boolean'>
   readonly orientation: Prisma.FieldRef<"ImageMetadata", 'Int'>
   readonly colorSpace: Prisma.FieldRef<"ImageMetadata", 'ColorSpace'>
+  readonly colorModel: Prisma.FieldRef<"ImageMetadata", 'ColorModel'>
   readonly exifDateTimeOriginal: Prisma.FieldRef<"ImageMetadata", 'DateTime'>
   readonly cameraMake: Prisma.FieldRef<"ImageMetadata", 'String'>
   readonly cameraModel: Prisma.FieldRef<"ImageMetadata", 'String'>
