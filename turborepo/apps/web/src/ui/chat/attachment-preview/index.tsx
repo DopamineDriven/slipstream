@@ -96,8 +96,9 @@ export function AttachmentPreviewComponent({
                         "https://raw.githubusercontent.com/DopamineDriven/slipstream/refs/heads/main/turborepo/apps/web/public/aic-logo.svg"
                       }
                       alt={attachment.filename}
-                      width={attachment.width}
-                      height={attachment.height}
+                      width={attachment.width ?? 40}
+                      height={attachment.height ?? 40}
+                      unoptimized={attachment.mime ==="image/tiff" ? false : attachment?.mime === "image/heic" ? false : attachment.mime === "image/bmp" ? false : true}
                       className="h-10 w-10 rounded-md object-cover md:h-12 md:w-12"
                     />
                     {meta?.type === "IMAGE" && meta.animated && (

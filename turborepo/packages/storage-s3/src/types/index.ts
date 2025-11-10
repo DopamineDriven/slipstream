@@ -1,9 +1,9 @@
-import type { StorageClass } from "@aws-sdk/client-s3";
+import type { ChecksumAlgorithm, StorageClass } from "@aws-sdk/client-s3";
 import type {
   AwsCredentialIdentity,
   AwsCredentialIdentityProvider
 } from "@aws-sdk/types";
-import { S3ObjectId } from "@slipstream/types";
+import type { S3ObjectId } from "@slipstream/types";
 
 export interface StorageConfig {
   accessKeyId: string;
@@ -28,7 +28,7 @@ export type UploadResult = {
   publicUrl: string;
   size?: number;
   location?: string;
-  checksum?: { algo: ChecksumAlgorithmType; value: string };
+  checksum?: { algo: ChecksumAlgorithm; value: string };
 };
 
 export type UploadOptions = {
@@ -116,7 +116,7 @@ export interface PresignMeta {
 
 export interface PresignCompatMeta {
   attachmentId: string;
-  target: "pdf" | "jpg" | "mp4" | "mp3";
+  target: "pdf" | "jpg" | "mp4" | "mp3" | "png" | "jpeg" | "webp";
   origin: AssetOriginType;
 }
 
@@ -160,7 +160,7 @@ export type FinalizeResult = {
   contentDisposition?: string;
   storageClass?: keyof typeof StorageClass;
   expires?: Date;
-  checksum?: { algo: ChecksumAlgorithmType; value: string };
+  checksum?: { algo: ChecksumAlgorithm; value: string };
   presignedUrl: string;
   presignedUrlExpiresAt: number;
 };
@@ -169,33 +169,13 @@ export type ImageProbe = {
   format: ImageFormatType;
   width: number;
   height: number;
-  colorModel:
-    | "rgb"
-    | "rgba"
-    | "grayscale"
-    | "grayscale-alpha"
-    | "indexed"
-    | "cmyk"
-    | "ycbcr"
-    | "ycck"
-    | "unknown";
+  colorModel: ColorModelType;
   frames: number;
   animated: boolean;
   hasAlpha: boolean | null;
   orientation: number | null;
   aspectRatio: number;
-  colorSpace:
-    | "unknown"
-    | "srgb"
-    | "display_p3"
-    | "adobe_rgb"
-    | "prophoto_rgb"
-    | "rec2020"
-    | "rec709"
-    | "cmyk"
-    | "lab"
-    | "xyz"
-    | "gray";
+  colorSpace: ColorSpaceType;
   iccProfile: string | null;
   exifDateTimeOriginal: string | null;
 };
@@ -228,19 +208,34 @@ export type ChecksumAlgorithmType =
   | "CRC32C"
   | "CRC64NVME"
   | "SHA1"
+  | "COMPOSITE"
   | "SHA256";
 
 export type ImageFormatType =
   | "apng"
-  | "jpeg"
   | "png"
+  | "jpeg"
+  | "gif"
+  | "bmp"
   | "webp"
   | "avif"
-  | "heic"
-  | "gif"
-  | "tiff"
-  | "bmp"
   | "svg"
+  | "ico"
+  | "heic"
+  | "tiff"
+  | "unknown";
+
+export type ColorModelType =
+  | "rgb"
+  | "rgba"
+  | "grayscale"
+  | "grayscale-alpha"
+  | "indexed"
+  | "cmyk"
+  | "ycbcr"
+  | "ycck"
+  | "vector"
+  | "lab"
   | "unknown";
 
 export type ColorSpaceType =

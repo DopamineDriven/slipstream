@@ -88,7 +88,7 @@ export class xAIService extends ModelService {
   private handleMostRecentMsgForImg(
     mostRecentMsg:
       | {
-          role: "user";
+          role: "user" | "assistant";
           content:
             | string
             | readonly (
@@ -106,7 +106,7 @@ export class xAIService extends ModelService {
               )[];
         }
       | {
-          role: "system" | "assistant";
+          role: "system";
           content: string;
         }
       | undefined
@@ -123,7 +123,7 @@ export class xAIService extends ModelService {
     model = "grok-4-0709" satisfies GrokModelIdUnion,
     messages: readonly (
       | {
-          role: "user";
+          role: "user" | "assistant";
           content:
             | string
             | readonly (
@@ -137,7 +137,7 @@ export class xAIService extends ModelService {
                   }
               )[];
         }
-      | { role: "system" | "assistant"; content: string }
+      | { role: "system"; content: string }
     )[],
     apiKey?: string,
     options?: {
@@ -183,7 +183,7 @@ export class xAIService extends ModelService {
     n = 1,
     messages: readonly (
       | {
-          role: "user";
+          role: "user" | "assistant";
           content:
             | string
             | readonly (
@@ -197,7 +197,7 @@ export class xAIService extends ModelService {
                   }
               )[];
         }
-      | { role: "system" | "assistant"; content: string }
+      | { role: "system"; content: string }
     )[],
     userId: string,
     apiKey?: string
@@ -281,7 +281,7 @@ export class xAIService extends ModelService {
   ): readonly (
     | { role: "system"; content: string }
     | {
-        role: "user";
+        role: "user" | "assistant";
         content:
           | string
           | readonly (
@@ -295,12 +295,12 @@ export class xAIService extends ModelService {
                 }
             )[];
       }
-    | { role: "assistant"; content: string }
   )[] {
     // Helper to build content parts from a message's attachments + text
-    const buildUserContent = (
+    const buildContent = (
       m: MessageSingleton<true>,
-      model: GrokModelIdUnion
+      model: GrokModelIdUnion,
+      includeProviderTag = false
     ) => {
       const parts: (
         | { type: "text"; text: string }
@@ -309,6 +309,8 @@ export class xAIService extends ModelService {
             image_url: { url: string; detail?: "low" | "medium" | "high" };
           }
       )[] = [];
+
+      // Include attachments for vision-capable models
       if (
         (model === "grok-2-image-1212" ||
           model === "grok-2-vision-1212" ||
@@ -319,58 +321,112 @@ export class xAIService extends ModelService {
         m.attachments.length > 0
       ) {
         for (const att of m.attachments) {
-          const url = att.cdnUrl ?? att.sourceUrl;
-          if (url && att.mime?.startsWith("image/")) {
+          // Properly check compat status to determine which URLs/MIME to use
+          const url =
+            att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
+          const mime =
+            att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
+
+          if (url && mime?.startsWith("image/")) {
             parts.push({ type: "image_url", image_url: { url, detail } });
           }
         }
       }
-      parts.push({ type: "text", text: m.content });
+
+      // Add text content with optional provider tag
+      let textContent = m.content;
+      if (includeProviderTag && m.senderType === "AI") {
+        const provider = m.provider.toLowerCase();
+        const modelName = m.model ?? "";
+        const modelIdentifier = `[${provider}/${modelName}]`;
+        textContent = `${modelIdentifier}\n${m.content}`;
+      }
+
+      parts.push({ type: "text", text: textContent });
       return parts;
     };
 
-    if (isNewChat) {
-      const first = msgs[0];
-      if (!first) {
-        // Fallback: include system prompt if present and an empty user turn
-        return systemPrompt
-          ? ([
-              { role: "system", content: systemPrompt },
-              { role: "user", content: "" }
-            ] as const)
-          : ([{ role: "user", content: "" }] as const);
+    // Process all messages with attachments for both new and existing chats
+    const processedMessages: (
+      | { role: "system"; content: string }
+      | {
+          role: "user" | "assistant";
+          content:
+            | string
+            | readonly (
+                | { type: "text"; text: string }
+                | {
+                    type: "image_url";
+                    image_url: {
+                      url: string;
+                      detail?: "low" | "medium" | "high";
+                    };
+                  }
+              )[];
+        }
+    )[] = [];
+
+    // Add system prompt with context about multi-provider conversation
+    if (systemPrompt || !isNewChat) {
+      const basePrompt = !isNewChat
+        ? "Note: previous responses in this conversation may be tagged with their source model in [PROVIDER/MODEL] notation for context."
+        : "";
+      const enhancedSystemPrompt = systemPrompt
+        ? basePrompt
+          ? `${systemPrompt}\n\n${basePrompt}`
+          : systemPrompt
+        : basePrompt;
+
+      if (enhancedSystemPrompt) {
+        processedMessages.push({
+          role: "system",
+          content: enhancedSystemPrompt
+        });
       }
-      const parts = buildUserContent(first, model);
-      const userMsg =
-        parts.length === 1 && parts?.[0] && parts?.[0].type === "text"
-          ? ({ role: "user", content: parts?.[0]?.text } as const)
-          : ({ role: "user", content: parts } as const);
-      if (systemPrompt) {
-        return [{ role: "system", content: systemPrompt }, userMsg] as const;
-      }
-      return [userMsg] as const;
     }
 
-    // Existing chat: include history (assistant tags), and for the last
-    // user turn, include its attachments inline, if any.
-    const last = msgs.at(-1);
-    if (last?.senderType === "USER") {
-      const history = this.prependProviderModelTag(msgs.slice(0, -1));
-      const base = this.formatMsgs(history, systemPrompt);
-      const parts = buildUserContent(last, model);
-      const userMsg =
-        parts.length === 1 && parts?.[0]?.type === "text"
-          ? ({ role: "user", content: parts?.[0].text } as const)
-          : ({ role: "user", content: parts } as const);
-      return [...base, userMsg] as const;
+    // Handle empty message case
+    if (msgs.length === 0) {
+      if (processedMessages.length === 0) {
+        processedMessages.push({ role: "user", content: "" });
+      }
+      return processedMessages;
     }
 
-    // If last is assistant or not present, just map entire history
-    const formatted = this.formatMsgs(
-      this.prependProviderModelTag(msgs),
-      systemPrompt
-    );
-    return formatted;
+    // Process all messages with attachment support
+    for (const msg of msgs) {
+      const includeTag = !isNewChat && msg.senderType === "AI";
+      const parts = buildContent(msg, model, includeTag);
+
+      if (msg.senderType === "USER") {
+        // User messages can have attachments as content array
+        const userMsg =
+          parts.length === 1 && parts[0]?.type === "text"
+            ? { role: "user" as const, content: parts[0].text }
+            : { role: "user" as const, content: parts };
+        processedMessages.push(userMsg);
+      } else if (msg.senderType === "AI") {
+        // AI/Assistant messages - xAI API expects string content for assistant role
+        // Convert any attachments to markdown links within the text
+        let assistantContent = "";
+        for (const part of parts) {
+          if (part.type === "text") {
+            assistantContent += part.text;
+          } else if (part.type === "image_url") {
+            // Include image reference as markdown link for assistant messages
+            assistantContent += `\n![attachment](${part.image_url.url})\n`;
+          }
+        }
+        processedMessages.push({
+          role: "assistant" as const,
+          content: assistantContent
+        });
+      }
+      // Skip SYSTEM messages as they shouldn't appear in conversation history
+      // (system prompts are handled separately above)
+    }
+
+    return processedMessages;
   }
 
   private async generateId(target: "seriesId" | "generationGroupId") {

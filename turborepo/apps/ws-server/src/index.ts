@@ -180,13 +180,18 @@ async function exe() {
       vercel: v0
     });
 
+    const { ImageCompatService } = await import("@/image/index.ts");
+
+    const imgCompatService = new ImageCompatService(s3, prisma, isProd);
+    
     const resolver = new Resolver(
       wsServer,
       providers,
       s3,
       region,
       isProd,
-      extract
+      extract,
+      imgCompatService
     );
 
     resolver.registerAll();

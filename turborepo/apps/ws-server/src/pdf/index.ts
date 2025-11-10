@@ -1,12 +1,8 @@
 import http from "http";
 import { timingSafeEqual } from "node:crypto";
-import type { AssetType, CompatStatus } from "@slipstream/db/enums-node";
 import { PrismaService } from "@/prisma/index.ts";
-import * as dotenv from "dotenv";
-import type { AssetOriginType } from "@slipstream/storage-s3";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import { S3Storage } from "@slipstream/storage-s3";
-
-dotenv.config({ quiet: true });
 
 export type AccessTokenResProps = {
   access_token: string;
@@ -58,33 +54,7 @@ export class PdfService {
     }
   }
 
-  public handleCompat(assetType: AssetType, ext: string | null) {
-    switch (assetType) {
-      case "DOCUMENT": {
-        if (ext === "pdf") {
-          return "ALIASED" as const satisfies CompatStatus;
-        }
-        return "PENDING" as const satisfies CompatStatus;
-      }
-      case "IMAGE": {
-        if (ext === "jpg" || ext === "png" || ext === "webp") {
-          return "ALIASED" as const satisfies CompatStatus;
-        } else return "PENDING" as const satisfies CompatStatus;
-      }
-      case "AUDIO": {
-        if (ext === "mp3") {
-          return "ALIASED" as const satisfies CompatStatus;
-        } else return "PENDING" as const satisfies CompatStatus;
-      }
-      case "VIDEO": {
-        if (ext === "mp4") {
-          return "ALIASED" as const satisfies CompatStatus;
-        } else return "PENDING" as const satisfies CompatStatus;
-      }
-    }
-  }
-
-  private handleTarget(assetType: AssetType) {
+  private handleTarget(assetType: $Enums.AssetType) {
     return assetType === "AUDIO"
       ? ("mp3" as const)
       : assetType === "DOCUMENT"
@@ -106,8 +76,8 @@ export class PdfService {
     id: string;
     cdnUrl: string;
     bucket: string;
-    origin: AssetOriginType;
-    assetType: AssetType;
+    origin: $Enums.AssetOrigin;
+    assetType: $Enums.AssetType;
     key: string;
     mime: string | null;
     filename: string | null;
@@ -256,7 +226,7 @@ export class PdfService {
   }
   private async finalizeCompatAfterWebhook(
     attachmentId: string,
-    origin: AssetOriginType
+    origin: $Enums.AssetOrigin
   ) {
     const compatKey = this.s3.generateCompatKey({
       attachmentId,

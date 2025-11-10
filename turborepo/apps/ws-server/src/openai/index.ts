@@ -956,7 +956,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
       let rtHelper;
 
       if (s.type === "response.created" && tInitial === 0) {
-        text = "Image generation in progress...";
+       if (imgGenEnabled) text = "Image generation in progress...";
         tInitial = performance.now();
       }
       if (

@@ -153,10 +153,17 @@ export class S3Storage extends S3Utils {
     } as const satisfies PresignedUploadResponse;
   }
 
-  private compatContentType(t: "pdf" | "jpg" | "mp4" | "mp3") {
+  private compatContentType(
+    t: "pdf" | "jpg" | "jpeg" | "png" | "webp" | "mp4" | "mp3"
+  ) {
     switch (t) {
       case "pdf":
         return "application/pdf";
+      case "webp":
+        return "image/webp";
+      case "png":
+        return "image/png";
+      case "jpeg":
       case "jpg":
         return "image/jpeg";
       case "mp4":
@@ -223,8 +230,8 @@ export class S3Storage extends S3Utils {
       })
     );
 
-    const versionId = head.VersionId ?? "";
-    const s3ObjectId = `s3://${bucket}/${args.key}#${versionId}`;
+    const versionId = head.VersionId ?? "nov";
+    const s3ObjectId = `s3://${bucket}/${args.key}#${versionId}` as const;
     const cdnUrlCompat = this.getCfUrl(args.isProd, args.key);
 
     return { versionId, s3ObjectId, cdnUrlCompat } as const;
@@ -375,6 +382,47 @@ export class S3Storage extends S3Utils {
           : `uploadGeneratedFromUrl failed for ${url}: ${JSON.stringify(err, null, 2)}`;
 
       throw new Error(errorMessage);
+    }
+  }
+  public async uploadCompatGenerated(
+    data: Buffer | Uint8Array | string | Readable,
+    isProd: boolean,
+    meta: PresignCompatMeta & PresignMeta & { conversationId?: string },
+    opts?: UploadOptions
+  ) {
+    const bucket = this.cfg.buckets[this.BUCKET_MAP[meta.origin]];
+
+    const key = this.generateCompatKey(meta); // <origin>/converted/att_<id>.<ext>
+
+    const contentType = this.compatContentType(meta.target);
+
+    const cacheKey = `${bucket}:${key}`;
+    const uploadPromise =
+      this.uploadCache.get(cacheKey) ??
+      this.performUpload(bucket, key, data, {
+        filename: meta.filename,
+        origin: meta.origin,
+        userId: meta.userId,
+        conversationId: meta.conversationId,
+        messageId: meta.messageId,
+        size: meta.size,
+        contentType,
+        // strong cache; compat objects are immutable once written
+        cacheControl:
+          opts?.cacheControl ?? "public, max-age=31536000, immutable",
+        contentDisposition:
+          opts?.contentDisposition ??
+          `inline; filename="att_${meta.attachmentId}.${meta.target}"`,
+        // propagate any other headers via opts
+        ...opts
+      });
+
+    this.uploadCache.set(cacheKey, uploadPromise);
+    try {
+      const res = await uploadPromise;
+      return await this.finalize(res.bucket, res.key, isProd, res.versionId);
+    } finally {
+      this.uploadCache.delete(cacheKey);
     }
   }
 
@@ -747,7 +795,15 @@ export class S3Storage extends S3Utils {
   public generateCompatKey(meta: PresignCompatMeta) {
     const filename = `att_${meta.attachmentId}.${meta.target}` as const;
 
-    return [meta.origin.toLowerCase(), `converted`, filename].join("/");
+    const workup = [
+      meta.origin.toLowerCase() as Lowercase<typeof meta.origin>,
+      `converted`,
+      filename
+    ] as const;
+
+    return workup.join(
+      "/"
+    ) as `${(typeof workup)[0]}/${(typeof workup)[1]}/${(typeof workup)[2]}`;
   }
 
   public async objectExists(bucket: string, key: string, versionId?: string) {
