@@ -11,10 +11,13 @@ import type {
   HandleAiChatReqUpdateWithImgGenSansAttachmentsProps,
   InferTopLevelMime,
   UpdateAttachment,
+  UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata,
   UserData
 } from "@/types/index.ts";
 import { ExtractService } from "@/extract/index.ts";
+import { PrismaAttachmentProviderService } from "@/prisma/attachment-provider.ts";
+import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
   $Enums,
   Attachment,
@@ -36,7 +39,6 @@ import type {
 } from "@slipstream/types";
 import { DbService, PrismaClient } from "@slipstream/db/node";
 import { EncryptionService } from "@slipstream/encryption";
-import {PrismaAttachmentProviderService} from "@/prisma/attachment-provider.ts";
 
 export class PrismaService extends PrismaAttachmentProviderService {
   readonly prismaClient: PrismaClient;
@@ -1184,8 +1186,8 @@ export class PrismaService extends PrismaAttachmentProviderService {
             revisedPrompt: data.imgGenFields.revisedPrompt
           }
         });
-        return {aiMsgId,persist};
-      } else return {aiMsgId,persist};
+        return { aiMsgId, persist };
+      } else return { aiMsgId, persist };
     });
 
     return transaction;
@@ -1571,7 +1573,6 @@ export class PrismaService extends PrismaAttachmentProviderService {
     } | null;
   }
 
-
   public getTopLevelMime(
     target: keyof typeof this.mimeToExt
   ):
@@ -1649,5 +1650,123 @@ export class PrismaService extends PrismaAttachmentProviderService {
       oldestAttachment: attachments[0]?.createdAt,
       newestAttachment: attachments[attachments.length - 1]?.createdAt
     };
+  }
+
+  public async findUniqueAttachment(attachmentId: string) {
+    return await this.prismaClient.attachment.findUnique({
+      where: { id: attachmentId }
+    });
+  }
+
+  public async updateAttachmentCompat({
+    attachmentId,
+    compatCdnUrl,
+    compatKey,
+    compatReadyAt,
+    compatStatus,
+    compatExt,
+    compatMime,
+    compatS3ObjectId,
+    compatVersionId
+  }: UpdateAttachmentCompatProps) {
+    return await this.prismaClient.attachment.update({
+      where: { id: attachmentId },
+      data: {
+        compatCdnUrl,
+        compatStatus,
+        compatReadyAt,
+        compatKey,
+        compatExt,
+        compatMime,
+        compatVersionId,
+        compatS3ObjectId
+      }
+    });
+  }
+
+  public async updateImgAttachmentCompat({
+    attachmentId,
+    compatCdnUrl,
+    compatKey,
+    compatReadyAt,
+    compatStatus,
+    compatExt,
+    compatMime,
+    compatS3ObjectId,
+    checksumSha256,
+    checksumAlgo,
+    compatVersionId,
+    cacheControl,
+    contentDisposition,
+    s3LastModified
+  }: UpdateAttachmentCompatProps & {
+    cacheControl?: string | null;
+    contentDisposition?: string | null;
+    s3LastModified?: string | Date | null;
+    checksumAlgo?: $Enums.ChecksumAlgo;
+    checksumSha256?: string | null;
+  }) {
+    const meta = (await this.extractor.extractRemote(
+      compatCdnUrl,
+      4096 * 32
+    )) as ExpandedImgSpecs;
+    return await this.prismaClient.attachment.update({
+      where: { id: attachmentId },
+      data: {
+        compatCdnUrl,
+        compatStatus,
+        compatReadyAt,
+        compatKey,
+        compatExt,
+        compatMime,
+        compatVersionId,
+        compatS3ObjectId,
+        checksumAlgo,
+        checksumSha256,
+        cacheControl,
+        contentDisposition,
+        s3LastModified,
+        size: meta.byteSize ? BigInt(meta.byteSize) : undefined,
+        image: {
+          upsert: {
+            where: { attachmentId },
+            update: {
+              height: meta.height,
+              width: meta.width,
+              animated: meta.animated,
+              aspectRatio: meta.aspectRatio,
+              colorModel:
+                meta.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : meta.colorModel,
+              colorSpace: meta.colorSpace,
+              format: meta.format,
+              exifDateTimeOriginal: meta.exifDateTimeOriginal,
+              frames: meta.frames,
+              hasAlpha: meta.hasAlpha,
+              iccProfile: meta.iccProfile,
+              orientation: meta.orientation
+            },
+            create: {
+              height: meta.height,
+              width: meta.width,
+              animated: meta.animated,
+              aspectRatio: meta.aspectRatio,
+              colorModel:
+                meta.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : meta.colorModel,
+              colorSpace: meta.colorSpace,
+              format: meta.format,
+              exifDateTimeOriginal: meta.exifDateTimeOriginal,
+              frames: meta.frames,
+              hasAlpha: meta.hasAlpha,
+              iccProfile: meta.iccProfile,
+              orientation: meta.orientation
+            }
+          }
+        }
+      }
+    });
   }
 }

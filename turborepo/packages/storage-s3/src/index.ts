@@ -4,6 +4,7 @@ export type {
   AssetOriginType,
   AssetStatusType,
   ChecksumAlgorithmType,
+  ColorModelType,
   ColorSpaceType,
   CopyOptions,
   DeleteResult,

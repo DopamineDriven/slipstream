@@ -333,14 +333,20 @@ export class GeminiService extends ModelService {
 
   private async getFileByName(name: string, apiKey?: string) {
     const ai = this.getClient(apiKey);
-    if (!name.startsWith("files/") && !name.includes("/")) {
+
+    try {
+      if (!name.startsWith("files/") && !name.includes("/")) {
+        return await ai.files.get({
+          name: `files/${name}`
+        });
+      }
       return await ai.files.get({
-        name: `files/${name}`
+        name
       });
+    } catch (err) {
+      this.logger.debug(err, `filebyNameError received ${name} with no match`);
+      throw new Error(`filebyNameError received ${name} with no match`);
     }
-    return await ai.files.get({
-      name
-    });
   }
 
   private async checkPrisma(keyFingerprint: string) {
@@ -367,13 +373,8 @@ export class GeminiService extends ModelService {
     // 0. Check in-memory cache first
     const cached = this.assetCache.get(cacheKey);
 
-    const checkPrisma = await this.checkPrisma(keyFingerprint);
-
-    if (
-      cached &&
-      checkPrisma.includes(cached.fileUri) &&
-      new Date(cached.expiresAt).getTime() > now.getTime()
-    ) {
+  //  const fileByName =  this.getFileByName(`files/${attachment.id}`, apiKey);
+    if (cached && new Date(cached.expiresAt).getTime() > now.getTime()) {
       this.logger.info(`Reusing cached Gemini asset: ${attachment.id}`);
       return {
         fileUri: cached.fileUri,

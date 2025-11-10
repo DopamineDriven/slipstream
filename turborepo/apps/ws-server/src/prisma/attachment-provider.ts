@@ -1,4 +1,3 @@
-import type { UpdateAttachmentCompatProps } from "@/types/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { DbService, PrismaClient } from "@slipstream/db/node";
 
@@ -41,38 +40,6 @@ export class PrismaAttachmentProviderService extends ModelService {
       }
     }
     return arr;
-  }
-
-  public async findUniqueAttachment(attachmentId: string) {
-    return await this.prismaClient.attachment.findUnique({
-      where: { id: attachmentId }
-    });
-  }
-
-  public async updateAttachmentCompat({
-    attachmentId,
-    compatCdnUrl,
-    compatKey,
-    compatReadyAt,
-    compatStatus,
-    compatExt,
-    compatMime,
-    compatS3ObjectId,
-    compatVersionId
-  }: UpdateAttachmentCompatProps) {
-    return await this.prismaClient.attachment.update({
-      where: { id: attachmentId },
-      data: {
-        compatCdnUrl,
-        compatStatus,
-        compatReadyAt,
-        compatKey,
-        compatExt,
-        compatMime,
-        compatVersionId,
-        compatS3ObjectId
-      }
-    });
   }
 
   public async findActiveGeminiAsset(

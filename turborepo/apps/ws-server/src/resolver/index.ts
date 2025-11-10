@@ -9,6 +9,7 @@ import type {
 } from "@/types/index.ts";
 import OpenAI from "openai";
 import { ExtractService } from "@/extract/index.ts";
+import { ImageCompatService } from "@/image/index.ts";
 import { ModelService } from "@/models/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
@@ -35,7 +36,8 @@ export class Resolver extends ModelService {
     private s3Service: S3Storage,
     private region: string,
     private isProd: boolean,
-    private extract: ExtractService
+    private extract: ExtractService,
+    private imgCompatService: ImageCompatService
   ) {
     super();
   }
@@ -1421,18 +1423,21 @@ export class Resolver extends ModelService {
         storageClass
       } = await this.s3Service.finalize(bucket, key, this.isProd, versionId);
 
-      const compatStatus =
-        extension === "pdf"
-          ? "ALIASED"
-          : extension === "jpg"
-            ? "ALIASED"
-            : extension === "png"
-              ? "ALIASED"
-              : extension === "webp"
-                ? "ALIASED"
-                : "PENDING";
-
       const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
+      const compatStatus =
+        specs.type === "DOCUMENT" &&
+        extension === "pdf" &&
+        specs.format === "pdf"
+          ? "ALIASED"
+          : specs.type === "IMAGE" && specs.width < 2000 && specs.height < 2000
+            ? extension === "jpg"
+              ? "ALIASED"
+              : extension === "png"
+                ? "ALIASED"
+                : extension === "webp"
+                  ? "ALIASED"
+                  : "PENDING"
+            : "PENDING";
       const attachment = await this.wsServer.prisma.updateAttachment({
         data: {
           bucket: finalBucket,
@@ -1609,6 +1614,29 @@ export class Resolver extends ModelService {
           key: attachment.key,
           mime: attachment.mime,
           origin: attachment.origin
+        });
+        void this.wsServer.redis.publishTypedEvent(
+          redisChannel,
+          "asset_ready",
+          {
+            ...assetReady
+          }
+        );
+      } else if (
+        attachment.compatStatus === "PENDING" &&
+        attachment.assetType === "IMAGE" &&
+        attachment.cdnUrl &&
+        attachment.filename &&
+        specs.type === "IMAGE"
+      ) {
+        await this.imgCompatService.convertImage({
+          id: attachment.id,
+          cdnUrl: attachment.cdnUrl,
+          filename: attachment.filename,
+          origin: attachment.origin,
+          specs: specs,
+          userId,
+          conversationId
         });
         void this.wsServer.redis.publishTypedEvent(
           redisChannel,
