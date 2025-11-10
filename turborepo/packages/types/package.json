@@ -1,6 +1,6 @@
 {
   "name": "@slipstream/types",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "convenient type definitions",
   "publishConfig": {
     "access": "public",

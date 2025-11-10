@@ -1,6 +1,5 @@
 "use client";
 
-import type { ClientWorkupProps } from "@/types/shared";
 import type { User } from "@/utils/auth-client";
 import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { ApiKeysTab } from "@/ui/api-key-settings";
@@ -13,20 +12,25 @@ import {
 } from "@/ui/atoms/drawer";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
+import type { ClientContextWorkupProps } from "@slipstream/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@slipstream/ui";
 
 interface SettingsDrawerProps {
-  initialData: ClientWorkupProps;
+  initialData: ClientContextWorkupProps;
   user?: User;
   isLoading?: boolean;
 }
 
-export function SettingsDrawer({ initialData, user, isLoading = false }: SettingsDrawerProps) {
+export function SettingsDrawer({
+  initialData,
+  user,
+  isLoading = false
+}: SettingsDrawerProps) {
   const { isOpen, close, activeTab, setActiveTab } = useSettingsDrawer();
   return (
     <Drawer open={isOpen} onOpenChange={open => !open && close()}>
-      <DrawerContent className="bg-linear-210 from-background/95 via-background/75 to-background/95 backdrop-blur-sm border-foreground/55 text-foreground/80 font-basis flex h-[90vh] flex-col">
-        <div className="mx-auto flex w-full max-w-md sm:max-w-xl grow flex-col overflow-x-hidden">
+      <DrawerContent className="from-background/95 via-background/75 to-background/95 border-foreground/55 text-foreground/80 font-basis flex h-[90vh] flex-col bg-linear-210 backdrop-blur-sm">
+        <div className="mx-auto flex w-full max-w-md grow flex-col overflow-x-hidden sm:max-w-xl">
           <DrawerHeader className="flex shrink-0 items-center justify-between bg-transparent">
             <div>
               <DrawerTitle className="text-foreground text-2xl">
@@ -71,4 +75,3 @@ export function SettingsDrawer({ initialData, user, isLoading = false }: Setting
     </Drawer>
   );
 }
-

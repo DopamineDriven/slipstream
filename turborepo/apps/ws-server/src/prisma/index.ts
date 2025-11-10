@@ -1155,7 +1155,7 @@ export class PrismaService extends PrismaAttachmentProviderService {
 
       const msg = persist.messages[0];
       if (!msg) throw new Error("AIChatResponse Message was not created");
-
+      const aiMsgId = msg?.id;
       if (data.imgGenEnabled === true) {
         if (!jobId || !data.imgGenFields?.images)
           throw new Error("no jobid to associate image gen with");
@@ -1184,8 +1184,8 @@ export class PrismaService extends PrismaAttachmentProviderService {
             revisedPrompt: data.imgGenFields.revisedPrompt
           }
         });
-        return persist;
-      } else return persist;
+        return {aiMsgId,persist};
+      } else return {aiMsgId,persist};
     });
 
     return transaction;

@@ -27,6 +27,7 @@ import type { CTR, DX, Rm } from "@/utils.ts";
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
   conversationId: string;
+  userMsgId: string;
   userId: string;
   chunk?: string;
   done: T extends "ai_chat_error" ? true : boolean;
@@ -37,6 +38,7 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
+  aiMsgId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
 }

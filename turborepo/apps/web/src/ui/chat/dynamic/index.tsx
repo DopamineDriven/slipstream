@@ -62,7 +62,9 @@ export function ChatInterface({
     isThinking,
     thinkingDuration,
     imgGenEnabled,
-    imgGenFields
+    imgGenFields,
+    currentUserMsgId,
+    currentAiMsgId
   } = useAIChatContext();
   const router = useRouter();
   const { selectedModel } = useModelSelection();
@@ -174,9 +176,12 @@ export function ChatInterface({
         }
       );
 
+      // Generate optimistic user message ID
+      const optimisticMsgId = `new-chat-user-${Date.now()}`;
+
       // Add optimistic user message
       const userMsg = createUserMessage({
-        id: `new-chat-user-${Date.now()}`,
+        id: optimisticMsgId,
         content: queuedPrompt,
         userId: user.id,
         provider: toPrismaFormat(selectedModel.provider),
@@ -204,9 +209,9 @@ export function ChatInterface({
       setMessages([initialMessage]);
       lastUserMessageRef.current = queuedPrompt;
 
-      // Send to AI
+      // Send to AI with optimistic message ID
       const explicitBatchId = initialBatchIdRef.current ?? undefined;
-      sendChat(queuedPrompt, explicitBatchId);
+      sendChat(queuedPrompt, explicitBatchId, undefined, undefined, optimisticMsgId);
 
       // Clear persisted attachments after consuming
       try {
@@ -284,6 +289,9 @@ export function ChatInterface({
     setIsAwaitingFirstChunk(false);
 
     setMessages(prev => {
+      // Don't update message IDs during streaming - wait until completion
+      // This ensures the streaming UI detection (based on "streaming-" prefix) continues to work
+
       // Check if we already have a streaming message
       const existingStreamIndex = prev.findIndex(m =>
         m.id.startsWith("streaming-")
@@ -353,13 +361,31 @@ export function ChatInterface({
   // Handle completion
   useEffect(() => {
     if (isComplete && streamedText) {
-      // Convert streaming message to final message
+      // Convert streaming message to final message and update message IDs
       setMessages(prev => {
-        const streamingIndex = prev.findIndex(m =>
+        let updated = [...prev];
+
+        // Update user message ID if we have a real one from server
+        if (currentUserMsgId) {
+          updated = updated.map(msg => {
+            // Find the most recent optimistic user message and update its ID
+            if (msg.senderType === "USER" && (msg.id.startsWith("user-") || msg.id.startsWith("new-chat-user-"))) {
+              // Check if this is the most recent user message
+              const lastUserMsgIndex = [...updated].reverse().findIndex(m => m.senderType === "USER");
+              const actualIndex = updated.length - 1 - lastUserMsgIndex;
+              if (updated[actualIndex] === msg) {
+                return { ...msg, id: currentUserMsgId };
+              }
+            }
+            return msg;
+          });
+        }
+
+        // Update AI message from streaming to final
+        const streamingIndex = updated.findIndex(m =>
           m.id.startsWith("streaming-")
         );
         if (streamingIndex >= 0) {
-          const updated = [...prev];
           const streamingMsg = updated[streamingIndex];
           if (streamingMsg && updated?.[streamingIndex]) {
             updated[streamingIndex] = finalizeStreamingMessage(
@@ -367,13 +393,14 @@ export function ChatInterface({
               streamedText,
               {
                 thinkingText: thinkingText ?? undefined,
-                thinkingDuration: thinkingDuration ?? undefined
+                thinkingDuration: thinkingDuration ?? undefined,
+                aiMsgId: currentAiMsgId ?? undefined
               }
             );
           }
-          return updated;
         }
-        return prev;
+
+        return updated;
       });
 
       // Reset streaming state after completion
@@ -386,7 +413,9 @@ export function ChatInterface({
     streamedText,
     resetStreamingState,
     thinkingText,
-    thinkingDuration
+    thinkingDuration,
+    currentAiMsgId,
+    currentUserMsgId
   ]);
 
   // Reset processed flag when navigating away from new-chat
@@ -424,9 +453,12 @@ export function ChatInterface({
         );
       }) as AttachmentSingleton<true>[];
 
+      // Generate optimistic user message ID
+      const optimisticMsgId = `user-${Date.now()}-${Math.random()}`;
+
       // Add optimistic user message with optional attachments
       const userMsg = createUserMessage({
-        id: `user-${Date.now()}-${Math.random()}`,
+        id: optimisticMsgId,
         content: content.trim(),
         userId: user.id,
         provider: toPrismaFormat(selectedModel.provider),
@@ -448,13 +480,13 @@ export function ChatInterface({
       setMessages(prev => [...prev, userMsg]);
       lastUserMessageRef.current = content.trim();
       setIsAwaitingFirstChunk(true);
-      // To continue this session, run codex resume 019a346c-971d-7c53-b1db-d01ed0b8a58c
-      // Send to AI — include batchId and image-gen options (when present)
+      // Send to AI — include batchId, image-gen options, and optimistic message ID
       sendChat(
         content.trim(),
         payload.batchId,
         payload.imgGenEnabled,
-        payload.imgGenFields
+        payload.imgGenFields,
+        optimisticMsgId
       );
     },
     [activeConversationId, selectedModel, sendChat, user, assetUpload]

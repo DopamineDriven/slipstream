@@ -139,16 +139,22 @@ export function MessageIcons({
                 disabled={isStreaming === true || isPending}
                 className={cn(
                   actionButtonVariants.default,
-                  `transition-colors`,
+                  "transition-all duration-200",
                   action.isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                  resolvedTheme === "light" && action.isActive
-                    ? "text-white"
-                    : actionButtonVariants.reaction
+                    ? resolvedTheme === "light"
+                      ? "scale-105 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+                      : "text-foreground scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
+                    : resolvedTheme === "light"
+                      ? "text-background/85 hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                 )}
                 onClick={action.onClick}>
-                <action.icon className="size-3" />
+                <action.icon
+                  className={cn(
+                    "size-3 transition-all duration-200",
+                    action.isActive && "fill-current"
+                  )}
+                />
               </Button>
             ))}
             {IconMap.map(action => (

@@ -86,7 +86,7 @@ function MultiStateApiKeySubmissionBadge({
       ref={badgeRef}
       onClick={onClick}
       disabled={isDisabled}
-      className={`bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text flex min-h-[44px] items-center justify-center rounded-md border px-4 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${getStateStyles(state)} ${className} `}
+      className={`bg-brand-sidebar border-brand-border hover:bg-brand-primary/20 text-brand-text flex min-h-11 items-center justify-center rounded-md border px-4 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${getStateStyles(state)} ${className} `}
       style={{
         gap: state === "idle" ? 8 : 12
       }}

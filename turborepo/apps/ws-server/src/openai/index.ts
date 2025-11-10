@@ -69,6 +69,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
     streamChannel,
     userId,
     thinkingChunks,
+    userMsgId,
     ws,
     apiKey,
     jobId,
@@ -279,6 +280,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               done: false,
               userId,
               model,
+              userMsgId,
               provider,
               imgGenEnabled: true,
               imgGenFields: {
@@ -326,6 +328,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             thinkingDuration: undefined,
             title,
             systemPrompt,
+            userMsgId,
             imgGenFields: {
               outputWidth: imgSpecs.width,
               outputHeight: imgSpecs.height,
@@ -380,6 +383,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               userId,
               provider,
               title,
+              userMsgId,
               imgGenEnabled,
               model,
               systemPrompt,
@@ -411,6 +415,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             imgGenEnabled,
             systemPrompt,
             temperature,
+            userMsgId,
+            isThinking: false,
             topP,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
@@ -607,7 +613,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             width = getIt?.width ?? 1024,
             outputAspectRatio = width / height;
 
-          await this.prisma.handleAiChatResponse({
+          const d = await this.prisma.handleAiChatResponse({
             chunk: openaiAgg,
             conversationId,
             done: true,
@@ -617,6 +623,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             provider,
             userId,
             systemPrompt,
+            userMsgId,
             usage,
             jobId,
             requestMessageId,
@@ -661,6 +668,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
               userId,
               provider,
               model,
+              userMsgId,
+              aiMsgId: d.aiMsgId,
               title,
               imgGenEnabled: true,
               usage,
@@ -708,6 +717,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             type: "ai_chat_response",
             conversationId,
             userId,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
             systemPrompt,
             temperature,
             usage,
@@ -766,6 +777,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
     thinkingChunks,
     userId,
     ws,
+    userMsgId,
     apiKey,
     max_tokens,
     jobId,
@@ -1150,6 +1162,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             done: false,
             userId,
             model,
+            userMsgId,
             provider,
             imgGenEnabled,
             imgGenFields: {
@@ -1179,6 +1192,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
           type: "ai_chat_chunk",
           conversationId,
           userId,
+          userMsgId,
           model,
           thinkingDuration: openaiThinkingStartTime
             ? performance.now() - openaiThinkingStartTime
@@ -1216,6 +1230,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             conversationId,
             done: false,
             userId,
+            userMsgId,
             model,
             provider,
             imgGenEnabled,
@@ -1251,6 +1266,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
           thinkingDuration: openaiThinkingStartTime
             ? performance.now() - openaiThinkingStartTime
             : undefined,
+          userMsgId,
           title,
           systemPrompt,
           imgGenFields: {
@@ -1286,6 +1302,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             provider,
             title,
             imgGenEnabled,
+            userMsgId,
             model,
             systemPrompt,
             imgGenFields: {
@@ -1315,6 +1332,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
           conversationId,
           userId,
           model,
+          userMsgId,
+          isThinking: false,
           title,
           imgGenEnabled,
           systemPrompt,
@@ -1527,12 +1546,13 @@ export class OpenAIService extends OpenAIServiceWorkup {
           const height = getIt?.height ?? 0,
             width = getIt?.width ?? 0;
 
-          await this.prisma.handleAiChatResponse({
+          const d = await this.prisma.handleAiChatResponse({
             chunk: openaiAgg,
             conversationId,
             done: true,
             title,
             temperature,
+            userMsgId,
             topP,
             provider,
             userId,
@@ -1593,6 +1613,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
               userId,
               provider,
               model,
+              userMsgId,
+              aiMsgId: d.aiMsgId,
               title,
               imgGenEnabled: true,
               usage,
@@ -1651,6 +1673,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
             conversationId,
             userId,
             systemPrompt,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
             temperature,
             usage,
             imgGenEnabled,
@@ -1688,6 +1712,9 @@ export class OpenAIService extends OpenAIServiceWorkup {
             done: true,
             title,
             temperature,
+            userMsgId,
+            jobId,
+            requestMessageId,
             topP,
             provider,
             userId,
@@ -1710,6 +1737,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               imgGenEnabled: false,
               imgGenFields: {},
               systemPrompt,
+              userMsgId,
               temperature,
               topP,
               chunk: openaiAgg,
@@ -1726,6 +1754,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             systemPrompt,
             temperature,
+            userMsgId,
             title,
             thinkingText:
               openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,

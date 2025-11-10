@@ -1,8 +1,8 @@
 "use client";
 
-import type { RxnUnion } from "@/types/shared";
 import { useState, useTransition } from "react";
 import { rxnAction } from "@/app/actions/message-actions";
+import { rxnObject } from "@/lib/rxn-object";
 import { MessageSingleton } from "@slipstream/types";
 
 export function useReaction(message: MessageSingleton<true>) {
@@ -14,8 +14,7 @@ export function useReaction(message: MessageSingleton<true>) {
   const [isPending, startTransition] = useTransition();
 
   const handleReaction = (currentAction: "like" | "dislike") => {
-    startTransition(async () => {
-      let action: RxnUnion, optimisticUpdate: typeof reactionState;
+      let action: keyof typeof rxnObject, optimisticUpdate: typeof reactionState;
 
       if (currentAction === "like") {
         if (reactionState.liked) {
@@ -49,7 +48,7 @@ export function useReaction(message: MessageSingleton<true>) {
 
       const previousState = reactionState;
       setReactionState(optimisticUpdate); // optimistic update
-
+    startTransition(async () => {
       try {
         const serverRes = await rxnAction(action, message.id);
 
@@ -57,14 +56,9 @@ export function useReaction(message: MessageSingleton<true>) {
           liked: serverRes.liked ?? false,
           disliked: serverRes.disliked ?? false
         });
-        // TODO: Update parent component with fresh message data
-        // create an onMessageUpdate callback
-        // onMessageUpdate?.(serverRes)
       } catch (error) {
         setReactionState(previousState); // Revert on error
         console.error("Failed to update reaction:", error);
-        // TODO: Show user-friendly error
-        // toast.error('Failed to update reaction. Please try again.')
       }
     });
   };

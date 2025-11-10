@@ -539,6 +539,7 @@ export class xAIService extends ModelService {
     temperature,
     imgGenEnabled,
     imgGenFields,
+    userMsgId,
     requestMessageId,
     jobId,
     title,
@@ -579,15 +580,17 @@ export class xAIService extends ModelService {
           userId,
           title,
           provider,
+          userMsgId,
           systemPrompt,
           temperature,
           thinkingDuration: undefined,
           isThinking: false,
           topP,
           model: m,
+          imgGenEnabled: true,
           chunk: grokAgg,
           done: false
-        })
+        } satisfies EventTypeMap["ai_chat_chunk"])
       );
       if (!res) {
         ws.send(
@@ -596,6 +599,7 @@ export class xAIService extends ModelService {
             provider: provider,
             conversationId,
             model: m,
+            imgGenEnabled: true,
             systemPrompt,
             temperature,
             topP,
@@ -610,8 +614,10 @@ export class xAIService extends ModelService {
           provider,
           conversationId,
           model: m,
+          userMsgId,
           title,
           systemPrompt,
+          imgGenEnabled: true,
           temperature,
           topP,
           userId,
@@ -719,9 +725,10 @@ export class xAIService extends ModelService {
         );
 
         const dur = performance.now() - totalDur;
-        await this.prisma.handleAiChatResponse({
+        const d = await this.prisma.handleAiChatResponse({
           chunk: grokAgg,
           conversationId,
+          userMsgId,
           done: true,
           provider,
           title,
@@ -771,11 +778,13 @@ export class xAIService extends ModelService {
             conversationId,
             userId,
             provider,
+            aiMsgId: d.aiMsgId,
             systemPrompt,
             thinkingDuration: undefined,
             thinkingText: undefined,
             title,
             temperature,
+            userMsgId,
             topP,
             model: m,
             chunk: grokAgg,
@@ -814,6 +823,8 @@ export class xAIService extends ModelService {
           conversationId,
           userId,
           systemPrompt,
+          userMsgId,
+          aiMsgId: d.aiMsgId,
           temperature,
           title,
           thinkingDuration:
@@ -952,6 +963,8 @@ export class xAIService extends ModelService {
               conversationId,
               userId,
               title,
+              userMsgId,
+              imgGenEnabled: false,
               provider,
               systemPrompt,
               temperature,
@@ -973,6 +986,8 @@ export class xAIService extends ModelService {
             conversationId,
             userId,
             model: m,
+            userMsgId,
+            imgGenEnabled: false,
             title,
             isThinking: grokIsCurrentlyThinking,
             thinkingDuration: grokThinkingStartTime
@@ -1000,6 +1015,8 @@ export class xAIService extends ModelService {
               title,
               provider,
               systemPrompt,
+              userMsgId,
+              imgGenEnabled: false,
               temperature,
               thinkingDuration:
                 grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
@@ -1016,6 +1033,8 @@ export class xAIService extends ModelService {
             conversationId,
             userId,
             model: m,
+            userMsgId,
+            imgGenEnabled: false,
             title,
             thinkingDuration:
               grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
@@ -1049,11 +1068,13 @@ export class xAIService extends ModelService {
         }
 
         if (done) {
-          await this.prisma.handleAiChatResponse({
+          const d = await this.prisma.handleAiChatResponse({
             chunk: grokAgg,
             conversationId,
             done,
+            imgGenEnabled: false,
             provider,
+            userMsgId,
             title,
             userId,
             model: m,
@@ -1071,6 +1092,9 @@ export class xAIService extends ModelService {
               conversationId,
               userId,
               provider,
+              userMsgId,
+              imgGenEnabled: false,
+              aiMsgId: d.aiMsgId,
               systemPrompt,
               thinkingDuration:
                 grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
@@ -1091,6 +1115,9 @@ export class xAIService extends ModelService {
             systemPrompt,
             temperature,
             title,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
+            imgGenEnabled: false,
             thinkingDuration:
               grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
             thinkingText: grokThinkingAgg,
@@ -1116,6 +1143,7 @@ export class xAIService extends ModelService {
           model: m,
           systemPrompt,
           temperature,
+          userMsgId,
           topP,
           title,
           userId,
@@ -1127,6 +1155,7 @@ export class xAIService extends ModelService {
         type: "ai_chat_error",
         provider,
         conversationId,
+        userMsgId,
         model: m,
         title,
         systemPrompt,

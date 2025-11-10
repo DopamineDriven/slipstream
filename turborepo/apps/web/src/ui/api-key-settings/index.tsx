@@ -1,6 +1,5 @@
 "use client";
 
-import type { ClientWorkupProps } from "@/types/shared";
 import type { ApiKeyData } from "@/ui/api-key-settings/types";
 import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-badge";
 import type { User } from "@/utils/auth-client";
@@ -14,7 +13,7 @@ import {
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
-import type { Providers as Provider } from "@slipstream/types";
+import type { Providers as Provider, ClientContextWorkupProps } from "@slipstream/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +43,7 @@ import {
 
 interface ApiKeysTabProps {
   className?: string;
-  initialData?: ClientWorkupProps;
+  initialData?: ClientContextWorkupProps;
   user?: User;
 }
 

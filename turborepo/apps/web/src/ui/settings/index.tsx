@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useElementDimensions } from "@/hooks/use-element-dimensions";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
-import { ClientWorkupProps } from "@/types/shared";
+import { ClientContextWorkupProps } from "@slipstream/types";
 import { ApiKeysTab } from "@/ui/api-key-settings";
 import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
@@ -90,7 +90,7 @@ export default function SettingsScaffold({
   initialData
 }: {
   user?: UserProps;
-  initialData?: ClientWorkupProps;
+  initialData?: ClientContextWorkupProps;
 }) {
   const { resolvedTheme } = useTheme();
 
