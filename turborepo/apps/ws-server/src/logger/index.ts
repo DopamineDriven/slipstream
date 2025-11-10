@@ -195,18 +195,6 @@ export class LoggerService {
     }
   }
 
-  public trying() {
-    this.logEvent("debug", {
-      type: "ai_chat_chunk",
-      payload: {
-        done: true,
-        conversationId: "",
-        type: "ai_chat_chunk",
-        userId: ""
-      }
-    });
-  }
-
   public logAIRequest(context: {
     userId: string;
     conversationId: string;

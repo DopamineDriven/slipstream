@@ -211,6 +211,7 @@ export class v0Service {
     thinkingChunks,
     apiKey,
     ws,
+    userMsgId,
     userId,
     isNewChat,
     max_tokens,
@@ -305,6 +306,8 @@ export class v0Service {
             conversationId,
             userId,
             title,
+            userMsgId,
+            imgGenEnabled: false,
             provider,
             systemPrompt,
             temperature,
@@ -326,6 +329,8 @@ export class v0Service {
           conversationId,
           userId,
           model,
+          userMsgId,
+          imgGenEnabled: false,
           title,
           isThinking: v0IsCurrentlyThinking,
           thinkingDuration: v0ThinkingStartTime
@@ -371,6 +376,8 @@ export class v0Service {
             userId,
             title,
             provider,
+            userMsgId,
+            imgGenEnabled: false,
             systemPrompt,
             temperature,
             thinkingDuration:
@@ -387,6 +394,8 @@ export class v0Service {
           type: "ai_chat_chunk",
           conversationId,
           userId,
+          userMsgId,
+          imgGenEnabled: false,
           model,
           title,
           thinkingDuration:
@@ -422,13 +431,15 @@ export class v0Service {
 
       // Check if stream is finished
       if (done) {
-        await this.prisma.handleAiChatResponse({
+        const d = await this.prisma.handleAiChatResponse({
           chunk: v0Agg,
           conversationId,
           done,
           provider,
           title,
           userId,
+          userMsgId,
+          imgGenEnabled: false,
           model,
           systemPrompt,
           thinkingDuration:
@@ -445,6 +456,9 @@ export class v0Service {
             conversationId,
             userId,
             provider,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
+            imgGenEnabled: false,
             systemPrompt,
             thinkingDuration:
               v0ThinkingDuration > 0 ? v0ThinkingDuration : undefined,
@@ -464,6 +478,9 @@ export class v0Service {
           conversationId,
           userId,
           systemPrompt,
+          userMsgId,
+          aiMsgId: d.aiMsgId,
+          imgGenEnabled: false,
           temperature,
           title,
           thinkingDuration:

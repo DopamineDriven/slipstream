@@ -546,6 +546,7 @@ export class AnthropicService {
     isNewChat,
     msgs,
     streamChannel,
+    userMsgId,
     thinkingChunks,
     userId,
     ws,
@@ -710,6 +711,7 @@ export class AnthropicService {
             provider,
             title,
             model,
+            userMsgId,
             systemPrompt,
             temperature,
             topP,
@@ -726,6 +728,7 @@ export class AnthropicService {
           type: "ai_chat_chunk",
           conversationId,
           userId,
+          userMsgId,
           model,
           thinkingDuration: anthropicThinkingStartTime
             ? performance.now() - anthropicThinkingStartTime
@@ -767,6 +770,7 @@ export class AnthropicService {
             type: "ai_chat_chunk",
             conversationId,
             userId,
+            userMsgId,
             provider,
             title,
             model,
@@ -789,6 +793,7 @@ export class AnthropicService {
           model,
           title,
           systemPrompt,
+          userMsgId,
           temperature,
           topP,
           provider,
@@ -822,7 +827,7 @@ export class AnthropicService {
       }
 
       if (done) {
-        await this.prisma.handleAiChatResponse({
+        const d = await this.prisma.handleAiChatResponse({
           chunk: anthropicAgg,
           conversationId,
           done: true,
@@ -830,6 +835,7 @@ export class AnthropicService {
           temperature,
           topP,
           provider,
+          userMsgId,
           userId,
           systemPrompt,
           model,
@@ -847,6 +853,8 @@ export class AnthropicService {
             userId,
             provider,
             model,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
             title,
             systemPrompt,
             temperature,
@@ -867,6 +875,8 @@ export class AnthropicService {
           systemPrompt,
           temperature,
           title,
+          userMsgId,
+          aiMsgId: d.aiMsgId,
           topP,
           provider,
           thinkingText: anthropicThinkingAgg || undefined,

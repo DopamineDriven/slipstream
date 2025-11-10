@@ -778,6 +778,7 @@ export type SSEBufferLike =
 export interface ProviderChatRequestEntity {
   isNewChat: boolean;
   conversationId: string;
+  userMsgId: string;
   title?: string;
   apiKey?: string;
   msgs: MessageSingleton<true>[];

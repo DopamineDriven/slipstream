@@ -39,6 +39,8 @@ interface StreamingMessage {
   thinkingDuration?: number;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
+  userMsgId?: string;
+  aiMsgId?: string;
 }
 
 interface AIChatContextValue {
@@ -57,6 +59,8 @@ interface AIChatContextValue {
 
   // Message tracking
   currentStreamingMessage: StreamingMessage | null;
+  currentUserMsgId: string | null;
+  currentAiMsgId: string | null;
 
   // Actions
   // Optionally accept an explicit batchId to associate attachments deterministically
@@ -64,7 +68,8 @@ interface AIChatContextValue {
     prompt: string,
     explicitBatchId?: string,
     imgGenEnabled?: boolean,
-    imgGenFields?: AIChatRequestImgGenFields
+    imgGenFields?: AIChatRequestImgGenFields,
+    optimisticUserMsgId?: string
   ) => void;
   setActiveConversationId: (id: string | null) => void;
   clearError: () => void;
@@ -127,6 +132,10 @@ export function AIChatProvider({
   const [imgGenFields, setImgGenFields] =
     useState<AIChatResponseImgGenFieldsFinal | null>(null);
 
+  // Message ID tracking
+  const [currentUserMsgId, setCurrentUserMsgId] = useState<string | null>(null);
+  const [currentAiMsgId, setCurrentAiMsgId] = useState<string | null>(null);
+
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
   const firstChunkReceivedRef = useRef<boolean>(false);
@@ -173,6 +182,8 @@ export function AIChatProvider({
   const activeUserStreamsRef = useRef<Set<string>>(new Set());
   const imgGenEnabledRef = useRef(imgGenEnabled);
   const imgGenFieldsRef = useRef(imgGenFields);
+  const currentUserMsgIdRef = useRef<string | null>(null);
+  const currentAiMsgIdRef = useRef<string | null>(null);
 
   // Update refs when state changes
   useEffect(() => {
@@ -210,6 +221,15 @@ export function AIChatProvider({
     imgGenFieldsRef.current = imgGenFields;
   }, [imgGenFields]);
 
+  // Keep refs for message ID state
+  useEffect(() => {
+    currentUserMsgIdRef.current = currentUserMsgId;
+  }, [currentUserMsgId]);
+
+  useEffect(() => {
+    currentAiMsgIdRef.current = currentAiMsgId;
+  }, [currentAiMsgId]);
+
   // Stable helper to update title state only when changed
   const updateTitle = useCallback((nextTitle?: string | null) => {
     if (!nextTitle) return;
@@ -228,6 +248,14 @@ export function AIChatProvider({
   // WebSocket event handlers - only depend on stable references
   useEffect(() => {
     const handleChunk = (evt: EventTypeMap["ai_chat_chunk"]) => {
+      // Capture message IDs from the event, only update if different
+      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
+        setCurrentUserMsgId(evt.userMsgId);
+      }
+      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
+        setCurrentAiMsgId(evt.aiMsgId);
+      }
+
       // Handle first chunk with real conversation ID for new-chat transitions
       if (
         !firstChunkReceivedRef.current &&
@@ -302,6 +330,7 @@ export function AIChatProvider({
       }
 
       // Update streaming message with all relevant data using refs
+      // Keep the streaming ID pattern during active streaming
       setCurrentStreamingMessage({
         id: `streaming-${evt.conversationId}`,
         content: streamedTextRef.current + (evt.chunk ?? ""),
@@ -313,11 +342,21 @@ export function AIChatProvider({
         timestamp: new Date(),
         isUser: false,
         imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
-        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields
+        imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
+        userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
+        aiMsgId: undefined // Don't pass aiMsgId during streaming chunks
       });
     };
 
     const handleError = (evt: EventTypeMap["ai_chat_error"]) => {
+      // Capture message IDs from the event, only update if different
+      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
+        setCurrentUserMsgId(evt.userMsgId);
+      }
+      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
+        setCurrentAiMsgId(evt.aiMsgId);
+      }
+
       console.error(`[AIChatContext] Chat error: ${evt.message}`);
       setError(evt.message);
       setIsStreaming(false);
@@ -353,6 +392,15 @@ export function AIChatProvider({
     };
 
     const handleResponse = (evt: EventTypeMap["ai_chat_response"]) => {
+      // Capture message IDs from the event, only update if different
+      if (evt.userMsgId && currentUserMsgIdRef.current !== evt.userMsgId) {
+        setCurrentUserMsgId(evt.userMsgId);
+      }
+      // aiMsgId should always be defined in ai_chat_response
+      if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
+        setCurrentAiMsgId(evt.aiMsgId);
+      }
+
       // Image generation final response - complete fields with final images
       if (evt.imgGenEnabled) {
         setImgGenEnabled(true);
@@ -455,7 +503,8 @@ export function AIChatProvider({
       prompt: string,
       explicitBatchId?: string,
       imgGenEnabled?: boolean,
-      imgGenFields?: AIChatRequestImgGenFields
+      imgGenFields?: AIChatRequestImgGenFields,
+      optimisticUserMsgId?: string
     ) => {
       if (!userId) {
         console.warn("[AIChatContext] Cannot send chat without userId");
@@ -492,6 +541,10 @@ export function AIChatProvider({
 
       // Use the active conversation ID
       const conversationId = activeConversationId ?? "new-chat";
+
+      // Generate or use provided optimistic userMsgId
+      const tempUserMsgId = optimisticUserMsgId ?? `user-${Date.now()}-${Math.random()}`;
+      setCurrentUserMsgId(tempUserMsgId);
 
       // Get API key configuration
       const hasProviderConfigured = apiKeys.isSet[selectedModel.provider];
@@ -604,6 +657,9 @@ export function AIChatProvider({
     // Reset image generation state
     setImgGenEnabled(false);
     setImgGenFields(null);
+    // Reset message IDs
+    setCurrentUserMsgId(null);
+    setCurrentAiMsgId(null);
   }, []);
 
   return (
@@ -619,6 +675,8 @@ export function AIChatProvider({
         isThinking,
         thinkingDuration,
         currentStreamingMessage,
+        currentUserMsgId,
+        currentAiMsgId,
         sendChat,
         setActiveConversationId,
         clearError,

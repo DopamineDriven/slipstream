@@ -210,6 +210,7 @@ export class Resolver extends ModelService {
     ws: WebSocket,
     userId: string,
     conversationIdInitial: string,
+    userMsgId: string,
     provider?: Provider,
     model?: string,
     systemPrompt?: string,
@@ -236,6 +237,7 @@ export class Resolver extends ModelService {
           topP,
           title: this.formatProvider(provider),
           userId,
+          userMsgId,
           done: true,
           message: friendly
         } satisfies EventTypeMap["ai_chat_error"];
@@ -288,6 +290,7 @@ export class Resolver extends ModelService {
         ws,
         userId,
         conversationIdInitial,
+        "no-msg-id-yet",
         provider,
         model,
         systemPrompt,
@@ -326,6 +329,7 @@ export class Resolver extends ModelService {
 
     const isNewChat = conversationIdInitial.startsWith("new-chat"),
       msgs = res.messages satisfies MessageSingleton<true>[],
+      userMsgId = res.messages.at(-1)?.id ?? "",
       conversationId = res.id,
       apiKey = res.apiKey ?? undefined,
       jobId = res.jobId,
@@ -375,6 +379,7 @@ export class Resolver extends ModelService {
           type: "ai_chat_chunk",
           conversationId,
           userId,
+          userMsgId,
           imgGenEnabled: isImgGenEnabled,
           chunk: chunks.join(""),
           thinkingText: thinkingAgg,
@@ -408,6 +413,7 @@ export class Resolver extends ModelService {
     const commonProps = {
       chunks,
       conversationId,
+      userMsgId,
       isNewChat,
       msgs,
       imgGenFields,
@@ -475,6 +481,7 @@ export class Resolver extends ModelService {
           conversationId,
           model,
           systemPrompt,
+          userMsgId,
           temperature,
           imgGenEnabled: false,
           imgGenFields: undefined,
@@ -492,6 +499,7 @@ export class Resolver extends ModelService {
           type: "ai_chat_error",
           provider,
           conversationId,
+          userMsgId,
           model,
           imgGenEnabled: false,
           imgGenFields: undefined,

@@ -2,7 +2,6 @@ import type {
   GenerateContentResponseProps,
   ProviderGeminiChatRequestEntity
 } from "@/gemini/types.ts";
-import type { MessageSingleton } from "@slipstream/types";
 import type {
   Blob,
   Content,
@@ -23,7 +22,11 @@ import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
 import type { CompatStatus } from "@slipstream/db/enums-node";
-import type { EventTypeMap, GeminiModelIdUnion } from "@slipstream/types";
+import type {
+  EventTypeMap,
+  GeminiModelIdUnion,
+  MessageSingleton
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class GeminiService extends ModelService {
@@ -589,6 +592,7 @@ export class GeminiService extends ModelService {
     conversationId,
     isNewChat,
     msgs,
+    userMsgId,
     streamChannel,
     thinkingChunks,
     userId,
@@ -697,6 +701,7 @@ export class GeminiService extends ModelService {
             type: "ai_chat_chunk",
             conversationId,
             userId,
+            userMsgId,
             model,
             title,
             systemPrompt,
@@ -722,6 +727,7 @@ export class GeminiService extends ModelService {
           model,
           title,
           systemPrompt,
+          userMsgId,
           temperature,
           topP,
           provider,
@@ -764,6 +770,7 @@ export class GeminiService extends ModelService {
             userId,
             model,
             title,
+            userMsgId,
             systemPrompt,
             isThinking: false,
             temperature,
@@ -786,6 +793,7 @@ export class GeminiService extends ModelService {
           title,
           isThinking: false,
           systemPrompt,
+          userMsgId,
           temperature,
           topP,
           thinkingText: geminiThinkingAgg,
@@ -822,6 +830,7 @@ export class GeminiService extends ModelService {
           JSON.stringify({
             type: "ai_chat_inline_data",
             conversationId,
+            userMsgId,
             data: _dataUrl,
             userId,
             done: false,
@@ -837,7 +846,7 @@ export class GeminiService extends ModelService {
         );
       }
       if (done) {
-        await this.prisma.handleAiChatResponse({
+        const d = await this.prisma.handleAiChatResponse({
           chunk: geminiAgg,
           conversationId,
           done: true,
@@ -846,6 +855,7 @@ export class GeminiService extends ModelService {
           userId,
           systemPrompt,
           temperature,
+          userMsgId,
           data: geminiDataPart
             ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
             : undefined,
@@ -862,6 +872,8 @@ export class GeminiService extends ModelService {
             conversationId,
             userId,
             model,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
             systemPrompt,
             data: geminiDataPart
               ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
@@ -885,6 +897,8 @@ export class GeminiService extends ModelService {
           systemPrompt,
           temperature,
           imgGenEnabled: false,
+          userMsgId,
+          aiMsgId: d.aiMsgId,
           data: geminiDataPart
             ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
             : undefined,

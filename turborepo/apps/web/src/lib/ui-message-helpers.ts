@@ -60,11 +60,12 @@ export function finalizeStreamingMessage(
   additionalData?: {
     thinkingText?: string;
     thinkingDuration?: number;
+    aiMsgId?: string;
   }
 ): MessageSingleton<true> {
   return {
     ...streamingMessage,
-    id: streamingMessage.id.replace("streaming-", ""),
+    id: additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
     content: finalContent,
     thinkingText: additionalData?.thinkingText ?? streamingMessage.thinkingText,
     thinkingDuration: additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,

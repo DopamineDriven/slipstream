@@ -189,6 +189,7 @@ export class LlamaService {
     conversationId,
     isNewChat,
     msgs,
+    userMsgId,
     thinkingChunks,
     streamChannel,
     userId,
@@ -242,6 +243,7 @@ export class LlamaService {
             type: "ai_chat_chunk",
             conversationId,
             userId,
+            userMsgId,
             title,
             provider,
             systemPrompt,
@@ -260,6 +262,7 @@ export class LlamaService {
           title,
           systemPrompt,
           temperature,
+          userMsgId,
           topP,
           provider,
           chunk: text,
@@ -285,11 +288,12 @@ export class LlamaService {
       }
 
       if (finish_reason != null) {
-        await this.prisma.handleAiChatResponse({
+        const d = await this.prisma.handleAiChatResponse({
           chunk: metaAgg,
           systemPrompt,
           temperature,
           topP,
+          userMsgId,
           conversationId,
           done: true,
           provider,
@@ -302,6 +306,8 @@ export class LlamaService {
             type: "ai_chat_response",
             conversationId,
             userId,
+            userMsgId,
+            aiMsgId: d.aiMsgId,
             provider,
             systemPrompt,
             title,
@@ -316,6 +322,8 @@ export class LlamaService {
           type: "ai_chat_response",
           conversationId,
           userId,
+          userMsgId,
+          aiMsgId: d.aiMsgId,
           systemPrompt,
           temperature,
           title,

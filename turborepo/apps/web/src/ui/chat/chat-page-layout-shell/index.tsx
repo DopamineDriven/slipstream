@@ -1,15 +1,14 @@
 "use client";
 
+import type { User } from "@/utils/auth-client";
 import type React from "react";
 import { Suspense, useCallback, useMemo, useState } from "react";
-import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import dynamic from "next/dynamic";
 import { useCookiesCtx } from "@/context/cookie-context";
+import { useSettingsDrawer } from "@/context/settings-drawer-context";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useResolvedTheme } from "@/hooks/use-resolved-theme";
 import { SidebarProps } from "@/types/ui";
-import type { ClientWorkupProps } from "@/types/shared";
-import type { User } from "@/utils/auth-client";
 import {
   Sidebar,
   SidebarInset,
@@ -20,6 +19,7 @@ import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawe
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
+import type { ClientContextWorkupProps } from "@slipstream/types";
 import {
   Button,
   PanelLeftClose as PanelLeft,
@@ -36,7 +36,7 @@ const ThemeToggle = dynamic(
 interface ChatLayoutShellProps {
   children: React.ReactNode;
   fallbackData?: SidebarProps[];
-  apiKeyData?: ClientWorkupProps;
+  apiKeyData?: ClientContextWorkupProps;
   user?: User;
 }
 
@@ -124,12 +124,7 @@ export function ChatLayoutShell({
         </div>
       </SidebarProvider>
       <MobileModelSelectorDrawer />
-      {apiKeyData && (
-        <SettingsDrawer
-          initialData={apiKeyData}
-          user={user}
-        />
-      )}
+      {apiKeyData && <SettingsDrawer initialData={apiKeyData} user={user} />}
     </div>
   );
 }
