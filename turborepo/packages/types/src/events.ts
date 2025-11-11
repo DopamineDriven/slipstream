@@ -39,6 +39,7 @@ export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   temperature?: number;
   topP?: number;
   aiMsgId?: string;
+  imgGenAttachmentId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
 }
@@ -468,7 +469,7 @@ export type ImageGenRequest = {
    * n=1 (default),
    * n=10 (max)
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * n=1 (default),
    * n=4 (max)
@@ -495,7 +496,7 @@ export type ImageGenRequest = {
    * "png" (default);
    * "png" | "jpeg" | "webp"
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * "png" (default);
    * "png" | "jpeg"
@@ -510,7 +511,7 @@ export type ImageGenRequest = {
    * Range: 0-100. Default: 100
    *
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * Only applies if mimeType is "image/jpeg",
    * Range: 0-100. Default: 75
@@ -555,7 +556,7 @@ export type ImageGenRequest = {
    *
    * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * "1:1" (default); "1:1" | "9:16" | "16:9" | "3:4" | "4:3"
    *
@@ -567,7 +568,7 @@ export type ImageGenRequest = {
   /**
    * **Imagen 3 & 4 models only**
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001,
+   *  imagen-4.0-generate-001,
    * imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001
    *
    * "dont_allow": Disallow the inclusion of people or faces in images.
@@ -800,7 +801,7 @@ export type AIChatResRT = {
     enableWebSearch: boolean | null;
     enableAssetGen: boolean | null;
     reasoningEffort: "minimal" | "low" | "medium" | "high" | null;
-    outputVerbosity: ("low" | "medium" | "high") | null
+    outputVerbosity: ("low" | "medium" | "high") | null;
     maxTokens: number | null;
     usageAlerts: boolean | null;
   } | null;
@@ -828,13 +829,51 @@ export type AIChatResRT = {
         updatedAt: Date;
         width: number;
         height: number;
-        format: "jpeg" | "png" | "gif" | "webp" | "avif" | "heic" | "apng" | "bmp" | "tiff" | "ico" | "jxl" | "jp2" | "jpx" | "jxr" | "jls" | "svg" | "raw" | "dng" | "cr2" | "nef" | "arw" | "hdr" | "pic" | "rgbe" | "xyze" | "unknown";
+        format:
+          | "jpeg"
+          | "png"
+          | "gif"
+          | "webp"
+          | "avif"
+          | "heic"
+          | "apng"
+          | "bmp"
+          | "tiff"
+          | "ico"
+          | "jxl"
+          | "jp2"
+          | "jpx"
+          | "jxr"
+          | "jls"
+          | "svg"
+          | "raw"
+          | "dng"
+          | "cr2"
+          | "nef"
+          | "arw"
+          | "hdr"
+          | "pic"
+          | "rgbe"
+          | "xyze"
+          | "unknown";
         aspectRatio: number | null;
         frames: number;
         hasAlpha: boolean | null;
         animated: boolean;
         orientation: number | null;
-        colorSpace: "unknown" | "srgb" | "display_p3" | "adobe_rgb" | "prophoto_rgb" | "rec2020" | "rec709" | "cmyk" | "lab" | "xyz" | "gray" | null;
+        colorSpace:
+          | "unknown"
+          | "srgb"
+          | "display_p3"
+          | "adobe_rgb"
+          | "prophoto_rgb"
+          | "rec2020"
+          | "rec709"
+          | "cmyk"
+          | "lab"
+          | "xyz"
+          | "gray"
+          | null;
         exifDateTimeOriginal: Date | null;
         cameraMake: string | null;
         cameraModel: string | null;
@@ -859,8 +898,25 @@ export type AIChatResRT = {
       batchId: string | null;
       generationGroupId: string | null;
       s3ObjectId: string | null;
-      origin: "UPLOAD" | "REMOTE" | "GENERATED" | "PASTED" | "SCREENSHOT" | "IMPORTED" | "SCRAPED";
-      status: "REQUESTED" | "PLANNED" | "UPLOADING" | "STORED" | "SCANNING" | "READY" | "FAILED" | "QUARANTINED" | "ATTACHED" | "DELETED";
+      origin:
+        | "UPLOAD"
+        | "REMOTE"
+        | "GENERATED"
+        | "PASTED"
+        | "SCREENSHOT"
+        | "IMPORTED"
+        | "SCRAPED";
+      status:
+        | "REQUESTED"
+        | "PLANNED"
+        | "UPLOADING"
+        | "STORED"
+        | "SCANNING"
+        | "READY"
+        | "FAILED"
+        | "QUARANTINED"
+        | "ATTACHED"
+        | "DELETED";
       uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
       assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
       cdnUrl: string | null;
@@ -909,7 +965,12 @@ export type AIChatResRT = {
     senderType: "USER" | "AI" | "SYSTEM";
     content: string;
     isImageGen: boolean;
-    messageType: "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN";
+    messageType:
+      | "AUDIO_GEN"
+      | "COMPUTER_USE"
+      | "IMAGE_GEN"
+      | "TEXT"
+      | "VIDEO_GEN";
     liked: boolean | null;
     disliked: boolean | null;
     tryAgain: boolean | null;

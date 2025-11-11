@@ -30,6 +30,8 @@ interface ChatFeedProps {
   activeConversationId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
+  imgGenAttachmentId?: string;
+  currentAiMsgId?: string;
 }
 
 export function ChatFeed({
@@ -46,6 +48,8 @@ export function ChatFeed({
   thinkingDuration,
   imgGenEnabled,
   imgGenFields,
+  imgGenAttachmentId,
+  currentAiMsgId,
   children
 }: ChatFeedProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -177,41 +181,60 @@ export function ChatFeed({
           ref={scrollRef}
           data-chat-feed
           className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
-          {messages?.map(message => (
-            <MessageBubble
-              key={message.id}
-              message={message}
-              user={user}
-              onUpdateMessage={onUpdateMessage}
-              isStreaming={isStreaming && message.id.startsWith("streaming-")}
-              liveThinkingText={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? thinkingText
-                  : undefined
-              }
-              liveIsThinking={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? isThinking
-                  : undefined
-              }
-              liveThinkingDuration={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? thinkingDuration
-                  : undefined
-              }
-              // Progressive image-gen data for streaming message
-              liveImgGenEnabled={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? imgGenEnabled
-                  : undefined
-              }
-              liveImgGenFields={
-                isStreaming && message.id.startsWith("streaming-")
-                  ? (imgGenFields ?? undefined)
-                  : undefined
-              }
-            />
-          ))}
+          {messages?.map(message => {
+            // Check if this is a streaming message or matches the current aiMsgId
+            const isStreamingMessage = isStreaming && message.id.startsWith("streaming-");
+
+            // For completed messages, check if it's an image gen message with the current aiMsgId
+            const isCurrentImgGenMessage =
+              message.senderType === "AI" &&
+              message.messageType === "IMAGE_GEN" &&
+              message.id === currentAiMsgId;
+
+            const shouldReceiveAttachmentId = isStreamingMessage ?? isCurrentImgGenMessage;
+
+            return (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                user={user}
+                onUpdateMessage={onUpdateMessage}
+                isStreaming={isStreamingMessage}
+                liveThinkingText={
+                  isStreamingMessage
+                    ? thinkingText
+                    : undefined
+                }
+                liveIsThinking={
+                  isStreamingMessage
+                    ? isThinking
+                    : undefined
+                }
+                liveThinkingDuration={
+                  isStreamingMessage
+                    ? thinkingDuration
+                    : undefined
+                }
+                // Progressive image-gen data for streaming message
+                liveImgGenEnabled={
+                  isStreamingMessage
+                    ? imgGenEnabled
+                    : undefined
+                }
+                liveImgGenFields={
+                  isStreamingMessage
+                    ? (imgGenFields ?? undefined)
+                    : undefined
+                }
+                liveImgGenAttachmentId={
+                  // Pass attachment ID for streaming messages and the specific AI message with matching ID
+                  shouldReceiveAttachmentId
+                    ? imgGenAttachmentId
+                    : undefined
+                }
+              />
+            );
+          })}
           {isStreaming &&
             isAwaitingFirstChunk &&
             (!imgGenFields?.partialImages ||

@@ -12,6 +12,7 @@ interface ImageGenerationCanvasProps {
   width: number;
   height: number;
   prompt?: string;
+  attachmentId?: string;
 }
 
 export function ImageGenerationCanvasTest({
@@ -20,7 +21,8 @@ export function ImageGenerationCanvasTest({
   height,
   width,
   currentImageIndex,
-  prompt
+  prompt,
+  attachmentId
 }: ImageGenerationCanvasProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -31,7 +33,10 @@ export function ImageGenerationCanvasTest({
     currentImageUrl && currentImageIndex === images.length - 1;
 
   return (
-    <div className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
+    <div
+      id={attachmentId ? `attachment-${attachmentId}` : undefined}
+      data-attachment-id={attachmentId ?? undefined}
+      className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
       <div
         className={cn(
           "absolute inset-0 transition-opacity duration-500",
@@ -53,7 +58,7 @@ export function ImageGenerationCanvasTest({
             alt={"/placeholder.svg"}
             width={width}
             height={height}
-            className="h-full w-full object-cover flex-1"
+            className="h-full w-full flex-1 object-cover"
             onLoad={() => setImageLoaded(true)}
             onLoadStart={() => setImageLoaded(false)}
             priority
@@ -80,7 +85,9 @@ export function ImageGenerationCanvasTest({
         <div
           className={cn(
             "absolute top-4 right-4 flex gap-2 opacity-30 transition-opacity duration-300",
-            !isGenerating && isFinalImage && "group-hover:opacity-100 focus:opacity-100"
+            !isGenerating &&
+              isFinalImage &&
+              "group-hover:opacity-100 focus:opacity-100"
           )}>
           <Button
             size="icon"

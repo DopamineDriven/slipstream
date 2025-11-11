@@ -1158,12 +1158,26 @@ export class PrismaService extends PrismaAttachmentProviderService {
       const msg = persist.messages[0];
       if (!msg) throw new Error("AIChatResponse Message was not created");
       const aiMsgId = msg?.id;
-      if (data.imgGenEnabled === true) {
+
+      if (
+        data.imgGenEnabled === true &&
+        typeof data.imgGenFields !== "undefined"
+      ) {
+        const imgGenAttachmentId = msg?.attachments.find(
+          t => t.imageGenOutput?.kind === "FINAL"
+        )?.id;
         if (!jobId || !data.imgGenFields?.images)
           throw new Error("no jobid to associate image gen with");
         const s = data.imgGenFields.images;
         if (data.imgGenFields.partialImages)
           s.concat(data.imgGenFields.partialImages);
+
+        const outputs = {
+          connect: msg.attachments
+            .map(t => t.imageGenOutput?.id)
+            .filter(t => typeof t !== "undefined")
+            .map(v => ({ id: v }))
+        } as const;
         await t.imageGenJob.update({
           where: { id: jobId },
           data: {
@@ -1183,11 +1197,12 @@ export class PrismaService extends PrismaAttachmentProviderService {
             nCompleted: s.filter(v => v.kind === "FINAL")?.length ?? 1,
             model: data.model,
             outputQuality: data.imgGenFields.outputQuality,
-            revisedPrompt: data.imgGenFields.revisedPrompt
+            revisedPrompt: data.imgGenFields.revisedPrompt,
+            outputs
           }
         });
-        return { aiMsgId, persist };
-      } else return { aiMsgId, persist };
+        return { aiMsgId, persist, imgGenAttachmentId };
+      } else return { aiMsgId, persist, imgGenAttachmentId: undefined };
     });
 
     return transaction;

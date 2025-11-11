@@ -59,7 +59,6 @@ interface ImageGenContextType {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
           case "gemini-2.5-flash-image":
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -159,7 +158,6 @@ interface ImageGenContextType {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
           case "gemini-2.5-flash-image":
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -249,7 +247,6 @@ function handleOutputSize(
             return data.output_size;
           } else return "1:1";
         }
-        case "imagen-3.0-generate-002":
         case "imagen-4.0-fast-generate-001":
         case "imagen-4.0-generate-001":
         case "imagen-4.0-ultra-generate-001": {
@@ -405,11 +402,6 @@ function handleImgGenOutputQuality(
       case "gemini": {
         const m = model as GetModelUtilRT<typeof provider>;
         switch (m) {
-          case "imagen-3.0-generate-002": {
-            if (data?.output_quality && /^1K$/gm.test(data.output_quality)) {
-              return data.output_quality as "1K";
-            } else return "1K";
-          }
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {

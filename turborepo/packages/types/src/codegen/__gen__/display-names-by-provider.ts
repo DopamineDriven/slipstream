@@ -40,7 +40,6 @@ export const displayNameModelsByProvider = {
     "Imagen 4",
     "Imagen 4 Fast",
     "Imagen 4 Ultra",
-    "Imagen 3.0",
     "Veo 3.1",
     "Veo 3.1 fast",
     "Veo 3",

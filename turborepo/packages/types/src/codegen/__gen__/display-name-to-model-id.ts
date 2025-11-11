@@ -40,7 +40,6 @@ export const displayNameToModelId = {
     "Imagen 4": "imagen-4.0-generate-001",
     "Imagen 4 Fast": "imagen-4.0-fast-generate-001",
     "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001",
-    "Imagen 3.0": "imagen-3.0-generate-002",
     "Veo 3.1": "veo-3.1-generate-preview",
     "Veo 3.1 fast": "veo-3.1-fast-generate-preview",
     "Veo 3": "veo-3.0-generate-001",

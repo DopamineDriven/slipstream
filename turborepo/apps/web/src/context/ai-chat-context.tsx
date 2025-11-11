@@ -41,6 +41,7 @@ interface StreamingMessage {
   imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
   userMsgId?: string;
   aiMsgId?: string;
+  imgGenAttachmentId?: string;
 }
 
 interface AIChatContextValue {
@@ -61,7 +62,7 @@ interface AIChatContextValue {
   currentStreamingMessage: StreamingMessage | null;
   currentUserMsgId: string | null;
   currentAiMsgId: string | null;
-
+  currentImgGenAttachmentId: string | null;
   // Actions
   // Optionally accept an explicit batchId to associate attachments deterministically
   sendChat: (
@@ -135,7 +136,9 @@ export function AIChatProvider({
   // Message ID tracking
   const [currentUserMsgId, setCurrentUserMsgId] = useState<string | null>(null);
   const [currentAiMsgId, setCurrentAiMsgId] = useState<string | null>(null);
-
+  const [currentImgGenAttachmentId, setCurrentImgGenAttachmentId] = useState<
+    string | null
+  >(null);
   // Track if we've updated the URL for this stream
   const urlUpdatedRef = useRef<boolean>(false);
   const firstChunkReceivedRef = useRef<boolean>(false);
@@ -184,6 +187,7 @@ export function AIChatProvider({
   const imgGenFieldsRef = useRef(imgGenFields);
   const currentUserMsgIdRef = useRef<string | null>(null);
   const currentAiMsgIdRef = useRef<string | null>(null);
+  const currentImgGenAttachmentIdRef = useRef<string | null>(null);
 
   // Update refs when state changes
   useEffect(() => {
@@ -230,6 +234,10 @@ export function AIChatProvider({
     currentAiMsgIdRef.current = currentAiMsgId;
   }, [currentAiMsgId]);
 
+  useEffect(() => {
+    currentImgGenAttachmentIdRef.current = currentImgGenAttachmentId;
+  }, [currentImgGenAttachmentId]);
+
   // Stable helper to update title state only when changed
   const updateTitle = useCallback((nextTitle?: string | null) => {
     if (!nextTitle) return;
@@ -254,6 +262,12 @@ export function AIChatProvider({
       }
       if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
         setCurrentAiMsgId(evt.aiMsgId);
+      }
+      if (
+        evt.imgGenAttachmentId &&
+        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
+      ) {
+        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
       }
 
       // Handle first chunk with real conversation ID for new-chat transitions
@@ -319,7 +333,8 @@ export function AIChatProvider({
       if (evt.imgGenFields) {
         setImgGenEnabled(true);
         console.log(evt.imgGenFields);
-            if (!firstChunkReceivedRef.current) firstChunkReceivedRef.current = true;
+        if (!firstChunkReceivedRef.current)
+          firstChunkReceivedRef.current = true;
         // Merge new fields with existing, preserving all partial images
         setImgGenFields(prev => ({
           ...prev,
@@ -344,6 +359,7 @@ export function AIChatProvider({
         imgGenEnabled: imgGenEnabledRef.current || evt.imgGenEnabled,
         imgGenFields: imgGenFieldsRef.current ?? evt.imgGenFields,
         userMsgId: evt.userMsgId ?? currentUserMsgIdRef.current ?? undefined,
+        imgGenAttachmentId: undefined, // Don't pass imgGenAttachmentId during streaming chunks
         aiMsgId: undefined // Don't pass aiMsgId during streaming chunks
       });
     };
@@ -355,6 +371,12 @@ export function AIChatProvider({
       }
       if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
         setCurrentAiMsgId(evt.aiMsgId);
+      }
+      if (
+        evt.imgGenAttachmentId &&
+        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
+      ) {
+        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
       }
 
       console.error(`[AIChatContext] Chat error: ${evt.message}`);
@@ -399,6 +421,12 @@ export function AIChatProvider({
       // aiMsgId should always be defined in ai_chat_response
       if (evt.aiMsgId && currentAiMsgIdRef.current !== evt.aiMsgId) {
         setCurrentAiMsgId(evt.aiMsgId);
+      }
+      if (
+        evt.imgGenAttachmentId &&
+        currentImgGenAttachmentIdRef.current !== evt.imgGenAttachmentId
+      ) {
+        setCurrentImgGenAttachmentId(evt.imgGenAttachmentId);
       }
 
       // Image generation final response - complete fields with final images
@@ -479,24 +507,33 @@ export function AIChatProvider({
   const recentMessagesRef = useRef<Map<string, number>>(new Map());
 
   const { getAll } = useCookiesCtx();
-  const { city, country, latlng, postalCode, region, tz, locale } = getAll(); // already wrapped in a useCallback
+  const { city, country, latlng, postalCode, region, tz, locale, ip, ua } =
+    getAll(); // already wrapped in a useCallback
+
   const metadata = useMemo(() => {
+    const useragent = ua ? decodeURIComponent(ua) : undefined;
+    const timezone = tz ? decodeURIComponent(tz) : undefined;
+    const ipAddress = ip ? decodeURIComponent(ip) : undefined;
     const [lat, lng] = latlng
-      ? latlng.split(",").map(p => {
-          return Number.parseFloat(p);
-        })
+      ? decodeURIComponent(latlng)
+          .split(",")
+          .map(p => {
+            return Number.parseFloat(p);
+          })
       : [undefined, undefined];
     return {
       city,
       country,
       postalCode,
       region,
-      tz,
+      tz: timezone,
+      ip: ipAddress,
+      ua: useragent,
       lat,
       lng,
       locale
     } satisfies AIChatRequestUserMetadata;
-  }, [city, country, latlng, postalCode, region, tz, locale]);
+  }, [city, ip, ua, country, latlng, postalCode, region, tz, locale]);
 
   const sendChat = useCallback(
     (
@@ -543,7 +580,8 @@ export function AIChatProvider({
       const conversationId = activeConversationId ?? "new-chat";
 
       // Generate or use provided optimistic userMsgId
-      const tempUserMsgId = optimisticUserMsgId ?? `user-${Date.now()}-${Math.random()}`;
+      const tempUserMsgId =
+        optimisticUserMsgId ?? `user-${Date.now()}-${Math.random()}`;
       setCurrentUserMsgId(tempUserMsgId);
 
       // Get API key configuration
@@ -660,6 +698,7 @@ export function AIChatProvider({
     // Reset message IDs
     setCurrentUserMsgId(null);
     setCurrentAiMsgId(null);
+    setCurrentImgGenAttachmentId(null);
   }, []);
 
   return (
@@ -676,6 +715,7 @@ export function AIChatProvider({
         thinkingDuration,
         currentStreamingMessage,
         currentUserMsgId,
+        currentImgGenAttachmentId,
         currentAiMsgId,
         sendChat,
         setActiveConversationId,

@@ -742,6 +742,10 @@ export class xAIService extends ModelService {
               cameraMake: null,
               cameraModel: null,
               colorSpace: getIt.colorSpace,
+              colorModel:
+                getIt.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : getIt.colorModel,
               dominantColorHex: null,
               exifDateTimeOriginal: getIt.exifDateTimeOriginal
                 ? new Date(getIt.exifDateTimeOriginal)
@@ -787,6 +791,7 @@ export class xAIService extends ModelService {
           userMsgId,
           done: true,
           provider,
+          mime: remapFinals[0]?.mime,
           title,
           userId,
           model: m,
@@ -840,6 +845,7 @@ export class xAIService extends ModelService {
             thinkingText: undefined,
             title,
             temperature,
+            imgGenAttachmentId: d.imgGenAttachmentId,
             userMsgId,
             topP,
             model: m,
@@ -881,6 +887,7 @@ export class xAIService extends ModelService {
           systemPrompt,
           userMsgId,
           aiMsgId: d.aiMsgId,
+          imgGenAttachmentId: d.imgGenAttachmentId,
           temperature,
           title,
           thinkingDuration:
@@ -1203,6 +1210,8 @@ export class xAIService extends ModelService {
           topP,
           title,
           userId,
+          aiMsgId: undefined,
+          imgGenEnabled,
           done: true,
           message: err instanceof Error ? err.message : String(err)
         } satisfies EventTypeMap["ai_chat_error"])
@@ -1215,6 +1224,8 @@ export class xAIService extends ModelService {
         model: m,
         title,
         systemPrompt,
+        aiMsgId: undefined,
+        imgGenEnabled,
         temperature,
         topP,
         userId,

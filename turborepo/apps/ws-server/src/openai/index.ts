@@ -13,6 +13,7 @@ import { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
+import { OpenAIServiceWorkup } from "@/openai/workup.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatResponseImgGenSubFields,
@@ -22,7 +23,6 @@ import type {
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-import { OpenAIServiceWorkup } from "./workup.ts";
 
 export class OpenAIService extends OpenAIServiceWorkup {
   private defaultClient: OpenAI;
@@ -156,18 +156,22 @@ export class OpenAIService extends OpenAIServiceWorkup {
       outputFormat = r.output_format;
       uploadtInitial = performance.now();
 
-      const safeN = this.handleImgGenCount("openai", m, { n: r.n });
+      const _safeN = this.handleImgGenCount("openai", m, { n: r.n });
+      const partial_images = this.handlePartialImgGen("openai", m, {
+        partialImagesRequested: r.partialImagesRequested
+      });
       const o = (await client.images.generate(
         {
-          prompt: msgs?.[0]?.content ?? "",
+          prompt: msgs.find(id => id.id === userMsgId)?.content ?? "",
           background: r.output_background,
           output_compression: r.output_compression,
           user: userId,
           output_format: r.output_format,
           model: m,
           moderation: r.moderation,
-          n: safeN,
-          partial_images: r.partialImagesRequested,
+          // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
+          n: 1,
+          partial_images,
           quality: r.output_quality,
           size: r.output_size,
           stream: true
@@ -178,11 +182,14 @@ export class OpenAIService extends OpenAIServiceWorkup {
       };
 
       for await (const stream of o) {
-        openaiAgg += "Image generation in progress...";
-
         let text: string | undefined = undefined,
+          started = false,
           done = false,
           rtHelper: S3FinalizePayload | undefined;
+        if (started === false) {
+          started = true;
+          text = "Image generation in progress...";
+        }
         if (stream.type === "image_generation.partial_image") {
           streamPartial = {
             ...stream
@@ -247,6 +254,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
               aspectRatio: imgSpecs.width / imgSpecs.height,
               cameraMake: null,
               cameraModel: null,
+              colorModel:
+                imgSpecs.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : imgSpecs.colorModel,
               colorSpace: imgSpecs.colorSpace,
               dominantColorHex: null,
               exifDateTimeOriginal: imgSpecs.exifDateTimeOriginal
@@ -371,8 +382,6 @@ export class OpenAIService extends OpenAIServiceWorkup {
           rtHelper = undefined;
         }
 
-        text = "Image generation in progress...";
-
         if (text) {
           openaiAgg += text;
           chunks.push(text);
@@ -384,7 +393,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               provider,
               title,
               userMsgId,
-              imgGenEnabled,
+              imgGenEnabled: true,
               model,
               systemPrompt,
               imgGenFields: {
@@ -406,6 +415,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               done: false
             } satisfies EventTypeMap["ai_chat_chunk"])
           );
+
           void this.redis.publishTypedEvent(streamChannel, "ai_chat_chunk", {
             type: "ai_chat_chunk",
             conversationId,
@@ -451,6 +461,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               thinkingChunks
             );
           }
+          text = undefined;
         }
         if (done === true && finalImgObj) {
           const b64 = Buffer.from(finalImgObj.b64_json, "base64");
@@ -621,6 +632,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             temperature,
             topP,
             provider,
+            uploadDuration: duration,
             userId,
             systemPrompt,
             userMsgId,
@@ -656,7 +668,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
               size: getIt.byteSize ?? 0,
               partialImagesActual: partialImgArr.length,
               partialImages: remapPartials,
-              images: [{ ...imgFinal }]
+              images: [{ ...imgFinal }],
+              activeImage: imgFinal
             },
             thinkingText: undefined,
             thinkingDuration: undefined
@@ -671,6 +684,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               userMsgId,
               aiMsgId: d.aiMsgId,
               title,
+              imgGenAttachmentId: d.imgGenAttachmentId,
               imgGenEnabled: true,
               usage,
               systemPrompt,
@@ -719,10 +733,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             userMsgId,
             aiMsgId: d.aiMsgId,
+            imgGenAttachmentId: d.imgGenAttachmentId,
             systemPrompt,
             temperature,
             usage,
-            imgGenEnabled,
+            imgGenEnabled: true,
             imgGenFields: {
               duration,
               revisedPrompt:
@@ -859,6 +874,8 @@ export class OpenAIService extends OpenAIServiceWorkup {
     );
 
     if (
+      imgGenFields &&
+      imgGenEnabled &&
       (m === "o3" ||
         m === "gpt-4.1" ||
         m === "gpt-4.1-mini" ||
@@ -896,22 +913,25 @@ export class OpenAIService extends OpenAIServiceWorkup {
         }
       );
 
-      str = await client.responses.create({
-        stream: true,
-        input: formatted,
-        instructions: this.buildInstructions(systemPrompt),
-        store: false,
-        model: m,
-        text: this.openAiVerbosity(m, "medium", imgGenEnabled),
-        temperature,
-        max_output_tokens: max_tokens,
-        top_p: topP,
-        safety_identifier: userId,
-        include: ["message.input_image.image_url"],
-        truncation: "auto",
-        tool_choice: "required",
-        tools
-      });
+      str = await client.responses.create(
+        {
+          stream: true,
+          input: formatted,
+          instructions: this.buildInstructions(systemPrompt),
+          store: false,
+          model: m,
+          text: this.openAiVerbosity(m, "medium", imgGenEnabled),
+          temperature,
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          safety_identifier: userId,
+          include: ["message.input_image.image_url"],
+          truncation: "auto",
+          tool_choice: "required",
+          tools
+        },
+        { stream: true }
+      );
     } else {
       const tools = this.handleTooling(
         m,
@@ -921,32 +941,35 @@ export class OpenAIService extends OpenAIServiceWorkup {
         imgGenEnabled,
         undefined
       );
-      str = await client.responses.create({
-        stream: true,
-        input: formatted,
-        instructions: this.buildInstructions(systemPrompt),
-        store: false,
-        model: m,
-        text: this.openAiVerbosity(
-          model as OpenAiModelIdUnion,
-          "medium",
-          imgGenEnabled
-        ),
-        temperature,
-        include: [
-          "web_search_call.action.sources",
-          "web_search_call.results",
-          "message.input_image.image_url",
-          "file_search_call.results"
-        ],
-        max_output_tokens: max_tokens,
-        top_p: topP,
-        safety_identifier: userId,
-        truncation: "auto",
-        reasoning,
-        parallel_tool_calls: true,
-        tools
-      });
+      str = await client.responses.create(
+        {
+          stream: true,
+          input: formatted,
+          instructions: this.buildInstructions(systemPrompt),
+          store: false,
+          model: m,
+          text: this.openAiVerbosity(
+            model as OpenAiModelIdUnion,
+            "medium",
+            imgGenEnabled
+          ),
+          temperature,
+          include: [
+            "web_search_call.action.sources",
+            "web_search_call.results",
+            "message.input_image.image_url",
+            "file_search_call.results"
+          ],
+          max_output_tokens: max_tokens,
+          top_p: topP,
+          safety_identifier: userId,
+          truncation: "auto",
+          reasoning,
+          parallel_tool_calls: true,
+          tools
+        },
+        { stream: true }
+      );
     }
     for await (const s of str) {
       let text: string | undefined = undefined,
@@ -956,7 +979,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
       let rtHelper;
 
       if (s.type === "response.created" && tInitial === 0) {
-       if (imgGenEnabled) text = "Image generation in progress...";
+        if (imgGenEnabled) text = "Image generation in progress...";
         tInitial = performance.now();
       }
       if (
@@ -1005,12 +1028,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
         }
         text = s.delta;
       }
-      if (s.type === "response.output_text.done" && imgGenEnabled === false) {
-        done = true;
-      }
       if (s.type === "response.completed") {
         openaiResId = s.response.id;
-
+        if (!imgGenEnabled) {
+          done = true;
+        }
         for (const r of s.response.output) {
           if (r.type === "image_generation_call" && r.result) {
             if (r.result !== null) {
@@ -1126,6 +1148,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
               cameraMake: null,
               cameraModel: null,
               colorSpace: getIt.colorSpace,
+              colorModel:
+                getIt.colorModel === "grayscale-alpha"
+                  ? "grayscale_alpha"
+                  : getIt.colorModel,
               dominantColorHex: null,
               exifDateTimeOriginal: getIt.exifDateTimeOriginal
                 ? new Date(getIt.exifDateTimeOriginal)
@@ -1164,7 +1190,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             model,
             userMsgId,
             provider,
-            imgGenEnabled,
+            imgGenEnabled: true,
             imgGenFields: {
               partialImagesActual: partialImgArr.length,
               partialImages:
@@ -1198,6 +1224,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             ? performance.now() - openaiThinkingStartTime
             : undefined,
           title,
+          imgGenEnabled: true,
           systemPrompt,
           imgGenFields: {
             partialImagesActual: partialImgArr.length,
@@ -1555,6 +1582,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userMsgId,
             topP,
             provider,
+            mime: `image/${getIt.format}`,
             userId,
             systemPrompt,
             usage,
@@ -1615,6 +1643,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
               model,
               userMsgId,
               aiMsgId: d.aiMsgId,
+              imgGenAttachmentId: d.imgGenAttachmentId,
               title,
               imgGenEnabled: true,
               usage,
@@ -1675,16 +1704,42 @@ export class OpenAIService extends OpenAIServiceWorkup {
             systemPrompt,
             userMsgId,
             aiMsgId: d.aiMsgId,
+            imgGenAttachmentId: d.imgGenAttachmentId,
             temperature,
             usage,
-            imgGenEnabled,
+            imgGenEnabled: true,
             imgGenFields: {
+              duration,
               actualCount: partialImgArr.length,
               outputAspectRatio: width / height,
-              outputFormat: outputFormat,
               outputSize: getIt.byteSize?.toString(10) ?? "0",
               outputMime: this.getGenMime(outputFormat),
+              revisedPrompt:
+                "revised_prompt" in finalImgObj &&
+                typeof finalImgObj.revised_prompt === "string"
+                  ? finalImgObj.revised_prompt
+                  : undefined,
+              outputFormat:
+                "output_format" in finalImgObj &&
+                typeof finalImgObj.output_format === "string"
+                  ? finalImgObj.output_format
+                  : outputFormat,
+              requestedCount: imgGenFields?.n,
+
+              partialImagesRequested: partialImgArr.length,
+              outputBackground:
+                "background" in finalImgObj &&
+                typeof finalImgObj.background === "string"
+                  ? finalImgObj.background
+                  : undefined,
+              outputCompression: imgGenFields?.output_compression,
+              seed: imgGenFields?.seed,
               outputWidth: width,
+              outputQuality:
+                "quality" in finalImgObj &&
+                typeof finalImgObj.quality === "string"
+                  ? finalImgObj.quality
+                  : undefined,
               outputHeight: height,
               size: getIt.byteSize ?? 0,
               partialImagesActual: partialImgArr.length,
@@ -1706,7 +1761,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
           void this.redis.del(`stream:state:${conversationId}`);
           break;
         } else {
-          await this.prisma.handleAiChatResponse({
+          const d = await this.prisma.handleAiChatResponse({
             chunk: openaiAgg,
             conversationId,
             done: true,
@@ -1720,6 +1775,9 @@ export class OpenAIService extends OpenAIServiceWorkup {
             userId,
             systemPrompt,
             model,
+            mime: undefined,
+            usage,
+            imgGenFields: undefined,
             imgGenEnabled: false,
             thinkingText:
               openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
@@ -1734,8 +1792,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
               provider,
               model,
               title,
+              usage,
+              aiMsgId: d.aiMsgId,
               imgGenEnabled: false,
-              imgGenFields: {},
+              imgGenAttachmentId: undefined,
+              imgGenFields: undefined,
               systemPrompt,
               userMsgId,
               temperature,
@@ -1756,6 +1817,11 @@ export class OpenAIService extends OpenAIServiceWorkup {
             temperature,
             userMsgId,
             title,
+            usage,
+            imgGenEnabled: false,
+            aiMsgId: d.aiMsgId,
+            imgGenAttachmentId: undefined,
+            imgGenFields: undefined,
             thinkingText:
               openaiThinkingAgg.length > 0 ? openaiThinkingAgg : undefined,
             thinkingDuration:
@@ -1775,7 +1841,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
 
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
     const m = model as OpenAiModelIdUnion;
-
+    console.log(`[openai::isImgGenEnabled]: ` + rest.imgGenEnabled);
     switch (m) {
       case "dall-e-2":
       case "dall-e-3":

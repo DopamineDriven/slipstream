@@ -84,7 +84,6 @@ export type OpenAISizeQualityOpts = {
 export type GoogleImgSizeQualityOpts = {
   size: {
     "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-    "imagen-3.0-generate-002": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
     "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
     "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
     "gemini-2.5-flash-image":
@@ -101,7 +100,6 @@ export type GoogleImgSizeQualityOpts = {
   };
   quality: {
     "imagen-4.0-fast-generate-001": "1K" | "2K";
-    "imagen-3.0-generate-002": "1K";
     "imagen-4.0-generate-001": "1K" | "2K";
     "imagen-4.0-ultra-generate-001": "1K" | "2K";
   };
@@ -110,7 +108,6 @@ export type GoogleImgSizeQualityOpts = {
 export type GoogleImgOutputFormat = {
   format: {
     "imagen-4.0-fast-generate-001": "image/png" | "image/jpeg";
-    "imagen-3.0-generate-002": "image/png" | "image/jpeg";
     "imagen-4.0-generate-001": "image/png" | "image/jpeg";
     "imagen-4.0-ultra-generate-001": "image/png" | "image/jpeg";
   };
@@ -439,7 +436,7 @@ export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
 
 /**
  * Parameters for Google's Imagen 3 & 4 models
- * (e.g., imagen-3.0-generate-002, imagen-4.0-generate-001,
+ * (e.g., imagen-4.0-generate-001,
  * imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001)
  */
 export type ImagenOptions = {
@@ -670,7 +667,7 @@ export type AIChatRequestImgGenFields = {
    * n=1 (default),
    * n=1 (max)
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * n=4 (default),
    * n=1 (min)
@@ -678,7 +675,7 @@ export type AIChatRequestImgGenFields = {
    */
   n?: number;
   /**
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001 only**
+   * ** imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001 only**
    *
    * A negative prompt.
    * What you *don't* want to see in the image.
@@ -696,7 +693,7 @@ export type AIChatRequestImgGenFields = {
   output_partial_images?: number;
   /**
    *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001**
+   * ** imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, & imagen-4.0-fast-generate-001**
    *
    * "image/png" (default) | "image/jpeg"
    *
@@ -712,7 +709,7 @@ export type AIChatRequestImgGenFields = {
    *
    * Range: 0-100. Default: 100
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * Only applies if mimeType is "image/jpeg",
    * Range: 0-100. Default: 75
@@ -757,7 +754,7 @@ export type AIChatRequestImgGenFields = {
    *
    * "auto" (default); "1024x1024" | "256x256" | "512x512" | "auto"
    *
-   * imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
+   *  imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001:
    *
    * "1:1"="1024x1024" (default) | "9:16"="768x1344" | "16:9"="1344x768" | "3:4"="864x1184" | "4:3"="1184x864"
    *
@@ -805,7 +802,7 @@ export type AIChatRequestImgGenFields = {
 
   /**
    *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
+   * ** imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
    *
    * A seed value for reproducible results.
    * 0 for random.
@@ -814,7 +811,7 @@ export type AIChatRequestImgGenFields = {
 
   /**
    *
-   * **imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
+   * ** imagen-4.0-generate-001, imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001 only**
    *
    * Whether to automatically enhance the prompt.
    * (Available on Imagen 4 and 3.0-002)
@@ -913,6 +910,18 @@ export type ImgMetadataEntity = {
     | "gray";
   dominantColorHex: null;
   exifDateTimeOriginal: Date | null;
+  colorModel:
+    | "unknown"
+    | "cmyk"
+    | "lab"
+    | "rgb"
+    | "rgba"
+    | "grayscale"
+    | "grayscale_alpha"
+    | "indexed"
+    | "ycbcr"
+    | "ycck"
+    | "vector";
   format:
     | "apng"
     | "png"
@@ -1022,8 +1031,14 @@ export type AIChatResponseImgGenSubFields = {
   s3LastModified: Date | null;
   deletedAt: Date | null;
   image: Rm<ImageSingleton, "attachmentId" | "createdAt" | "updatedAt"> | null;
-  document: Rm<DocumentSingleton, "attachmentId" | "createdAt" | "updatedAt"> | null;
-  imageGenOutput: Rm<ImageGenOutputSingleton, "id" | "attachmentId" | "createdAt" | "updatedAt"> | null;
+  document: Rm<
+    DocumentSingleton,
+    "attachmentId" | "createdAt" | "updatedAt"
+  > | null;
+  imageGenOutput: Rm<
+    ImageGenOutputSingleton,
+    "id" | "attachmentId" | "createdAt" | "updatedAt"
+  > | null;
   generationGroupId: string;
   requestMessageId?: string;
   createdAt: Date;

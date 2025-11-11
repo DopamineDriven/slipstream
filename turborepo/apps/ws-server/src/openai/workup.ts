@@ -13,13 +13,11 @@ import { ModelService } from "@/models/index.ts";
 import { ImageGenPartialArr } from "@/openai/types.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
-  AIChatRequestImgGenFields,
+  AIChatRequest,
   AIChatResponseImgGenSubFields,
   AIChatResRT,
   ConversationSingleton,
   ImgGenWorkupResRT,
-  OpenAIImgGenFacilitatingModels,
-  OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
 
@@ -31,11 +29,71 @@ export class OpenAIServiceWorkup extends ModelService {
   }
 
   protected responsesImgGen(
-    imgGenEnabled: boolean,
-    model: OpenAiModelIdUnion,
-    imgFields?: AIChatRequestImgGenFields,
+    imgGenEnabled: AIChatRequest["imgGenEnabled"],
+    mo: AIChatRequest["model"],
+    imgFields?: AIChatRequest["imgGenFields"],
     currentMsgBoundAssets?: ProviderOpenaiRequestEntity["currentMsgBoundAssets"]
-  ): ImgGenWorkupResRT<OpenAIImgGenFacilitatingModels | OpenAIImgGenModels> {
+  ):
+    | {
+        /**
+         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+         *
+         * "url" (default) | "b64_json"
+         */
+        response_format: "url" | "b64_json";
+        isPureImgGenModel: true;
+        /**
+         * **dall-e-3 only**
+         *
+         * defaults to "vivid"
+         */
+        style: "vivid" | "natural";
+        msgBoundImgAssets: boolean;
+        /** dall-e-3 has max n of 1 */
+        n: number;
+        model: "dall-e-3";
+        output_quality: "auto" | "standard" | "hd";
+        output_size: "auto" | "1024x1024" | "1792x1024" | "1024x1792";
+        targetApi: "images";
+      }
+    | {
+        /**
+         * **dall-e-2, dall-e-3, and grok-2-image-1212 only**
+         *
+         * "url" (default) | "b64_json"
+         */
+        response_format: "url" | "b64_json";
+        isPureImgGenModel: true;
+        msgBoundImgAssets: boolean;
+        /**
+         * count
+         *
+         * 1 (min)
+         * 10 (max)
+         */
+        n: number;
+        model: "dall-e-2";
+        output_quality: "auto" | "standard";
+        output_size: "auto" | "1024x1024" | "256x256" | "512x512";
+        targetApi: "images";
+      }
+    | ImgGenWorkupResRT<
+        | "gpt-5"
+        | "gpt-5-mini"
+        | "gpt-5-nano"
+        | "gpt-5-pro"
+        | "gpt-5-chat-latest"
+        | "gpt-4.1"
+        | "gpt-4.1-mini"
+        | "gpt-4.1-nano"
+        | "gpt-4o"
+        | "gpt-4o-mini"
+        | "gpt-image-1"
+        | "gpt-image-1-mini"
+        | "o3"
+      >
+    | undefined {
+    const model = mo as OpenAiModelIdUnion;
     if (imgGenEnabled === false) return undefined;
     if (!imgFields) return undefined;
     if (
@@ -53,8 +111,9 @@ export class OpenAIServiceWorkup extends ModelService {
       model === "sora-2" ||
       model === "sora-2-pro" ||
       model === "o1-pro"
-    )
-      return undefined;
+    ) {
+      return;
+    }
 
     const msgBoundImgAssets =
       typeof currentMsgBoundAssets?.assets !== "undefined" &&

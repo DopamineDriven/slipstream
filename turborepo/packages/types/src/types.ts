@@ -304,6 +304,7 @@ export type MessageSingleton<T extends boolean = false> = {
   conversationId: string;
   model: string | null;
   senderType: MessageSenderType;
+  messageType: MessageType | null
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -374,6 +375,8 @@ export type AssetReadyPayload = {
   updatedAt: Date;
 };
 
+
+export type MessageType = "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN";
 export type FlexiProvider =
   | "openai"
   | "anthropic"
