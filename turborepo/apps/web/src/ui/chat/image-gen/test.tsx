@@ -89,6 +89,7 @@ export function ImageGenerationCanvasTest({
 
   return (
     <div
+      id={displayAttachmentId ? `attachment-${displayAttachmentId}` : undefined}
       data-attachment-id={displayAttachmentId ?? undefined}
       className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
       <div
@@ -110,7 +111,7 @@ export function ImageGenerationCanvasTest({
             width={w}
             height={h}
             style={{ aspectRatio: w/h }}
-            className="h-full w-full object-cover flex-1"
+            className="h-full w-full object-cover"
             priority
             placeholder="blur"
             blurDataURL={shimmer([w, h])}
