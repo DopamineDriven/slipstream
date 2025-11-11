@@ -16,6 +16,7 @@ import { MessageActionsDialog } from "@/ui/chat/message-bubble/actions-dialog";
 import { MessageIcons } from "@/ui/chat/message-bubble/message-icons";
 import { ThinkingSection } from "@/ui/chat/thinking";
 import { useTheme } from "next-themes";
+import type { $Enums } from "@slipstream/db/edge-client";
 import type {
   AIChatResponseImgGenFieldsFinal,
   AttachmentSingleton,
@@ -97,6 +98,8 @@ export function MessageBubble({
     height: number;
     isGenerating: boolean;
     attachmentId?: string;
+    prompt?: string;
+    kind?: $Enums.ImageGenOutputKind;
   } | null>(null);
 
   const providerInfo = useMemo(
@@ -128,11 +131,12 @@ export function MessageBubble({
 
   const imageGenerationData = useMemo(() => {
     const imageUrls: string[] = [];
-    let isGenerating = true;
-    let prompt = "";
-    let width = 0;
-    let height = 0;
-    let finalAttachmentId: string | undefined;
+    let isGenerating = true,
+      prompt: string | undefined,
+      width = 0,
+      height = 0,
+      finalAttachmentId: string | undefined,
+      kind: $Enums.ImageGenOutputKind | undefined;
 
     // First, try to get images from streaming data
     if (liveImgGenFields) {
@@ -174,10 +178,15 @@ export function MessageBubble({
             // Update prompt from the latest image
             prompt = img.imageGenOutput?.revisedPrompt ?? prompt;
             // If we have a final image, we're no longer generating
-            if (img.imageGenOutput?.kind === "FINAL") {
-              console.log(`[final attachment id in streaming block]:` + img.id);
-              finalAttachmentId = img.id;
-              isGenerating = false;
+            if (img?.imageGenOutput?.kind) {
+              kind = img.imageGenOutput.kind;
+              if (img.imageGenOutput?.kind === "FINAL") {
+                console.log(
+                  `[final attachment id in streaming block]:` + img.id
+                );
+                finalAttachmentId = img.id;
+                isGenerating = false;
+              }
             }
           }
         }
@@ -209,13 +218,16 @@ export function MessageBubble({
         if (att.cdnUrl && !imageUrls.includes(att.cdnUrl)) {
           imageUrls.push(att.cdnUrl);
           prompt = att.imageGenOutput?.revisedPrompt ?? prompt;
-          if (att.imageGenOutput?.kind === "FINAL") {
-            console.log(
-              `[final attachment id in non-streaming block]:` + att.id
-            );
-            isGenerating = isStreaming;
-            // Capture the attachment ID for the final image
-            finalAttachmentId = att.id;
+          if (att?.imageGenOutput?.kind) {
+            kind = att.imageGenOutput.kind;
+            if (att.imageGenOutput?.kind === "FINAL") {
+              console.log(
+                `[final attachment id in non-streaming block]:` + att.id
+              );
+              isGenerating = isStreaming;
+              // Capture the attachment ID for the final image
+              finalAttachmentId = att.id;
+            }
           }
         }
       }
@@ -229,7 +241,9 @@ export function MessageBubble({
         isGenerating,
         width,
         height,
-        attachmentId: finalAttachmentId
+        attachmentId: finalAttachmentId,
+        kind,
+        prompt
       };
       imageDataCacheRef.current = newData;
       return newData;
@@ -450,6 +464,8 @@ export function MessageBubble({
               images={imageGenerationData.images}
               width={imageGenerationData.width}
               height={imageGenerationData.height}
+              kind={imageGenerationData.kind}
+              prompt={imageGenerationData.prompt}
               attachmentId={
                 liveImgGenAttachmentId ??
                 imageGenerationData.attachmentId ??

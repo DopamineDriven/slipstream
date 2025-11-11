@@ -425,7 +425,7 @@ export function ChatInterface({
       // Reset streaming state after completion
       setTimeout(() => {
         resetStreamingState();
-      }, 100);
+      }, 200);
     }
   }, [
     isComplete,
