@@ -213,7 +213,7 @@ export type ImageGenOutputSingleton<T extends boolean = false> = {
   updatedAt: Date;
   jobId: string;
   jobIndex: number;
-  kind: ImageGenOutputKind;
+  kind: ImageGenOutputKind // "FINAL" | "PARTIAL" -> only ever 1 FINAL;
   seriesIndex: number;
   isPartial: boolean;
   attachmentId: string;

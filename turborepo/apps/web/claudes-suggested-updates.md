@@ -1,9 +1,10 @@
+```tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { shimmer } from "@/lib/shimmer";
 import { cn } from "@/lib/utils";
+import { useAIChatContext } from "@/context/ai-chat-context";
 import { Button, Download, Eye } from "@slipstream/ui";
 
 interface ImageGenerationCanvasProps {
@@ -14,7 +15,6 @@ interface ImageGenerationCanvasProps {
   height: number;
   prompt?: string;
   attachmentId?: string;
-  kind?: "FINAL" | "PARTIAL";
 }
 
 export function ImageGenerationCanvasTest({
@@ -24,100 +24,81 @@ export function ImageGenerationCanvasTest({
   width,
   currentImageIndex,
   prompt,
-  attachmentId,
-  kind
+  attachmentId
 }: ImageGenerationCanvasProps) {
-  const imageUrlRef = useRef<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [effectiveAttachmentId, setEffectiveAttachmentId] = useState<string | undefined>(attachmentId);
 
-  const kindRef = useRef<"FINAL" | "PARTIAL" | null>(null);
+  // Persist IDs to handle the gap between streaming end and real ID arrival
+  const realAttachmentIdRef = useRef<string | null>(null);
+  const lastStreamingIdRef = useRef<string | null>(null);
 
-  const attachmentIdRef = useRef<string | null>(null);
+  // Get the real attachment ID from context if available
+  const { currentImgGenAttachmentId } = useAIChatContext();
 
-  const widthRef = useRef<number | null>(null);
-
-  const heightRef = useRef<number | null>(null);
-
-  const [w, setW] = useState<number | null>(null);
-
-  const [h, setH] = useState<number | null>(null);
-
-  const [displayImageUrl, setDisplayImageUrl] = useState<string | null>(null);
-
-  const [displayAttachmentId, setDisplayAttachmentId] = useState<
-    string | undefined
-  >(undefined);
-
-  const [displayKind, setDisplayKind] = useState<"FINAL" | "PARTIAL" | null>(
-    null
-  );
-
+  // Watch for attachment ID changes from context
   useEffect(() => {
-    if (height !== 0 && heightRef.current !== height) {
-      heightRef.current = height;
-      (() => setH(height))();
+    // Track streaming IDs
+    if (attachmentId?.startsWith('streaming-')) {
+      lastStreamingIdRef.current = attachmentId;
     }
-  }, [height]);
 
-  useEffect(() => {
-    if (width !== 0 && widthRef.current !== width) {
-      widthRef.current = width;
-      (() => setW(width))();
+    // If we get a real attachment ID from context, persist and use it
+    if (currentImgGenAttachmentId?.length === 24) {
+      realAttachmentIdRef.current = currentImgGenAttachmentId;
+      setEffectiveAttachmentId(currentImgGenAttachmentId);
+    } else if (realAttachmentIdRef.current) {
+      // Once we have a real ID, always use it
+      setEffectiveAttachmentId(realAttachmentIdRef.current);
+    } else if (attachmentId) {
+      // Use the current prop if available
+      setEffectiveAttachmentId(attachmentId);
+    } else if (lastStreamingIdRef.current) {
+      // Fall back to last known streaming ID during the gap
+      setEffectiveAttachmentId(lastStreamingIdRef.current);
     }
-  }, [width]);
+    // We intentionally never set to undefined - maintain stable IDs
+  }, [currentImgGenAttachmentId, attachmentId]);
 
-  useEffect(() => {
-    const currentImageUrl = images[currentImageIndex] ?? undefined;
-    if (currentImageUrl && imageUrlRef.current !== currentImageUrl) {
-      imageUrlRef.current = currentImageUrl;
-      (() => setDisplayImageUrl(currentImageUrl))();
-    }
-  }, [images, currentImageIndex]);
-
-  useEffect(() => {
-    if (attachmentId && attachmentIdRef.current !== attachmentId) {
-      attachmentIdRef.current = attachmentId;
-      (() => setDisplayAttachmentId(attachmentId))();
-    }
-  }, [attachmentId]);
-
-  useEffect(() => {
-    if (kind && kindRef.current !== kind) {
-      kindRef.current = kind;
-      (() => setDisplayKind(kind))();
-    }
-  }, [kind]);
+  const currentImageUrl = images[currentImageIndex] ?? null;
+  const isPartialImage =
+    currentImageUrl && currentImageIndex < images.length - 1;
+  const isFinalImage =
+    currentImageUrl && currentImageIndex === images.length - 1;
 
   return (
     <div
-      id={displayAttachmentId ? `attachment-${displayAttachmentId}` : undefined}
-      data-attachment-id={displayAttachmentId ?? undefined}
+      id={effectiveAttachmentId ? `attachment-${effectiveAttachmentId}` : undefined}
+      data-attachment-id={effectiveAttachmentId ?? undefined}
       className="bg-muted group relative mx-auto aspect-square w-full max-w-3xl overflow-hidden rounded-2xl">
       <div
         className={cn(
           "absolute inset-0 transition-opacity duration-500",
-          isGenerating && !displayImageUrl ? "opacity-100" : "opacity-0"
+          isGenerating && !currentImageUrl ? "opacity-100" : "opacity-0"
         )}>
         <div className="ripple-container" />
       </div>
 
-      {displayImageUrl && w && h && (
+      {currentImageUrl && (
         <div
           className={cn(
-            "absolute inset-0 scale-100 opacity-100 transition-all duration-700 ease-out"
+            "absolute inset-0 transition-all duration-700 ease-out",
+            imageLoaded || isPartialImage
+              ? "scale-100 opacity-100"
+              : "scale-95 opacity-0"
           )}>
           <Image
-            src={displayImageUrl ?? "/placeholder.svg"}
-            alt={"Image Gen"}
-            width={w}
-            height={h}
-            style={{ aspectRatio: w/h }}
-            className="h-full w-full object-cover"
+            src={currentImageUrl ?? "/placeholder.svg"}
+            alt={"/placeholder.svg"}
+            width={width}
+            height={height}
+            className="h-full w-full flex-1 object-cover"
+            onLoad={() => setImageLoaded(true)}
+            onLoadStart={() => setImageLoaded(false)}
             priority
-            placeholder="blur"
-            blurDataURL={shimmer([w, h])}
           />
 
-          {displayKind === "PARTIAL" && (
+          {isPartialImage && (
             <>
               <div className="scanning-line" />
               <div className="border-primary/30 animate-pulse-glow absolute inset-0 border-2" />
@@ -133,13 +114,13 @@ export function ImageGenerationCanvasTest({
       <div
         className={cn(
           "absolute inset-0 bg-black/0 transition-colors duration-300 hover:bg-black/20",
-          (isGenerating || !(displayKind === "FINAL")) && "pointer-events-none"
+          (isGenerating || !isFinalImage) && "pointer-events-none"
         )}>
         <div
           className={cn(
             "absolute top-4 right-4 flex gap-2 opacity-30 transition-opacity duration-300",
             !isGenerating &&
-              displayKind === "FINAL" &&
+              isFinalImage &&
               "group-hover:opacity-100 focus:opacity-100"
           )}>
           <Button
@@ -153,12 +134,12 @@ export function ImageGenerationCanvasTest({
             variant="ghost"
             className="bg-foreground/90 text-background hover:foreground backdrop-blur-sm"
             onClick={() => {
-              if (!displayImageUrl) return;
+              if (!currentImageUrl) return;
               const link = document.createElement("a");
-              link.href = displayImageUrl;
+              link.href = currentImageUrl;
               link.target = "_blank";
               link.rel = "noreferrer noopener";
-              const ext = displayImageUrl.split(/\./g).at(-1) ?? "png";
+              const ext = currentImageUrl.split(/\./g).at(-1) ?? "png";
               link.download = `generated-${Date.now()}.${ext}`;
               link.click();
             }}>
@@ -167,7 +148,7 @@ export function ImageGenerationCanvasTest({
         </div>
       </div>
 
-      {isGenerating && !displayImageUrl && (
+      {isGenerating && !currentImageUrl && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="animate-fade-in space-y-4 text-center">
             <div className="bg-background/80 border-border inline-flex items-center gap-2 rounded-full border px-4 py-2 backdrop-blur-sm">
@@ -185,3 +166,4 @@ export function ImageGenerationCanvasTest({
     </div>
   );
 }
+```
