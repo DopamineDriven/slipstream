@@ -521,7 +521,8 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public mapToCompletionImgGenArr(props: AIChatResRT) {
+  public mapToCompletionImgGenArr(props: AIChatResRT, userMsgId: string, revisedPrompt?: string) {
+
     const s = props.messages[0];
 
     if (!s) throw new Error("returned db res has no attachments for image gen");
@@ -564,16 +565,16 @@ export class OpenAIServiceWorkup extends ModelService {
         batchId: t.batchId,
         checksumAlgo: t.checksumAlgo,
         expiresAt: t?.expiresAt,
-        jobId: "",
+        jobId: t.imageGenOutput?.jobId,
         s3LastModified: t.s3LastModified,
         size: t.size ? Number(t.size) : null,
         sseAlgorithm: t.sseAlgorithm,
         sseKmsKeyId: t.sseKmsKeyId,
         storageClass: t.storageClass,
         uploadDuration: t.uploadDuration,
-        requestMessageId: "",
-        revisedPrompt: "",
-        seriesIndex: 0,
+        requestMessageId: userMsgId,
+        revisedPrompt,
+        seriesIndex: o,
         draftId: t.draftId,
         cacheControl: t.cacheControl,
         mime: t.mime ?? "",

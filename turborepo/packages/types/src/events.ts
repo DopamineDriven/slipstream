@@ -10,6 +10,8 @@ import type {
   AssetUploadAbortReason,
   AssetUploadInstructionsMethod,
   AttachmentMetadata,
+  ImgColorModel,
+  ImgColorSpace,
   MetadataUnion,
   S3ObjectId,
   UserMetadata,
@@ -861,19 +863,8 @@ export type AIChatResRT = {
         hasAlpha: boolean | null;
         animated: boolean;
         orientation: number | null;
-        colorSpace:
-          | "unknown"
-          | "srgb"
-          | "display_p3"
-          | "adobe_rgb"
-          | "prophoto_rgb"
-          | "rec2020"
-          | "rec709"
-          | "cmyk"
-          | "lab"
-          | "xyz"
-          | "gray"
-          | null;
+        colorSpace: ImgColorSpace | null;
+        colorModel: ImgColorModel | null;
         exifDateTimeOriginal: Date | null;
         cameraMake: string | null;
         cameraModel: string | null;
