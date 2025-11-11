@@ -457,24 +457,56 @@ export function MessageBubble({
               ? streamingRenderedContent
               : (renderedContent ?? message.content)}
           </div>
-          {message.senderType !== "USER" && imageGenerationData && (
-            <ImageGenerationCanvasTest
-              isGenerating={imageGenerationData.isGenerating}
-              currentImageIndex={imageGenerationData.currentImageIndex}
-              images={imageGenerationData.images}
-              width={imageGenerationData.width}
-              height={imageGenerationData.height}
-              kind={imageGenerationData.kind}
-              prompt={imageGenerationData.prompt}
-              attachmentId={
-                liveImgGenAttachmentId ??
-                imageGenerationData.attachmentId ??
-                (isStreaming
-                  ? `streaming-attachment-${message.conversationId}`
-                  : undefined)
-              }
-            />
-          )}
+          {message.senderType !== "USER" &&
+            (imageGenerationData ? (
+              <ImageGenerationCanvasTest
+                isGenerating={imageGenerationData.isGenerating}
+                currentImageIndex={imageGenerationData.currentImageIndex}
+                images={imageGenerationData.images}
+                width={imageGenerationData.width}
+                height={imageGenerationData.height}
+                kind={imageGenerationData.kind}
+                prompt={imageGenerationData.prompt}
+                attachmentId={
+                  liveImgGenAttachmentId ??
+                  imageGenerationData.attachmentId ??
+                  (isStreaming
+                    ? `streaming-attachment-${message.conversationId}`
+                    : undefined)
+                }
+              />
+            ) : (
+              <ImageGenerationCanvasTest
+                images={message.attachments
+                  .map(t => t.cdnUrl)
+                  .filter(v => v != null)}
+                isGenerating={false}
+                attachmentId={
+                  message.attachments.find(
+                    v => v.imageGenOutput?.kind === "FINAL"
+                  )?.id
+                }
+                kind={
+                  message.attachments.find(
+                    v => v.imageGenOutput?.kind === "FINAL"
+                  )?.imageGenOutput?.kind
+                }
+                prompt={
+                  message.attachments.find(
+                    v => v.imageGenOutput?.kind === "FINAL"
+                  )?.imageGenOutput?.revisedPrompt ?? undefined
+                }
+                currentImageIndex={message.attachments.length - 1}
+                height={
+                  message.attachments[message.attachments.length - 1]?.image
+                    ?.height ?? 1024
+                }
+                width={
+                  message.attachments[message.attachments.length - 1]?.image
+                    ?.width ?? 1024
+                }
+              />
+            ))}
           {message.attachments && message.attachments.length > 0 && (
             <div className={cn("mt-3", className)}>
               <div
