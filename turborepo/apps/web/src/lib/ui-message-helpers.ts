@@ -1,5 +1,10 @@
 // src/lib/ui-message-helpers.ts
-import type { MessageSingleton } from "@slipstream/types";
+import type {
+  AIChatResponseImgGenFieldsFinal,
+  AttachmentSingleton,
+  MessageSingleton
+} from "@slipstream/types";
+import { normalizeImgGenFields } from "./img-gen-to-attachment";
 
 /**
  * Creates a properly typed MessageSingleton for user messages
@@ -83,8 +88,31 @@ export function finalizeStreamingMessage(
     thinkingDuration?: number;
     aiMsgId?: string;
     imgGenAttachmentId?: string;
+    imgGenFields?: AIChatResponseImgGenFieldsFinal | null;
   }
 ): MessageSingleton<true> {
+  const arr = Array.of<AttachmentSingleton<true>>();
+
+  if (additionalData?.imgGenFields) {
+    const partials = normalizeImgGenFields(
+      additionalData.imgGenFields
+    )?.partialImages;
+
+    const finals = normalizeImgGenFields(additionalData.imgGenFields)?.images;
+
+    if (partials && partials.length > 0) {
+      const filter = partials.filter(t => typeof t !== "undefined");
+      if (filter.length > 0) arr.push(...filter);
+    }
+    if (finals && finals?.length > 0) {
+      const filter = finals.filter(t => typeof t !== "undefined");
+      const withCorrectId = filter.map(({ id: _id, ...rest }) => ({
+        ...rest,
+        id: additionalData.imgGenAttachmentId ?? _id
+      }));
+      if (withCorrectId.length > 0) arr.push(...withCorrectId);
+    }
+  }
   return {
     ...streamingMessage,
     id:
@@ -93,6 +121,7 @@ export function finalizeStreamingMessage(
     thinkingText: additionalData?.thinkingText ?? streamingMessage.thinkingText,
     thinkingDuration:
       additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    attachments: arr.length > 0 ? arr : streamingMessage.attachments
   };
 }

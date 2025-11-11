@@ -216,8 +216,8 @@ export function ChatInterface({
       sendChat(
         queuedPrompt,
         explicitBatchId,
-        undefined,
-        undefined,
+        imgGenEnabled,
+        imgGenFields ?? undefined,
         optimisticMsgId
       );
 
@@ -233,6 +233,7 @@ export function ChatInterface({
     activeConversationId,
     queuedPrompt,
     selectedModel,
+    imgGenFields,
     sendChat,
     imgGenEnabled,
     user,
@@ -413,7 +414,8 @@ export function ChatInterface({
                 thinkingText: thinkingText ?? undefined,
                 thinkingDuration: thinkingDuration ?? undefined,
                 aiMsgId: currentAiMsgId ?? undefined,
-                imgGenAttachmentId: currentImgGenAttachmentId ?? undefined
+                imgGenAttachmentId: currentImgGenAttachmentId ?? undefined,
+                imgGenFields: imgGenFields ?? undefined
               }
             );
           }
@@ -433,6 +435,7 @@ export function ChatInterface({
     currentImgGenAttachmentId,
     resetStreamingState,
     thinkingText,
+    imgGenFields,
     thinkingDuration,
     currentAiMsgId,
     currentUserMsgId
