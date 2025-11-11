@@ -40,7 +40,6 @@ export const modelIdsByProvider = {
     "imagen-4.0-generate-001",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-ultra-generate-001",
-    "imagen-3.0-generate-002",
     "veo-3.1-generate-preview",
     "veo-3.1-fast-generate-preview",
     "veo-3.0-generate-001",

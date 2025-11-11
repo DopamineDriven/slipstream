@@ -159,7 +159,7 @@ const components = {
   },
   code: ({ children, ...props }: ComponentPropsWithRef<"code">) => {
     return (
-      <div className="relative m-0 w-full p-0">
+      <span className="relative m-0 w-full p-0">
         <code
           className={cn(
             `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
@@ -167,7 +167,7 @@ const components = {
           {...props}>
           {children}
         </code>
-      </div>
+      </span>
     );
   },
   h1: createHeading(1),

@@ -12,8 +12,6 @@ import type {
   S3StorageClass
 } from "@slipstream/types";
 
-
-
 export type S3FinalizePayload = {
   bucket: string;
   key: string;
@@ -422,12 +420,39 @@ export type UploadToS3Rt = {
   extension:
     | "pdf"
     | "jpg"
+    | "jpeg"
     | "mp4"
     | "mp3"
+    | "heic"
+    | "heif"
+    | "tif"
     | "apng"
+    | "glb"
+    | "gltf"
+    | "obj"
+    | "ktx"
+    | "ktx2"
+    | "fbx"
+    | "usd"
+    | "cad"
+    | "usdz"
     | "png"
     | "gif"
     | "bmp"
+    | "jxl"
+    | "jp2"
+    | "jpx"
+    | "jxr"
+    | "jls"
+    | "raw"
+    | "dng"
+    | "cr2"
+    | "nef"
+    | "arw"
+    | "hdr"
+    | "pic"
+    | "rgbe"
+    | "xyze"
     | "webp"
     | "avif"
     | "svg"
@@ -445,7 +470,6 @@ export type UploadToS3Rt = {
     | "node"
     | "js"
     | "bin"
-    | "obj"
     | "ogx"
     | "rtf"
     | "sql"
@@ -502,12 +526,7 @@ export type UploadToS3Rt = {
     | "avci"
     | "dpx"
     | "emf"
-    | "ktx"
-    | "ktx2"
     | "cur"
-    | "glb"
-    | "gltf"
-    | "usdz"
     | "ics"
     | "css"
     | "csv"
@@ -649,7 +668,7 @@ export type UpdateAttachmentMetadata = {
           | "lab"
           | "xyz"
           | "gray";
-          colorModel: $Enums.ColorModel | null;
+        colorModel: $Enums.ColorModel | null;
         dominantColorHex: null;
         exifDateTimeOriginal: Date | null;
         format:
@@ -835,33 +854,7 @@ export type ImageSingleton = {
   createdAt: Date;
   updatedAt: Date;
   attachmentId: string;
-  format:
-    | "apng"
-    | "png"
-    | "gif"
-    | "bmp"
-    | "webp"
-    | "avif"
-    | "svg"
-    | "ico"
-    | "tiff"
-    | "jpeg"
-    | "heic"
-    | "unknown"
-    | "jxl"
-    | "jp2"
-    | "jpx"
-    | "jxr"
-    | "jls"
-    | "raw"
-    | "dng"
-    | "cr2"
-    | "nef"
-    | "arw"
-    | "hdr"
-    | "pic"
-    | "rgbe"
-    | "xyze";
+  format: $Enums.ImageFormat;
   width: number;
   height: number;
   aspectRatio: number | null;
@@ -963,27 +956,10 @@ export type AttachmentSingleton<T extends boolean = false> = {
   userId: string;
   messageId: string | null;
   s3ObjectId: string | null;
-  origin:
-    | "UPLOAD"
-    | "REMOTE"
-    | "GENERATED"
-    | "PASTED"
-    | "SCREENSHOT"
-    | "IMPORTED"
-    | "SCRAPED";
-  status:
-    | "REQUESTED"
-    | "PLANNED"
-    | "UPLOADING"
-    | "STORED"
-    | "SCANNING"
-    | "READY"
-    | "FAILED"
-    | "QUARANTINED"
-    | "ATTACHED"
-    | "DELETED";
+  origin: $Enums.AssetOrigin;
+  status: $Enums.AssetStatus;
   compatKey: string | null;
-  compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
+  compatStatus: $Enums.CompatStatus | null;
   compatCdnUrl: string | null;
   compatReadyAt: Date | null;
   generationGroupId?: string | null;
@@ -991,8 +967,8 @@ export type AttachmentSingleton<T extends boolean = false> = {
   compatS3ObjectId: string | null;
   compatMime: string | null;
   compatExt: string | null;
-  uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
-  assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
+  uploadMethod: $Enums.UploadMethod;
+  assetType: $Enums.AssetType;
   uploadDuration: number | null;
   cdnUrl: string | null;
   publicUrl: string | null;
@@ -1011,7 +987,7 @@ export type AttachmentSingleton<T extends boolean = false> = {
   ext: string | null;
   mime: string | null;
   etag: string | null;
-  checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
+  checksumAlgo: $Enums.ChecksumAlgo;
   checksumSha256: string | null;
   storageClass: string | null;
   sseAlgorithm: string | null;
@@ -1041,13 +1017,14 @@ export type UserKeySingleton = {
 export type MessageSingleton<T extends boolean = false> = {
   id: string;
   userId: string | null;
-  provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
+  provider: $Enums.Provider;
   createdAt: Date;
   updatedAt: Date;
   userKeyId: string | null;
   conversationId: string;
   model: string | null;
-  senderType: "USER" | "AI" | "SYSTEM";
+  messageType: $Enums.MessageType | null;
+  senderType: $Enums.SenderType;
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -1105,27 +1082,10 @@ export type AssetReadyPayload = {
   batchId: string | null;
   userId: string;
   messageId: string | null;
-  origin:
-    | "UPLOAD"
-    | "REMOTE"
-    | "GENERATED"
-    | "PASTED"
-    | "SCREENSHOT"
-    | "IMPORTED"
-    | "SCRAPED";
-  status:
-    | "REQUESTED"
-    | "PLANNED"
-    | "UPLOADING"
-    | "STORED"
-    | "SCANNING"
-    | "READY"
-    | "FAILED"
-    | "QUARANTINED"
-    | "ATTACHED"
-    | "DELETED";
-  uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
-  assetType: "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN";
+  origin: $Enums.AssetOrigin;
+  status: $Enums.AssetStatus;
+  uploadMethod: $Enums.UploadMethod;
+  assetType: $Enums.AssetType;
   uploadDuration: number | null;
   sourceUrl: string | null;
   thumbnailKey: string | null;
@@ -1135,7 +1095,7 @@ export type AssetReadyPayload = {
   filename: string | null;
   ext: string | null;
   mime: string | null;
-  checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
+  checksumAlgo: $Enums.ChecksumAlgo;
   checksumSha256: string | null;
   sseAlgorithm: string | null;
   sseKmsKeyId: string | null;
@@ -1320,6 +1280,7 @@ export type ImageGenReqDbRes<T extends boolean = false> = {
     userKeyId: string | null;
     conversationId: string;
     model: string | null;
+    messageType: $Enums.MessageType | null;
     senderType: $Enums.SenderType;
     content: string;
     thinkingText: string | null;

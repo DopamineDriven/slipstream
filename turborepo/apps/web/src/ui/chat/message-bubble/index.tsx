@@ -42,6 +42,7 @@ interface ChatMessageProps {
   liveThinkingDuration?: number;
   liveImgGenEnabled?: boolean;
   liveImgGenFields?: AIChatResponseImgGenFieldsFinal;
+  liveImgGenAttachmentId?: string;
 }
 
 // Global cache for processed markdown
@@ -60,7 +61,8 @@ export function MessageBubble({
   liveThinkingText,
   liveIsThinking,
   liveThinkingDuration,
-  liveImgGenFields
+  liveImgGenFields,
+  liveImgGenAttachmentId
 }: ChatMessageProps) {
   useEffect(() => {
     console.log({
@@ -94,6 +96,7 @@ export function MessageBubble({
     width: number;
     height: number;
     isGenerating: boolean;
+    attachmentId?: string;
   } | null>(null);
 
   const providerInfo = useMemo(
@@ -129,6 +132,7 @@ export function MessageBubble({
     let prompt = "";
     let width = 0;
     let height = 0;
+    let finalAttachmentId: string | undefined;
 
     // First, try to get images from streaming data
     if (liveImgGenFields) {
@@ -171,6 +175,8 @@ export function MessageBubble({
             prompt = img.imageGenOutput?.revisedPrompt ?? prompt;
             // If we have a final image, we're no longer generating
             if (img.imageGenOutput?.kind === "FINAL") {
+              console.log(`[final attachment id in streaming block]:` + img.id);
+              finalAttachmentId = img.id;
               isGenerating = false;
             }
           }
@@ -204,7 +210,12 @@ export function MessageBubble({
           imageUrls.push(att.cdnUrl);
           prompt = att.imageGenOutput?.revisedPrompt ?? prompt;
           if (att.imageGenOutput?.kind === "FINAL") {
+            console.log(
+              `[final attachment id in non-streaming block]:` + att.id
+            );
             isGenerating = isStreaming;
+            // Capture the attachment ID for the final image
+            finalAttachmentId = att.id;
           }
         }
       }
@@ -217,7 +228,8 @@ export function MessageBubble({
         currentImageIndex: imageUrls.length - 1,
         isGenerating,
         width,
-        height
+        height,
+        attachmentId: finalAttachmentId
       };
       imageDataCacheRef.current = newData;
       return newData;
@@ -371,6 +383,11 @@ export function MessageBubble({
         <div
           className={cn(
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
+            liveImgGenFields && message.senderType !== "USER" && isStreaming
+              ? "w-[85%]"
+              : message.attachments.length > 0 && message.senderType === "USER"
+                ? "w-[85%]"
+                : "",
             message.senderType === "USER"
               ? "bg-muted text-foreground"
               : resolvedTheme === "light"
@@ -433,6 +450,13 @@ export function MessageBubble({
               images={imageGenerationData.images}
               width={imageGenerationData.width}
               height={imageGenerationData.height}
+              attachmentId={
+                liveImgGenAttachmentId ??
+                imageGenerationData.attachmentId ??
+                (isStreaming
+                  ? `streaming-attachment-${message.conversationId}`
+                  : undefined)
+              }
             />
           )}
           {message.attachments && message.attachments.length > 0 && (

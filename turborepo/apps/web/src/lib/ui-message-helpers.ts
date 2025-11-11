@@ -4,16 +4,25 @@ import type { MessageSingleton } from "@slipstream/types";
 /**
  * Creates a properly typed MessageSingleton for user messages
  */
-export function createUserMessage(params: MessageSingleton<true>): MessageSingleton<true> {
+export function createUserMessage(
+  params: MessageSingleton<true>
+): MessageSingleton<true> {
   return {
     id: params.id,
     userId: params.userId,
     provider: params.provider,
-    createdAt: params.createdAt instanceof Date ? params.createdAt : new Date(params.createdAt),
-    updatedAt: params.updatedAt instanceof Date ? params.updatedAt : new Date(params.updatedAt),
+    createdAt:
+      params.createdAt instanceof Date
+        ? params.createdAt
+        : new Date(params.createdAt),
+    updatedAt:
+      params.updatedAt instanceof Date
+        ? params.updatedAt
+        : new Date(params.updatedAt),
     userKeyId: params.userKeyId ?? null,
     conversationId: params.conversationId,
     model: params.model,
+    messageType: params.imageGenJob ? "IMAGE_GEN" : "TEXT",
     senderType: "USER" as const,
     content: params.content,
     thinkingText: params.thinkingText ?? null,
@@ -29,13 +38,21 @@ export function createUserMessage(params: MessageSingleton<true>): MessageSingle
 /**
  * Creates a properly typed MessageSingleton for AI messages
  */
-export function createAIMessage(params: MessageSingleton<true>): MessageSingleton<true> {
+export function createAIMessage(
+  params: MessageSingleton<true>
+): MessageSingleton<true> {
   return {
     id: params.id,
     userId: params.userId,
     provider: params.provider,
-    createdAt: params.createdAt instanceof Date ? params.createdAt : new Date(params.createdAt),
-    updatedAt: params.updatedAt instanceof Date ? params.updatedAt : new Date(params.updatedAt),
+    createdAt:
+      params.createdAt instanceof Date
+        ? params.createdAt
+        : new Date(params.createdAt),
+    updatedAt:
+      params.updatedAt instanceof Date
+        ? params.updatedAt
+        : new Date(params.updatedAt),
     userKeyId: params.userKeyId ?? null,
     conversationId: params.conversationId,
     model: params.model,
@@ -46,6 +63,10 @@ export function createAIMessage(params: MessageSingleton<true>): MessageSingleto
     liked: params.liked ?? null,
     disliked: params.disliked ?? null,
     tryAgain: params.tryAgain ?? null,
+    messageType:
+      params.attachments && params.attachments.length > 0
+        ? "IMAGE_GEN"
+        : "TEXT",
     imageGenJob: params.imageGenJob ?? null,
     attachments: params.attachments ?? []
   };
@@ -61,14 +82,17 @@ export function finalizeStreamingMessage(
     thinkingText?: string;
     thinkingDuration?: number;
     aiMsgId?: string;
+    imgGenAttachmentId?: string;
   }
 ): MessageSingleton<true> {
   return {
     ...streamingMessage,
-    id: additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
+    id:
+      additionalData?.aiMsgId ?? streamingMessage.id.replace("streaming-", ""),
     content: finalContent,
     thinkingText: additionalData?.thinkingText ?? streamingMessage.thinkingText,
-    thinkingDuration: additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,
+    thinkingDuration:
+      additionalData?.thinkingDuration ?? streamingMessage.thinkingDuration,
     updatedAt: new Date()
   };
 }

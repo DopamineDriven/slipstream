@@ -42,7 +42,6 @@ export class ProviderValidation {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
           case "gemini-2.5-flash-image":
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -142,7 +141,6 @@ export class ProviderValidation {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
           case "gemini-2.5-flash-image":
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -215,7 +213,6 @@ export class ProviderValidation {
     if (
       !(
         model === "imagen-4.0-generate-001" ||
-        model === "imagen-3.0-generate-002" ||
         model === "imagen-4.0-fast-generate-001" ||
         model === "imagen-4.0-ultra-generate-001" ||
         model === "gemini-2.5-flash-image"
@@ -265,7 +262,6 @@ export class ProviderValidation {
       case "gemini": {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -476,7 +472,6 @@ export class ProviderValidation {
     if (
       !(
         m === "gpt-4.1" ||
-        m === "imagen-3.0-generate-002" ||
         m === "imagen-4.0-fast-generate-001" ||
         m === "imagen-4.0-generate-001" ||
         m === "imagen-4.0-ultra-generate-001" ||
@@ -499,7 +494,6 @@ export class ProviderValidation {
     const f = data?.output_format as "png" | "jpeg" | "webp" | undefined;
 
     if (
-      m === "imagen-3.0-generate-002" ||
       m === "imagen-4.0-fast-generate-001" ||
       m === "imagen-4.0-generate-001" ||
       m === "imagen-4.0-ultra-generate-001"
@@ -562,7 +556,6 @@ export class ProviderValidation {
     }
     if (
       !(
-        model === "imagen-3.0-generate-002" ||
         model === "imagen-4.0-fast-generate-001" ||
         model === "imagen-4.0-generate-001" ||
         model === "imagen-4.0-ultra-generate-001"
@@ -593,11 +586,6 @@ export class ProviderValidation {
       case "gemini": {
         const m = model as GetModelUtilRT<typeof provider>;
         switch (m) {
-          case "imagen-3.0-generate-002": {
-            if (data?.output_quality && /^1K$/gm.test(data.output_quality)) {
-              return data.output_quality as "1K";
-            } else return "1K";
-          }
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -801,7 +789,6 @@ export class ProviderValidation {
               return data.output_size;
             } else return "1:1";
           }
-          case "imagen-3.0-generate-002":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {

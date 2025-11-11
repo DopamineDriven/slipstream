@@ -64,7 +64,8 @@ export function ChatInterface({
     imgGenEnabled,
     imgGenFields,
     currentUserMsgId,
-    currentAiMsgId
+    currentAiMsgId,
+    currentImgGenAttachmentId
   } = useAIChatContext();
   const router = useRouter();
   const { selectedModel } = useModelSelection();
@@ -187,6 +188,7 @@ export function ChatInterface({
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
         conversationId: activeConversationId ?? "new-chat",
+        messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
         disliked: null,
         createdAt: new Date(),
         liked: null,
@@ -211,7 +213,13 @@ export function ChatInterface({
 
       // Send to AI with optimistic message ID
       const explicitBatchId = initialBatchIdRef.current ?? undefined;
-      sendChat(queuedPrompt, explicitBatchId, undefined, undefined, optimisticMsgId);
+      sendChat(
+        queuedPrompt,
+        explicitBatchId,
+        undefined,
+        undefined,
+        optimisticMsgId
+      );
 
       // Clear persisted attachments after consuming
       try {
@@ -226,6 +234,7 @@ export function ChatInterface({
     queuedPrompt,
     selectedModel,
     sendChat,
+    imgGenEnabled,
     user,
     isWaitingForRealId,
     assetUpload,
@@ -316,6 +325,7 @@ export function ChatInterface({
         id: `streaming-${activeConversationId}`,
         content: streamedText,
         userId: user.id,
+        messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
         conversationId: activeConversationId,
@@ -369,9 +379,15 @@ export function ChatInterface({
         if (currentUserMsgId) {
           updated = updated.map(msg => {
             // Find the most recent optimistic user message and update its ID
-            if (msg.senderType === "USER" && (msg.id.startsWith("user-") || msg.id.startsWith("new-chat-user-"))) {
+            if (
+              msg.senderType === "USER" &&
+              (msg.id.startsWith("user-") ||
+                msg.id.startsWith("new-chat-user-"))
+            ) {
               // Check if this is the most recent user message
-              const lastUserMsgIndex = [...updated].reverse().findIndex(m => m.senderType === "USER");
+              const lastUserMsgIndex = [...updated]
+                .reverse()
+                .findIndex(m => m.senderType === "USER");
               const actualIndex = updated.length - 1 - lastUserMsgIndex;
               if (updated[actualIndex] === msg) {
                 return { ...msg, id: currentUserMsgId };
@@ -382,9 +398,11 @@ export function ChatInterface({
         }
 
         // Update AI message from streaming to final
+
         const streamingIndex = updated.findIndex(m =>
           m.id.startsWith("streaming-")
         );
+
         if (streamingIndex >= 0) {
           const streamingMsg = updated[streamingIndex];
           if (streamingMsg && updated?.[streamingIndex]) {
@@ -394,7 +412,8 @@ export function ChatInterface({
               {
                 thinkingText: thinkingText ?? undefined,
                 thinkingDuration: thinkingDuration ?? undefined,
-                aiMsgId: currentAiMsgId ?? undefined
+                aiMsgId: currentAiMsgId ?? undefined,
+                imgGenAttachmentId: currentImgGenAttachmentId ?? undefined
               }
             );
           }
@@ -411,6 +430,7 @@ export function ChatInterface({
   }, [
     isComplete,
     streamedText,
+    currentImgGenAttachmentId,
     resetStreamingState,
     thinkingText,
     thinkingDuration,
@@ -465,6 +485,7 @@ export function ChatInterface({
         model: selectedModel.modelId,
         conversationId: activeConversationId ?? "new-chat",
         createdAt: new Date(),
+        messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
         disliked: null,
         liked: null,
         senderType: "USER",
@@ -489,7 +510,14 @@ export function ChatInterface({
         optimisticMsgId
       );
     },
-    [activeConversationId, selectedModel, sendChat, user, assetUpload]
+    [
+      activeConversationId,
+      selectedModel,
+      sendChat,
+      user,
+      assetUpload,
+      imgGenEnabled
+    ]
   );
 
   return (
@@ -510,6 +538,8 @@ export function ChatInterface({
         thinkingDuration={thinkingDuration ?? undefined}
         imgGenEnabled={imgGenEnabled}
         imgGenFields={imgGenFields ?? undefined}
+        imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
+        currentAiMsgId={currentAiMsgId ?? undefined}
         user={user}>
         <ChatHero
           user={user}

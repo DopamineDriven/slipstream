@@ -20,8 +20,7 @@ export const modelIdToDisplayNameImgGen = {
     "gemini-2.5-flash-image": "Nano Banana",
     "imagen-4.0-generate-001": "Imagen 4",
     "imagen-4.0-fast-generate-001": "Imagen 4 Fast",
-    "imagen-4.0-ultra-generate-001": "Imagen 4 Ultra",
-    "imagen-3.0-generate-002": "Imagen 3.0"
+    "imagen-4.0-ultra-generate-001": "Imagen 4 Ultra"
   },
   grok: {
     "grok-2-image-1212": "Grok 2 Image"
