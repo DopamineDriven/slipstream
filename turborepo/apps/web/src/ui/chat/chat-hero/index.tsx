@@ -1,4 +1,3 @@
-// src/ui/chat/dynamic/index.tsx
 "use client";
 
 import type { ModelSelection } from "@/lib/models";

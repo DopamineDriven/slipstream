@@ -475,7 +475,8 @@ export function MessageBubble({
                     : undefined)
                 }
               />
-            ) : (
+            ) : message.attachments.length > 0 &&
+              message.messageType === "IMAGE_GEN" ? (
               <ImageGenerationCanvasTest
                 images={message.attachments
                   .map(t => t.cdnUrl)
@@ -506,7 +507,7 @@ export function MessageBubble({
                     ?.width ?? 1024
                 }
               />
-            ))}
+            ) : null)}
           {message.attachments && message.attachments.length > 0 && (
             <div className={cn("mt-3", className)}>
               <div
