@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 
 # libc6-compat only needed for some node modules (e.g., sharp). Safe to include for widest compatibility.
 RUN apk add --no-cache libc6-compat
@@ -11,7 +11,7 @@ WORKDIR /app
 FROM base AS builder
 
 # Install turbo and pnpm globally
-RUN npm install -g turbo@2.5.4 pnpm@10.12.3
+RUN npm install -g turbo@2.6.1 pnpm@10.21.0
 
 # Copy monorepo root files for turbo
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./

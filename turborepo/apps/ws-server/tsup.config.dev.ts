@@ -8,6 +8,8 @@ const tsupConfig = (options: Options) =>
     entry: [
       "src/index.ts",
       "src/anthropic/index.ts",
+      "src/anthropic/types.ts",
+      "src/anthropic/workup.ts",
       "src/extract/index.ts",
       "src/gemini/index.ts",
       "src/gemini/types.ts",

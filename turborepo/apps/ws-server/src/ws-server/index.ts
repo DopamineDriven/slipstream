@@ -136,7 +136,7 @@ export class WSServer {
   ): Promise<void> {
     const cookies = req.headers.cookie;
     const cookieObj = this.parsedCookies(cookies);
-
+    
     const { userId, email } = (await this.authenticateConnection(ws, req)) ?? {
       userId: null,
       email: undefined

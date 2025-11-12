@@ -15,15 +15,15 @@
         "dist/*/index.d.ts"
       ],
       "anthropic": [
-        "dist/anthropic/index.d.ts"
+        "dist/anthropic/index.d.ts",
+        "src/anthropic/types.d.ts",
+        "src/anthropic/workup.d.ts"
       ],
       "extract": [
         "dist/extract/index.d.ts"
       ],
       "gemini": [
-        "dist/gemini/index.d.ts"
-      ],
-      "gemini/types": [
+        "dist/gemini/index.d.ts",
         "dist/gemini/types.d.ts"
       ],
       "image": [
@@ -42,21 +42,15 @@
         "dist/models/index.d.ts"
       ],
       "openai": [
-        "dist/openai/index.d.ts"
-      ],
-      "openai/types": [
-        "src/openai/types.d.ts"
-      ],
-      "openai/workup": [
+        "dist/openai/index.d.ts",
+        "src/openai/types.d.ts",
         "src/openai/workup.d.ts"
       ],
       "pdf": [
         "dist/pdf/index.d.ts"
       ],
       "prisma": [
-        "dist/prisma/index.d.ts"
-      ],
-      "prisma/attachment-provider": [
+        "dist/prisma/index.d.ts",
         "dist/prisma/attachment-provider.d.ts"
       ],
       "providers": [
@@ -69,18 +63,14 @@
         "dist/types/index.d.ts"
       ],
       "vercel": [
-        "dist/vercel/index.d.ts"
-      ],
-      "vercel/sse": [
+        "dist/vercel/index.d.ts",
         "dist/vercel/sse.d.ts"
       ],
       "ws-server": [
         "dist/ws-server/index.d.ts"
       ],
       "xai": [
-        "dist/xai/index.d.ts"
-      ],
-      "xai/sse": [
+        "dist/xai/index.d.ts",
         "dist/xai/sse.d.ts"
       ]
     }
@@ -88,28 +78,29 @@
   "scripts": {
     "build": "tsup",
     "pre:build": "pnpm db:generate",
-    "db:generate": "pnpm --filter \"@slipstream/db\" db:generate",
-    "db:migrate": "pnpm --filter \"@slipstream/db\" db:migrate",
+    "db:generate": "pnpm --filter @slipstream/db db:generate",
+    "db:migrate": "pnpm --filter @slipstream/db db:migrate",
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,md}\" --ignore-unknown --cache",
-    "prisma:studio": "pnpm --filter \"@slipstream/db\" prisma:studio",
+    "prisma:studio": "pnpm --filter @slipstream/db prisma:studio",
     "clean": "git clean -xdf .turbo dist node_modules",
     "dev": "nodemon --watch src --ext ts --exit-child --exec \"tsx src/index.ts\"",
     "lint": "eslint",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "node --test --import tsx --test-reporter spec"
   },
   "prettier": "@slipstream/prettier-config",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.927.0",
-    "@aws-sdk/client-secrets-manager": "^3.927.0",
-    "@aws-sdk/credential-providers": "^3.927.0",
-    "@aws-sdk/s3-request-presigner": "^3.927.0",
+    "@aws-sdk/client-s3": "^3.929.0",
+    "@aws-sdk/client-secrets-manager": "^3.929.0",
+    "@aws-sdk/credential-providers": "^3.929.0",
+    "@aws-sdk/s3-request-presigner": "^3.929.0",
     "@aws-sdk/types": "^3.922.0",
     "@d0paminedriven/fs": "^7.6.0",
     "@d0paminedriven/metadata": "^4.0.1",
     "@google/genai": "^1.29.0",
-    "@napi-rs/canvas": "^0.1.81",
+    "@napi-rs/canvas": "^0.1.82",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-prometheus": "^0.208.0",
     "@opentelemetry/instrumentation-http": "^0.208.0",
@@ -123,7 +114,7 @@
     "@slipstream/redis-service": "workspace:*",
     "@slipstream/storage-s3": "workspace:*",
     "@slipstream/types": "workspace:*",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "@types/ws": "^8.18.1",
     "bullmq": "^5.63.0",
@@ -148,20 +139,17 @@
   },
   "devDependencies": {
     "@slipstream/eslint-config": "workspace:*",
-    "@slipstream/jest-presets": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/jest": "^30.0.0",
     "eslint": "^9.39.1",
-    "jest": "^30.2.0",
     "jiti": "^2.6.1",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "prettier": "^3.6.2",
     "terser": "^5.44.1",
-    "tsdown": "^0.15.2",
+    "tsdown": "^0.15.12",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
-    "typescript-eslint": "^8.46.3",
+    "typescript-eslint": "^8.46.4",
     "wait-on": "^9.0.3"
   }
 }

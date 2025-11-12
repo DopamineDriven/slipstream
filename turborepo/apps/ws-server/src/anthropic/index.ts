@@ -1,545 +1,22 @@
-import type {
-  MessageSingleton,
-  ProviderChatRequestEntity
-} from "@/types/index.ts";
-import type { Uploadable } from "@anthropic-ai/sdk";
-import type {
-  BetaContentBlockParam,
-  BetaImageBlockParam,
-  BetaMessageParam,
-  BetaRawMessageStreamEvent,
-  BetaRequestDocumentBlock,
-  BetaStopReason,
-  BetaTextBlockParam,
-  BetaThinkingConfigParam,
-  BetaWebSearchResultBlock,
-  BetaWebSearchTool20250305,
-  FileUploadParams
-} from "@anthropic-ai/sdk/resources/beta.mjs";
-import type { Logger as PinoLogger } from "pino";
+import type { ProviderAnthropicChatRequestEntity } from "@/anthropic/types.ts";
+import type { Anthropic } from "@anthropic-ai/sdk";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import type { CompatStatus } from "@slipstream/db/enums-node";
-import type {
-  AllModelsUnion,
-  AnthropicModelIdUnion,
-  EventTypeMap
-} from "@slipstream/types";
+import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
+import { AnthropicWorkup } from "./workup.ts";
 
-interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
-  user_location?: BetaWebSearchTool20250305.UserLocation;
-}
-
-export class AnthropicService {
-  private defaultClient: Anthropic;
-  private logger: PinoLogger;
-  // In-memory cache for uploaded files (similar to Gemini pattern)
-  private assetCache = new Map<string, { fileId: string; expiresAt: Date }>();
+export class AnthropicService extends AnthropicWorkup {
   constructor(
     logger: LoggerService,
-    private prisma: PrismaService,
+    protected prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
-    private apiKey: string
+    protected apiKey: string
   ) {
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[anthropic] " }
-      );
-    this.defaultClient = new Anthropic({
-      apiKey: this.apiKey,
-      logLevel: "debug",
-      logger: this.logger
-    });
+    super(logger, prisma, apiKey);
   }
-
-  public getClient(overrideKey?: string) {
-    const client = this.defaultClient;
-    if (overrideKey) {
-      return client.withOptions({ apiKey: overrideKey });
-    }
-    return client;
-  }
-
-  private handleBetaHeaders(model: AnthropicModelIdUnion) {
-    switch (model) {
-      case "claude-sonnet-4-5-20250929":
-      case "claude-sonnet-4-20250514": {
-        return [
-          "files-api-2025-04-14",
-          "extended-cache-ttl-2025-04-11",
-          "context-1m-2025-08-07"
-        ] satisfies Anthropic.Beta.AnthropicBeta[];
-      }
-      case "claude-3-5-haiku-20241022":
-      case "claude-3-haiku-20240307":
-      case "claude-3-7-sonnet-20250219":
-      case "claude-opus-4-1-20250805":
-      case "claude-opus-4-20250514":
-      case "claude-haiku-4-5-20251001":
-      default: {
-        return [
-          "files-api-2025-04-14",
-          "extended-cache-ttl-2025-04-11"
-        ] satisfies Anthropic.Beta.AnthropicBeta[];
-      }
-    }
-  }
-
-  private async streamToBuffer(stream: ReadableStream<Uint8Array>) {
-    const reader = stream.getReader();
-    const chunks = Array.of<Uint8Array>();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) {
-        chunks.push(value);
-      }
-    }
-    return Buffer.concat(chunks);
-  }
-  private handleNumBigIntUnion(size: number | bigint) {
-    return typeof size === "bigint" ? 10n * 1024n * 1024n : 10 * 1024 * 1024;
-  }
-  private async uploadFileToAnthropic(
-    attachment: {
-      compatCdnUrl: string | null;
-      compatMime: string | null;
-      cdnUrl: string | null;
-      mime: string | null;
-      id: string;
-      filename: string | null;
-      compatStatus: CompatStatus | null;
-    },
-    client: Anthropic,
-    model: AnthropicModelIdUnion
-  ) {
-    let url: string | null;
-    if (attachment.compatStatus === "ALIASED")
-      url = attachment.cdnUrl ?? attachment.compatCdnUrl;
-    url = attachment.compatCdnUrl ?? attachment.cdnUrl;
-    if (!url) throw new Error("No CDN URL available for upload");
-    // Fetch the file
-    const response = await fetch(url);
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch file: ${response.statusText}`);
-    }
-
-    // const buffer = await this.streamToBuffer(response.body);
-    // const mime = (attachment.compatStatus === "ACTIVE" ? attachment.compatMime : attachment.mime) ?? "application/pdf";
-    // const filename = attachment.filename ?? "document.pdf";
-
-    // Upload using Anthropic Files API
-    const file = await client.beta.files.upload({
-      file: (await fetch(url)) satisfies Uploadable,
-      betas: this.handleBetaHeaders(model)
-    } satisfies FileUploadParams);
-
-    return file;
-  }
-
-  private async ensureAnthropicAssetUploaded(
-    attachment: {
-      cdnUrl: string | null;
-      compatCdnUrl: string | null;
-      compatMime: string | null;
-      filename: string | null;
-      mime: string | null;
-      id: string;
-      compatStatus: CompatStatus | null;
-    },
-    client: Anthropic,
-    model: AnthropicModelIdUnion,
-    keyFingerprint: string,
-    keyId?: string
-  ): Promise<string> {
-    const cacheKey = `${keyFingerprint}:${attachment.id}`;
-    const now = new Date();
-
-    // Check in-memory cache
-    const cached = this.assetCache.get(cacheKey);
-    if (cached && cached.expiresAt > now) {
-      this.logger.debug(`Reusing cached Anthropic file: ${attachment.id}`);
-      return cached.fileId;
-    }
-
-    // Check database
-    const existing = await this.prisma.findActiveAnthropicAsset(
-      attachment.id,
-      keyFingerprint
-    );
-
-    if (
-      existing?.providerRef &&
-      existing.expiresAt &&
-      existing.expiresAt > now
-    ) {
-      this.logger.debug(`Reusing Anthropic file from DB: ${attachment.id}`);
-      this.assetCache.set(cacheKey, {
-        fileId: existing.providerRef,
-        expiresAt: existing.expiresAt
-      });
-      return existing.providerRef;
-    }
-
-    const mime =
-      (attachment.compatStatus === "ACTIVE"
-        ? attachment.compatMime
-        : attachment.mime) ?? "application/pdf";
-
-    // Create mapping (acts as lock)
-    const mapping = await this.prisma.upsertAnthropicAssetMapping(
-      attachment.id,
-      keyFingerprint,
-      mime,
-      keyId
-    );
-
-    try {
-      // Upload file
-      const uploadedFile = await this.uploadFileToAnthropic(
-        attachment,
-        client,
-        model
-      );
-
-      // Anthropic files expire in 7 days per documentation
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-      await this.prisma.finalizeAnthropicAsset(
-        mapping.id,
-        uploadedFile.id,
-        expiresAt,
-        BigInt(uploadedFile.size_bytes ?? 0)
-      );
-
-      // Update cache
-      this.assetCache.set(cacheKey, {
-        fileId: uploadedFile.id,
-        expiresAt
-      });
-
-      this.logger.info(
-        `Uploaded PDF to Anthropic Files API: ${uploadedFile.id} (${uploadedFile.filename})`
-      );
-
-      return uploadedFile.id;
-    } catch (error) {
-      await this.prisma.markAnthropicAssetFailed(
-        mapping.id,
-        error instanceof Error ? error.message : JSON.stringify(error, null, 2)
-      );
-      throw error;
-    }
-  }
-
-  private get outputTokensByModel() {
-    return {
-      "claude-3-haiku-20240307": 4096,
-      "claude-3-5-haiku-20241022": 8192,
-      "claude-opus-4-20250514": 32000,
-      "claude-opus-4-1-20250805": 32000,
-      "claude-haiku-4-5-20251001": 64000,
-      "claude-sonnet-4-20250514": 64000,
-      "claude-sonnet-4-5-20250929": 64000,
-      "claude-3-7-sonnet-20250219": 64000
-    } as const satisfies Record<
-      AnthropicModelIdUnion,
-      4096 | 8192 | 32000 | 64000
-    >;
-  }
-
-  private getMaxTokens = <const T extends AnthropicModelIdUnion>(model: T) => {
-    return this.outputTokensByModel[model];
-  };
-
-  public async formatAnthropicHistoryWithFiles(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[],
-    model: AnthropicModelIdUnion,
-    systemPrompt?: string,
-    client?: Anthropic,
-    keyFingerprint = "server",
-    keyId?: string
-  ) {
-    if (!isNewChat) {
-      const messages = await Promise.all(
-        msgs.map(async msg => {
-          if (msg.senderType === "USER") {
-            const content = Array.of<BetaContentBlockParam>();
-            try {
-              // Process attachments
-              if (msg.attachments && msg.attachments.length > 0 && client) {
-                for (const attachment of msg.attachments) {
-                  const {
-                    cdnUrl,
-                    mime: ogMime,
-                    compatStatus,
-                    compatCdnUrl,
-                    compatMime
-                  } = attachment;
-                  const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
-                  const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-
-                  if (url && mime) {
-                    // Use Files API for PDFs only
-                    if (mime === "application/pdf") {
-                      try {
-                        const fileId = await this.ensureAnthropicAssetUploaded(
-                          attachment,
-                          client,
-                          model,
-                          keyFingerprint,
-                          keyId
-                        );
-                        const docBlock = {
-                          type: "document",
-                          source: { file_id: fileId, type: "file" }
-                        } as const satisfies BetaRequestDocumentBlock;
-                        content.push(docBlock);
-                      } catch (err) {
-                        this.logger.warn(
-                          { err },
-                          "Failed to upload PDF to Files API, falling back to URL"
-                        );
-                        // Fallback to URL
-                        const docBlock = {
-                          type: "document",
-                          source: {
-                            type: "url",
-                            url
-                          }
-                        } as const satisfies BetaRequestDocumentBlock;
-                        content.push(docBlock);
-                      }
-                    } else if (mime.startsWith("image/")) {
-                      // Images use URLs
-                      const imageBlock = {
-                        type: "image",
-                        source: {
-                          type: "url",
-                          url
-                        }
-                      } as const satisfies BetaImageBlockParam;
-                      content.push(imageBlock);
-                    } else if (mime.includes("application")) {
-                      // Other docs use URLs
-                      const docBlock = {
-                        type: "document",
-                        source: {
-                          type: "url",
-                          url
-                        }
-                      } as const satisfies BetaRequestDocumentBlock;
-                      content.push(docBlock);
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              this.logger.warn({ err }, "error in anthropic history workup");
-            } finally {
-              content.push({ type: "text", text: msg.content } as const);
-            }
-
-            return {
-              role: "user",
-              content: content.length > 0 ? content : msg.content
-            } as const satisfies BetaMessageParam;
-          } else {
-            const provider = msg.provider.toLowerCase();
-            const model = msg.model ?? "";
-            return {
-              role: "assistant",
-              content: `<model provider="${provider}" name="${model}">\n${msg.content}\n</model>`
-            } as const;
-          }
-        })
-      );
-
-      const enhancedSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
-        : "Previous responses in this conversation may be tagged with their source model for context.";
-
-      return {
-        messages,
-        system: [
-          { type: "text", text: enhancedSystemPrompt }
-        ] as const satisfies BetaTextBlockParam[]
-      };
-    } else {
-      // new chat means only one message exists period -> the first user message
-      const userMsg = msgs[0];
-      const content = Array.of<BetaContentBlockParam>();
-
-      if (userMsg) {
-        try {
-          if (userMsg.attachments && userMsg.attachments.length > 0 && client) {
-            for (const attachment of userMsg.attachments) {
-              const {
-                cdnUrl,
-                mime: ogMime,
-                compatCdnUrl,
-                compatMime
-              } = attachment;
-              const url = compatCdnUrl ?? cdnUrl;
-              const mime = compatMime ?? ogMime;
-
-              if (url && mime) {
-                // Use Files API for PDFs only
-                if (mime === "application/pdf") {
-                  try {
-                    const fileId = await this.ensureAnthropicAssetUploaded(
-                      attachment,
-                      client,
-                      model,
-                      keyFingerprint,
-                      keyId
-                    );
-                    const docBlock = {
-                      type: "document",
-                      source: {
-                        type: "file",
-                        file_id: fileId
-                      },
-                      cache_control: { type: "ephemeral", ttl: "1h" }
-                    } as const satisfies BetaRequestDocumentBlock;
-                    content.push(docBlock);
-                  } catch (err) {
-                    this.logger.warn(
-                      { err },
-                      "Failed to upload PDF to Files API, falling back to URL"
-                    );
-                    // Fallback to URL
-                    const docBlock = {
-                      type: "document",
-                      source: {
-                        type: "url",
-                        url
-                      }
-                    } as const satisfies BetaContentBlockParam;
-                    content.push(docBlock);
-                  }
-                } else if (mime.startsWith("image/")) {
-                  // Images use URLs
-                  const imageBlock = {
-                    type: "image",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies BetaContentBlockParam;
-                  content.push(imageBlock);
-                } else if (mime.includes("application")) {
-                  // Other docs use URLs
-                  const docBlock = {
-                    type: "document",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies BetaContentBlockParam;
-                  content.push(docBlock);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          this.logger.warn(
-            { err },
-            "error in new chat anthropic history workup"
-          );
-        } finally {
-          content.push({ type: "text", text: userMsg.content } as const);
-        }
-      }
-
-      // never pass the already database persisted user prompt
-      const messages = [
-        {
-          role: "user",
-          content: content.length >= 1 ? content : "no user message found"
-        }
-      ] as const satisfies BetaMessageParam[];
-
-      if (systemPrompt) {
-        return {
-          messages,
-          system: [
-            { type: "text", text: systemPrompt }
-          ] as const satisfies BetaTextBlockParam[]
-        };
-      } else {
-        return {
-          messages,
-          system: undefined
-        };
-      }
-    }
-  }
-
-  private handleMaxTokens(mod: AllModelsUnion, max_tokens?: number) {
-    const model = mod as AnthropicModelIdUnion;
-    if (max_tokens && max_tokens <= this.getMaxTokens(model)) {
-      return max_tokens;
-    } else {
-      return this.getMaxTokens(model);
-    }
-  }
-
-  private handleThinking(mod: AllModelsUnion, max_tokens?: number) {
-    const model = mod as AnthropicModelIdUnion;
-    switch (model) {
-      case "claude-3-7-sonnet-20250219":
-      case "claude-opus-4-1-20250805":
-      case "claude-opus-4-20250514":
-      case "claude-sonnet-4-20250514":
-      case "claude-haiku-4-5-20251001":
-      case "claude-sonnet-4-5-20250929": {
-        if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
-          return {
-            type: "enabled",
-            budget_tokens: this.getMaxTokens(model) - 1024
-          } as const satisfies BetaThinkingConfigParam;
-        } else {
-          return {
-            type: "disabled"
-          } as const satisfies BetaThinkingConfigParam;
-        }
-      }
-      case "claude-3-5-haiku-20241022":
-      case "claude-3-haiku-20240307":
-      default: {
-        return { type: "disabled" } as const satisfies BetaThinkingConfigParam;
-      }
-    }
-  }
-
-  public handleMaxTokensAndThinking(mod: AllModelsUnion, max_tokens?: number) {
-    return {
-      thinking: this.handleThinking(mod, max_tokens),
-      max_tokens: this.handleMaxTokens(mod, max_tokens)
-    };
-  }
-
-  private webSearchTool(
-    user_location: ProviderAnthropicChatRequestEntity["user_location"]
-  ) {
-    return [
-      {
-        type: "web_search_20250305",
-        cache_control: { type: "ephemeral", ttl: "1h" },
-        name: "web_search",
-        user_location
-      }
-    ] satisfies BetaWebSearchTool20250305[] | undefined;
-  }
-
+  
   public async handleAnthropicAiChatRequest({
     chunks,
     conversationId,
@@ -553,13 +30,14 @@ export class AnthropicService {
     apiKey,
     keyId,
     max_tokens,
-    model = "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion,
+    model: m,
     systemPrompt,
     temperature,
     title,
     topP,
     user_location
   }: ProviderAnthropicChatRequestEntity) {
+    const model = m as AnthropicModelIdUnion;
     const provider = "anthropic" as const;
     let anthropicThinkingStartTime: number | null = null,
       anthropicThinkingDuration = 0,
@@ -576,27 +54,25 @@ export class AnthropicService {
     const { messages, system } = await this.formatAnthropicHistoryWithFiles(
       isNewChat,
       msgs,
-      model as AnthropicModelIdUnion,
+      model,
       systemPrompt,
-      anthropic,
       keyFingerprint,
-      keyId ?? undefined
+      keyId ?? undefined,
+      apiKey
     );
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
-      model as AllModelsUnion,
+      model,
       max_tokens
     );
-    this.logger.debug(
-      messages,
-      "debugging full content on first message to anthropic"
-    );
+    this.logger.debug(messages, "[anthropic]: debugging full content");
     /**
      * tools failing on anthropic following bash_tool_20251022 release...
+     * Keeping this commented out for now
      */
     const _tools = this.webSearchTool(user_location);
 
-    const betas = this.handleBetaHeaders(model as AnthropicModelIdUnion);
+    const betas = this.handleBetaHeaders(model);
 
     const stream = (await anthropic.beta.messages.create(
       {
@@ -613,15 +89,15 @@ export class AnthropicService {
         betas
       },
       { stream: true }
-    )) satisfies Stream<BetaRawMessageStreamEvent> & {
+    )) satisfies Stream<Anthropic.Beta.BetaRawMessageStreamEvent> & {
       _request_id?: string | null;
     };
 
     for await (const chunk of stream) {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
-        webSearchRes: BetaWebSearchResultBlock | null = null,
-        done: BetaStopReason | null = null;
+        webSearchRes: Anthropic.Beta.BetaWebSearchResultBlock | null = null,
+        done: Anthropic.Beta.BetaStopReason | null = null;
 
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "server_tool_use") {
