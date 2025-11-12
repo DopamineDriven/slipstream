@@ -35,6 +35,7 @@ export function useFallingEdgeTimer(flag=false, ms = 3000) {
     }
 
     prevRef.current = flag;
+    // don't want ms or active to included in dep array, would cause excessive re-rendering
     // eslint-disable-next-line
   }, [flag]);
 

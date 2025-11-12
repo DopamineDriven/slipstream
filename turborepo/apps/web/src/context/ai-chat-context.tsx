@@ -684,7 +684,6 @@ export function AIChatProvider({
   const clearError = useCallback(() => setError(null), []);
 
   const resetStreamingState = useCallback(() => {
-    setStreamedText("");
     setThinkingText("");
     setIsThinking(false);
     setThinkingDuration(null);
@@ -692,6 +691,7 @@ export function AIChatProvider({
     setIsStreaming(false);
     setIsComplete(false);
     setError(null);
+    setStreamedText("");
     // Reset image generation state
     setImgGenEnabled(false);
     setImgGenFields(null);
