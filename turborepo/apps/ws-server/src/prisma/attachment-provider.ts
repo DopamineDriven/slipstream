@@ -188,8 +188,7 @@ export class PrismaAttachmentProviderService extends ModelService {
         attachmentId,
         provider: "ANTHROPIC",
         keyFingerprint,
-        state: "ACTIVE",
-        expiresAt: { gt: new Date() }
+        state: "ACTIVE"
       }
     });
   }
@@ -198,9 +197,12 @@ export class PrismaAttachmentProviderService extends ModelService {
     attachmentId: string,
     keyFingerprint = "server",
     mime: string,
-    keyId?: string
+    fileId: string,
+    keyId?: string,
+    size?: bigint,
+    created_at?: string
   ) {
-    return this.prismaClient.attachmentProvider.upsert({
+    return await this.prismaClient.attachmentProvider.upsert({
       where: {
         attachmentId_provider_keyFingerprint: {
           attachmentId,
@@ -209,38 +211,42 @@ export class PrismaAttachmentProviderService extends ModelService {
         }
       },
       update: {
-        state: "PENDING",
+        state: "ACTIVE",
         errorCode: null,
         errorMessage: null,
-        lastCheckedAt: new Date()
+        size,
+        userKeyId: keyId,
+        provider: "ANTHROPIC",
+        keyFingerprint,
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       },
       create: {
-        attachmentId,
-        provider: "ANTHROPIC",
+        state: "ACTIVE",
+        errorCode: null,
+        errorMessage: null,
+        size,
         userKeyId: keyId,
+        provider: "ANTHROPIC",
         keyFingerprint,
-        state: "PENDING",
-        mime
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       }
     });
   }
 
-  public async finalizeAnthropicAsset(
-    mappingId: string,
-    fileId: string,
-    expiresAt: Date,
-    size?: bigint
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerRef: fileId,
-        expiresAt,
-        size,
-        readyAt: new Date(),
-        lastCheckedAt: new Date()
+  public async deleteStaleIds(ids: string[]) {
+   return await this.prismaClient.$transaction(async t => {
+      for (const id of ids) {
+        await t.attachmentProvider.delete({ where: { id } });
       }
+      return;
     });
   }
 

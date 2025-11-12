@@ -7,6 +7,8 @@ const tsupConfig = (options: Options) =>
     entry: [
       "src/index.ts",
       "src/anthropic/index.ts",
+      "src/anthropic/types.ts",
+      "src/anthropic/workup.ts",
       "src/extract/index.ts",
       "src/gemini/index.ts",
       "src/gemini/types.ts",
@@ -33,7 +35,7 @@ const tsupConfig = (options: Options) =>
       "!src/test/**/*",
       "!public/**/*"
     ],
-    target: ["node24"],
+    target: ["node25"],
     dts: true,
     watch: process.env.NODE_ENV === "development",
     keepNames: true,

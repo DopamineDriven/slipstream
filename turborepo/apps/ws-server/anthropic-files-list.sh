@@ -8,7 +8,7 @@ else
     exit 1
 fi
 
-curl "https://api.anthropic.com/v1/files" \
+curl "https://api.anthropic.com/v1/files?limit=500" \
      -H "x-api-key: $ANTHROPIC_API_KEY" \
      -H "anthropic-version: 2023-06-01" \
      -H "anthropic-beta: files-api-2025-04-14" \

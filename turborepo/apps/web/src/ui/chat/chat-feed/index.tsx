@@ -13,6 +13,7 @@ import type {
   AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
+import { useFallingEdgeTimer } from "@/hooks/use-falling-edge-timer";
 
 interface ChatFeedProps {
   messages: MessageSingleton<true>[];
@@ -53,6 +54,9 @@ export function ChatFeed({
   children
 }: ChatFeedProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+
+  const isTransitionState = useFallingEdgeTimer(isStreaming, 3000);
 
   useEffect(() => {
     console.log({
@@ -183,7 +187,7 @@ export function ChatFeed({
           className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
           {messages?.map(message => {
             // Check if this is a streaming message or matches the current aiMsgId
-            const isStreamingMessage = isStreaming && message.id.startsWith("streaming-");
+            const isStreamingMessage =isTransitionState || (isStreaming && message.id.startsWith("streaming-"));
 
             // For completed messages, check if it's an image gen message with the current aiMsgId
             const isCurrentImgGenMessage =
