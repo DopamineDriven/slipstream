@@ -203,7 +203,7 @@ export function ChatFeed({
                 message={message}
                 user={user}
                 onUpdateMessage={onUpdateMessage}
-                isStreaming={isStreamingMessage}
+                isStreaming={isTransitionState || isStreamingMessage}
                 liveThinkingText={
                   isStreamingMessage
                     ? thinkingText
@@ -226,7 +226,7 @@ export function ChatFeed({
                     : undefined
                 }
                 liveImgGenFields={
-                  isStreamingMessage
+                imgGenFields ||  isStreamingMessage
                     ? (imgGenFields ?? undefined)
                     : undefined
                 }
