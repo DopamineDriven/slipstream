@@ -13,7 +13,7 @@ import type {
   AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
-import { useFallingEdgeTimer } from "@/hooks/use-falling-edge-timer";
+// import { useFallingEdgeTimer } from "@/hooks/use-falling-edge-timer";
 
 interface ChatFeedProps {
   messages: MessageSingleton<true>[];
@@ -56,7 +56,7 @@ export function ChatFeed({
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
 
-  const isTransitionState = useFallingEdgeTimer(isStreaming, 3000);
+ //const isTransitionState = useFallingEdgeTimer(isStreaming, 3000);
 
   useEffect(() => {
     console.log({
@@ -187,7 +187,7 @@ export function ChatFeed({
           className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
           {messages?.map(message => {
             // Check if this is a streaming message or matches the current aiMsgId
-            const isStreamingMessage =isTransitionState || (isStreaming && message.id.startsWith("streaming-"));
+   const isStreamingMessage = isStreaming && message.id.startsWith("streaming-");
 
             // For completed messages, check if it's an image gen message with the current aiMsgId
             const isCurrentImgGenMessage =
@@ -195,7 +195,7 @@ export function ChatFeed({
               message.messageType === "IMAGE_GEN" &&
               message.id === currentAiMsgId;
 
-            const shouldReceiveAttachmentId = isStreamingMessage ?? isCurrentImgGenMessage;
+            const shouldReceiveAttachmentId = isCurrentImgGenMessage || typeof imgGenFields !=="undefined" || isStreamingMessage;
 
             return (
               <MessageBubble
@@ -203,7 +203,7 @@ export function ChatFeed({
                 message={message}
                 user={user}
                 onUpdateMessage={onUpdateMessage}
-                isStreaming={isTransitionState || isStreamingMessage}
+                isStreaming={isStreamingMessage}
                 liveThinkingText={
                   isStreamingMessage
                     ? thinkingText
@@ -226,7 +226,7 @@ export function ChatFeed({
                     : undefined
                 }
                 liveImgGenFields={
-                imgGenFields ||  isStreamingMessage
+                  isStreamingMessage
                     ? (imgGenFields ?? undefined)
                     : undefined
                 }

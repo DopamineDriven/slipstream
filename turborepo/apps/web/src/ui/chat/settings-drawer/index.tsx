@@ -12,17 +12,14 @@ import {
 } from "@/ui/atoms/drawer";
 import { ScrollArea } from "@/ui/atoms/scroll-area";
 import { UserProfileCard } from "@/ui/settings/user-profile-card";
-import type { ClientContextWorkupProps } from "@slipstream/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@slipstream/ui";
 
 interface SettingsDrawerProps {
-  initialData: ClientContextWorkupProps;
   user?: User;
   isLoading?: boolean;
 }
 
 export function SettingsDrawer({
-  initialData,
   user,
   isLoading = false
 }: SettingsDrawerProps) {
@@ -58,7 +55,6 @@ export function SettingsDrawer({
                   </TabsList>
                   <TabsContent value="apiKeys" className="my-auto">
                     <ApiKeysTab
-                      initialData={initialData}
                       user={user}
                       className="bg-background/40 border-brand-border"
                     />

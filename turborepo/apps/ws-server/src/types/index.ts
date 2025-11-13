@@ -4,6 +4,7 @@ import type {
   AIChatRequest,
   AIChatRequestImgGenFields,
   AllModelsUnion,
+  ClientContextWorkupProps,
   CTR,
   EventTypeMap,
   Provider,
@@ -738,6 +739,7 @@ export interface WSServerOptions {
 }
 
 export interface UserData {
+  providerContext?: ClientContextWorkupProps;
   ip?: string;
   ua?: string;
   email?: string;

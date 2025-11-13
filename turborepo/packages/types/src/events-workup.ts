@@ -227,6 +227,7 @@ export type UserMetadata = {
   tz?: string;
   postalCode?: string;
   locale?: string;
+  providerContext?: ClientContextWorkupProps;
 };
 
 export type AIChatEventTypeUnion =

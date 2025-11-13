@@ -10,7 +10,6 @@ import Link from "next/link";
 import { useElementDimensions } from "@/hooks/use-element-dimensions";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
-import { ClientContextWorkupProps } from "@slipstream/types";
 import { ApiKeysTab } from "@/ui/api-key-settings";
 import { MobileSettingsFAB } from "@/ui/settings/mobile-settings-fab";
 import { AccountSettingsSection } from "@/ui/settings/sections/account-settings-toolbar";
@@ -86,11 +85,9 @@ const SECTION_TITLES = {
 type SectionId = keyof typeof SECTION_TITLES;
 
 export default function SettingsScaffold({
-  user,
-  initialData
+  user
 }: {
   user?: UserProps;
-  initialData?: ClientContextWorkupProps;
 }) {
   const { resolvedTheme } = useTheme();
 
@@ -430,7 +427,7 @@ export default function SettingsScaffold({
                   {section.title}
                 </h2>
                 {section.title === "API Keys" ? (
-                  <SectionComponent user={user} initialData={initialData} />
+                  <SectionComponent user={user} />
                 ) : (
                   <SectionComponent user={user} />
                 )}

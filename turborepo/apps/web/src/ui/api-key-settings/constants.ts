@@ -14,7 +14,7 @@ export const providerObj = [
     text: "Anthropic",
     icon: AnthropicIcon,
     value: "sk-ant-*******************************************",
-    isSet: true,
+    isSet: false,
     isDefault: false
   },
   {
@@ -30,7 +30,7 @@ export const providerObj = [
     text: "Grok",
     icon: XAiIcon,
     value: "xai-*******************************************",
-    isSet: true,
+    isSet: false,
     isDefault: false
   },
   {
@@ -38,8 +38,8 @@ export const providerObj = [
     text: "OpenAI",
     icon: OpenAiIcon,
     value: "sk-************************************************",
-    isSet: true,
-    isDefault: true
+    isSet: false,
+    isDefault: false
   },
   {
     provider: "meta",
@@ -57,7 +57,7 @@ export const providerObj = [
     isDefault: false,
     isSet: false
   }
-] satisfies ApiKeyData[];
+] as ApiKeyData[];
 
 export const CARD_HEADER_TEXT =
   "Bring your own API keys for expanded model support. This allows for substantially higher usage limits and access to premium models.";
@@ -67,4 +67,4 @@ export const CARD_FOOTER_TEXT =
 export const API_KEY_SETTINGS_TEXT_CONSTS = {
   CARD_HEADER_TEXT,
   CARD_FOOTER_TEXT
-} as const;
+};

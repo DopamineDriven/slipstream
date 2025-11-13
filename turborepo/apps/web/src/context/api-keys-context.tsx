@@ -1,14 +1,52 @@
-// src/context/api-keys-context.tsx
 "use client";
 
 import type { ReactNode } from "react";
-import { createContext, useContext } from "react";
-import useSWR from "swr";
-import type { ClientContextWorkupProps } from "@slipstream/types";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from "react";
+import { useChatWebSocketContext } from "@/context/chat-ws-context";
+import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 
 interface ApiKeysContextValue {
-  apiKeys: ClientContextWorkupProps;
-  updateApiKeys: (keys: ClientContextWorkupProps) => void;
+  sendProviderContextPing: () => void;
+  sendProviderContextUpdate: (success: boolean) => void;
+  providerContext: ClientContextWorkupProps | null;
+  isAwaitingUpdateAck: boolean;
+  isAwaitingInitial: boolean;
+  isAwaitingPong: boolean;
+  isSet: <
+    const P extends keyof ClientContextWorkupProps["isSet"] =
+      | "openai"
+      | "gemini"
+      | "grok"
+      | "anthropic"
+      | "meta"
+      | "vercel"
+  >(
+    provider: P
+  ) => Record<
+    "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel",
+    boolean
+  >[P];
+  isDefault: <
+    const P extends keyof ClientContextWorkupProps["isDefault"] =
+      | "openai"
+      | "gemini"
+      | "grok"
+      | "anthropic"
+      | "meta"
+      | "vercel"
+  >(
+    provider: P
+  ) => Record<
+    "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel",
+    boolean
+  >[P];
 }
 
 const ApiKeysContext = createContext<ApiKeysContextValue | undefined>(
@@ -34,51 +72,160 @@ const fallbackApiKeys = {
   }
 };
 
-const fetcher = async (url: string) => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+function equalityCheck(
+  one: ClientContextWorkupProps,
+  two: ClientContextWorkupProps
+) {
+  const isSet = { o: one.isSet, t: two.isSet } as const;
+
+  const isDefault = { o: one.isDefault, t: two.isDefault } as const;
+
+  const p = [
+    "anthropic",
+    "gemini",
+    "openai",
+    "meta",
+    "vercel",
+    "grok"
+  ] as const;
+
+  for (const provider of p) {
+    if (isSet.o[provider] !== isSet.t[provider]) return false;
+    if (isDefault.o[provider] !== isDefault.t[provider]) return false;
   }
-  return response.json<ClientContextWorkupProps>();
-};
+
+  return true;
+}
 
 export function ApiKeysProvider({
-  children,
-  userId,
-  fallbackData
+  children
 }: Readonly<{
   children: ReactNode;
-  userId?: string;
-  fallbackData?:
-    | ClientContextWorkupProps
-    | Promise<ClientContextWorkupProps>
-    | undefined;
 }>) {
-  const { data, mutate } = useSWR(
-    userId ? `/api/users/${userId}/api-keys` : null,
-    fetcher,
-    {
-      revalidateOnFocus: false, // Don't revalidate when window gains focus (tab switching)
-      revalidateOnReconnect: false, // Don't revalidate on network reconnect
-      revalidateOnMount: true, // Keep initial load on mount
-      revalidateIfStale: false, // Don't revalidate if data is considered stale
-      refreshInterval: 0, // Disable automatic polling
-      dedupingInterval: 60000, // Cache requests for 1 minute to prevent duplicate calls
-      errorRetryCount: 2,
-      errorRetryInterval: 5000,
-      fetcher,
-      fallbackData // always hydrates on first load or when a user reauthenticates (starts a new session)
-    }
+  const { client, sendEvent } = useChatWebSocketContext();
+
+  const [providerContext, setProviderContext] =
+    useState<ClientContextWorkupProps | null>(null);
+
+  const providerContextRef = useRef<ClientContextWorkupProps | null>(null);
+
+  const [isAwaitingUpdateAck, setIsAwaitingUpdateAck] = useState(false);
+  const [isAwaitingPong, setIsAwaitingPong] = useState(false);
+  const [isAwaitingInitial, setIsAwaitingInitial] = useState(true);
+
+  useEffect(() => {
+    providerContextRef.current = providerContext;
+  }, [providerContext]);
+
+  useEffect(() => {
+    const handleConnection = (ev: EventTypeMap["connection_established"]) => {
+      if (
+        providerContextRef.current === null ||
+        equalityCheck(providerContextRef.current, ev.providerContext) === false
+      ) {
+        setProviderContext(ev.providerContext);
+        setIsAwaitingInitial(false);
+      } else {
+        setIsAwaitingInitial(false);
+      }
+    };
+
+    const handleProviderContextUpdateAck = (
+      ev: EventTypeMap["provider_context_update_ack"]
+    ) => {
+      if (
+        providerContextRef.current === null ||
+        equalityCheck(providerContextRef.current, ev.providerContext) === false
+      ) {
+        setProviderContext(ev.providerContext);
+        setIsAwaitingUpdateAck(false);
+      } else {
+        setIsAwaitingUpdateAck(false);
+      }
+    };
+
+    const handleProviderContextPong = (
+      ev: EventTypeMap["provider_context_pong"]
+    ) => {
+      if (
+        providerContextRef.current === null ||
+        equalityCheck(providerContextRef.current, ev.providerContext) === false
+      ) {
+        setProviderContext(ev.providerContext);
+        setIsAwaitingPong(false);
+      } else {
+        setIsAwaitingPong(false);
+      }
+    };
+
+    client.on("connection_established", handleConnection);
+    client.on("provider_context_pong", handleProviderContextPong);
+    client.on("provider_context_update_ack", handleProviderContextUpdateAck);
+    return () => {
+      client.off("connection_established");
+      client.off("provider_context_pong");
+      client.off("provider_context_update_ack");
+    };
+  }, [client]);
+
+  const sendProviderContextUpdate = useCallback(
+    (success: boolean) => {
+      if (success === false) return;
+      else {
+        setIsAwaitingUpdateAck(true);
+        sendEvent("provider_context_update", {
+          type: "provider_context_update"
+        });
+      }
+    },
+    [sendEvent]
   );
 
-  const updateApiKeys = (keys: ClientContextWorkupProps) => {
-    // Optimistically update SWR cache, no immediate revalidation
-    mutate(keys, false);
-  };
+  const sendProviderContextPing = useCallback(() => {
+    setIsAwaitingPong(true);
+    sendEvent("provider_context_ping", {
+      type: "provider_context_ping"
+    });
+  }, [sendEvent]);
+
+  const isDefault = useCallback(
+    <
+      const P extends
+        keyof ClientContextWorkupProps["isDefault"] = keyof ClientContextWorkupProps["isDefault"]
+    >(
+      provider: P
+    ) => {
+      const data = providerContext ?? fallbackApiKeys;
+      return data.isDefault[provider];
+    },
+    [providerContext]
+  );
+
+  const isSet = useCallback(
+    <
+      const P extends
+        keyof ClientContextWorkupProps["isSet"] = keyof ClientContextWorkupProps["isSet"]
+    >(
+      provider: P
+    ) => {
+      const data = providerContext ?? fallbackApiKeys;
+      return data.isSet[provider];
+    },
+    [providerContext]
+  );
 
   return (
     <ApiKeysContext.Provider
-      value={{ updateApiKeys, apiKeys: data ?? fallbackApiKeys }}>
+      value={{
+        isAwaitingInitial,
+        isAwaitingPong,
+        isAwaitingUpdateAck,
+        sendProviderContextPing,
+        sendProviderContextUpdate,
+        providerContext,
+        isSet,
+        isDefault
+      }}>
       {children}
     </ApiKeysContext.Provider>
   );

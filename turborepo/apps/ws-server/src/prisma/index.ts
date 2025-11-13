@@ -115,7 +115,7 @@ export class PrismaService extends PrismaAttachmentProviderService {
     );
     let isValid = false;
     if (sesh?.[0]) {
-      isValid = sesh?.[0].expires.getTime() > new Date(Date.now()).getTime();
+      isValid = sesh[0].expires.getTime() > new Date(Date.now()).getTime();
     }
     return {
       userId: id,

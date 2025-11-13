@@ -6,7 +6,7 @@ import { ormHandler } from "@/orm";
 import { ChatLayoutShell } from "@/ui/chat/chat-page-layout-shell";
 import { getSession } from "@/utils/auth";
 
-const { prismaConversationService, prismaApiKeyService } =
+const { prismaConversationService } =
   ormHandler(prismaClient);
 export const metadata: Metadata = {
   title: "Chat Home"
@@ -20,14 +20,10 @@ export default async function ChatLayout({
   const session = await getSession();
 
   if (!session?.user) redirect("/auth/login");
-  const [fallbackData, apiKeyData] = await Promise.all([
-    prismaConversationService.getSidebarData(session.user.id),
-    prismaApiKeyService.getClientApiKeys(session.user.id)
-  ]);
+  const fallbackData = await  prismaConversationService.getSidebarData(session.user.id)
   return (
     <ChatLayoutShell
       fallbackData={fallbackData}
-      apiKeyData={apiKeyData}
       user={session.user}
     >
       {children}

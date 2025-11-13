@@ -12,7 +12,7 @@ import type { RawData } from "ws";
 import { PdfService } from "@/pdf/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { WebSocket, WebSocketServer } from "ws";
-import type { EventTypeMap } from "@slipstream/types";
+import type { ClientContextWorkupProps, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class WSServer {
@@ -31,6 +31,11 @@ export class WSServer {
       raw: RawData,
       userData?: UserData
     ) => void | Promise<void>;
+    handleConnectionEstablished(
+      ws: WebSocket,
+      userId: string,
+      userData?: UserData
+    ): Promise<void>;
   };
 
   constructor(
@@ -71,6 +76,11 @@ export class WSServer {
       raw: RawData,
       userData?: UserData
     ) => void | Promise<void>;
+    handleConnectionEstablished(
+      ws: WebSocket,
+      userId: string,
+      userData?: UserData
+    ): Promise<void>;
   }) {
     this.resolver = resolver;
   }
@@ -98,6 +108,7 @@ export class WSServer {
   private async stashUserData(
     userId: string,
     cookieObj: Record<keyof UserData, string> | null,
+    providerContext: ClientContextWorkupProps,
     email?: string
   ) {
     if (!cookieObj) return;
@@ -114,7 +125,8 @@ export class WSServer {
       country,
       latlng,
       tz,
-      userId
+      userId,
+      providerContext
     });
     return this.userDataMap.set(userId, {
       email,
@@ -125,9 +137,30 @@ export class WSServer {
       postalCode,
       city,
       country,
+      providerContext,
       latlng,
       tz
     });
+  }
+
+  public async refreshUserProviderConfig(userId: string) {
+    const userData = this.userDataMap.get(userId);
+    if (!userData) {
+      throw new Error(
+        `Cannot refresh provider config: user ${userId} not in map`
+      );
+    }
+
+    const providerContext = await this.prisma.injectClientApiKeyProps(userId);
+    if (!providerContext) throw new Error("unable to resolve provider context");
+    // Update in-memory data
+    this.userDataMap.set(userId, {
+      ...userData,
+      providerContext
+    });
+
+    console.info(`Refreshed provider config for user ${userId}`);
+    return providerContext;
   }
 
   private async handleConnection(
@@ -136,19 +169,31 @@ export class WSServer {
   ): Promise<void> {
     const cookies = req.headers.cookie;
     const cookieObj = this.parsedCookies(cookies);
-    
+
     const { userId, email } = (await this.authenticateConnection(ws, req)) ?? {
       userId: null,
       email: undefined
     };
     if (!userId) return;
-    await this.stashUserData(userId, cookieObj, email);
+    const providers = await this.prisma.injectClientApiKeyProps(userId);
+
+    await this.stashUserData(userId, cookieObj, providers, email);
+
+    const fallbackConfigData = {
+      anthropic: false,
+      gemini: false,
+      grok: false,
+      meta: false,
+      openai: false,
+      vercel: false
+    };
     const {
       city,
       country,
       ip,
       locale,
       ua,
+      providerContext,
       latlng,
       tz,
       postalCode,
@@ -164,7 +209,25 @@ export class WSServer {
       ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0",
       locale: "en-US",
       postalCode: "unknown postal code",
-      region: "Illinois"
+      region: "Illinois",
+      providerContext: {
+        isDefault: fallbackConfigData,
+        isSet: fallbackConfigData
+      }
+    };
+
+    const userData = {
+      email: userEmail,
+      city,
+      ip,
+      providerContext,
+      locale,
+      ua,
+      country,
+      latlng,
+      postalCode,
+      region,
+      tz
     };
 
     this.userMap.set(ws, userId);
@@ -173,26 +236,20 @@ export class WSServer {
     ws.on("message", raw => {
       if (this.resolver) {
         const uid = this.userMap.get(ws) ?? "";
-        this.resolver.handleRawMessage(ws, uid, raw, {
-          email: userEmail,
-          city,
-          ip,
-          locale,
-          ua,
-          country,
-          latlng,
-          postalCode,
-          region,
-          tz
-        });
+        this.resolver.handleRawMessage(ws, uid, raw, userData);
       } else {
         ws.send(JSON.stringify({ error: "No resolver configured" }));
       }
     });
     ws.on("close", () => {
       this.userMap.delete(ws);
+      this.userDataMap.delete(userId);
       console.info(`User ${userId} disconnected`);
     });
+
+    if (this.resolver?.handleConnectionEstablished) {
+      void this.resolver.handleConnectionEstablished(ws, userId, userData);
+    }
   }
 
   private async authenticateConnection(

@@ -5,6 +5,7 @@ import type { ApiKeySubmissionState } from "@/ui/atoms/multi-state-submission-ba
 import type { User } from "@/utils/auth-client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getDecryptedApiKeyOnEdit, upsertApiKey } from "@/app/actions/api-key";
+import { useApiKeys } from "@/context/api-keys-context";
 import { cn } from "@/lib/utils";
 import {
   API_KEY_SETTINGS_TEXT_CONSTS,
@@ -13,7 +14,10 @@ import {
 import { BreakoutWrapper } from "@/ui/atoms/breakout-wrapper";
 import { MultiStateApiKeySubmissionBadge } from "@/ui/atoms/multi-state-submission-badge";
 import { AnimatePresence, motion } from "motion/react";
-import type { Providers as Provider, ClientContextWorkupProps } from "@slipstream/types";
+import type {
+  ClientContextWorkupProps,
+  Providers as Provider
+} from "@slipstream/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,21 +45,65 @@ import {
   X
 } from "@slipstream/ui";
 
+const toProviderContext = (providerObj: ApiKeyData[]) => {
+  const r = {
+    isDefault: {
+      gemini: false,
+      grok: false,
+      meta: false,
+      vercel: false,
+      openai: false,
+      anthropic: false
+    },
+    isSet: {
+      gemini: false,
+      grok: false,
+      meta: false,
+      vercel: false,
+      openai: false,
+      anthropic: false
+    }
+  };
+  providerObj.forEach(function (o) {
+    r.isDefault[o.provider] = o.isDefault;
+    r.isSet[o.provider] = o.isSet;
+  });
+  return r;
+};
+
+function equalityCheck(
+  one: ClientContextWorkupProps,
+  two: ClientContextWorkupProps
+) {
+  const isSet = { o: one.isSet, t: two.isSet } as const;
+
+  const isDefault = { o: one.isDefault, t: two.isDefault } as const;
+
+  const p = [
+    "anthropic",
+    "gemini",
+    "openai",
+    "meta",
+    "vercel",
+    "grok"
+  ] as const;
+
+  for (const provider of p) {
+    if (isSet.o[provider] !== isSet.t[provider]) return false;
+    if (isDefault.o[provider] !== isDefault.t[provider]) return false;
+  }
+
+  return true;
+}
+
 interface ApiKeysTabProps {
   className?: string;
-  initialData?: ClientContextWorkupProps;
   user?: User;
 }
 
 const { CARD_HEADER_TEXT, CARD_FOOTER_TEXT } = API_KEY_SETTINGS_TEXT_CONSTS;
 
-export function ApiKeysTab({
-  className = "",
-  initialData,
-  user: _user
-}: ApiKeysTabProps) {
-  const [_isLoading, setIsLoading] = useState(false);
-
+export function ApiKeysTab({ className = "", user: _user }: ApiKeysTabProps) {
   // State for managing API keys
   const [apiKeys, setApiKeys] = useState<ApiKeyData[]>([]);
   const [editingKey, setEditingKey] = useState<Provider | null>(null);
@@ -114,20 +162,45 @@ export function ApiKeysTab({
     [originalValues]
   );
 
-  useEffect(() => {
-    if (initialData) {
-      const initialKeys = providerObj
-        .filter(provider => initialData.isSet[provider.provider])
-        .map(provider => ({
-          ...provider,
-          isSet: true,
-          isDefault: initialData.isDefault[provider.provider]
-        }));
+  const {
+    providerContext,
+    isAwaitingInitial,
+    isAwaitingPong,
+    isAwaitingUpdateAck,
+    sendProviderContextUpdate
+  } = useApiKeys();
 
-      setApiKeys(initialKeys);
+  useEffect(() => {
+    if (!providerContext) return;
+    if ((isAwaitingInitial || isAwaitingPong || isAwaitingUpdateAck) === true)
+      return;
+    if (equalityCheck(toProviderContext(apiKeys), providerContext) === false) {
+      const arr = Array.of<ApiKeyData>();
+      for (const p of providerObj) {
+        if (providerContext.isSet[p.provider]) {
+          p.isSet = true;
+          if (providerContext.isDefault[p.provider]) {
+            p.isDefault = true;
+            arr.push(p);
+          } else {
+            p.isDefault = false;
+            arr.push(p);
+          }
+        } else {
+          p.isSet = false;
+          p.isDefault = false;
+          arr.push(p);
+        }
+      }
+      setApiKeys(arr);
     }
-    setIsLoading(false);
-  }, [initialData]);
+  }, [
+    providerContext,
+    apiKeys,
+    isAwaitingInitial,
+    isAwaitingPong,
+    isAwaitingUpdateAck
+  ]);
 
   const toggleVisibility = async (provider: Provider) => {
     const newVisible = new Set(visibleKeys);
@@ -273,7 +346,7 @@ export function ApiKeysTab({
 
     try {
       const getResult = await upsertApiKey(formData);
-
+      sendProviderContextUpdate(getResult.success);
       if (getResult.success) {
         const apiKey = formData.get("apiKey") as string;
         const asDefault = formData.get("asDefault") === "true";

@@ -18,6 +18,7 @@ import type {
   AllModelsUnion,
   AnyEvent,
   AnyEventTypeUnion,
+  ClientContextWorkupProps,
   DocSpecs,
   DocumentSingleton,
   EventTypeMap,
@@ -77,6 +78,14 @@ export class Resolver extends ModelService {
     this.wsServer.on(
       "asset_upload_progress",
       this.handleAssetProgress.bind(this)
+    );
+    this.wsServer.on(
+      "provider_context_ping",
+      this.handleProviderContextPing.bind(this)
+    );
+    this.wsServer.on(
+      "provider_context_update",
+      this.handleProviderContextUpdate.bind(this)
     );
   }
 
@@ -260,6 +269,44 @@ export class Resolver extends ModelService {
       // If the guardrail check fails for any reason, fall through to normal handling
       console.warn("rate-limit check failed", this.safeErrMsg(e));
     }
+  }
+
+  public async handleSyncProvider() {}
+
+  public async handleProviderContextPing(
+    _event: EventTypeMap["provider_context_ping"],
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
+    let providerContext: ClientContextWorkupProps;
+    if (typeof userData?.providerContext === "undefined") {
+      providerContext =
+        await this.wsServer.prisma.injectClientApiKeyProps(userId);
+    } else {
+      providerContext = userData?.providerContext;
+    }
+
+    const payload = {
+      type: "provider_context_pong",
+      providerContext
+    } satisfies EventTypeMap["provider_context_pong"];
+    ws.send(JSON.stringify(payload));
+  }
+
+  public async handleProviderContextUpdate(
+    _event: EventTypeMap["provider_context_update"],
+    ws: WebSocket,
+    userId: string,
+    _userData?: UserData
+  ) {
+    const providerContext =
+      await this.wsServer.refreshUserProviderConfig(userId);
+    const payload = {
+      type: "provider_context_update_ack",
+      providerContext
+    } satisfies EventTypeMap["provider_context_update_ack"];
+    ws.send(JSON.stringify(payload));
   }
 
   public async handleAIChat(
@@ -532,6 +579,34 @@ export class Resolver extends ModelService {
     }
   }
 
+  public async postHandleConnectionEstablishedJob(userId: string) {
+    return await this.providers.anthropic.syncFileRegistry(userId, true);
+  }
+
+  public async handleConnectionEstablished(
+    ws: WebSocket,
+    userId: string,
+    userData?: UserData
+  ) {
+    try {
+      let providerContext: ClientContextWorkupProps;
+      if (typeof userData?.providerContext === "undefined") {
+        providerContext =
+          await this.wsServer.prisma.injectClientApiKeyProps(userId);
+      } else {
+        providerContext = userData?.providerContext;
+      }
+      const payload = {
+        type: "connection_established",
+        providerContext
+      } satisfies EventTypeMap["connection_established"];
+
+      ws.send(JSON.stringify(payload));
+      void this.postHandleConnectionEstablishedJob(userId);
+    } catch (err) {
+      this.safeErrMsg(err);
+    }
+  }
   /** Dispatches incoming events to handlers */
   public async handleRawMessage(
     ws: WebSocket,
@@ -569,6 +644,12 @@ export class Resolver extends ModelService {
       case "asset_attached":
         await this.handleAssetAttached(event, ws, userId, userData);
         break;
+      case "provider_context_ping":
+        await this.handleProviderContextPing(event, ws, userId, userData);
+        break;
+      case "provider_context_update":
+        await this.handleProviderContextUpdate(event, ws, userId, userData);
+        break;
       default:
         await this.wsServer.redis.publish(
           this.wsServer.channel,
@@ -602,11 +683,16 @@ export class Resolver extends ModelService {
     "asset_upload_request",
     "asset_upload_response",
     "asset_uploaded",
+    "connection_established",
     "image_gen_error",
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
     "ping",
+    "provider_context_ping",
+    "provider_context_pong",
+    "provider_context_update",
+    "provider_context_update_ack",
     "typing"
   ] as const satisfies readonly AnyEventTypeUnion[];
 

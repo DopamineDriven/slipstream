@@ -100,7 +100,7 @@ export function AIChatProvider({
   const pathname = usePathname();
   const { client, isConnected, sendEvent } = useChatWebSocketContext();
   const { selectedModel } = useModelSelection();
-  const { apiKeys } = useApiKeys();
+  const { providerContext } = useApiKeys();
   const { startNewBatch, currentBatchId, getUploadsByBatchId } =
     useAssetUpload();
 
@@ -585,8 +585,10 @@ export function AIChatProvider({
       setCurrentUserMsgId(tempUserMsgId);
 
       // Get API key configuration
-      const hasProviderConfigured = apiKeys.isSet[selectedModel.provider];
-      const isDefaultProvider = apiKeys.isDefault[selectedModel.provider];
+      const hasProviderConfigured =
+        providerContext.isSet[selectedModel.provider];
+      const isDefaultProvider =
+        providerContext.isDefault[selectedModel.provider];
 
       console.log(
         `[AIChatContext] Sending chat with conversationId: ${conversationId}`
@@ -674,7 +676,7 @@ export function AIChatProvider({
       userId,
       activeConversationId,
       selectedModel,
-      apiKeys,
+      providerContext,
       startNewBatch,
       currentBatchId,
       getUploadsByBatchId

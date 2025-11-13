@@ -109,6 +109,7 @@ export type {
   AssetUploadResponse,
   ChatWsEvent,
   ChatWsEventTypeUnion,
+  ConnectionEstablished,
   EventMap,
   EventTypeMap,
   ImageGenError,
@@ -116,6 +117,10 @@ export type {
   ImageGenRequest,
   ImageGenResponse,
   PingMessage,
+  ProviderContextPing,
+  ProviderContextPong,
+  ProviderContextUpdate,
+  ProviderContextUpdateAck,
   TypingIndicator
 } from "@/events.ts";
 
@@ -315,6 +320,7 @@ export type {
   ListModelsSingleton,
   MessageSenderType,
   MessageSingleton,
+  MessageType,
   PrismaProvider,
   ProfileSingleton,
   OpenAiError,
