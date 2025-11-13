@@ -10,6 +10,7 @@ import type {
   AssetUploadAbortReason,
   AssetUploadInstructionsMethod,
   AttachmentMetadata,
+  ClientContextWorkupProps,
   ImgColorModel,
   ImgColorSpace,
   MetadataUnion,
@@ -18,9 +19,9 @@ import type {
   WithExpiry
 } from "@/events-workup.ts";
 import type {
+  AllImgGenFacilitatingModelsUnion,
+  AllImgGenModelsUnion,
   GetModelUtilRT,
-  ImageGenFacilitatingModelsByProvider,
-  ImageGenModelsByProvider,
   ImageGenProviders,
   Provider
 } from "@/models.ts";
@@ -109,6 +110,29 @@ export type TypingIndicator = {
 
 export type PingMessage = {
   type: "ping";
+};
+
+export type ConnectionEstablished = {
+  type: "connection_established";
+  providerContext: ClientContextWorkupProps;
+};
+
+export type ProviderContextUpdate = {
+  type: "provider_context_update";
+};
+
+export type ProviderContextUpdateAck = {
+  type: "provider_context_update_ack";
+  providerContext: ClientContextWorkupProps;
+};
+
+export type ProviderContextPing = {
+  type: "provider_context_ping";
+};
+
+export type ProviderContextPong = {
+  type: "provider_context_pong";
+  providerContext: ClientContextWorkupProps;
 };
 
 /**
@@ -429,12 +453,7 @@ export type ImageGenRequest = {
   conversationId: string;
   prompt: string;
   provider: ImageGenProviders;
-  model?:
-    | ImageGenModelsByProvider<"gemini">
-    | ImageGenModelsByProvider<"openai">
-    | ImageGenModelsByProvider<"grok">
-    | ImageGenFacilitatingModelsByProvider<"gemini">
-    | ImageGenFacilitatingModelsByProvider<"openai">;
+  model?: AllImgGenFacilitatingModelsUnion | AllImgGenModelsUnion;
   systemPrompt?: string;
   temperature?: number;
   topP?: number;
@@ -733,11 +752,16 @@ export type AnyEvent =
   | AssetUploadProgress
   | AssetUploadRequest
   | AssetUploadResponse
+  | ConnectionEstablished
   | ImageGenError
   | ImageGenProgress
   | ImageGenRequest
   | ImageGenResponse
   | PingMessage
+  | ProviderContextPing
+  | ProviderContextPong
+  | ProviderContextUpdate
+  | ProviderContextUpdateAck
   | TypingIndicator;
 
 export type AnyEventTypeUnion = AnyEvent["type"];
@@ -777,11 +801,16 @@ export type EventTypeMap = {
   asset_upload_request: AssetUploadRequest;
   asset_upload_response: AssetUploadResponse;
   asset_uploaded: AssetUploadedNotification;
+  connection_established: ConnectionEstablished;
   image_gen_error: ImageGenError;
   image_gen_progress: ImageGenProgress;
   image_gen_request: ImageGenRequest;
   image_gen_response: ImageGenResponse;
   ping: PingMessage;
+  provider_context_ping: ProviderContextPing;
+  provider_context_pong: ProviderContextPong;
+  provider_context_update: ProviderContextUpdate;
+  provider_context_update_ack: ProviderContextUpdateAck;
   typing: TypingIndicator;
 };
 

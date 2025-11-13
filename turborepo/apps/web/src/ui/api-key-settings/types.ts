@@ -11,6 +11,6 @@ export interface ApiKeyData {
     "viewBox" | "fill" | "xmlns" | "role"
   >) => JSX.Element;
   value?: string;
-  isSet?: boolean;
-  isDefault?: boolean;
+  isSet: boolean;
+  isDefault: boolean;
 }

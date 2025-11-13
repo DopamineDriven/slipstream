@@ -1,5 +1,6 @@
 import { ModelService } from "@/models/index.ts";
 import { DbService, PrismaClient } from "@slipstream/db/node";
+import { $Enums } from "@slipstream/db/node/generated/client";
 
 export class PrismaAttachmentProviderService extends ModelService {
   protected readonly prismaClient: PrismaClient;
@@ -242,7 +243,7 @@ export class PrismaAttachmentProviderService extends ModelService {
   }
 
   public async deleteStaleIds(ids: string[]) {
-   return await this.prismaClient.$transaction(async t => {
+    return await this.prismaClient.$transaction(async t => {
       for (const id of ids) {
         await t.attachmentProvider.delete({ where: { id } });
       }
@@ -250,17 +251,14 @@ export class PrismaAttachmentProviderService extends ModelService {
     });
   }
 
-  public async markAnthropicAssetFailed(
-    mappingId: string,
-    errorMessage: string
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date()
-      }
+  public async hasProviderMessages(userId: string, provider: $Enums.Provider) {
+    const p = await this.prismaClient.message.findFirst({
+      where: { userId, provider }
     });
+    if (p === null) return false;
+        // const v = await this.prismaClient.attachmentProvider.findFirst({where: { provider, userKeyId: p.userKeyId }});
+
+
+    else return true;
   }
 }

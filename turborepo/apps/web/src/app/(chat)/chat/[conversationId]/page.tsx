@@ -70,6 +70,7 @@ export default async function ChatPage({
           document: att.document ?? null,
           size: att.size ? Number(att.size) : null
         }));
+
         return { ...rest, attachments: cleanAttachments };
       });
       messages = m;

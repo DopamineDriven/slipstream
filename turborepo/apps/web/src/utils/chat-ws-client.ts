@@ -1,5 +1,6 @@
 import type { HandlerMap, RawData } from "@/types/chat-ws";
 import type {
+  AnyEventTypeUnion,
   ChatWsEvent,
   ChatWsEventTypeUnion,
   EventTypeMap
@@ -38,13 +39,18 @@ class EventHandlerRegistry {
     "asset_upload_request",
     "asset_upload_response",
     "asset_uploaded",
+    "connection_established",
     "image_gen_error",
     "image_gen_progress",
     "image_gen_request",
     "image_gen_response",
     "ping",
+    "provider_context_ping",
+    "provider_context_pong",
+    "provider_context_update",
+    "provider_context_update_ack",
     "typing"
-  ] as const;
+  ] as const satisfies AnyEventTypeUnion[];
 
   public register<const K extends keyof HandlerMap>(
     event: K,
@@ -264,6 +270,12 @@ class EventHandlerRegistry {
           handler(event, socket);
         }
       },
+      connection_established: () => {
+        const handler = this.handlers.connection_established;
+        if (handler && event.type === "connection_established") {
+          handler(event, socket);
+        }
+      },
       image_gen_progress: () => {
         const handler = this.handlers.image_gen_progress;
         if (handler && event.type === "image_gen_progress") {
@@ -291,6 +303,30 @@ class EventHandlerRegistry {
       ping: () => {
         const handler = this.handlers.ping;
         if (handler && event.type === "ping") {
+          handler(event, socket);
+        }
+      },
+      provider_context_ping: () => {
+        const handler = this.handlers.provider_context_ping;
+        if (handler && event.type === "provider_context_ping") {
+          handler(event, socket);
+        }
+      },
+      provider_context_pong: () => {
+        const handler = this.handlers.provider_context_pong;
+        if (handler && event.type === "provider_context_pong") {
+          handler(event, socket);
+        }
+      },
+      provider_context_update: () => {
+        const handler = this.handlers.provider_context_update;
+        if (handler && event.type === "provider_context_update") {
+          handler(event, socket);
+        }
+      },
+      provider_context_update_ack: () => {
+        const handler = this.handlers.provider_context_update_ack;
+        if (handler && event.type === "provider_context_update_ack") {
           handler(event, socket);
         }
       },

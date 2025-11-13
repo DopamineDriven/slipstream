@@ -19,7 +19,6 @@ import { MobileModelSelectorDrawer } from "@/ui/chat/mobile-model-selector-drawe
 import { ProviderModelSelector } from "@/ui/chat/provider-model-selector";
 import { SettingsDrawer } from "@/ui/chat/settings-drawer";
 import { EnhancedSidebar } from "@/ui/chat/sidebar";
-import type { ClientContextWorkupProps } from "@slipstream/types";
 import {
   Button,
   PanelLeftClose as PanelLeft,
@@ -36,7 +35,6 @@ const ThemeToggle = dynamic(
 interface ChatLayoutShellProps {
   children: React.ReactNode;
   fallbackData?: SidebarProps[];
-  apiKeyData?: ClientContextWorkupProps;
   user?: User;
 }
 
@@ -74,7 +72,6 @@ function HeaderActions() {
 export function ChatLayoutShell({
   children,
   fallbackData,
-  apiKeyData,
   user
 }: ChatLayoutShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -124,7 +121,7 @@ export function ChatLayoutShell({
         </div>
       </SidebarProvider>
       <MobileModelSelectorDrawer />
-      {apiKeyData && <SettingsDrawer initialData={apiKeyData} user={user} />}
+      <SettingsDrawer user={user} />
     </div>
   );
 }

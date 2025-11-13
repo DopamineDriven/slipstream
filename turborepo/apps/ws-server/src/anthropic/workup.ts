@@ -181,12 +181,25 @@ export class AnthropicWorkup {
     ];
   }
 
-  protected async syncFileRegistry(apiKey?: string, cleanupStaleFiles = false) {
-    this.logger.info("Starting Anthropic file registry sync");
+  public async syncFileRegistry(userId: string, cleanupStaleFiles = false) {
+    const hasAnthropicMessages = await this.prisma.hasProviderMessages(
+      userId,
+      "ANTHROPIC"
+    );
+    if (!hasAnthropicMessages)
+      return { synced: true, totalFiles: 0, lastSync: new Date() };
+    const tryApiKey = await this.prisma.handleApiKeyLookup("anthropic", userId);
+
+    this.logger.info(
+      `Starting Anthropic file registry sync -- ${tryApiKey.apiKey === null ? "no anthropic key on file" : "anthropic api key on file"}`
+    );
+
     let totalFiles = 0;
 
+    const apiKey = tryApiKey.apiKey ?? this.apiKey;
     // Preserve existing lastAccessedAt data before clearing
     const existingAccessData = new Map<string, Date>();
+
     for (const [id, record] of this.fileRegistry) {
       if (record.lastAccessedAt) {
         existingAccessData.set(id, record.lastAccessedAt);
@@ -268,8 +281,8 @@ export class AnthropicWorkup {
       remainingGB: (remainingBytes / 1024 / 1024 / 1024).toFixed(2),
       lastSync: this.lastRegistrySync,
       cacheSize: this.assetCache.size,
-      orphanedCacheEntries,  // Entries in cache but not in registry
-      cacheHealth: orphanedCacheEntries === 0 ? 'healthy' : 'needs_cleanup'
+      orphanedCacheEntries, // Entries in cache but not in registry
+      cacheHealth: orphanedCacheEntries === 0 ? "healthy" : "needs_cleanup"
     };
   }
 
@@ -492,7 +505,7 @@ export class AnthropicWorkup {
         { error, attachmentId: attachment.id },
         "Failed to upload file to Anthropic Files API"
       );
-      throw new Error(this.prisma.safeErrMsg(error)); 
+      throw new Error(this.prisma.safeErrMsg(error));
     }
   }
 
@@ -509,6 +522,9 @@ export class AnthropicWorkup {
       const messages = await Promise.all(
         msgs.map(async msg => {
           if (msg.senderType === "USER") {
+                        // Process AI-generated attachments (e.g., from image generation)
+              let i = 0;
+
             const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
             try {
               // Process attachments
@@ -534,11 +550,18 @@ export class AnthropicWorkup {
                           keyId,
                           apiKey
                         );
-
-                        const docBlock = {
+                        if (i < 4) {
+                          i++;
+                                   const docBlock = {
                           type: "document",
                           source: { file_id: fileId, type: "file" },
                           cache_control: { type: "ephemeral", ttl: "1h" }
+                        } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
+                        content.push(docBlock);
+                        }
+                        const docBlock = {
+                          type: "document",
+                          source: { file_id: fileId, type: "file" }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
                       } catch (err) {
@@ -552,8 +575,7 @@ export class AnthropicWorkup {
                           source: {
                             type: "url",
                             url
-                          },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
+                          }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
                       }
@@ -578,8 +600,7 @@ export class AnthropicWorkup {
                             source: {
                               type: "file",
                               file_id: fileId
-                            },
-                            cache_control: { type: "ephemeral", ttl: "1h" }
+                            }
                           } as const satisfies Anthropic.Beta.BetaImageBlockParam;
                           content.push(imageBlock);
                         } catch (err) {
@@ -593,8 +614,7 @@ export class AnthropicWorkup {
                             source: {
                               type: "url",
                               url
-                            },
-                            cache_control: { type: "ephemeral", ttl: "1h" }
+                            }
                           } as const satisfies Anthropic.Beta.BetaImageBlockParam;
                           content.push(imageBlock);
                         }
@@ -605,8 +625,7 @@ export class AnthropicWorkup {
                           source: {
                             type: "url",
                             url
-                          },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
+                          }
                         } as const satisfies Anthropic.Beta.BetaImageBlockParam;
                         content.push(imageBlock);
                       }
@@ -629,8 +648,7 @@ export class AnthropicWorkup {
             } finally {
               content.push({
                 type: "text",
-                text: msg.content,
-                cache_control: { type: "ephemeral", ttl: "1h" }
+                text: msg.content
               } as const);
             }
 
@@ -642,7 +660,6 @@ export class AnthropicWorkup {
             const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
 
             try {
-              // Process AI-generated attachments (e.g., from image generation)
               if (msg.attachments && msg.attachments.length > 0) {
                 for (const attachment of msg.attachments) {
                   const {
@@ -670,10 +687,10 @@ export class AnthropicWorkup {
                           keyId,
                           apiKey
                         );
+
                         const docBlock = {
                           type: "document",
-                          source: { file_id: fileId, type: "file" },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
+                          source: { file_id: fileId, type: "file" }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
                       } catch (err) {
@@ -687,8 +704,7 @@ export class AnthropicWorkup {
                           source: {
                             type: "url",
                             url
-                          },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
+                          }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
                       }
@@ -696,56 +712,12 @@ export class AnthropicWorkup {
                       assetType === "IMAGE" &&
                       mime.startsWith("image/")
                     ) {
-                      // Use Files API for images >= 1MB for better performance with large images
-                      const sizeInMB = size / 1024 / 1024;
-                      if (sizeInMB >= 1) {
-                        try {
-                          const fileId =
-                            await this.ensureAnthropicAssetUploaded(
-                              attachment,
-                              model as AnthropicModelIdUnion,
-                              keyFingerprint,
-                              keyId,
-                              apiKey
-                            );
-                          // Images uploaded to Files API use file_id source
-                          const imageBlock = {
-                            type: "image",
-                            source: {
-                              type: "file",
-                              file_id: fileId
-                            },
-                            cache_control: { type: "ephemeral", ttl: "1h" }
-                          } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                          content.push(imageBlock);
-                        } catch (err) {
-                          this.logger.warn(
-                            { err, size: sizeInMB },
-                            "Failed to upload large AI image to Files API, falling back to URL"
-                          );
-                          // Fallback to URL
-                          const imageBlock = {
-                            type: "image",
-                            source: {
-                              type: "url",
-                              url
-                            },
-                            cache_control: { type: "ephemeral", ttl: "1h" }
-                          } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                          content.push(imageBlock);
-                        }
-                      } else {
-                        // Smaller images use URLs for faster processing
-                        const imageBlock = {
-                          type: "image",
-                          source: {
-                            type: "url",
-                            url
-                          },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
-                        } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                        content.push(imageBlock);
-                      }
+                      // Smaller images use URLs for faster processing
+                      const imageBlock = {
+                        type: "text",
+                        text: `\n\n![${attachment.filename}](${url})\n\n`
+                      } as const satisfies Anthropic.Beta.BetaContentBlockParam;
+                      content.push(imageBlock);
                     } else if (mime.includes("application")) {
                       // Other docs use URLs
                       const docBlock = {
@@ -770,8 +742,7 @@ export class AnthropicWorkup {
               const textContent = `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${msg.content}\n</model>`;
               content.push({
                 type: "text",
-                text: textContent,
-                cache_control: { type: "ephemeral", ttl: "1h" }
+                text: textContent
               } as const satisfies Anthropic.Beta.BetaTextBlockParam);
             }
 
@@ -795,8 +766,7 @@ export class AnthropicWorkup {
         system: [
           {
             type: "text",
-            text: enhancedSystemPrompt,
-            cache_control: { type: "ephemeral", ttl: "1h" }
+            text: enhancedSystemPrompt
           }
         ] as const satisfies Anthropic.Beta.BetaTextBlockParam[]
       };
@@ -808,6 +778,7 @@ export class AnthropicWorkup {
       if (userMsg) {
         try {
           if (userMsg.attachments && userMsg.attachments.length > 0) {
+            let i=0;
             for (const attachment of userMsg.attachments) {
               const {
                 cdnUrl,
@@ -829,6 +800,8 @@ export class AnthropicWorkup {
                       keyId,
                       apiKey
                     );
+                    if (i<4) {
+                      i++;
                     const docBlock = {
                       type: "document",
                       source: {
@@ -836,6 +809,15 @@ export class AnthropicWorkup {
                         file_id: fileId
                       },
                       cache_control: { type: "ephemeral", ttl: "1h" }
+                    } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
+                    content.push(docBlock);
+                    }
+                    const docBlock = {
+                      type: "document",
+                      source: {
+                        type: "file",
+                        file_id: fileId
+                      }
                     } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                     content.push(docBlock);
                   } catch (err) {
@@ -885,8 +867,7 @@ export class AnthropicWorkup {
         } finally {
           content.push({
             type: "text",
-            text: userMsg.content,
-            cache_control: { type: "ephemeral", ttl: "1h" }
+            text: userMsg.content
           } as const satisfies Anthropic.Beta.BetaTextBlockParam);
         }
       }
@@ -905,8 +886,7 @@ export class AnthropicWorkup {
           system: [
             {
               type: "text",
-              text: systemPrompt,
-              cache_control: { type: "ephemeral", ttl: "1h" }
+              text: systemPrompt
             }
           ] as const satisfies Anthropic.Beta.BetaTextBlockParam[]
         };
