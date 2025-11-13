@@ -88,6 +88,24 @@ interface AIChatContextValue {
 const AIChatContext = createContext<AIChatContextValue | undefined>(undefined);
 
 // Note: Track active user streams within the provider to avoid module-scope writes
+const fallbackApiKeys = {
+  isDefault: {
+    anthropic: false,
+    gemini: false,
+    grok: false,
+    meta: false,
+    openai: false,
+    vercel: false
+  },
+  isSet: {
+    anthropic: false,
+    gemini: false,
+    grok: false,
+    meta: false,
+    openai: false,
+    vercel: false
+  }
+};
 
 export function AIChatProvider({
   children,
@@ -583,12 +601,10 @@ export function AIChatProvider({
       const tempUserMsgId =
         optimisticUserMsgId ?? `user-${Date.now()}-${Math.random()}`;
       setCurrentUserMsgId(tempUserMsgId);
-
+      const p = providerContext ?? fallbackApiKeys;
       // Get API key configuration
-      const hasProviderConfigured =
-        providerContext.isSet[selectedModel.provider];
-      const isDefaultProvider =
-        providerContext.isDefault[selectedModel.provider];
+      const hasProviderConfigured = p.isSet[selectedModel.provider];
+      const isDefaultProvider = p.isDefault[selectedModel.provider];
 
       console.log(
         `[AIChatContext] Sending chat with conversationId: ${conversationId}`
