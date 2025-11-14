@@ -544,6 +544,7 @@ export function ChatInterface({
           imgGenFields={imgGenFields ?? undefined}
           imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
           currentAiMsgId={currentAiMsgId ?? undefined}
+          isNewChat={isNewChat}
           user={user}>
           <ChatHero
             user={user}

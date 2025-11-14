@@ -35,6 +35,7 @@ interface ChatFeedProps {
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
   imgGenAttachmentId?: string;
   currentAiMsgId?: string;
+  isNewChat?: boolean;
 }
 
 export function ChatFeed({
@@ -53,6 +54,7 @@ export function ChatFeed({
   imgGenFields,
   imgGenAttachmentId,
   currentAiMsgId,
+  isNewChat,
   children
 }: ChatFeedProps) {
   const { scrollRef, setScrollState, showScrollButton, scrollToBottom } =
@@ -107,8 +109,11 @@ export function ChatFeed({
     }
   }, [quote, clear]);
 
-  // Initial scroll to bottom on mount - ensures we always start at the bottom
+  // Initial scroll to bottom - runs on mount and when conversation changes (but not during new-chat transitions)
   useEffect(() => {
+    // Don't scroll during new-chat ID resolution - wait until router recouples
+    if (isNewChat) return;
+
     const initialScroll = () => {
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -123,8 +128,7 @@ export function ChatFeed({
     }, 50);
 
     return () => clearTimeout(fallbackTimer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only on mount - component remounts on true navigation
+  }, [activeConversationId, isNewChat, scrollRef]); // Re-run when conversation changes or new-chat completes
 
   // Auto-scroll when messages change or streaming updates occur (only if near bottom)
   useEffect(() => {
