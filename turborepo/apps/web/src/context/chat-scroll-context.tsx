@@ -47,6 +47,7 @@ export function ChatScrollProvider({ children }: { children: ReactNode }) {
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
 
       const currentScrollTop = startScrollTop + distance * easeOutQuart;
+      // eslint-disable-next-line react-compiler/react-compiler
       container.scrollTop = currentScrollTop;
 
       if (progress < 1) {

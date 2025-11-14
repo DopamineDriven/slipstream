@@ -116,6 +116,7 @@ export function ChatFeed({
 
     const initialScroll = () => {
       if (scrollRef.current) {
+        // eslint-disable-next-line react-compiler/react-compiler
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };
@@ -137,6 +138,7 @@ export function ChatFeed({
     // Use requestAnimationFrame for smooth scrolling
     requestAnimationFrame(() => {
       if (scrollRef.current) {
+        // eslint-disable-next-line react-compiler/react-compiler
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     });
