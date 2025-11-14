@@ -2,6 +2,7 @@
 
 import type { ReactNode, RefObject } from "react";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { smoothScrollToBottom } from "@/lib/helpers";
 
 interface ChatScrollContextValue {
   scrollRef: RefObject<HTMLDivElement | null>;
@@ -33,13 +34,8 @@ export function ChatScrollProvider({ children }: { children: ReactNode }) {
     const targetScrollTop = container.scrollHeight - container.clientHeight;
     const distance = targetScrollTop - startScrollTop;
 
-    // Calculate duration based on distance (0.3-0.8s range)
-    const baseDuration = 300;
-    const maxDuration = 800;
-    const duration = Math.min(
-      maxDuration,
-      baseDuration + Math.abs(distance) * 0.3
-    );
+    // Use sqrt-based easing for smooth scroll that adapts to distance (300-1500ms range)
+    const duration = smoothScrollToBottom(distance);
 
     const startTime = performance.now();
 
