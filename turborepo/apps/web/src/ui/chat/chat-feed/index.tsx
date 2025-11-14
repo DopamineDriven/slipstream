@@ -8,6 +8,7 @@ import { useScrollObserver } from "@/hooks/use-scroll-observer";
 import { useSelectionQuote } from "@/hooks/use-selection-quote";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
+import { ChatScrollAnchor } from "@/ui/chat/chat-scroll-anchor";
 import { motion } from "motion/react";
 import type {
   AIChatResponseImgGenFieldsFinal,
@@ -241,6 +242,7 @@ export function ChatFeed({
                 </div>
               </motion.div>
             )}
+          <ChatScrollAnchor trackVisibility={isStreaming} />
         </div>
       )}
       {rect && quote && (

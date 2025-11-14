@@ -1,6 +1,7 @@
 "use client";
 
-import { useChatScroll } from "@/context/chat-scroll-context";
+import { useCallback } from "react";
+import { useAtBottom } from "@/hooks/use-at-bottom";
 import { cn } from "@/lib/utils";
 import { Button, ChevronDown } from "@slipstream/ui";
 
@@ -9,7 +10,17 @@ interface FloatingScrollButtonProps {
 }
 
 export function FloatingScrollButton({ isHome }: FloatingScrollButtonProps) {
-  const { showScrollButton, scrollToBottom } = useChatScroll();
+  const isAtBottom = useAtBottom(100); // 100px threshold
+
+  const scrollToBottom = useCallback(() => {
+    const container = document.querySelector("[data-chat-feed]") as HTMLElement;
+    if (!container) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth"
+    });
+  }, []);
 
   return (
     <div
@@ -23,9 +34,9 @@ export function FloatingScrollButton({ isHome }: FloatingScrollButtonProps) {
         onClick={scrollToBottom}
         className={cn(
           "bg-background border-border pointer-events-auto h-8 w-8 rounded-full border shadow-lg transition-all duration-200 ease-[cubic-bezier(0.31,0.1,0.08,0.96)] hover:opacity-75 hover:shadow-xl",
-          showScrollButton
-            ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-50"
-            : "pointer-events-none translate-y-2 opacity-0"
+          isAtBottom
+            ? "pointer-events-none translate-y-2 opacity-0"
+            : "animate-floating-bob pointer-events-auto translate-y-0 opacity-50"
         )}
         style={{ "--bob-multiplier": 0.7 } as React.CSSProperties}
         aria-label="Scroll to bottom">
