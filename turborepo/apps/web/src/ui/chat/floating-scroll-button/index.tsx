@@ -11,10 +11,12 @@ interface FloatingScrollButtonProps {
 export function FloatingScrollButton({ isHome }: FloatingScrollButtonProps) {
   const { showScrollButton, scrollToBottom } = useChatScroll();
 
-  if (isHome) return null;
-
   return (
-    <div className="pointer-events-none fixed bottom-24 left-0 right-0 z-50 flex justify-center px-4">
+    <div
+      className={cn(
+        "pointer-events-none fixed bottom-24 left-0 right-0 z-50 justify-center px-4",
+        isHome ? "hidden" : "flex"
+      )}>
       <Button
         variant="secondary"
         size="icon"
