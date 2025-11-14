@@ -23,7 +23,6 @@ import type { AIChatRequestImgGenFields } from "@slipstream/types";
 import {
   Button,
   Camera,
-  ChevronDown,
   Expand,
   FileText,
   ImageGen,
@@ -104,8 +103,6 @@ export function ChatInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showExpandButton, setShowExpandButton] = useState(false);
-
-  const [showScrollButton, setShowScrollButton] = useState(false);
 
   const [message, setMessage] = useState("");
   const imgGen = useImageGen();
@@ -256,32 +253,6 @@ export function ChatInput({
       .map(l => `> ${l}`)
       .join("\n");
   };
-
-  // Monitor scroll state
-  useEffect(() => {
-    const checkScrollState = () => {
-      const chatFeed = document.querySelector(
-        "[data-chat-feed]"
-      ) as HTMLDivElement | null;
-      if (!chatFeed) return;
-
-      const distanceFromBottom =
-        chatFeed.scrollHeight - (chatFeed.scrollTop + chatFeed.clientHeight);
-      setShowScrollButton(distanceFromBottom > 100);
-    };
-
-    const chatFeed = document.querySelector("[data-chat-feed]");
-    if (chatFeed) {
-      chatFeed.addEventListener("scroll", checkScrollState, { passive: true });
-      checkScrollState();
-    }
-
-    return () => {
-      if (chatFeed) {
-        chatFeed.removeEventListener("scroll", checkScrollState);
-      }
-    };
-  }, []);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -477,9 +448,6 @@ export function ChatInput({
         : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );
-  const handleScrollToBottom = () => {
-    window.chatScrollToBottom?.();
-  };
 
   const effectivePlaceholder = useMemo(
     () => placeholder ?? `Shoot ${selectedModel.displayName} a message...`,
@@ -604,25 +572,7 @@ export function ChatInput({
               </div>
             </div>
           )}
-          {/* Scroll to bottom button */}
           <div className="relative">
-            <div className="pointer-events-none absolute -top-10 flex w-full items-center justify-center">
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={handleScrollToBottom}
-                className={cn(
-                  "bg-background border-border pointer-events-auto h-7 w-7 rounded-full border shadow-lg hover:opacity-75 hover:shadow-xl",
-                  "transition-all duration-200 ease-[cubic-bezier(0.31,0.1,0.08,0.96)]",
-                  showScrollButton
-                    ? "animate-floating-bob pointer-events-auto translate-y-0 opacity-50"
-                    : "pointer-events-none translate-y-2 opacity-0"
-                )}
-                style={{ "--bob-multiplier": 0.7 }}
-                aria-label="Scroll to bottom">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </div>
             <form onSubmit={handleSend} ref={formRef}>
               <div className="group bg-background focus-within:ring-ring/20 rounded-lg border transition-colors focus-within:ring-1 focus-within:ring-offset-0">
                 <div className="p-3 pb-2">
@@ -783,8 +733,3 @@ export function ChatInput({
   );
 }
 
-declare module "react" {
-  export interface CSSProperties extends Properties<string | number> {
-    "--bob-multiplier"?: number;
-  }
-}

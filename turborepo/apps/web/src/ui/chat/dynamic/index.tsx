@@ -11,6 +11,7 @@ import React, {
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useAssetUpload } from "@/context/asset-context";
+import { ChatScrollProvider } from "@/context/chat-scroll-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
@@ -523,45 +524,47 @@ export function ChatInterface({
   );
 
   return (
-    <div
-      className={cn(
-        "flex h-full flex-col",
-        isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
-      )}>
-      <ChatFeed
-        messages={messages}
-        streamedText={isStreaming ? streamedText : ""}
-        isAwaitingFirstChunk={isAwaitingFirstChunk}
-        activeConversationId={activeConversationId ?? "new-chat"}
-        isStreaming={isStreaming}
-        isThinking={isThinking}
-        isHome={isHome}
-        thinkingText={thinkingText}
-        thinkingDuration={thinkingDuration ?? undefined}
-        imgGenEnabled={imgGenEnabled}
-        imgGenFields={imgGenFields ?? undefined}
-        imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
-        currentAiMsgId={currentAiMsgId ?? undefined}
-        user={user}>
-        <ChatHero
-          user={user}
-          selectedModel={selectedModel}
-          tz={tz}
-          onPromptClickAction={handlePromptClick}
-        />
-      </ChatFeed>
-      <Suspense>
-        <ChatInput
-          handlePromptConsumed={handlePromptConsumed}
-          initialPrompt={queuedPrompt}
-          autoSubmitInitialPrompt
-          onUserMessage={handleUserMessage}
-          user={user}
-          isConnected={isConnected}
-          activeConversationId={activeConversationId}
-          conversationId={activeConversationId ?? conversationId}
-        />
-      </Suspense>
-    </div>
+    <ChatScrollProvider>
+      <div
+        className={cn(
+          "flex h-full flex-col",
+          isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
+        )}>
+        <ChatFeed
+          messages={messages}
+          streamedText={isStreaming ? streamedText : ""}
+          isAwaitingFirstChunk={isAwaitingFirstChunk}
+          activeConversationId={activeConversationId ?? "new-chat"}
+          isStreaming={isStreaming}
+          isThinking={isThinking}
+          isHome={isHome}
+          thinkingText={thinkingText}
+          thinkingDuration={thinkingDuration ?? undefined}
+          imgGenEnabled={imgGenEnabled}
+          imgGenFields={imgGenFields ?? undefined}
+          imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
+          currentAiMsgId={currentAiMsgId ?? undefined}
+          user={user}>
+          <ChatHero
+            user={user}
+            selectedModel={selectedModel}
+            tz={tz}
+            onPromptClickAction={handlePromptClick}
+          />
+        </ChatFeed>
+        <Suspense>
+          <ChatInput
+            handlePromptConsumed={handlePromptConsumed}
+            initialPrompt={queuedPrompt}
+            autoSubmitInitialPrompt
+            onUserMessage={handleUserMessage}
+            user={user}
+            isConnected={isConnected}
+            activeConversationId={activeConversationId}
+            conversationId={activeConversationId ?? conversationId}
+          />
+        </Suspense>
+      </div>
+    </ChatScrollProvider>
   );
 }

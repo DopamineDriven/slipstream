@@ -217,9 +217,3 @@ export function ThinkingSection({
     </div>
   );
 }
-
-declare module "react" {
-  export interface CSSProperties extends Properties<string | number> {
-    "--bob-multiplier"?: number;
-  }
-}
