@@ -75,6 +75,7 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "o3":
+          case "gpt-5.1":
           case "gpt-5-pro":
           case "gpt-5-chat-latest":
           case "gpt-5-mini":
@@ -82,6 +83,9 @@ export class ProviderValidation {
           case "gpt-5": {
             return true;
           }
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "chatgpt-4o-latest":
@@ -170,6 +174,10 @@ export class ProviderValidation {
           case "gpt-image-1-mini": {
             return true;
           }
+          case "gpt-5.1":
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "gpt-4-turbo":
@@ -305,6 +313,7 @@ export class ProviderValidation {
           case "gpt-4.1-nano":
           case "gpt-4o":
           case "gpt-4o-mini":
+          case "gpt-5.1":
           case "o3":
           case "gpt-5-pro":
           case "gpt-5-mini":
@@ -329,6 +338,9 @@ export class ProviderValidation {
           case "chatgpt-4o-latest":
           case "o1-pro":
           case "sora-2":
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "sora-2-pro":
           case "gpt-3.5-turbo":
           case "gpt-4":
@@ -377,7 +389,8 @@ export class ProviderValidation {
           case "gpt-5-pro":
           case "gpt-5-mini":
           case "gpt-5-nano":
-          case "gpt-5": {
+          case "gpt-5":
+          case "gpt-5.1": {
             if (!(data?.format === "png" || data?.format === "webp"))
               return undefined;
             if (
@@ -392,6 +405,9 @@ export class ProviderValidation {
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "chatgpt-4o-latest":
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "o1-pro":
           case "sora-2":
           case "sora-2-pro":
@@ -443,7 +459,8 @@ export class ProviderValidation {
         model === "gpt-4o" ||
         model === "gpt-4o-mini" ||
         model === "o3" ||
-        model === "gpt-image-1"
+        model === "gpt-image-1" ||
+        model === "gpt-5.1"
       )
     )
       return undefined;
@@ -480,6 +497,7 @@ export class ProviderValidation {
         m === "gpt-5-chat-latest" ||
         m === "gpt-5-pro" ||
         m === "gpt-5" ||
+        m === "gpt-5.1" ||
         m === "gpt-5-mini" ||
         m === "gpt-5-nano" ||
         m === "gpt-4o" ||
@@ -530,6 +548,7 @@ export class ProviderValidation {
         model === "gpt-5-chat-latest" ||
         model === "gpt-5-pro" ||
         model === "gpt-5" ||
+        model === "gpt-5.1" ||
         model === "gpt-5-mini" ||
         model === "gpt-5-nano" ||
         model === "gpt-4o" ||
@@ -637,6 +656,7 @@ export class ProviderValidation {
           case "gpt-4.1-nano":
           case "gpt-4o":
           case "gpt-4o-mini":
+          case "gpt-5.1":
           case "gpt-5":
           case "gpt-5-mini":
           case "gpt-5-chat-latest":
@@ -652,6 +672,9 @@ export class ProviderValidation {
               return data.output_quality as "high" | "medium" | "low" | "auto";
             } else return "auto";
           }
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "gpt-3.5-turbo":
           case "gpt-4":
           case "gpt-4-turbo":
@@ -688,7 +711,7 @@ export class ProviderValidation {
         return "grok-2-imagine-1212";
       }
       case "openai": {
-        return "gpt-5";
+        return "gpt-5.1";
       }
       case "anthropic":
       case "meta":
@@ -707,7 +730,8 @@ export class ProviderValidation {
     switch (provider) {
       case "openai": {
         if (model) {
-          switch (model) {
+          const m = model as GetModelUtilRT<typeof provider>;
+          switch (m) {
             case "dall-e-2":
             case "dall-e-3":
             case "o3-mini":
@@ -723,6 +747,9 @@ export class ProviderValidation {
             case "sora-2-pro":
             case "gpt-4-turbo":
             case "gpt-5-codex":
+            case "gpt-5.1-chat-latest":
+            case "gpt-5.1-codex":
+            case "gpt-5.1-codex-mini":
             case "o1": {
               return undefined;
             }
@@ -733,6 +760,7 @@ export class ProviderValidation {
             case "gpt-4o-mini":
             case "gpt-5-chat-latest":
             case "gpt-5-pro":
+            case "gpt-5.1":
             case "gpt-5":
             case "gpt-5-mini":
             case "gpt-5-nano":
@@ -842,6 +870,7 @@ export class ProviderValidation {
           case "gpt-4o":
           case "gpt-4o-mini":
           case "gpt-5":
+          case "gpt-5.1":
           case "gpt-5-pro":
           case "gpt-5-chat-latest":
           case "gpt-5-mini":
@@ -858,6 +887,9 @@ export class ProviderValidation {
           }
           case "gpt-3.5-turbo":
           case "gpt-4":
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
           case "gpt-4-turbo":
           case "chatgpt-4o-latest":
           case "o1":

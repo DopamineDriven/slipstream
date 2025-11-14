@@ -213,7 +213,7 @@ export type ImageGenOutputSingleton<T extends boolean = false> = {
   updatedAt: Date;
   jobId: string;
   jobIndex: number;
-  kind: ImageGenOutputKind // "FINAL" | "PARTIAL" -> only ever 1 FINAL;
+  kind: ImageGenOutputKind; // "FINAL" | "PARTIAL" -> only ever 1 FINAL;
   seriesIndex: number;
   isPartial: boolean;
   attachmentId: string;
@@ -304,7 +304,7 @@ export type MessageSingleton<T extends boolean = false> = {
   conversationId: string;
   model: string | null;
   senderType: MessageSenderType;
-  messageType: MessageType | null
+  messageType: MessageType | null;
   content: string;
   thinkingText: string | null;
   thinkingDuration: number | null;
@@ -375,8 +375,12 @@ export type AssetReadyPayload = {
   updatedAt: Date;
 };
 
-
-export type MessageType = "AUDIO_GEN" | "COMPUTER_USE" | "IMAGE_GEN" | "TEXT" | "VIDEO_GEN";
+export type MessageType =
+  | "AUDIO_GEN"
+  | "COMPUTER_USE"
+  | "IMAGE_GEN"
+  | "TEXT"
+  | "VIDEO_GEN";
 export type FlexiProvider =
   | "openai"
   | "anthropic"

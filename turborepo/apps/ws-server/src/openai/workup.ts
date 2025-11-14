@@ -78,6 +78,7 @@ export class OpenAIServiceWorkup extends ModelService {
         targetApi: "images";
       }
     | ImgGenWorkupResRT<
+        | "gpt-5.1"
         | "gpt-5"
         | "gpt-5-mini"
         | "gpt-5-nano"
@@ -104,6 +105,9 @@ export class OpenAIServiceWorkup extends ModelService {
       model === "o3-mini" ||
       model === "o1" ||
       model === "o3-deep-research" ||
+      model === "gpt-5.1-chat-latest" ||
+      model === "gpt-5.1-codex" ||
+      model === "gpt-5.1-codex-mini" ||
       model === "o4-mini-deep-research" ||
       model === "o4-mini" ||
       model === "o3-pro" ||
@@ -521,8 +525,11 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public mapToCompletionImgGenArr(props: AIChatResRT, userMsgId: string, revisedPrompt?: string) {
-
+  public mapToCompletionImgGenArr(
+    props: AIChatResRT,
+    userMsgId: string,
+    revisedPrompt?: string
+  ) {
     const s = props.messages[0];
 
     if (!s) throw new Error("returned db res has no attachments for image gen");
@@ -956,6 +963,7 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-5-pro": {
         return { effort: "high", summary: "detailed" } as const;
       }
+      case "gpt-5.1":
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano":
@@ -966,6 +974,9 @@ export class OpenAIServiceWorkup extends ModelService {
         }
         return { effort, summary } satisfies Reasoning;
       }
+      case "gpt-5.1-chat-latest":
+      case "gpt-5.1-codex-mini":
+      case "gpt-5.1-codex":
       case "gpt-5-codex":
       case "o1":
       case "o3-mini":
@@ -1005,6 +1016,18 @@ export class OpenAIServiceWorkup extends ModelService {
       case "dall-e-3": {
         return true;
       }
+      case "gpt-5.1":
+      case "chatgpt-4o-latest":
+      case "gpt-5-chat-latest":
+      case "gpt-5.1-chat-latest":
+      case "gpt-5.1-codex":
+      case "gpt-5.1-codex-mini":
+      case "o1":
+      case "o1-pro":
+      case "o3-deep-research":
+      case "o4-mini-deep-research":
+      case "sora-2":
+      case "sora-2-pro":
       case "gpt-5-pro":
       case "gpt-5-codex":
       case "gpt-5":
@@ -1030,6 +1053,7 @@ export class OpenAIServiceWorkup extends ModelService {
 
   public imageGenToolCompat(model: OpenAiModelIdUnion) {
     switch (model) {
+      case "gpt-5.1":
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-nano":
@@ -1043,6 +1067,9 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4o-mini": {
         return true;
       }
+      case "gpt-5.1-chat-latest":
+      case "gpt-5.1-codex":
+      case "gpt-5.1-codex-mini":
       case "dall-e-2":
       case "dall-e-3":
       case "gpt-image-1":
@@ -1076,14 +1103,23 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-5-pro": {
         return { verbosity: "high" } as const;
       }
+      case "gpt-5.1":
       case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-chat-latest":
-      case "gpt-5-codex":
       case "gpt-5-nano": {
         if (imgGenEnabled) {
           return { verbosity: "low" } satisfies ResponseTextConfig;
         }
+        const v = verbosity
+          ? (verbosity as ResponseTextConfig["verbosity"])
+          : ("medium" satisfies ResponseTextConfig["verbosity"]);
+        return { verbosity: v } satisfies ResponseTextConfig;
+      }
+      case "gpt-5-codex":
+      case "gpt-5.1-chat-latest":
+      case "gpt-5.1-codex":
+      case "gpt-5.1-codex-mini": {
         const v = verbosity
           ? (verbosity as ResponseTextConfig["verbosity"])
           : ("medium" satisfies ResponseTextConfig["verbosity"]);
@@ -1109,6 +1145,8 @@ export class OpenAIServiceWorkup extends ModelService {
       case "gpt-4.1-mini":
       case "gpt-4.1-nano":
       case "gpt-4o":
+      case "o3-deep-research":
+      case "o4-mini-deep-research":
       case "gpt-4o-mini":
       default: {
         return undefined;

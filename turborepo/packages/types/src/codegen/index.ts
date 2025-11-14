@@ -13,6 +13,7 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
@@ -51,10 +52,14 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-5.1",
     "gpt-5",
-    "gpt-5-codex",
     "gpt-5-mini",
     "gpt-5-nano",
+    "gpt-5.1-chat-latest",
+    "gpt-5.1-codex",
+    "gpt-5.1-codex-mini",
+    "gpt-5-codex",
     "gpt-5-pro",
     "gpt-5-chat-latest",
     "gpt-4.1",
@@ -361,6 +366,10 @@ function formattedOpenAi(props: OpenAiResponse) {
       return { id, displayName: "GPT Image 1", ...rest };
     if (id === "gpt-5-codex")
       return { id, displayName: "GPT-5-Codex", ...rest };
+    if (id === "gpt-5.1-codex")
+      return { id, displayName: "GPT-5.1 Codex", ...rest };
+    if (id === "gpt-5.1-codex-mini")
+      return { id, displayName: "GPT-5.1 Codex mini", ...rest };
     if (id === "gpt-image-1-mini")
       return { id, displayName: "GPT Image 1 mini", ...rest };
     if (id === "dall-e-3") return { id, displayName: "DALL·E 3", ...rest };
@@ -373,6 +382,8 @@ function formattedOpenAi(props: OpenAiResponse) {
       return { id, displayName: "ChatGPT-4o", ...rest };
     if (id === "gpt-5-chat-latest")
       return { id, displayName: "GPT-5 Chat", ...rest };
+    if (id === "gpt-5.1-chat-latest")
+      return { id, displayName: "GPT-5.1 Chat", ...rest };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });

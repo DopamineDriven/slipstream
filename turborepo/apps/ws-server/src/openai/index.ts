@@ -880,6 +880,7 @@ export class OpenAIService extends OpenAIServiceWorkup {
         m === "gpt-4.1" ||
         m === "gpt-4.1-mini" ||
         m === "gpt-4.1-nano" ||
+        m === "gpt-5.1" ||
         m === "gpt-5" ||
         m === "gpt-5-mini" ||
         m === "gpt-5-nano" ||
@@ -1852,6 +1853,10 @@ export class OpenAIService extends OpenAIServiceWorkup {
           ...rest
         });
       }
+      case "gpt-5.1":
+      case "gpt-5.1-chat-latest":
+      case "gpt-5.1-codex":
+      case "gpt-5.1-codex-mini":
       case "o3-deep-research":
       case "o4-mini-deep-research":
       case "chatgpt-4o-latest":

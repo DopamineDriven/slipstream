@@ -35,34 +35,14 @@ export const providerModelImageGenApi = {
 } as const;
 
 export const allImgSupportingProviderModels = {
-  openai: [
-    "gpt-image-1",
-    "gpt-image-1-mini",
-    "dall-e-2",
-    "dall-e-3",
-    "gpt-5",
-    "gpt-5-mini",
-    "gpt-5-nano",
-    "gpt-5-chat-latest",
-    "gpt-5-pro",
-    "gpt-4.1",
-    "gpt-4.1-mini",
-    "gpt-4.1-nano",
-    "o3",
-    "gpt-4o",
-    "gpt-4o-mini"
-  ],
-  gemini: [
-    "gemini-2.5-flash-image",
-    "imagen-4.0-fast-generate-001",
-    "imagen-4.0-generate-001",
-    "imagen-4.0-ultra-generate-001"
-  ],
-  grok: ["grok-2-image-1212"]
+  openai: modelIdsByProviderImgGen.openai,
+  gemini: modelIdsByProviderImgGen.gemini,
+  grok: modelIdsByProviderImgGen.grok
 } as const;
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
@@ -71,9 +51,9 @@ export const providerModelImageGenFacilitatingApi = {
     "gpt-4.1",
     "gpt-4.1-mini",
     "gpt-4.1-nano",
-    "o3",
     "gpt-4o",
-    "gpt-4o-mini"
+    "gpt-4o-mini",
+    "o3"
   ],
   gemini: ["gemini-2.5-flash-image"]
 } as const;
@@ -374,8 +354,8 @@ export const getDisplayNameByModelId = <
 export const defaultModelDisplayNameByProvider = {
   openai: "GPT-5 nano" satisfies OpenAiDisplayNameUnion,
   gemini: "Gemini 2.5 Flash" satisfies GeminiDisplayNameUnion,
-  grok: "Grok 4" satisfies GrokDisplayNameUnion,
-  anthropic: "Claude Sonnet 4" satisfies AnthropicDisplayNameUnion,
+  grok: "Grok 4 Fast Reasoning" satisfies GrokDisplayNameUnion,
+  anthropic: "Claude Sonnet 4.5" satisfies AnthropicDisplayNameUnion,
   meta: "Llama 3.3 (70B, Instruct)" satisfies MetaDisplayNameUnion,
   vercel: "v0 medium (legacy)" satisfies VercelDisplayNameUnion
 } as const;
@@ -383,8 +363,8 @@ export const defaultModelDisplayNameByProvider = {
 export const defaultModelIdByProvider = {
   openai: "gpt-5-nano" satisfies OpenAiModelIdUnion,
   gemini: "gemini-2.5-flash" satisfies GeminiModelIdUnion,
-  grok: "grok-4-0709" satisfies GrokModelIdUnion,
-  anthropic: "claude-sonnet-4-20250514" satisfies AnthropicModelIdUnion,
+  grok: "grok-4-fast-reasoning" satisfies GrokModelIdUnion,
+  anthropic: "claude-sonnet-4-5-20250929" satisfies AnthropicModelIdUnion,
   meta: "Llama-3.3-70B-Instruct" satisfies MetaModelIdUnion,
   vercel: "v0-1.0-md" satisfies VercelModelIdUnion
 } as const;
