@@ -124,7 +124,7 @@ export function ChatFeed({
 
     return () => clearTimeout(fallbackTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeConversationId]); // Re-run when conversation changes
+  }, []); // Run only on mount - component remounts on true navigation
 
   // Auto-scroll when messages change or streaming updates occur (only if near bottom)
   useEffect(() => {
