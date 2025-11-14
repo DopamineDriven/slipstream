@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useScroll } from "motion/react";
+import { useChatScroll } from "@/context/chat-scroll-context";
 import { cn } from "@/lib/utils";
 import { Button, ChevronDown } from "@slipstream/ui";
 
@@ -11,10 +12,11 @@ interface FloatingScrollButtonProps {
 
 export function FloatingScrollButton({ isHome }: FloatingScrollButtonProps) {
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const { scrollRef } = useChatScroll();
 
-  // Track scroll progress of the chat feed container
+  // Track scroll progress of the chat feed container using the actual ref
   const { scrollYProgress } = useScroll({
-    container: { current: typeof window !== "undefined" ? document.querySelector("[data-chat-feed]") : null },
+    container: scrollRef,
   });
 
   // Update isAtBottom when scroll progress changes
@@ -26,14 +28,13 @@ export function FloatingScrollButton({ isHome }: FloatingScrollButtonProps) {
   }, [scrollYProgress]);
 
   const scrollToBottom = useCallback(() => {
-    const container = document.querySelector("[data-chat-feed]") as HTMLElement;
-    if (!container) return;
+    if (!scrollRef.current) return;
 
-    container.scrollTo({
-      top: container.scrollHeight,
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
       behavior: "smooth"
     });
-  }, []);
+  }, [scrollRef]);
 
   return (
     <div
