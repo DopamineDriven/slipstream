@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-export function useAtBottom(offset = 0): boolean {
+export function useAtBottom<const T extends number>(offset?: T) {
+  const offsetUndefined = typeof offset === "undefined" ? 0 : offset;
   const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
@@ -10,21 +11,19 @@ export function useAtBottom(offset = 0): boolean {
     if (!container) return;
 
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-      const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-
-      setIsAtBottom(distanceFromBottom <= offset);
+      setIsAtBottom(
+        container.scrollTop + container.clientHeight >=
+          container.scrollHeight - offsetUndefined
+      );
     };
 
     container.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Check initial state
+    handleScroll();
 
     return () => {
       container.removeEventListener("scroll", handleScroll);
     };
-  }, [offset]);
+  }, [offsetUndefined]);
 
   return isAtBottom;
 }
