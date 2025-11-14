@@ -1,9 +1,13 @@
 export const displayNameModelsByProvider = {
   openai: [
+    "GPT-5.1",
     "GPT-5",
-    "GPT-5-Codex",
     "GPT-5 mini",
     "GPT-5 nano",
+    "GPT-5.1 Chat",
+    "GPT-5.1 Codex",
+    "GPT-5.1 Codex mini",
+    "GPT-5-Codex",
     "GPT-5 pro",
     "GPT-5 Chat",
     "GPT-4.1",

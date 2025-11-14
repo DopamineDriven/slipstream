@@ -1119,6 +1119,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   output_format: "jpeg" | "webp" | "png";
   output_compression: number | undefined;
   model:
+    | "gpt-5.1"
     | "gpt-image-1"
     | "gpt-image-1-mini"
     | "gpt-5"
@@ -1151,6 +1152,7 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-5-chat-latest"
           | "gpt-5-pro"
           | "gpt-5-mini"
+          | "gpt-5.1"
           | "gpt-5-nano"
           | "gpt-4.1"
           | "gpt-4.1-mini"
@@ -1163,6 +1165,9 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
             | "gpt-5-codex"
             | "gpt-3.5-turbo"
             | "gpt-4-turbo"
+            | "gpt-5.1-chat-latest"
+            | "gpt-5.1-codex"
+            | "gpt-5.1-codex-mini"
             | "chatgpt-4o-latest"
             | "o1-pro"
             | "o1"
@@ -1191,6 +1196,7 @@ export type ImgGenWorkupRTObj = {
   "gpt-4o": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5-chat-latest": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
   o1: undefined;
   "o1-pro": undefined;
   "sora-2": undefined;
@@ -1205,6 +1211,9 @@ export type ImgGenWorkupRTObj = {
   "o3-pro": undefined;
   "o3-mini": undefined;
   "o4-mini": undefined;
+  "gpt-5.1-chat-latest": undefined;
+  "gpt-5.1-codex": undefined;
+  "gpt-5.1.-codex-mini": undefined;
 };
 
 export type ImgGenWorkupResRT<T extends keyof ImgGenWorkupRTObj> =
