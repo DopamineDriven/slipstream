@@ -685,6 +685,16 @@ export class AnthropicWorkup {
                         }
                       } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                       content.push(docBlock);
+                    } else if (mime.startsWith("text/")) {
+                      // Text files (markdown, plain text, etc.) use document type
+                      const docBlock = {
+                        type: "document",
+                        source: {
+                          type: "url",
+                          url
+                        }
+                      } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
+                      content.push(docBlock);
                     }
                   }
                 }
@@ -766,6 +776,16 @@ export class AnthropicWorkup {
                       content.push(imageBlock);
                     } else if (mime.includes("application")) {
                       // Other docs use URLs
+                      const docBlock = {
+                        type: "document",
+                        source: {
+                          type: "url",
+                          url
+                        }
+                      } as const satisfies Anthropic.Beta.BetaContentBlockParam;
+                      content.push(docBlock);
+                    } else if (mime.startsWith("text/")) {
+                      // Text files (markdown, plain text, etc.) use document type
                       const docBlock = {
                         type: "document",
                         source: {
@@ -893,6 +913,16 @@ export class AnthropicWorkup {
                   content.push(imageBlock);
                 } else if (mime.includes("application")) {
                   // Other docs use URLs
+                  const docBlock = {
+                    type: "document",
+                    source: {
+                      type: "url",
+                      url
+                    }
+                  } as const satisfies Anthropic.Beta.BetaContentBlockParam;
+                  content.push(docBlock);
+                } else if (mime.startsWith("text/")) {
+                  // Text files (markdown, plain text, etc.) use document type
                   const docBlock = {
                     type: "document",
                     source: {

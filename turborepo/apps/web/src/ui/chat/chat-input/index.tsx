@@ -446,8 +446,8 @@ export function ChatInput({
       selectedModel.provider === "openai" ||
       selectedModel.provider === "anthropic" ||
       selectedModel.provider === "gemini"
-        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,application/*,text/*"
-        : ".pdf,.docx,application/*,text/*",
+        ? ".md,.markdown,.txt,.pdf,.docx,.xlsx,.pptx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,text/plain,application/*,text/*"
+        : ".pdf,.docx,.md,.markdown,.txt,application/*,text/*",
     [selectedModel.provider]
   );
 
