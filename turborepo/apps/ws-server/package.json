@@ -43,6 +43,7 @@
         "dist/models/index.d.ts"
       ],
       "openai": [
+        "dist/openai/gpt-image.d.ts",
         "dist/openai/index.d.ts",
         "dist/openai/types.d.ts",
         "dist/openai/workup.d.ts"
@@ -91,12 +92,12 @@
   },
   "prettier": "@slipstream/prettier-config",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.68.0",
+    "@anthropic-ai/sdk": "^0.69.0",
     "@aws-crypto/sha256-js": "^5.2.0",
-    "@aws-sdk/client-s3": "^3.931.0",
-    "@aws-sdk/client-secrets-manager": "^3.931.0",
-    "@aws-sdk/credential-providers": "^3.931.0",
-    "@aws-sdk/s3-request-presigner": "^3.931.0",
+    "@aws-sdk/client-s3": "^3.932.0",
+    "@aws-sdk/client-secrets-manager": "^3.932.0",
+    "@aws-sdk/credential-providers": "^3.932.0",
+    "@aws-sdk/s3-request-presigner": "^3.932.0",
     "@aws-sdk/types": "^3.930.0",
     "@d0paminedriven/fs": "^7.6.0",
     "@d0paminedriven/metadata": "^4.0.1",
@@ -118,7 +119,7 @@
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "@types/ws": "^8.18.1",
-    "bullmq": "^5.63.1",
+    "bullmq": "^5.63.2",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
     "dotenv-expand": "^12.0.3",

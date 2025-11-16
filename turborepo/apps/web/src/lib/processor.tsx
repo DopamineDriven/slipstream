@@ -24,8 +24,8 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { VFile } from "vfile";
-import { cn } from "./utils";
 import { imgSrcMapper } from "./img-helper";
+import { cn } from "./utils";
 
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
@@ -145,7 +145,13 @@ function CustomImage({
       }
       alt={alt}
       width={width}
-      unoptimized={typeof src === "string" ? imgSrcMapper.includes(src) ? false : true : false}
+      unoptimized={
+        typeof src === "string"
+          ? imgSrcMapper.includes(src)
+            ? false
+            : true
+          : false
+      }
       height={height}
       sizes="100vw"
       style={{ width: "100%", height: "auto", objectFit: "cover" }}
@@ -159,12 +165,13 @@ const components = {
   pre: ({ children, ...props }: ComponentPropsWithRef<"pre">) => {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
-  code: ({ children, ...props }: ComponentPropsWithRef<"code">) => {
+  code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
     return (
-      <span className="relative m-0 w-full p-0">
+      <span className="relative m-0 w-full min-w-0 p-0 break-all">
         <code
           className={cn(
-            `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
+            `inline-block max-w-full overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`,
+            className
           )}
           {...props}>
           {children}
@@ -179,80 +186,115 @@ const components = {
   h5: createHeading(5),
   h6: createHeading(6),
   img: CustomImage,
-  // TODO: Add analytics tracking, default classes, animations, etc.
-  p: ({ ...props }: ComponentPropsWithRef<"p">) => (
-    <p className={cn("mb-1.5 leading-7", props.className)} {...props}>
-      {props.children}
+  p: ({ className, children, ...props }: ComponentPropsWithRef<"p">) => (
+    <p className={cn("mb-1.5 leading-7", className)} {...props}>
+      {children}
     </p>
   ),
-  li: ({ ...props }: ComponentPropsWithRef<"li">) => (
+  li: ({ className, children, ...props }: ComponentPropsWithRef<"li">) => (
     <li
       className={cn(
         "leading-7 whitespace-normal! [&>p]:mb-1 [&>p:last-child]:mb-0",
-        props.className
+        className
       )}
       {...props}>
-      {props.children}
+      {children}
     </li>
   ),
-  ol: ({ ...props }: ComponentPropsWithRef<"ol">) => (
+  ol: ({ className, children, ...props }: ComponentPropsWithRef<"ol">) => (
     <ol
       className={cn(
         "mb-2 ml-6 list-decimal space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2.5",
-        props.className
+        className
       )}
       {...props}>
-      {props.children}
+      {children}
     </ol>
   ),
-  ul: ({ ...props }: ComponentPropsWithRef<"ul">) => (
+  ul: ({ className, children, ...props }: ComponentPropsWithRef<"ul">) => (
     <ul
       className={cn(
         "mb-2 ml-6 list-disc space-y-0.5 [&_ol]:mt-1 [&_ol]:mb-0 [&_ul]:mt-1 [&_ul]:mb-0 [&>li]:pl-2.5",
-        props.className
+        className
       )}
       {...props}>
-      {props.children}
+      {children}
     </ul>
   ),
-  div: ({ ...props }: ComponentPropsWithRef<"div">) => (
-    <div {...props}>{props.children}</div>
+  div: ({ className, children, ...props }: ComponentPropsWithRef<"div">) => (
+    <div className={cn(className)} {...props}>
+      {children}
+    </div>
   ),
-  span: ({ ...props }: ComponentPropsWithRef<"span">) => (
-    <span {...props}>{props.children}</span>
+  span: ({ children, className, ...props }: ComponentPropsWithRef<"span">) => (
+    <span className={cn(className)} {...props}>
+      {children}
+    </span>
   ),
-  blockquote: ({ ...props }: ComponentPropsWithRef<"blockquote">) => (
+  blockquote: ({
+    children,
+    className,
+    ...props
+  }: ComponentPropsWithRef<"blockquote">) => (
     <blockquote
-      className={cn("mb-2 border-l-4 pl-4 italic", props.className)}
+      className={cn("mb-2 border-l-4 pl-4 italic", className)}
       {...props}>
-      {props.children}
+      {children}
     </blockquote>
   ),
-  cite: ({ ...props }: ComponentPropsWithRef<"cite">) => (
-    <cite {...props}>{props.children}</cite>
+  cite: ({ className, children, ...props }: ComponentPropsWithRef<"cite">) => (
+    <cite className={cn(className)} {...props}>
+      {children}
+    </cite>
   ),
-  hr: ({ ...props }: ComponentPropsWithRef<"hr">) => <hr {...props} />,
-  br: ({ ...props }: ComponentPropsWithRef<"br">) => <br {...props} />,
-  caption: ({ ...props }: ComponentPropsWithRef<"caption">) => (
-    <caption {...props}>{props.children}</caption>
+  hr: ({ className, ...props }: ComponentPropsWithRef<"hr">) => (
+    <hr className={cn(className)} {...props} />
   ),
-  em: ({ ...props }: ComponentPropsWithRef<"em">) => (
-    <em {...props}>{props.children}</em>
+  br: ({ className, ...props }: ComponentPropsWithRef<"br">) => (
+    <br className={cn(className)} {...props} />
   ),
-  strong: ({ ...props }: ComponentPropsWithRef<"strong">) => (
-    <strong className={cn("font-bold", props.className)} {...props}>
-      {props.children}
+  caption: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"caption">) => (
+    <caption className={cn(className)} {...props}>
+      {children}
+    </caption>
+  ),
+  em: ({ className, children, ...props }: ComponentPropsWithRef<"em">) => (
+    <em className={cn(className)} {...props}>
+      {children}
+    </em>
+  ),
+  strong: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"strong">) => (
+    <strong className={cn("font-bold", className)} {...props}>
+      {children}
     </strong>
   ),
-  b: ({ ...props }: ComponentPropsWithRef<"b">) => (
-    <b className={cn("font-bold", props.className)} {...props}>
-      {props.children}
+  b: ({ className, children, ...props }: ComponentPropsWithRef<"b">) => (
+    <b className={cn("font-bold", className)} {...props}>
+      {children}
     </b>
   ),
-  aside: ({ ...props }: ComponentPropsWithRef<"aside">) => (
-    <aside {...props}>{props.children}</aside>
+  aside: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"aside">) => (
+    <aside className={cn(className)} {...props}>
+      {children}
+    </aside>
   ),
-  table: ({ className, ...props }: ComponentPropsWithRef<"table">) => (
+  table: ({
+    children,
+    className,
+    ...props
+  }: ComponentPropsWithRef<"table">) => (
     <div
       className="-mx-3 my-3 overflow-x-auto overscroll-x-contain px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] md:mx-0 [&::-webkit-scrollbar]:hidden"
       role="region"
@@ -264,11 +306,15 @@ const components = {
           className
         )}
         {...props}>
-        {props.children}
+        {children}
       </table>
     </div>
   ),
-  thead: ({ className, ...props }: ComponentPropsWithRef<"thead">) => (
+  thead: ({
+    children,
+    className,
+    ...props
+  }: ComponentPropsWithRef<"thead">) => (
     <thead
       className={cn(
         "px-2.5 py-2 text-left align-top text-sm",
@@ -276,36 +322,54 @@ const components = {
         className
       )}
       {...props}>
-      {props.children}
+      {children}
     </thead>
   ),
-  tbody: ({ ...props }: ComponentPropsWithRef<"tbody">) => (
-    <tbody {...props}>{props.children}</tbody>
+  tbody: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"tbody">) => (
+    <tbody className={cn(className)} {...props}>
+      {children}
+    </tbody>
   ),
-  tspan: ({ ...props }: ComponentPropsWithRef<"tspan">) => (
-    <tspan {...props}>{props.children}</tspan>
+  tspan: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"tspan">) => (
+    <tspan className={cn(className)} {...props}>
+      {children}
+    </tspan>
   ),
-  tfoot: ({ ...props }: ComponentPropsWithRef<"tfoot">) => (
-    <tfoot {...props}>{props.children}</tfoot>
+  tfoot: ({
+    className,
+    children,
+    ...props
+  }: ComponentPropsWithRef<"tfoot">) => (
+    <tfoot className={cn(className)} {...props}>
+      {children}
+    </tfoot>
   ),
-  tr: ({ ...props }: ComponentPropsWithRef<"tr">) => (
-    <tr className={cn("border-b", props.className)} {...props}>
-      {props.children}
+  tr: ({ className, children, ...props }: ComponentPropsWithRef<"tr">) => (
+    <tr className={cn("border-b", className)} {...props}>
+      {children}
     </tr>
   ),
-  td: ({ className, ...props }: ComponentPropsWithRef<"td">) => (
+  td: ({ children, className, ...props }: ComponentPropsWithRef<"td">) => (
     <td
-      {...props}
       className={cn(
         "px-3 py-1.5 align-top text-xs",
         "wrap-break-word hyphens-auto whitespace-normal",
         "[&_a]:wrap-break-word [&_code]:wrap-break-word [&_li]:wrap-break-word",
         className
-      )}>
-      {props.children}
+      )}
+      {...props}>
+      {children}
     </td>
   ),
-  th: ({ className, ...props }: ComponentPropsWithRef<"th">) => (
+  th: ({ children, className, ...props }: ComponentPropsWithRef<"th">) => (
     <th
       className={cn(
         "border px-2.5 py-2 text-left align-top text-xs font-semibold",
@@ -313,7 +377,7 @@ const components = {
         className
       )}
       {...props}>
-      {props.children}
+      {children}
     </th>
   )
 };

@@ -1,4 +1,6 @@
+import type { ImageGenPartialArr } from "@/openai/types.ts";
 import type {
+  BigIntToCompatProps,
   InferPromiseRT,
   ProviderOpenaiRequestEntity
 } from "@/types/index.ts";
@@ -7,27 +9,153 @@ import type {
   ResponseTextConfig
 } from "openai/resources/responses/responses.mjs";
 import type { Reasoning } from "openai/resources/shared.mjs";
+import type { Logger as PinoLogger } from "pino";
 import { OpenAI, toFile } from "openai";
-import { ModelService } from "@/models/index.ts";
-import { ImageGenPartialArr } from "@/openai/types.ts";
+import { ExtractService } from "@/extract/index.ts";
+import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
   AIChatRequest,
   AIChatResponseImgGenSubFields,
-  AIChatResRT,
-  ConversationSingleton,
   ImgGenWorkupResRT,
   MessageSingleton,
   OpenAiModelIdUnion
 } from "@slipstream/types";
+import { S3Storage } from "@slipstream/storage-s3";
 
-export class OpenAIServiceWorkup extends ModelService {
+export class OpenAIServiceWorkup {
   protected readonly vsCache = new Map<string, string>();
   protected readonly inflightVS = new Map<string, Promise<string>>();
-  constructor(protected prisma: PrismaService) {
-    super();
+  protected defaultClient: OpenAI;
+  protected logger: PinoLogger;
+  constructor(
+    logger: LoggerService,
+    protected prisma: PrismaService,
+    protected apiKey: string,
+    protected extractor: ExtractService,
+    protected s3: S3Storage,
+    protected isProd: boolean
+  ) {
+    this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[openai] " }
+      );
+    this.defaultClient = new OpenAI({
+      logLevel: "debug",
+      apiKey: this.apiKey,
+      logger: this.logger
+    });
   }
+  protected getClient(overrideKey?: string) {
+    const client = this.defaultClient;
+    if (overrideKey) {
+      return client.withOptions({ apiKey: overrideKey });
+    }
 
+    return client;
+  }
+  
+  public async titleGenUtil<
+    const T extends "ai_chat_request" | "image_gen_request"
+  >(
+    type: T,
+    {
+      apiKey,
+      messages,
+      prompt
+    }: BigIntToCompatProps<typeof type>["rt"] & {
+      prompt: string;
+    }
+  ) {
+    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
+    const msgs = messages?.[0];
+
+    const openai = this.getClient(apiKey ?? undefined);
+
+    if (msgs?.attachments) {
+      for (const t of msgs.attachments) {
+        if (typeof t !== "undefined") {
+          const {
+            mime,
+            compatMime,
+            compatCdnUrl,
+            compatStatus,
+            cdnUrl,
+            assetType
+          } = t;
+          if (compatStatus != null && cdnUrl != null && mime != null) {
+            const file_url =
+              compatStatus === "ACTIVE" && compatCdnUrl != null
+                ? compatCdnUrl
+                : cdnUrl;
+            const mimeType =
+              compatStatus === "ACTIVE" && compatMime != null
+                ? compatMime
+                : mime;
+            if (mimeType === "application/pdf" && assetType === "DOCUMENT") {
+              content.push({ type: "input_file", file_url });
+            }
+            if (mimeType.startsWith("image") && assetType === "IMAGE") {
+              content.push({
+                type: "input_image",
+                image_url: file_url,
+                detail: "auto"
+              });
+            }
+          }
+        }
+        break;
+      }
+      content.push({ type: "input_text", text: msgs.content });
+      try {
+        const res = await openai.responses.create({
+          model: "gpt-5-nano",
+          store: false,
+          reasoning: { effort: "minimal" },
+          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+          temperature: 1,
+          input: [
+            {
+              role: "system",
+              content:
+                "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+            },
+            { role: "user", content } as const
+          ]
+        });
+        const title = res.output_text;
+        console.log(`1. ` + title);
+        return this.prisma.sanitizeTitle(title);
+      } catch {
+        /**fall through */
+      }
+    }
+    content.push({ type: "input_text", text: prompt });
+    try {
+      const res = await openai.responses.create({
+        model: "gpt-5-nano",
+        store: false,
+        reasoning: { effort: "minimal" },
+        instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+        temperature: 1,
+        input: [
+          {
+            role: "system",
+            content:
+              "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+          },
+          { role: "user", content } as const
+        ]
+      });
+      const title = res.output_text;
+      console.log(`2. ` + title);
+      return this.prisma.sanitizeTitle(title);
+    } catch {
+      /**fall through */
+    }
+  }
   protected responsesImgGen(
     imgGenEnabled: AIChatRequest["imgGenEnabled"],
     mo: AIChatRequest["model"],
@@ -164,11 +292,11 @@ export class OpenAIServiceWorkup extends ModelService {
         n: 1,
         model: model,
         output_quality:
-          (this.handleImgGenOutputQuality("openai", model, {
+          (this.prisma.handleImgGenOutputQuality("openai", model, {
             output_quality
           }) as "auto" | "hd" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.handleOutputSize("openai", model, { output_size }) as
+          (this.prisma.handleOutputSize("openai", model, { output_size }) as
             | "auto"
             | "1024x1024"
             | "1792x1024"
@@ -194,14 +322,14 @@ export class OpenAIServiceWorkup extends ModelService {
          * 1 (min)
          * 10 (max)
          */
-        n: this.handleImgGenCount("openai", model, { n }) ?? 1,
+        n: this.prisma.handleImgGenCount("openai", model, { n }) ?? 1,
         model: "dall-e-2" as const,
         output_quality:
-          (this.handleImgGenOutputQuality("openai", model, {
+          (this.prisma.handleImgGenOutputQuality("openai", model, {
             output_quality
           }) as "auto" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.handleOutputSize("openai", model, { output_size }) as
+          (this.prisma.handleOutputSize("openai", model, { output_size }) as
             | "auto"
             | "256x256"
             | "512x512"
@@ -216,7 +344,7 @@ export class OpenAIServiceWorkup extends ModelService {
     const outputFormat =
       (output_format as "jpeg" | "webp" | "png" | undefined) ??
       ("png" as const);
-    const bg = this.handleImgGenBg("openai", model, {
+    const bg = this.prisma.handleImgGenBg("openai", model, {
       background: output_background,
       format: outputFormat
     });
@@ -229,16 +357,18 @@ export class OpenAIServiceWorkup extends ModelService {
             ? true
             : false,
       msgBoundImgAssets,
-      n: this.handleImgGenCount("openai", model, { n }),
+      n: this.prisma.handleImgGenCount("openai", model, { n }),
       moderation: moderate,
       output_format: outputFormat,
-      output_compression: this.handleImgGenCompression("openai", model, {
+      output_compression: this.prisma.handleImgGenCompression("openai", model, {
         output_compression,
         output_format
       }),
       model: model,
       output_quality:
-        (this.handleImgGenOutputQuality("openai", model, { output_quality }) as
+        (this.prisma.handleImgGenOutputQuality("openai", model, {
+          output_quality
+        }) as
           | "low"
           | "auto"
           | "high"
@@ -247,7 +377,7 @@ export class OpenAIServiceWorkup extends ModelService {
           | "medium"
           | undefined) ?? ("high" as const),
       output_size:
-        (this.handleOutputSize("openai", model, { output_size }) as
+        (this.prisma.handleOutputSize("openai", model, { output_size }) as
           | "1536x1024"
           | "1024x1536"
           | "1024x1024"
@@ -257,18 +387,18 @@ export class OpenAIServiceWorkup extends ModelService {
         this.imageGenToolCompat(model) === true
           ? ("responses" as const)
           : ("images" as const),
-      partialImagesRequested: this.handlePartialImgGen("openai", model, {
+      partialImagesRequested: this.prisma.handlePartialImgGen("openai", model, {
         partialImagesRequested: output_partial_images
       }),
       input_fidelity:
         input_fidelity && msgBoundImgAssets
-          ? this.handleInputFidelity("openai", model, { input_fidelity })
+          ? this.prisma.handleInputFidelity("openai", model, { input_fidelity })
           : undefined
     };
     console.log(sharedOpts);
     return sharedOpts as ImgGenWorkupResRT<typeof model>;
   }
-  public async ensureAssetUploadedToOpenAI(
+  private async ensureAssetUploadedToOpenAI(
     attachment: {
       id: string;
       cdnUrl: string | null;
@@ -341,25 +471,13 @@ export class OpenAIServiceWorkup extends ModelService {
     } catch (err) {
       await this.prisma.markOpenAIAssetFailed(
         mapping.id,
-        err instanceof Error ? err.message : this.safeErrMsg(err)
+        err instanceof Error ? err.message : this.prisma.safeErrMsg(err)
       );
       throw err;
     }
   }
 
-  public mapPartialImgGenArr(props: ImageGenPartialArr[]) {
-    return props.map((t, o) => {
-      return {
-        index: t[0] ?? o,
-        cdnUrl: t[1],
-        width: t[3],
-        height: t[4],
-        mime: t[5]
-      };
-    });
-  }
-
-  public getGenMime(target: string) {
+  protected getGenMime(target: string) {
     return target === "jpeg"
       ? "image/jpeg"
       : target === "jpg"
@@ -370,14 +488,17 @@ export class OpenAIServiceWorkup extends ModelService {
             ? "image/webp"
             : "application/octet-stream";
   }
-  public async generateId(target: "itemId" | "generationGroupId") {
+  protected async generateId(target: "itemId" | "generationGroupId") {
     const { nanoid } = await import("nanoid");
     if (target === "generationGroupId") {
       const generationGroupId = "resp_" + nanoid();
       return generationGroupId;
     } else return nanoid();
   }
-  public mapPersistenceImgGenArr(userId: string, props: ImageGenPartialArr[]) {
+  protected mapPersistenceImgGenArr(
+    userId: string,
+    props: ImageGenPartialArr[]
+  ) {
     return props.map((t, o) => {
       const rt = t[25];
       const expImg = t[26];
@@ -485,131 +606,7 @@ export class OpenAIServiceWorkup extends ModelService {
     });
   }
 
-  public transformConvoSingleton(data: ConversationSingleton<true>) {
-    const cdnUrls = Array.of<string>();
-    const timeAndIndexArr = Array.of<readonly [number, number]>();
-    try {
-      for (const alpha of data.messages) {
-        if (!alpha.attachments) continue;
-        for (const beta of alpha.attachments) {
-          if (beta.cdnUrl) cdnUrls.push(beta.cdnUrl);
-          continue;
-        }
-      }
-    } finally {
-      for (const url of cdnUrls) {
-        const p = url.split(/\//gm);
-        const filename = p.at(-1);
-        if (!filename) continue;
-        const pathFragments = filename.split(/-/gm);
-
-        const timestamp = pathFragments[0];
-        const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
-
-        if (!timestamp || !seriesIndex) continue;
-        timeAndIndexArr.push([
-          Number.parseInt(timestamp),
-          Number.parseInt(seriesIndex)
-        ]);
-        continue;
-      }
-      const sorted = timeAndIndexArr
-        .sort(([_aa, aaa], [_bb, bbb]) => aaa - bbb)
-        .sort(([aa, _aaa], [bb, _bbb]) => aa - bb);
-
-      return sorted.map((t, o) =>
-        o === sorted.length - 1
-          ? [t[0], "FINAL" as const, t[1]]
-          : [t[0], "PARTIAL" as const, t[1]]
-      ) as [number, "PARTIAL" | "FINAL", number][];
-    }
-  }
-
-  public mapToCompletionImgGenArr(
-    props: AIChatResRT,
-    userMsgId: string,
-    revisedPrompt?: string
-  ) {
-    const s = props.messages[0];
-
-    if (!s) throw new Error("returned db res has no attachments for image gen");
-
-    return s.attachments.map((t, o) => {
-      const p = t.cdnUrl?.split(/\//gm);
-      const filename = p?.at(-1);
-      const ext = filename?.split(".")?.at(-1) ?? null;
-      const pathFragments = filename?.split(/-/gm);
-      const _timestamp = pathFragments?.[0];
-      const seriesId = pathFragments?.[1] ?? null;
-      const seriesIndex = pathFragments?.[2]?.split(".")?.[0];
-      const kind = o === s.attachments?.length - 1 ? "FINAL" : "PARTIAL";
-      return {
-        cdnUrl: t.cdnUrl ?? "",
-        seriesId: t.seriesId ?? seriesId,
-        width: t.image?.width ?? 0,
-        height: t.image?.height ?? 0,
-        checksumSha256: t.checksumSha256,
-        compatCdnUrl: t.cdnUrl,
-        compatExt: t.ext ?? ext,
-        compatKey: t.key,
-        compatMime: t.mime,
-        compatReadyAt: t.s3LastModified,
-        compatS3ObjectId: t.s3ObjectId,
-        compatStatus: "ALIASED",
-        compatVersionId: t.versionId,
-        createdAt: t.createdAt,
-        deletedAt: t.deletedAt,
-        index: seriesIndex,
-        itemId: t.seriesId ?? "",
-        origin: "GENERATED",
-        publicUrl: t.publicUrl,
-        region: t.region,
-        sourceUrl: t.sourceUrl,
-        status: "READY",
-        thumbnailKey: t.thumbnailKey,
-        updatedAt: t.updatedAt,
-        userId: t.userId,
-        batchId: t.batchId,
-        checksumAlgo: t.checksumAlgo,
-        expiresAt: t?.expiresAt,
-        jobId: t.imageGenOutput?.jobId,
-        s3LastModified: t.s3LastModified,
-        size: t.size ? Number(t.size) : null,
-        sseAlgorithm: t.sseAlgorithm,
-        sseKmsKeyId: t.sseKmsKeyId,
-        storageClass: t.storageClass,
-        uploadDuration: t.uploadDuration,
-        requestMessageId: userMsgId,
-        revisedPrompt,
-        seriesIndex: o,
-        draftId: t.draftId,
-        cacheControl: t.cacheControl,
-        mime: t.mime ?? "",
-        assetType: t.assetType,
-        conversationId: t.conversationId,
-        id: t.id,
-        messageId: t.messageId,
-        uploadMethod: "GENERATED",
-        contentDisposition: t.contentDisposition,
-        contentEncoding: t.contentEncoding,
-        document: null,
-        bucket: t.bucket,
-        generationGroupId: t.generationGroupId ?? "",
-        jobIndex: 0,
-        key: t.key,
-        s3ObjectId: t.s3ObjectId ?? "",
-        versionId: t.versionId ?? "",
-        etag: t.etag,
-        ext: t.ext,
-        filename: t.filename,
-        image: t.image,
-        imageGenOutput: t.imageGenOutput,
-        kind: t.imageGenOutput?.kind ?? kind
-      } as const;
-    });
-  }
-
-  public async buildAttachmentContentAsync(
+  protected async buildAttachmentContentAsync(
     attachments?: MessageSingleton<true>["attachments"],
     client?: OpenAI,
     keyFingerprint = "server",
@@ -665,7 +662,7 @@ export class OpenAIServiceWorkup extends ModelService {
   }
 
   // openai/index.ts
-  public async formatOpenAiWithUploads(
+  protected async formatOpenAiWithUploads(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     client: OpenAI,
@@ -724,7 +721,7 @@ export class OpenAIServiceWorkup extends ModelService {
       return this.formatMsgs(this.prependProviderModelTag(msgs));
     }
   }
-  public prependProviderModelTag(
+  private prependProviderModelTag(
     msgs: Pick<
       MessageSingleton<true>,
       "senderType" | "provider" | "model" | "content"
@@ -745,13 +742,13 @@ export class OpenAIServiceWorkup extends ModelService {
     }) satisfies ResponseInput;
   }
 
-  public buildInstructions(systemPrompt?: string) {
+  protected buildInstructions(systemPrompt?: string) {
     return systemPrompt
       ? `${systemPrompt}\n\nWhen formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.`
       : "When formatting codeblocks, always fence them with proper language tags using backticks not tildes.\nNote: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
   }
 
-  public ensureUserVectorStoreId(
+  protected ensureUserVectorStoreId(
     client: OpenAI,
     workspaceId: string | null | undefined,
     userId: string
@@ -786,7 +783,7 @@ export class OpenAIServiceWorkup extends ModelService {
     this.inflightVS.set(name, p);
     return p;
   }
-  public hasFiles(
+  protected hasFiles(
     formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
   ) {
     return formatted.some(m => {
@@ -800,7 +797,7 @@ export class OpenAIServiceWorkup extends ModelService {
       );
     });
   }
-  public hasImages(
+  protected hasImages(
     formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
   ) {
     return formatted.some(m => {
@@ -811,7 +808,7 @@ export class OpenAIServiceWorkup extends ModelService {
       );
     });
   }
-  public fileIds(
+  protected fileIds(
     formatted: InferPromiseRT<ReturnType<typeof this.formatOpenAiWithUploads>>
   ) {
     const fileIdArr = Array.of<string>();
@@ -829,48 +826,10 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public buildAttachmentContent(
-    attachments?: MessageSingleton<true>["attachments"]
+  protected filenameToCompat(
+    filename: string | null,
+    compatExt: string | null
   ) {
-    const content = Array.of<
-      | {
-          type: "input_image";
-          image_url: string;
-          detail: "auto" | "low" | "high";
-        }
-      | {
-          type: "input_file";
-          file_url?: string;
-          filename?: string;
-          file_id?: string | null;
-          file_data?: string;
-        }
-    >();
-    if (!attachments || attachments.length === 0) return content;
-
-    for (const att of attachments) {
-      const url = att.compatCdnUrl ?? att.cdnUrl ?? att.sourceUrl;
-      const mime = att.compatMime ?? att.mime ?? "";
-      const filename =
-        att.compatStatus === "ACTIVE"
-          ? this.filenameToCompat(att.filename, att.compatExt)
-          : att.filename;
-      if (!url || url.length === 0) continue;
-
-      if (mime.startsWith("image/")) {
-        content.push({ type: "input_image", image_url: url, detail: "auto" });
-      } else {
-        content.push({
-          type: "input_file",
-          file_url: url,
-          filename: filename ?? undefined
-        });
-      }
-    }
-    return content;
-  }
-
-  public filenameToCompat(filename: string | null, compatExt: string | null) {
     if (!filename) {
       return `filename-${Date.now()}.${compatExt ?? "pdf"}`;
     }
@@ -886,7 +845,7 @@ export class OpenAIServiceWorkup extends ModelService {
       .join(".");
   }
 
-  public formatMsgs(
+  protected formatMsgs(
     msgs: (
       | {
           readonly role: "user";
@@ -901,7 +860,7 @@ export class OpenAIServiceWorkup extends ModelService {
     return [...msgs] as const satisfies ResponseInput;
   }
 
-  public normalizeLocation(
+  protected normalizeLocation(
     user_location: ProviderOpenaiRequestEntity["user_location"]
   ) {
     return (
@@ -919,7 +878,7 @@ export class OpenAIServiceWorkup extends ModelService {
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
 
-  public handleTooling(
+  protected handleTooling(
     model: OpenAiModelIdUnion,
     hasFiles: boolean,
     user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
@@ -952,7 +911,7 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public openaiReasoning(
+  protected openaiReasoning(
     model: OpenAiModelIdUnion,
     effort: Reasoning["effort"] = "medium",
     summary: Reasoning["summary"] = "auto",
@@ -1008,7 +967,7 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public canCallImageApi(model: OpenAiModelIdUnion) {
+  protected canCallImageApi(model: OpenAiModelIdUnion) {
     switch (model) {
       case "gpt-image-1":
       case "gpt-image-1-mini":
@@ -1051,7 +1010,7 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public imageGenToolCompat(model: OpenAiModelIdUnion) {
+  protected imageGenToolCompat(model: OpenAiModelIdUnion) {
     switch (model) {
       case "gpt-5.1":
       case "gpt-5":
@@ -1094,7 +1053,7 @@ export class OpenAIServiceWorkup extends ModelService {
     }
   }
 
-  public openAiVerbosity(
+  protected openAiVerbosity(
     model: OpenAiModelIdUnion,
     verbosity?: string,
     imgGenEnabled = false

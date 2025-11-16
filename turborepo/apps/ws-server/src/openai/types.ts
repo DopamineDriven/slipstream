@@ -1,6 +1,10 @@
-import { S3FinalizePayload } from "@/types/index.ts";
-import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
-import type { ImgMetadataEntity, S3Checksum, S3StorageClass } from "@slipstream/types";
+import type { S3FinalizePayload } from "@/types/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type {
+  ImgMetadataEntity,
+  S3Checksum,
+  S3StorageClass
+} from "@slipstream/types";
 
 export type OpenAIImgApiStreamPartial = {
   output_format: "png" | "jpeg" | "webp";
@@ -59,3 +63,32 @@ export type ImageGenPartialArr = [
   S3FinalizePayload,
   ExpandedImgSpecs
 ];
+
+export type ImgGenResProps = {
+  /**
+   * The unique ID of the image generation call.
+   */
+  id: string;
+
+  /**
+   * The generated image encoded in base64.
+   */
+  result: string | null;
+
+  /**
+   * The status of the image generation call.
+   */
+  status: "in_progress" | "completed" | "generating" | "failed";
+
+  background: "opaque" | "transparent" | "auto";
+
+  output_format: "png" | "jpeg" | "webp";
+  quality: "high" | "medium" | "low" | "auto";
+
+  revised_prompt: string | null;
+
+  /**
+   * The type of the image generation call. Always `image_generation_call`.
+   */
+  type: "image_generation_call";
+};

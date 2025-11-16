@@ -196,7 +196,8 @@ export function MessageIcons({
             <span>•</span>
             <span className="font-medium">{getFirstName(user?.name)}</span>
           </div>
-          <div className="items-center gap-2 md:flex">
+          <div
+            className={cn("items-center gap-2", isMobile ? "hidden" : "flex")}>
             <AnimatedCopyButton
               textToCopy={message.content}
               className={actionButtonVariants.default}

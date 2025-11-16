@@ -1,15 +1,12 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import type {
-  BigIntToCompatProps,
   BufferLike,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
-import OpenAI from "openai";
 import { ExtractService } from "@/extract/index.ts";
 import { ImageCompatService } from "@/image/index.ts";
-import { ModelService } from "@/models/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
 import { WebSocket } from "ws";
@@ -18,11 +15,9 @@ import type {
   AnyEvent,
   AnyEventTypeUnion,
   ClientContextWorkupProps,
-  DocSpecs,
   DocumentSingleton,
   EventTypeMap,
   ImageSingleton,
-  ImageSpecs,
   MessageSingleton,
   Provider,
   RTC
@@ -30,7 +25,7 @@ import type {
 import { RedisChannels } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
 
-export class Resolver extends ModelService {
+export class Resolver {
   constructor(
     public wsServer: WSServer,
     private providers: ProviderService,
@@ -39,9 +34,7 @@ export class Resolver extends ModelService {
     private isProd: boolean,
     private extract: ExtractService,
     private imgCompatService: ImageCompatService
-  ) {
-    super();
-  }
+  ) {}
 
   // Track high-resolution start times for upload progress per attachment
   private uploadTimers = new Map<string, bigint>();
@@ -89,132 +82,10 @@ export class Resolver extends ModelService {
     );
   }
 
-  public sanitizeTitle = (generatedTitle: string) => {
-    return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
-  };
-  private contentTypeToExt(contentType?: string) {
-    return contentType
-      ? this.wsServer.prisma.mimeToExt[
-          contentType as keyof typeof this.wsServer.prisma.mimeToExt
-        ][0]
-      : undefined;
-  }
-
-  private extToContentType(metadata?: ImageSpecs | DocSpecs) {
-    return metadata?.format && metadata.format !== "unknown"
-      ? metadata.type === "IMAGE"
-        ? this.extToMime[
-            metadata.format === "heic" ? "avif" : metadata.format
-          ][0]
-        : metadata.type === "DOCUMENT"
-          ? (metadata.mimeType ?? "")
-          : ""
-      : "";
-  }
-
   private resolveChannel(conversationId: string, userId: string) {
     return conversationId === "new-chat"
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
-  }
-  private async titleGenUtil<
-    const T extends "ai_chat_request" | "image_gen_request"
-  >(
-    type: T,
-    {
-      messages,
-      prompt
-    }: BigIntToCompatProps<typeof type>["rt"] & {
-      prompt: string;
-    }
-  ) {
-    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
-    const msgs = messages?.[0];
-
-    const openaiSvc = this.providers.getInstance("openai");
-    const openai = openaiSvc.getClient();
-
-    if (msgs?.attachments) {
-      for (const t of msgs.attachments) {
-        if (typeof t !== "undefined") {
-          const {
-            mime,
-            compatMime,
-            compatCdnUrl,
-            compatStatus,
-            cdnUrl,
-            assetType
-          } = t;
-          if (compatStatus != null && cdnUrl != null && mime != null) {
-            const file_url =
-              compatStatus === "ACTIVE" && compatCdnUrl != null
-                ? compatCdnUrl
-                : cdnUrl;
-            const mimeType =
-              compatStatus === "ACTIVE" && compatMime != null
-                ? compatMime
-                : mime;
-            if (mimeType === "application/pdf" && assetType === "DOCUMENT") {
-              content.push({ type: "input_file", file_url });
-            }
-            if (mimeType.startsWith("image") && assetType === "IMAGE") {
-              content.push({
-                type: "input_image",
-                image_url: file_url,
-                detail: "auto"
-              });
-            }
-          }
-        }
-        break;
-      }
-      content.push({ type: "input_text", text: msgs.content });
-      try {
-        const res = await openai.responses.create({
-          model: "gpt-5-nano",
-          store: false,
-          reasoning: { effort: "minimal" },
-          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
-          temperature: 1,
-          input: [
-            {
-              role: "system",
-              content:
-                "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
-            },
-            { role: "user", content } as const
-          ]
-        });
-        const title = res.output_text;
-        console.log(`1. ` + title);
-        return this.sanitizeTitle(title);
-      } catch {
-        /**fall through */
-      }
-    }
-    content.push({ type: "input_text", text: prompt });
-    try {
-      const res = await openai.responses.create({
-        model: "gpt-5-nano",
-        store: false,
-        reasoning: { effort: "minimal" },
-        instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
-        temperature: 1,
-        input: [
-          {
-            role: "system",
-            content:
-              "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
-          },
-          { role: "user", content } as const
-        ]
-      });
-      const title = res.output_text;
-      console.log(`2. ` + title);
-      return this.sanitizeTitle(title);
-    } catch {
-      /**fall through */
-    }
   }
 
   private async handleFreeMsgQuota(
@@ -246,7 +117,7 @@ export class Resolver extends ModelService {
           systemPrompt,
           temperature,
           topP,
-          title: this.formatProvider(provider),
+          title: this.wsServer.prisma.formatProvider(provider),
           userId,
           userMsgId,
           done: true,
@@ -267,7 +138,10 @@ export class Resolver extends ModelService {
       }
     } catch (e) {
       // If the guardrail check fails for any reason, fall through to normal handling
-      console.warn("rate-limit check failed", this.safeErrMsg(e));
+      console.warn(
+        "rate-limit check failed",
+        this.wsServer.prisma.safeErrMsg(e)
+      );
     }
   }
 
@@ -314,7 +188,7 @@ export class Resolver extends ModelService {
     userData?: UserData
   ) {
     const provider = event.provider,
-      model = this.getModel(
+      model = this.wsServer.prisma.getModel(
         provider,
         event?.model as AllModelsUnion | undefined
       ),
@@ -395,7 +269,8 @@ export class Resolver extends ModelService {
 
     const title =
       res?.title ??
-      (await this.titleGenUtil("ai_chat_request", {
+      (await this.providers.openai.titleGenUtil("ai_chat_request", {
+        apiKey,
         prompt: event.prompt,
         ...res
       }));
@@ -520,7 +395,7 @@ export class Resolver extends ModelService {
         }
       }
     } catch (err) {
-      console.error(`AI Stream Error`, this.safeErrMsg(err));
+      console.error(`AI Stream Error`, this.wsServer.prisma.safeErrMsg(err));
       ws.send(
         JSON.stringify({
           type: "ai_chat_error",
@@ -536,7 +411,7 @@ export class Resolver extends ModelService {
           title,
           userId,
           done: true,
-          message: this.safeErrMsg(err)
+          message: this.wsServer.prisma.safeErrMsg(err)
         } satisfies EventTypeMap["ai_chat_error"])
       );
       void this.wsServer.redis.publishTypedEvent(
@@ -556,7 +431,7 @@ export class Resolver extends ModelService {
           topP,
           userId,
           done: true,
-          message: this.safeErrMsg(err)
+          message: this.wsServer.prisma.safeErrMsg(err)
         }
       );
       void this.wsServer.redis.saveStreamState(
@@ -605,7 +480,7 @@ export class Resolver extends ModelService {
       ws.send(JSON.stringify(payload));
       void this.postHandleConnectionEstablishedJob(userId);
     } catch (err) {
-      this.safeErrMsg(err);
+      this.wsServer.prisma.safeErrMsg(err);
     }
   }
   /** Dispatches incoming events to handlers */
@@ -774,18 +649,6 @@ export class Resolver extends ModelService {
     }
   }
 
-  private handleAssetType(mimeType: string) {
-    return mimeType.startsWith("image/")
-      ? ("IMAGE" as const)
-      : mimeType.startsWith("application/") || mimeType.startsWith("text/")
-        ? ("DOCUMENT" as const)
-        : mimeType.startsWith("audio/")
-          ? ("AUDIO" as const)
-          : mimeType.startsWith("video/")
-            ? ("VIDEO" as const)
-            : ("UNKNOWN" as const);
-  }
-
   public async handleAssetAttached(
     event: EventTypeMap["asset_attached"],
     ws: WebSocket,
@@ -821,14 +684,14 @@ export class Resolver extends ModelService {
     try {
       const mimeType = mime;
 
-      const extension = this.contentTypeToExt(mime) ?? "bin";
+      const extension = this.wsServer.prisma.contentTypeToExt(mime) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.getSize(size ?? 0, "auto", {
+      const sizeInfo = this.wsServer.prisma.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
@@ -928,7 +791,7 @@ export class Resolver extends ModelService {
             ? { document: docOrImg?.document }
             : {}),
         mime: mimeType,
-        assetType: this.handleAssetType(mimeType),
+        assetType: this.wsServer.prisma.handleAssetType(mimeType),
         ext: extension,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
@@ -990,7 +853,7 @@ export class Resolver extends ModelService {
         draftId,
         conversationId: event.conversationId,
         success: false,
-        error: this.safeErrMsg(error)
+        error: this.wsServer.prisma.safeErrMsg(error)
       } satisfies EventTypeMap["asset_upload_error"];
 
       ws.send(JSON.stringify(uploadError));
@@ -1036,14 +899,15 @@ export class Resolver extends ModelService {
     try {
       const mimeType = mime;
 
-      const extension = this.contentTypeToExt(mimeType) ?? "bin";
+      const extension =
+        this.wsServer.prisma.contentTypeToExt(mimeType) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
         : `${filename}.${extension}`;
 
       // ✅ Use fs package for human-readable size logging
-      const sizeInfo = this.getSize(size ?? 0, "auto", {
+      const sizeInfo = this.wsServer.prisma.getSize(size ?? 0, "auto", {
         decimals: 2,
         includeUnits: true
       });
@@ -1142,7 +1006,7 @@ export class Resolver extends ModelService {
             ? { document: docOrImg?.document }
             : {}),
         mime: mimeType,
-        assetType: this.handleAssetType(mimeType),
+        assetType: this.wsServer.prisma.handleAssetType(mimeType),
         ext: extension,
         draftId,
         bucket: presignedData.bucket,
@@ -1204,7 +1068,7 @@ export class Resolver extends ModelService {
         draftId,
         conversationId: event.conversationId,
         success: false,
-        error: this.safeErrMsg(error)
+        error: this.wsServer.prisma.safeErrMsg(error)
       } satisfies EventTypeMap["asset_upload_error"];
 
       ws.send(JSON.stringify(uploadError));
@@ -1238,7 +1102,7 @@ export class Resolver extends ModelService {
 
     try {
       // 1. Validate URL
-      if (!this.isValidUrl(sourceUrl)) {
+      if (!this.wsServer.prisma.isValidUrl(sourceUrl)) {
         throw new Error(`Invalid URL: ${sourceUrl}`);
       }
 
@@ -1259,7 +1123,7 @@ export class Resolver extends ModelService {
       const contentType =
         headResponse.headers.get("content-type") ?? "application/octet-stream";
 
-      const ext = this.contentTypeToExt(contentType) ?? "bin";
+      const ext = this.wsServer.prisma.contentTypeToExt(contentType) ?? "bin";
 
       const fileSizeBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
@@ -1441,27 +1305,11 @@ export class Resolver extends ModelService {
         userId,
         sourceUrl,
         success: false,
-        error: this.safeErrMsg(error)
+        error: this.wsServer.prisma.safeErrMsg(error)
       } satisfies EventTypeMap["asset_fetch_error"];
 
       ws.send(JSON.stringify(errorEvent));
     }
-  }
-
-  private toBigInt(size?: number, bytesUploaded?: number) {
-    return size
-      ? size === 0
-        ? 0n
-        : BigInt(size)
-      : bytesUploaded
-        ? bytesUploaded === 0
-          ? 0n
-          : BigInt(bytesUploaded)
-        : undefined;
-  }
-
-  private fromBigInt(size: bigint | null) {
-    return size ? (size === 0n ? 0 : Number(size)) : undefined;
   }
 
   public async handleAssetUploadComplete(
@@ -1548,7 +1396,8 @@ export class Resolver extends ModelService {
           compatCdnUrl: compatStatus === "ALIASED" ? cdnUrl : undefined,
           compatExt:
             compatStatus === "ALIASED"
-              ? (extension ?? this.contentTypeToExt(contentType))
+              ? (extension ??
+                this.wsServer.prisma.contentTypeToExt(contentType))
               : undefined,
           compatKey: compatStatus === "ALIASED" ? key : undefined,
           compatMime: compatStatus === "ALIASED" ? contentType : undefined,
@@ -1566,9 +1415,9 @@ export class Resolver extends ModelService {
           s3ObjectId: finalS3ObjectId,
           etag: finalEtag ?? etag,
           status: "READY",
-          ext: extension ?? this.contentTypeToExt(contentType),
+          ext: extension ?? this.wsServer.prisma.contentTypeToExt(contentType),
           mime: contentType,
-          size: this.toBigInt(size, bytesUploaded)
+          size: this.wsServer.prisma.toBigInt(size, bytesUploaded)
         },
         metadata:
           specs?.type === "IMAGE"
@@ -1672,10 +1521,13 @@ export class Resolver extends ModelService {
           attachment.mime ??
           contentType ??
           (metadata?.type === "IMAGE" || metadata?.type === "DOCUMENT"
-            ? this.extToContentType(metadata)
+            ? this.wsServer.prisma.extToContentType(metadata)
             : ""),
         origin: attachment.origin,
-        size: this.fromBigInt(attachment.size) ?? bytesUploaded ?? 0,
+        size:
+          this.wsServer.prisma.fromBigInt(attachment.size) ??
+          bytesUploaded ??
+          0,
         status: "READY",
         etag: attachment.etag ?? finalEtag ?? etag,
         bucket,
@@ -1762,7 +1614,7 @@ export class Resolver extends ModelService {
         versionId,
         conversationId: event.conversationId,
         success: false,
-        error: this.safeErrMsg(error)
+        error: this.wsServer.prisma.safeErrMsg(error)
       } satisfies EventTypeMap["asset_upload_complete_error"];
 
       ws.send(JSON.stringify(uploadError));
@@ -1793,7 +1645,7 @@ export class Resolver extends ModelService {
 
     // Process in parallel with concurrency limit
     const CONCURRENCY_LIMIT = 3;
-    const chunks = this.chunkArray(urls, CONCURRENCY_LIMIT);
+    const chunks = this.wsServer.prisma.chunkArray(urls, CONCURRENCY_LIMIT);
 
     for (const chunk of chunks) {
       const results = await Promise.allSettled(
@@ -1818,7 +1670,7 @@ export class Resolver extends ModelService {
           } else {
             failed.push({
               url: chunk[index],
-              error: this.safeErrMsg(result?.status)
+              error: this.wsServer.prisma.safeErrMsg(result?.status)
             });
           }
         } else {

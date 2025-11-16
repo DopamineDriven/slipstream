@@ -43,6 +43,18 @@ export class ModelService extends ProviderValidation {
     return { attachments: mapIt, ...rest } satisfies MessageSingleton<true>;
   }
 
+  public sanitizeTitle = (generatedTitle: string) => {
+    return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
+  };
+
+  public  contentTypeToExt(contentType?: string) {
+    return contentType
+      ? this.mimeToExt[
+          contentType as keyof typeof this.mimeToExt
+        ][0]
+      : undefined;
+  };
+
   public getModel = <
     const V extends Provider,
     const K extends GetModelUtilRT<V>
@@ -115,8 +127,35 @@ export class ModelService extends ProviderValidation {
       }
     }
   };
+
+public fromBigInt(size: bigint | null) {
+    return size ? (size === 0n ? 0 : Number(size)) : undefined;
+  }
+  public toBigInt(size?: number, bytesUploaded?: number) {
+    return size
+      ? size === 0
+        ? 0n
+        : BigInt(size)
+      : bytesUploaded
+        ? bytesUploaded === 0
+          ? 0n
+          : BigInt(bytesUploaded)
+        : undefined;
+  }
   public isValidUrl(url: string) {
     return URL.canParse(url);
+  }
+
+  public handleAssetType(mimeType: string) {
+    return mimeType.startsWith("image/")
+      ? ("IMAGE" as const)
+      : mimeType.startsWith("application/") || mimeType.startsWith("text/")
+        ? ("DOCUMENT" as const)
+        : mimeType.startsWith("audio/")
+          ? ("AUDIO" as const)
+          : mimeType.startsWith("video/")
+            ? ("VIDEO" as const)
+            : ("UNKNOWN" as const);
   }
 
   public handleAssetMetadata(specs: ExpandedDocSpecs | ExpandedImgSpecs): {
@@ -363,6 +402,16 @@ export class ModelService extends ProviderValidation {
     return agg;
   };
 
+  public extToContentType(metadata?: ExpandedImgSpecs | ExpandedDocSpecs) {
+      return metadata?.format && metadata.format !== "unknown"
+        ? metadata.type === "IMAGE"
+          ? this.extToMime[metadata.format][0]
+          : metadata.type === "DOCUMENT"
+            ? (metadata.mimeType ?? "application/octet-stream")
+            : "application/octet-stream"
+        : "application/octet-stream";
+    }
+
   public mimeToExt = {
     "application/dash+xml": ["mpd"],
     "application/epub+zip": ["epub"],
@@ -447,7 +496,8 @@ export class ModelService extends ProviderValidation {
     "image/dpx": ["dpx"],
     "image/emf": ["emf"],
     "image/gif": ["gif"],
-    "image/jpeg": ["jpg"],
+    "image/heic": ["heic"],
+    "image/jpeg": ["jpg", "jpeg"],
     "image/ktx": ["ktx"],
     "image/ktx2": ["ktx2"],
     "image/png": ["png"],
@@ -528,6 +578,7 @@ export class ModelService extends ProviderValidation {
     glb: ["model/gltf-binary"],
     gltf: ["model/gltf+json"],
     gz: ["application/gzip", "application/x-gzip"],
+    heic: ["image/heic"],
     hjif: ["haptics/hjif"],
     hmpg: ["haptics/hmpg"],
     htm: ["text/html"],
