@@ -161,10 +161,10 @@ const components = {
   },
   code: ({ children, ...props }: ComponentPropsWithRef<"code">) => {
     return (
-      <span className="relative m-0 w-full p-0">
+      <span className="relative m-0 w-full min-w-0 p-0">
         <code
           className={cn(
-            `overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
+            `inline-block max-w-full overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
           )}
           {...props}>
           {children}
