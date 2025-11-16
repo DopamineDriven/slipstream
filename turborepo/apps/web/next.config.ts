@@ -53,6 +53,7 @@ export default {
         hostname: `chat.aicoalesce.com`,
         protocol: "https"
       },
+      {hostname: "home.nps.gov", protocol: "https"},
       {
         hostname: `dev.chat.aicoalesce.com`,
         protocol: "https"

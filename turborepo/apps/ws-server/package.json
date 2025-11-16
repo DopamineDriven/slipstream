@@ -16,15 +16,16 @@
       ],
       "anthropic": [
         "dist/anthropic/index.d.ts",
-        "src/anthropic/types.d.ts",
-        "src/anthropic/workup.d.ts"
+        "dist/anthropic/types.d.ts",
+        "dist/anthropic/workup.d.ts"
       ],
       "extract": [
         "dist/extract/index.d.ts"
       ],
       "gemini": [
         "dist/gemini/index.d.ts",
-        "dist/gemini/types.d.ts"
+        "dist/gemini/types.d.ts",
+        "dist/gemini/workup.d.ts"
       ],
       "image": [
         "dist/image/index.d.ts"
@@ -43,8 +44,8 @@
       ],
       "openai": [
         "dist/openai/index.d.ts",
-        "src/openai/types.d.ts",
-        "src/openai/workup.d.ts"
+        "dist/openai/types.d.ts",
+        "dist/openai/workup.d.ts"
       ],
       "pdf": [
         "dist/pdf/index.d.ts"
@@ -54,7 +55,7 @@
         "dist/prisma/attachment-provider.d.ts"
       ],
       "providers": [
-        "src/providers/index.d.ts"
+        "dist/providers/index.d.ts"
       ],
       "resolver": [
         "dist/resolver/index.d.ts"

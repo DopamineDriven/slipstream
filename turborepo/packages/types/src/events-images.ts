@@ -10,7 +10,8 @@ import type {
   ImageGenOutputSingleton,
   ImageSingleton
 } from "@/types.ts";
-import { Rm } from "./utils.ts";
+import type { Rm } from "@/utils.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export type NanoBananaOutputSize =
   | "1:1"
@@ -894,58 +895,24 @@ export type S3StorageClass =
 export type ImgMetadataEntity = {
   animated: boolean;
   aspectRatio: number;
-  cameraMake: null;
-  cameraModel: null;
-  colorSpace:
-    | "unknown"
-    | "srgb"
-    | "display_p3"
-    | "adobe_rgb"
-    | "prophoto_rgb"
-    | "rec2020"
-    | "rec709"
-    | "cmyk"
-    | "lab"
-    | "xyz"
-    | "gray";
-  dominantColorHex: null;
+  cameraMake: string | null;
+  cameraModel: string | null;
+  colorSpace: $Enums.ColorSpace;
+  dominantColorHex: string | null;
   exifDateTimeOriginal: Date | null;
-  colorModel:
-    | "unknown"
-    | "cmyk"
-    | "lab"
-    | "rgb"
-    | "rgba"
-    | "grayscale"
-    | "grayscale_alpha"
-    | "indexed"
-    | "ycbcr"
-    | "ycck"
-    | "vector";
-  format:
-    | "apng"
-    | "png"
-    | "jpeg"
-    | "gif"
-    | "bmp"
-    | "webp"
-    | "avif"
-    | "heic"
-    | "svg"
-    | "ico"
-    | "tiff"
-    | undefined;
+  colorModel: $Enums.ColorModel;
+  format: $Enums.ImageFormat;
   frames: number;
-  gpsLat: null;
-  gpsLon: null;
+  gpsLat: number | null;
+  gpsLon: number | null;
   hasAlpha: boolean;
   height: number;
   width: number;
   iccProfile: string | null;
-  lensModel: null;
+  lensModel: string | null;
   orientation: number | null;
-  createdAt: undefined;
-  updatedAt: undefined;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 export type ImageGenPartialArr = [
   number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
@@ -997,7 +964,6 @@ export type AIChatResponseImgGenSubFields = {
     | "ATTACHED"
     | "DELETED";
   size: number | null;
-
   compatKey: string | null;
   compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
   compatCdnUrl: string | null;

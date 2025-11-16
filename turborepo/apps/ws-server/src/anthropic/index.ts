@@ -16,7 +16,7 @@ export class AnthropicService extends AnthropicWorkup {
   ) {
     super(logger, prisma, apiKey);
   }
-  
+
   public async handleAnthropicAiChatRequest({
     chunks,
     conversationId,
@@ -97,7 +97,8 @@ export class AnthropicService extends AnthropicWorkup {
       let text: string | undefined = undefined,
         thinkingText: string | undefined = undefined,
         webSearchRes: Anthropic.Beta.BetaWebSearchResultBlock | null = null,
-        done: Anthropic.Beta.BetaStopReason | null = null;
+        done: Anthropic.Beta.BetaStopReason | null = null,
+        usage: number | undefined = undefined;
 
       if (chunk.type === "content_block_start") {
         if (chunk.content_block.type === "server_tool_use") {
@@ -156,6 +157,9 @@ export class AnthropicService extends AnthropicWorkup {
         }
       } else if (chunk.type === "message_delta") {
         done = chunk.delta.stop_reason;
+        if (chunk.usage.input_tokens) usage = chunk.usage.input_tokens;
+        if (usage && chunk.usage.output_tokens)
+          usage += chunk.usage.output_tokens;
       }
       if (thinkingText) {
         if (webSearchRes) {
@@ -311,6 +315,7 @@ export class AnthropicService extends AnthropicWorkup {
           temperature,
           topP,
           provider,
+          usage,
           userMsgId,
           userId,
           systemPrompt,
@@ -327,6 +332,7 @@ export class AnthropicService extends AnthropicWorkup {
             type: "ai_chat_response",
             conversationId,
             userId,
+            usage,
             provider,
             model,
             userMsgId,
@@ -348,6 +354,7 @@ export class AnthropicService extends AnthropicWorkup {
           type: "ai_chat_response",
           conversationId,
           userId,
+          usage,
           systemPrompt,
           temperature,
           title,

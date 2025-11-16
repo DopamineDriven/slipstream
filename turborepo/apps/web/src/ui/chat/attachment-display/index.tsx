@@ -1,9 +1,10 @@
 "use client";
 
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { useCallback, useState } from "react";
 import Image from "next/image";
+import { imgSrcMapper } from "@/lib/img-helper";
 import { cn } from "@/lib/utils";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type { AttachmentSingleton } from "@slipstream/types";
 import {
   Button,
@@ -54,7 +55,9 @@ const getFileIcon = (attachment: AttachmentSingleton<true>) => {
   }
 };
 // Only use CDN URLs; S3 buckets are private and publicUrl may not be usable
-const getDisplayUrl = (attachment: AttachmentSingleton<true>): string | null => {
+const getDisplayUrl = (
+  attachment: AttachmentSingleton<true>
+): string | null => {
   return attachment?.cdnUrl ?? null;
 };
 
@@ -79,11 +82,15 @@ export function AttachmentDisplay({
   const [expanded, setExpanded] = useState<{
     url: string;
     kind: "image" | "pdf";
+    format: string;
   } | null>(null);
 
-  const handlePreview = useCallback((url: string, kind: "image" | "pdf") => {
-    setExpanded({ url, kind });
-  }, []);
+  const handlePreview = useCallback(
+    (url: string, kind: "image" | "pdf", format: string) => {
+      setExpanded({ url, kind, format });
+    },
+    []
+  );
 
   const clickcb = useCallback(
     (_e: React.MouseEvent<HTMLButtonElement | SVGSVGElement, MouseEvent>) => {
@@ -117,7 +124,11 @@ export function AttachmentDisplay({
                 className="relative inline-block h-64 w-full max-w-[90dvw] cursor-pointer rounded-lg border md:max-w-sm"
                 onClick={() =>
                   attachment.cdnUrl
-                    ? handlePreview(attachment.cdnUrl, "image")
+                    ? handlePreview(
+                        attachment.cdnUrl,
+                        "image",
+                        attachment.ext ?? "jpeg"
+                      )
                     : () => {}
                 }>
                 <Image
@@ -125,7 +136,9 @@ export function AttachmentDisplay({
                   unoptimized={
                     !isNextImageCompat(
                       attachment.ext as ExpandedImgSpecs["format"]
-                    )
+                    ) || imgSrcMapper.includes(attachment.ext)
+                      ? false
+                      : true
                   }
                   fill
                   alt={attachment.filename ?? "Attachment"}
@@ -140,7 +153,11 @@ export function AttachmentDisplay({
                     onClick={e => {
                       e.stopPropagation();
                       attachment.cdnUrl
-                        ? handlePreview(attachment.cdnUrl, "image")
+                        ? handlePreview(
+                            attachment.cdnUrl,
+                            "image",
+                            attachment.ext ?? "jpeg"
+                          )
                         : null;
                     }}>
                     <Eye className="h-3 w-3" />
@@ -189,7 +206,12 @@ export function AttachmentDisplay({
                         attachment.cdnUrl
                           ? handlePreview(
                               attachment.cdnUrl,
-                              isPdf ? "pdf" : "image"
+                              isPdf ? "pdf" : "image",
+                              !isPdf
+                                ? attachment.ext
+                                  ? (attachment.ext as ExpandedImgSpecs["format"])
+                                  : "jpeg"
+                                : "pdf"
                             )
                           : () => {}
                       }
@@ -246,6 +268,13 @@ export function AttachmentDisplay({
                   fill
                   sizes="96dvw"
                   className="rounded-md object-contain"
+                  unoptimized={
+                    !isNextImageCompat(
+                      expanded.format as ExpandedImgSpecs["format"]
+                    ) || imgSrcMapper.includes(expanded.url)
+                      ? false
+                      : true
+                  }
                 />
               </div>
             ) : (

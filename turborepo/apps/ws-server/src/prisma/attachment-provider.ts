@@ -25,39 +25,6 @@ export class PrismaAttachmentProviderService extends ModelService {
     });
   }
 
-  public async getGeminiProviderAttachments(keyFingerprint: string) {
-    const getAll = await this.prismaClient.attachmentProvider.findMany({
-      where: { provider: "GEMINI", keyFingerprint },
-      select: { providerUri: true, expiresAt: true }
-    });
-    const arr = Array.of<string>();
-    for (const t of getAll) {
-      if (
-        t.expiresAt &&
-        t.providerUri &&
-        new Date(t.expiresAt).getTime() > Date.now()
-      ) {
-        arr.push(t.providerUri);
-      }
-    }
-    return arr;
-  }
-
-  public async findActiveGeminiAsset(
-    attachmentId: string,
-    keyFingerprint: string
-  ) {
-    return this.prismaClient.attachmentProvider.findFirst({
-      where: {
-        attachmentId,
-        provider: "GEMINI",
-        keyFingerprint,
-        state: "ACTIVE",
-        expiresAt: { gt: new Date() }
-      }
-    });
-  }
-
   public async upsertOpenAIAssetMapping(
     attachmentId: string,
     keyFingerprint = "server",
@@ -93,29 +60,52 @@ export class PrismaAttachmentProviderService extends ModelService {
     attachmentId: string,
     keyFingerprint = "server",
     mime: string,
-    keyId?: string
+    fileId: string,
+    fileUri: string,
+    expirationTime: string,
+    keyId?: string,
+    size?: bigint,
+    created_at?: string
   ) {
     return this.prismaClient.attachmentProvider.upsert({
       where: {
         attachmentId_provider_keyFingerprint: {
-          attachmentId: attachmentId,
+          attachmentId,
           provider: "GEMINI",
           keyFingerprint
         }
       },
       update: {
-        state: "PENDING",
+        state: "ACTIVE",
         errorCode: null,
         errorMessage: null,
-        lastCheckedAt: new Date(Date.now())
+        size,
+        userKeyId: keyId,
+        providerUri: fileUri,
+        provider: "GEMINI",
+        expiresAt: new Date(expirationTime),
+        keyFingerprint,
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       },
       create: {
-        attachmentId: attachmentId,
-        provider: "GEMINI",
+        state: "ACTIVE",
+        errorCode: null,
+        errorMessage: null,
+        size,
+        expiresAt: new Date(expirationTime),
         userKeyId: keyId,
+        providerUri: fileUri,
+        provider: "GEMINI",
         keyFingerprint,
-        state: "PENDING",
-        mime
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       }
     });
   }
@@ -137,39 +127,7 @@ export class PrismaAttachmentProviderService extends ModelService {
     });
   }
 
-  public async finalizeGeminiAsset(
-    mappingId: string,
-    providerUri: string,
-    providerRef: string,
-    expiresAt: Date,
-    sizeBytes: number
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerUri,
-        providerRef,
-        expiresAt,
-        readyAt: new Date(Date.now()),
-        lastCheckedAt: new Date(Date.now()),
-        size: sizeBytes
-      }
-    });
-  }
-
   public async markOpenAIAssetFailed(mappingId: string, errorMessage: string) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async markGeminiAssetFailed(mappingId: string, errorMessage: string) {
     await this.prismaClient.attachmentProvider.update({
       where: { id: mappingId },
       data: {
@@ -251,14 +209,95 @@ export class PrismaAttachmentProviderService extends ModelService {
     });
   }
 
+  public async findManyByProvider(provider: $Enums.Provider, userId: string) {
+    const t = await this.prismaClient.$transaction(async p => {
+      const d = await p.attachment.findMany({
+        where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
+        select: {
+          id: true,
+          providerLinks: {
+            select: {
+              id: true,
+              keyFingerprint: true,
+              expiresAt: true,
+              providerRef: true,
+              provider: true,
+              userKeyId: true,
+              lastCheckedAt: true,
+              providerUri: true,
+              createdAt: true
+            }
+          },
+          key: true
+        }
+      });
+      const agg = Array.of<{
+        id: string;
+        attachmentId: string;
+        expiresAt: Date | null;
+        provider: $Enums.Provider;
+        keyFingerprint: string;
+        userKeyId: string | null;
+        providerRef: string;
+        isExpired: boolean;
+        providerUri: string | null;
+      }>();
+      for (const dd of d) {
+        if (dd.providerLinks.length > 0) {
+          for (const ddd of dd.providerLinks) {
+            if (ddd.provider === provider && ddd.providerRef) {
+              if (provider !== "GEMINI") {
+                agg.push({
+                  attachmentId: dd.id,
+                  expiresAt: ddd.expiresAt,
+                  id: ddd.id,
+                  keyFingerprint: ddd.keyFingerprint,
+                  provider: ddd.provider,
+                  providerRef: ddd.providerRef,
+                  isExpired:
+                    14 * 24 * 60 * 60 * 1000 <
+                    Date.now() -
+                      (ddd.lastCheckedAt?.getTime() ?? ddd.createdAt.getTime()),
+                  userKeyId: ddd.userKeyId,
+                  providerUri: ddd.providerUri
+                });
+              }
+              if (provider === "GEMINI" && ddd.providerUri && ddd.expiresAt) {
+                agg.push({
+                  attachmentId: dd.id,
+                  expiresAt: ddd.expiresAt,
+                  id: ddd.id,
+                  keyFingerprint: ddd.keyFingerprint,
+                  provider: ddd.provider,
+                  providerRef: ddd.providerRef,
+                  isExpired: ddd.expiresAt.getTime() < Date.now(),
+                  userKeyId: ddd.userKeyId,
+                  providerUri: ddd.providerUri
+                });
+              }
+            }
+          }
+        }
+      }
+      if (agg.length > 0) {
+        const idsToDelete = agg
+          .filter(v => v.isExpired === true)
+          .map(vv => vv.id);
+        await this.deleteStaleIds(idsToDelete);
+      }
+      return agg.filter(v => v.isExpired === false);
+    });
+    return t;
+  }
+
   public async hasProviderMessages(userId: string, provider: $Enums.Provider) {
     const p = await this.prismaClient.message.findFirst({
-      where: { userId, provider }
+      where: {
+        userId,
+        attachments: { some: { providerLinks: { some: { provider } } } }
+      },
+      select: { id: true, userKeyId: true }
     });
-    if (p === null) return false;
-        // const v = await this.prismaClient.attachmentProvider.findFirst({where: { provider, userKeyId: p.userKeyId }});
-
-
-    else return true;
+    return p;
   }
 }

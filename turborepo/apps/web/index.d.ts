@@ -5,7 +5,6 @@ declare module "gtag.js";
 declare global {
   interface Window {
     dataLayer?: object[];
-    chatScrollToBottom?: () => void;
   }
   interface JSON {
     parse<T = unknown>(

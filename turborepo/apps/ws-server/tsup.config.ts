@@ -12,6 +12,7 @@ const tsupConfig = (options: Options) =>
       "src/extract/index.ts",
       "src/gemini/index.ts",
       "src/gemini/types.ts",
+      "src/gemini/workup.ts",
       "src/image/index.ts",
       "src/logger/index.ts",
       "src/meta/index.ts",

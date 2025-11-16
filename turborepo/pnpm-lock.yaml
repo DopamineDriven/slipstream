@@ -990,6 +990,13 @@ importers:
         version: 8.46.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
 
   packages/types:
+    dependencies:
+      '@d0paminedriven/metadata':
+        specifier: ^4.0.1
+        version: 4.0.1
+      '@slipstream/db':
+        specifier: workspace:*
+        version: link:../db
     devDependencies:
       '@d0paminedriven/fs':
         specifier: ^7.6.0

@@ -3,7 +3,6 @@ import { ReadableStream } from "node:stream/web";
 import type {
   BigIntToCompatProps,
   BufferLike,
-  MessageSingleton,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
@@ -24,6 +23,7 @@ import type {
   EventTypeMap,
   ImageSingleton,
   ImageSpecs,
+  MessageSingleton,
   Provider,
   RTC
 } from "@slipstream/types";
@@ -270,8 +270,6 @@ export class Resolver extends ModelService {
       console.warn("rate-limit check failed", this.safeErrMsg(e));
     }
   }
-
-  public async handleSyncProvider() {}
 
   public async handleProviderContextPing(
     _event: EventTypeMap["provider_context_ping"],
@@ -580,7 +578,10 @@ export class Resolver extends ModelService {
   }
 
   public async postHandleConnectionEstablishedJob(userId: string) {
-    return await this.providers.anthropic.syncFileRegistry(userId, true);
+    return await Promise.all([
+      this.providers.anthropic.syncFileRegistry(userId, true),
+      this.providers.gemini.syncFileRegistry(userId, true)
+    ]);
   }
 
   public async handleConnectionEstablished(

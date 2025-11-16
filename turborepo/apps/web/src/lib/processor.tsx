@@ -25,6 +25,7 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { VFile } from "vfile";
 import { cn } from "./utils";
+import { imgSrcMapper } from "./img-helper";
 
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
@@ -144,6 +145,7 @@ function CustomImage({
       }
       alt={alt}
       width={width}
+      unoptimized={typeof src === "string" ? imgSrcMapper.includes(src) ? false : true : false}
       height={height}
       sizes="100vw"
       style={{ width: "100%", height: "auto", objectFit: "cover" }}

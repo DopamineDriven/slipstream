@@ -1,3 +1,23 @@
+/**
+ * api-handling types for codegen
+ */
+export type {
+  AnthropicError,
+  AnthropicModel,
+  AnthropicResponse,
+  AnthropicSuccess,
+  GeminiError,
+  GeminiModel,
+  GeminiResponse,
+  GeminiSuccess,
+  GrokModelsResponse,
+  ListModelsSingleton,
+  MultimodalRT,
+  OpenAiError,
+  OpenAiResponse,
+  SuccessResponse
+} from "@/codegen-types.ts";
+
 export type {
   AIChatRequestImgGenFields,
   AIChatResponseImgGenFields,
@@ -278,58 +298,27 @@ export type {
 export { createDraftId, parseDraftId } from "@/utils.ts";
 
 /**
- * api-handling types for codegen
+ * domain level types
  */
-
 export type {
   AccountSingleton,
-  AttachmentChecksumAlgo,
-  AttachmentCompatStatus,
-  AttachmentOrigin,
   AttachmentProviderSingleton,
-  AttachmentProviderState,
-  AttachmentStatus,
-  AttachmentType,
-  AttachmentUploadMethod,
-  AnthropicError,
-  AnthropicModel,
-  AnthropicResponse,
-  AnthropicSuccess,
   AssetReadyPayload,
   AttachmentSingleton,
   BigIntOrNumber,
   ConversationSingleton,
-  ConvoSettingsReasoningEffort,
+  ConversationSingletonOneOff,
   ConvoSettingsSingleton,
-  ConvoSettingsVerbosity,
   DocumentSingleton,
   FlexiProvider,
-  GeminiError,
-  GeminiModel,
-  GeminiResponse,
-  GeminiSuccess,
-  GrokModelsResponse,
   ImageGenJobSingleton,
-  ImageGenJobStage,
-  ImageGenOutputKind,
   ImageGenOutputSingleton,
-  ImageMetadataColorModel,
-  ImageMetadataColorSpace,
-  ImageMetadataFormat,
   ImageSingleton,
-  ListModelsSingleton,
-  MessageSenderType,
   MessageSingleton,
-  MessageType,
-  PrismaProvider,
   ProfileSingleton,
-  OpenAiError,
-  OpenAiResponse,
   SessionSingleton,
   SettingsSingleton,
-  SettingsTheme,
   Signals,
-  SuccessResponse,
   UserKeySingleton,
   UserSingleton
 } from "@/types.ts";

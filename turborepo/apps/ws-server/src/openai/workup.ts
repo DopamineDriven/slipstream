@@ -1,6 +1,5 @@
 import type {
   InferPromiseRT,
-  MessageSingleton,
   ProviderOpenaiRequestEntity
 } from "@/types/index.ts";
 import type {
@@ -18,6 +17,7 @@ import type {
   AIChatResRT,
   ConversationSingleton,
   ImgGenWorkupResRT,
+  MessageSingleton,
   OpenAiModelIdUnion
 } from "@slipstream/types";
 

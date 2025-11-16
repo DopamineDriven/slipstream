@@ -1,6 +1,7 @@
 "use client";
 
 import type { User } from "@/utils/auth-client";
+import type { Properties } from "csstype";
 import React, {
   Suspense,
   useCallback,
@@ -11,6 +12,7 @@ import React, {
 import { useRouter } from "next/navigation";
 import { useAIChatContext } from "@/context/ai-chat-context";
 import { useAssetUpload } from "@/context/asset-context";
+import { ChatScrollProvider } from "@/context/chat-scroll-context";
 import { useCookiesCtx } from "@/context/cookie-context";
 import { useModelSelection } from "@/context/model-selection-context";
 import { usePathnameContext } from "@/context/pathname-context";
@@ -25,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
+import { FloatingScrollButton } from "@/ui/chat/floating-bob";
 import type {
   AttachmentSingleton,
   MessageSingleton,
@@ -64,7 +67,8 @@ export function ChatInterface({
     imgGenFields,
     currentUserMsgId,
     currentAiMsgId,
-    currentImgGenAttachmentId
+    currentImgGenAttachmentId,
+    isNewChat
   } = useAIChatContext();
   const router = useRouter();
   const { selectedModel } = useModelSelection();
@@ -184,6 +188,7 @@ export function ChatInterface({
         id: optimisticMsgId,
         content: queuedPrompt,
         userId: user.id,
+        isImageGen: imgGenEnabled,
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
         conversationId: activeConversationId ?? "new-chat",
@@ -329,6 +334,7 @@ export function ChatInterface({
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
         conversationId: activeConversationId,
+        isImageGen: imgGenEnabled,
         thinkingText: isThinking
           ? thinkingText
           : thinkingDuration
@@ -482,6 +488,7 @@ export function ChatInterface({
       const userMsg = createUserMessage({
         id: optimisticMsgId,
         content: content.trim(),
+        isImageGen: imgGenEnabled,
         userId: user.id,
         provider: toPrismaFormat(selectedModel.provider),
         model: selectedModel.modelId,
@@ -523,45 +530,53 @@ export function ChatInterface({
   );
 
   return (
-    <div
-      className={cn(
-        "flex h-full flex-col",
-        isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
-      )}>
-      <ChatFeed
-        messages={messages}
-        streamedText={isStreaming ? streamedText : ""}
-        isAwaitingFirstChunk={isAwaitingFirstChunk}
-        activeConversationId={activeConversationId ?? "new-chat"}
-        isStreaming={isStreaming}
-        isThinking={isThinking}
-        isHome={isHome}
-        thinkingText={thinkingText}
-        thinkingDuration={thinkingDuration ?? undefined}
-        imgGenEnabled={imgGenEnabled}
-        imgGenFields={imgGenFields ?? undefined}
-        imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
-        currentAiMsgId={currentAiMsgId ?? undefined}
-        user={user}>
-        <ChatHero
-          user={user}
-          selectedModel={selectedModel}
-          tz={tz}
-          onPromptClickAction={handlePromptClick}
-        />
-      </ChatFeed>
-      <Suspense>
-        <ChatInput
-          handlePromptConsumed={handlePromptConsumed}
-          initialPrompt={queuedPrompt}
-          autoSubmitInitialPrompt
-          onUserMessage={handleUserMessage}
-          user={user}
-          isConnected={isConnected}
-          activeConversationId={activeConversationId}
-          conversationId={activeConversationId ?? conversationId}
-        />
-      </Suspense>
-    </div>
+    <ChatScrollProvider>
+      <div
+        className={cn(
+          "flex h-full flex-col",
+          isHome ? "mx-auto items-center justify-center p-4" : "overflow-y-auto"
+        )}>
+        <ChatFeed
+          messages={messages}
+          streamedText={isStreaming ? streamedText : ""}
+          isAwaitingFirstChunk={isAwaitingFirstChunk}
+          activeConversationId={activeConversationId ?? "new-chat"}
+          isStreaming={isStreaming}
+          isThinking={isThinking}
+          isNewChat={isNewChat}
+          isHome={isHome}
+          thinkingText={thinkingText}
+          thinkingDuration={thinkingDuration ?? undefined}
+          imgGenEnabled={imgGenEnabled}
+          imgGenFields={imgGenFields ?? undefined}
+          imgGenAttachmentId={currentImgGenAttachmentId ?? undefined}
+          currentAiMsgId={currentAiMsgId ?? undefined}
+          user={user}>
+          <ChatHero
+            user={user}
+            selectedModel={selectedModel}
+            tz={tz}
+            onPromptClickAction={handlePromptClick}
+          />
+        </ChatFeed>
+        <Suspense>
+          <ChatInput
+            handlePromptConsumed={handlePromptConsumed}
+            initialPrompt={queuedPrompt}
+            autoSubmitInitialPrompt
+            onUserMessage={handleUserMessage}
+            user={user}
+            isConnected={isConnected}
+            activeConversationId={activeConversationId}
+            conversationId={activeConversationId ?? conversationId}
+          >            <FloatingScrollButton isHome={isHome} /></ChatInput>
+        </Suspense>
+      </div>
+    </ChatScrollProvider>
   );
+}
+declare module "react" {
+  export interface CSSProperties extends Properties<string | number> {
+    "--bob-multiplier"?: number;
+  }
 }

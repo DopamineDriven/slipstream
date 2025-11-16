@@ -19,58 +19,11 @@ interface ApiKeysContextValue {
   isAwaitingUpdateAck: boolean;
   isAwaitingInitial: boolean;
   isAwaitingPong: boolean;
-  isSet: <
-    const P extends keyof ClientContextWorkupProps["isSet"] =
-      | "openai"
-      | "gemini"
-      | "grok"
-      | "anthropic"
-      | "meta"
-      | "vercel"
-  >(
-    provider: P
-  ) => Record<
-    "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel",
-    boolean
-  >[P];
-  isDefault: <
-    const P extends keyof ClientContextWorkupProps["isDefault"] =
-      | "openai"
-      | "gemini"
-      | "grok"
-      | "anthropic"
-      | "meta"
-      | "vercel"
-  >(
-    provider: P
-  ) => Record<
-    "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel",
-    boolean
-  >[P];
 }
 
 const ApiKeysContext = createContext<ApiKeysContextValue | undefined>(
   undefined
 );
-
-const fallbackApiKeys = {
-  isDefault: {
-    anthropic: false,
-    gemini: false,
-    grok: false,
-    meta: false,
-    openai: false,
-    vercel: false
-  },
-  isSet: {
-    anthropic: false,
-    gemini: false,
-    grok: false,
-    meta: false,
-    openai: false,
-    vercel: false
-  }
-};
 
 function equalityCheck(
   one: ClientContextWorkupProps,
@@ -188,32 +141,6 @@ export function ApiKeysProvider({
     });
   }, [sendEvent]);
 
-  const isDefault = useCallback(
-    <
-      const P extends
-        keyof ClientContextWorkupProps["isDefault"] = keyof ClientContextWorkupProps["isDefault"]
-    >(
-      provider: P
-    ) => {
-      const data = providerContext ?? fallbackApiKeys;
-      return data.isDefault[provider];
-    },
-    [providerContext]
-  );
-
-  const isSet = useCallback(
-    <
-      const P extends
-        keyof ClientContextWorkupProps["isSet"] = keyof ClientContextWorkupProps["isSet"]
-    >(
-      provider: P
-    ) => {
-      const data = providerContext ?? fallbackApiKeys;
-      return data.isSet[provider];
-    },
-    [providerContext]
-  );
-
   return (
     <ApiKeysContext.Provider
       value={{
@@ -222,9 +149,7 @@ export function ApiKeysProvider({
         isAwaitingUpdateAck,
         sendProviderContextPing,
         sendProviderContextUpdate,
-        providerContext,
-        isSet,
-        isDefault
+        providerContext
       }}>
       {children}
     </ApiKeysContext.Provider>

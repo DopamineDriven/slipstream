@@ -1,4 +1,4 @@
-import type { Signals } from "@/types/index.ts";
+import type { Signals } from "@slipstream/types";
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
 import { Credentials } from "@slipstream/credentials";
@@ -183,7 +183,7 @@ async function exe() {
     const { ImageCompatService } = await import("@/image/index.ts");
 
     const imgCompatService = new ImageCompatService(s3, prisma, isProd);
-    
+
     const resolver = new Resolver(
       wsServer,
       providers,
