@@ -630,8 +630,6 @@ code > [data-line]::before {
 .prose code:not(pre code) {
   display: inline-block;
   max-width: 100%;
-  white-space: pre;
-  overflow-x: auto;
   vertical-align: -0.2em;
   -webkit-overflow-scrolling: touch;
 

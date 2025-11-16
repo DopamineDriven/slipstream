@@ -2,7 +2,6 @@ import { relative } from "node:path";
 import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-/** `outExtension({format})` -> when format passed in it outputs esm so using it as `.${format}.mjs` -> `filename.esm.mjs` on output */
 const tsupConfig = (options: Options) =>
   ({
     entry: [
@@ -19,6 +18,7 @@ const tsupConfig = (options: Options) =>
       "src/meta/index.ts",
       "src/mixins/index.ts",
       "src/models/index.ts",
+      "src/openai/gpt-image.ts",
       "src/openai/index.ts",
       "src/openai/types.ts",
       "src/openai/workup.ts",
@@ -37,7 +37,7 @@ const tsupConfig = (options: Options) =>
       "!src/test/**/*",
       "!public/**/*"
     ],
-    target: ["node24"],
+    target: ["node25"],
     dts: true,
     watch: process.env.NODE_ENV === "development",
     keepNames: true,
