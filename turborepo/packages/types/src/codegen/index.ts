@@ -2,10 +2,10 @@ import type {
   AnthropicResponse,
   GeminiResponse,
   GrokModelsResponse,
+  MultimodalRT,
   OpenAiResponse
-} from "@/types.ts";
-import { Provider } from "@/models.ts";
-import { XOR } from "@/utils.ts";
+} from "@/codegen-types.ts";
+import type { Provider } from "@/models.ts";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
@@ -205,7 +205,7 @@ function grokDisplayName(id: string) {
   return id === "grok-4-fast-non-reasoning" ? GROK_NAME_OVERRIDES[id] : s;
 }
 
-function displayNameV0(id: string): string {
+function displayNameV0(id: string) {
   const raw = id?.trim();
   if (!raw) return "";
   // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
@@ -231,7 +231,7 @@ function displayNameV0(id: string): string {
 }
 
 // Replace formatMeta with this stronger normalizer
-function formatMeta(id: string): string {
+function formatMeta(id: string) {
   const raw = id?.trim();
   if (!raw) return "";
 
@@ -775,72 +775,7 @@ async function Multimodal<
   const S extends "default" | "img" | "video",
   const T extends "keys=model-id" | "keys=display-name",
   const V extends "model-id-only" | "display-name-only"
->(
-  mode: S,
-  target: T,
-  arrayOnly?: V
-): Promise<
-  XOR<
-    XOR<
-      | {
-          openai: string[];
-          gemini: string[];
-          grok: string[];
-        }
-      | {
-          openai: {
-            [k: string]: string;
-          };
-          gemini: {
-            [k: string]: string;
-          };
-          grok: {
-            [k: string]: string;
-          };
-        },
-      | {
-          openai: string[];
-          gemini: string[];
-        }
-      | {
-          openai: {
-            [k: string]: string;
-          };
-          gemini: {
-            [k: string]: string;
-          };
-        }
-    >,
-    | {
-        openai: string[];
-        gemini: string[];
-        grok: string[];
-        anthropic: string[];
-        meta: string[];
-        vercel: string[];
-      }
-    | {
-        openai: {
-          [k: string]: string;
-        };
-        gemini: {
-          [k: string]: string;
-        };
-        grok: {
-          [k: string]: string;
-        };
-        anthropic: {
-          [k: string]: string;
-        };
-        meta: {
-          [k: string]: string;
-        };
-        vercel: {
-          [k: string]: string;
-        };
-      }
-  >
-> {
+>(mode: S, target: T, arrayOnly?: V): Promise<MultimodalRT> {
   switch (mode) {
     case "img": {
       return await (arrayOnly

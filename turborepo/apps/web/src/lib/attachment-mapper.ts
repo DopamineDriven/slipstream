@@ -11,12 +11,15 @@ export type UploadLookup = {
   size?: number | null;
 };
 
-function toAssetType(mime: string | null | undefined): "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN" {
+function toAssetType(
+  mime: string | null | undefined
+): "IMAGE" | "DOCUMENT" | "AUDIO" | "VIDEO" | "UNKNOWN" {
   if (!mime) return "UNKNOWN";
   if (mime.startsWith("image/")) return "IMAGE";
   if (mime.startsWith("audio/")) return "AUDIO";
   if (mime.startsWith("video/")) return "VIDEO";
-  if (mime.startsWith("application/") || mime.startsWith("text/")) return "DOCUMENT";
+  if (mime.startsWith("application/") || mime.startsWith("text/"))
+    return "DOCUMENT";
   return "UNKNOWN";
 }
 
@@ -28,17 +31,17 @@ function toAssetType(mime: string | null | undefined): "IMAGE" | "DOCUMENT" | "A
 function extractSeriesIdFromGeneratedFilename(filename: string): string | null {
   try {
     // Remove file extension first
-    const nameWithoutExt = filename.split('.')[0];
+    const nameWithoutExt = filename.split(".")[0];
     if (!nameWithoutExt) return null;
 
     // Pattern: {timestamp}-{seriesId}-{index}
     // Split at first dash to remove timestamp
-    const [_timestamp, ...rest] = nameWithoutExt.split('-');
+    const [_timestamp, ...rest] = nameWithoutExt.split("-");
     if (!rest.length) return null;
 
     // Join back and split from the end to remove index
-    const withoutTimestamp = rest.join('-');
-    const lastDashIndex = withoutTimestamp.lastIndexOf('-');
+    const withoutTimestamp = rest.join("-");
+    const lastDashIndex = withoutTimestamp.lastIndexOf("-");
 
     if (lastDashIndex === -1) return null;
 
@@ -46,7 +49,7 @@ function extractSeriesIdFromGeneratedFilename(filename: string): string | null {
     const seriesId = withoutTimestamp.substring(0, lastDashIndex);
 
     // Validate it looks like a seriesId (should contain underscore)
-    if (seriesId.includes('_')) {
+    if (seriesId.includes("_")) {
       return seriesId;
     }
 
@@ -95,7 +98,7 @@ function extractS3InfoFromCdnUrl(cdnUrl: string | null): {
       isGenerated = true;
 
       // Extract seriesId from the filename if it's a generated asset
-      const pathParts = key.split('/');
+      const pathParts = key.split("/");
       const filename = pathParts[pathParts.length - 1];
       if (filename) {
         seriesId = extractSeriesIdFromGeneratedFilename(filename);
@@ -121,7 +124,10 @@ export function buildOptimisticAttachment(
 ): AttachmentSingleton<true> {
   const filename = (lookup?.filename ?? preview.filename) || "file";
   const mime = (lookup?.mime ?? preview.mime) || "application/octet-stream";
-  const size = typeof (lookup?.size ?? preview.size) === "number" ? Number(lookup?.size ?? preview.size) : 0;
+  const size =
+    typeof (lookup?.size ?? preview.size) === "number"
+      ? Number(lookup?.size ?? preview.size)
+      : 0;
   const ext = filename ? (filename.split(".").pop() ?? "").toLowerCase() : null;
   const assetType = toAssetType(mime);
 
@@ -131,7 +137,9 @@ export function buildOptimisticAttachment(
 
   if (lookup?.draftId) {
     try {
-      const [extractedUserId, , extractedBatchId] = parseDraftId(lookup.draftId);
+      const [extractedUserId, , extractedBatchId] = parseDraftId(
+        lookup.draftId
+      );
       userId = extractedUserId;
       batchId = extractedBatchId;
     } catch {
@@ -140,7 +148,9 @@ export function buildOptimisticAttachment(
   }
 
   // Extract S3 info and detect if it's a generated asset
-  const { bucket, key, isGenerated, seriesId } = extractS3InfoFromCdnUrl(lookup?.cdnUrl ?? null);
+  const { bucket, key, isGenerated, seriesId } = extractS3InfoFromCdnUrl(
+    lookup?.cdnUrl ?? null
+  );
 
   // Determine origin and upload method based on whether it's generated
   const origin = isGenerated ? "GENERATED" : "UPLOAD";
@@ -148,7 +158,8 @@ export function buildOptimisticAttachment(
 
   // For generated assets, generationGroupId might be derivable from seriesId
   // The seriesId typically contains the generation group ID
-  const generationGroupId = isGenerated && seriesId ? `resp_${seriesId.replace('ig_', '')}` : null;
+  const generationGroupId =
+    isGenerated && seriesId ? `resp_${seriesId.replace("ig_", "")}` : null;
 
   const now = new Date();
 
@@ -161,7 +172,7 @@ export function buildOptimisticAttachment(
     userId,
     messageId: null,
     s3ObjectId: null,
-
+    seriesId: seriesId ?? "",
     // Status fields
     origin: origin as "UPLOAD" | "GENERATED",
     status: "UPLOADING" as const, // Optimistic attachments are uploading

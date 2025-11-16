@@ -1,4 +1,4 @@
-import type { AttachmentSingleton, DocumentSingleton } from "@/types/index.ts";
+import type { AttachmentSingleton, DocumentSingleton } from "@slipstream/types";
 import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });

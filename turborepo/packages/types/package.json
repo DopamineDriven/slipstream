@@ -27,6 +27,9 @@
         "types": [
           "dist/types.d.ts"
         ],
+        "codegen-types": [
+          "dist/codegen-types.d.ts"
+        ],
         "codegen": [
           "dist/codegen/*.d.ts"
         ]
@@ -58,6 +61,9 @@
       "types": [
         "dist/types.d.ts"
       ],
+      "codegen-types": [
+        "dist/codegen-types.d.ts"
+      ],
       "codegen": [
         "dist/codegen/*.d.ts"
       ]
@@ -78,6 +84,7 @@
     "./events-images": "./dist/events-images.js",
     "./events-workup": "./dist/events-workup.js",
     "./events": "./dist/events.js",
+    "./codegen-types": "./dist/codegen-types.js",
     "./codegen/*": "./dist/codegen/*.js"
   },
   "scripts": {
@@ -91,6 +98,10 @@
     "pregen": "pnpm gen:media",
     "gen": "pnpm tsx src/codegen/index.ts --target default",
     "postgen": "pnpm format"
+  },
+  "dependencies": {
+    "@d0paminedriven/metadata": "^4.0.1",
+    "@slipstream/db": "workspace:*"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^7.6.0",

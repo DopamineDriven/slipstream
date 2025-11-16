@@ -11,5 +11,5 @@ src/test/sanity/*
 src/test/c**/*
 *.pdf
 testing.sh
-src/test/google/*
+
 src/test/anthropic/*

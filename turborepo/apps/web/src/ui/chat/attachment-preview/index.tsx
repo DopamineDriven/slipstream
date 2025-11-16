@@ -7,6 +7,7 @@ import type {
 } from "@d0paminedriven/metadata";
 import { default as NextImage } from "next/image";
 import { useAssetMetadata } from "@/hooks/use-asset-metadata";
+import { imgSrcMapper } from "@/lib/img-helper";
 import { cn } from "@/lib/utils";
 import { Button, Card, CardContent, FileText, X } from "@slipstream/ui";
 
@@ -98,7 +99,19 @@ export function AttachmentPreviewComponent({
                       alt={attachment.filename}
                       width={attachment.width ?? 40}
                       height={attachment.height ?? 40}
-                      unoptimized={attachment.mime ==="image/tiff" ? false : attachment?.mime === "image/heic" ? false : attachment.mime === "image/bmp" ? false : true}
+                      unoptimized={
+                        attachment.thumbnail
+                          ? imgSrcMapper.includes(attachment.thumbnail)
+                            ? false
+                            : true
+                          : attachment.mime === "image/tiff"
+                            ? false
+                            : attachment?.mime === "image/heic"
+                              ? false
+                              : attachment.mime === "image/bmp"
+                                ? false
+                                : true
+                      }
                       className="h-10 w-10 rounded-md object-cover md:h-12 md:w-12"
                     />
                     {meta?.type === "IMAGE" && meta.animated && (

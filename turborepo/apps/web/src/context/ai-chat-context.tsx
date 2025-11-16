@@ -1,4 +1,3 @@
-// src/context/ai-chat-context.tsx
 "use client";
 
 import {
@@ -51,6 +50,7 @@ interface AIChatContextValue {
   streamedText: string;
   isStreaming: boolean;
   isComplete: boolean;
+  isNewChat: boolean;
   error: string | null;
 
   // Thinking state
@@ -161,7 +161,8 @@ export function AIChatProvider({
   const urlUpdatedRef = useRef<boolean>(false);
   const firstChunkReceivedRef = useRef<boolean>(false);
   const originalConversationIdRef = useRef<string | null>(activeConversationId);
-
+  const [isNewChat, setIsNewChat] = useState(false);
+  const isNewChatRef = useRef<boolean | null>(false);
   // Initialize and sync active conversation from pathname
   // This is passive - only reads from the URL, never manipulates it
   // Router manipulation only happens during new-chat → real ID transitions
@@ -256,6 +257,10 @@ export function AIChatProvider({
     currentImgGenAttachmentIdRef.current = currentImgGenAttachmentId;
   }, [currentImgGenAttachmentId]);
 
+  useEffect(() => {
+    isNewChatRef.current = isNewChat;
+  }, [isNewChat]);
+
   // Stable helper to update title state only when changed
   const updateTitle = useCallback((nextTitle?: string | null) => {
     if (!nextTitle) return;
@@ -303,7 +308,7 @@ export function AIChatProvider({
 
         // Update window.history immediately to show real URL
         window.history.replaceState(null, "", `/chat/${evt.conversationId}`);
-
+        setIsNewChat(true);
         urlUpdatedRef.current = true;
 
         // Update active conversation ID to the real one from the event
@@ -425,6 +430,7 @@ export function AIChatProvider({
           `[AIChatContext] Error occurred, syncing router to: /chat/${evt.conversationId}`
         );
         router.replace(`/chat/${evt.conversationId}`, { scroll: false });
+        if (isNewChatRef.current === true) setIsNewChat(false);
         urlUpdatedRef.current = false;
       }
 
@@ -494,6 +500,7 @@ export function AIChatProvider({
             `[AIChatContext] Stream complete, syncing router to: /chat/${evt.conversationId}`
           );
           router.replace(`/chat/${evt.conversationId}`, { scroll: false });
+          if (isNewChatRef.current === true) setIsNewChat(false);
           urlUpdatedRef.current = false;
         }
 
@@ -725,6 +732,7 @@ export function AIChatProvider({
         activeConversationId,
         title,
         streamedText,
+        isNewChat,
         isStreaming,
         isComplete,
         error,

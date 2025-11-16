@@ -9,6 +9,7 @@ import type {
   GeminiImgGenModels,
   GetModelUtilRT,
   GrokImgGenModels,
+  MessageSingleton,
   OpenAIImgGenModels,
   Provider
 } from "@slipstream/types";
@@ -19,6 +20,27 @@ import { imageModelSets } from "@slipstream/types/models";
 export class ModelService extends ProviderValidation {
   constructor() {
     super();
+  }
+  public handleBigintToNumber(
+    message: MessageSingleton<false>
+  ): MessageSingleton<true> {
+    const { attachments, ...rest } = message;
+    const mapIt = attachments.map(t => {
+      const { size, ...p } = t;
+      const mapProviderSingleton = p?.providerLinks?.map(v => {
+        const { size, attachment: _att, ...s } = v;
+        return {
+          size: size ? Number(size) : null,
+          ...s
+        };
+      });
+      return {
+        ...p,
+        size: size ? Number(size) : null,
+        providerLinks: mapProviderSingleton
+      };
+    });
+    return { attachments: mapIt, ...rest } satisfies MessageSingleton<true>;
   }
 
   public getModel = <
@@ -329,6 +351,18 @@ export class ModelService extends ProviderValidation {
       }
     }
   }
+
+  public arrToArrOfArrs = <const T>(
+    arr: T[],
+    int = 10,
+    agg = Array.of<T[]>()
+  ) => {
+    for (let i = 0; i < arr.length; i++) {
+      agg.push(arr.slice(i, i + int));
+    }
+    return agg;
+  };
+
   public mimeToExt = {
     "application/dash+xml": ["mpd"],
     "application/epub+zip": ["epub"],

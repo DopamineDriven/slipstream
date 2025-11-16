@@ -1,6 +1,5 @@
 "use client";
 
-import type { Properties } from "csstype";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useCookiesCtx } from "@/context/cookie-context";
@@ -216,10 +215,4 @@ export function ThinkingSection({
       </Accordion>
     </div>
   );
-}
-
-declare module "react" {
-  export interface CSSProperties extends Properties<string | number> {
-    "--bob-multiplier"?: number;
-  }
 }

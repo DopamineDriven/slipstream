@@ -2,10 +2,11 @@
 
 import type { User } from "@/utils/auth-client";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect } from "react";
+import { useChatScroll } from "@/context/chat-scroll-context";
 import { useScrollObserver } from "@/hooks/use-scroll-observer";
 import { useSelectionQuote } from "@/hooks/use-selection-quote";
-import { smoothScrollToBottom } from "@/lib/helpers";
+import { cn } from "@/lib/utils";
 import { SelectionToolbar } from "@/ui/chat/chat-selection";
 import { MessageBubble } from "@/ui/chat/message-bubble";
 import { motion } from "motion/react";
@@ -13,7 +14,6 @@ import type {
   AIChatResponseImgGenFieldsFinal,
   MessageSingleton
 } from "@slipstream/types";
-// import { useFallingEdgeTimer } from "@/hooks/use-falling-edge-timer";
 
 interface ChatFeedProps {
   messages: MessageSingleton<true>[];
@@ -28,6 +28,7 @@ interface ChatFeedProps {
   streamedText?: string;
   isStreaming?: boolean;
   children?: ReactNode;
+  isNewChat: boolean;
   activeConversationId?: string;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatResponseImgGenFieldsFinal;
@@ -43,7 +44,9 @@ export function ChatFeed({
   isAwaitingFirstChunk,
   isStreaming,
   streamedText,
+  activeConversationId,
   thinkingText,
+  isNewChat,
   isThinking,
   isHome,
   thinkingDuration,
@@ -53,10 +56,7 @@ export function ChatFeed({
   currentAiMsgId,
   children
 }: ChatFeedProps) {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-
-
- //const isTransitionState = useFallingEdgeTimer(isStreaming, 3000);
+  const { scrollRef, setScrollState } = useChatScroll();
 
   useEffect(() => {
     console.log({
@@ -68,15 +68,20 @@ export function ChatFeed({
     });
   }, [imgGenFields]);
 
-  const [isScrolling, setIsScrolling] = useState(false);
-
   const { rect, quote, clear } = useSelectionQuote("[data-chat-feed]");
-  // Use the scroll observer hook
-  const { isNearBottom } = useScrollObserver(scrollRef, {
-    nearBottomThreshold: 200,
-    scrollButtonThreshold: 100,
-    debounceMs: 50
-  });
+
+  const { isNearBottom, showScrollButton: hookShowScrollButton } =
+    useScrollObserver(scrollRef, {
+      nearBottomThreshold: 200,
+      scrollButtonThreshold: 100,
+      debounceMs: 50
+    });
+
+  // Sync scroll state to context whenever it changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setScrollState(isNearBottom, hookShowScrollButton);
+  }, [isNearBottom, hookShowScrollButton, setScrollState]);
 
   // Notify parent about scroll button state
   const handleQuote = useCallback(async () => {
@@ -99,64 +104,25 @@ export function ChatFeed({
       console.error("Failed to copy:", err);
     }
   }, [quote, clear]);
-  // Smooth scroll to bottom with velocity based on distance
-  const scrollToBottom = useCallback(() => {
-    if (!scrollRef.current || isScrolling) return;
-
-    setIsScrolling(true);
-    const container = scrollRef.current;
-    const startScrollTop = container.scrollTop;
-    const targetScrollTop = container.scrollHeight - container.clientHeight;
-    const distance = targetScrollTop - startScrollTop;
-
-    const duration = smoothScrollToBottom(distance);
-
-    const startTime = performance.now();
-
-    const animateScroll = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // easeOutQuart easing function for natural deceleration
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-
-      const currentScrollTop = startScrollTop + distance * easeOutQuart;
-      container.scrollTop = currentScrollTop;
-
-      if (progress < 1) {
-        requestAnimationFrame(animateScroll);
-      } else {
-        setIsScrolling(false);
-      }
-    };
-
-    requestAnimationFrame(animateScroll);
-  }, [isScrolling]);
-
-  // Assign to global window for access from other components
-  useEffect(() => {
-    window.chatScrollToBottom = scrollToBottom;
-
-    return () => {
-      // Cleanup on unmount
-      delete window.chatScrollToBottom;
-    };
-  }, [scrollToBottom]);
 
   useEffect(() => {
-    const scrollToBottom = () => {
+    const initialScroll = () => {
+      if (isNewChat) return;
       if (scrollRef.current) {
+        // eslint-disable-next-line
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };
-    requestAnimationFrame(scrollToBottom);
+
+    // Use multiple attempts to ensure scroll happens after DOM is fully rendered
+    requestAnimationFrame(initialScroll);
 
     const fallbackTimer = setTimeout(() => {
-      requestAnimationFrame(scrollToBottom);
-    }, 100);
+      requestAnimationFrame(initialScroll);
+    }, 50);
 
     return () => clearTimeout(fallbackTimer);
-  }, []);
+  }, [activeConversationId, scrollRef, isNewChat]);
 
   // Auto-scroll when messages change or streaming updates occur (only if near bottom)
   useEffect(() => {
@@ -173,7 +139,8 @@ export function ChatFeed({
     streamedText,
     thinkingText,
     isAwaitingFirstChunk,
-    isNearBottom
+    isNearBottom,
+    scrollRef
   ]);
 
   return (
@@ -184,10 +151,14 @@ export function ChatFeed({
         <div
           ref={scrollRef}
           data-chat-feed
-          className={`flex-1 space-y-6 overflow-y-auto px-4 py-6 ${className}`}>
+          className={cn(
+            `flex-1 space-y-6 overflow-y-auto px-4 py-6`,
+            className
+          )}>
           {messages?.map(message => {
             // Check if this is a streaming message or matches the current aiMsgId
-   const isStreamingMessage = isStreaming && message.id.startsWith("streaming-");
+            const isStreamingMessage =
+              isStreaming && message.id.startsWith("streaming-");
 
             // For completed messages, check if it's an image gen message with the current aiMsgId
             const isCurrentImgGenMessage =
@@ -195,7 +166,10 @@ export function ChatFeed({
               message.messageType === "IMAGE_GEN" &&
               message.id === currentAiMsgId;
 
-            const shouldReceiveAttachmentId = isCurrentImgGenMessage || typeof imgGenFields !=="undefined" || isStreamingMessage;
+            const shouldReceiveAttachmentId =
+              isCurrentImgGenMessage ||
+              typeof imgGenFields !== "undefined" ||
+              isStreamingMessage;
 
             return (
               <MessageBubble
@@ -204,37 +178,21 @@ export function ChatFeed({
                 user={user}
                 onUpdateMessage={onUpdateMessage}
                 isStreaming={isStreamingMessage}
-                liveThinkingText={
-                  isStreamingMessage
-                    ? thinkingText
-                    : undefined
-                }
-                liveIsThinking={
-                  isStreamingMessage
-                    ? isThinking
-                    : undefined
-                }
+                liveThinkingText={isStreamingMessage ? thinkingText : undefined}
+                liveIsThinking={isStreamingMessage ? isThinking : undefined}
                 liveThinkingDuration={
-                  isStreamingMessage
-                    ? thinkingDuration
-                    : undefined
+                  isStreamingMessage ? thinkingDuration : undefined
                 }
                 // Progressive image-gen data for streaming message
                 liveImgGenEnabled={
-                  isStreamingMessage
-                    ? imgGenEnabled
-                    : undefined
+                  isStreamingMessage ? imgGenEnabled : undefined
                 }
                 liveImgGenFields={
-                  isStreamingMessage
-                    ? (imgGenFields ?? undefined)
-                    : undefined
+                  isStreamingMessage ? (imgGenFields ?? undefined) : undefined
                 }
                 liveImgGenAttachmentId={
                   // Pass attachment ID for streaming messages and the specific AI message with matching ID
-                  shouldReceiveAttachmentId
-                    ? imgGenAttachmentId
-                    : undefined
+                  shouldReceiveAttachmentId ? imgGenAttachmentId : undefined
                 }
               />
             );

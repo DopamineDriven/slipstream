@@ -1,7 +1,4 @@
-import type {
-  MessageSingleton,
-  ProviderChatRequestEntity
-} from "@/types/index.ts";
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import type {
   CompletionMessage,
   MessageImageContentItem,
@@ -13,7 +10,11 @@ import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { LlamaAPIClient } from "llama-api-client";
-import type { EventTypeMap, MetaModelIdUnion } from "@slipstream/types";
+import type {
+  EventTypeMap,
+  MessageSingleton,
+  MetaModelIdUnion
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export class LlamaService {

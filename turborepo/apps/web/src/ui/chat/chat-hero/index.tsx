@@ -73,6 +73,7 @@ export function ChatHero({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+      
         className="mb-8 text-center">
         <Logo className="mx-auto mb-4 size-16 stroke-current text-current sm:size-20 lg:size-24 [&_path]:stroke-current" />
         <h1 className="text-foreground/95 mb-2 text-base font-medium sm:text-lg">

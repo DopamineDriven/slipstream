@@ -1,15 +1,15 @@
 import { WebSocket } from "ws";
 import type { $Enums, Attachment } from "@slipstream/db/node/generated/client";
 import type {
-  AIChatRequest,
   AIChatRequestImgGenFields,
   AllModelsUnion,
   ClientContextWorkupProps,
+  ConversationSingletonOneOff as ConversationSingleton,
   CTR,
   EventTypeMap,
+  MessageSingleton,
   Provider,
   RTC,
-  S3Checksum,
   S3StorageClass
 } from "@slipstream/types";
 
@@ -19,119 +19,7 @@ export type S3FinalizePayload = {
   versionId: string;
   contentDisposition: string | undefined;
   cacheControl: string | undefined;
-  extension:
-    | "pdf"
-    | "jpg"
-    | "mp4"
-    | "mp3"
-    | "apng"
-    | "png"
-    | "gif"
-    | "bmp"
-    | "webp"
-    | "avif"
-    | "svg"
-    | "ico"
-    | "tiff"
-    | "mpd"
-    | "epub"
-    | "ttf"
-    | "gz"
-    | "jar"
-    | "json"
-    | "jsonld"
-    | "webmanifest"
-    | "doc"
-    | "node"
-    | "js"
-    | "bin"
-    | "obj"
-    | "ogx"
-    | "rtf"
-    | "sql"
-    | "toml"
-    | "azw"
-    | "mpkg"
-    | "m3u8"
-    | "pkpass"
-    | "xul"
-    | "xls"
-    | "eot"
-    | "ppt"
-    | "odp"
-    | "ods"
-    | "odt"
-    | "pptx"
-    | "xlsx"
-    | "docx"
-    | "rar"
-    | "vsd"
-    | "wasm"
-    | "7z"
-    | "abw"
-    | "bz"
-    | "bz2"
-    | "cda"
-    | "csh"
-    | "arc"
-    | "php"
-    | "mdx"
-    | "ndjson"
-    | "pyc"
-    | "sh"
-    | "tar"
-    | "zip"
-    | "xhtml"
-    | "xml"
-    | "yml"
-    | "aac"
-    | "mid"
-    | "m4a"
-    | "opus"
-    | "ogg"
-    | "wav"
-    | "weba"
-    | "midi"
-    | "otf"
-    | "woff"
-    | "woff2"
-    | "hjif"
-    | "hmpg"
-    | "ivs"
-    | "aces"
-    | "avci"
-    | "dpx"
-    | "emf"
-    | "ktx"
-    | "ktx2"
-    | "cur"
-    | "glb"
-    | "gltf"
-    | "usdz"
-    | "ics"
-    | "css"
-    | "csv"
-    | "sse"
-    | "html"
-    | "md"
-    | "txt"
-    | "rs"
-    | "ts"
-    | "vtt"
-    | "c"
-    | "cs"
-    | "cpp"
-    | "java"
-    | "py"
-    | "rb"
-    | "tex"
-    | "3gp"
-    | "3g2"
-    | "mpeg"
-    | "ogv"
-    | "webm"
-    | "avi"
-    | undefined;
+  extension:S3ExtUnion;
   expires: Date;
   cdnUrl:
     | `https://assets.aicoalesce.com/${string}`
@@ -169,83 +57,11 @@ export type S3FinalizePayload = {
     | undefined;
 };
 
-export type ImgMetadataEntity = {
-  animated: boolean;
-  aspectRatio: number;
-  cameraMake: null;
-  cameraModel: null;
-  colorSpace:
-    | "unknown"
-    | "srgb"
-    | "display_p3"
-    | "adobe_rgb"
-    | "prophoto_rgb"
-    | "rec2020"
-    | "rec709"
-    | "cmyk"
-    | "lab"
-    | "xyz"
-    | "gray";
-  dominantColorHex: null;
-  exifDateTimeOriginal: Date | null;
-  format:
-    | "apng"
-    | "png"
-    | "jpeg"
-    | "gif"
-    | "bmp"
-    | "webp"
-    | "avif"
-    | "heic"
-    | "svg"
-    | "ico"
-    | "tiff"
-    | undefined;
-  frames: number;
-  gpsLat: null;
-  gpsLon: null;
-  hasAlpha: boolean;
-  height: number;
-  width: number;
-  iccProfile: string | null;
-  lensModel: null;
-  orientation: number | null;
-  createdAt: undefined;
-  updatedAt: undefined;
-};
-
-export type ImageGenPartialArr = [
-  number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
-  string, // cdnUrl (cloudfront url returned post-s3 upload)
-  string, // itemId (shared by all partials and final image)
-  number, // width
-  number, // height
-  string, // mime type
-  string, // s3 bucket
-  string, // s3 key
-  string, // s3 versionId
-  string, // s3ObjectId
-  string | undefined, // filename
-  string | undefined, // extension
-  string | undefined, // etag
-  number | undefined, // size
-  string | undefined, // s3 last modified
-  string | undefined, // content disposition
-  string | undefined, // cache control
-  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
-  S3StorageClass | undefined, // s3 storage class
-  string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
-  ImgMetadataEntity | undefined, // ImageMetadata via extractor package
-  number | undefined, // upload duration
-  string | undefined, // requestMessageId
-  string | undefined, // jobId
-  string | undefined // revised_prompt
-];
-
 export type HandleAiChatRequestRT = (
   | ImageGenReqDbRes<true>
   | ConversationSingleton<true>
 ) & {
+  apiKey?: string | null;
   requestMessageId?: string;
   jobId?: string;
   assetCounts: number;
@@ -412,195 +228,6 @@ export type HandleAiChatReqUpdateWithImgGenSansAttachmentsProps = {
   messageData: MessageDataWorkupProps;
 };
 
-export type UploadToS3Rt = {
-  bucket: string;
-  key: string;
-  versionId: string;
-  contentDisposition: string | undefined;
-  cacheControl: string | undefined;
-  extension:
-    | "pdf"
-    | "jpg"
-    | "jpeg"
-    | "mp4"
-    | "mp3"
-    | "heic"
-    | "heif"
-    | "tif"
-    | "apng"
-    | "glb"
-    | "gltf"
-    | "obj"
-    | "ktx"
-    | "ktx2"
-    | "fbx"
-    | "usd"
-    | "cad"
-    | "usdz"
-    | "png"
-    | "gif"
-    | "bmp"
-    | "jxl"
-    | "jp2"
-    | "jpx"
-    | "jxr"
-    | "jls"
-    | "raw"
-    | "dng"
-    | "cr2"
-    | "nef"
-    | "arw"
-    | "hdr"
-    | "pic"
-    | "rgbe"
-    | "xyze"
-    | "webp"
-    | "avif"
-    | "svg"
-    | "ico"
-    | "tiff"
-    | "mpd"
-    | "epub"
-    | "ttf"
-    | "gz"
-    | "jar"
-    | "json"
-    | "jsonld"
-    | "webmanifest"
-    | "doc"
-    | "node"
-    | "js"
-    | "bin"
-    | "ogx"
-    | "rtf"
-    | "sql"
-    | "toml"
-    | "azw"
-    | "mpkg"
-    | "m3u8"
-    | "pkpass"
-    | "xul"
-    | "xls"
-    | "eot"
-    | "ppt"
-    | "odp"
-    | "ods"
-    | "odt"
-    | "pptx"
-    | "xlsx"
-    | "docx"
-    | "rar"
-    | "vsd"
-    | "wasm"
-    | "7z"
-    | "abw"
-    | "bz"
-    | "bz2"
-    | "cda"
-    | "csh"
-    | "arc"
-    | "php"
-    | "mdx"
-    | "ndjson"
-    | "pyc"
-    | "sh"
-    | "tar"
-    | "zip"
-    | "xhtml"
-    | "xml"
-    | "yml"
-    | "aac"
-    | "mid"
-    | "m4a"
-    | "opus"
-    | "ogg"
-    | "wav"
-    | "weba"
-    | "midi"
-    | "otf"
-    | "woff"
-    | "woff2"
-    | "hjif"
-    | "hmpg"
-    | "ivs"
-    | "aces"
-    | "avci"
-    | "dpx"
-    | "emf"
-    | "cur"
-    | "ics"
-    | "css"
-    | "csv"
-    | "sse"
-    | "html"
-    | "md"
-    | "txt"
-    | "rs"
-    | "ts"
-    | "vtt"
-    | "c"
-    | "cs"
-    | "cpp"
-    | "java"
-    | "py"
-    | "rb"
-    | "tex"
-    | "3gp"
-    | "3g2"
-    | "mpeg"
-    | "ogv"
-    | "webm"
-    | "avi"
-    | undefined;
-  expires: Date;
-  cdnUrl:
-    | `https://assets.aicoalesce.com/${string}`
-    | `https://assets-dev.aicoalesce.com/${string}`;
-  publicUrl: string;
-  presignedUrl: string;
-  presignedUrlExpiresAt: number;
-  storageClass:
-    | "DEEP_ARCHIVE"
-    | "EXPRESS_ONEZONE"
-    | "FSX_OPENZFS"
-    | "GLACIER"
-    | "GLACIER_IR"
-    | "INTELLIGENT_TIERING"
-    | "ONEZONE_IA"
-    | "OUTPOSTS"
-    | "REDUCED_REDUNDANCY"
-    | "SNOW"
-    | "STANDARD"
-    | "STANDARD_IA"
-    | undefined;
-  s3ObjectId: `s3://${string}/${string}#${string}`;
-  etag: string | undefined;
-  size: number | undefined;
-  contentType: string | undefined;
-  lastModified: string | undefined;
-  checksum:
-    | {
-        readonly algo: "SHA256";
-        readonly value: string;
-      }
-    | {
-        readonly algo: "CRC32C";
-        readonly value: string;
-      }
-    | {
-        readonly algo: "CRC32";
-        readonly value: string;
-      }
-    | {
-        readonly algo: "SHA1";
-        readonly value: string;
-      }
-    | {
-        readonly algo: "CRC64NVME";
-        readonly value: string;
-      }
-    | undefined;
-};
 
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
@@ -657,34 +284,11 @@ export type UpdateAttachmentMetadata = {
         aspectRatio: number;
         cameraMake: null;
         cameraModel: null;
-        colorSpace:
-          | "unknown"
-          | "srgb"
-          | "display_p3"
-          | "adobe_rgb"
-          | "prophoto_rgb"
-          | "rec2020"
-          | "rec709"
-          | "cmyk"
-          | "lab"
-          | "xyz"
-          | "gray";
+        colorSpace: $Enums.ColorSpace | null;
         colorModel: $Enums.ColorModel | null;
         dominantColorHex: null;
         exifDateTimeOriginal: Date | null;
-        format:
-          | "jpeg"
-          | "png"
-          | "gif"
-          | "webp"
-          | "avif"
-          | "heic"
-          | "apng"
-          | "bmp"
-          | "tiff"
-          | "ico"
-          | "svg"
-          | undefined;
+        format: $Enums.ImageFormat | undefined;
         frames: number;
         gpsLat: null;
         gpsLon: null;
@@ -782,20 +386,6 @@ export type BufferLike =
   | { valueOf(): string }
   | { [Symbol.toPrimitive](hint: string): string };
 
-export type SSEBufferLike =
-  | string
-  | Buffer
-  | BufferSource
-  | ArrayBufferLike
-  | ArrayBufferView
-  | Blob
-  | ArrayLike<number>
-  | readonly (Uint8Array | Buffer)[]
-  | {
-      valueOf(): string | ArrayBufferLike | ArrayBufferView | ArrayLike<number>;
-    }
-  | { [Symbol.toPrimitive](hint: "string" | "number" | "default"): string };
-
 export interface ProviderChatRequestEntity {
   isNewChat: boolean;
   conversationId: string;
@@ -821,505 +411,9 @@ export interface ProviderChatRequestEntity {
   imgGenFields?: AIChatRequestImgGenFields;
 }
 
-export type OpenAIPartialImgSummary = {
-  seq: number;
-  partial_index: number;
-  length: number;
-};
 
-export type BigIntOrNumber<T extends boolean = false> = T extends true
-  ? number
-  : bigint;
+export interface ImageGenReqDbRes<T extends boolean = false> extends ConversationSingleton<T> {apiKey?: string | null;};
 
-export type DocumentSingleton = {
-  title: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  attachmentId: string;
-  format: string;
-  pageCount: number | null;
-  wordCount: number | null;
-  language: string | null;
-  author: string | null;
-  subject: string | null;
-  keywords: string[];
-  pdfVersion: string | null;
-  isLinearized: boolean | null;
-  isEncrypted: boolean;
-  isSearchable: boolean;
-  encoding: string | null;
-  lineCount: number | null;
-  textPreview: string | null;
-};
-
-export type ImageSingleton = {
-  createdAt: Date;
-  updatedAt: Date;
-  attachmentId: string;
-  format: $Enums.ImageFormat;
-  width: number;
-  height: number;
-  aspectRatio: number | null;
-  frames: number;
-  hasAlpha: boolean | null;
-  animated: boolean;
-  orientation: number | null;
-  colorModel: $Enums.ColorModel | null;
-  colorSpace: $Enums.ColorSpace | null;
-  exifDateTimeOriginal: Date | null;
-  cameraMake: string | null;
-  cameraModel: string | null;
-  lensModel: string | null;
-  gpsLat: number | null;
-  gpsLon: number | null;
-  dominantColorHex: string | null;
-  iccProfile: string | null;
-};
-
-export type ConvoSettingsSingleton = {
-  id: string;
-  conversationId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  systemPrompt: string | null;
-  temperature: number | null;
-  topP: number | null;
-  maxTokens: number | null;
-  enableThinking: boolean | null;
-  trackUsage: boolean | null;
-  enableWebSearch: boolean | null;
-  enableAssetGen: boolean | null;
-  reasoningEffort: $Enums.ReasoningEffort | null;
-  outputVerbosity: $Enums.OutputVerbosity | null;
-  usageAlerts: boolean | null;
-};
-
-export type ImageGenJobSingleton = {
-  id: string;
-  userKeyId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-  provider: $Enums.Provider;
-  model: string;
-  keyFingerprint: string | null;
-  prompt: string;
-  systemPrompt: string | null;
-  temperature: number | null;
-  topP: number | null;
-  nRequested: number;
-  nCompleted: number;
-  seed: number | null;
-  negativePrompt: string | null;
-  outputSize: string | null;
-  outputQuality: string | null;
-  outputFormat: string | null;
-  outputBackground: string | null;
-  outputCompression: number | null;
-  partialImagesRequested: number | null;
-  inputFidelity: string | null;
-  personGeneration: string | null;
-  moderation: string | null;
-  stage: $Enums.ImageGenStage;
-  progress: number;
-  etaSeconds: number | null;
-  durationMs: number | null;
-  usage: number | null;
-  revisedPrompt: string | null;
-  error: string | null;
-  requestMessageId: string;
-  outputs?: ImageGenOutputSingleton[];
-  userKey?: UserKeySingleton;
-};
-
-export type ImageGenOutputSingleton = {
-  id: string;
-  seriesId: string;
-  ext: string | null;
-  mime: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  jobId: string;
-  jobIndex: number;
-  kind: $Enums.ImageGenOutputKind;
-  seriesIndex: number;
-  isPartial: boolean;
-  attachmentId: string;
-  width: number | null;
-  height: number | null;
-  revisedPrompt: string | null;
-};
-
-export type AttachmentSingleton<T extends boolean = false> = {
-  id: string;
-  conversationId: string | null;
-  draftId: string | null;
-  batchId: string | null;
-  userId: string;
-  messageId: string | null;
-  s3ObjectId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
-  compatKey: string | null;
-  compatStatus: $Enums.CompatStatus | null;
-  compatCdnUrl: string | null;
-  compatReadyAt: Date | null;
-  generationGroupId?: string | null;
-  compatVersionId: string | null;
-  compatS3ObjectId: string | null;
-  compatMime: string | null;
-  compatExt: string | null;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
-  uploadDuration: number | null;
-  cdnUrl: string | null;
-  publicUrl: string | null;
-  sourceUrl: string | null;
-  thumbnailKey: string | null;
-  bucket: string;
-  key: string;
-  versionId: string | null;
-  region: string;
-  cacheControl: string | null;
-  contentDisposition: string | null;
-  contentEncoding: string | null;
-  expiresAt: Date | null;
-  size: BigIntOrNumber<T> | null;
-  filename: string | null;
-  ext: string | null;
-  mime: string | null;
-  etag: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
-  checksumSha256: string | null;
-  storageClass: string | null;
-  sseAlgorithm: string | null;
-  sseKmsKeyId: string | null;
-  s3LastModified: Date | null;
-  deletedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  image: ImageSingleton | null;
-  document: DocumentSingleton | null;
-  imageGenOutput: ImageGenOutputSingleton | null;
-};
-
-export type UserKeySingleton = {
-  id: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  provider: $Enums.Provider;
-  apiKey: string;
-  iv: string;
-  authTag: string;
-  label: string | null;
-  isDefault: boolean;
-};
-
-export type MessageSingleton<T extends boolean = false> = {
-  id: string;
-  userId: string | null;
-  provider: $Enums.Provider;
-  createdAt: Date;
-  updatedAt: Date;
-  userKeyId: string | null;
-  conversationId: string;
-  model: string | null;
-  messageType: $Enums.MessageType | null;
-  senderType: $Enums.SenderType;
-  content: string;
-  thinkingText: string | null;
-  thinkingDuration: number | null;
-  liked: boolean | null;
-  disliked: boolean | null;
-  tryAgain: boolean | null;
-  imageGenJob?: ImageGenJobSingleton | null;
-  userKey?: UserKeySingleton | null;
-  attachments: AttachmentSingleton<T>[];
-};
-
-export type ConversationSingleton<T extends boolean = false> = {
-  id: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userKeyId: string | null;
-  title: string | null;
-  branchId: string | null;
-  parentId: string | null;
-  isShared: boolean;
-  shareToken: string | null;
-  apiKey: string | null;
-  conversationSettings: ConvoSettingsSingleton | null;
-  messages: MessageSingleton<T>[];
-};
-
-/**
-   attachmentId: string;
-  compatKey: string;
-  compatStatus: $Enums.CompatStatus;
-  compatCdnUrl: string;
-  compatReadyAt: Date;
-  compatVersionId?: string;
-  compatS3ObjectId?: string;
-  compatMime?: string;
-  compatExt?: string;
- */
-
-export type AssetReadyPayload = {
-  publicUrl: string | null;
-  bucket: string;
-  cacheControl: string | null;
-  contentDisposition: string | null;
-  etag: string | null;
-  s3ObjectId: string | null;
-  key: string;
-  cdnUrl: string | null;
-  versionId: string | null;
-  size: bigint | null;
-  storageClass: string | null;
-  id: string;
-  conversationId: string | null;
-  draftId: string | null;
-  batchId: string | null;
-  userId: string;
-  messageId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
-  uploadDuration: number | null;
-  sourceUrl: string | null;
-  thumbnailKey: string | null;
-  region: string;
-  contentEncoding: string | null;
-  expiresAt: Date | null;
-  filename: string | null;
-  ext: string | null;
-  mime: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
-  checksumSha256: string | null;
-  sseAlgorithm: string | null;
-  sseKmsKeyId: string | null;
-  s3LastModified: Date | null;
-  deletedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type Signals =
-  | "SIGABRT"
-  | "SIGALRM"
-  | "SIGBREAK"
-  | "SIGBUS"
-  | "SIGCHLD"
-  | "SIGCONT"
-  | "SIGFPE"
-  | "SIGHUP"
-  | "SIGILL"
-  | "SIGINFO"
-  | "SIGINT"
-  | "SIGIO"
-  | "SIGIOT"
-  | "SIGKILL"
-  | "SIGLOST"
-  | "SIGPIPE"
-  | "SIGPOLL"
-  | "SIGPROF"
-  | "SIGPWR"
-  | "SIGQUIT"
-  | "SIGSEGV"
-  | "SIGSTKFLT"
-  | "SIGSTOP"
-  | "SIGSYS"
-  | "SIGTERM"
-  | "SIGTRAP"
-  | "SIGTSTP"
-  | "SIGTTIN"
-  | "SIGTTOU"
-  | "SIGUNUSED"
-  | "SIGURG"
-  | "SIGUSR1"
-  | "SIGUSR2"
-  | "SIGVTALRM"
-  | "SIGWINCH"
-  | "SIGXCPU"
-  | "SIGXFSZ";
-
-export type ImageGenReqDbRes<T extends boolean = false> = {
-  messages: ({
-    attachments: ({
-      imageGenOutput: {
-        id: string;
-        seriesId: string;
-        ext: string | null;
-        mime: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        jobId: string;
-        jobIndex: number;
-        kind: $Enums.ImageGenOutputKind;
-        seriesIndex: number;
-        isPartial: boolean;
-        attachmentId: string;
-        width: number | null;
-        height: number | null;
-        revisedPrompt: string | null;
-      } | null;
-      image: {
-        createdAt: Date;
-        updatedAt: Date;
-        format: $Enums.ImageFormat;
-        attachmentId: string;
-        width: number;
-        height: number;
-        aspectRatio: number | null;
-        frames: number;
-        hasAlpha: boolean | null;
-        colorModel: $Enums.ColorModel | null;
-        animated: boolean;
-        orientation: number | null;
-        colorSpace: $Enums.ColorSpace | null;
-        exifDateTimeOriginal: Date | null;
-        cameraMake: string | null;
-        cameraModel: string | null;
-        lensModel: string | null;
-        gpsLat: number | null;
-        gpsLon: number | null;
-        dominantColorHex: string | null;
-        iccProfile: string | null;
-      } | null;
-      document: DocumentSingleton | null;
-    } & {
-      id: string;
-      userId: string;
-      createdAt: Date;
-      updatedAt: Date;
-      conversationId: string | null;
-      batchId: string | null;
-      draftId: string | null;
-      messageId: string | null;
-      s3ObjectId: string | null;
-      origin: $Enums.AssetOrigin;
-      status: $Enums.AssetStatus;
-      uploadMethod: $Enums.UploadMethod;
-      assetType: $Enums.AssetType;
-      uploadDuration: number | null;
-      cdnUrl: string | null;
-      publicUrl: string | null;
-      sourceUrl: string | null;
-      thumbnailKey: string | null;
-      compatMime: string | null;
-      compatExt: string | null;
-      compatVersionId: string | null;
-      compatKey: string | null;
-      compatS3ObjectId: string | null;
-      compatStatus: $Enums.CompatStatus | null;
-      compatReadyAt: Date | null;
-      compatCdnUrl: string | null;
-      bucket: string;
-      key: string;
-      versionId: string | null;
-      region: string;
-      cacheControl: string | null;
-      contentDisposition: string | null;
-      contentEncoding: string | null;
-      expiresAt: Date | null;
-      size: BigIntOrNumber<T> | null;
-      filename: string | null;
-      ext: string | null;
-      mime: string | null;
-      etag: string | null;
-      checksumAlgo: $Enums.ChecksumAlgo;
-      checksumSha256: string | null;
-      storageClass: string | null;
-      sseAlgorithm: string | null;
-      sseKmsKeyId: string | null;
-      s3LastModified: Date | null;
-      deletedAt: Date | null;
-    })[];
-    imageGenJob: {
-      id: string;
-      userId: string;
-      provider: $Enums.Provider;
-      createdAt: Date;
-      updatedAt: Date;
-      userKeyId: string | null;
-      prompt: string;
-      model: string;
-      systemPrompt: string | null;
-      temperature: number | null;
-      topP: number | null;
-      moderation: string | null;
-      negativePrompt: string | null;
-      personGeneration: string | null;
-      seed: number | null;
-      partialImagesRequested: number | null;
-      keyFingerprint: string | null;
-      nRequested: number;
-      nCompleted: number;
-      outputSize: string | null;
-      outputQuality: string | null;
-      outputFormat: string | null;
-      outputBackground: string | null;
-      outputCompression: number | null;
-      inputFidelity: string | null;
-      stage: $Enums.ImageGenStage;
-      progress: number;
-      etaSeconds: number | null;
-      durationMs: number | null;
-      usage: number | null;
-      revisedPrompt: string | null;
-      error: string | null;
-      requestMessageId: string;
-    } | null;
-  } & {
-    id: string;
-    userId: string | null;
-    provider: $Enums.Provider;
-    createdAt: Date;
-    updatedAt: Date;
-    userKeyId: string | null;
-    conversationId: string;
-    model: string | null;
-    messageType: $Enums.MessageType | null;
-    senderType: $Enums.SenderType;
-    content: string;
-    thinkingText: string | null;
-    thinkingDuration: number | null;
-    liked: boolean | null;
-    disliked: boolean | null;
-    tryAgain: boolean | null;
-  })[];
-  conversationSettings: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    conversationId: string;
-    systemPrompt: string | null;
-    temperature: number | null;
-    topP: number | null;
-    maxTokens: number | null;
-    enableThinking: boolean | null;
-    trackUsage: boolean | null;
-    enableWebSearch: boolean | null;
-    enableAssetGen: boolean | null;
-    reasoningEffort: $Enums.ReasoningEffort | null;
-    outputVerbosity: $Enums.OutputVerbosity | null;
-    usageAlerts: boolean | null;
-  } | null;
-  id: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userKeyId: string | null;
-  title: string | null;
-  branchId: string | null;
-  parentId: string | null;
-  isShared: boolean;
-  shareToken: string | null;
-  apiKey: string | null;
-};
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
     type: "approximate";
@@ -1328,7 +422,6 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     country?: string;
     tz?: string;
   };
-
   currentMsgBoundAssets?: {
     /**
      * count of assets bound to the current user messsage
@@ -1346,21 +439,137 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   };
 }
 
-export type NormalizeAIChatReqDataRT = {
-  provider: Provider;
-  model: AllModelsUnion;
-  topP: number | undefined;
-  temperature: number | undefined;
-  systemPrompt: string | undefined;
-  max_tokens: number | undefined;
-  hasProviderConfigured: boolean | undefined;
-  isDefaultProvider: boolean | undefined;
-  prompt: string;
-  conversationIdInitial: string;
-  batchId: string | undefined;
-  imgGenEnabled: boolean | undefined;
-  isNewChat: boolean;
-  isImgGenCapable: boolean;
-  isPureImgGenModel: boolean;
-  imgGenFields: AIChatRequest["imgGenFields"];
-};
+export type S3ExtUnion =
+  | "pdf"
+  | "jpg"
+  | "jpeg"
+  | "mp4"
+  | "mp3"
+  | "heic"
+  | "heif"
+  | "tif"
+  | "apng"
+  | "glb"
+  | "gltf"
+  | "obj"
+  | "ktx"
+  | "ktx2"
+  | "fbx"
+  | "usd"
+  | "cad"
+  | "usdz"
+  | "png"
+  | "gif"
+  | "bmp"
+  | "jxl"
+  | "jp2"
+  | "jpx"
+  | "jxr"
+  | "jls"
+  | "raw"
+  | "dng"
+  | "cr2"
+  | "nef"
+  | "arw"
+  | "hdr"
+  | "pic"
+  | "rgbe"
+  | "xyze"
+  | "webp"
+  | "avif"
+  | "svg"
+  | "ico"
+  | "tiff"
+  | "mpd"
+  | "epub"
+  | "ttf"
+  | "gz"
+  | "jar"
+  | "json"
+  | "jsonld"
+  | "webmanifest"
+  | "doc"
+  | "node"
+  | "js"
+  | "bin"
+  | "ogx"
+  | "rtf"
+  | "sql"
+  | "toml"
+  | "azw"
+  | "mpkg"
+  | "m3u8"
+  | "pkpass"
+  | "xul"
+  | "xls"
+  | "eot"
+  | "ppt"
+  | "odp"
+  | "ods"
+  | "odt"
+  | "pptx"
+  | "xlsx"
+  | "docx"
+  | "rar"
+  | "vsd"
+  | "wasm"
+  | "7z"
+  | "abw"
+  | "bz"
+  | "bz2"
+  | "cda"
+  | "csh"
+  | "arc"
+  | "php"
+  | "mdx"
+  | "ndjson"
+  | "pyc"
+  | "sh"
+  | "tar"
+  | "zip"
+  | "xhtml"
+  | "xml"
+  | "yml"
+  | "aac"
+  | "mid"
+  | "m4a"
+  | "opus"
+  | "ogg"
+  | "wav"
+  | "weba"
+  | "midi"
+  | "otf"
+  | "woff"
+  | "woff2"
+  | "hjif"
+  | "hmpg"
+  | "ivs"
+  | "aces"
+  | "avci"
+  | "dpx"
+  | "emf"
+  | "cur"
+  | "ics"
+  | "css"
+  | "csv"
+  | "sse"
+  | "html"
+  | "md"
+  | "txt"
+  | "rs"
+  | "ts"
+  | "vtt"
+  | "c"
+  | "cs"
+  | "cpp"
+  | "java"
+  | "py"
+  | "rb"
+  | "tex"
+  | "3gp"
+  | "3g2"
+  | "mpeg"
+  | "ogv"
+  | "webm"
+  | "avi"
+  | undefined;

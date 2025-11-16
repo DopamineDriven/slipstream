@@ -228,7 +228,45 @@ export class AnthropicWorkup {
       );
     }
 
+     try {
+      const providerAssets = await this.prisma.findManyByProvider("ANTHROPIC", userId);
+
+      // Populate asset cache with active database mappings
+      for (const asset of providerAssets) {
+        if (asset.providerRef && !asset.isExpired) {
+          const cacheKey = `${asset.keyFingerprint}:${asset.attachmentId}`;
+
+          // Only add to cache if file exists in registry (authoritative source)
+          if (this.fileRegistry.has(asset.providerRef)) {
+            this.assetCache.set(cacheKey, {
+              fileId: asset.providerRef,
+              dbRecordId: asset.id
+            });
+
+            // Update registry with DB record ID for cross-reference
+            const registryEntry = this.fileRegistry.get(asset.providerRef);
+            if (registryEntry) {
+              registryEntry.dbRecordId = asset.id;
+              this.fileRegistry.set(asset.providerRef, registryEntry);
+            }
+          } else {
+            this.logger.warn(
+              { providerRef: asset.providerRef, attachmentId: asset.attachmentId },
+              "DB asset not found in Anthropic registry, skipping cache entry"
+            );
+          }
+        }
+      }
+
+      this.logger.info(
+        `Populated asset cache with ${this.assetCache.size} entries from database`
+      );
+    } catch (error) {
+      this.logger.error({ error }, "Failed to populate asset cache from database");
+    }
+
     this.lastRegistrySync = new Date();
+    
     this.logger.info(
       `File registry sync complete: ${totalFiles} files indexed`
     );
@@ -294,6 +332,7 @@ export class AnthropicWorkup {
   // Clean up files not accessed in the specified period
   private async cleanupStaleFiles(apiKey?: string, staleThresholdDays = 14) {
     const client = this.getClient(apiKey);
+
     const staleThreshold = new Date(
       Date.now() - staleThresholdDays * 24 * 60 * 60 * 1000
     );
@@ -318,13 +357,17 @@ export class AnthropicWorkup {
       return;
     }
 
-    this.logger.info(`Cleaning up ${filesToDelete.length} stale files`);
+    this.logger.debug(
+      filesToDelete,
+      `Cleaning up ${filesToDelete.length} stale files`
+    );
 
     // Delete from database first (in transaction)
     if (dbRecordsToDelete.length > 0) {
       try {
         await this.prisma.deleteStaleIds(dbRecordsToDelete);
         this.logger.debug(
+          dbRecordsToDelete,
           `Deleted ${dbRecordsToDelete.length} stale database records`
         );
       } catch (error) {
@@ -353,12 +396,15 @@ export class AnthropicWorkup {
       } catch (error) {
         this.logger.warn(
           { error, fileId },
-          "Failed to delete stale file from Anthropic"
+          `Failed to delete stale file ${fileId} from Anthropic`
         );
       }
     }
 
-    this.logger.info(`Cleanup complete: ${filesToDelete.length} files removed`);
+    this.logger.debug(
+      {},
+      `Cleanup complete: ${filesToDelete.length} files removed`
+    );
   }
 
   private async uploadFileToAnthropic(
@@ -522,8 +568,8 @@ export class AnthropicWorkup {
       const messages = await Promise.all(
         msgs.map(async msg => {
           if (msg.senderType === "USER") {
-                        // Process AI-generated attachments (e.g., from image generation)
-              let i = 0;
+            // Process AI-generated attachments (e.g., from image generation)
+            let i = 0;
 
             const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
             try {
@@ -552,12 +598,12 @@ export class AnthropicWorkup {
                         );
                         if (i < 4) {
                           i++;
-                                   const docBlock = {
-                          type: "document",
-                          source: { file_id: fileId, type: "file" },
-                          cache_control: { type: "ephemeral", ttl: "1h" }
-                        } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                        content.push(docBlock);
+                          const docBlock = {
+                            type: "document",
+                            source: { file_id: fileId, type: "file" },
+                            cache_control: { type: "ephemeral", ttl: "1h" }
+                          } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
+                          content.push(docBlock);
                         }
                         const docBlock = {
                           type: "document",
@@ -778,7 +824,7 @@ export class AnthropicWorkup {
       if (userMsg) {
         try {
           if (userMsg.attachments && userMsg.attachments.length > 0) {
-            let i=0;
+            let i = 0;
             for (const attachment of userMsg.attachments) {
               const {
                 cdnUrl,
@@ -800,17 +846,17 @@ export class AnthropicWorkup {
                       keyId,
                       apiKey
                     );
-                    if (i<4) {
+                    if (i < 4) {
                       i++;
-                    const docBlock = {
-                      type: "document",
-                      source: {
-                        type: "file",
-                        file_id: fileId
-                      },
-                      cache_control: { type: "ephemeral", ttl: "1h" }
-                    } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                    content.push(docBlock);
+                      const docBlock = {
+                        type: "document",
+                        source: {
+                          type: "file",
+                          file_id: fileId
+                        },
+                        cache_control: { type: "ephemeral", ttl: "1h" }
+                      } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
+                      content.push(docBlock);
                     }
                     const docBlock = {
                       type: "document",

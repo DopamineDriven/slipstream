@@ -26,6 +26,7 @@ import type {
   Provider
 } from "@/models.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
+import { $Enums } from "@slipstream/db/node/generated/client";
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
@@ -831,8 +832,8 @@ export type AIChatResRT = {
     trackUsage: boolean | null;
     enableWebSearch: boolean | null;
     enableAssetGen: boolean | null;
-    reasoningEffort: "minimal" | "low" | "medium" | "high" | null;
-    outputVerbosity: ("low" | "medium" | "high") | null;
+    reasoningEffort: $Enums.ReasoningEffort | null;
+    outputVerbosity: $Enums.OutputVerbosity | null;
     maxTokens: number | null;
     usageAlerts: boolean | null;
   } | null;
@@ -845,7 +846,7 @@ export type AIChatResRT = {
         jobId: string;
         mime: string | null;
         jobIndex: number;
-        kind: "PARTIAL" | "FINAL";
+        kind: $Enums.ImageGenOutputKind;
         seriesIndex: number;
         seriesId: string;
         isPartial: boolean;
@@ -860,33 +861,7 @@ export type AIChatResRT = {
         updatedAt: Date;
         width: number;
         height: number;
-        format:
-          | "jpeg"
-          | "png"
-          | "gif"
-          | "webp"
-          | "avif"
-          | "heic"
-          | "apng"
-          | "bmp"
-          | "tiff"
-          | "ico"
-          | "jxl"
-          | "jp2"
-          | "jpx"
-          | "jxr"
-          | "jls"
-          | "svg"
-          | "raw"
-          | "dng"
-          | "cr2"
-          | "nef"
-          | "arw"
-          | "hdr"
-          | "pic"
-          | "rgbe"
-          | "xyze"
-          | "unknown";
+        format: $Enums.ImageFormat;
         aspectRatio: number | null;
         frames: number;
         hasAlpha: boolean | null;
@@ -918,27 +893,10 @@ export type AIChatResRT = {
       batchId: string | null;
       generationGroupId: string | null;
       s3ObjectId: string | null;
-      origin:
-        | "UPLOAD"
-        | "REMOTE"
-        | "GENERATED"
-        | "PASTED"
-        | "SCREENSHOT"
-        | "IMPORTED"
-        | "SCRAPED";
-      status:
-        | "REQUESTED"
-        | "PLANNED"
-        | "UPLOADING"
-        | "STORED"
-        | "SCANNING"
-        | "READY"
-        | "FAILED"
-        | "QUARANTINED"
-        | "ATTACHED"
-        | "DELETED";
-      uploadMethod: "GENERATED" | "FETCHED" | "PRESIGNED" | "SERVER";
-      assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN";
+      origin: $Enums.AssetOrigin;
+      status: $Enums.AssetStatus;
+      uploadMethod: $Enums.UploadMethod;
+      assetType: $Enums.AssetType;
       cdnUrl: string | null;
       publicUrl: string | null;
       sourceUrl: string | null;
@@ -948,7 +906,7 @@ export type AIChatResRT = {
       compatVersionId: string | null;
       compatKey: string | null;
       compatS3ObjectId: string | null;
-      compatStatus: "FAILED" | "PENDING" | "ACTIVE" | "ALIASED" | null;
+      compatStatus: $Enums.CompatStatus | null;
       compatReadyAt: Date | null;
       compatCdnUrl: string | null;
       bucket: string;
@@ -962,7 +920,7 @@ export type AIChatResRT = {
       size: bigint | null;
       filename: string | null;
       etag: string | null;
-      checksumAlgo: "CRC32" | "CRC32C" | "SHA1" | "SHA256" | "CRC64NVME";
+      checksumAlgo: $Enums.ChecksumAlgo;
       checksumSha256: string | null;
       storageClass: string | null;
       sseAlgorithm: string | null;
@@ -978,19 +936,14 @@ export type AIChatResRT = {
     userKeyId: string | null;
     updatedAt: Date;
     conversationId: string;
-    provider: "OPENAI" | "GROK" | "GEMINI" | "ANTHROPIC" | "META" | "VERCEL";
+    provider: $Enums.Provider;
     model: string | null;
     thinkingDuration: number | null;
     thinkingText: string | null;
-    senderType: "USER" | "AI" | "SYSTEM";
+    senderType: $Enums.SenderType;
     content: string;
     isImageGen: boolean;
-    messageType:
-      | "AUDIO_GEN"
-      | "COMPUTER_USE"
-      | "IMAGE_GEN"
-      | "TEXT"
-      | "VIDEO_GEN";
+    messageType: $Enums.MessageType;
     liked: boolean | null;
     disliked: boolean | null;
     tryAgain: boolean | null;

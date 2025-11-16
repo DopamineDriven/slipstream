@@ -22,7 +22,10 @@ export type XOR<T, U> =
     : T | U
 
 /**
- * Conditional to Required
+ * CTR (Conditional to Required)
+ *
+ * - By default: makes all **optional** properties required.
+ * - With K: makes only the specified optional keys required.
  */
 export type CTR<
   T,
@@ -32,7 +35,10 @@ export type CTR<
 };
 
 /**
- * Required to Conditional
+ * RTC (Required to Conditional)
+ *
+ * - By default: makes all **required** properties optional.
+ * - With K: makes only the specified required keys optional.
  */
 export type RTC<
   T,
@@ -45,8 +51,9 @@ export type IsExact<T, U> = [T] extends [U]
     ? true
     : false
   : false;
+
 /**
- * To Conditionally never
+ * TCN (To Conditionally Never)
  */
 export type TCN<T, X extends keyof T = keyof T> = Rm<T, X> & {
   [Q in X]?: XOR<T[Q], never>;

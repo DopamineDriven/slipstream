@@ -1,5 +1,4 @@
 import type {
-  MessageSingleton,
   ProviderChatRequestEntity,
   S3FinalizePayload
 } from "@/types/index.ts";
@@ -26,6 +25,7 @@ import type {
   EventTypeMap,
   GrokModelIdUnion,
   ImgMetadataEntity,
+  MessageSingleton,
   S3Checksum,
   S3StorageClass
 } from "@slipstream/types";

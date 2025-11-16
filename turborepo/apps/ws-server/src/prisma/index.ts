@@ -247,18 +247,25 @@ export class PrismaService extends PrismaAttachmentProviderService {
       const { attachments, ...rest } = t;
 
       const cleanAttachments = attachments.map(att => {
+      const cleanLinks = att?.providerLinks?.map((v) =>{
+        return {
+          ...v,
+          size: v.size ? Number(v.size) : null
+        }
+      })
         const size =
           typeof att.size === "bigint"
             ? att.size === 0n
               ? 0
               : Number(att.size)
             : null;
-        const cleaned = { ...att, size };
+        const cleaned = { ...att, size, providerLinks: cleanLinks ?? undefined };
+
         return cleaned;
       });
       return { attachments: cleanAttachments, ...rest };
     });
-    return { messages: msgArr, ...rest } satisfies BigIntToCompatProps<
+    return { messages: msgArr, ...rest } as BigIntToCompatProps<
       typeof target
     >["rt"];
   }
