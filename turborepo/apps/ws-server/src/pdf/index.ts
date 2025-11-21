@@ -23,8 +23,7 @@ export class PdfService {
     private clientSecret: string,
     private webhookSecret: string,
     private s3: S3Storage,
-    private prisma: PrismaService,
-    private isProd: boolean
+    private prisma: PrismaService
   ) {}
 
   private async getAdobeAccessToken() {
@@ -67,7 +66,7 @@ export class PdfService {
   }
 
   private get webhookUrl() {
-    return this.isProd
+    return this.prisma.isProd
       ? "https://ws.aicoalesce.com/webhooks/adobe/pdf-created"
       : "http://localhost:4000/webhooks/adobe/pdf-created";
   }
@@ -160,7 +159,7 @@ export class PdfService {
       console.log(`full error text: ` + error);
       throw new Error(`Adobe conversion failed: ${response.status} - ${error}`);
     }
-    const compatCdnUrl = this.s3.getCfUrl(this.isProd, compatKey);
+    const compatCdnUrl = this.s3.getCfUrl(this.prisma.isProd, compatKey);
 
     console.log(compatCdnUrl);
     return { compatCdnUrl, compatKey };
@@ -236,7 +235,7 @@ export class PdfService {
 
     const { s3ObjectId, cdnUrlCompat, versionId } =
       await this.s3.finalizeCompatObject({
-        isProd: this.isProd,
+        isProd: this.prisma.isProd,
         key: compatKey,
         origin
       });

@@ -628,16 +628,14 @@ code > [data-line]::before {
   border-radius: 999px;
 }
 .prose code:not(pre code) {
-  display: inline-block;
+  display: inline;
   max-width: 100%;
-  vertical-align: -0.2em;
+  vertical-align: baseline;
   -webkit-overflow-scrolling: touch;
-
-  /* keep your visual styles */
-  border-radius: 0.125rem; /* rounded-sm */
-  padding: 0.4em 0.2em; /* px-[0.2em] py-[0.4em] */
   background: oklch(94.611% 0.00011 271.152);
   color: oklch(18.15% 0 0);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .dark .prose code:not(pre code) {

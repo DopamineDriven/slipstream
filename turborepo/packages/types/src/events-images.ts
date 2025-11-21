@@ -87,6 +87,17 @@ export type GoogleImgSizeQualityOpts = {
     "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
     "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
     "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
+    "gemini-3-pro-image-preview":
+      | "1:1"
+      | "2:3"
+      | "3:2"
+      | "3:4"
+      | "4:3"
+      | "4:5"
+      | "5:4"
+      | "9:16"
+      | "16:9"
+      | "21:9";
     "gemini-2.5-flash-image":
       | "1:1"
       | "2:3"
@@ -100,6 +111,8 @@ export type GoogleImgSizeQualityOpts = {
       | "21:9";
   };
   quality: {
+    "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
+    "gemini-2.5-flash-image": "1K" | "2K" | "4K";
     "imagen-4.0-fast-generate-001": "1K" | "2K";
     "imagen-4.0-generate-001": "1K" | "2K";
     "imagen-4.0-ultra-generate-001": "1K" | "2K";
@@ -441,7 +454,10 @@ export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
  * imagen-4.0-ultra-generate-001, imagen-4.0-fast-generate-001)
  */
 export type ImagenOptions = {
-  model: Exclude<GeminiImgGenModels, "gemini-2.5-flash-image">;
+  model: Exclude<
+    GeminiImgGenModels,
+    "gemini-2.5-flash-image" | "gemini-3-pro-image-preview"
+  >;
   /**
    * The text prompt describing the image.
    */
@@ -478,7 +494,7 @@ export type ImagenOptions = {
    * The output resolution. Only available for Imagen 4.
    * Default: "1K"
    */
-  sampleImageSize?: "1K" | "2K";
+  sampleImageSize?: "1K" | "2K" ;
 
   /**
    * A seed value for reproducible results.
@@ -516,7 +532,7 @@ export type NanoBananaImageGenOpts = {
   /**
    * The model ID.
    */
-  model: "gemini-2.5-flash-image";
+  model: "gemini-2.5-flash-image" | "gemini-3-pro-image-preview";
 
   /**
    * The prompt, which can be simple text or a mix of

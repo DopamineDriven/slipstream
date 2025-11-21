@@ -222,6 +222,7 @@ export function GeminiMixin<
               deps.logger,
               deps.prisma,
               deps.redis,
+              deps.s3,
               deps.extract,
               this.#geminiApiKey ?? ""
             );
@@ -290,7 +291,6 @@ export function OpenAIMixin<
               deps.prisma,
               deps.extract,
               deps.s3,
-              deps.isProd,
               deps.redis,
               this.#openaiApiKey ?? ""
             );
@@ -359,7 +359,6 @@ export function GrokMixin<
               deps.redis,
               deps.extract,
               deps.s3,
-              deps.isProd,
               this.#grokApiKey ?? ""
             );
         }

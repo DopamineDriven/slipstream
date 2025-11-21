@@ -10,14 +10,38 @@ describe("handleOutputSize", () => {
   it("should return 1:1 for gemini provdier with no model set", {}, () => {
     assert.equal(p.handleOutputSize("gemini"), "1:1");
   });
+  it(
+    "should return 21:9 for gemini provdier, model gemini-2.5-flash-image, output size set to 21:9",
+    {},
+    () => {
+      assert.equal(
+        p.handleOutputSize("gemini", "gemini-2.5-flash-image", {
+          output_size: "21:9"
+        }),
+        "21:9"
+      );
+    }
+  );
   it("should return undefined for grok provdier with no model set", {}, () => {
     assert.equal(p.handleOutputSize("grok"), undefined);
   });
+  it(
+    "should return 1024x1024 for openai with gpt-image-1 selected and output_size set to 1024x1536",
+    {},
+    () => {
+      assert.equal(
+        p.handleOutputSize("openai", "gpt-image-1", {
+          output_size: "1536x1024"
+        }),
+        "1536x1024"
+      );
+    }
+  );
 });
 
 describe("handleImgGenOutputQuality", () => {
-  it("should return auto for openai provdier with no model set", {}, () => {
-    assert.equal(p.handleImgGenOutputQuality("openai"), "auto");
+  it("should return undefined for openai provdier with no model set", {}, () => {
+    assert.equal(p.handleImgGenOutputQuality("openai"), undefined);
   });
   it(
     "should return undefined for gemini provdier with no model set",
@@ -36,9 +60,56 @@ describe("handleImgGenOutputQuality", () => {
       );
     }
   );
+  it(
+    "should return 4K for gemini provdier with model set to gemini-2.5-flash-image",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenOutputQuality("gemini", "gemini-2.5-flash-image", {
+          output_quality: "4K"
+        }),
+        "4K"
+      );
+    }
+  );
   it("should return undefined for grok provdier with no model set", {}, () => {
     assert.equal(p.handleImgGenOutputQuality("grok"), undefined);
   });
+});
+
+describe("handleImgGenOutputFormat", () => {
+  it("should return undefined for grok", {}, () => {
+    assert.equal(
+      p.handleImgGenOutputFormat("grok", "grok-2-image-1212", {
+        format: undefined
+      }),
+      undefined
+    );
+  });
+  it(
+    "should return image/jpeg for proivder gemini, model imagen-4.0-fast-generate-001, format set to image/png",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenOutputFormat("gemini", "imagen-4.0-fast-generate-001", {
+          format: "image/png"
+        }),
+        "image/png"
+      );
+    }
+  );
+  it(
+    "should return webp for proivder openai, model gpt-5.1, format set to webp",
+    {},
+    () => {
+      assert.equal(
+        p.handleImgGenOutputFormat("openai", "gpt-5.1", {
+          format: "webp"
+        }),
+        "webp"
+      );
+    }
+  );
 });
 
 describe("handleImgGenCompression", () => {
@@ -294,6 +365,7 @@ describe("isImgGenCapableModel", () => {
     }
   );
 });
+
 describe("isPureImgGenModel", () => {
   it(
     "should return true for provider=gemini, model=imagen-4.0-ultra-generate-001",

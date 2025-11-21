@@ -77,6 +77,7 @@ export function AttachmentPreviewComponent({
           } else {
             const m = attachment.mime;
             if (m === "application/pdf") docFormat = "PDF";
+            else if (m.includes("text/md")) docFormat === "MD";
             else if (m.includes("wordprocessingml")) docFormat = "DOCX";
             else if (m.includes("presentationml")) docFormat = "PPTX";
             else if (m.includes("spreadsheetml")) docFormat = "XLSX";

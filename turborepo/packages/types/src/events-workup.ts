@@ -1,6 +1,13 @@
 import type { Provider } from "@/models.ts";
+import type {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs,
+  PdfDocSpecs as PdfSpecs,
+  PresentationDocSpecs as PresentationSpecs,
+  SpreadSheetDocSpecs as SpreadSheetSpecs
+} from "@d0paminedriven/metadata";
 import { $Enums } from "@slipstream/db/node/generated/client";
-import type { ExpandedDocSpecs, ExpandedImgSpecs, PdfDocSpecs as PdfSpecs,SpreadSheetDocSpecs as SpreadSheetSpecs,PresentationDocSpecs as PresentationSpecs } from "@d0paminedriven/metadata";
+
 export type SpreadSheetExtensions = "xlsx" | "xls" | "ods" | "csv";
 
 export type PresentationExtensions = "pptx" | "ppt" | "odp";
@@ -48,15 +55,15 @@ export type ImgColorModel = $Enums.ColorModel;
 
 export type ImgFormat = $Enums.ImageFormat;
 
-export interface ImageSpecs extends ExpandedImgSpecs {};
+export interface ImageSpecs extends ExpandedImgSpecs {}
 
-export interface PdfDocSpecs extends PdfSpecs{}
+export interface PdfDocSpecs extends PdfSpecs {}
 
 export interface SpreadSheetDocSpecs extends SpreadSheetSpecs {}
 
 export interface PresentationDocSpecs extends PresentationSpecs {}
 
-export interface DocSpecs extends ExpandedDocSpecs{};
+export interface DocSpecs extends ExpandedDocSpecs {}
 
 export type UnknownSpecs = {
   type: "UNKNOWN";

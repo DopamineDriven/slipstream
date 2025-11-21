@@ -1,7 +1,7 @@
 "use client";
 
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { imgSrcMapper } from "@/lib/img-helper";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,9 @@ const handleDownload = (attachment: AttachmentSingleton<true>) => {
     document.body.removeChild(link);
   }
 };
+
+const markdownCache = new Map<string, React.ReactNode>();
+
 export function AttachmentDisplay({
   attachments,
   className,
@@ -81,12 +84,71 @@ export function AttachmentDisplay({
 }: AttachmentDisplayProps) {
   const [expanded, setExpanded] = useState<{
     url: string;
-    kind: "image" | "pdf";
+    kind: "image" | "pdf" | "md";
     format: string;
   } | null>(null);
 
+  const [rendered, setRendered] = useState<React.ReactNode | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const processingRef = useRef(false);
+
+  useEffect(() => {
+    if (!expanded?.url) return;
+    if (!expanded.url.endsWith("md")) return;
+    const cacheKey = `attachment-md:${expanded?.url}`;
+    const cached = markdownCache.get(cacheKey);
+    if (cached) {
+      setRendered(cached);
+      return;
+    }
+
+    if (processingRef.current) return;
+    processingRef.current = true;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        // 1) fetch the raw markdown from your CDN
+        const res = await fetch(expanded.url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+
+        // 2) process with the same helper you use in the bubble component
+        const { processMarkdownToReact } = await import("@/lib/processor");
+        const processed = await processMarkdownToReact(text);
+
+        if (!cancelled) {
+          markdownCache.set(cacheKey, processed);
+          // evict oldest if you care
+          if (markdownCache.size > 50) {
+            const firstKey = markdownCache.keys().next().value;
+            if (firstKey) markdownCache.delete(firstKey);
+          }
+          setRendered(processed);
+        }
+      } catch (err) {
+        console.error("Markdown attachment processing error:", err);
+        if (!cancelled) {
+          setError("Failed to render markdown attachment.");
+          setRendered(
+            <div className="text-sm text-red-500">
+              Error rendering markdown attachment.
+            </div>
+          );
+        }
+      } finally {
+        processingRef.current = false;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [expanded?.url]);
+
   const handlePreview = useCallback(
-    (url: string, kind: "image" | "pdf", format: string) => {
+    (url: string, kind: "image" | "pdf" | "md", format: string) => {
       setExpanded({ url, kind, format });
     },
     []
@@ -110,7 +172,8 @@ export function AttachmentDisplay({
 
           const isPdf =
             attachment.assetType === "DOCUMENT" && attachment.ext === "pdf";
-
+          const isMd =
+            attachment.assetType === "DOCUMENT" && attachment.ext === "md";
           // Full image preview only when we have a real URL
           if (
             attachment.assetType === "IMAGE" &&
@@ -197,7 +260,7 @@ export function AttachmentDisplay({
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  {(isImage || isPdf) && (
+                  {(isImage || isPdf || isMd) && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -206,11 +269,13 @@ export function AttachmentDisplay({
                         attachment.cdnUrl
                           ? handlePreview(
                               attachment.cdnUrl,
-                              isPdf ? "pdf" : "image",
+                              isPdf ? "pdf" : isMd ? "md" : "image",
                               !isPdf
-                                ? attachment.ext
-                                  ? (attachment.ext as ExpandedImgSpecs["format"])
-                                  : "jpeg"
+                                ? !isMd
+                                  ? attachment.ext
+                                    ? (attachment.ext as ExpandedImgSpecs["format"])
+                                    : "jpeg"
+                                  : "md"
                                 : "pdf"
                             )
                           : () => {}
@@ -277,7 +342,7 @@ export function AttachmentDisplay({
                   }
                 />
               </div>
-            ) : (
+            ) : expanded.kind === "pdf" ? (
               <div
                 className="pointer-events-auto relative h-[92dvh] w-[96dvw]"
                 onClick={e => e.stopPropagation()}>
@@ -291,6 +356,14 @@ export function AttachmentDisplay({
                   suppressHydrationWarning
                   allow="fullscreen; display-capture;"
                 />
+              </div>
+            ) : (
+              <div
+                className="pointer-events-auto relative h-[92dvh] w-[96dvw]"
+                onClick={e => e.stopPropagation()}>
+                <div className="leading-relaxed text-pretty whitespace-pre-wrap">
+                  {rendered ?? error}
+                </div>
               </div>
             )}
           </div>

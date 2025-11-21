@@ -1,30 +1,58 @@
 # syntax=docker/dockerfile:1.4
-FROM node:25-alpine AS base
+FROM node:25-bullseye-slim AS base
 
-# libc6-compat only needed for some node modules (e.g., sharp). Safe to include for widest compatibility.
-RUN apk add --no-cache libc6-compat
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    wget \
+    ca-certificates \
+    openssl \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libncurses5-dev \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    liblzma-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Make sure to set working directory
+# Compile Python 3.10 with proper venv support
+RUN wget https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz \
+    && tar -xzf Python-3.10.0.tgz \
+    && cd Python-3.10.0 \
+    && ./configure --enable-optimizations --with-ensurepip=install \
+    && make -j$(nproc) \
+    && make altinstall \
+    && cd .. \
+    && rm -rf Python-3.10.0 Python-3.10.0.tgz
+
+# Install pip properly
+RUN wget https://bootstrap.pypa.io/get-pip.py \
+    && python3.10 get-pip.py \
+    && rm get-pip.py
+
+# Update alternatives
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.10 1 \
+    && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.10 1
+
 WORKDIR /app
 
-# --- Builder: Turbo prune for workspace
+# --- Builder ---
 FROM base AS builder
-
-# Install turbo and pnpm globally
-RUN npm install -g turbo@2.6.1 pnpm@10.21.0
-
-# Copy monorepo root files for turbo
+RUN npm install -g turbo@2.6.1 pnpm@10.22.0
 COPY turbo.json pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
-
-# Copy entire monorepo (needed for turbo prune to analyze deps)
 COPY . .
-
-# silence turbo telemetry banner
 ENV TURBO_TELEMETRY=0
-
 RUN turbo prune --scope=@slipstream/ws-server --docker
 
-# install deps for pruned app
+# --- Installer ---
 FROM builder AS installer
 
 # cp pruned pnpm files and sources
@@ -34,24 +62,27 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     --mount=type=cache,id=pnpm-registry,target=/root/.npm \
     pnpm install --no-frozen-lockfile
 
-# cp turbo pruned src
 COPY --from=builder /app/out/full/ ./
-
-# --- Build the actual app (and any required deps)
 RUN pnpm build:ws-server
 
+# --- Runner ---
 FROM base AS runner
 
-# security -- create app user wsserver
-RUN addgroup -S wsserver && adduser -S wsserver -G wsserver
+RUN groupadd --system --gid 1001 wsserver && \
+    useradd --system --uid 1001 --gid wsserver --create-home wsserver
 
-USER wsserver
+# install Python packages
+RUN python3.10 -m pip install --no-cache-dir --upgrade pip \
+    && python3.10 -m pip install --no-cache-dir xai-sdk==1.4.0  # Note: == not =
 
 WORKDIR /app
-
-# cp built app and runtime deps
 COPY --from=installer /app .
 
+RUN chown -R wsserver:wsserver /app
+
+USER wsserver
 EXPOSE 4000
+ENV NODE_ENV=production
+ENV PYTHONUNBUFFERED=1
 
 CMD ["node", "apps/ws-server/dist/index.js"]

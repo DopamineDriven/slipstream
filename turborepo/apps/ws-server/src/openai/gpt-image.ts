@@ -29,11 +29,10 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     protected prisma: PrismaService,
     protected extractor: ExtractService,
     protected s3: S3Storage,
-    protected isProd: boolean,
     protected redis: EnhancedRedisPubSub,
     protected apiKey: string
   ) {
-    super(logger, prisma, apiKey, extractor, s3, isProd);
+    super(logger, prisma, apiKey, extractor, s3);
   }
 
   protected async handleOpenaiAiNativeImageRequestGptImage1({
@@ -190,7 +189,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             .concat(`.${format}`);
 
           tInitial = performance.now();
-          rtHelper = await this.s3.uploadGenerated(b64, this.isProd, {
+          rtHelper = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
             contentType:
               imgSpecs.contentType ??
               this.getGenMime(streamPartial.output_format),
@@ -452,7 +451,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           )) as ExpandedImgSpecs;
 
           tInitial = performance.now();
-          const rt = await this.s3.uploadGenerated(b64, this.isProd, {
+          const rt = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
             contentType: this.getGenMime(finalImgObj.output_format),
             filename,
             origin: "GENERATED",

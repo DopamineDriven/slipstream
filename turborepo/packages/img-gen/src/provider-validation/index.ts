@@ -8,6 +8,114 @@ import type {
   Rm
 } from "@slipstream/types";
 
+type OpenAIModelAspectRatio = {
+  "gpt-5.1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-5"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-5-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-5-nano"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-5.1-chat-latest"?: undefined;
+  "gpt-5.1-codex"?: undefined;
+  "gpt-5.1-codex-mini"?: undefined;
+  "gpt-5-codex"?: undefined;
+  "gpt-5-pro"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-5-chat-latest"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-4.1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-4.1-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-4.1-nano"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-4o"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-4o-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-image-1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "gpt-image-1-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "dall-e-3"?: "1792x1024" | "1024x1792" | "1024x1024" | "auto";
+  "dall-e-2"?: "256x256" | "512x512" | "1024x1024" | "auto";
+  "chatgpt-4o-latest"?: undefined;
+  "o4-mini"?: undefined;
+  "o4-mini-deep-research"?: undefined;
+  "o3-deep-research"?: undefined;
+  o3?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
+  "o3-pro"?: undefined;
+  "o3-mini"?: undefined;
+  o1?: undefined;
+  "o1-pro"?: undefined;
+  "gpt-4"?: undefined;
+  "gpt-4-turbo"?: undefined;
+  "gpt-3.5-turbo"?: undefined;
+  "sora-2"?: undefined;
+  "sora-2-pro"?: undefined;
+};
+
+type GeminiModelAspectRatio = {
+  "gemini-3-pro-image-preview":
+    | "1:1"
+    | "2:3"
+    | "3:2"
+    | "3:4"
+    | "4:3"
+    | "9:16"
+    | "16:9"
+    | "21:9"
+    | undefined;
+  "gemini-2.5-flash-image":
+    | "1:1"
+    | "2:3"
+    | "3:2"
+    | "3:4"
+    | "4:3"
+    | "9:16"
+    | "16:9"
+    | "21:9"
+    | undefined;
+  "imagen-4.0-ultra-generate-001":
+    | "1:1"
+    | "3:4"
+    | "4:3"
+    | "9:16"
+    | "16:9"
+    | undefined;
+  "imagen-4.0-fast-generate-001":
+    | "1:1"
+    | "3:4"
+    | "4:3"
+    | "9:16"
+    | "16:9"
+    | undefined;
+  "imagen-4.0-generate-001":
+    | "1:1"
+    | "3:4"
+    | "4:3"
+    | "9:16"
+    | "16:9"
+    | undefined;
+  "gemini-3-pro-preview": undefined;
+  "gemini-2.5-pro": undefined;
+  "gemini-2.5-flash": undefined;
+  "gemini-2.5-flash-lite": undefined;
+  "gemini-2.0-flash": undefined;
+  "gemini-2.0-flash-lite": undefined;
+  "veo-3.1-generate-preview": undefined;
+  "veo-3.1-fast-generate-preview": undefined;
+  "veo-3.0-generate-001": undefined;
+  "veo-3.0-fast-generate-001": undefined;
+  "veo-2.0-generate-001": undefined;
+};
+
+type OutputSizeProps<P extends Provider = Provider> = {
+  openai?: OpenAIModelAspectRatio[GetModelUtilRT<"openai">];
+  anthropic?: {
+    [M in GetModelUtilRT<"anthropic">]: undefined;
+  }[GetModelUtilRT<"anthropic">];
+  grok?: {
+    [S in GetModelUtilRT<"grok">]?: undefined;
+  }[GetModelUtilRT<"grok">];
+  meta?: {
+    [P in GetModelUtilRT<"meta">]?: undefined;
+  }[GetModelUtilRT<"meta">];
+  gemini?: GeminiModelAspectRatio[GetModelUtilRT<"gemini">];
+  vercel?: {
+    [P in GetModelUtilRT<"vercel">]?: undefined;
+  }[GetModelUtilRT<"vercel">];
+}[P];
+
 export class ProviderValidation {
   public isImgGenCapableModel<const T extends Provider = Provider>(
     provider: T,
@@ -27,6 +135,9 @@ export class ProviderValidation {
           case "grok-2-image-1212": {
             return true;
           }
+          case "grok-4-0709":
+          case "grok-4-1-fast-non-reasoning":
+          case "grok-4-1-fast-reasoning":
           case "grok-2-vision-1212":
           case "grok-3":
           case "grok-3-mini":
@@ -41,12 +152,14 @@ export class ProviderValidation {
       case "gemini": {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
+          case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
             return true;
           }
+          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -133,6 +246,8 @@ export class ProviderValidation {
           case "grok-3":
           case "grok-3-mini":
           case "grok-4-0709":
+          case "grok-4-1-fast-non-reasoning":
+          case "grok-4-1-fast-reasoning":
           case "grok-4-fast-non-reasoning":
           case "grok-4-fast-reasoning":
           case "grok-code-fast-1":
@@ -144,12 +259,14 @@ export class ProviderValidation {
       case "gemini": {
         const m = model as GetModelUtilRT<typeof p>;
         switch (m) {
+          case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image":
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
             return true;
           }
+          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -223,7 +340,8 @@ export class ProviderValidation {
         model === "imagen-4.0-generate-001" ||
         model === "imagen-4.0-fast-generate-001" ||
         model === "imagen-4.0-ultra-generate-001" ||
-        model === "gemini-2.5-flash-image"
+        model === "gemini-2.5-flash-image" ||
+        model === "gemini-3-pro-image-preview"
       )
     ) {
       return undefined;
@@ -255,6 +373,8 @@ export class ProviderValidation {
               return data.n;
             } else return 1;
           }
+          case "grok-4-1-fast-non-reasoning":
+          case "grok-4-1-fast-reasoning":
           case "grok-2-vision-1212":
           case "grok-3":
           case "grok-3-mini":
@@ -279,6 +399,7 @@ export class ProviderValidation {
               return data.n;
             } else return 4;
           }
+          case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image": {
             if (data?.n) {
               if (data.n < 1) return 1;
@@ -286,6 +407,7 @@ export class ProviderValidation {
               return data.n;
             } else return 1;
           }
+          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -357,6 +479,133 @@ export class ProviderValidation {
           }
         }
       }
+      default: {
+        return undefined;
+      }
+    }
+  }
+
+  public handleImgGenOutputFormat<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<T>,
+    data?: {
+      format?: {
+        openai?: "png" | "jpeg" | "webp";
+        gemini?: "image/png" | "image/jpeg" | undefined;
+        grok?: undefined;
+        vercel?: undefined;
+        meta?: undefined;
+        anthropic?: undefined;
+      }[T];
+    }
+  ): {
+    openai?: "png" | "jpeg" | "webp";
+    gemini?: "image/png" | "image/jpeg" | undefined;
+    grok?: undefined;
+    vercel?: undefined;
+    meta?: undefined;
+    anthropic?: undefined;
+  }[T] {
+    const p = provider as Provider;
+    switch (p) {
+      case "gemini": {
+        const m = (model as GetModelUtilRT<typeof p>) ?? "gemini-2.5-pro";
+        switch (m) {
+          case "imagen-4.0-fast-generate-001":
+          case "imagen-4.0-generate-001":
+          case "imagen-4.0-ultra-generate-001": {
+            if (data?.format)
+              return data.format as {
+                openai?: "png" | "jpeg" | "webp";
+                gemini?: "image/png" | "image/jpeg" | undefined;
+                grok?: undefined;
+                vercel?: undefined;
+                meta?: undefined;
+                anthropic?: undefined;
+              }[T];
+            else return undefined;
+          }
+          case "gemini-3-pro-image-preview":
+          case "gemini-2.0-flash":
+          case "gemini-2.0-flash-lite":
+          case "gemini-2.5-flash":
+          case "gemini-2.5-flash-image":
+          case "gemini-2.5-flash-lite":
+          case "gemini-2.5-pro":
+          case "gemini-3-pro-preview":
+          case "veo-2.0-generate-001":
+          case "veo-3.0-fast-generate-001":
+          case "veo-3.0-generate-001":
+          case "veo-3.1-fast-generate-preview":
+          case "veo-3.1-generate-preview":
+          default: {
+            return undefined;
+          }
+        }
+      }
+      case "openai": {
+        const m = model as GetModelUtilRT<typeof p>;
+        switch (m) {
+          case "gpt-image-1":
+          case "gpt-image-1-mini":
+          case "gpt-4.1":
+          case "gpt-4.1-mini":
+          case "gpt-4.1-nano":
+          case "gpt-4o":
+          case "gpt-4o-mini":
+          case "o3":
+          case "gpt-5-chat-latest":
+          case "gpt-5-pro":
+          case "gpt-5-mini":
+          case "gpt-5-nano":
+          case "gpt-5":
+          case "gpt-5.1": {
+            if (
+              !(
+                data?.format === "png" ||
+                data?.format === "webp" ||
+                data?.format === "jpeg"
+              )
+            ) {
+              return undefined;
+            } else
+              return data.format as {
+                openai?: "png" | "jpeg" | "webp";
+                gemini?: "image/png" | "image/jpeg" | undefined;
+                grok?: undefined;
+                vercel?: undefined;
+                meta?: undefined;
+                anthropic?: undefined;
+              }[T];
+          }
+          case "dall-e-2":
+          case "dall-e-3":
+          case "gpt-3.5-turbo":
+          case "gpt-4":
+          case "chatgpt-4o-latest":
+          case "gpt-5.1-chat-latest":
+          case "gpt-5.1-codex":
+          case "gpt-5.1-codex-mini":
+          case "o1-pro":
+          case "sora-2":
+          case "sora-2-pro":
+          case "gpt-4-turbo":
+          case "gpt-5-codex":
+          case "o1":
+          case "o3-deep-research":
+          case "o4-mini-deep-research":
+          case "o3-mini":
+          case "o3-pro":
+          case "o4-mini":
+          default: {
+            return undefined;
+          }
+        }
+      }
+      case "anthropic":
+      case "grok":
+      case "meta":
+      case "vercel":
       default: {
         return undefined;
       }
@@ -590,21 +839,76 @@ export class ProviderValidation {
     } else return "ALLOW_ADULT";
   }
 
-  public handleImgGenOutputQuality(
-    provider: Provider,
-    model?: AllModelsUnion,
-    data?: { output_quality?: string }
-  ) {
+  public handleImgGenOutputQuality<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<typeof provider>,
+    data?: {
+      output_quality?: {
+        gemini?: "1K" | "2K" | "4K" | undefined;
+        openai?:
+          | "high"
+          | "medium"
+          | "low"
+          | "auto"
+          | "standard"
+          | "hd"
+          | undefined;
+        grok?: undefined;
+        meta?: undefined;
+        vercel?: undefined;
+        anthropic?: undefined;
+      }[typeof provider];
+    }
+  ): {
+    gemini?: "1K" | "2K" | "4K" | undefined;
+    openai?: "high" | "medium" | "low" | "auto" | "standard" | "hd" | undefined;
+    grok?: undefined;
+    meta?: undefined;
+    vercel?: undefined;
+    anthropic?: undefined;
+  }[T] {
     switch (provider) {
-      case "anthropic":
-      case "meta":
-      case "vercel":
-      case "grok": {
-        return undefined;
-      }
       case "gemini": {
-        const m = model as GetModelUtilRT<typeof provider>;
+        const m = model as GetModelUtilRT<"gemini">;
         switch (m) {
+          case "gemini-3-pro-image-preview":
+          case "gemini-2.5-flash-image": {
+            if (
+              data?.output_quality &&
+              /^(1|2|4)K$/gm.test(data.output_quality)
+            ) {
+              return data.output_quality as "1K" | "2K" | "4K" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "1K" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+          }
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
           case "imagen-4.0-ultra-generate-001": {
@@ -612,9 +916,39 @@ export class ProviderValidation {
               data?.output_quality &&
               /^(1|2)K$/gm.test(data.output_quality)
             ) {
-              return data.output_quality as "1K" | "2K";
-            } else return "1K";
+              return data.output_quality as "1K" | "2K" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "1K" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
           }
+          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -625,31 +959,88 @@ export class ProviderValidation {
           case "veo-3.0-generate-001":
           case "veo-3.1-fast-generate-preview":
           case "veo-3.1-generate-preview":
-          case "gemini-2.5-flash-image":
           default: {
             return undefined;
           }
         }
       }
       case "openai": {
-        if (!model) return "auto";
-        const m = model as GetModelUtilRT<typeof provider>;
+        if (!model) return undefined;
+        const m = model as GetModelUtilRT<"openai">;
         switch (m) {
           case "dall-e-2": {
             if (
               data?.output_quality &&
               /^(standard|auto)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality as "standard" | "auto";
-            } else return "auto";
+              return data.output_quality as "standard" | "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
           }
           case "dall-e-3": {
             if (
               data?.output_quality &&
               /^(standard|auto|hd)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality as "standard" | "hd" | "auto";
-            } else return "auto";
+              return data.output_quality as "standard" | "hd" | "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
           }
           case "gpt-4.1":
           case "gpt-4.1-mini":
@@ -669,8 +1060,41 @@ export class ProviderValidation {
               data?.output_quality &&
               /^(high|medium|low|auto)$/gm.test(data.output_quality)
             ) {
-              return data.output_quality as "high" | "medium" | "low" | "auto";
-            } else return "auto";
+              return data.output_quality as
+                | "high"
+                | "medium"
+                | "low"
+                | "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
+            } else
+              return "auto" as {
+                gemini?: "1K" | "2K" | "4K" | undefined;
+                openai?:
+                  | "high"
+                  | "medium"
+                  | "low"
+                  | "auto"
+                  | "standard"
+                  | "hd"
+                  | undefined;
+                grok?: undefined;
+                meta?: undefined;
+                vercel?: undefined;
+                anthropic?: undefined;
+              }[T];
           }
           case "gpt-5.1-chat-latest":
           case "gpt-5.1-codex":
@@ -692,12 +1116,44 @@ export class ProviderValidation {
             return undefined;
           }
           default: {
-            return "auto";
+            return "auto" as {
+              gemini?: "1K" | "2K" | "4K" | undefined;
+              openai?:
+                | "high"
+                | "medium"
+                | "low"
+                | "auto"
+                | "standard"
+                | "hd"
+                | undefined;
+              grok?: undefined;
+              meta?: undefined;
+              vercel?: undefined;
+              anthropic?: undefined;
+            }[T];
           }
         }
       }
+      case "anthropic":
+      case "meta":
+      case "vercel":
+      case "grok":
       default: {
-        return undefined;
+        return undefined as {
+          gemini?: "1K" | "2K" | "4K" | undefined;
+          openai?:
+            | "high"
+            | "medium"
+            | "low"
+            | "auto"
+            | "standard"
+            | "hd"
+            | undefined;
+          grok?: undefined;
+          meta?: undefined;
+          vercel?: undefined;
+          anthropic?: undefined;
+        }[T];
       }
     }
   }
@@ -792,11 +1248,11 @@ export class ProviderValidation {
     }
   }
 
-  public handleOutputSize(
-    provider: Provider,
-    model?: AllModelsUnion,
-    data?: { output_size?: string }
-  ) {
+  public handleOutputSize<const T extends Provider = Provider>(
+    provider: T,
+    model?: GetModelUtilRT<T>,
+    data?: { output_size?: OutputSizeProps<typeof provider> }
+  ): OutputSizeProps<typeof provider> {
     switch (provider) {
       case "anthropic":
       case "meta":
@@ -805,8 +1261,9 @@ export class ProviderValidation {
         return undefined;
       }
       case "gemini": {
-        const m = model as GetModelUtilRT<typeof provider> | undefined;
+        const m = model as GetModelUtilRT<"gemini"> | undefined;
         switch (m) {
+          case "gemini-3-pro-image-preview":
           case "gemini-2.5-flash-image": {
             if (
               data?.output_size &&
@@ -814,8 +1271,8 @@ export class ProviderValidation {
                 data.output_size
               )
             ) {
-              return data.output_size;
-            } else return "1:1";
+              return data.output_size as OutputSizeProps<typeof provider>;
+            } else return "1:1" as OutputSizeProps<typeof provider>;
           }
           case "imagen-4.0-fast-generate-001":
           case "imagen-4.0-generate-001":
@@ -824,9 +1281,10 @@ export class ProviderValidation {
               data?.output_size &&
               /^(1:1|3:4|4:3|9:16|16:9)$/gm.test(data.output_size)
             ) {
-              return data.output_size;
-            } else return "1:1";
+              return data.output_size as OutputSizeProps<typeof provider>;
+            } else return "1:1" as OutputSizeProps<typeof provider>;
           }
+          case "gemini-3-pro-preview":
           case "gemini-2.0-flash":
           case "gemini-2.0-flash-lite":
           case "gemini-2.5-flash":
@@ -841,28 +1299,32 @@ export class ProviderValidation {
           }
           case undefined:
           default: {
-            return "1:1";
+            return "1:1" as OutputSizeProps<typeof provider>;
           }
         }
       }
       case "openai": {
-        const m = model as GetModelUtilRT<typeof provider> | undefined;
+        const m = model as GetModelUtilRT<"openai"> | undefined;
         switch (m) {
           case "dall-e-2": {
             if (
               data?.output_size &&
               /^(256x256|512x512|1024x1024|auto)$/gm.test(data.output_size)
             ) {
-              return data.output_size;
-            } else return "auto";
+              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
+                typeof provider
+              >;
+            } else return "auto" as OutputSizeProps<typeof provider>;
           }
           case "dall-e-3": {
             if (
               data?.output_size &&
               /^(1792x1024|1024x1792|1024x1024|auto)$/gm.test(data.output_size)
             ) {
-              return data.output_size;
-            } else return "auto";
+              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
+                typeof provider
+              >;
+            } else return "auto" as OutputSizeProps<typeof provider>;
           }
           case "gpt-4.1":
           case "gpt-4.1-mini":
@@ -882,8 +1344,10 @@ export class ProviderValidation {
               data?.output_size &&
               /^(1536x1024|1024x1536|1024x1024|auto)$/gm.test(data.output_size)
             ) {
-              return data.output_size;
-            } else return "auto";
+              return data.output_size as OpenAIModelAspectRatio[GetModelUtilRT<"openai">] as OutputSizeProps<
+                typeof provider
+              >;
+            } else return "auto" as OutputSizeProps<typeof provider>;
           }
           case "gpt-3.5-turbo":
           case "gpt-4":
@@ -906,7 +1370,7 @@ export class ProviderValidation {
           }
           case undefined:
           default: {
-            return "auto";
+            return "auto" as OutputSizeProps<typeof provider>;
           }
         }
       }
@@ -968,9 +1432,13 @@ export class ProviderValidation {
         provider === "grok"
           ? "png"
           : (data?.imgGenFields?.output_format ?? "png"),
-      outputSize = this.handleOutputSize(provider, model, {
-        output_size: data.imgGenFields?.output_size
-      }),
+      outputSize = this.handleOutputSize(
+        provider,
+        model,
+        data.imgGenFields?.output_size as Parameters<
+          typeof this.handleOutputSize
+        >["2"]
+      ),
       stage = "QUEUED",
       temperature = data.temperature,
       systemPrompt = data.systemPrompt,
@@ -978,9 +1446,13 @@ export class ProviderValidation {
       prompt = data?.prompt,
       topP = data?.topP,
       nCompleted = 0,
-      outputQuality = this.handleImgGenOutputQuality(provider, model, {
-        output_quality: data.imgGenFields?.output_quality
-      }),
+      outputQuality = this.handleImgGenOutputQuality<typeof provider>(
+        provider,
+        model,
+        data.imgGenFields?.output_quality as Parameters<
+          typeof this.handleImgGenOutputQuality
+        >["2"]
+      ),
       apiKey = data.apiKey,
       keyId = data.keyId,
       userKeyId = keyId,

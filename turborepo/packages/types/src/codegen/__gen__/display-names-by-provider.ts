@@ -35,9 +35,11 @@ export const displayNameModelsByProvider = {
     "Sora 2 Pro"
   ],
   gemini: [
+    "Gemini 3 Pro Preview",
     "Gemini 2.5 Pro",
     "Gemini 2.5 Flash",
     "Nano Banana",
+    "Nano Banana Pro",
     "Gemini 2.5 Flash-Lite",
     "Gemini 2.0 Flash",
     "Gemini 2.0 Flash-Lite",
@@ -51,6 +53,8 @@ export const displayNameModelsByProvider = {
     "Veo 2"
   ],
   grok: [
+    "Grok 4.1 Fast Reasoning",
+    "Grok 4.1 Fast Non-Reasoning",
     "Grok 4",
     "Grok Code Fast 1",
     "Grok 4 Fast Reasoning",

@@ -167,16 +167,25 @@ const components = {
   },
   code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
     return (
-      <span className="relative m-0 w-full min-w-0 p-0 break-all">
-        <code
+           <code
           className={cn(
-            `inline-block max-w-full overflow-x-auto overscroll-x-contain p-0 pt-8 pr-12 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`,
+// Layout & Wrapping
+        "break-all whitespace-pre-wrap inline",
+        // Typography
+        "font-mono text-sm",
+        // Spacing & Decoration
+        "px-1 py-0.5 rounded-md",
+        // Clone ensures padding/background applies to EACH line if it wraps
+        "box-decoration-clone",
+        // Colors (using your variables)
+        "bg-current text-foreground/80",
+        // Reset weird scroll/block styles from before
+        "border-none overflow-visible min-w-0 max-w-none",
             className
           )}
           {...props}>
           {children}
         </code>
-      </span>
     );
   },
   h1: createHeading(1),

@@ -69,6 +69,8 @@ export interface CredentialEntity {
   OPTIMIZE_API_KEY?: string;
   PRISMA_SERVICE_TOKEN?: string;
   OPENAI_WEBHOOK_DEEP_REASONING?: string;
+  X_AI_COLLECTION?: string;
+  X_AI_MANAGEMENT_API_KEY?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

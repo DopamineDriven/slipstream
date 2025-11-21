@@ -3,18 +3,22 @@ import type {
   Content,
   ContentUnion,
   File,
+  GenerateContentConfig,
   GenerateContentParameters,
   Part,
-  ThinkingConfig,
+  PartMediaResolution,
   ToolConfig,
-  ToolListUnion,
   UploadFileParameters
 } from "@google/genai";
 import type { Logger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { GoogleGenAI } from "@google/genai";
+import {
+  GoogleGenAI,
+  PartMediaResolutionLevel,
+  ThinkingLevel
+} from "@google/genai";
 import type {
   AttachmentSingleton,
   GeminiModelIdUnion,
@@ -25,7 +29,10 @@ export class GeminiWorkupService {
   protected defaultClient: GoogleGenAI;
   protected logger: Logger;
   protected apiVersion = "v1alpha" as const;
-  private assetCache = new Map<string, { fileUri: string; expiresAt: Date }>();
+  private assetCache = new Map<
+    string,
+    { fileUri: string; expiresAt: Date; databaseId: string }
+  >();
   private fileRegistry = new Map<string, File>();
   private lastRegistrySync: Date | null = null;
   constructor(
@@ -90,8 +97,9 @@ export class GeminiWorkupService {
     const client = this.getClient(apiKey);
     const filesToDelete = Array.of<string>();
     const dbRecordsToDelete = Array.of<string>();
-
-    for (const [name, record] of this.fileRegistry) {
+    const toTuple = Array.from(this.fileRegistry.entries());
+    const assetCacheFileNames = Array.from(this.assetCache.keys());
+    for (const [name, record] of toTuple) {
       // Check if file has expired (Google Files have 48-hour TTL)
       if (record.expirationTime) {
         const expired = new Date(record.expirationTime).getTime();
@@ -99,24 +107,24 @@ export class GeminiWorkupService {
         if (expired < Date.now()) {
           filesToDelete.push(name);
           // Collect database record IDs if available
-          if (record.name) {
-            dbRecordsToDelete.push(record.name);
+          if (record.name && assetCacheFileNames.includes(record.name)) {
+            const dbId = this.assetCache.get(record.name)?.databaseId;
+            const expires = this.assetCache.get(record.name)?.expiresAt;
+            if (dbId && expires && expires.getTime() < Date.now()) {
+              dbRecordsToDelete.push(dbId);
+            }
           }
         }
       }
     }
 
     if (filesToDelete.length === 0) {
-      this.logger.info("No stale files to clean up");
+      console.info("No stale files to clean up from google files api");
       return;
     }
 
-    this.logger.debug(
-      filesToDelete,
-      `Cleaning up ${filesToDelete.length} stale files`
-    );
-
     // Delete from database first (in transaction)
+
     if (dbRecordsToDelete.length > 0) {
       try {
         await this.prisma.deleteStaleIds(dbRecordsToDelete);
@@ -124,10 +132,20 @@ export class GeminiWorkupService {
           dbRecordsToDelete,
           `Deleted ${dbRecordsToDelete.length} stale database records`
         );
+        console.info(
+          `cleaned up ${dbRecordsToDelete.length} files in cleanupStaleFiles for GEMINI - target -> database`
+        );
       } catch (error) {
-        this.logger.warn({ error }, "Failed to delete stale database records");
+        this.logger.warn(
+          { error },
+          "Failed to delete stale files in cleanupStaleFiles for GEMINI - target -> database"
+        );
       }
     }
+    console.info(
+      `no files to delete in cleanupStaleFiles for GEMINI - target -> database`
+    );
+
     // Then delete from Google Files API
     for (const name of filesToDelete) {
       try {
@@ -138,27 +156,20 @@ export class GeminiWorkupService {
         if (this.assetCache.has(name)) {
           this.assetCache.delete(name);
         }
-        // Also clean up any other expired cache entries
-        for (const [key, value] of this.assetCache) {
-          if (new Date(value.expiresAt).getTime() < Date.now()) {
-            this.assetCache.delete(key);
-          }
-        }
-
-        this.logger.debug(
-          { name: name },
-          `Deleted stale file from Google Files API: ${name}`
+        console.info(
+          filesToDelete,
+          `Cleaned up ${filesToDelete.length} stale files for GEMINI - target->google files api`
         );
       } catch (error) {
         this.logger.warn(
           { error, name },
-          `Failed to delete stale file ${name} from Google`
+          `Failed to delete stale file ${name} for GEMINI - target->google files api`
         );
       }
     }
     this.logger.debug(
       {},
-      `Cleanup complete: ${filesToDelete.length} files removed`
+      `Cleanup complete: ${filesToDelete.length} files removed for GEMINI - target->google files api`
     );
   }
 
@@ -167,69 +178,33 @@ export class GeminiWorkupService {
       userId,
       "GEMINI"
     );
-    if (!hasGeminiMessages)
+    if (!hasGeminiMessages) {
       return { synced: true, totalFiles: 0, lastSync: new Date() };
+    }
     const tryApiKey = await this.prisma.handleApiKeyLookup("gemini", userId);
 
-    this.logger.info(
+    console.info(
       `Starting Google Gemini file registry sync -- ${tryApiKey.apiKey === null ? "no gemini key on file" : "gemini api key on file"}`
     );
 
     let totalFiles = 0;
 
     const apiKey = tryApiKey.apiKey ?? this.apiKey;
-
-    // Clear and rebuild registry
-    this.fileRegistry.clear();
-
-    for await (const batch of this.getAllGoogleFiles(apiKey)) {
-      for (const file of batch.page) {
-        if (file.name && file.expirationTime && file.uri && file.sizeBytes) {
-          this.fileRegistry.set(file.name, {
-            name: file.name,
-            sizeBytes: file.sizeBytes,
-            createTime: file.createTime,
-            uri: file.uri,
-            displayName: file.displayName,
-            mimeType: file.mimeType,
-            error: file.error,
-            expirationTime: file.expirationTime,
-            sha256Hash: file.sha256Hash,
-            source: file.source,
-            state: file.state,
-            videoMetadata: file.videoMetadata,
-            updateTime: file.updateTime,
-            downloadUri: file.downloadUri
-          });
-        }
-      }
-
-      totalFiles = batch.count;
-      console.debug(`Synced ${batch.count} files, has_more: ${batch.has_more}`);
-    }
+    this.assetCache.clear();
     try {
       const providerAssets = await this.prisma.findManyByProvider(
         "GEMINI",
         userId
       );
-
-      // Populate asset cache with active database mappings
-      for (const asset of providerAssets) {
-        if (asset.providerUri && asset.expiresAt && !asset.isExpired) {
-          // Only add to cache if file exists in registry (authoritative source)
-          if (this.fileRegistry.has(asset.providerRef)) {
+      // Populate asset cache with active database mappings (gated by environment (database) and api key (user-key vs default server key))
+      if (providerAssets.length > 0) {
+        for (const asset of providerAssets) {
+          if (asset.providerUri && asset.expiresAt && !asset.isExpired) {
             this.assetCache.set(asset.providerRef, {
               expiresAt: asset.expiresAt,
-              fileUri: asset.providerUri
+              fileUri: asset.providerUri,
+              databaseId: asset.id
             });
-          } else {
-            this.logger.warn(
-              {
-                providerRef: asset.providerRef,
-                attachmentId: asset.attachmentId
-              },
-              "DB asset not found in Google registry, skipping cache entry"
-            );
           }
         }
       }
@@ -238,19 +213,67 @@ export class GeminiWorkupService {
         `Populated Gemini asset cache with ${this.assetCache.size} entries from database`
       );
     } catch (error) {
-      this.logger.error(
-        { error },
-        "Failed to populate asset cache from database"
-      );
+      console.error({ error }, "Failed to populate asset cache from database");
     }
+    // Clear and rebuild registry
+    this.fileRegistry.clear();
+    // Populate file registry cache but cross-compare with asset-cache entries before persisting (ensure database-existence for user before adding--if a user is using the default server api key there will be many files not relevant to the user in the google files api)
+    for await (const batch of this.getAllGoogleFiles(apiKey)) {
+      for (const file of batch.page) {
+        if (file.name && file.expirationTime && file.uri && file.sizeBytes) {
+          if (this.assetCache.has(file.name)) {
+            this.fileRegistry.set(file.name, {
+              name: file.name,
+              sizeBytes: file.sizeBytes,
+              createTime: file.createTime,
+              uri: file.uri,
+              displayName: file.displayName,
+              mimeType: file.mimeType,
+              error: file.error,
+              expirationTime: file.expirationTime,
+              sha256Hash: file.sha256Hash,
+              source: file.source,
+              state: file.state,
+              videoMetadata: file.videoMetadata,
+              updateTime: file.updateTime,
+              downloadUri: file.downloadUri
+            });
+          }
+        }
+      }
+
+      totalFiles = batch.count;
+      console.debug(`Synced ${batch.count} files, has_more: ${batch.has_more}`);
+    }
+
     this.lastRegistrySync = new Date();
-    this.logger.info(
+    console.info(
       `File registry and Asset cache sync complete for Gemini: ${totalFiles} files indexed`
     );
 
     // Optionally trigger cleanup of stale files
     if (cleanupStaleFiles) {
       await this.cleanupStaleFiles(apiKey);
+    }
+    // the same api key (for me) is used in prod and dev -- therefore, not all fileRegistry cached files will be available in either environment (shared file registry, database partitioned by env)
+    if (this.fileRegistry.size !== this.assetCache.size) {
+      if (this.fileRegistry.size > this.assetCache.size) {
+        const fileRegistryCacheKeys = Array.from(this.fileRegistry.keys());
+        for (const fileKey of fileRegistryCacheKeys) {
+          if (!this.assetCache.has(fileKey)) {
+            this.fileRegistry.delete(fileKey);
+          }
+        }
+      }
+      if (this.assetCache.size > this.fileRegistry.size) {
+        const dbCacheKeys = Array.from(this.assetCache.keys());
+
+        for (const dbKey of dbCacheKeys) {
+          if (!this.fileRegistry.has(dbKey)) {
+            this.assetCache.delete(dbKey);
+          }
+        }
+      }
     }
 
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
@@ -284,9 +307,7 @@ export class GeminiWorkupService {
     apiKey?: string
   ) {
     try {
-      // Determine URL and MIME type based on compatibility status
-      let url: string | null;
-      let mime: string | null;
+      let url: string | null, mime: string | null;
       if (attachment.compatStatus === "ACTIVE") {
         url = attachment.compatCdnUrl ?? attachment.cdnUrl;
         mime = attachment.compatMime ?? attachment.mime;
@@ -307,7 +328,8 @@ export class GeminiWorkupService {
       const uploadedFile = await ai.files.upload({
         file: new Blob([buffer]),
         config: {
-          mimeType,
+          mimeType:
+            mimeType === "application/text" ? "text/markdown" : mimeType,
           name: `files/${attachment.id}`,
           displayName: attachment.filename ?? undefined
         }
@@ -321,19 +343,54 @@ export class GeminiWorkupService {
       throw new Error(
         error instanceof Error
           ? error.message
-          : "Failed to upload file to Google Files API"
+          : "Failed to upload file to Google Files API" +
+            this.prisma.safeErrMsg(error)
       );
     }
+  }
+
+  /**
+   * gemini-3-* only
+   */
+  private mediaResolutionLevel(mimeType?: string) {
+    if (!mimeType)
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_UNSPECIFIED
+      } satisfies PartMediaResolution;
+    else if (mimeType === "application/pdf") {
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_MEDIUM
+      } satisfies PartMediaResolution;
+    } else if (mimeType.startsWith("image/")) {
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_HIGH
+      } satisfies PartMediaResolution;
+    } else if (mimeType.startsWith("video/")) {
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_MEDIUM
+      } satisfies PartMediaResolution;
+    } else if (
+      mimeType.startsWith("text/") ||
+      mimeType.startsWith("application/")
+    ) {
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_MEDIUM
+      } satisfies PartMediaResolution;
+    } else
+      return {
+        level: PartMediaResolutionLevel.MEDIA_RESOLUTION_UNSPECIFIED
+      } satisfies PartMediaResolution;
   }
 
   private async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
     keyFingerprint: string,
     keyId?: string,
-    apiKey?: string
+    apiKey?: string,
+    model?: GeminiModelIdUnion
   ) {
     const formatted = Array.of<Content>();
-
+    const m = model ?? "gemini-2.5-pro";
     for (const msg of msgs) {
       if (msg.senderType === "USER") {
         const partArr = Array.of<Part>();
@@ -347,15 +404,31 @@ export class GeminiWorkupService {
                 attachment?.compatMime &&
                 attachment?.compatStatus
               ) {
-                const { fileUri, mimeType } = await this.ensureAssetUploaded(
-                  attachment,
-                  keyFingerprint,
-                  keyId ?? undefined,
-                  apiKey
-                );
-                partArr.push({
-                  fileData: { fileUri, mimeType }
-                });
+                if (
+                  m === "gemini-3-pro-preview" ||
+                  m === "gemini-3-pro-image-preview"
+                ) {
+                  const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                    attachment,
+                    keyFingerprint,
+                    keyId ?? undefined,
+                    apiKey
+                  );
+                  partArr.push({
+                    fileData: { fileUri, mimeType },
+                    mediaResolution: this.mediaResolutionLevel(mimeType)
+                  });
+                } else {
+                  const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                    attachment,
+                    keyFingerprint,
+                    keyId ?? undefined,
+                    apiKey
+                  );
+                  partArr.push({
+                    fileData: { fileUri, mimeType }
+                  });
+                }
               }
             } catch (err) {
               this.logger.warn(
@@ -438,7 +511,8 @@ export class GeminiWorkupService {
     keyFingerprint: string,
     systemPrompt?: string,
     keyId?: string,
-    apiKey?: string
+    apiKey?: string,
+    model?: GeminiModelIdUnion
   ) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
@@ -449,7 +523,8 @@ export class GeminiWorkupService {
       msgs,
       keyFingerprint,
       keyId,
-      apiKey
+      apiKey,
+      model
     );
     return {
       history,
@@ -527,7 +602,7 @@ export class GeminiWorkupService {
       // Verify not expired
       if (expiresAt.getTime() > now.getTime()) {
         // Create database mapping for existing file
-        await this.prisma.upsertGeminiAssetMapping(
+        const d = await this.prisma.upsertGeminiAssetMapping(
           attachment.id,
           keyFingerprint,
           existingInRegistry.mimeType,
@@ -541,7 +616,8 @@ export class GeminiWorkupService {
 
         this.assetCache.set(fileKey, {
           fileUri: existingInRegistry.uri,
-          expiresAt
+          expiresAt,
+          databaseId: d.id
         });
 
         this.logger.debug(
@@ -590,7 +666,8 @@ export class GeminiWorkupService {
       // Update in-memory cache
       this.assetCache.set(fileKey, {
         fileUri: uploadedFile.uri,
-        expiresAt: new Date(uploadedFile.expirationTime)
+        expiresAt: new Date(uploadedFile.expirationTime),
+        databaseId: dbRecord.id
       });
 
       // Add to registry with all file metadata
@@ -615,13 +692,23 @@ export class GeminiWorkupService {
   }
 
   private mediaModalities(model: GeminiModelIdUnion) {
-    if (!(model === "gemini-2.5-flash-image")) {
+    if (
+      !(
+        model === "gemini-2.5-flash-image" ||
+        model === "gemini-3-pro-image-preview"
+      )
+    ) {
       return ["TEXT"];
     } else return ["TEXT", "IMAGE"];
   }
 
   private candidateCount(model: GeminiModelIdUnion, n = 1) {
-    if (!(model === "gemini-2.5-flash-image")) {
+    if (
+      !(
+        model === "gemini-2.5-flash-image" ||
+        model === "gemini-3-pro-image-preview"
+      )
+    ) {
       return undefined;
     } else return this.prisma.handleImgGenCount("gemini", model, { n });
   }
@@ -634,18 +721,105 @@ export class GeminiWorkupService {
     } satisfies ToolConfig;
   }
 
-  private getTools() {
-    return [{ googleSearch: {} }, { urlContext: {} }] satisfies ToolListUnion;
+  private getTools(model?: GeminiModelIdUnion) {
+    const m = model ?? "gemini-2.5-pro";
+
+    switch (m) {
+      case "gemini-2.5-pro":
+      case "gemini-3-pro-preview":
+      case "gemini-2.5-flash": {
+        return [
+          { googleSearch: {} },
+          { urlContext: {} },
+          { googleSearchRetrieval: {} },
+          { fileSearch: {} }
+        ] satisfies GenerateContentConfig["tools"];
+      }
+      case "gemini-3-pro-image-preview": {
+        return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
+      }
+      case "gemini-2.5-flash-image": {
+        return [] satisfies GenerateContentConfig["tools"];
+      }
+      case "gemini-2.5-flash-lite": {
+        return [
+          { googleSearch: {} },
+          { urlContext: {} },
+          { googleSearchRetrieval: {} }
+        ] satisfies GenerateContentConfig["tools"];
+      }
+      case "gemini-2.0-flash": {
+        return [
+          { googleSearch: {} },
+          { googleSearchRetrieval: {} }
+        ] satisfies GenerateContentConfig["tools"];
+      }
+      case "gemini-2.0-flash-lite":
+      case "imagen-4.0-fast-generate-001":
+      case "imagen-4.0-generate-001":
+      case "imagen-4.0-ultra-generate-001":
+      case "veo-2.0-generate-001":
+      case "veo-3.0-fast-generate-001":
+      case "veo-3.0-generate-001":
+      case "veo-3.1-fast-generate-preview":
+      case "veo-3.1-generate-preview":
+      default: {
+        return undefined satisfies GenerateContentConfig["tools"];
+      }
+    }
   }
 
-  private getThinkingConfig() {
-    return {
-      includeThoughts: true,
-      thinkingBudget: -1
-    } satisfies ThinkingConfig;
+  private getThinkingConfig(model?: GeminiModelIdUnion) {
+    const m = model ?? "gemini-2.5-pro";
+    switch (m) {
+      /**
+       * gemini-3-* only
+       */
+      case "gemini-3-pro-preview": {
+        return {
+          includeThoughts: true,
+          thinkingLevel: ThinkingLevel.HIGH
+        } satisfies GenerateContentConfig["thinkingConfig"];
+      }
+      case "gemini-3-pro-image-preview":
+      case "gemini-2.5-flash":
+      case "gemini-2.5-flash-lite":
+      case "gemini-2.5-pro": {
+        return {
+          includeThoughts: true,
+          thinkingBudget: -1
+        } satisfies GenerateContentConfig["thinkingConfig"];
+      }
+      case "gemini-2.0-flash":
+      case "gemini-2.0-flash-lite":
+      case "imagen-4.0-fast-generate-001":
+      case "imagen-4.0-generate-001":
+      case "imagen-4.0-ultra-generate-001":
+      case "veo-2.0-generate-001":
+      case "veo-3.0-fast-generate-001":
+      case "veo-3.0-generate-001":
+      case "veo-3.1-fast-generate-preview":
+      case "veo-3.1-generate-preview":
+      default: {
+        return {
+          includeThoughts: false,
+          thinkingBudget: 0
+        } satisfies GenerateContentConfig["thinkingConfig"];
+      }
+      case "gemini-2.5-flash-image": {
+        return undefined satisfies GenerateContentConfig["thinkingConfig"];
+      }
+    }
+  }
+  protected async generateId(target: "seriesId" | "generationGroupId") {
+    const { nanoid } = await import("nanoid");
+    if (target === "generationGroupId") {
+      const generationGroupId = "resp_" + nanoid();
+      return generationGroupId;
+    } else return nanoid();
   }
 
-  protected async contentGen({
+  private async contentGenChat({
     isNewChat,
     keyId,
     model,
@@ -661,8 +835,8 @@ export class GeminiWorkupService {
     const m = model as GeminiModelIdUnion;
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng);
-    const tools = this.getTools();
-    const thinkingConfig = this.getThinkingConfig();
+    const tools = this.getTools(m);
+    const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =
       await this.getHistoryAndInstruction(
@@ -671,7 +845,8 @@ export class GeminiWorkupService {
         keyFingerprint,
         systemPrompt,
         keyId ?? undefined,
-        apiKey
+        apiKey,
+        m
       );
     const responseModalities = this.mediaModalities(m);
     const candidateCount = this.candidateCount(m, imgGenFields?.n);
@@ -681,11 +856,11 @@ export class GeminiWorkupService {
       config: {
         maxOutputTokens,
         toolConfig,
+        automaticFunctionCalling: { disable: false },
         responseModalities,
         tools,
         topP,
         candidateCount,
-        // imageConfig: { aspectRatio: "21:9" },
         temperature,
         systemInstruction,
         thinkingConfig
@@ -693,11 +868,98 @@ export class GeminiWorkupService {
     } satisfies GenerateContentParameters;
   }
 
-  protected async nanoBananaContentGen() {
-    // const nanoBanana = await gemini.models.generateContentStream({contents: fullContent,model: "gemini-2.5-flash-image",config: {responseModalities: ["TEXT", "IMAGE"],imageConfig: {aspectRatio:"21:9"},thinkingConfig: {includeThoughts: true, thinkingBudget: -1},systemInstruction,mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH}})
+  private async contentGenNanoBananas({
+    isNewChat,
+    keyId,
+    model,
+    msgs,
+    apiKey,
+    latlng,
+    topP,
+    temperature,
+    max_tokens,
+    systemPrompt,
+    imgGenFields
+  }: GenerateContentResponseProps) {
+    const m = model as GeminiModelIdUnion;
+    // fallback to platform provided server api key for users that don't have a Google API Key on file
+    const keyFingerprint = keyId ?? "server";
+    const toolConfig = this.getToolConfig(latlng);
+    const tools = this.getTools(m);
+    const thinkingConfig = this.getThinkingConfig(m);
+    const maxOutputTokens = max_tokens;
+    const { history: contents, systemInstruction } =
+      await this.getHistoryAndInstruction(
+        isNewChat,
+        msgs,
+        keyFingerprint,
+        systemPrompt,
+        keyId ?? undefined,
+        apiKey,
+        m
+      );
+    const out = imgGenFields?.output_size as
+      | "1:1"
+      | "2:3"
+      | "3:2"
+      | "3:4"
+      | "4:3"
+      | "9:16"
+      | "16:9"
+      | "21:9"
+      | undefined;
+
+    const aspectRatio = this.prisma.handleOutputSize("gemini", m, {
+      output_size: out
+    });
+    const imageSize = this.prisma.handleImgGenOutputQuality("gemini", m, {
+      output_quality: imgGenFields?.output_quality as
+        | "1K"
+        | "2K"
+        | "4K"
+        | undefined
+    });
+    const responseModalities = this.mediaModalities(m);
+    const candidateCount = this.candidateCount(m, imgGenFields?.n);
+    return {
+      contents,
+      model,
+      config: {
+        maxOutputTokens,
+        toolConfig,
+        thinkingConfig,
+        responseModalities,
+        tools,
+        topP,
+        candidateCount,
+        imageConfig: { aspectRatio, imageSize },
+        temperature,
+        systemInstruction
+      }
+    } satisfies GenerateContentParameters;
   }
 
-  protected async imagenContentGen() {
-    // const imagen = await gemini.models.generateImages({model: "imagen-4.0-generate-001" satisfies GeminiModelIdUnion,prompt: "",config: {includeRaiReason: true,}})
+  protected async contentGen({
+    model,
+    imgGenFields,
+    ...rest
+  }: GenerateContentResponseProps) {
+    const m = model as GeminiModelIdUnion;
+    if (
+      (m === "gemini-2.5-flash-image" || m === "gemini-3-pro-image-preview") &&
+      typeof imgGenFields !== "undefined"
+    ) {
+      return this.contentGenNanoBananas({
+        model: m,
+        imgGenFields: imgGenFields,
+        ...rest
+      });
+    } else {
+      return this.contentGenChat({
+        model: m,
+        imgGenFields: undefined,
+        ...rest
+      });
+    }
   }
 }

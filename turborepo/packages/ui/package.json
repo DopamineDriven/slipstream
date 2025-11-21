@@ -91,7 +91,7 @@
     "tailwindcss": ">=4.1.17"
   },
   "dependencies": {
-    "@base-ui-components/react": "^1.0.0-beta.4",
+    "@base-ui-components/react": "1.0.0-beta.6",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -129,7 +129,7 @@
     "@slipstream/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.39.1",
@@ -139,8 +139,8 @@
     "prettier": "^3.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "rolldown": "1.0.0-beta.50",
-    "rolldown-plugin-dts": "^0.17.7",
+    "rolldown": "1.0.0-beta.51",
+    "rolldown-plugin-dts": "^0.18.0",
     "tailwindcss": "^4.1.17",
     "terser": "^5.44.1",
      "tsdown": "^0.15.12",

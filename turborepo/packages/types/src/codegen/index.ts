@@ -31,6 +31,7 @@ const providerModelImagesApi = {
     "dall-e-2"
   ],
   gemini: [
+    "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "imagen-4.0-generate-001",
     "imagen-4.0-fast-generate-001",
@@ -87,9 +88,11 @@ const providerModelChatApi = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3-pro-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-image",
+    "gemini-3-pro-image-preview",
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
@@ -103,6 +106,8 @@ const providerModelChatApi = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4-1-fast-reasoning",
+    "grok-4-1-fast-non-reasoning",
     "grok-4-0709",
     "grok-code-fast-1",
     "grok-4-fast-reasoning",
@@ -190,7 +195,9 @@ async function geminiFetcher() {
  * one-offs here for when xAI ships odd labels
  */
 const GROK_NAME_OVERRIDES = {
-  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning"
+  "grok-4-fast-non-reasoning": "Grok 4 Fast Non-Reasoning",
+  "grok-4-1-fast-non-reasoning": "Grok 4.1 Fast Non-Reasoning",
+  "grok-4-1-fast-reasoning": "Grok 4.1 Fast Reasoning"
 } satisfies Record<string, string>;
 
 function grokDisplayName(id: string) {
@@ -202,7 +209,13 @@ function grokDisplayName(id: string) {
 
   // Explicit model-specific overrides take ultimate precedence
 
-  return id === "grok-4-fast-non-reasoning" ? GROK_NAME_OVERRIDES[id] : s;
+  return id === "grok-4-fast-non-reasoning"
+    ? GROK_NAME_OVERRIDES[id]
+    : id === "grok-4-1-fast-non-reasoning"
+      ? GROK_NAME_OVERRIDES[id]
+      : id === "grok-4-1-fast-reasoning"
+        ? GROK_NAME_OVERRIDES[id]
+        : s;
 }
 
 function displayNameV0(id: string) {

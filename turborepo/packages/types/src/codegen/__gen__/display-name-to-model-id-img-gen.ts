@@ -18,6 +18,7 @@ export const displayNameToModelIdImgGen = {
     "DALL·E 2": "dall-e-2"
   },
   gemini: {
+    "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana": "gemini-2.5-flash-image",
     "Imagen 4": "imagen-4.0-generate-001",
     "Imagen 4 Fast": "imagen-4.0-fast-generate-001",

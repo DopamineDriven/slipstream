@@ -35,9 +35,11 @@ export const displayNameToModelId = {
     "Sora 2 Pro": "sora-2-pro"
   },
   gemini: {
+    "Gemini 3 Pro Preview": "gemini-3-pro-preview",
     "Gemini 2.5 Pro": "gemini-2.5-pro",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Nano Banana": "gemini-2.5-flash-image",
+    "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
@@ -51,6 +53,8 @@ export const displayNameToModelId = {
     "Veo 2": "veo-2.0-generate-001"
   },
   grok: {
+    "Grok 4.1 Fast Reasoning": "grok-4-1-fast-reasoning",
+    "Grok 4.1 Fast Non-Reasoning": "grok-4-1-fast-non-reasoning",
     "Grok 4": "grok-4-0709",
     "Grok Code Fast 1": "grok-code-fast-1",
     "Grok 4 Fast Reasoning": "grok-4-fast-reasoning",

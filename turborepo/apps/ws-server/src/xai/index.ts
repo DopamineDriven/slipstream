@@ -73,7 +73,6 @@ export class xAIService extends ModelService {
     private redis: EnhancedRedisPubSub,
     private extract: ExtractService,
     private s3: S3Storage,
-    private isProd: boolean,
     private apiKey?: string
   ) {
     super();
@@ -314,6 +313,8 @@ export class xAIService extends ModelService {
       if (
         (model === "grok-2-image-1212" ||
           model === "grok-2-vision-1212" ||
+          model ==="grok-4-1-fast-non-reasoning" ||
+          model ==="grok-4-1-fast-reasoning" ||
           model === "grok-4-0709" ||
           model === "grok-4-fast-non-reasoning" ||
           model === "grok-4-fast-reasoning") &&
@@ -704,7 +705,7 @@ export class xAIService extends ModelService {
             .concat(`.${getIt.format}`);
 
           tInitial = performance.now();
-          const rtHelper = await this.s3.uploadGenerated(b64, this.isProd, {
+          const rtHelper = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
             contentType: getIt.contentType ?? "image/jpeg",
             filename,
             origin: "GENERATED",
@@ -1005,7 +1006,8 @@ export class xAIService extends ModelService {
         if (
           thinkingText &&
           grokIsCurrentlyThinking &&
-          (m === ("grok-code-fast-1" satisfies GrokModelIdUnion) ||
+          (m === ("grok-4-1-fast-reasoning" satisfies GrokModelIdUnion) ||
+            m === ("grok-code-fast-1" satisfies GrokModelIdUnion) ||
             m === ("grok-3-mini" satisfies GrokModelIdUnion) ||
             m === ("grok-4-0709" satisfies GrokModelIdUnion) ||
             m === ("grok-4-fast-reasoning" satisfies GrokModelIdUnion))

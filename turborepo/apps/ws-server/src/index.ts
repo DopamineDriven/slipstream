@@ -1,6 +1,6 @@
-import type { Signals } from "@slipstream/types";
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
+import type { Signals } from "@slipstream/types";
 import { Credentials } from "@slipstream/credentials";
 
 dotenv.config({ quiet: true });
@@ -87,8 +87,7 @@ async function exe() {
       cfg.PDF_SERVICES_CLIENT_SECRET,
       cfg.ADOBE_WEBHOOK_SECRET,
       s3,
-      prisma,
-      isProd
+      prisma
     );
 
     const { WSServer } = await import("@/ws-server/index.ts");
@@ -118,7 +117,6 @@ async function exe() {
       redisInstance,
       extract,
       s3,
-      isProd,
       cfg.X_AI_KEY
     );
 
@@ -138,7 +136,6 @@ async function exe() {
       prisma,
       extract,
       s3,
-      isProd,
       redisInstance,
       cfg.OPENAI_API_KEY
     );
@@ -149,6 +146,7 @@ async function exe() {
       logger,
       prisma,
       redisInstance,
+      s3,
       extract,
       cfg.GOOGLE_API_KEY
     );
@@ -189,7 +187,6 @@ async function exe() {
       providers,
       s3,
       region,
-      isProd,
       extract,
       imgCompatService
     );
