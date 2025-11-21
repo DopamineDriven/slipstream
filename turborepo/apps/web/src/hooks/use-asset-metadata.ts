@@ -103,6 +103,7 @@ export function useAssetMetadata({ attachments }: AttachmentPreviewProps) {
       if (
         attachment.mime === "application/pdf" ||
         attachment.mime === "application/rtf" ||
+        attachment.mime ==="application/text" ||
         attachment.mime.startsWith("text/") ||
         attachment.mime ===
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||

@@ -11,7 +11,11 @@ const genai = new GoogleGenAI({
 
 (async () => {
   const upload = await genai.files.upload({
-    file: relative(process.cwd(), "src/test/__out__/data/resume-2025.pdf")
+    file: relative(
+      process.cwd(),
+      "src/test/__out__/condensed/The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-III.md"
+    ),
+    config: { mimeType: "text/markdown", name: "files/Paved-with-Good-Intentions-Pt-III".toLowerCase() }
   });
   return upload;
 })().then(v => {

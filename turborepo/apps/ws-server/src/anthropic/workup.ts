@@ -17,7 +17,7 @@ export class AnthropicWorkup {
   protected logger: PinoLogger;
   private assetCache = new Map<
     string,
-    { fileId: string; dbRecordId: string }
+    { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
   >();
   // Registry of all Anthropic files with access tracking
   private fileRegistry = new Map<string, AnthropicFileRecord>();
@@ -206,30 +206,14 @@ export class AnthropicWorkup {
       }
     }
 
-    // Clear and rebuild registry
-    this.fileRegistry.clear();
+    this.assetCache.clear();
 
-    for await (const batch of this.getAllAnthropicFiles(apiKey)) {
-      for (const file of batch.data) {
-        this.fileRegistry.set(file.id, {
-          id: file.id,
-          size_bytes: file.size_bytes,
-          created_at: file.created_at,
-          filename: file.filename,
-          mime_type: file.mime_type,
-          // Restore existing lastAccessedAt if available
-          lastAccessedAt: existingAccessData.get(file.id)
-        });
-      }
-
-      totalFiles = batch.count;
-      this.logger.debug(
-        `Synced ${batch.count} files, has_more: ${batch.has_more}`
+    const dbResId = new Map<string, string>();
+    try {
+      const providerAssets = await this.prisma.findManyByProvider(
+        "ANTHROPIC",
+        userId
       );
-    }
-
-     try {
-      const providerAssets = await this.prisma.findManyByProvider("ANTHROPIC", userId);
 
       // Populate asset cache with active database mappings
       for (const asset of providerAssets) {
@@ -237,10 +221,12 @@ export class AnthropicWorkup {
           const cacheKey = `${asset.keyFingerprint}:${asset.attachmentId}`;
 
           // Only add to cache if file exists in registry (authoritative source)
-          if (this.fileRegistry.has(asset.providerRef)) {
+          if (asset.isExpired === false) {
+            dbResId.set(asset.providerRef, asset.id);
             this.assetCache.set(cacheKey, {
               fileId: asset.providerRef,
-              dbRecordId: asset.id
+              dbRecordId: asset.id,
+              lastCheckedAt: asset.lastCheckedAt
             });
 
             // Update registry with DB record ID for cross-reference
@@ -251,7 +237,10 @@ export class AnthropicWorkup {
             }
           } else {
             this.logger.warn(
-              { providerRef: asset.providerRef, attachmentId: asset.attachmentId },
+              {
+                providerRef: asset.providerRef,
+                attachmentId: asset.attachmentId
+              },
               "DB asset not found in Anthropic registry, skipping cache entry"
             );
           }
@@ -262,11 +251,42 @@ export class AnthropicWorkup {
         `Populated asset cache with ${this.assetCache.size} entries from database`
       );
     } catch (error) {
-      this.logger.error({ error }, "Failed to populate asset cache from database");
+      this.logger.error(
+        { error },
+        "Failed to populate asset cache from database"
+      );
+    }
+
+    // Clear and rebuild registry
+    this.fileRegistry.clear();
+
+    for await (const batch of this.getAllAnthropicFiles(apiKey)) {
+      for (const file of batch.data) {
+        if (dbResId.has(file.id)) {
+          const dbId = dbResId.get(file.id);
+          if (dbId) {
+            this.fileRegistry.set(file.id, {
+              id: file.id,
+              size_bytes: file.size_bytes,
+              created_at: file.created_at,
+              filename: file.filename,
+              mime_type: file.mime_type,
+              dbRecordId: dbId,
+              // Restore existing lastAccessedAt if available
+              lastAccessedAt: existingAccessData.get(file.id)
+            });
+          }
+        }
+      }
+
+      totalFiles = batch.count;
+      this.logger.debug(
+        `Synced ${batch.count} files, has_more: ${batch.has_more}`
+      );
     }
 
     this.lastRegistrySync = new Date();
-    
+
     this.logger.info(
       `File registry sync complete: ${totalFiles} files indexed`
     );
@@ -338,8 +358,9 @@ export class AnthropicWorkup {
     );
     const filesToDelete: string[] = [];
     const dbRecordsToDelete: string[] = [];
+    const fileRegistryTuple = Array.from(this.fileRegistry.entries());
 
-    for (const [fileId, record] of this.fileRegistry) {
+    for (const [fileId, record] of fileRegistryTuple) {
       // If never accessed, use created_at as baseline
       const lastUsed = record.lastAccessedAt ?? new Date(record.created_at);
 
@@ -490,7 +511,8 @@ export class AnthropicWorkup {
         );
         this.assetCache.set(cacheKey, {
           fileId: existing.providerRef,
-          dbRecordId: existing.id
+          dbRecordId: existing.id,
+          lastCheckedAt: existing.lastCheckedAt
         });
         // Mark as accessed for cleanup tracking
         this.markFileAccessed(existing.providerRef);
@@ -526,7 +548,8 @@ export class AnthropicWorkup {
       // Update cache with database record ID for fast lookups
       this.assetCache.set(cacheKey, {
         fileId: uploadedFile.id,
-        dbRecordId: dbRecord.id // Store the actual DB record ID for fast array searches
+        dbRecordId: dbRecord.id,
+        lastCheckedAt: dbRecord.lastCheckedAt // Store the actual DB record ID for fast array searches
       });
 
       // Add to registry with current access time
@@ -587,7 +610,7 @@ export class AnthropicWorkup {
                   const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
                   if (url && mime) {
-                    if (mime === "application/pdf") {
+                    if (mime === "application/pdf" || mime === "text/plain") {
                       try {
                         const fileId = await this.ensureAnthropicAssetUploaded(
                           attachment,
@@ -722,8 +745,9 @@ export class AnthropicWorkup {
 
                   if (url && mime && size) {
                     if (
-                      assetType === "DOCUMENT" &&
-                      mime === "application/pdf"
+                      (assetType === "DOCUMENT" &&
+                        mime === "application/pdf") ||
+                      mime === "text/plain"
                     ) {
                       try {
                         const fileId = await this.ensureAnthropicAssetUploaded(

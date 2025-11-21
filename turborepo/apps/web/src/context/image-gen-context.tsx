@@ -48,6 +48,9 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         }
         case "grok-2-vision-1212":
         case "grok-3":
+        case "grok-4-0709":
+        case "grok-4-1-fast-non-reasoning":
+        case "grok-4-1-fast-reasoning":
         case "grok-3-mini":
         case "grok-4-fast-non-reasoning":
         case "grok-4-fast-reasoning":
@@ -60,12 +63,14 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
     case "gemini": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image":
         case "imagen-4.0-fast-generate-001":
         case "imagen-4.0-generate-001":
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+        case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -152,6 +157,8 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "grok-3":
         case "grok-3-mini":
         case "grok-4-0709":
+        case "grok-4-1-fast-non-reasoning":
+        case "grok-4-1-fast-reasoning":
         case "grok-4-fast-non-reasoning":
         case "grok-4-fast-reasoning":
         case "grok-code-fast-1":
@@ -163,12 +170,14 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
     case "gemini": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image":
         case "imagen-4.0-fast-generate-001":
         case "imagen-4.0-generate-001":
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+        case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -247,6 +256,7 @@ function handleOutputSize(
     }
     case "gemini": {
       switch (model) {
+        case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image": {
           if (
             data?.output_size &&
@@ -267,6 +277,7 @@ function handleOutputSize(
             return data.output_size;
           } else return "1:1";
         }
+        case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -444,6 +455,16 @@ function handleImgGenOutputQuality(
             return data.output_quality as "1K" | "2K";
           } else return "1K";
         }
+        case "gemini-2.5-flash-image":
+        case "gemini-3-pro-image-preview": {
+          if (
+            data?.output_quality &&
+            /^(1|2|4)K$/gm.test(data.output_quality)
+          ) {
+            return data.output_quality as "1K" | "2K" | "4K";
+          } else return "1K";
+        }
+        case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
@@ -454,7 +475,6 @@ function handleImgGenOutputQuality(
         case "veo-3.0-generate-001":
         case "veo-3.1-fast-generate-preview":
         case "veo-3.1-generate-preview":
-        case "gemini-2.5-flash-image":
         default: {
           return undefined;
         }

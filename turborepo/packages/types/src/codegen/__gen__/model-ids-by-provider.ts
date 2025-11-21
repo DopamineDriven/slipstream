@@ -35,9 +35,11 @@ export const modelIdsByProvider = {
     "sora-2-pro"
   ],
   gemini: [
+    "gemini-3-pro-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-image",
+    "gemini-3-pro-image-preview",
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
@@ -51,6 +53,8 @@ export const modelIdsByProvider = {
     "veo-2.0-generate-001"
   ],
   grok: [
+    "grok-4-1-fast-reasoning",
+    "grok-4-1-fast-non-reasoning",
     "grok-4-0709",
     "grok-code-fast-1",
     "grok-4-fast-reasoning",

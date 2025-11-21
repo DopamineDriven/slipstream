@@ -17,6 +17,12 @@ export const displayNameModelsByProviderImgGen = {
     "DALL·E 3",
     "DALL·E 2"
   ],
-  gemini: ["Nano Banana", "Imagen 4", "Imagen 4 Fast", "Imagen 4 Ultra"],
+  gemini: [
+    "Nano Banana Pro",
+    "Nano Banana",
+    "Imagen 4",
+    "Imagen 4 Fast",
+    "Imagen 4 Ultra"
+  ],
   grok: ["Grok 2 Image"]
 } as const;

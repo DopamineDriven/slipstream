@@ -127,6 +127,7 @@ export function ChatInput({
     max: 10,
     allowedTypes: [
       "image/*",
+      "application/text",
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -446,7 +447,7 @@ export function ChatInput({
       selectedModel.provider === "openai" ||
       selectedModel.provider === "anthropic" ||
       selectedModel.provider === "gemini"
-        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,application/*,text/*"
+        ? ".md,.txt,.pdf,.docx,.xlsx,.pptx,application/text,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/pdf,text/markdown,application/*,text/*"
         : ".pdf,.docx,application/*,text/*",
     [selectedModel.provider]
   );

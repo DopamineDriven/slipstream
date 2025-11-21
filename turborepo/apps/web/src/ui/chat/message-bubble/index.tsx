@@ -399,7 +399,7 @@ export function MessageBubble({
             "group relative max-w-[85%] min-w-0 rounded-2xl px-4 py-3 text-sm",
             liveImgGenFields && message.senderType !== "USER" && isStreaming
               ? "w-[85%]"
-              : message.attachments.length > 0 && message.senderType === "USER"
+              : message.attachments.length > 0
                 ? "w-[85%]"
                 : "",
             message.senderType === "USER"

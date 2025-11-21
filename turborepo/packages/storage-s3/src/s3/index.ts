@@ -282,7 +282,9 @@ export class S3Storage extends S3Utils {
 
   public contentTypeToExt(ContentType?: string) {
     if (ContentType) {
-      return this.fs.mimeToExt(ContentType as keyof typeof this.fs.toExtObj);
+      return ContentType === "application/text"
+        ? this.fs.mimeToExt("text/markdown" as keyof typeof this.fs.toExtObj)
+        : this.fs.mimeToExt(ContentType as keyof typeof this.fs.toExtObj);
     } else return undefined;
   }
 

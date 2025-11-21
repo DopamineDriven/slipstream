@@ -16,7 +16,7 @@
     "build:ui": "turbo build --filter=@slipstream/ui",
     "build:web": "turbo build --filter=@slipstream/web",
     "build:ws-server": "turbo build --filter=@slipstream/ws-server",
-    "built:it": "bash ./manage.sh build",
+    "build:it": "bash ./manage.sh build",
     "changeset": "changeset",
     "clean": "git clean -xdf node_modules",
     "dev": "turbo dev --parallel --continue",
@@ -39,7 +39,7 @@
     "wsl2:info": "lsb_release -a"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.5",
+    "@biomejs/biome": "^2.3.6",
     "@changesets/cli": "^2.29.7",
     "@d0paminedriven/turbogen": "^5.6.0",
     "@slipstream/eslint-config": "workspace:*",
@@ -49,12 +49,12 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "knip": "^5.69.1",
+    "knip": "^5.70.1",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3",
-    "vercel": "^48.10.2"
+    "vercel": "^48.10.4"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

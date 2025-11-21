@@ -33,8 +33,7 @@ export class OpenAIServiceWorkup {
     protected prisma: PrismaService,
     protected apiKey: string,
     protected extractor: ExtractService,
-    protected s3: S3Storage,
-    protected isProd: boolean
+    protected s3: S3Storage
   ) {
     this.logger = logger
       .getPinoInstance()
@@ -48,7 +47,7 @@ export class OpenAIServiceWorkup {
       logger: this.logger
     });
   }
-  protected getClient(overrideKey?: string) {
+  public getClient(overrideKey?: string) {
     const client = this.defaultClient;
     if (overrideKey) {
       return client.withOptions({ apiKey: overrideKey });
@@ -56,7 +55,7 @@ export class OpenAIServiceWorkup {
 
     return client;
   }
-  
+
   public async titleGenUtil<
     const T extends "ai_chat_request" | "image_gen_request"
   >(
@@ -293,15 +292,22 @@ export class OpenAIServiceWorkup {
         model: model,
         output_quality:
           (this.prisma.handleImgGenOutputQuality("openai", model, {
-            output_quality
+            output_quality: output_quality as
+              | "hd"
+              | "auto"
+              | "standard"
+              | undefined
           }) as "auto" | "hd" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.prisma.handleOutputSize("openai", model, { output_size }) as
-            | "auto"
-            | "1024x1024"
-            | "1792x1024"
-            | "1024x1792"
-            | undefined) ?? ("auto" as const),
+          (this.prisma.handleOutputSize("openai", model, {
+            output_size: output_size as
+              | "1792x1024"
+              | "1024x1792"
+              | "1024x1024"
+              | "auto"
+              | undefined
+          }) as "auto" | "1024x1024" | "1792x1024" | "1024x1792" | undefined) ??
+          ("auto" as const),
         targetApi: "images" as const
       };
       return dalle3Opts satisfies ImgGenWorkupResRT<"dall-e-3">;
@@ -326,15 +332,18 @@ export class OpenAIServiceWorkup {
         model: "dall-e-2" as const,
         output_quality:
           (this.prisma.handleImgGenOutputQuality("openai", model, {
-            output_quality
+            output_quality: output_quality as "auto" | "standard" | undefined
           }) as "auto" | "standard" | undefined) ?? ("auto" as const),
         output_size:
-          (this.prisma.handleOutputSize("openai", model, { output_size }) as
-            | "auto"
-            | "256x256"
-            | "512x512"
-            | "1024x1024"
-            | undefined) ?? ("auto" as const),
+          (this.prisma.handleOutputSize("openai", model, {
+            output_size: output_size as
+              | "256x256"
+              | "512x512"
+              | "1024x1024"
+              | "auto"
+              | undefined
+          }) as "auto" | "256x256" | "512x512" | "1024x1024" | undefined) ??
+          ("auto" as const),
         targetApi: "images" as const
       };
       return dalle2Opts satisfies ImgGenWorkupResRT<"dall-e-2">;
@@ -367,7 +376,12 @@ export class OpenAIServiceWorkup {
       model: model,
       output_quality:
         (this.prisma.handleImgGenOutputQuality("openai", model, {
-          output_quality
+          output_quality: output_quality as
+            | "low"
+            | "medium"
+            | "high"
+            | "auto"
+            | undefined
         }) as
           | "low"
           | "auto"
@@ -377,11 +391,15 @@ export class OpenAIServiceWorkup {
           | "medium"
           | undefined) ?? ("high" as const),
       output_size:
-        (this.prisma.handleOutputSize("openai", model, { output_size }) as
-          | "1536x1024"
-          | "1024x1536"
-          | "1024x1024"
-          | undefined) ?? ("auto" as const),
+        (this.prisma.handleOutputSize("openai", model, {
+          output_size: output_size as
+            | "1536x1024"
+            | "1024x1024"
+            | "1024x1536"
+            | "auto"
+            | undefined
+        }) as "1536x1024" | "1024x1536" | "1024x1024" | undefined) ??
+        ("auto" as const),
       output_background: bg,
       targetApi:
         this.imageGenToolCompat(model) === true

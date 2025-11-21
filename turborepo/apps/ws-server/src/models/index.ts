@@ -1,5 +1,6 @@
 import fsSync from "fs";
 import { join, relative, resolve } from "path";
+import type { InferTopLevelMime } from "@/types/index.ts";
 import type {
   ExpandedDocSpecs,
   ExpandedImgSpecs
@@ -9,9 +10,11 @@ import type {
   GeminiImgGenModels,
   GetModelUtilRT,
   GrokImgGenModels,
+  ImageGenJobSingleton,
   MessageSingleton,
   OpenAIImgGenModels,
-  Provider
+  Provider,
+  UserKeySingleton
 } from "@slipstream/types";
 import { ProviderValidation } from "@slipstream/img-gen";
 import { providerModelChatApi } from "@slipstream/types";
@@ -24,37 +27,56 @@ export class ModelService extends ProviderValidation {
   public handleBigintToNumber(
     message: MessageSingleton<false>
   ): MessageSingleton<true> {
-    const { attachments, ...rest } = message;
+    const { attachments, userKey, imageGenJob, ...rest } = message;
     const mapIt = attachments.map(t => {
       const { size, ...p } = t;
       const mapProviderSingleton = p?.providerLinks?.map(v => {
-        const { size, attachment: _att, ...s } = v;
+        const { size, userKey, attachment: _att, ...s } = v;
         return {
+          userKey: userKey as undefined | UserKeySingleton<true>,
           size: size ? Number(size) : null,
           ...s
         };
       });
+
       return {
         ...p,
         size: size ? Number(size) : null,
         providerLinks: mapProviderSingleton
       };
     });
-    return { attachments: mapIt, ...rest } satisfies MessageSingleton<true>;
+
+    return {
+      userKey: userKey as undefined | UserKeySingleton<true>,
+      attachments: mapIt,
+      imageGenJob: imageGenJob as ImageGenJobSingleton<true> | undefined,
+      ...rest
+    } satisfies MessageSingleton<true>;
   }
 
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   };
 
-  public  contentTypeToExt(contentType?: string) {
+  public contentTypeToExt(contentType?: string) {
     return contentType
-      ? this.mimeToExt[
-          contentType as keyof typeof this.mimeToExt
-        ][0]
+      ? this.mimeToExt[contentType as keyof typeof this.mimeToExt][0]
       : undefined;
-  };
-
+  }
+  public getTopLevelMime(
+    target: keyof typeof this.mimeToExt
+  ):
+    | "audio"
+    | "application"
+    | "image"
+    | "video"
+    | "multipart"
+    | "text"
+    | "model"
+    | "haptics"
+    | "font" {
+    return target.split("/")?.[0] as InferTopLevelMime<typeof target>;
+  }
   public getModel = <
     const V extends Provider,
     const K extends GetModelUtilRT<V>
@@ -128,7 +150,7 @@ export class ModelService extends ProviderValidation {
     }
   };
 
-public fromBigInt(size: bigint | null) {
+  public fromBigInt(size: bigint | null) {
     return size ? (size === 0n ? 0 : Number(size)) : undefined;
   }
   public toBigInt(size?: number, bytesUploaded?: number) {
@@ -403,14 +425,14 @@ public fromBigInt(size: bigint | null) {
   };
 
   public extToContentType(metadata?: ExpandedImgSpecs | ExpandedDocSpecs) {
-      return metadata?.format && metadata.format !== "unknown"
-        ? metadata.type === "IMAGE"
-          ? this.extToMime[metadata.format][0]
-          : metadata.type === "DOCUMENT"
-            ? (metadata.mimeType ?? "application/octet-stream")
-            : "application/octet-stream"
-        : "application/octet-stream";
-    }
+    return metadata?.format && metadata.format !== "unknown"
+      ? metadata.type === "IMAGE"
+        ? this.extToMime[metadata.format][0]
+        : metadata.type === "DOCUMENT"
+          ? (metadata.mimeType ?? "application/octet-stream")
+          : "application/octet-stream"
+      : "application/octet-stream";
+  }
 
   public mimeToExt = {
     "application/dash+xml": ["mpd"],
@@ -430,6 +452,7 @@ public fromBigInt(size: bigint | null) {
     "application/pdf": ["pdf"],
     "application/rtf": ["rtf"],
     "application/sql": ["sql"],
+    "application/text": ["md"],
     "application/toml": ["toml"],
     "application/vnd.amazon.ebook": ["azw"],
     "application/vnd.apple.installer+xml": ["mpkg"],

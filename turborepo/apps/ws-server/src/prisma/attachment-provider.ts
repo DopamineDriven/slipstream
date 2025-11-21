@@ -1,13 +1,10 @@
-import { ModelService } from "@/models/index.ts";
-import { DbService, PrismaClient } from "@slipstream/db/node";
-import { $Enums } from "@slipstream/db/node/generated/client";
+import { PrismaUtilsService } from "@/prisma/utils.ts";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import { DbService } from "@slipstream/db/node";
 
-export class PrismaAttachmentProviderService extends ModelService {
-  protected readonly prismaClient: PrismaClient;
-
+export class PrismaAttachmentProviderService extends PrismaUtilsService {
   constructor(prisma: DbService) {
-    super();
-    this.prismaClient = prisma.prismaClient;
+    super(prisma);
   }
 
   public async findActiveOpenAIAsset(
@@ -142,7 +139,7 @@ export class PrismaAttachmentProviderService extends ModelService {
     attachmentId: string,
     keyFingerprint = "server"
   ) {
-    return this.prismaClient.attachmentProvider.findFirst({
+    return await this.prismaClient.attachmentProvider.findFirst({
       where: {
         attachmentId,
         provider: "ANTHROPIC",
@@ -201,103 +198,119 @@ export class PrismaAttachmentProviderService extends ModelService {
   }
 
   public async deleteStaleIds(ids: string[]) {
-    return await this.prismaClient.$transaction(async t => {
-      for (const id of ids) {
-        await t.attachmentProvider.delete({ where: { id } });
-      }
-      return;
-    });
+    if (ids.length > 0) {
+      return await this.prismaClient.$transaction(async t => {
+        for (const id of ids) {
+          await t.attachmentProvider.delete({ where: { id } });
+        }
+        return;
+      });
+    } else return;
   }
 
   public async findManyByProvider(provider: $Enums.Provider, userId: string) {
-    const t = await this.prismaClient.$transaction(async p => {
-      const d = await p.attachment.findMany({
-        where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
-        select: {
-          id: true,
-          providerLinks: {
-            select: {
-              id: true,
-              keyFingerprint: true,
-              expiresAt: true,
-              providerRef: true,
-              provider: true,
-              userKeyId: true,
-              lastCheckedAt: true,
-              providerUri: true,
-              createdAt: true
-            }
-          },
-          key: true
-        }
-      });
-      const agg = Array.of<{
-        id: string;
-        attachmentId: string;
-        expiresAt: Date | null;
-        provider: $Enums.Provider;
-        keyFingerprint: string;
-        userKeyId: string | null;
-        providerRef: string;
-        isExpired: boolean;
-        providerUri: string | null;
-      }>();
-      for (const dd of d) {
-        if (dd.providerLinks.length > 0) {
-          for (const ddd of dd.providerLinks) {
-            if (ddd.provider === provider && ddd.providerRef) {
-              if (provider !== "GEMINI") {
-                agg.push({
-                  attachmentId: dd.id,
-                  expiresAt: ddd.expiresAt,
-                  id: ddd.id,
-                  keyFingerprint: ddd.keyFingerprint,
-                  provider: ddd.provider,
-                  providerRef: ddd.providerRef,
-                  isExpired:
-                    14 * 24 * 60 * 60 * 1000 <
-                    Date.now() -
-                      (ddd.lastCheckedAt?.getTime() ?? ddd.createdAt.getTime()),
-                  userKeyId: ddd.userKeyId,
-                  providerUri: ddd.providerUri
-                });
+    const prismaTransaction = await this.prismaClient.$transaction(
+      async prisma => {
+        const attachmentFindManyRes = await prisma.attachment.findMany({
+          where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
+          select: {
+            id: true,
+            providerLinks: {
+              select: {
+                id: true,
+                keyFingerprint: true,
+                expiresAt: true,
+                providerRef: true,
+                provider: true,
+                userKeyId: true,
+                lastCheckedAt: true,
+                providerUri: true,
+                createdAt: true
               }
-              if (provider === "GEMINI" && ddd.providerUri && ddd.expiresAt) {
-                agg.push({
-                  attachmentId: dd.id,
-                  expiresAt: ddd.expiresAt,
-                  id: ddd.id,
-                  keyFingerprint: ddd.keyFingerprint,
-                  provider: ddd.provider,
-                  providerRef: ddd.providerRef,
-                  isExpired: ddd.expiresAt.getTime() < Date.now(),
-                  userKeyId: ddd.userKeyId,
-                  providerUri: ddd.providerUri
-                });
+            },
+            key: true
+          }
+        });
+        const aggArr = Array.of<{
+          id: string;
+          attachmentId: string;
+          expiresAt: Date | null;
+          provider: $Enums.Provider;
+          keyFingerprint: string;
+          userKeyId: string | null;
+          providerRef: string;
+          isExpired: boolean;
+          providerUri: string | null;
+          lastCheckedAt: Date | null;
+        }>();
+        for (const attachment of attachmentFindManyRes) {
+          if (attachment.providerLinks.length > 0) {
+            for (const providerLink of attachment.providerLinks) {
+              if (
+                providerLink.provider === provider &&
+                providerLink.providerRef
+              ) {
+                if (provider !== "GEMINI") {
+                  aggArr.push({
+                    attachmentId: attachment.id,
+                    expiresAt: providerLink.expiresAt,
+                    id: providerLink.id,
+                    keyFingerprint: providerLink.keyFingerprint,
+                    provider: providerLink.provider,
+                    providerRef: providerLink.providerRef,
+                    isExpired:
+                      14 * 24 * 60 * 60 * 1000 <
+                      Date.now() -
+                        (providerLink.lastCheckedAt?.getTime() ??
+                          providerLink.createdAt.getTime()),
+                    userKeyId: providerLink.userKeyId,
+                    providerUri: providerLink.providerUri,
+                    lastCheckedAt: providerLink.lastCheckedAt
+                  });
+                }
+                if (
+                  provider === "GEMINI" &&
+                  providerLink.providerUri &&
+                  providerLink.expiresAt
+                ) {
+                  aggArr.push({
+                    attachmentId: attachment.id,
+                    expiresAt: providerLink.expiresAt,
+                    id: providerLink.id,
+                    keyFingerprint: providerLink.keyFingerprint,
+                    provider: providerLink.provider,
+                    providerRef: providerLink.providerRef,
+                    isExpired: providerLink.expiresAt.getTime() < Date.now(),
+                    userKeyId: providerLink.userKeyId,
+                    providerUri: providerLink.providerUri,
+                    lastCheckedAt: providerLink.lastCheckedAt
+                  });
+                }
               }
             }
           }
         }
+        if (aggArr.length > 0) {
+          const idsToDelete = aggArr
+            .filter(aggArrregate => aggArrregate.isExpired === true)
+            .map(aggArrregate => aggArrregate.id);
+          if (idsToDelete.length > 0) {
+            for (const id of idsToDelete) {
+              await prisma.attachmentProvider.delete({ where: { id } });
+            }
+          }
+        }
+        return aggArr.filter(v => v.isExpired === false);
       }
-      if (agg.length > 0) {
-        const idsToDelete = agg
-          .filter(v => v.isExpired === true)
-          .map(vv => vv.id);
-        await this.deleteStaleIds(idsToDelete);
-      }
-      return agg.filter(v => v.isExpired === false);
-    });
-    return t;
+    );
+    return prismaTransaction;
   }
 
   public async hasProviderMessages(userId: string, provider: $Enums.Provider) {
-    const p = await this.prismaClient.message.findFirst({
-      where: {
-        userId,
-        attachments: { some: { providerLinks: { some: { provider } } } }
-      },
-      select: { id: true, userKeyId: true }
+    const count = await this.prismaClient.attachment.count({
+      where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
+      select: { id: true }
     });
-    return p;
+    return count.id > 0 ? true : false;
   }
 }

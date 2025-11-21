@@ -22,11 +22,10 @@ export class OpenAIService extends OpenAIGPTImageService {
     protected prisma: PrismaService,
     protected extractor: ExtractService,
     protected s3: S3Storage,
-    protected isProd: boolean,
     protected redis: EnhancedRedisPubSub,
     protected apiKey: string
   ) {
-    super(logger, prisma, extractor, s3, isProd, redis, apiKey);
+    super(logger, prisma, extractor, s3, redis, apiKey);
   }
   protected async handleOpenaiAiChatRequest({
     chunks,
@@ -325,7 +324,7 @@ export class OpenAIService extends OpenAIGPTImageService {
           uploadtInitial = performance.now();
           rtHelper = await this.s3.uploadGenerated(
             Buffer.from(b64, "base64"),
-            this.isProd,
+            this.prisma.isProd,
             {
               contentType: mimeType ?? this.getGenMime(outputFormat),
               filename,
@@ -646,7 +645,7 @@ export class OpenAIService extends OpenAIGPTImageService {
 
           uploadtInitial = performance.now();
 
-          const rt = await this.s3.uploadGenerated(b64, this.isProd, {
+          const rt = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
             contentType: this.getGenMime(outputFormat),
             filename: filename,
             userId,

@@ -1,10 +1,12 @@
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream } from "node:stream/web";
 import type {
+  BigIntToCompatProps,
   BufferLike,
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
+import OpenAI from "openai";
 import { ExtractService } from "@/extract/index.ts";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
@@ -31,7 +33,6 @@ export class Resolver {
     private providers: ProviderService,
     private s3Service: S3Storage,
     private region: string,
-    private isProd: boolean,
     private extract: ExtractService,
     private imgCompatService: ImageCompatService
   ) {}
@@ -87,7 +88,105 @@ export class Resolver {
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
   }
+ private async titleGenUtil<
+    const T extends "ai_chat_request" | "image_gen_request"
+  >(
+    type: T,
+    {
+      messages,
+      prompt
+    }: BigIntToCompatProps<typeof type>["rt"] & {
+      prompt: string;
+    }
+  ) {
+    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
+    const msgs = messages?.[0];
 
+    const openaiSvc = this.providers.getInstance("openai");
+    const openai = openaiSvc.getClient();
+
+    if (msgs?.attachments) {
+      for (const t of msgs.attachments) {
+        if (typeof t !== "undefined") {
+          const {
+            mime,
+            compatMime,
+            compatCdnUrl,
+            compatStatus,
+            cdnUrl,
+            assetType
+          } = t;
+          if (compatStatus != null && cdnUrl != null && mime != null) {
+            const file_url =
+              compatStatus === "ACTIVE" && compatCdnUrl != null
+                ? compatCdnUrl
+                : cdnUrl;
+            const mimeType =
+              compatStatus === "ACTIVE" && compatMime != null
+                ? compatMime
+                : mime;
+            if (mimeType === "application/pdf" && assetType === "DOCUMENT") {
+              content.push({ type: "input_file", file_url });
+            }
+            if (mimeType.startsWith("image") && assetType === "IMAGE") {
+              content.push({
+                type: "input_image",
+                image_url: file_url,
+                detail: "auto"
+              });
+            }
+          }
+        }
+        break;
+      }
+      content.push({ type: "input_text", text: msgs.content });
+      try {
+        const res = await openai.responses.create({
+          model: "gpt-5-nano",
+          store: false,
+          reasoning: { effort: "minimal" },
+          instructions: `Generate a creative & descriptive yet concise title  ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+          temperature: 1,
+          input: [
+            {
+              role: "system",
+              content:
+                "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+            },
+            { role: "user", content } as const
+          ]
+        });
+        const title = res.output_text;
+        console.log(`1. ` + title);
+        return this.wsServer.prisma.sanitizeTitle(title);
+      } catch {
+        /**fall through */
+      }
+    }
+    content.push({ type: "input_text", text: prompt });
+    try {
+      const res = await openai.responses.create({
+        model: "gpt-5-nano",
+        store: false,
+        reasoning: { effort: "minimal" },
+        instructions: `Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes.`,
+        temperature: 1,
+        input: [
+          {
+            role: "system",
+            content:
+              "Generate a creative & descriptive yet concise title ( **MAX 12 words** ) for this user-submitted-prompt and any attachments. Do **not** wrap the generated title in quotes."
+          },
+          { role: "user", content } as const
+        ]
+      });
+      const title = res.output_text;
+      console.log(`2. ` + title);
+      return this.wsServer.prisma.sanitizeTitle(title);
+    } catch {
+      /**fall through */
+    }
+  }
   private async handleFreeMsgQuota(
     ws: WebSocket,
     userId: string,
@@ -266,14 +365,17 @@ export class Resolver {
       resumedFromChunk = 0,
       thinkingAgg = "",
       thinkingDuration = 0;
-
-    const title =
-      res?.title ??
-      (await this.providers.openai.titleGenUtil("ai_chat_request", {
+    let tit: string | undefined;
+    if (!res.title) {
+      tit = await this.titleGenUtil("ai_chat_request", {
         apiKey,
         prompt: event.prompt,
         ...res
-      }));
+      });
+    } else {
+      tit = res.title;
+    }
+    const title = tit;
 
     if (existingState && !existingState.metadata.completed) {
       chunks = existingState.chunks;
@@ -453,9 +555,11 @@ export class Resolver {
   }
 
   public async postHandleConnectionEstablishedJob(userId: string) {
+    const gemini = this.providers.getInstance("gemini");
+    const anthropic = this.providers.getInstance("anthropic");
     return await Promise.all([
-      this.providers.anthropic.syncFileRegistry(userId, true),
-      this.providers.gemini.syncFileRegistry(userId, true)
+      anthropic.syncFileRegistry(userId, true),
+      gemini.syncFileRegistry(userId, true)
     ]);
   }
 
@@ -682,13 +786,18 @@ export class Resolver {
     const streamChannel = this.resolveChannel(conversationId, userId);
     let attachmentId = "";
     try {
-      const mimeType = mime;
+      const mimeType =
+        mime === "text/markdown"
+          ? "text/plain"
+          : mime === "application/text"
+            ? "text/plain"
+            : mime;
 
       const extension = this.wsServer.prisma.contentTypeToExt(mime) ?? "bin";
 
       const properFilename = filename.includes(".")
         ? filename
-        : `${filename}.${extension}`;
+        : `${filename}.${extension === "md" ? "txt" : extension}`;
 
       // ✅ Use fs package for human-readable size logging
       const sizeInfo = this.wsServer.prisma.getSize(size ?? 0, "auto", {
@@ -755,7 +864,7 @@ export class Resolver {
                   title: filename,
                   attachmentId: undefined,
                   isLinearized: metadata.isLinearized,
-                  format: extension,
+                  format: extension === "md" ? "txt" : extension,
                   pageCount: metadata.pageCount,
                   wordCount: metadata.wordCount,
                   language: metadata.language,
@@ -792,7 +901,7 @@ export class Resolver {
             : {}),
         mime: mimeType,
         assetType: this.wsServer.prisma.handleAssetType(mimeType),
-        ext: extension,
+        ext: extension === "md" ? "txt" : extension,
         bucket: presignedData.bucket,
         cdnUrl: presignedData.publicUrl,
         sourceUrl: presignedData.uploadUrl,
@@ -1356,13 +1465,19 @@ export class Resolver {
         versionId: finalVersion,
         size,
         storageClass
-      } = await this.s3Service.finalize(bucket, key, this.isProd, versionId);
+      } = await this.s3Service.finalize(bucket, key, this.wsServer.prisma.isProd, versionId);
 
       const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
       const compatStatus =
         specs.type === "DOCUMENT" &&
-        extension === "pdf" &&
-        specs.format === "pdf"
+        (extension === "pdf" || extension === "md" || extension === "txt") &&
+        (specs.format === "pdf" ||
+          specs.format === "md" ||
+          specs.format === "txt") &&
+        (specs.mimeType === "application/pdf" ||
+          specs.mimeType === "application/text" ||
+          specs.mimeType === "text/markdown" ||
+          specs.mimeType === "text/plain")
           ? "ALIASED"
           : specs.type === "IMAGE" && specs.width < 2000 && specs.height < 2000
             ? extension === "jpg"
@@ -1542,7 +1657,9 @@ export class Resolver {
       // TODO implement image conversion pipeline with sharp (for all non-png/jpg/webp images)
       if (
         attachment.compatStatus === "PENDING" &&
-        attachment.assetType === "DOCUMENT"
+        attachment.assetType === "DOCUMENT" &&
+        attachment.ext !== "pdf" &&
+        attachment.ext !== "md"
       ) {
         await this.wsServer.pdfService.convertToPdf({
           assetType: attachment.assetType,
