@@ -46,7 +46,7 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
     const createElementHeadingStyles = {
       id: slug,
       className:
-        "[h1]:text-5xl [h2]:text-4xl [h3]:text-3xl [h4]:text-2xl [h5]:text-xl [h6]:text-lg wrap-break-word whitespace-normal",
+        "[h1]:text-4xl [h2]:text-3xl [h3]:text-2xl [h4]:text-2xl [h5]:text-xl [h6]:text-lg wrap-break-word whitespace-normal",
       ...rest
     };
     return createElement(target, createElementHeadingStyles, [
@@ -55,7 +55,7 @@ function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
         {
           href: `#${slug}`,
           key: `link-${slug}`,
-          className: "anchor hover:underline wrap-break-word "
+          className: "anchor hover:text-current/95 ease-in-out wrap-break-word "
         },
         [children]
       )
@@ -167,25 +167,19 @@ const components = {
   },
   code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
     return (
-           <code
-          className={cn(
-// Layout & Wrapping
-        "break-all whitespace-pre-wrap inline",
-        // Typography
-        "font-mono text-sm",
-        // Spacing & Decoration
-        "px-1 py-0.5 rounded-md",
-        // Clone ensures padding/background applies to EACH line if it wraps
-        "box-decoration-clone",
-        // Colors (using your variables)
-        "bg-current text-foreground/80",
-        // Reset weird scroll/block styles from before
-        "border-none overflow-visible min-w-0 max-w-none",
-            className
-          )}
-          {...props}>
-          {children}
-        </code>
+      <code
+        className={cn(
+          "inline break-all whitespace-pre-wrap",
+          "font-mono text-sm",
+          "rounded-md px-1 py-0.5",
+          "box-decoration-clone",
+          "text-foreground/85",
+          "max-w-none min-w-0 overflow-visible border-none",
+          className
+        )}
+        {...props}>
+        {children}
+      </code>
     );
   },
   h1: createHeading(1),
