@@ -238,8 +238,8 @@ importers:
         version: 6.0.3
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@playwright/test':
         specifier: ^1.56.1
         version: 1.56.1
@@ -385,8 +385,8 @@ importers:
         specifier: ^3.936.0
         version: 3.936.0
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@d0paminedriven/metadata':
         specifier: ^4.0.1
         version: 4.0.1
@@ -561,8 +561,8 @@ importers:
         version: 12.0.3
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -628,8 +628,8 @@ importers:
         version: 6.19.0(@opentelemetry/api@1.9.0)
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -695,8 +695,8 @@ importers:
         version: 12.0.3
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -753,8 +753,8 @@ importers:
         version: link:../types
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -804,8 +804,8 @@ importers:
   packages/key-validator:
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -868,8 +868,8 @@ importers:
         version: 5.10.0
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -944,8 +944,8 @@ importers:
         version: 0.34.5
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -1002,8 +1002,8 @@ importers:
         version: link:../db
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -1144,8 +1144,8 @@ importers:
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.6))(@types/react@19.2.6)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
       '@d0paminedriven/fs':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.1.0
+        version: 10.1.0
       '@microsoft/api-extractor':
         specifier: ^7.55.1
         version: 7.55.1(@types/node@24.10.1)
@@ -1943,8 +1943,8 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
-  '@d0paminedriven/fs@10.0.0':
-    resolution: {integrity: sha512-7AKOwVrUJYMHvAcQ7k90+UyUpzexmVNv8LO7QioLUVMOnVPVr1DG4j2SVAYFX634JluRZFjfPy87CPwzqzQgQg==}
+  '@d0paminedriven/fs@10.1.0':
+    resolution: {integrity: sha512-dPRxGTwxAKpWw1HjOsz+LPGUNryT3m+gbTL8UHdbbYKGoAhiGzFugSTbM5SuEafRNm9EdcATWC+JzoVNhEP94w==}
 
   '@d0paminedriven/fs@6.5.0':
     resolution: {integrity: sha512-/iWW3jG8sk+PI/EbFOC247SKfur7upC6GKNPfSbpfE0i55jOYVa882FNys/9WJCAr+eUhZ0Q49JAKsTSI/q02A==}
@@ -11467,7 +11467,7 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@d0paminedriven/fs@10.0.0':
+  '@d0paminedriven/fs@10.1.0':
     dependencies:
       '@d0paminedriven/metadata': 4.0.1
       dotenv: 17.2.3

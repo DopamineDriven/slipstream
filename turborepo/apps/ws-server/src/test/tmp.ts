@@ -261,20 +261,19 @@ async def main():
 
       # Upload document
       result = await client.collections.upload_document(
-          collection_id="collection_f4013855-de49-43c0-a785-bff9f36fd328,
+          collection_id="${this.xaiCollection}",
           name="${displayFilename}",
           data=data,
-          content_type="${mimeType}",
-          
+          content_type="${mimeType}"
       )
 
       await client.close()
 
       # --- SNEK TRANSLATION LAYER ---
-      # Node can't read snek protobuf -- extract protobuf to return readable JSON
+      # Node can't read snek's protobuf -- extract protobuf to return readable JSON
 
       meta = result.file_metadata
-
+      print(f"[Python] upload result {meta}")
       return {
           "file_id": meta.file_id,
           "name": meta.name,
@@ -345,8 +344,9 @@ const data = async () => {
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({
+      where: { assetType: "DOCUMENT" },
       take: 10,
-      skip: 0,
+      skip: 10,
       orderBy: { createdAt: "desc" },
       include: {
         providerLinks: { include: { userKey: true } },

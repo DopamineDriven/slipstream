@@ -94,20 +94,14 @@ export class GeminiService extends GeminiWorkupService {
       let dataPart: Blob | undefined = undefined,
         textPart: string | undefined = undefined,
         thinkingPart: string | undefined = undefined,
-        started = false,
         done: keyof typeof FinishReason | undefined = undefined;
         if (tInitial === 0) {
           tInitial = performance.now();
-          if (imgGenEnabled === true && started === false) {
-            started = true;
-
-            textPart = "Image generation in progress...";
-          }
         }
-      if (chunk.candidates) {
         if (chunk.responseId && typeof resId === "undefined") {
           resId = chunk.responseId;
         }
+      if (chunk.candidates) {
         for (const candidate of chunk.candidates) {
           if (candidate.content?.parts) {
             for (const part of candidate.content.parts) {
@@ -492,7 +486,7 @@ export class GeminiService extends GeminiWorkupService {
             temperature,
             userMsgId,
             data: geminiDataPart
-              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data?.length}`
               : undefined,
             topP,
             model,
@@ -586,7 +580,7 @@ export class GeminiService extends GeminiWorkupService {
             temperature,
             userMsgId,
             data: geminiDataPart
-              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data?.length}`
+              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
               : undefined,
             topP,
             model,
