@@ -1,45 +1,90 @@
-import { tmpdir } from "node:os";
-import { resolve } from "node:path";
-import type {
-  AssetToTmpWorkupProps,
-  PythonBuiltIns,
-  UrlExtWorkupProps,
-  XAIReturnedDocMetadata
-} from "@/xai/types.ts";
-import type { Logger } from "pino";
-import { ExtractService } from "@/extract/index.ts";
-import { LoggerService } from "@/logger/index.ts";
-import { PrismaService } from "@/prisma/index.ts";
+import { tmpdir } from "os";
+import { resolve } from "path";
 import { Fs } from "@d0paminedriven/fs";
+import * as dotenv from "dotenv";
 import { python } from "pythonia";
-import type { AttachmentSingleton } from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { AttachmentSingleton, UserKeySingleton } from "@slipstream/types";
 
-export class GrokCollectionsService {
-  protected logger: Logger;
+dotenv.config({ quiet: true, path: ".env" });
+
+export type MaybePromise<T> = T | Promise<T>;
+
+export interface UrlExtWorkupProps {
+  id: string;
+  compatStatus: $Enums.CompatStatus | null;
+  ext: string | null;
+  compatExt: string | null;
+  cdnUrl: string | null;
+  compatCdnUrl: string | null;
+  mime: string | null;
+  compatMime: string | null;
+}
+
+export interface AssetToTmpWorkupProps extends UrlExtWorkupProps {
+  userId: string;
+  filename: string | null;
+}
+
+export type XAIReturnedDocMetadata = {
+  file_id: string;
+  name: string;
+  size_bytes: number;
+  content_type: string;
+  created_at_nanos: number;
+  created_at: number; // unix timestamp (seconds)
+  hash: string;
+  status: number;
+  error: undefined;
+};
+
+export type GlobalDictProps = {
+  upload_result: Promise<XAIReturnedDocMetadata>;
+};
+
+export type PythonExecType = (
+  uploadScript: string,
+  global_dict: {
+    upload_result: Promise<XAIReturnedDocMetadata>;
+  }
+) => MaybePromise<unknown>;
+
+export type PythonGlobalsType = () => Promise<GlobalDictProps>;
+
+export type PythonBuiltIns = {
+  exec: Promise<PythonExecType>;
+  globals: Promise<PythonGlobalsType>;
+};
+
+export class GrokFileServiceWorkup {
   protected fs: Fs;
+
   private assetCache = new Map<
     string,
     { fileUri: string; expiresAt: Date; databaseId: string }
   >();
   private fileRegistry = new Map<string, XAIReturnedDocMetadata>();
   private lastRegistrySync: Date | null = null;
-
   constructor(
-    logger: LoggerService,
     fs: Fs,
-    protected extract: ExtractService,
-    protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string,
     protected xaiCollection: string
   ) {
     this.fs = fs;
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[grok] " }
-      );
+  }
+  protected safeErrMsg(err: unknown) {
+    if (err instanceof Error) {
+      return err.message;
+    } else if (typeof err === "object" && err != null) {
+      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+    } else if (typeof err === "string") {
+      return err;
+    } else if (typeof err === "number") {
+      return err.toPrecision(5);
+    } else if (typeof err === "boolean") {
+      return `${err}`;
+    } else return String(err);
   }
 
   private urlExtWorkup({
@@ -230,7 +275,7 @@ upload_result = asyncio.run(main())
         return doc;
       }
     } catch (err) {
-      console.error(this.prisma.safeErrMsg(err));
+      console.error(this.safeErrMsg(err));
       throw err;
     } finally {
       try {
@@ -241,10 +286,85 @@ upload_result = asyncio.run(main())
       } catch (err) {
         console.warn(
           `cleanup of tmp file ${tmpUniquename} thought to be located at ${absTmpPath} failed following xAI file upload.`.concat(
-            this.prisma.safeErrMsg(err)
+            this.safeErrMsg(err)
           )
         );
       }
     }
   }
 }
+
+const data = async () => {
+  const { Credentials } = await import("@slipstream/credentials");
+  const p = new Credentials();
+  const datasourceUrl = await p.get("DIRECT_URL");
+  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
+  const prismaClient = new PrismaClient({
+    datasourceUrl
+  });
+  prismaClient.$connect();
+  try {
+    const data = await prismaClient.attachment.findMany({
+      take: 10,
+      skip: 20,
+      orderBy: { createdAt: "desc" },
+      include: {
+        providerLinks: { include: { userKey: true } },
+        document: true,
+        image: true,
+        imageGenOutput: true
+      }
+    });
+    return data.map(t => {
+      const { size, ...p } = t;
+      const mapProviderSingleton = p?.providerLinks?.map(v => {
+        const { size, userKey, ...s } = v;
+        return {
+          userKey: userKey as undefined | UserKeySingleton<true>,
+          size: size ? Number(size) : null,
+          ...s
+        };
+      });
+
+      return {
+        ...p,
+        size: size ? Number(size) : null,
+        providerLinks: mapProviderSingleton
+      };
+    });
+  } catch (err) {
+    throw new Error(
+      typeof err === "string"
+        ? err
+        : err instanceof Error
+          ? err.message
+          : "there was a problem in providerLinks test query..."
+    );
+  } finally {
+    prismaClient.$disconnect();
+  }
+};
+const fs = new Fs(process.cwd());
+
+const grokFileService = new GrokFileServiceWorkup(
+  fs,
+  process.env.X_AI_KEY ?? "",
+  process.env.X_AI_MANAGEMENT_API_KEY ?? "",
+  process.env.X_AI_COLLECTION ?? ""
+);
+
+(async () => {
+  const vv = await data();
+  const start = performance.now();
+  const arr = Array.of<XAIReturnedDocMetadata>();
+  for (const v of vv) {
+    const d = await grokFileService.exeScript(v);
+    arr.push(d);
+  }
+  console.log(`duration: ${performance.now() - start}`);
+  return arr;
+})().then(res => {
+  console.log(res);
+  python.exit();
+  return;
+});

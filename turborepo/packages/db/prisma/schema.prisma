@@ -451,6 +451,7 @@ model AttachmentProvider {
   state          ProviderAssetState @default(PENDING)
 
   // provider-specific refs
+  containerRef  String?
   providerUri   String?
   providerRef   String?
   mime          String?
@@ -472,6 +473,7 @@ model AttachmentProvider {
   @@index([provider, providerRef])
   @@index([attachmentId, provider])
   @@index([provider, state, expiresAt])
+  @@index([containerRef, provider])
 }
 
 model ImageMetadata {

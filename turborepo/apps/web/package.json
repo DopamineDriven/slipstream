@@ -76,7 +76,7 @@
     "vfile": "^6.0.3"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^7.6.0",
+    "@d0paminedriven/fs": "^10.0.0",
     "@playwright/test": "^1.56.1",
     "@shikijs/transformers": "^3.15.0",
     "@slipstream/eslint-config": "workspace:*",

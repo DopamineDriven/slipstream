@@ -1,5 +1,5 @@
 import { relative } from "node:path";
-import type { Options } from "tsdown";
+import type { UserConfig as Options } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
@@ -33,6 +33,7 @@ export default defineConfig(
       ],
       cwd: process.cwd(),
       target: ["node25"],
+      fixedExtension: false,
       dts: true,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],

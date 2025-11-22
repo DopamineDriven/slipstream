@@ -39,7 +39,7 @@
     "wsl2:info": "lsb_release -a"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.6",
+    "@biomejs/biome": "^2.3.7",
     "@changesets/cli": "^2.29.7",
     "@d0paminedriven/turbogen": "^5.6.0",
     "@slipstream/eslint-config": "workspace:*",
@@ -54,7 +54,7 @@
     "tsx": "^4.20.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3",
-    "vercel": "^48.10.4"
+    "vercel": "^48.10.7"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

@@ -167,8 +167,7 @@ export class GeminiWorkupService {
         );
       }
     }
-    this.logger.debug(
-      {},
+    console.log(
       `Cleanup complete: ${filesToDelete.length} files removed for GEMINI - target->google files api`
     );
   }
@@ -217,7 +216,8 @@ export class GeminiWorkupService {
     }
     // Clear and rebuild registry
     this.fileRegistry.clear();
-    // Populate file registry cache but cross-compare with asset-cache entries before persisting (ensure database-existence for user before adding--if a user is using the default server api key there will be many files not relevant to the user in the google files api)
+    // Populate file registry cache but cross-compare with asset-cache entries before persisting (ensure database-existence for user before adding--
+    // if a user is using the default server api key there will be many files not relevant to the user in the google files api)
     for await (const batch of this.getAllGoogleFiles(apiKey)) {
       for (const file of batch.page) {
         if (file.name && file.expirationTime && file.uri && file.sizeBytes) {
@@ -730,9 +730,7 @@ export class GeminiWorkupService {
       case "gemini-2.5-flash": {
         return [
           { googleSearch: {} },
-          { urlContext: {} },
-          { googleSearchRetrieval: {} },
-          { fileSearch: {} }
+          { urlContext: {} }
         ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-3-pro-image-preview": {
@@ -744,15 +742,11 @@ export class GeminiWorkupService {
       case "gemini-2.5-flash-lite": {
         return [
           { googleSearch: {} },
-          { urlContext: {} },
-          { googleSearchRetrieval: {} }
+          { urlContext: {} }
         ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-2.0-flash": {
-        return [
-          { googleSearch: {} },
-          { googleSearchRetrieval: {} }
-        ] satisfies GenerateContentConfig["tools"];
+        return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-2.0-flash-lite":
       case "imagen-4.0-fast-generate-001":

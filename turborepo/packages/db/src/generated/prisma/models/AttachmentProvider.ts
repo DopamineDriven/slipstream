@@ -41,6 +41,7 @@ export type AttachmentProviderMinAggregateOutputType = {
   userKeyId: string | null
   keyFingerprint: string | null
   state: $Enums.ProviderAssetState | null
+  containerRef: string | null
   providerUri: string | null
   providerRef: string | null
   mime: string | null
@@ -61,6 +62,7 @@ export type AttachmentProviderMaxAggregateOutputType = {
   userKeyId: string | null
   keyFingerprint: string | null
   state: $Enums.ProviderAssetState | null
+  containerRef: string | null
   providerUri: string | null
   providerRef: string | null
   mime: string | null
@@ -81,6 +83,7 @@ export type AttachmentProviderCountAggregateOutputType = {
   userKeyId: number
   keyFingerprint: number
   state: number
+  containerRef: number
   providerUri: number
   providerRef: number
   mime: number
@@ -111,6 +114,7 @@ export type AttachmentProviderMinAggregateInputType = {
   userKeyId?: true
   keyFingerprint?: true
   state?: true
+  containerRef?: true
   providerUri?: true
   providerRef?: true
   mime?: true
@@ -131,6 +135,7 @@ export type AttachmentProviderMaxAggregateInputType = {
   userKeyId?: true
   keyFingerprint?: true
   state?: true
+  containerRef?: true
   providerUri?: true
   providerRef?: true
   mime?: true
@@ -151,6 +156,7 @@ export type AttachmentProviderCountAggregateInputType = {
   userKeyId?: true
   keyFingerprint?: true
   state?: true
+  containerRef?: true
   providerUri?: true
   providerRef?: true
   mime?: true
@@ -258,6 +264,7 @@ export type AttachmentProviderGroupByOutputType = {
   userKeyId: string | null
   keyFingerprint: string
   state: $Enums.ProviderAssetState
+  containerRef: string | null
   providerUri: string | null
   providerRef: string | null
   mime: string | null
@@ -301,6 +308,7 @@ export type AttachmentProviderWhereInput = {
   userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
   state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
+  containerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
@@ -323,6 +331,7 @@ export type AttachmentProviderOrderByWithRelationInput = {
   userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   keyFingerprint?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  containerRef?: Prisma.SortOrderInput | Prisma.SortOrder
   providerUri?: Prisma.SortOrderInput | Prisma.SortOrder
   providerRef?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -349,6 +358,7 @@ export type AttachmentProviderWhereUniqueInput = Prisma.AtLeast<{
   userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
   state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
+  containerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
@@ -371,6 +381,7 @@ export type AttachmentProviderOrderByWithAggregationInput = {
   userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   keyFingerprint?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  containerRef?: Prisma.SortOrderInput | Prisma.SortOrder
   providerUri?: Prisma.SortOrderInput | Prisma.SortOrder
   providerRef?: Prisma.SortOrderInput | Prisma.SortOrder
   mime?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -399,6 +410,7 @@ export type AttachmentProviderScalarWhereWithAggregatesInput = {
   userKeyId?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   keyFingerprint?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string
   state?: Prisma.EnumProviderAssetStateWithAggregatesFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
+  containerRef?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   providerUri?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   providerRef?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   mime?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
@@ -417,6 +429,7 @@ export type AttachmentProviderCreateInput = {
   provider: $Enums.Provider
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -439,6 +452,7 @@ export type AttachmentProviderUncheckedCreateInput = {
   userKeyId?: string | null
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -457,6 +471,7 @@ export type AttachmentProviderUpdateInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -479,6 +494,7 @@ export type AttachmentProviderUncheckedUpdateInput = {
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -499,6 +515,7 @@ export type AttachmentProviderCreateManyInput = {
   userKeyId?: string | null
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -517,6 +534,7 @@ export type AttachmentProviderUpdateManyMutationInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -537,6 +555,7 @@ export type AttachmentProviderUncheckedUpdateManyInput = {
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -573,6 +592,7 @@ export type AttachmentProviderCountOrderByAggregateInput = {
   userKeyId?: Prisma.SortOrder
   keyFingerprint?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  containerRef?: Prisma.SortOrder
   providerUri?: Prisma.SortOrder
   providerRef?: Prisma.SortOrder
   mime?: Prisma.SortOrder
@@ -597,6 +617,7 @@ export type AttachmentProviderMaxOrderByAggregateInput = {
   userKeyId?: Prisma.SortOrder
   keyFingerprint?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  containerRef?: Prisma.SortOrder
   providerUri?: Prisma.SortOrder
   providerRef?: Prisma.SortOrder
   mime?: Prisma.SortOrder
@@ -617,6 +638,7 @@ export type AttachmentProviderMinOrderByAggregateInput = {
   userKeyId?: Prisma.SortOrder
   keyFingerprint?: Prisma.SortOrder
   state?: Prisma.SortOrder
+  containerRef?: Prisma.SortOrder
   providerUri?: Prisma.SortOrder
   providerRef?: Prisma.SortOrder
   mime?: Prisma.SortOrder
@@ -727,6 +749,7 @@ export type AttachmentProviderCreateWithoutUserKeyInput = {
   provider: $Enums.Provider
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -747,6 +770,7 @@ export type AttachmentProviderUncheckedCreateWithoutUserKeyInput = {
   provider: $Enums.Provider
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -796,6 +820,7 @@ export type AttachmentProviderScalarWhereInput = {
   userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
   state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
+  containerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
@@ -814,6 +839,7 @@ export type AttachmentProviderCreateWithoutAttachmentInput = {
   provider: $Enums.Provider
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -834,6 +860,7 @@ export type AttachmentProviderUncheckedCreateWithoutAttachmentInput = {
   userKeyId?: string | null
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -879,6 +906,7 @@ export type AttachmentProviderCreateManyUserKeyInput = {
   provider: $Enums.Provider
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -897,6 +925,7 @@ export type AttachmentProviderUpdateWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -917,6 +946,7 @@ export type AttachmentProviderUncheckedUpdateWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -936,6 +966,7 @@ export type AttachmentProviderUncheckedUpdateManyWithoutUserKeyInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -955,6 +986,7 @@ export type AttachmentProviderCreateManyAttachmentInput = {
   userKeyId?: string | null
   keyFingerprint: string
   state?: $Enums.ProviderAssetState
+  containerRef?: string | null
   providerUri?: string | null
   providerRef?: string | null
   mime?: string | null
@@ -973,6 +1005,7 @@ export type AttachmentProviderUpdateWithoutAttachmentInput = {
   provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -993,6 +1026,7 @@ export type AttachmentProviderUncheckedUpdateWithoutAttachmentInput = {
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1012,6 +1046,7 @@ export type AttachmentProviderUncheckedUpdateManyWithoutAttachmentInput = {
   userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
+  containerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1034,6 +1069,7 @@ export type AttachmentProviderSelect<ExtArgs extends runtime.Types.Extensions.In
   userKeyId?: boolean
   keyFingerprint?: boolean
   state?: boolean
+  containerRef?: boolean
   providerUri?: boolean
   providerRef?: boolean
   mime?: boolean
@@ -1056,6 +1092,7 @@ export type AttachmentProviderSelectCreateManyAndReturn<ExtArgs extends runtime.
   userKeyId?: boolean
   keyFingerprint?: boolean
   state?: boolean
+  containerRef?: boolean
   providerUri?: boolean
   providerRef?: boolean
   mime?: boolean
@@ -1078,6 +1115,7 @@ export type AttachmentProviderSelectUpdateManyAndReturn<ExtArgs extends runtime.
   userKeyId?: boolean
   keyFingerprint?: boolean
   state?: boolean
+  containerRef?: boolean
   providerUri?: boolean
   providerRef?: boolean
   mime?: boolean
@@ -1100,6 +1138,7 @@ export type AttachmentProviderSelectScalar = {
   userKeyId?: boolean
   keyFingerprint?: boolean
   state?: boolean
+  containerRef?: boolean
   providerUri?: boolean
   providerRef?: boolean
   mime?: boolean
@@ -1113,7 +1152,7 @@ export type AttachmentProviderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["attachmentProvider"]>
+export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "containerRef" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["attachmentProvider"]>
 export type AttachmentProviderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
@@ -1140,6 +1179,7 @@ export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.
     userKeyId: string | null
     keyFingerprint: string
     state: $Enums.ProviderAssetState
+    containerRef: string | null
     providerUri: string | null
     providerRef: string | null
     mime: string | null
@@ -1582,6 +1622,7 @@ export interface AttachmentProviderFieldRefs {
   readonly userKeyId: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly keyFingerprint: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly state: Prisma.FieldRef<"AttachmentProvider", 'ProviderAssetState'>
+  readonly containerRef: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly providerUri: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly providerRef: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly mime: Prisma.FieldRef<"AttachmentProvider", 'String'>
