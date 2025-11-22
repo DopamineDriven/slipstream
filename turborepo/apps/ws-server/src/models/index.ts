@@ -53,7 +53,16 @@ export class ModelService extends ProviderValidation {
       ...rest
     } satisfies MessageSingleton<true>;
   }
-
+  public toPathnameExtTuple(path: string) {
+    const extAndPath = (path.split(/\//gim).at(-1) ?? "")?.split(/\./gm);
+    if (extAndPath.length > 2) {
+      const handleFalsePositives = extAndPath
+        .slice(0, extAndPath.length - 1)
+        ?.join("--");
+      const ext = extAndPath.at(-1) ?? "";
+      return [handleFalsePositives, ext] as const;
+    } else return [extAndPath?.[0] ?? "", extAndPath.at?.(-1) ?? ""] as const;
+  }
   public sanitizeTitle = (generatedTitle: string) => {
     return generatedTitle.trim().replace(/^(['"])(.*?)\1$/, "$2");
   };

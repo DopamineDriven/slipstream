@@ -28,6 +28,7 @@ export default defineConfig(
       dts: true,
       cwd: process.cwd(),
       target: "esnext",
+      fixedExtension: false,
       outDir: "dist"
     }) satisfies Options
 );

@@ -1,36 +1,23 @@
-import { join, resolve } from "path";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import type {
+  AssetToTmpWorkupProps,
+  PythonBuiltIns,
+  UrlExtWorkupProps,
+  XAIReturnedDocMetadata
+} from "@/xai/types.ts";
 import type { Logger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Fs } from "@d0paminedriven/fs";
-import { Extract } from "@d0paminedriven/metadata";
-import * as dotenv from "dotenv";
 import { python } from "pythonia";
+import type { AttachmentSingleton } from "@slipstream/types";
+import { $Enums } from "@slipstream/db/node/generated/client";
 
-const fs = new Fs(process.cwd());
-const meta = new Extract();
-
-dotenv.config({ quiet: true });
-
-// NOW get the environment variables - and verify they're loaded
-const X_AI_KEY = process.env.X_AI_KEY ?? "";
-const X_AI_MANAGEMENT_API_KEY = process.env.X_AI_MANAGEMENT_API_KEY ?? "";
-const X_AI_COLLECTION = process.env.X_AI_COLLECTION ?? "";
-
-interface XAIReturnedDocMetadata {
-  file_id: string;
-  name: string;
-  size_bytes: number;
-  content_type: string;
-  created_at_nanos: number;
-  created_at: number; // unix timestamp (seconds)
-  hash: string;
-  status: number;
-}
-
-export class GrokCollectionsService extends Fs {
+export class GrokCollectionsService {
   protected logger: Logger;
+  protected fs: Fs;
   private assetCache = new Map<
     string,
     { fileUri: string; expiresAt: Date; databaseId: string }
@@ -40,13 +27,14 @@ export class GrokCollectionsService extends Fs {
 
   constructor(
     logger: LoggerService,
+    fs: Fs,
     protected extract: ExtractService,
     protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string,
     protected xaiCollection: string
   ) {
-    super(process.cwd());
+    this.fs = fs;
     this.logger = logger
       .getPinoInstance()
       .child(
@@ -54,55 +42,189 @@ export class GrokCollectionsService extends Fs {
         { msgPrefix: "[grok] " }
       );
   }
-}
-export async function uploadToCollections(
-  filePath: string,
-  filename?: string,
-  contentType = "text/markdown"
-) {
-  const buffer = fs.fileToBuffer(filePath);
 
-  const specs = await meta.extractRemote(buffer, 4096 * 96);
-  contentType = specs.contentType ?? "text/markdown";
-  console.log(`File buffer size: ${buffer.length} bytes`);
+  private urlExtWorkup({
+    cdnUrl,
+    compatCdnUrl,
+    compatStatus,
+    ext,
+    compatExt,
+    id,
+    mime,
+    compatMime
+  }: UrlExtWorkupProps) {
+    const urlExtRecord = { url: "", ext: "", mime: "" };
+    try {
+      if (!compatStatus)
+        throw new Error(
+          `no compat status associated with attachmentId ${id}; something went wrong...`
+        );
+      if (
+        compatStatus === "ACTIVE" &&
+        compatCdnUrl &&
+        compatExt &&
+        compatMime
+      ) {
+        urlExtRecord.url = compatCdnUrl;
+        urlExtRecord.ext = compatExt;
+        urlExtRecord.mime = compatMime;
+      }
+      if (compatStatus === "ALIASED" && cdnUrl && ext && mime) {
+        urlExtRecord.url = cdnUrl;
+        urlExtRecord.ext = ext;
+        urlExtRecord.mime = mime;
+      }
+    } finally {
+      return urlExtRecord;
+    }
+  }
 
-  // Create a single Python script that does everything in one async context
-  const uploadScript = `
-import asyncio
+  private assetToTmpWorkup({
+    cdnUrl,
+    compatCdnUrl,
+    compatExt,
+    compatStatus,
+    ext,
+    compatMime,
+    mime,
+    id,
+    assetType,
+    conversationId,
+    messageId,
+    userId
+  }: AssetToTmpWorkupProps) {
+    const {
+      ext: extension,
+      url,
+      mime: mimeType
+    } = this.urlExtWorkup({
+      cdnUrl,
+      compatCdnUrl,
+      compatStatus,
+      compatExt,
+      ext,
+      id,
+      mime,
+      compatMime
+    });
+    const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+    const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
+    const urlObj = new URL(url);
+
+    let usefulName: string;
+    if (conversationId && messageId) {
+      usefulName = `${userId}-${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${extension}`;
+    } else {
+      usefulName = urlObj.pathname.replace(/\//gim, "-");
+    }
+    const safeFilename = usefulName;
+    const absTmpPath = resolve(tmpdir(), tmpName);
+    return {
+      tmpFilenamePrefix: tmpPrefix,
+      tmpUniquename: tmpName,
+      absTmpPath,
+      ext: extension,
+      remoteUrl: url,
+      safeFilename,
+      mimeType
+    };
+  }
+
+  protected canParseFilename(filename: string) {
+    return /^(?:[a-z0-9]+-){4}[a-z]+.[a-z]+$/.test(filename);
+  }
+
+  protected parseFilename(filename: string) {
+    const toArr = filename.split("-");
+    const splitFinal = toArr?.at(-1)?.split(".") ?? [""];
+
+    const combined = [...toArr.slice(0, toArr.length - 1), ...splitFinal];
+    // it's certain that these values exist since this method should
+    // *only* be accessed after passing the canParseFilename check first
+    return {
+      userId: combined?.[0] ?? "",
+      conversationId: combined?.[1] ?? "",
+      messageId: combined?.[2] ?? "",
+      attachmentId: combined?.[3] ?? "",
+      assetType: (combined?.[4] ?? "").toUpperCase() as $Enums.AssetType,
+      extension: combined?.[5] ?? ""
+    };
+  }
+
+  protected toFilenameFormat(att: AttachmentSingleton<true>) {
+    const { ext } = this.urlExtWorkup(att);
+    if (att.conversationId && att.messageId) {
+      return `${att.userId}-${att.conversationId}-${att.messageId}-${att.id}-${att.assetType.toLowerCase()}.${ext}`;
+    } else return undefined;
+  }
+
+  private async remoteToTmpWorkup(att: AttachmentSingleton<true>) {
+    const {
+      absTmpPath,
+      ext,
+      tmpUniquename,
+      tmpFilenamePrefix,
+      safeFilename,
+      remoteUrl,
+      mimeType
+    } = this.assetToTmpWorkup(att);
+
+    await this.fs.fetchRemoteWriteLocalLargeFiles(remoteUrl, absTmpPath, false);
+    if (this.fs.existsTmp(tmpUniquename)) {
+      return {
+        tmpUniquename,
+        absTmpPath,
+        ext,
+        tmpFilenamePrefix,
+        safeFilename,
+        mimeType
+      };
+    } else {
+      throw new Error(
+        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath}`
+      );
+    }
+  }
+
+  private pythonScript(
+    displayFilename: string,
+    absTmpPath: string,
+    mimeType: string
+  ) {
+    // prettier-ignore
+    return  `import asyncio
+import os
 from xai_sdk import AsyncClient
 
 async def main():
   try:
-      # Create client
       client = AsyncClient(
-          api_key="${X_AI_KEY}",
-          management_api_key="${X_AI_MANAGEMENT_API_KEY}"
+          api_key="${this.xaiKey}",
+          management_api_key="${this.xaiManagementKey}"
       )
 
-      # Convert buffer data
-      data = file_data
-      if isinstance(data, dict):
-          if 'data' in data:
-              data = bytes(data['data'])
-          else:
-              data = bytes(list(data.values()))
-      elif not isinstance(data, bytes):
-          data = bytes(data)
+      file_path = r"${absTmpPath}"
 
-      print(f"Uploading {len(data)} bytes to collection")
+      if not os.path.exists(file_path):
+          return {"error": f"File not found at {file_path}"}
+
+      with open(file_path, "rb") as file:
+          data = file.read()
+
+      print(f"[Python] Uploading {len(data)} bytes from disk to xAI collection...")
 
       # Upload document
       result = await client.collections.upload_document(
-          collection_id="${X_AI_COLLECTION}",
-          name="${filename ?? "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md"}",
+          collection_id="${this.xaiCollection}",
+          name="${displayFilename}",
           data=data,
-          content_type="${contentType}"
+          content_type="${mimeType}"
       )
 
       await client.close()
 
       # --- SNEK TRANSLATION LAYER ---
-      # Node can't read SNEK protobufs -- extract protobuf to return readable JSON
+      # Node can't read snek protobuf -- extract protobuf to return readable JSON
 
       meta = result.file_metadata
 
@@ -121,97 +243,46 @@ async def main():
 # Run the upload
 upload_result = asyncio.run(main())
 `;
-  interface GlobalConfig {
-    [key: string]: string | number | boolean;
   }
-  // Inject the file data and execute
-  const builtins = (await python("builtins")) as {
-    exec: (
-      uploadScript: unknown,
-      global_dict: {
-        __setitem__: (key: string, value: unknown) => Promise<unknown>;
-        upload_result: Promise<XAIReturnedDocMetadata>;
+
+  public async exeScript(att: AttachmentSingleton<true>) {
+    const { tmpUniquename, safeFilename, mimeType, absTmpPath, ext } =
+      await this.remoteToTmpWorkup(att);
+    const uploadScript = this.pythonScript(safeFilename, absTmpPath, mimeType);
+    try {
+      const builtins = (await python("builtins")) as PythonBuiltIns;
+
+      const exec_func = await builtins.exec;
+
+      const globals_func = await builtins.globals;
+
+      const global_dict = await globals_func();
+
+      await exec_func(uploadScript, global_dict);
+
+      const doc = await global_dict.upload_result;
+
+      if (!doc) {
+        throw new Error("xAI Upload file to collections error (SNEK Bridge)");
+      } else {
+        return doc;
       }
-    ) => unknown;
-    globals: () => Promise<GlobalConfig>;
-  };
-  // eslint-disable-next-line
-  const exec_func = (await builtins.exec) as (
-    uploadScript: unknown,
-    global_dict: {
-      __setitem__: (key: string, value: unknown) => Promise<unknown>;
-      upload_result: Promise<XAIReturnedDocMetadata>;
+    } catch (err) {
+      console.error(this.prisma.safeErrMsg(err));
+      throw err;
+    } finally {
+      try {
+        if (this.fs.exists(absTmpPath)) {
+          this.fs.rmFile(absTmpPath);
+          console.log(`cleaned up tmp file ${tmpUniquename.slice(0,37)}...(${ext})`);
+        }
+      } catch (err) {
+        console.warn(
+          `cleanup of tmp file ${tmpUniquename} thought to be located at ${absTmpPath} failed following xAI file upload.`.concat(
+            this.prisma.safeErrMsg(err)
+          )
+        );
+      }
     }
-  ) => Promise<unknown>;
-  // eslint-disable-next-line
-  const globals_func = (await builtins.globals) as () => Promise<unknown>;
-
-  const global_dict = (await globals_func()) as {
-    __setitem__: (key: string, value: unknown) => Promise<unknown>;
-    upload_result: Promise<XAIReturnedDocMetadata>;
-  };
-
-  // set file_data variables
-  await global_dict.__setitem__("file_data", buffer);
-
-  // exe the script
-  await exec_func(uploadScript, global_dict);
-
-  // extract result
-  const doc = (await global_dict.upload_result) as XAIReturnedDocMetadata;
-  if (!doc) {
-    throw new Error("xAI Upload file to collections error (SNEK Bridge)");
   }
-  return doc;
-  // // extract known properties (translated from snek protobuf)
-  // try {
-  //   const result: Record<string, any> = {};
-  //   // Try different property names
-  //   for (const prop of [
-  //     "created_at_nanos",
-  //     "file_id",
-  //     "content_type",
-  //     "hash",
-  //     "size_bytes",
-  //     "name",
-  //     "status",
-  //     "created_at"
-  //   ]) {
-  //     try {
-  //       const value = await doc[prop];
-  //       if (typeof value !== "undefined") {
-  //         result[prop] = value;
-  //         // eslint-disable-next-line
-  //         console.log(`  ${prop}: ${value}`);
-  //       }
-  //     } catch {
-  //       console.log(`  ${prop}: not found`);
-  //     }
-  //   }
-
-  //   return result;
-  // } catch {
-  //   console.log("Could not extract properties, returning raw doc");
-  //   return { raw: doc };
-  // }
 }
-
-(async () => {
-  return await uploadToCollections(
-    resolve(
-      join(
-        process.cwd(),
-        "src/test/__out__/condensed/The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md"
-      )
-    ),
-    "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md",
-    "text/markdown"
-  );
-})()
-  .then(res => {
-    console.log("✅ Upload complete! Result:", res);
-    return;
-  })
-  .catch(err => {
-    console.error("❌ Upload failed:", err);
-  });

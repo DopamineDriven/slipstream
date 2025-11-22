@@ -38,6 +38,7 @@ const tsupConfig = (options: Options) =>
       "src/xai/collections.ts",
       "src/xai/index.ts",
       "src/xai/sse.ts",
+      "src/xai/types.ts",
       "!src/__out__/**/*",
       "!src/test/**/*",
       "!public/**/*"

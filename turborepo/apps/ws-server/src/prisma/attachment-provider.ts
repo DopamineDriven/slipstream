@@ -149,6 +149,19 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     });
   }
 
+  public async markProviderLastCheckedAt(
+    id: string,
+    provider: $Enums.Provider
+  ) {
+    return await this.prismaClient.attachmentProvider.update({
+      where: { id, provider },
+      data: {
+        lastCheckedAt: new Date(Date.now())
+      },
+      select: { lastCheckedAt: true }
+    });
+  }
+
   public async upsertAnthropicAssetMapping(
     attachmentId: string,
     keyFingerprint = "server",
@@ -207,7 +220,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       });
     } else return;
   }
-
+ 
   public async findManyByProvider(provider: $Enums.Provider, userId: string) {
     const prismaTransaction = await this.prismaClient.$transaction(
       async prisma => {

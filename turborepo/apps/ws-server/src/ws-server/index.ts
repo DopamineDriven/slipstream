@@ -20,7 +20,7 @@ export class WSServer {
   public readonly channel: string;
   private unsubscribePubSub?: () => Promise<void>;
   private userMap = new Map<WebSocket, string>();
-  private userDataMap = new Map<string, UserData>();
+  public userDataMap = new Map<string, UserData>();
   private httpServer: http.Server;
 
   public readonly handlers: HandlerMap = {};
@@ -143,21 +143,24 @@ export class WSServer {
     });
   }
 
-  public async refreshUserProviderConfig(userId: string) {
+  public async refreshUserProviderConfig(ws: WebSocket) {
+    const userId = this.userMap.get(ws);
+    if (!userId) throw new Error("no user session currently active");
     const userData = this.userDataMap.get(userId);
+    console.log(userId);
     if (!userData) {
       throw new Error(
         `Cannot refresh provider config: user ${userId} not in map`
       );
     }
+    console.info(userData);
 
     const providerContext = await this.prisma.injectClientApiKeyProps(userId);
+
     if (!providerContext) throw new Error("unable to resolve provider context");
+    if (userData.providerContext) userData.providerContext = providerContext;
     // Update in-memory data
-    this.userDataMap.set(userId, {
-      ...userData,
-      providerContext
-    });
+    this.userDataMap.set(userId, userData);
 
     console.info(`Refreshed provider config for user ${userId}`);
     return providerContext;
@@ -179,21 +182,13 @@ export class WSServer {
 
     await this.stashUserData(userId, cookieObj, providers, email);
 
-    const fallbackConfigData = {
-      anthropic: false,
-      gemini: false,
-      grok: false,
-      meta: false,
-      openai: false,
-      vercel: false
-    };
     const {
       city,
       country,
       ip,
       locale,
       ua,
-      providerContext,
+      providerContext = providers,
       latlng,
       tz,
       postalCode,
@@ -211,8 +206,8 @@ export class WSServer {
       postalCode: "unknown postal code",
       region: "Illinois",
       providerContext: {
-        isDefault: fallbackConfigData,
-        isSet: fallbackConfigData
+        isDefault: providers.isDefault,
+        isSet: providers.isSet
       }
     };
 

@@ -303,6 +303,7 @@ export const AttachmentProviderScalarFieldEnum = {
   userKeyId: 'userKeyId',
   keyFingerprint: 'keyFingerprint',
   state: 'state',
+  containerRef: 'containerRef',
   providerUri: 'providerUri',
   providerRef: 'providerRef',
   mime: 'mime',

@@ -1,3 +1,4 @@
+import { tmpdir } from "os";
 import { join, resolve } from "path";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -5,6 +6,8 @@ import { Fs } from "@d0paminedriven/fs";
 import { Extract } from "@d0paminedriven/metadata";
 import * as dotenv from "dotenv";
 import { python } from "pythonia";
+import { $Enums } from "@slipstream/db/node/generated/client";
+import { AttachmentSingleton } from "@slipstream/types";
 
 const fs = new Fs(process.cwd());
 const meta = new Extract();
@@ -27,7 +30,8 @@ interface XAIReturnedDocMetadata {
   status: number;
 }
 
-export class GrokFileCollectionService extends Fs {
+export class GrokFileCollectionService {
+  protected fs: Fs;
 
   private assetCache = new Map<
     string,
@@ -37,25 +41,114 @@ export class GrokFileCollectionService extends Fs {
   private lastRegistrySync: Date | null = null;
   protected extract: ExtractService;
 
-
   constructor(
+    fs: Fs,
     extract: ExtractService,
     protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string,
     protected xaiCollection: string
   ) {
-    super(process.cwd());
+    this.fs = fs;
     this.extract = extract;
   }
+  private urlExtWorkup({
+    cdnUrl,
+    compatCdnUrl,
+    compatStatus,
+    ext,
+    compatExt,
+    id
+  }: {
+    id: string;
+    compatStatus: $Enums.CompatStatus | null;
+    ext: string | null;
+    compatExt: string | null;
+    cdnUrl: string | null;
+    compatCdnUrl: string | null;
+  }) {
+    const urlExtRecord = { url: "", ext: "" };
+    try {
+      if (!compatStatus)
+        throw new Error(
+          `no compat status associated with attachmentId ${id}; something went wrong...`
+        );
+      if (compatStatus === "ACTIVE" && compatCdnUrl && compatExt) {
+        urlExtRecord.url = compatCdnUrl;
+        urlExtRecord.ext = compatExt;
+      }
+      if (compatStatus === "ALIASED" && cdnUrl && ext) {
+        urlExtRecord.url = cdnUrl;
+        urlExtRecord.ext = ext;
+      }
+    } finally {
+      return urlExtRecord;
+    }
+  }
 
+  protected assetToTmpWorkup({
+    cdnUrl,
+    compatCdnUrl,
+    compatExt,
+    compatStatus,
+    ext,
+    id,
+    filename,
+    userId
+  }: {
+    id: string;
+    userId: string;
+    compatStatus: $Enums.CompatStatus | null;
+    cdnUrl: string | null;
+    compatCdnUrl: string | null;
+    ext: string | null;
+    compatExt: string | null;
+    filename: string | null;
+  }) {
+    const { ext: extension, url } = this.urlExtWorkup({
+      cdnUrl,
+      compatCdnUrl,
+      compatStatus,
+      compatExt,
+      ext,
+      id
+    });
+    const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+    const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
+    const urlObj = new URL(url);
+    const safeFilename = filename ?? urlObj.pathname.replace(/\//gmi, "-");
+    const absTmpPath = resolve(tmpdir(), tmpName);
+    return {
+      tmpFilenamePrefix: tmpPrefix,
+      tmpUniquename: tmpName,
+      absTmpPath,
+      ext: extension,
+      remoteUrl: url,
+      safeFilename
+    };
+  }
 
+  public async remoteToTmpWorkup(att: AttachmentSingleton<true>) {
+    const { absTmpPath, ext, tmpUniquename, tmpFilenamePrefix, remoteUrl } =
+      this.assetToTmpWorkup(att);
+
+    await this.fs.fetchRemoteWriteLocalLargeFiles(remoteUrl, absTmpPath, false);
+    if (this.fs.existsTmp(tmpUniquename)) {
+      return { tmpUniquename, absTmpPath, ext, tmpFilenamePrefix };
+    } else {
+      throw new Error(
+        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath}`
+      );
+    }
+  }
 }
+
 export async function uploadToCollections(
   filePath: string,
   filename?: string,
   contentType = "text/markdown"
 ) {
+
   const buffer = fs.fileToBuffer(filePath);
 
   const specs = await meta.extractRemote(buffer, 4096 * 96);
@@ -90,7 +183,7 @@ async def main():
       # Upload document
       result = await client.collections.upload_document(
           collection_id="${X_AI_COLLECTION}",
-          name="${filename ?? "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md"}",
+          name="${filename ?? "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.md"}",
           data=data,
           content_type="${contentType}"
       )
@@ -166,10 +259,10 @@ upload_result = asyncio.run(main())
     resolve(
       join(
         process.cwd(),
-        "src/test/__out__/condensed/The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md"
+        "src/test/__out__/condensed/The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.md"
       )
     ),
-    "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.md",
+    "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.md",
     "text/markdown"
   );
 })()

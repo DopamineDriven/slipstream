@@ -88,7 +88,7 @@ export class Resolver {
       ? RedisChannels.user(userId)
       : RedisChannels.conversationStream(conversationId);
   }
- private async titleGenUtil<
+  private async titleGenUtil<
     const T extends "ai_chat_request" | "image_gen_request"
   >(
     type: T,
@@ -264,20 +264,69 @@ export class Resolver {
     } satisfies EventTypeMap["provider_context_pong"];
     ws.send(JSON.stringify(payload));
   }
+  protected equalityCheck(
+    one: ClientContextWorkupProps,
+    two: ClientContextWorkupProps
+  ) {
+    const isSet = { o: one.isSet, t: two.isSet } as const;
 
+    const isDefault = { o: one.isDefault, t: two.isDefault } as const;
+
+    const p = [
+      "anthropic",
+      "gemini",
+      "openai",
+      "meta",
+      "vercel",
+      "grok"
+    ] as const;
+
+    for (const provider of p) {
+      if (isSet.o[provider] !== isSet.t[provider]) return false;
+      if (isDefault.o[provider] !== isDefault.t[provider]) return false;
+    }
+
+    return true;
+  }
+
+  protected hasAllFalseApiKeys(one: ClientContextWorkupProps) {
+    const isSet = { o: one.isSet } as const;
+
+    const p = [
+      "anthropic",
+      "gemini",
+      "openai",
+      "meta",
+      "vercel",
+      "grok"
+    ] as const;
+
+    for (const provider of p) {
+      if (isSet.o[provider] !== false) return false;
+    }
+
+    return true;
+  }
   public async handleProviderContextUpdate(
     _event: EventTypeMap["provider_context_update"],
     ws: WebSocket,
-    userId: string,
+    _userId: string,
     _userData?: UserData
   ) {
     const providerContext =
-      await this.wsServer.refreshUserProviderConfig(userId);
+      await this.wsServer.prisma.injectClientApiKeyProps(_userId);
+    const userRecord = this.wsServer.userDataMap.get(_userId);
+
     const payload = {
       type: "provider_context_update_ack",
       providerContext
     } satisfies EventTypeMap["provider_context_update_ack"];
     ws.send(JSON.stringify(payload));
+    if (userRecord?.providerContext) {
+      userRecord.providerContext = providerContext;
+      this.wsServer.userDataMap.set(_userId, userRecord);
+      return;
+    }
   }
 
   public async handleAIChat(
@@ -566,10 +615,11 @@ export class Resolver {
   public async handleConnectionEstablished(
     ws: WebSocket,
     userId: string,
-    userData?: UserData
+    _userData?: UserData
   ) {
     try {
       let providerContext: ClientContextWorkupProps;
+      const userData = this.wsServer.userDataMap.get(userId);
       if (typeof userData?.providerContext === "undefined") {
         providerContext =
           await this.wsServer.prisma.injectClientApiKeyProps(userId);
@@ -1465,7 +1515,12 @@ export class Resolver {
         versionId: finalVersion,
         size,
         storageClass
-      } = await this.s3Service.finalize(bucket, key, this.wsServer.prisma.isProd, versionId);
+      } = await this.s3Service.finalize(
+        bucket,
+        key,
+        this.wsServer.prisma.isProd,
+        versionId
+      );
 
       const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
       const compatStatus =

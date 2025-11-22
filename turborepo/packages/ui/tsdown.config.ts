@@ -1,6 +1,6 @@
 // tsdown.config.ts
 import { relative } from "node:path";
-import type { Options } from "tsdown";
+import type { UserConfig as Options } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
@@ -34,6 +34,7 @@ export default defineConfig(
       dts: true,
       external: ["react"],
       platform: "neutral",
+      fixedExtension: false,
       target: ["esnext"],
       format: ["esm"],
       sourcemap: true,
