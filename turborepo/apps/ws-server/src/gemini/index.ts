@@ -94,16 +94,20 @@ export class GeminiService extends GeminiWorkupService {
       let dataPart: Blob | undefined = undefined,
         textPart: string | undefined = undefined,
         thinkingPart: string | undefined = undefined,
+        started = false,
         done: keyof typeof FinishReason | undefined = undefined;
-
-      if (chunk.candidates) {
         if (tInitial === 0) {
           tInitial = performance.now();
+          if (imgGenEnabled === true && started === false) {
+            started = true;
+
+            textPart = "Image generation in progress...";
+          }
         }
+      if (chunk.candidates) {
         if (chunk.responseId && typeof resId === "undefined") {
           resId = chunk.responseId;
         }
-        if (imgGenEnabled) textPart = "Image generation in progress...";
         for (const candidate of chunk.candidates) {
           if (candidate.content?.parts) {
             for (const part of candidate.content.parts) {
@@ -236,7 +240,7 @@ export class GeminiService extends GeminiWorkupService {
             title,
             userMsgId,
             systemPrompt,
-            isThinking: false,
+            isThinking: geminiIsCurrentlyThinking,
             temperature,
             topP,
             provider,
@@ -255,7 +259,7 @@ export class GeminiService extends GeminiWorkupService {
           userId,
           model,
           title,
-          isThinking: false,
+          isThinking: geminiIsCurrentlyThinking,
           systemPrompt,
           userMsgId,
           temperature,
@@ -292,7 +296,7 @@ export class GeminiService extends GeminiWorkupService {
         geminiDataArr.push(dataPart);
         geminiDataPart = dataPart;
         const _dataUrl =
-          `data:${dataPart.mimeType};base64,${dataPart.data}` as const;
+          `data:${dataPart.mimeType};base64,${dataPart.data?.length}` as const;
         ws.send(
           JSON.stringify({
             type: "ai_chat_inline_data",
@@ -535,7 +539,7 @@ export class GeminiService extends GeminiWorkupService {
               temperature,
               userMsgId,
               data: geminiDataPart
-                ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+                ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data?.length}`
                 : undefined,
               topP,
               model,
@@ -582,7 +586,7 @@ export class GeminiService extends GeminiWorkupService {
             temperature,
             userMsgId,
             data: geminiDataPart
-              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data}`
+              ? `data:${geminiDataPart?.mimeType};base64,${geminiDataPart.data?.length}`
               : undefined,
             topP,
             model,

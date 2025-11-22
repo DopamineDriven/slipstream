@@ -15,7 +15,9 @@ export interface UrlExtWorkupProps {
 
 export interface AssetToTmpWorkupProps extends UrlExtWorkupProps {
   userId: string;
-  filename: string | null;
+  conversationId: string | null;
+  messageId: string | null;
+  assetType: $Enums.AssetType;
 }
 
 export type XAIReturnedDocMetadata = {

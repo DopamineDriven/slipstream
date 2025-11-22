@@ -23,7 +23,10 @@ export interface UrlExtWorkupProps {
 
 export interface AssetToTmpWorkupProps extends UrlExtWorkupProps {
   userId: string;
-  filename: string | null;
+  conversationId: string | null;
+  origin: $Enums.AssetOrigin;
+  messageId: string | null;
+  assetType: $Enums.AssetType;
 }
 
 export type XAIReturnedDocMetadata = {
@@ -127,12 +130,14 @@ export class GrokFileServiceWorkup {
     cdnUrl,
     compatCdnUrl,
     compatExt,
+    assetType,
     compatStatus,
+    conversationId,
     ext,
+    messageId,
     compatMime,
     mime,
     id,
-    filename,
     userId
   }: AssetToTmpWorkupProps) {
     const {
@@ -152,7 +157,15 @@ export class GrokFileServiceWorkup {
     const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
     const urlObj = new URL(url);
-    const safeFilename = filename ?? urlObj.pathname.replace(/\//gim, "-");
+
+    let usefulName: string;
+    if (conversationId && messageId) {
+      // will always be defined as message and convoId for incoming assets are database derived and incoming user messages are persisted fully so AI SDKs always receive db-synced data
+      usefulName = `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${extension}`;
+    } else {
+      usefulName = urlObj.pathname.replace(/\//gim, "-");
+    }
+    const safeFilename = usefulName;
     const absTmpPath = resolve(tmpdir(), tmpName);
     return {
       tmpFilenamePrefix: tmpPrefix,
@@ -192,6 +205,32 @@ export class GrokFileServiceWorkup {
       );
     }
   }
+  protected canParseFilename(filename: string) {
+    return /^(?:[a-z0-9]+-){3}[a-z]+.[a-z]+$/.test(filename);
+  }
+
+  protected parseFilename(filename: string) {
+    const toArr = filename.split("-");
+    const splitFinal = toArr?.at(-1)?.split(".") ?? [""];
+
+    const combined = [...toArr.slice(0, toArr.length - 1), ...splitFinal];
+    // it's certain that these values exist since this method
+    // should *only* be accessed after passing the canParseFilename helper first
+    return {
+      conversationId: combined?.[0] ?? "",
+      messageId: combined?.[1] ?? "",
+      attachmentId: combined?.[2] ?? "",
+      assetType: (combined?.[3] ?? "").toUpperCase() as $Enums.AssetType,
+      extension: combined?.[4] ?? ""
+    };
+  }
+
+  protected toFilenameFormat(att: AttachmentSingleton<true>) {
+    const { ext } = this.urlExtWorkup(att);
+    if (att.conversationId && att.messageId) {
+      return `${att.userId}-${att.conversationId}-${att.messageId}-${att.id}-${att.assetType.toLowerCase()}.${ext}`;
+    } else return undefined;
+  }
 
   private pythonScript(
     displayFilename: string,
@@ -222,10 +261,11 @@ async def main():
 
       # Upload document
       result = await client.collections.upload_document(
-          collection_id="${this.xaiCollection}",
+          collection_id="collection_f4013855-de49-43c0-a785-bff9f36fd328,
           name="${displayFilename}",
           data=data,
-          content_type="${mimeType}"
+          content_type="${mimeType}",
+          
       )
 
       await client.close()
@@ -285,7 +325,7 @@ upload_result = asyncio.run(main())
         }
       } catch (err) {
         console.warn(
-          `cleanup of tmp file ${tmpUniquename} thought to be located at ${absTmpPath} failed following xAI file upload.`.concat(
+          `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following xAI file upload.`.concat(
             this.safeErrMsg(err)
           )
         );
@@ -306,7 +346,7 @@ const data = async () => {
   try {
     const data = await prismaClient.attachment.findMany({
       take: 10,
-      skip: 20,
+      skip: 0,
       orderBy: { createdAt: "desc" },
       include: {
         providerLinks: { include: { userKey: true } },

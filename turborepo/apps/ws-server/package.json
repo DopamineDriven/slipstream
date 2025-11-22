@@ -78,7 +78,8 @@
       "xai": [
         "dist/xai/collections.d.ts",
         "dist/xai/index.d.ts",
-        "dist/xai/sse.d.ts"
+        "dist/xai/sse.d.ts",
+        "dist/xai/types.d.ts"
       ]
     }
   },

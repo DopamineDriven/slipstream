@@ -13,6 +13,7 @@ import { PrismaService } from "@/prisma/index.ts";
 import { Fs } from "@d0paminedriven/fs";
 import { python } from "pythonia";
 import type { AttachmentSingleton } from "@slipstream/types";
+import { $Enums } from "@slipstream/db/node/generated/client";
 
 export class GrokCollectionsService {
   protected logger: Logger;
@@ -87,7 +88,9 @@ export class GrokCollectionsService {
     compatMime,
     mime,
     id,
-    filename,
+    assetType,
+    conversationId,
+    messageId,
     userId
   }: AssetToTmpWorkupProps) {
     const {
@@ -107,7 +110,14 @@ export class GrokCollectionsService {
     const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
     const urlObj = new URL(url);
-    const safeFilename = filename ?? urlObj.pathname.replace(/\//gim, "-");
+
+    let usefulName: string;
+    if (conversationId && messageId) {
+      usefulName = `${userId}-${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${extension}`;
+    } else {
+      usefulName = urlObj.pathname.replace(/\//gim, "-");
+    }
+    const safeFilename = usefulName;
     const absTmpPath = resolve(tmpdir(), tmpName);
     return {
       tmpFilenamePrefix: tmpPrefix,
@@ -118,6 +128,34 @@ export class GrokCollectionsService {
       safeFilename,
       mimeType
     };
+  }
+
+  protected canParseFilename(filename: string) {
+    return /^(?:[a-z0-9]+-){4}[a-z]+.[a-z]+$/.test(filename);
+  }
+
+  protected parseFilename(filename: string) {
+    const toArr = filename.split("-");
+    const splitFinal = toArr?.at(-1)?.split(".") ?? [""];
+
+    const combined = [...toArr.slice(0, toArr.length - 1), ...splitFinal];
+    // it's certain that these values exist since this method should
+    // *only* be accessed after passing the canParseFilename check first
+    return {
+      userId: combined?.[0] ?? "",
+      conversationId: combined?.[1] ?? "",
+      messageId: combined?.[2] ?? "",
+      attachmentId: combined?.[3] ?? "",
+      assetType: (combined?.[4] ?? "").toUpperCase() as $Enums.AssetType,
+      extension: combined?.[5] ?? ""
+    };
+  }
+
+  protected toFilenameFormat(att: AttachmentSingleton<true>) {
+    const { ext } = this.urlExtWorkup(att);
+    if (att.conversationId && att.messageId) {
+      return `${att.userId}-${att.conversationId}-${att.messageId}-${att.id}-${att.assetType.toLowerCase()}.${ext}`;
+    } else return undefined;
   }
 
   private async remoteToTmpWorkup(att: AttachmentSingleton<true>) {
@@ -208,7 +246,7 @@ upload_result = asyncio.run(main())
   }
 
   public async exeScript(att: AttachmentSingleton<true>) {
-    const { tmpUniquename, safeFilename, mimeType, absTmpPath } =
+    const { tmpUniquename, safeFilename, mimeType, absTmpPath, ext } =
       await this.remoteToTmpWorkup(att);
     const uploadScript = this.pythonScript(safeFilename, absTmpPath, mimeType);
     try {
@@ -236,7 +274,7 @@ upload_result = asyncio.run(main())
       try {
         if (this.fs.exists(absTmpPath)) {
           this.fs.rmFile(absTmpPath);
-          console.log(`cleaned up tmp file ${tmpUniquename}`);
+          console.log(`cleaned up tmp file ${tmpUniquename.slice(0,37)}...(${ext})`);
         }
       } catch (err) {
         console.warn(

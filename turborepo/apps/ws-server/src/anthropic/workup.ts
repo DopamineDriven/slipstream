@@ -299,55 +299,35 @@ export class AnthropicWorkup {
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
   }
 
-  private markFileAccessed(fileId: string) {
+  private async markFileAccessed(
+    fileId: string,
+    dbRecordId: string,
+    cacheKey: string
+  ) {
     const record = this.fileRegistry.get(fileId);
-    if (record) {
-      record.lastAccessedAt = new Date();
-      this.fileRegistry.set(fileId, record);
+
+    let lastCheckedAt: Date | null;
+
+    if (this.assetCache.has(cacheKey)) {
+      const { lastCheckedAt: lastCheckedDb } =
+        await this.prisma.markProviderLastCheckedAt(dbRecordId, "ANTHROPIC");
+      lastCheckedAt = lastCheckedDb;
+    } else {
+      lastCheckedAt = new Date(Date.now());
     }
-  }
 
-  // Get registry stats for monitoring
-  protected getFileRegistryStats() {
-    const MAX_REGISTRY_SIZE_GB = 100; // Anthropic's max registry size
-    const MAX_REGISTRY_SIZE_BYTES = MAX_REGISTRY_SIZE_GB * 1024 * 1024 * 1024;
+    if (record && lastCheckedAt) {
+      record.lastAccessedAt = lastCheckedAt;
+      this.fileRegistry.set(fileId, record);
 
-    const totalFiles = this.fileRegistry.size;
-    const totalSize = Array.from(this.fileRegistry.values()).reduce(
-      (sum, file) => sum + file.size_bytes,
-      0
-    );
-
-    const usagePercentage = (totalSize / MAX_REGISTRY_SIZE_BYTES) * 100;
-    const remainingBytes = MAX_REGISTRY_SIZE_BYTES - totalSize;
-
-    // Check cache/registry alignment
-    let orphanedCacheEntries = 0;
-    for (const [_, value] of this.assetCache) {
-      if (!this.fileRegistry.has(value.fileId)) {
-        orphanedCacheEntries++;
+      const assetCacheRecord = this.assetCache.get(cacheKey);
+      if (assetCacheRecord) {
+        assetCacheRecord.lastCheckedAt = lastCheckedAt;
+        this.assetCache.set(cacheKey, assetCacheRecord);
       }
     }
-
-    return {
-      totalFiles,
-      totalSizeBytes: totalSize,
-      totalSizeMB: Math.round(totalSize / 1024 / 1024),
-      totalSizeGB: (totalSize / 1024 / 1024 / 1024).toFixed(2),
-      maxSizeGB: MAX_REGISTRY_SIZE_GB,
-      usagePercentage: usagePercentage.toFixed(2),
-      remainingGB: (remainingBytes / 1024 / 1024 / 1024).toFixed(2),
-      lastSync: this.lastRegistrySync,
-      cacheSize: this.assetCache.size,
-      orphanedCacheEntries, // Entries in cache but not in registry
-      cacheHealth: orphanedCacheEntries === 0 ? "healthy" : "needs_cleanup"
-    };
   }
 
-  // Check if a specific file exists in the registry
-  protected isFileInRegistry(fileId: string): boolean {
-    return this.fileRegistry.has(fileId);
-  }
 
   // Clean up files not accessed in the specified period
   private async cleanupStaleFiles(apiKey?: string, staleThresholdDays = 14) {
@@ -480,7 +460,7 @@ export class AnthropicWorkup {
           `Reusing cached & verified Anthropic file: ${attachment.id}`
         );
         // Mark as accessed for cleanup tracking
-        this.markFileAccessed(cached.fileId);
+        void this.markFileAccessed(cached.fileId, cached.dbRecordId, cacheKey);
         return cached.fileId;
       } else {
         // File not in registry, clear from cache as it may have been deleted
@@ -515,7 +495,7 @@ export class AnthropicWorkup {
           lastCheckedAt: existing.lastCheckedAt
         });
         // Mark as accessed for cleanup tracking
-        this.markFileAccessed(existing.providerRef);
+        void this.markFileAccessed(existing.providerRef, existing.id, cacheKey);
         return existing.providerRef;
       } else {
         // File exists in DB but not in registry - it may have been deleted

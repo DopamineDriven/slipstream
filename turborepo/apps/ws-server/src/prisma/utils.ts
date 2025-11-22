@@ -1,10 +1,7 @@
 import type { BigIntToCompatProps } from "@/types/index.ts";
 import { ModelService } from "@/models/index.ts";
-import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
-import type {
-  ClientContextWorkupProps,
-  RecordCountsProps
-} from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+
 import { DbService, PrismaClient } from "@slipstream/db/node";
 
 export class PrismaUtilsService extends ModelService {
@@ -15,55 +12,7 @@ export class PrismaUtilsService extends ModelService {
     this.prismaClient = prisma.prismaClient;
   }
 
-  protected formatClientContextProps(props: RecordCountsProps) {
-    const isDefault = Object.fromEntries(
-      Object.entries(props.isDefault).map(([t, o]) => {
-        return [
-          t as Lowercase<$Enums.Provider>,
-          o === 0 ? false : true
-        ] as const;
-      })
-    );
-    const isSet = Object.fromEntries(
-      Object.entries(props.isSet).map(([t, o]) => {
-        return [
-          t as Lowercase<$Enums.Provider>,
-          o === 0 ? false : true
-        ] as const;
-      })
-    );
-    return { isSet, isDefault } as ClientContextWorkupProps;
-  }
 
-  protected handleExistingKeysForClient(props: UserKey[]) {
-    const initialProps = {
-      isSet: {
-        openai: 0,
-        grok: 0,
-        gemini: 0,
-        anthropic: 0,
-        vercel: 0,
-        meta: 0
-      },
-      isDefault: {
-        vercel: 0,
-        meta: 0,
-        openai: 0,
-        grok: 0,
-        gemini: 0,
-        anthropic: 0
-      }
-    };
-    props.forEach(function (res) {
-      const provider = res.provider.toLowerCase() as Lowercase<$Enums.Provider>;
-      const isDefault = res.isDefault;
-      initialProps.isSet[provider] += 1;
-      initialProps.isDefault[provider] += isDefault ? 1 : 0;
-    });
-    return this.formatClientContextProps(
-      initialProps
-    ) satisfies ClientContextWorkupProps;
-  }
 
   protected parseDraftId(draftId: string) {
     if (/^(?:[A-Za-z0-9_-]+~){3}(?:0|[1-9][0-9]*)$/.test(draftId) === false) {

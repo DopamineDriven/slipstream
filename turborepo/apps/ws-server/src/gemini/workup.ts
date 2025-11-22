@@ -405,8 +405,7 @@ export class GeminiWorkupService {
                 attachment?.compatStatus
               ) {
                 if (
-                  m === "gemini-3-pro-preview" ||
-                  m === "gemini-3-pro-image-preview"
+                  m === "gemini-3-pro-preview"
                 ) {
                   const { fileUri, mimeType } = await this.ensureAssetUploaded(
                     attachment,
