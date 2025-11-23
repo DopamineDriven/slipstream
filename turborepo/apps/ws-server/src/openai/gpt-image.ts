@@ -198,7 +198,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             userId,
             size: imgSpecs.byteSize,
             conversationId
-          });
+          })
           tDelta = performance.now() - tInitial;
 
           partialImgArr.push([

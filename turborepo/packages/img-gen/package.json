@@ -55,7 +55,7 @@
     "@slipstream/types": "workspace:*"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.0.0",
+    "@d0paminedriven/fs": "^10.1.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",

@@ -628,6 +628,8 @@ export class ModelService extends ProviderValidation {
     jpg: ["image/jpeg"],
     js: ["text/javascript", "application/node"],
     json: ["application/json"],
+    jsonc: ["application/json", "application/jsonc"],
+    json5: ["application/json", "application/json5"],
     jsonld: ["application/ld+json"],
     ktx: ["image/ktx"],
     ktx2: ["image/ktx2"],

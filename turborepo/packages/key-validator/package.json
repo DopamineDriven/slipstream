@@ -56,7 +56,7 @@
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.0.0",
+    "@d0paminedriven/fs": "^10.1.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
