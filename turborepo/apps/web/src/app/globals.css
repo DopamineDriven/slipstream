@@ -631,7 +631,9 @@ code > [data-line]::before {
   display: inline;
   max-width: 100%;
   vertical-align: baseline;
-  -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
   background: oklch(94.611% 0.00011 271.152);
   color: oklch(18.15% 0 0);
   -webkit-box-decoration-break: clone;
