@@ -169,7 +169,7 @@ const components = {
     return (
       <code
         className={cn(
-          "inline wrap-anywhere break-all whitespace-pre-wrap",
+          "inline wrap-anywhere! break-all! whitespace-pre-wrap!",
           "font-mono text-sm",
           "rounded-md px-1 py-0.5",
           "box-decoration-clone",
