@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Andrew Ross", url: "https://github.com/DopamineDriven" }],
   twitter: {
     card: "summary_large_image",
-    title: "AI Chat",
+    title: "Slipstream",
     creator: "@Dopamine_Driven",
     creatorId: "989610823105568769",
     description:
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   description:
     "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
   openGraph: {
-    title: "AI Chat",
+    title: "Slipstream",
     description:
       "Chat with models offered by Gemini, OpenAI, Anthropic, Meta, v0, and xAI",
     url: getSiteUrl(process.env.VERCEL_ENV),
