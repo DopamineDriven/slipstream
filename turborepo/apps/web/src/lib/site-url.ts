@@ -10,3 +10,10 @@ export const getSiteUrl = (env?: "development" | "production" | "preview") => {
   else if (env === "preview") return getPreviewUrl;
   else return getLocalUrl;
 };
+
+export const getAnalyticsMode = (env?: "development" | "production" | "preview") => {
+  if (!env) return "development" as const;
+  else if (env === "production") return "production" as const;
+  else if (env === "preview") return "production" as const;
+  else return "auto" as const
+};

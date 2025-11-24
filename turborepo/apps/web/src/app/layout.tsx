@@ -9,9 +9,10 @@ import { Suspense } from "react";
 import Script from "next/script";
 import { CookieProvider } from "@/context/cookie-context";
 import { PathnameProvider } from "@/context/pathname-context";
-import { getSiteUrl } from "@/lib/site-url";
+import { getAnalyticsMode, getSiteUrl } from "@/lib/site-url";
 import { PathnameSync } from "@/ui/pathname-sync";
 import * as ga from "@/utils/google-analytics";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -77,7 +78,10 @@ export const metadata: Metadata = {
     {
       type: "image/png",
       rel: "icon",
-      url: new URL("/meta/favicon-96x96.png", getSiteUrl(process.env.VERCEL_ENV)),
+      url: new URL(
+        "/meta/favicon-96x96.png",
+        getSiteUrl(process.env.VERCEL_ENV)
+      ),
       sizes: "96x96"
     }
   ],
@@ -104,6 +108,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const mode = getAnalyticsMode(process.env.VERCEL_ENV);
   return (
     <html suppressHydrationWarning lang="en" data-scroll-behavior="smooth">
       <head>
@@ -139,6 +144,7 @@ export default async function RootLayout({
             </PathnameProvider>
           </ThemeProvider>
         </CookieProvider>
+        <Analytics mode={mode} />
       </body>
       <Script
         async
