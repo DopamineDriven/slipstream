@@ -49,8 +49,8 @@ export type ImgArr = [
   string | undefined, // s3 last modified
   string | undefined, // content disposition
   string | undefined, // cache control
-  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
-  S3StorageClass | undefined, // s3 storage class
+  S3Checksum, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass, // s3 storage class
   string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
   ImgMetadataEntity | undefined, // ImageMetadata via extractor package
   number | undefined, // upload duration

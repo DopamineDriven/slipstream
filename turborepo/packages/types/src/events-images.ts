@@ -494,7 +494,7 @@ export type ImagenOptions = {
    * The output resolution. Only available for Imagen 4.
    * Default: "1K"
    */
-  sampleImageSize?: "1K" | "2K" ;
+  sampleImageSize?: "1K" | "2K";
 
   /**
    * A seed value for reproducible results.

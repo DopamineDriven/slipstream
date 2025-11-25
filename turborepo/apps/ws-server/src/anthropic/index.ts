@@ -6,15 +6,17 @@ import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { AnthropicWorkup } from "./workup.ts";
+import { ExtractService } from "@/extract/index.ts";
 
 export class AnthropicService extends AnthropicWorkup {
   constructor(
     logger: LoggerService,
+    extract: ExtractService,
     protected prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     protected apiKey: string
   ) {
-    super(logger, prisma, apiKey);
+    super(logger, extract, prisma, apiKey);
   }
 
   public async handleAnthropicAiChatRequest({

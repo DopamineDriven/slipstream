@@ -37,9 +37,9 @@ export const displayNameToModelId = {
   gemini: {
     "Gemini 3 Pro Preview": "gemini-3-pro-preview",
     "Gemini 2.5 Pro": "gemini-2.5-pro",
-    "Gemini 2.5 Flash": "gemini-2.5-flash",
-    "Nano Banana": "gemini-2.5-flash-image",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
+    "Nano Banana": "gemini-2.5-flash-image",
+    "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
@@ -65,11 +65,12 @@ export const displayNameToModelId = {
     "Grok 2 Vision": "grok-2-vision-1212"
   },
   anthropic: {
-    "Claude Haiku 4.5": "claude-haiku-4-5-20251001",
     "Claude Sonnet 4.5": "claude-sonnet-4-5-20250929",
+    "Claude Opus 4.5": "claude-opus-4-5-20251101",
+    "Claude Haiku 4.5": "claude-haiku-4-5-20251001",
     "Claude Opus 4.1": "claude-opus-4-1-20250805",
-    "Claude Opus 4": "claude-opus-4-20250514",
     "Claude Sonnet 4": "claude-sonnet-4-20250514",
+    "Claude Opus 4": "claude-opus-4-20250514",
     "Claude Sonnet 3.7": "claude-3-7-sonnet-20250219",
     "Claude Haiku 3.5": "claude-3-5-haiku-20241022",
     "Claude Haiku 3": "claude-3-haiku-20240307"

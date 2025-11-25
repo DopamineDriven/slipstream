@@ -124,6 +124,7 @@ async function exe() {
 
     const anthropic = new AnthropicService(
       logger,
+      extract,
       prisma,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
