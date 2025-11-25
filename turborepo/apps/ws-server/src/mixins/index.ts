@@ -154,6 +154,7 @@ export function AnthropicMixin<
             factory?.(deps, this.#anthropicApiKey) ??
             new AnthropicService(
               deps.logger,
+              deps.extract,
               deps.prisma,
               deps.redis,
               this.#anthropicApiKey ?? ""

@@ -49,12 +49,12 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "knip": "^5.70.1",
+    "knip": "^5.70.2",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3",
-    "vercel": "^48.10.7"
+    "vercel": "^48.10.11"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

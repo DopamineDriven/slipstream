@@ -5,8 +5,6 @@
 
 @plugin "tailwindcss-motion";
 
-@plugin "@tailwindcss/typography";
-
 /*
   https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
 
@@ -229,8 +227,6 @@
     }
   }
 
-
-
   --animate-flash: flash 1.2s ease-out 1;
   @keyframes flash {
     0% {
@@ -298,7 +294,6 @@
     --color-brand-text-emphasis: oklch(100% 0.005 255);
   }
 }
-
 
 @layer components {
   @property --ripple-shift {
@@ -374,8 +369,14 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, oklch(var(--primary)) 20%, oklch(var(--primary)) 80%, transparent);
-    box-shadow: 0 0 20px 4px oklch(var(--primary) / 0.5);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(var(--color-primary)) 20%,
+      oklch(var(--color-primary)) 80%,
+      transparent
+    );
+    box-shadow: 0 0 20px 4px oklch(var(--color-primary) / 0.5);
     animation: scan 2s ease-in-out infinite;
     z-index: 10;
   }
@@ -520,23 +521,8 @@ body::-webkit-scrollbar-thumb {
   }
 }
 
-.prose
-  :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  color: var(--color-foreground);
-  font-weight: 600;
-}
-
 @utility text-balance {
   text-wrap: balance;
-}
-
-@utility prose-quoteless {
-  & :where(li code, p code, a code:first-of-type)::before,
-  & :where(li code, p code, a code:first-of-type)::after,
-  & :where(blockquote p:first-of-type)::before,
-  & :where(blockquote p:first-of-type)::after {
-    content: none;
-  }
 }
 
 *,
@@ -549,7 +535,6 @@ body {
   overflow-x: hidden;
 }
 pre {
-  /* General pre styling, will be refined by prose */
   padding: 0.5rem;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -578,7 +563,9 @@ code > [data-line]::before {
   width: 1.25rem;
   margin-right: 0.75rem;
   text-align: right;
-  color: hsl(var(--brand-text-muted)); /* Use muted text for line numbers */
+  color: hsl(
+    var(--color-muted-foreground)
+  ); /* Use muted text for line numbers */
 }
 
 .highlighted {
@@ -593,136 +580,95 @@ code > [data-line]::before {
 .word {
   @apply rounded-sm bg-[color-mix(in_oklab,oklch(95.28%_0.005264_247.9)_20%,transparent)] px-[0.1em] py-[0.2em] dark:bg-[color-mix(in_oklab,oklch(60.13%_0.1982_263.1)_20%,transparent)];
 }
-.sssss {
-  background: linear-gradient(
-    to bottom,
-    rgb(255 255 255 / 0.4),
-    transparent,
-    rgb(255 255 255 / 0.5)
-  );
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-}
-.prose {
-  @apply max-w-none;
-}
 
-.prose pre {
+pre {
   @apply border-accent-foreground relative m-0 overflow-x-auto rounded-lg border border-solid bg-transparent p-0 text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
 }
 
 @media (width < 768px) {
-  .prose pre {
+  pre {
     @apply p-0 text-sm;
   }
 }
 
-.prose pre code {
+pre code {
   @apply bg-transparent p-0 text-inherit;
 }
 
-.prose code:not(pre code)::-webkit-scrollbar {
+code:not(pre code)::-webkit-scrollbar {
   height: 6px;
 }
-.prose code:not(pre code)::-webkit-scrollbar-thumb {
+code:not(pre code)::-webkit-scrollbar-thumb {
   background: color-mix(in oklab, var(--color-brand-primary) 35%, transparent);
   border-radius: 999px;
 }
-.prose code:not(pre code) {
+code:not(pre code) {
   display: inline;
   max-width: 100%;
   vertical-align: baseline;
   white-space: pre-wrap;
   word-break: break-all;
   overflow-wrap: anywhere;
-  background: oklch(94.611% 0.00011 271.152);
-  color: oklch(18.15% 0 0);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
-.dark .prose code:not(pre code) {
-  background: oklch(85.69% 0.0141 247.99 / 0.15);
-  color: oklch(80.03% 0.1821 151.71);
-}
-
-/* inline code */
-
-.prose a {
-  @apply text-brand-ring [text-decoration:none] hover:[text-decoration:underline];
-}
-
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4,
-.prose h5,
-.prose h6 {
-  @apply text-brand-text-emphasis;
-}
-
-.prose p,
-.prose ul,
-.prose ol,
-.prose li {
-  @apply text-brand-text;
-}
-
-.prose pre .token.comment,
-.prose pre .token.prolog,
-.prose pre .token.doctype,
-.prose pre .token.cdata {
+pre .token.comment,
+pre .token.prolog,
+pre .token.doctype,
+pre .token.cdata {
   @apply text-[oklch(51.028%_0.00006_271.152)] dark:text-[oklch(71.37%_0.0192_261.32)];
 }
 
-.prose pre .token.punctuation {
+pre .token.punctuation {
   @apply text-[oklch(42.024%_0.00005_271.152)] dark:text-[oklch(87.17%_0.0093_258.34)];
 }
 
-.prose pre .token.property,
-.prose pre .token.tag,
-.prose pre .token.boolean,
-.prose pre .token.number,
-.prose pre .token.constant,
-.prose pre .token.symbol,
-.prose pre .token.deleted {
+pre .token.property,
+pre .token.tag,
+pre .token.boolean,
+pre .token.number,
+pre .token.constant,
+pre .token.symbol,
+pre .token.deleted {
   @apply text-[oklch(54.586%_0.20291_356.499)] dark:text-[oklch(80.03%_0.1821_151.71)];
 }
 
-.prose pre .token.selector,
-.prose pre .token.attr-name,
-.prose pre .token.string,
-.prose pre .token.char,
-.prose pre .token.builtin,
-.prose pre .token.inserted {
+pre .token.selector,
+pre .token.attr-name,
+pre .token.string,
+pre .token.char,
+pre .token.builtin,
+pre .token.inserted {
   @apply text-[oklch(57.729%_0.12624_156.126)] dark:text-[oklch(72.17%_0.1767_305.5)];
 }
 
-.prose pre .token.operator,
-.prose pre .token.entity,
-.prose pre .token.url,
-.prose pre .language-css .token.string,
-.prose pre .style .token.string {
+pre .token.operator,
+pre .token.entity,
+pre .token.url,
+pre .language-css .token.string,
+pre .style .token.string {
   @apply text-[oklch(56.233%_0.1106_236.093)] dark:text-[oklch(90.52%_0.1657_98.11)];
 }
 
-.prose pre .token.atrule,
-.prose pre .token.attr-value,
-.prose pre .token.keyword {
+pre .token.atrule,
+pre .token.attr-value,
+pre .token.keyword {
   @apply text-[oklch(54.201%_0.2263_311.436)] dark:text-[oklch(71.37%_0.1434_254.62)];
 }
 
-.prose pre .token.function,
-.prose pre .token.class-name {
+pre .token.function,
+pre .token.class-name {
   @apply text-[oklch(63.075%_0.13435_60.247)] dark:text-[oklch(72.53%_0.1752_349.76)];
 }
 
-.prose pre .token.regex,
-.prose pre .token.important,
-.prose pre .token.variable {
+pre .token.regex,
+pre .token.important,
+pre .token.variable {
   @apply text-[oklch(33.581%_0.12548_23.959)] dark:text-[oklch(86.06%_0.1731_91.94)];
 }
 
-.prose pre code[class*="language-"] {
+pre code[class*="language-"] {
   @apply text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
 }
 
@@ -823,8 +769,14 @@ select {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, oklch(var(--primary)) 20%, oklch(var(--primary)) 80%, transparent);
-    box-shadow: 0 0 20px 4px oklch(var(--primary) / 0.5);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(var(--color-primary)) 20%,
+      oklch(var(--color-primary)) 80%,
+      transparent
+    );
+    box-shadow: 0 0 20px 4px oklch(var(--color-primary) / 0.5);
     animation: scan 2s ease-in-out infinite;
     z-index: 10;
   }

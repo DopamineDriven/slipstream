@@ -37,9 +37,9 @@ export const displayNameModelsByProvider = {
   gemini: [
     "Gemini 3 Pro Preview",
     "Gemini 2.5 Pro",
-    "Gemini 2.5 Flash",
-    "Nano Banana",
     "Nano Banana Pro",
+    "Nano Banana",
+    "Gemini 2.5 Flash",
     "Gemini 2.5 Flash-Lite",
     "Gemini 2.0 Flash",
     "Gemini 2.0 Flash-Lite",
@@ -65,11 +65,12 @@ export const displayNameModelsByProvider = {
     "Grok 2 Vision"
   ],
   anthropic: [
-    "Claude Haiku 4.5",
     "Claude Sonnet 4.5",
+    "Claude Opus 4.5",
+    "Claude Haiku 4.5",
     "Claude Opus 4.1",
-    "Claude Opus 4",
     "Claude Sonnet 4",
+    "Claude Opus 4",
     "Claude Sonnet 3.7",
     "Claude Haiku 3.5",
     "Claude Haiku 3"

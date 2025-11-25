@@ -37,9 +37,9 @@ export const modelIdsByProvider = {
   gemini: [
     "gemini-3-pro-preview",
     "gemini-2.5-pro",
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-image",
     "gemini-3-pro-image-preview",
+    "gemini-2.5-flash-image",
+    "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
@@ -65,11 +65,12 @@ export const modelIdsByProvider = {
     "grok-2-vision-1212"
   ],
   anthropic: [
-    "claude-haiku-4-5-20251001",
     "claude-sonnet-4-5-20250929",
+    "claude-opus-4-5-20251101",
+    "claude-haiku-4-5-20251001",
     "claude-opus-4-1-20250805",
-    "claude-opus-4-20250514",
     "claude-sonnet-4-20250514",
+    "claude-opus-4-20250514",
     "claude-3-7-sonnet-20250219",
     "claude-3-5-haiku-20241022",
     "claude-3-haiku-20240307"

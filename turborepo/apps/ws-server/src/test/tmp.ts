@@ -273,7 +273,7 @@ async def main():
       # Node can't read snek's protobuf -- extract protobuf to return readable JSON
 
       meta = result.file_metadata
-      print(f"[Python] upload result {meta}")
+      # print(f"[Python] upload result {meta}")
       return {
           "file_id": meta.file_id,
           "name": meta.name,
@@ -346,7 +346,7 @@ const data = async () => {
     const data = await prismaClient.attachment.findMany({
       where: { assetType: "DOCUMENT" },
       take: 10,
-      skip: 10,
+      skip: 40,
       orderBy: { createdAt: "desc" },
       include: {
         providerLinks: { include: { userKey: true } },

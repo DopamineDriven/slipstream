@@ -1,9 +1,9 @@
-import { Extract } from "@d0paminedriven/metadata";
+import { Fs } from "@d0paminedriven/fs";
 import { $Enums } from "@slipstream/db/node/generated/client";
 
-export class ExtractService extends Extract {
+export class ExtractService extends Fs {
   constructor() {
-    super();
+    super(process.cwd());
   }
 
   private isValidUrl(ss: string) {
