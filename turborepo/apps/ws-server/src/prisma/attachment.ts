@@ -18,10 +18,9 @@ import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
 
 export class PrismaAttachmentService extends PrismaAttachmentProviderService {
-  protected extractor: ExtractService;
+
   constructor(prisma: DbService, extractor: ExtractService) {
-    super(prisma);
-    this.extractor = extractor;
+    super(prisma, extractor);
   }
 
   async createAttachment({

@@ -34,6 +34,7 @@ export default defineConfig(
       sourcemap: true,
       tsconfig: relative(process.cwd(), "tsconfig.json"),
       clean: true,
-      outDir: "dist"
+      outDir: "dist",
+      unbundle: true
     }) satisfies Options
 );

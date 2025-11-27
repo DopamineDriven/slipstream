@@ -1,10 +1,23 @@
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { ExtractService } from "@/extract/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import { DbService } from "@slipstream/db/node";
+import { AttachmentSingleton } from "@slipstream/types";
 
+export interface AttachmentSingletonWithProvider<T extends $Enums.Provider>
+  extends AttachmentSingleton<true> {
+  provider: T;
+}
+
+export type AttachmentSingletonProviderWorkup<T extends $Enums.Provider> =
+  AttachmentSingleton<true> & { provider: T };
 export class PrismaAttachmentProviderService extends PrismaUtilsService {
-  constructor(prisma: DbService) {
+  protected extractor: ExtractService;
+  constructor(prisma: DbService, extractor: ExtractService) {
     super(prisma);
+    this.extractor = extractor;
   }
 
   public async findActiveOpenAIAsset(
@@ -26,9 +39,12 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     attachmentId: string,
     keyFingerprint = "server",
     mime: string,
-    keyId?: string
+    fileId: string,
+    keyId?: string,
+    size?: bigint,
+    created_at?: string
   ) {
-    return this.prismaClient.attachmentProvider.upsert({
+    return await this.prismaClient.attachmentProvider.upsert({
       where: {
         attachmentId_provider_keyFingerprint: {
           attachmentId,
@@ -37,18 +53,32 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         }
       },
       update: {
-        state: "PENDING",
+        state: "ACTIVE",
         errorCode: null,
         errorMessage: null,
-        lastCheckedAt: new Date(Date.now())
+        size,
+        userKeyId: keyId,
+        provider: "OPENAI",
+        keyFingerprint,
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       },
       create: {
-        attachmentId,
-        provider: "OPENAI",
+        state: "ACTIVE",
+        errorCode: null,
+        errorMessage: null,
+        size,
         userKeyId: keyId,
+        provider: "OPENAI",
         keyFingerprint,
-        state: "PENDING",
-        mime
+        attachmentId,
+        mime,
+        providerRef: fileId,
+        readyAt: created_at,
+        lastCheckedAt: created_at
       }
     });
   }
@@ -103,34 +133,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         providerRef: fileId,
         readyAt: created_at,
         lastCheckedAt: created_at
-      }
-    });
-  }
-
-  public async finalizeOpenAIAsset(
-    mappingId: string,
-    providerRef: string,
-    size?: bigint
-  ) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "ACTIVE",
-        providerRef, // store openai file_id here
-        size,
-        readyAt: new Date(Date.now()),
-        lastCheckedAt: new Date(Date.now())
-      }
-    });
-  }
-
-  public async markOpenAIAssetFailed(mappingId: string, errorMessage: string) {
-    await this.prismaClient.attachmentProvider.update({
-      where: { id: mappingId },
-      data: {
-        state: "FAILED",
-        errorMessage,
-        lastCheckedAt: new Date(Date.now())
       }
     });
   }
@@ -213,14 +215,12 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   public async deleteStaleIds(ids: string[]) {
     if (ids.length > 0) {
       return await this.prismaClient.$transaction(async t => {
-        for (const id of ids) {
-          await t.attachmentProvider.delete({ where: { id } });
-        }
+        await t.attachmentProvider.deleteMany({ where: { id: { in: ids } } });
         return;
       });
     } else return;
   }
- 
+
   public async findManyByProvider(provider: $Enums.Provider, userId: string) {
     const prismaTransaction = await this.prismaClient.$transaction(
       async prisma => {
@@ -229,6 +229,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
           select: {
             id: true,
             providerLinks: {
+              where: { provider },
               select: {
                 id: true,
                 keyFingerprint: true,
@@ -308,9 +309,9 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
             .filter(aggArrregate => aggArrregate.isExpired === true)
             .map(aggArrregate => aggArrregate.id);
           if (idsToDelete.length > 0) {
-            for (const id of idsToDelete) {
-              await prisma.attachmentProvider.delete({ where: { id } });
-            }
+            await prisma.attachmentProvider.deleteMany({
+              where: { id: { in: idsToDelete } }
+            });
           }
         }
         return aggArr.filter(v => v.isExpired === false);
@@ -321,9 +322,155 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
 
   public async hasProviderMessages(userId: string, provider: $Enums.Provider) {
     const count = await this.prismaClient.attachment.count({
-      where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
-      select: { id: true }
+      where: { AND: [{ providerLinks: { some: { provider } }, userId }] }
     });
-    return count.id > 0 ? true : false;
+    return count > 0 ? true : false;
+  }
+
+  private urlExtWorkup<const T extends $Enums.Provider>(
+    provider: T,
+    attachment: AttachmentSingleton<true>
+  ) {
+    const urlExtRecord = { url: "", ext: "", mime: "" };
+    try {
+      if (!attachment.compatStatus)
+        throw new Error(
+          `no compat status provided in attachment record ${attachment.id} for provider ${provider.toLowerCase()}`
+        );
+      if (
+        attachment.compatStatus === "ACTIVE" &&
+        attachment.compatExt &&
+        attachment.compatCdnUrl &&
+        attachment.compatMime
+      ) {
+        urlExtRecord.ext = attachment.compatExt;
+        urlExtRecord.mime = attachment.compatMime;
+        urlExtRecord.url = attachment.compatCdnUrl;
+      }
+      if (
+        attachment.compatStatus === "ALIASED" &&
+        attachment.ext &&
+        attachment.mime &&
+        attachment.cdnUrl
+      ) {
+        urlExtRecord.ext = attachment.ext;
+        urlExtRecord.mime = attachment.mime;
+        urlExtRecord.url = attachment.cdnUrl;
+      }
+    } catch (err) {
+      throw new Error("error in urlExtWorkup".concat(this.safeErrMsg(err)));
+    } finally {
+      return urlExtRecord;
+    }
+  }
+
+  private async filesApiToTmpWorkup<const T extends $Enums.Provider>(
+    provider: T,
+    {
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId,
+      ...rest
+    }: AttachmentSingleton<true>
+  ) {
+    const { ext, mime, url } = this.urlExtWorkup(provider, {
+      ...rest,
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId
+    });
+
+    const tmpPrefix = `${provider.toLowerCase()}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+    const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
+    const urlObj = new URL(url);
+
+    let usefulName: string;
+    if (conversationId && messageId) {
+      // will always be defined as message and convoId for incoming assets are database derived
+      // and incoming user messages are persisted fully so AI SDKs always receive db-synced data
+      usefulName =
+        provider === "GEMINI"
+          ? `${id}.${ext}`
+          : `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${ext}`;
+    } else {
+      usefulName = urlObj.pathname.replace(/\//gim, "-");
+    }
+    const safeFilename = usefulName;
+    const absTmpPath = resolve(tmpdir(), tmpName);
+    return {
+      tmpFilenamePrefix: tmpPrefix,
+      tmpUniquename: tmpName,
+      absTmpPath,
+      ext,
+      remoteUrl: url,
+      safeFilename,
+      mime
+    };
+  }
+
+  public async fetchRemoteToTmp<const T extends $Enums.Provider>(
+    provider: T,
+    att: AttachmentSingleton<true>
+  ) {
+    const workup = await this.filesApiToTmpWorkup(provider, att);
+    if (!workup)
+      throw new Error(
+        `${provider.toLowerCase()} workup for ${att.id} not defined`
+      );
+    const {
+      absTmpPath,
+      ext,
+      tmpUniquename,
+      tmpFilenamePrefix,
+      safeFilename,
+      remoteUrl,
+      mime
+    } = workup;
+    await this.extractor.fetchRemoteWriteLocalLargeFiles(
+      remoteUrl,
+      absTmpPath,
+      false
+    );
+    if (this.extractor.existsTmp(tmpUniquename)) {
+      return {
+        tmpUniquename,
+        absTmpPath,
+        ext,
+        tmpFilenamePrefix,
+        safeFilename,
+        mime
+      };
+    } else {
+      throw new Error(
+        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath} exist for provider ${provider.toLowerCase()}`
+      );
+    }
+  }
+
+  public cleanupTmpPostupload<const T extends $Enums.Provider>(
+    provider: T,
+    absTmpPath: string,
+    tmpUniquename: string
+  ) {
+    try {
+      if (this.extractor.exists(absTmpPath)) {
+        this.extractor.rmFile(absTmpPath);
+        console.log(
+          `cleaned up tmp file ${tmpUniquename} following ${provider.toLowerCase()} file upload.`
+        );
+      }
+    } catch (err) {
+      console.warn(
+        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following ${provider.toLowerCase()} file upload.`.concat(
+          this.safeErrMsg(err)
+        )
+      );
+    }
   }
 }

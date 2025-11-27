@@ -17,7 +17,6 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   try {
     return await prismaClient.attachment.count({
       where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
-      select: { id: true }
     });
   } catch (err) {
     throw new Error(
@@ -35,5 +34,5 @@ const data = async (provider: $Enums.Provider, userId: string) => {
 (async () => {
   return await data("GEMINI", "nrr6h4r4480f6kviycyo1zhf");
 })().then(d => {
-  console.log(d?.id ?? 0);
+  console.log(d ?? 0);
 });

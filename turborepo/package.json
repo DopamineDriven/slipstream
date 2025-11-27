@@ -54,7 +54,7 @@
     "tsx": "^4.20.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3",
-    "vercel": "^48.10.11"
+    "vercel": "^48.10.14"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

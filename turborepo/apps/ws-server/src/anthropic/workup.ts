@@ -1,6 +1,4 @@
 import { createReadStream } from "node:fs";
-import { tmpdir } from "node:os";
-import { resolve } from "node:path";
 import type {
   AnthropicFileRecord,
   ProviderAnthropicChatRequestEntity
@@ -9,7 +7,7 @@ import type { Logger as PinoLogger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { Anthropic, toFile } from "@anthropic-ai/sdk";
+import { Anthropic } from "@anthropic-ai/sdk";
 import type {
   AnthropicModelIdUnion,
   AttachmentSingleton,
@@ -57,7 +55,7 @@ export class AnthropicWorkup {
   protected handleBetaHeaders(model: AnthropicModelIdUnion) {
     switch (model) {
       // effort parameter is only supported by claude-opus-4.5
-      case "claude-opus-4-20250514": {
+      case "claude-opus-4-5-20251101": {
         return [
           "effort-2025-11-24",
           "files-api-2025-04-14",
@@ -73,10 +71,17 @@ export class AnthropicWorkup {
           "context-1m-2025-08-07"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
+      // output context window expansion 64k->128k is only supported by claude-sonnet-3.7
+      case "claude-3-7-sonnet-20250219": {
+        return [
+          "files-api-2025-04-14",
+          "extended-cache-ttl-2025-04-11",
+          "output-128k-2025-02-19"
+        ] satisfies Anthropic.Beta.AnthropicBeta[];
+      }
       case "claude-3-5-haiku-20241022":
       case "claude-3-haiku-20240307":
-      case "claude-opus-4-5-20251101":
-      case "claude-3-7-sonnet-20250219":
+      case "claude-opus-4-20250514":
       case "claude-opus-4-1-20250805":
       case "claude-haiku-4-5-20251001":
       default: {
@@ -98,11 +103,25 @@ export class AnthropicWorkup {
       "claude-haiku-4-5-20251001": 64000,
       "claude-sonnet-4-20250514": 64000,
       "claude-sonnet-4-5-20250929": 64000,
-      "claude-3-7-sonnet-20250219": 64000
+      "claude-3-7-sonnet-20250219": 128000
     } as const satisfies Record<
       AnthropicModelIdUnion,
-      4096 | 8192 | 32000 | 64000
+      4096 | 8192 | 32000 | 64000 | 128000
     >;
+  }
+
+  private get inputTokenCeilingByModel() {
+    return {
+      "claude-3-haiku-20240307": 200000,
+      "claude-3-5-haiku-20241022": 200000,
+      "claude-opus-4-20250514": 200000,
+      "claude-opus-4-1-20250805": 200000,
+      "claude-opus-4-5-20251101": 200000,
+      "claude-haiku-4-5-20251001": 200000,
+      "claude-sonnet-4-20250514": 1000000,
+      "claude-sonnet-4-5-20250929": 1000000,
+      "claude-3-7-sonnet-20250219": 200000
+    } as const satisfies Record<AnthropicModelIdUnion, 200000 | 1000000>;
   }
 
   private getMaxTokens = <const T extends AnthropicModelIdUnion>(model: T) => {
@@ -426,146 +445,23 @@ export class AnthropicWorkup {
     );
   }
 
-  private urlExtWorkup(attachment: AttachmentSingleton<true>) {
-    const urlExtRecord = { url: "", ext: "", mime: "" };
-    try {
-      if (!attachment.compatStatus)
-        throw new Error(
-          `no compat status provided in attachment record ${attachment.id}`
-        );
-      if (
-        attachment.compatStatus === "ACTIVE" &&
-        attachment.compatExt &&
-        attachment.compatCdnUrl &&
-        attachment.compatMime
-      ) {
-        urlExtRecord.ext = attachment.compatExt;
-        urlExtRecord.mime = attachment.compatMime;
-        urlExtRecord.url = attachment.compatCdnUrl;
-      }
-      if (
-        attachment.compatStatus === "ALIASED" &&
-        attachment.ext &&
-        attachment.mime &&
-        attachment.cdnUrl
-      ) {
-        urlExtRecord.ext = attachment.ext;
-        urlExtRecord.mime = attachment.mime;
-        urlExtRecord.url = attachment.cdnUrl;
-      }
-    } catch (err) {
-      throw new Error(
-        "error in urlExtWorkup".concat(this.prisma.safeErrMsg(err))
-      );
-    } finally {
-      return urlExtRecord;
-    }
-  }
-
-  private async toTmpWorkup({
-    assetType,
-    compatStatus,
-    conversationId,
-    messageId,
-    id,
-    userId,
-    ...rest
-  }: AttachmentSingleton<true>) {
-    const { ext, mime, url } = this.urlExtWorkup({
-      ...rest,
-      assetType,
-      compatStatus,
-      conversationId,
-      messageId,
-      id,
-      userId
-    });
-
-    const tmpPrefix = `anthropic-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
-    const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
-    const urlObj = new URL(url);
-
-    let usefulName: string;
-    if (conversationId && messageId) {
-      // will always be defined as message and convoId for incoming assets are database derived and incoming user messages are persisted fully so AI SDKs always receive db-synced data
-      usefulName = `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${ext}`;
-    } else {
-      usefulName = urlObj.pathname.replace(/\//gim, "-");
-    }
-    const safeFilename = usefulName;
-    const absTmpPath = resolve(tmpdir(), tmpName);
-    return {
-      tmpFilenamePrefix: tmpPrefix,
-      tmpUniquename: tmpName,
-      absTmpPath,
-      ext,
-      remoteUrl: url,
-      safeFilename,
-      mime
-    };
-  }
-
-  private async remoteToTmp(att: AttachmentSingleton<true>) {
-    const workup = await this.toTmpWorkup(att);
-    if (!workup) throw new Error("workup not defined");
-    const {
-      absTmpPath,
-      ext,
-      tmpUniquename,
-      tmpFilenamePrefix,
-      safeFilename,
-      remoteUrl,
-      mime
-    } = workup;
-    await this.extractor.fetchRemoteWriteLocalLargeFiles(
-      remoteUrl,
-      absTmpPath,
-      false
-    );
-    if (this.extractor.existsTmp(tmpUniquename)) {
-      return {
-        tmpUniquename,
-        absTmpPath,
-        ext,
-        tmpFilenamePrefix,
-        safeFilename,
-        mime
-      };
-    } else {
-      throw new Error(
-        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath}`
-      );
-    }
-  }
-
   private async uploadFileToAnthropic(
     attachment: AttachmentSingleton<true>,
     model: AnthropicModelIdUnion,
     apiKey?: string
   ) {
     const client = this.getClient(apiKey);
-    const { absTmpPath, mime, tmpUniquename } =
-      await this.remoteToTmp(attachment);
+    const { absTmpPath, tmpUniquename } = await this.prisma.fetchRemoteToTmp(
+      "ANTHROPIC",
+      attachment
+    );
     try {
       return await client.beta.files.upload({
-        file: (await toFile(createReadStream(absTmpPath), undefined, {
-          type: mime
-        })) satisfies Anthropic.Beta.FileUploadParams["file"],
+        file: createReadStream(absTmpPath),
         betas: this.handleBetaHeaders(model)
       } satisfies Anthropic.Beta.FileUploadParams);
     } finally {
-      try {
-        if (this.extractor.exists(absTmpPath)) {
-          this.extractor.rmFile(absTmpPath);
-          console.log(`cleaned up tmp file ${tmpUniquename}`);
-        }
-      } catch (err) {
-        console.warn(
-          `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following Anthropic file upload.`.concat(
-            this.prisma.safeErrMsg(err)
-          )
-        );
-      }
+      this.prisma.cleanupTmpPostupload("ANTHROPIC", absTmpPath, tmpUniquename);
     }
   }
 
@@ -727,7 +623,7 @@ export class AnthropicWorkup {
                           attachment,
                           model,
                           keyFingerprint,
-                          keyId,
+                          msg.userKeyId ?? undefined,
                           apiKey
                         );
                         // anthropic allows for a max of 4 blocks to have a cache_control header set else the request errors
@@ -736,12 +632,14 @@ export class AnthropicWorkup {
                           const docBlock = {
                             type: "document",
                             source: { file_id: fileId, type: "file" },
+                            citations: { enabled: true },
                             cache_control: { type: "ephemeral", ttl: "1h" }
                           } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                           content.push(docBlock);
                         }
                         const docBlock = {
                           type: "document",
+                          citations: { enabled: true },
                           source: { file_id: fileId, type: "file" }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
@@ -753,6 +651,7 @@ export class AnthropicWorkup {
                         // Fallback to URL
                         const docBlock = {
                           type: "document",
+                          citations: { enabled: true },
                           source: {
                             type: "url",
                             url
@@ -772,7 +671,7 @@ export class AnthropicWorkup {
                               attachment,
                               model,
                               keyFingerprint,
-                              keyId,
+                              msg.userKeyId ?? undefined,
                               apiKey
                             );
                           // Images uploaded to Files API use file_id source
@@ -814,6 +713,7 @@ export class AnthropicWorkup {
                       // Other docs use URLs
                       const docBlock = {
                         type: "document",
+                        citations: { enabled: true },
                         source: {
                           type: "url",
                           url
@@ -866,13 +766,14 @@ export class AnthropicWorkup {
                           attachment,
                           model,
                           keyFingerprint,
-                          keyId,
+                          msg?.userKeyId ?? undefined,
                           apiKey
                         );
 
                         const docBlock = {
                           type: "document",
-                          source: { file_id: fileId, type: "file" }
+                          source: { file_id: fileId, type: "file" },
+                          citations: { enabled: true }
                         } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
                         content.push(docBlock);
                       } catch (err) {
@@ -883,6 +784,7 @@ export class AnthropicWorkup {
                         // Fallback to URL
                         const docBlock = {
                           type: "document",
+                          citations: { enabled: true },
                           source: {
                             type: "url",
                             url
@@ -904,6 +806,7 @@ export class AnthropicWorkup {
                       // Other docs use URLs
                       const docBlock = {
                         type: "document",
+                        citations: { enabled: true },
                         source: {
                           type: "url",
                           url
@@ -1011,6 +914,7 @@ export class AnthropicWorkup {
                     // Fallback to URL
                     const docBlock = {
                       type: "document",
+                      citations: { enabled: true },
                       source: {
                         type: "url",
                         url
