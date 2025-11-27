@@ -270,4 +270,7 @@ declare global {
   interface Body {
     json<T = unknown>(): Promise<T>;
   }
+  interface Response {
+    json<T = unknown>(): Promise<T>;
+  }
 }

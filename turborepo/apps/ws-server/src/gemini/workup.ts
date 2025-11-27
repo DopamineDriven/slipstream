@@ -279,57 +279,20 @@ export class GeminiWorkupService {
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
   }
 
-  private async fetchAssetForGenAI(url: string, mime: string | null) {
-    const mimeType = mime ?? "application/octet-stream";
-
-    const response = await fetch(url, { method: "GET" });
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch asset: ${response.statusText}`);
-    }
-
-    const reader = response.body.getReader();
-    const chunks = Array.of<Uint8Array>();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) {
-        chunks.push(value);
-      }
-    }
-    const buffer = Buffer.concat(chunks);
-
-    return { buffer, mimeType };
-  }
-
   private async uploadRemoteAssetToGoogle(
     attachment: AttachmentSingleton<true>,
     apiKey?: string
   ) {
+    const { absTmpPath, mime, tmpUniquename } =
+      await this.prisma.fetchRemoteToTmp("GEMINI", attachment);
+
+    const mimeType = mime === "application/text" ? "text/markdown" : mime;
     try {
-      let url: string | null, mime: string | null;
-      if (attachment.compatStatus === "ACTIVE") {
-        url = attachment.compatCdnUrl ?? attachment.cdnUrl;
-        mime = attachment.compatMime ?? attachment.mime;
-      } else {
-        url = attachment.cdnUrl ?? attachment.compatCdnUrl;
-        mime = attachment.mime ?? attachment.compatMime;
-      }
-
-      if (!url || !mime) {
-        throw new Error("No CDN URL or MIME type available for upload");
-      }
-
-      // Fetch the remote file
-      const { buffer, mimeType } = await this.fetchAssetForGenAI(url, mime);
-
-      // Upload to Google's File API with deterministic naming
       const ai = this.getClient(apiKey);
       const uploadedFile = await ai.files.upload({
-        file: new Blob([buffer]),
+        file: absTmpPath,
         config: {
-          mimeType:
-            mimeType === "application/text" ? "text/markdown" : mimeType,
+          mimeType,
           name: `files/${attachment.id}`,
           displayName: attachment.filename ?? undefined
         }
@@ -346,6 +309,8 @@ export class GeminiWorkupService {
           : "Failed to upload file to Google Files API" +
             this.prisma.safeErrMsg(error)
       );
+    } finally {
+      this.prisma.cleanupTmpPostupload("GEMINI", absTmpPath, tmpUniquename);
     }
   }
 
@@ -404,9 +369,7 @@ export class GeminiWorkupService {
                 attachment?.compatMime &&
                 attachment?.compatStatus
               ) {
-                if (
-                  m === "gemini-3-pro-preview"
-                ) {
+                if (m === "gemini-3-pro-preview") {
                   const { fileUri, mimeType } = await this.ensureAssetUploaded(
                     attachment,
                     keyFingerprint,

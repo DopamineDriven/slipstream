@@ -41,7 +41,6 @@ export class OpenAIService extends OpenAIGPTImageService {
     max_tokens,
     jobId,
     requestMessageId,
-    keyId,
     model = "gpt-5-mini" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
@@ -88,8 +87,7 @@ export class OpenAIService extends OpenAIGPTImageService {
       isNewChat,
       msgs,
       client,
-      userId,
-      keyId ?? undefined
+      userId
     );
 
     const loc = this.normalizeLocation(user_location);

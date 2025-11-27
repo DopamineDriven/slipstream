@@ -48,7 +48,6 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     apiKey,
     jobId,
     requestMessageId,
-    keyId,
     systemPrompt,
     temperature,
     topP,
@@ -86,8 +85,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       isNewChat,
       msgs,
       client,
-      userId,
-      keyId ?? undefined
+      userId
     );
 
     // image api doesn't return a resp_id like responses api does:
