@@ -31,7 +31,8 @@ export default defineConfig(
         "!src/test/**"
       ],
       target: ["node25"],
-      dts: true,
+      dts: true,      unbundle: true,
+
       fixedExtension: false,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],

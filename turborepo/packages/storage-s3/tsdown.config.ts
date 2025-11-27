@@ -30,6 +30,7 @@ export default defineConfig(
       target: ["node25"],
       dts: true,
       fixedExtension: false,
+      unbundle: true,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],
       cwd: process.cwd(),
