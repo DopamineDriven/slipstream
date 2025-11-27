@@ -29,7 +29,6 @@ export type XAIReturnedDocMetadata = {
   created_at: number; // unix timestamp (seconds)
   hash: string;
   status: number;
-  error: undefined;
 };
 
 export type GlobalDictProps = {

@@ -1,12 +1,10 @@
-import { createReadStream } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { Anthropic, toFile } from "@anthropic-ai/sdk";
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 import { AttachmentSingleton, UserKeySingleton } from "@slipstream/types";
 
-dotenv.config({ quiet: true, path: ".env" });
+dotenv.config({ quiet: true });
 
 const fs = new Fs(process.cwd());
 
@@ -32,9 +30,9 @@ const data = async (datasourceUrl: string) => {
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({
-      where: { assetType: "IMAGE" },
-      take: 10,
-      skip: 5,
+      where: { assetType: "DOCUMENT" },
+      take: 5,
+      skip: 20,
       orderBy: { createdAt: "desc" },
       include: {
         providerLinks: { include: { userKey: true } },
@@ -132,14 +130,28 @@ async function toTmpWorkup({
     userId
   });
 
-  const tmpPrefix = `anthropic-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+  const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
   const tmpName = fs.uniqueTmpName(tmpPrefix, ext);
+
+
   const urlObj = new URL(url);
 
+  const path = urlObj.pathname.slice(urlObj.pathname.lastIndexOf("/") + 1);
+
+  const filename = path
+    .split(/(-)/gim)
+    .filter((_, o) => o >= 2)
+    .join("");
+
+  const withoutExt = (filename.split(".")?.[0] ??"")
+
+  const toHex = Buffer.from(withoutExt, "utf-8").toString("hex");
+
   let usefulName: string;
+
   if (conversationId && messageId) {
     // will always be defined as message and convoId for incoming assets are database derived and incoming user messages are persisted fully so AI SDKs always receive db-synced data
-    usefulName = `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${ext}`;
+    usefulName = `${conversationId}-${messageId}-${id}-${toHex}.${ext}`;
   } else {
     usefulName = urlObj.pathname.replace(/\//gim, "-");
   }
@@ -156,9 +168,10 @@ async function toTmpWorkup({
   };
 }
 
-async function remoteToTmp(att: AttachmentSingleton<true>) {
+
+async function fetchRemoteToTmp(att: AttachmentSingleton<true>) {
   const workup = await toTmpWorkup(att);
-  if (!workup) throw new Error("workup not defined");
+  if (!workup) throw new Error(`xai workup for ${att.id} not defined`);
   const {
     absTmpPath,
     ext,
@@ -173,6 +186,7 @@ async function remoteToTmp(att: AttachmentSingleton<true>) {
     return {
       tmpUniquename,
       absTmpPath,
+      remoteUrl,
       ext,
       tmpFilenamePrefix,
       safeFilename,
@@ -180,41 +194,91 @@ async function remoteToTmp(att: AttachmentSingleton<true>) {
     };
   } else {
     throw new Error(
-      `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath}`
+      `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath} exist for provider xai`
     );
   }
 }
 
+function cleanupTmpPostupload(absTmpPath: string, tmpUniquename: string) {
+  try {
+    if (fs.exists(absTmpPath)) {
+      fs.rmFile(absTmpPath);
+      console.log(
+        `cleaned up tmp file ${tmpUniquename} following xai file upload.`
+      );
+    }
+  } catch (err) {
+    console.warn(
+      `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following xai file upload.`.concat(
+        safeErrMsg(err)
+      )
+    );
+  }
+}
 
+async function fetchXai(att: AttachmentSingleton<true>, apiKey: string) {
+  const { absTmpPath, tmpUniquename, mime, safeFilename } =
+    await fetchRemoteToTmp(att);
+  try {
+    const F = new FormData();
+    // requires a file object to derive name  from...
+    const x = fs.fileToBuffer(absTmpPath);
+
+    const file = new File([x], safeFilename, { type: mime });
+
+    F.set("file", file, safeFilename);
+    // F.append("purpose", new Blob(["assistants"]), safeFilename);
+    const fetcher = await fetch(
+      "https://api.x.ai/v1/files?purpose=assistants",
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`
+        },
+        method: "POST",
+        body: F
+      }
+    );
+    return await fetcher.json();
+  } catch (err) {
+    console.error(safeErrMsg(err));
+  } finally {
+    cleanupTmpPostupload(absTmpPath, tmpUniquename);
+  }
+}
+
+type UploadRT = {
+  bytes: number;
+  created_at: number;
+  expires_at: null;
+  filename: string;
+  id: string;
+  object: "file";
+  purpose: string;
+};
+
+type ResShape = { data: UploadRT[]; pagination_token: null | string | number };
 
 (async () => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
-  const apiKey = await p.get("ANTHROPIC_API_KEY");
+  const apiKey = await p.get("X_AI_KEY");
   const datasourceUrl = await p.get("DIRECT_URL");
-  const helper = Array.of<Anthropic.Beta.Files.FileMetadata>();
+  const helper = Array.of<unknown>();
   const start = performance.now();
-  const claudeSdk = new Anthropic({
-    apiKey
-  });
+
   const ddd = (await data(datasourceUrl)) satisfies AttachmentSingleton<true>[];
   for (const d of ddd) {
-    const getProps = await remoteToTmp(d);
-    const upload = await claudeSdk.beta.files.upload({
-      betas: ["files-api-2025-04-14"],
-      file: await toFile(createReadStream(getProps.absTmpPath), undefined, {
-        type: getProps.mime
-      })
-    });
+    const upload = (await fetchXai(d, apiKey)) as ResShape;
+    console.log(upload);
     helper.push(upload);
-    if (fs.exists(getProps.absTmpPath)) {
-      console.log(`removing ${getProps.tmpUniquename} from tmp`);
-      fs.rmFile(getProps.absTmpPath);
-    }
   }
   console.log(`duration: ${performance.now() - start} ms`);
   return helper;
 })().then(v => {
+  fs.withWs(
+    `src/test/__out__/xai/files/upload.json`,
+    JSON.stringify(v, null, 2)
+  );
   console.log(v);
   return v;
 });
