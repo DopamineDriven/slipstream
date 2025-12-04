@@ -25,7 +25,7 @@ export default defineConfig(
       ],
       format: ["esm"],
       clean: true,
-      dts: true,
+      dts: { tsgo: true },
       cwd: process.cwd(),
       target: "node25",
       fixedExtension: false,

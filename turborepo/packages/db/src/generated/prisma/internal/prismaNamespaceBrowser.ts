@@ -24,28 +24,30 @@ export const Decimal = runtime.Decimal
 
 
 export const NullTypes = {
-  DbNull: runtime.objectEnumValues.classes.DbNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.DbNull),
-  JsonNull: runtime.objectEnumValues.classes.JsonNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.JsonNull),
-  AnyNull: runtime.objectEnumValues.classes.AnyNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.AnyNull),
+  DbNull: runtime.NullTypes.DbNull as (new (secret: never) => typeof runtime.DbNull),
+  JsonNull: runtime.NullTypes.JsonNull as (new (secret: never) => typeof runtime.JsonNull),
+  AnyNull: runtime.NullTypes.AnyNull as (new (secret: never) => typeof runtime.AnyNull),
 }
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.objectEnumValues.instances.DbNull
+export const DbNull = runtime.DbNull
+
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.objectEnumValues.instances.JsonNull
+export const JsonNull = runtime.JsonNull
+
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.objectEnumValues.instances.AnyNull
+export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
@@ -53,6 +55,7 @@ export const ModelName = {
   Profile: 'Profile',
   Account: 'Account',
   Session: 'Session',
+  ProviderStore: 'ProviderStore',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -75,12 +78,12 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  * Enums
  */
 
-export const TransactionIsolationLevel = runtime.makeStrictEnum({
+export const TransactionIsolationLevel = {
   ReadUncommitted: 'ReadUncommitted',
   ReadCommitted: 'ReadCommitted',
   RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
-} as const)
+} as const
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
@@ -153,6 +156,23 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const ProviderStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  storeRef: 'storeRef',
+  storeName: 'storeName',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  providerStoreCreatedAt: 'providerStoreCreatedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
 
 
 export const UserKeyScalarFieldEnum = {
@@ -303,7 +323,6 @@ export const AttachmentProviderScalarFieldEnum = {
   userKeyId: 'userKeyId',
   keyFingerprint: 'keyFingerprint',
   state: 'state',
-  containerRef: 'containerRef',
   providerUri: 'providerUri',
   providerRef: 'providerRef',
   mime: 'mime',
@@ -313,6 +332,7 @@ export const AttachmentProviderScalarFieldEnum = {
   lastCheckedAt: 'lastCheckedAt',
   errorCode: 'errorCode',
   errorMessage: 'errorMessage',
+  storeId: 'storeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

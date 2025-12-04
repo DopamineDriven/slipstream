@@ -13,11 +13,12 @@
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.7.1"
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2"
   },
   "devDependencies": {
     "@slipstream/tsconfig": "workspace:*",
+    "@typescript/native-preview": "^7.0.0-dev.20251204.1",
     "typescript": "^5.9.3"
   },
   "prettier": "@slipstream/prettier-config"

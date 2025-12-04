@@ -29,7 +29,7 @@ export default defineConfig(
       ],
       cwd: process.cwd(),
       target: ["node25"],
-      dts: true,
+      dts: { tsgo: true },
       fixedExtension: false,
       watch: process.env.NODE_ENV === "development",
       format: ["esm"],

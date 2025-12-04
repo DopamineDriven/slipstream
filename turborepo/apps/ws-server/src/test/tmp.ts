@@ -90,91 +90,136 @@ export class GrokFileServiceWorkup {
     } else return String(err);
   }
 
-  private urlExtWorkup({
-    cdnUrl,
-    compatCdnUrl,
-    compatStatus,
-    ext,
-    compatExt,
-    id,
-    mime,
-    compatMime
-  }: UrlExtWorkupProps) {
-    const urlExtRecord = { url: "", ext: "", mime: "" };
+  private urlExtWorkup(attachment: AttachmentSingleton<true>) {
+    const urlExtRecord = { url: "", ext: "", mime: "", xaiFilename: "" };
     try {
-      if (!compatStatus)
+      if (!attachment.compatStatus)
         throw new Error(
-          `no compat status associated with attachmentId ${id}; something went wrong...`
+          `no compat status provided in attachment record ${attachment.id}`
         );
       if (
-        compatStatus === "ACTIVE" &&
-        compatCdnUrl &&
-        compatExt &&
-        compatMime
+        attachment.compatStatus === "ACTIVE" &&
+        attachment.compatExt &&
+        attachment.compatCdnUrl &&
+        attachment.compatMime
       ) {
-        urlExtRecord.url = compatCdnUrl;
-        urlExtRecord.ext = compatExt;
-        urlExtRecord.mime = compatMime;
+        urlExtRecord.ext = attachment.compatExt;
+        urlExtRecord.mime = attachment.compatMime;
+        urlExtRecord.url = attachment.compatCdnUrl;
+        urlExtRecord.xaiFilename = this.toXaiFilename(attachment);
       }
-      if (compatStatus === "ALIASED" && cdnUrl && ext && mime) {
-        urlExtRecord.url = cdnUrl;
-        urlExtRecord.ext = ext;
-        urlExtRecord.mime = mime;
+      if (
+        attachment.compatStatus === "ALIASED" &&
+        attachment.ext &&
+        attachment.mime &&
+        attachment.cdnUrl
+      ) {
+        urlExtRecord.ext = attachment.ext;
+        urlExtRecord.mime = attachment.mime;
+        urlExtRecord.url = attachment.cdnUrl;
+        urlExtRecord.xaiFilename = this.toXaiFilename(attachment);
       }
+    } catch (err) {
+      throw new Error("error in urlExtWorkup ".concat(this.safeErrMsg(err)));
     } finally {
       return urlExtRecord;
     }
   }
 
-  private assetToTmpWorkup({
-    cdnUrl,
-    compatCdnUrl,
-    compatExt,
+  protected async getCollectionByUserId(userId: string) {
+    return await fetch(
+      `https://management-api.x.ai/v1/collections?filter=collection_name:${userId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.xaiManagementKey}`
+        }
+      }
+    );
+  }
+
+  private filenameToHex(url: string) {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    const pathname = path.slice(path.lastIndexOf("/") + 1);
+    const filename = pathname.slice(14);
+    const dbFile = filename ?? `file.pdf`;
+
+    const withoutExt = dbFile.slice(0, dbFile.lastIndexOf("."));
+
+    return Buffer.from(withoutExt, "utf-8").toString("hex");
+  }
+
+  private toXaiFilename(att: AttachmentSingleton<true>) {
+    let url: string;
+    if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
+      url = att.compatCdnUrl;
+    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
+      url = att.cdnUrl;
+    } else {
+      url = "";
+    }
+    if (att.conversationId && att.messageId && att.compatExt) {
+      return `${att.conversationId}-${att.messageId}-${att.id}-${this.filenameToHex(url)}.${att.compatExt}`;
+    } else {
+      throw new Error(`no conversationId or messageId set for ${att.id}`);
+    }
+  }
+
+  protected async assetToTmpWorkup({
     assetType,
     compatStatus,
     conversationId,
-    ext,
     messageId,
-    compatMime,
-    mime,
     id,
-    userId
-  }: AssetToTmpWorkupProps) {
-    const {
-      ext: extension,
-      url,
-      mime: mimeType
-    } = this.urlExtWorkup({
-      cdnUrl,
-      compatCdnUrl,
+    userId,
+    ...rest
+  }: AttachmentSingleton<true>) {
+    const { ext, mime, url, xaiFilename } = this.urlExtWorkup({
+      ...rest,
+      assetType,
       compatStatus,
-      compatExt,
-      ext,
+      conversationId,
+      messageId,
       id,
-      mime,
-      compatMime
+      userId
     });
-    const tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
-    const tmpName = this.fs.uniqueTmpName(tmpPrefix, extension);
+
+    const toTmpWorkupObj = {
+      absTmpPath: "",
+      tmpPrefix: "",
+      tmpName: "",
+      safeFilename: ""
+    };
+
+    toTmpWorkupObj.tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
+
+    toTmpWorkupObj.tmpName = this.fs.uniqueTmpName(
+      toTmpWorkupObj.tmpPrefix,
+      ext
+    );
+
     const urlObj = new URL(url);
 
     let usefulName: string;
+
     if (conversationId && messageId) {
       // will always be defined as message and convoId for incoming assets are database derived and incoming user messages are persisted fully so AI SDKs always receive db-synced data
-      usefulName = `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${extension}`;
+      usefulName = xaiFilename;
     } else {
       usefulName = urlObj.pathname.replace(/\//gim, "-");
     }
-    const safeFilename = usefulName;
-    const absTmpPath = resolve(tmpdir(), tmpName);
+    toTmpWorkupObj.safeFilename = usefulName;
+    toTmpWorkupObj.absTmpPath = resolve(tmpdir(), toTmpWorkupObj.tmpName);
     return {
-      tmpFilenamePrefix: tmpPrefix,
-      tmpUniquename: tmpName,
-      absTmpPath,
-      ext: extension,
+      tmpFilenamePrefix: toTmpWorkupObj.tmpPrefix,
+      tmpUniquename: toTmpWorkupObj.tmpName,
+      absTmpPath: toTmpWorkupObj.absTmpPath,
+      ext,
       remoteUrl: url,
-      safeFilename,
-      mimeType
+      safeFilename: toTmpWorkupObj.safeFilename,
+      mime
     };
   }
 
@@ -186,11 +231,11 @@ export class GrokFileServiceWorkup {
       tmpFilenamePrefix,
       safeFilename,
       remoteUrl,
-      mimeType
-    } = this.assetToTmpWorkup(att);
+      mime: mimeType
+    } = await this.assetToTmpWorkup(att);
 
     await this.fs.fetchRemoteWriteLocalLargeFiles(remoteUrl, absTmpPath, false);
-    if (this.fs.existsTmp(tmpUniquename)) {
+    if (this.fs.exists(absTmpPath)) {
       return {
         tmpUniquename,
         absTmpPath,
@@ -205,37 +250,56 @@ export class GrokFileServiceWorkup {
       );
     }
   }
+
+  protected cleanupTmpPostupload(absTmpPath: string, tmpUniquename: string) {
+    try {
+      if (this.fs.exists(absTmpPath)) {
+        this.fs.rmFile(absTmpPath);
+        console.log(
+          `cleaned up tmp file ${tmpUniquename} following xai file upload.`
+        );
+      }
+    } catch (err) {
+      console.warn(
+        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following xai file upload.`.concat(
+          this.safeErrMsg(err)
+        )
+      );
+    }
+  }
   protected canParseFilename(filename: string) {
-    return /^(?:[a-z0-9]+-){3}[a-z]+.[a-z]+$/.test(filename);
+    return /^(?:[a-z0-9]+-){3}[a-f0-9]+\.[a-z]+$/.test(filename);
   }
 
   protected parseFilename(filename: string) {
-    const toArr = filename.split("-");
-    const splitFinal = toArr?.at(-1)?.split(".") ?? [""];
+    if (!this.canParseFilename(filename))
+      throw new Error(
+        "always guard parseFilename with its canParseFilename helper!"
+      );
 
-    const combined = [...toArr.slice(0, toArr.length - 1), ...splitFinal];
-    // it's certain that these values exist since this method
-    // should *only* be accessed after passing the canParseFilename helper first
+    const [conversationId, messageId, attachmentId, fileNameExt] =
+      filename.split("-") as [string, string, string, string];
+    const [fileNameHex, extension] = fileNameExt.split(".") as [string, string];
+
+    const fileName = Buffer.from(fileNameHex, "hex").toString("utf-8");
+
     return {
-      conversationId: combined?.[0] ?? "",
-      messageId: combined?.[1] ?? "",
-      attachmentId: combined?.[2] ?? "",
-      assetType: (combined?.[3] ?? "").toUpperCase() as $Enums.AssetType,
-      extension: combined?.[4] ?? ""
+      conversationId,
+      messageId,
+      attachmentId,
+      fileName,
+      extension
     };
-  }
-
-  protected toFilenameFormat(att: AttachmentSingleton<true>) {
-    const { ext } = this.urlExtWorkup(att);
-    if (att.conversationId && att.messageId) {
-      return `${att.userId}-${att.conversationId}-${att.messageId}-${att.id}-${att.assetType.toLowerCase()}.${ext}`;
-    } else return undefined;
   }
 
   private pythonScript(
     displayFilename: string,
     absTmpPath: string,
-    mimeType: string
+    mimeType: string,
+    conversationId: string,
+    messageId: string,
+    attachmentId: string,
+    originalFilename: string
   ) {
     // prettier-ignore
     return  `import asyncio
@@ -259,12 +323,20 @@ async def main():
 
       print(f"[Python] Uploading {len(data)} bytes from disk to xAI collection...")
 
+      fields = {
+          "conversationId": "${conversationId}",
+          "messageId": "${messageId}",
+          "attachmentId": "${attachmentId}",
+          "originalFilename": "${originalFilename}"
+      }
+
       # Upload document
       result = await client.collections.upload_document(
           collection_id="${this.xaiCollection}",
           name="${displayFilename}",
           data=data,
-          content_type="${mimeType}"
+          content_type="${mimeType}",
+          fields=fields
       )
 
       await client.close()
@@ -273,7 +345,7 @@ async def main():
       # Node can't read snek's protobuf -- extract protobuf to return readable JSON
 
       meta = result.file_metadata
-      # print(f"[Python] upload result {meta}")
+      print(f"[Python] upload result {meta}")
       return {
           "file_id": meta.file_id,
           "name": meta.name,
@@ -282,10 +354,10 @@ async def main():
           "created_at": meta.created_at.seconds, # Extract raw timestamp
           "hash": meta.hash,
           "created_at_nanos": meta.created_at.nanos,
-          "status": result.status # Capture status from parent object
+          "status": result.status
       }
   except Exception as e:
-        return {"error": str(e)}
+      return {"error": str(e)}
 # Run the upload
 upload_result = asyncio.run(main())
 `;
@@ -294,7 +366,17 @@ upload_result = asyncio.run(main())
   public async exeScript(att: AttachmentSingleton<true>) {
     const { tmpUniquename, safeFilename, mimeType, absTmpPath } =
       await this.remoteToTmpWorkup(att);
-    const uploadScript = this.pythonScript(safeFilename, absTmpPath, mimeType);
+    console.log(safeFilename);
+
+    const uploadScript = this.pythonScript(
+      safeFilename,
+      absTmpPath,
+      mimeType,
+      att.conversationId ?? "new-chat",
+      att.messageId ?? "new-message",
+      att.id,
+      att.filename ?? `content`
+    );
     try {
       const builtins = (await python("builtins")) as PythonBuiltIns;
 
@@ -317,18 +399,7 @@ upload_result = asyncio.run(main())
       console.error(this.safeErrMsg(err));
       throw err;
     } finally {
-      try {
-        if (this.fs.exists(absTmpPath)) {
-          this.fs.rmFile(absTmpPath);
-          console.log(`cleaned up tmp file ${tmpUniquename}`);
-        }
-      } catch (err) {
-        console.warn(
-          `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following xAI file upload.`.concat(
-            this.safeErrMsg(err)
-          )
-        );
-      }
+      this.cleanupTmpPostupload(absTmpPath, tmpUniquename);
     }
   }
 }
@@ -337,16 +408,17 @@ const data = async () => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
   const datasourceUrl = await p.get("DIRECT_URL");
+  const _datasource = process.env.DIRECT_URL ?? datasourceUrl;
   const { PrismaClient } = await import("@slipstream/db/node/generated/client");
   const prismaClient = new PrismaClient({
-    datasourceUrl
+    datasourceUrl: datasourceUrl
   });
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({
       where: { assetType: "DOCUMENT" },
       take: 10,
-      skip: 40,
+      skip: 30,
       orderBy: { createdAt: "desc" },
       include: {
         providerLinks: { include: { userKey: true } },

@@ -8,11 +8,10 @@ import type {
   xAIImgGenResponse
 } from "@/xai/sse.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
-import type { Logger as PinoLogger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
-import { ModelService } from "@/models/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { GrokCollectionsService } from "@/xai/collections.ts";
 import {
   createXAISSEParser,
   isContentDelta,
@@ -62,26 +61,40 @@ type ImageGenPartialArr = [
   ExpandedImgSpecs
 ];
 
-export class xAIService extends ModelService {
-  private readonly baseUrl = "https://api.x.ai/v1/chat/completions";
+type ImageGenMessagesProps = readonly (
+  | {
+      role: "user" | "assistant";
+      content:
+        | string
+        | readonly (
+            | { type: "text"; text: string }
+            | {
+                type: "image_url";
+                image_url: {
+                  url: string;
+                  detail?: "low" | "medium" | "high";
+                };
+              }
+          )[];
+    }
+  | { role: "system"; content: string }
+)[];
+
+
+export class xAIService extends GrokCollectionsService {
+  private readonly baseUrl = "https://api.x.ai/v1/responses";
   private readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-  private logger: PinoLogger;
   /** key: storename; val: storeId; */
   constructor(
     logger: LoggerService,
-    private prisma: PrismaService,
+    protected prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
-    private extract: ExtractService,
+    protected extract: ExtractService,
     private s3: S3Storage,
-    private apiKey?: string
+    protected apiKey: string,
+    protected managementKey: string
   ) {
-    super();
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[xai] " }
-      );
+    super(logger, extract, prisma, apiKey, managementKey);
   }
 
   private handleMostRecentMsgForImg(
@@ -180,24 +193,7 @@ export class xAIService extends ModelService {
   private async handleImgGen(
     model = "grok-2-image-1212" satisfies GrokModelIdUnion,
     n = 1,
-    messages: readonly (
-      | {
-          role: "user" | "assistant";
-          content:
-            | string
-            | readonly (
-                | { type: "text"; text: string }
-                | {
-                    type: "image_url";
-                    image_url: {
-                      url: string;
-                      detail?: "low" | "medium" | "high";
-                    };
-                  }
-              )[];
-        }
-      | { role: "system"; content: string }
-    )[],
+    messages: ImageGenMessagesProps,
     userId: string,
     apiKey?: string
   ) {
@@ -313,8 +309,8 @@ export class xAIService extends ModelService {
       if (
         (model === "grok-2-image-1212" ||
           model === "grok-2-vision-1212" ||
-          model ==="grok-4-1-fast-non-reasoning" ||
-          model ==="grok-4-1-fast-reasoning" ||
+          model === "grok-4-1-fast-non-reasoning" ||
+          model === "grok-4-1-fast-reasoning" ||
           model === "grok-4-0709" ||
           model === "grok-4-fast-non-reasoning" ||
           model === "grok-4-fast-reasoning") &&
@@ -617,7 +613,7 @@ export class xAIService extends ModelService {
     const m = model as GrokModelIdUnion;
     if (m === "grok-2-image-1212" && imgGenEnabled) {
       const generationGroupId = await this.generateId("generationGroupId");
-      const n = this.handleImgGenCount(provider, m, {
+      const n = this.prisma.handleImgGenCount(provider, m, {
         n: imgGenFields?.n
       });
       totalDur = performance.now();
@@ -705,14 +701,18 @@ export class xAIService extends ModelService {
             .concat(`.${getIt.format}`);
 
           tInitial = performance.now();
-          const rtHelper = await this.s3.uploadGenerated(b64, this.prisma.isProd, {
-            contentType: getIt.contentType ?? "image/jpeg",
-            filename,
-            origin: "GENERATED",
-            userId,
-            size: getIt.byteSize,
-            conversationId
-          });
+          const rtHelper = await this.s3.uploadGenerated(
+            b64,
+            this.prisma.isProd,
+            {
+              contentType: getIt.contentType ?? "image/jpeg",
+              filename,
+              origin: "GENERATED",
+              userId,
+              size: getIt.byteSize,
+              conversationId
+            }
+          );
           a = rtHelper;
           tDelta = performance.now() - tInitial;
           const uploadTime = tDelta;
@@ -1252,3 +1252,4 @@ export class xAIService extends ModelService {
     }
   }
 }
+// codex resume 019aeb73-466c-78e3-beea-34f50e76f617

@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
+import type * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -228,6 +228,7 @@ export type UserWhereInput = {
   keys?: Prisma.UserKeyListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  providerStores?: Prisma.ProviderStoreListRelationFilter
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
 }
 
@@ -248,6 +249,7 @@ export type UserOrderByWithRelationInput = {
   keys?: Prisma.UserKeyOrderByRelationAggregateInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
   conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  providerStores?: Prisma.ProviderStoreOrderByRelationAggregateInput
   settings?: Prisma.SettingsOrderByWithRelationInput
 }
 
@@ -271,6 +273,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   keys?: Prisma.UserKeyListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  providerStores?: Prisma.ProviderStoreListRelationFilter
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
 }, "id" | "email">
 
@@ -323,6 +326,7 @@ export type UserCreateInput = {
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -343,6 +347,7 @@ export type UserUncheckedCreateInput = {
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -363,6 +368,7 @@ export type UserUpdateInput = {
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -383,6 +389,7 @@ export type UserUncheckedUpdateInput = {
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -531,6 +538,20 @@ export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
 }
 
+export type UserCreateNestedOneWithoutProviderStoresInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutProviderStoresNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput
+  upsert?: Prisma.UserUpsertWithoutProviderStoresInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProviderStoresInput, Prisma.UserUpdateWithoutProviderStoresInput>, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
+}
+
 export type UserCreateNestedOneWithoutKeysInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutKeysInput
@@ -603,6 +624,7 @@ export type UserCreateWithoutProfileInput = {
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -622,6 +644,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -657,6 +680,7 @@ export type UserUpdateWithoutProfileInput = {
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -676,6 +700,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -695,6 +720,7 @@ export type UserCreateWithoutAccountsInput = {
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -714,6 +740,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -749,6 +776,7 @@ export type UserUpdateWithoutAccountsInput = {
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -768,6 +796,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -787,6 +816,7 @@ export type UserCreateWithoutSessionsInput = {
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -806,6 +836,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -841,6 +872,7 @@ export type UserUpdateWithoutSessionsInput = {
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -857,6 +889,103 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutProviderStoresInput = {
+  id?: string
+  name?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  email_verified?: boolean | null
+  image?: string | null
+  isAnonymous?: boolean | null
+  lastLoginMethod?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutProviderStoresInput = {
+  id?: string
+  name?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  email_verified?: boolean | null
+  image?: string | null
+  isAnonymous?: boolean | null
+  lastLoginMethod?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutProviderStoresInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
+}
+
+export type UserUpsertWithoutProviderStoresInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutProviderStoresInput, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutProviderStoresInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutProviderStoresInput, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
+}
+
+export type UserUpdateWithoutProviderStoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutProviderStoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
@@ -879,6 +1008,7 @@ export type UserCreateWithoutKeysInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -898,6 +1028,7 @@ export type UserUncheckedCreateWithoutKeysInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -933,6 +1064,7 @@ export type UserUpdateWithoutKeysInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -952,6 +1084,7 @@ export type UserUncheckedUpdateWithoutKeysInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -972,6 +1105,7 @@ export type UserCreateWithoutSettingsInput = {
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -991,6 +1125,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -1026,6 +1161,7 @@ export type UserUpdateWithoutSettingsInput = {
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -1045,6 +1181,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationsInput = {
@@ -1063,6 +1200,7 @@ export type UserCreateWithoutConversationsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -1082,6 +1220,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1117,6 +1256,7 @@ export type UserUpdateWithoutConversationsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -1136,6 +1276,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1155,6 +1296,7 @@ export type UserCreateWithoutAttachmentsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
 }
 
@@ -1174,6 +1316,7 @@ export type UserUncheckedCreateWithoutAttachmentsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1209,6 +1352,7 @@ export type UserUpdateWithoutAttachmentsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -1228,6 +1372,7 @@ export type UserUncheckedUpdateWithoutAttachmentsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1242,6 +1387,7 @@ export type UserCountOutputType = {
   keys: number
   attachments: number
   conversations: number
+  providerStores: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1250,6 +1396,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   keys?: boolean | UserCountOutputTypeCountKeysArgs
   attachments?: boolean | UserCountOutputTypeCountAttachmentsArgs
   conversations?: boolean | UserCountOutputTypeCountConversationsArgs
+  providerStores?: boolean | UserCountOutputTypeCountProviderStoresArgs
 }
 
 /**
@@ -1297,6 +1444,13 @@ export type UserCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ConversationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountProviderStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderStoreWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1315,6 +1469,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   keys?: boolean | Prisma.User$keysArgs<ExtArgs>
   attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs>
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
+  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1366,6 +1521,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   keys?: boolean | Prisma.User$keysArgs<ExtArgs>
   attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs>
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
+  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1381,6 +1537,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     keys: Prisma.$UserKeyPayload<ExtArgs>[]
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
     conversations: Prisma.$ConversationPayload<ExtArgs>[]
+    providerStores: Prisma.$ProviderStorePayload<ExtArgs>[]
     settings: Prisma.$SettingsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1794,6 +1951,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   keys<T extends Prisma.User$keysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$keysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachments<T extends Prisma.User$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversations<T extends Prisma.User$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerStores<T extends Prisma.User$providerStoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$providerStoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__SettingsClient<runtime.Types.Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2358,6 +2516,30 @@ export type User$conversationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * User.providerStores
+ */
+export type User$providerStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderStore
+   */
+  select?: Prisma.ProviderStoreSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderStore
+   */
+  omit?: Prisma.ProviderStoreOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderStoreInclude<ExtArgs> | null
+  where?: Prisma.ProviderStoreWhereInput
+  orderBy?: Prisma.ProviderStoreOrderByWithRelationInput | Prisma.ProviderStoreOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderStoreWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderStoreScalarFieldEnum | Prisma.ProviderStoreScalarFieldEnum[]
 }
 
 /**

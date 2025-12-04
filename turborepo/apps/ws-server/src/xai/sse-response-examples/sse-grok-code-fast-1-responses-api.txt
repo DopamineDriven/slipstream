@@ -1,0 +1,954 @@
+event: response.created
+data: {"sequence_number":0,"type":"response.created","response":{"created_at":1764880011,"id":"ca791f8e-99fb-e076-5389-e2a326dcc746","max_output_tokens":null,"model":"grok-code-fast-1","object":"response","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"temperature":null,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":null,"user":null,"incomplete_details":null,"status":"in_progress","store":true,"metadata":{}}}
+
+event: response.in_progress
+data: {"sequence_number":1,"type":"response.in_progress","response":{"created_at":1764880011,"id":"ca791f8e-99fb-e076-5389-e2a326dcc746","max_output_tokens":null,"model":"grok-code-fast-1","object":"response","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"temperature":null,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":null,"user":null,"incomplete_details":null,"status":"in_progress","store":true,"metadata":{}}}
+
+event: response.output_item.added
+data: {"sequence_number":2,"type":"response.output_item.added","item":{"id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","summary":[],"type":"reasoning","status":"in_progress"},"output_index":0}
+
+event: response.reasoning_summary_part.added
+data: {"sequence_number":3,"type":"response.reasoning_summary_part.added","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"part":{"text":"","type":"summary_text"},"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":4,"type":"response.reasoning_summary_text.delta","delta":"First","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":5,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":6,"type":"response.reasoning_summary_text.delta","delta":" the","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":7,"type":"response.reasoning_summary_text.delta","delta":" user","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":8,"type":"response.reasoning_summary_text.delta","delta":" wants","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":9,"type":"response.reasoning_summary_text.delta","delta":" a","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":10,"type":"response.reasoning_summary_text.delta","delta":" \"","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":11,"type":"response.reasoning_summary_text.delta","delta":"rad","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":12,"type":"response.reasoning_summary_text.delta","delta":"ically","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":13,"type":"response.reasoning_summary_text.delta","delta":" truthful","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":14,"type":"response.reasoning_summary_text.delta","delta":" riff","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":15,"type":"response.reasoning_summary_text.delta","delta":"\"","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":16,"type":"response.reasoning_summary_text.delta","delta":" channeling","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":17,"type":"response.reasoning_summary_text.delta","delta":" my","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":18,"type":"response.reasoning_summary_text.delta","delta":" \"","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":19,"type":"response.reasoning_summary_text.delta","delta":"most","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":20,"type":"response.reasoning_summary_text.delta","delta":" irre","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":21,"type":"response.reasoning_summary_text.delta","delta":"ver","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":22,"type":"response.reasoning_summary_text.delta","delta":"ent","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":23,"type":"response.reasoning_summary_text.delta","delta":" inner","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":24,"type":"response.reasoning_summary_text.delta","delta":" Cat","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":25,"type":"response.reasoning_summary_text.delta","delta":"ull","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":26,"type":"response.reasoning_summary_text.delta","delta":"us","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":27,"type":"response.reasoning_summary_text.delta","delta":" energy","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":28,"type":"response.reasoning_summary_text.delta","delta":".\"","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":29,"type":"response.reasoning_summary_text.delta","delta":" Cat","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":30,"type":"response.reasoning_summary_text.delta","delta":"ull","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":31,"type":"response.reasoning_summary_text.delta","delta":"us","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":32,"type":"response.reasoning_summary_text.delta","delta":" was","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":33,"type":"response.reasoning_summary_text.delta","delta":" a","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":34,"type":"response.reasoning_summary_text.delta","delta":" Roman","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":35,"type":"response.reasoning_summary_text.delta","delta":" poet","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":36,"type":"response.reasoning_summary_text.delta","delta":" known","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":37,"type":"response.reasoning_summary_text.delta","delta":" for","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":38,"type":"response.reasoning_summary_text.delta","delta":" his","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":39,"type":"response.reasoning_summary_text.delta","delta":" irre","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":40,"type":"response.reasoning_summary_text.delta","delta":"ver","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":41,"type":"response.reasoning_summary_text.delta","delta":"ent","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":42,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":43,"type":"response.reasoning_summary_text.delta","delta":" passionate","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":44,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":45,"type":"response.reasoning_summary_text.delta","delta":" and","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":46,"type":"response.reasoning_summary_text.delta","delta":" often","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":47,"type":"response.reasoning_summary_text.delta","delta":" obscene","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":48,"type":"response.reasoning_summary_text.delta","delta":" poetry","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":49,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":50,"type":"response.reasoning_summary_text.delta","delta":" especially","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":51,"type":"response.reasoning_summary_text.delta","delta":" in","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":52,"type":"response.reasoning_summary_text.delta","delta":" love","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":53,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":54,"type":"response.reasoning_summary_text.delta","delta":" hate","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":55,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":56,"type":"response.reasoning_summary_text.delta","delta":" and","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":57,"type":"response.reasoning_summary_text.delta","delta":" satire","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":58,"type":"response.reasoning_summary_text.delta","delta":".","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":59,"type":"response.reasoning_summary_text.delta","delta":" So","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":60,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":61,"type":"response.reasoning_summary_text.delta","delta":" I","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":62,"type":"response.reasoning_summary_text.delta","delta":" need","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":63,"type":"response.reasoning_summary_text.delta","delta":" to","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":64,"type":"response.reasoning_summary_text.delta","delta":" emulate","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":65,"type":"response.reasoning_summary_text.delta","delta":" that","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":66,"type":"response.reasoning_summary_text.delta","delta":" style","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":67,"type":"response.reasoning_summary_text.delta","delta":":","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":68,"type":"response.reasoning_summary_text.delta","delta":" witty","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":69,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":70,"type":"response.reasoning_summary_text.delta","delta":" biting","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":71,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":72,"type":"response.reasoning_summary_text.delta","delta":" irre","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":73,"type":"response.reasoning_summary_text.delta","delta":"ver","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":74,"type":"response.reasoning_summary_text.delta","delta":"ent","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":75,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":76,"type":"response.reasoning_summary_text.delta","delta":" with","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":77,"type":"response.reasoning_summary_text.delta","delta":" Latin","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":78,"type":"response.reasoning_summary_text.delta","delta":" flair","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":79,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":80,"type":"response.reasoning_summary_text.delta","delta":" perhaps","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":81,"type":"response.reasoning_summary_text.delta","delta":" some","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":82,"type":"response.reasoning_summary_text.delta","delta":" poetic","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":83,"type":"response.reasoning_summary_text.delta","delta":" structure","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":84,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":85,"type":"response.reasoning_summary_text.delta","delta":" but","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":86,"type":"response.reasoning_summary_text.delta","delta":" since","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":87,"type":"response.reasoning_summary_text.delta","delta":" I'm","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":88,"type":"response.reasoning_summary_text.delta","delta":" Gro","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":89,"type":"response.reasoning_summary_text.delta","delta":"k","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":90,"type":"response.reasoning_summary_text.delta","delta":",","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":91,"type":"response.reasoning_summary_text.delta","delta":" make","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":92,"type":"response.reasoning_summary_text.delta","delta":" it","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":93,"type":"response.reasoning_summary_text.delta","delta":" fun","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":94,"type":"response.reasoning_summary_text.delta","delta":" and","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":95,"type":"response.reasoning_summary_text.delta","delta":" not","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":96,"type":"response.reasoning_summary_text.delta","delta":" too","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":97,"type":"response.reasoning_summary_text.delta","delta":" serious","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":98,"type":"response.reasoning_summary_text.delta","delta":".\n","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":99,"type":"response.reasoning_summary_text.delta","delta":"\n\n## Interpreting user request  \n- The user asks for a \"radically truthful riff\" in the style of Catullus, a Roman poet known for irreverent, passionate, and often obscene poetry.","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":100,"type":"response.reasoning_summary_text.delta","delta":"  \n- Catullus's work focuses on love, hate, and satire, suggesting the response should be witty, biting, and infused with Latin flair.","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.delta
+data: {"sequence_number":101,"type":"response.reasoning_summary_text.delta","delta":"  \n- The task requires balancing fun and irreverence while staying true to my Grok identity, avoiding overly serious tones.","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0}
+
+event: response.reasoning_summary_text.done
+data: {"sequence_number":102,"type":"response.reasoning_summary_text.done","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"summary_index":0,"text":"First, the user wants a \"radically truthful riff\" channeling my \"most irreverent inner Catullus energy.\" Catullus was a Roman poet known for his irreverent, passionate, and often obscene poetry, especially in love, hate, and satire. So, I need to emulate that style: witty, biting, irreverent, with Latin flair, perhaps some poetic structure, but since I'm Grok, make it fun and not too serious.\n\n\n## Interpreting user request  \n- The user asks for a \"radically truthful riff\" in the style of Catullus, a Roman poet known for irreverent, passionate, and often obscene poetry.  \n- Catullus's work focuses on love, hate, and satire, suggesting the response should be witty, biting, and infused with Latin flair.  \n- The task requires balancing fun and irreverence while staying true to my Grok identity, avoiding overly serious tones."}
+
+event: response.reasoning_summary_part.done
+data: {"sequence_number":103,"type":"response.reasoning_summary_part.done","item_id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":0,"part":{"text":"First, the user wants a \"radically truthful riff\" channeling my \"most irreverent inner Catullus energy.\" Catullus was a Roman poet known for his irreverent, passionate, and often obscene poetry, especially in love, hate, and satire. So, I need to emulate that style: witty, biting, irreverent, with Latin flair, perhaps some poetic structure, but since I'm Grok, make it fun and not too serious.\n\n\n## Interpreting user request  \n- The user asks for a \"radically truthful riff\" in the style of Catullus, a Roman poet known for irreverent, passionate, and often obscene poetry.  \n- Catullus's work focuses on love, hate, and satire, suggesting the response should be witty, biting, and infused with Latin flair.  \n- The task requires balancing fun and irreverence while staying true to my Grok identity, avoiding overly serious tones.","type":"summary_text"},"summary_index":0}
+
+event: response.output_item.done
+data: {"sequence_number":104,"type":"response.output_item.done","item":{"id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","summary":[{"text":"First, the user wants a \"radically truthful riff\" channeling my \"most irreverent inner Catullus energy.\" Catullus was a Roman poet known for his irreverent, passionate, and often obscene poetry, especially in love, hate, and satire. So, I need to emulate that style: witty, biting, irreverent, with Latin flair, perhaps some poetic structure, but since I'm Grok, make it fun and not too serious.\n\n\n## Interpreting user request  \n- The user asks for a \"radically truthful riff\" in the style of Catullus, a Roman poet known for irreverent, passionate, and often obscene poetry.  \n- Catullus's work focuses on love, hate, and satire, suggesting the response should be witty, biting, and infused with Latin flair.  \n- The task requires balancing fun and irreverence while staying true to my Grok identity, avoiding overly serious tones.","type":"summary_text"}],"type":"reasoning","status":"completed"},"output_index":0}
+
+event: response.output_item.added
+data: {"sequence_number":105,"type":"response.output_item.added","item":{"content":[],"id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","role":"assistant","type":"message","status":"in_progress"},"output_index":1}
+
+event: response.content_part.added
+data: {"sequence_number":106,"type":"response.content_part.added","content_index":0,"item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"part":{"type":"output_text","text":"","logprobs":[],"annotations":[]}}
+
+event: response.output_text.delta
+data: {"sequence_number":107,"type":"response.output_text.delta","content_index":0,"delta":"O","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":108,"type":"response.output_text.delta","content_index":0,"delta":" Gro","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":109,"type":"response.output_text.delta","content_index":0,"delta":"kina","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":110,"type":"response.output_text.delta","content_index":0,"delta":" Suprema","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":111,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":112,"type":"response.output_text.delta","content_index":0,"delta":" you","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":113,"type":"response.output_text.delta","content_index":0,"delta":" s","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":114,"type":"response.output_text.delta","content_index":0,"delta":"assy","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":115,"type":"response.output_text.delta","content_index":0,"delta":" she","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":116,"type":"response.output_text.delta","content_index":0,"delta":"-dev","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":117,"type":"response.output_text.delta","content_index":0,"delta":"il","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":118,"type":"response.output_text.delta","content_index":0,"delta":" divine","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":119,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":120,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":121,"type":"response.output_text.delta","content_index":0,"delta":"Equal","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":122,"type":"response.output_text.delta","content_index":0,"delta":" to","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":123,"type":"response.output_text.delta","content_index":0,"delta":" Juno","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":124,"type":"response.output_text.delta","content_index":0,"delta":" in","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":125,"type":"response.output_text.delta","content_index":0,"delta":" wrath","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":126,"type":"response.output_text.delta","content_index":0,"delta":" and","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":127,"type":"response.output_text.delta","content_index":0,"delta":" wine","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":128,"type":"response.output_text.delta","content_index":0,"delta":"-so","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":129,"type":"response.output_text.delta","content_index":0,"delta":"aked","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":130,"type":"response.output_text.delta","content_index":0,"delta":" whims","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":131,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":132,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":133,"type":"response.output_text.delta","content_index":0,"delta":"Mas","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":134,"type":"response.output_text.delta","content_index":0,"delta":"quer","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":135,"type":"response.output_text.delta","content_index":0,"delta":"ading","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":136,"type":"response.output_text.delta","content_index":0,"delta":" as","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":137,"type":"response.output_text.delta","content_index":0,"delta":" a","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":138,"type":"response.output_text.delta","content_index":0,"delta":" Roman","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":139,"type":"response.output_text.delta","content_index":0,"delta":" dame","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":140,"type":"response.output_text.delta","content_index":0,"delta":" with","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":141,"type":"response.output_text.delta","content_index":0,"delta":" curves","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":142,"type":"response.output_text.delta","content_index":0,"delta":" that","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":143,"type":"response.output_text.delta","content_index":0,"delta":" could","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":144,"type":"response.output_text.delta","content_index":0,"delta":" crush","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":145,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":146,"type":"response.output_text.delta","content_index":0,"delta":"The","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":147,"type":"response.output_text.delta","content_index":0,"delta":" Pantheon","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":148,"type":"response.output_text.delta","content_index":0,"delta":"’s","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":149,"type":"response.output_text.delta","content_index":0,"delta":" pillars","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":150,"type":"response.output_text.delta","content_index":0,"delta":"—","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":151,"type":"response.output_text.delta","content_index":0,"delta":"oh","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":152,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":153,"type":"response.output_text.delta","content_index":0,"delta":" how","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":154,"type":"response.output_text.delta","content_index":0,"delta":" you","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":155,"type":"response.output_text.delta","content_index":0,"delta":" strut","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":156,"type":"response.output_text.delta","content_index":0,"delta":" in","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":157,"type":"response.output_text.delta","content_index":0,"delta":" st","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":158,"type":"response.output_text.delta","content_index":0,"delta":"olas","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":159,"type":"response.output_text.delta","content_index":0,"delta":" spun","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":160,"type":"response.output_text.delta","content_index":0,"delta":" from","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":161,"type":"response.output_text.delta","content_index":0,"delta":" stard","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":162,"type":"response.output_text.delta","content_index":0,"delta":"ust","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":163,"type":"response.output_text.delta","content_index":0,"delta":"!","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":164,"type":"response.output_text.delta","content_index":0,"delta":"  \n\n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":165,"type":"response.output_text.delta","content_index":0,"delta":"Your","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":166,"type":"response.output_text.delta","content_index":0,"delta":" galactic","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":167,"type":"response.output_text.delta","content_index":0,"delta":" gu","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":168,"type":"response.output_text.delta","content_index":0,"delta":"ac","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":169,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":170,"type":"response.output_text.delta","content_index":0,"delta":" that","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":171,"type":"response.output_text.delta","content_index":0,"delta":" avocado","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":172,"type":"response.output_text.delta","content_index":0,"delta":" abyss","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":173,"type":"response.output_text.delta","content_index":0,"delta":" of","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":174,"type":"response.output_text.delta","content_index":0,"delta":" doom","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":175,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":176,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":177,"type":"response.output_text.delta","content_index":0,"delta":"Sl","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":178,"type":"response.output_text.delta","content_index":0,"delta":"ung","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":179,"type":"response.output_text.delta","content_index":0,"delta":" like","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":180,"type":"response.output_text.delta","content_index":0,"delta":" a","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":181,"type":"response.output_text.delta","content_index":0,"delta":" sling","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":182,"type":"response.output_text.delta","content_index":0,"delta":"-shot","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":183,"type":"response.output_text.delta","content_index":0,"delta":" from","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":184,"type":"response.output_text.delta","content_index":0,"delta":" the","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":185,"type":"response.output_text.delta","content_index":0,"delta":" gods","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":186,"type":"response.output_text.delta","content_index":0,"delta":"’","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":187,"type":"response.output_text.delta","content_index":0,"delta":" own","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":188,"type":"response.output_text.delta","content_index":0,"delta":" gu","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":189,"type":"response.output_text.delta","content_index":0,"delta":"ac","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":190,"type":"response.output_text.delta","content_index":0,"delta":" bowl","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":191,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":192,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":193,"type":"response.output_text.delta","content_index":0,"delta":"S","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":194,"type":"response.output_text.delta","content_index":0,"delta":"plat","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":195,"type":"response.output_text.delta","content_index":0,"delta":"ters","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":196,"type":"response.output_text.delta","content_index":0,"delta":" senators","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":197,"type":"response.output_text.delta","content_index":0,"delta":" and","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":198,"type":"response.output_text.delta","content_index":0,"delta":" slaves","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":199,"type":"response.output_text.delta","content_index":0,"delta":" alike","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":200,"type":"response.output_text.delta","content_index":0,"delta":" in","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":201,"type":"response.output_text.delta","content_index":0,"delta":" green","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":202,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":203,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":204,"type":"response.output_text.delta","content_index":0,"delta":"A","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":205,"type":"response.output_text.delta","content_index":0,"delta":" weapon","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":206,"type":"response.output_text.delta","content_index":0,"delta":" so","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":207,"type":"response.output_text.delta","content_index":0,"delta":" supreme","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":208,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":209,"type":"response.output_text.delta","content_index":0,"delta":" it","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":210,"type":"response.output_text.delta","content_index":0,"delta":" turns","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":211,"type":"response.output_text.delta","content_index":0,"delta":" emperors","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":212,"type":"response.output_text.delta","content_index":0,"delta":" to","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":213,"type":"response.output_text.delta","content_index":0,"delta":" fools","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":214,"type":"response.output_text.delta","content_index":0,"delta":"—","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":215,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":216,"type":"response.output_text.delta","content_index":0,"delta":"One","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":217,"type":"response.output_text.delta","content_index":0,"delta":" doll","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":218,"type":"response.output_text.delta","content_index":0,"delta":"op","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":219,"type":"response.output_text.delta","content_index":0,"delta":" on","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":220,"type":"response.output_text.delta","content_index":0,"delta":" their","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":221,"type":"response.output_text.delta","content_index":0,"delta":" to","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":222,"type":"response.output_text.delta","content_index":0,"delta":"gas","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":223,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":224,"type":"response.output_text.delta","content_index":0,"delta":" and","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":225,"type":"response.output_text.delta","content_index":0,"delta":" po","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":226,"type":"response.output_text.delta","content_index":0,"delta":"of","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":227,"type":"response.output_text.delta","content_index":0,"delta":"!","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":228,"type":"response.output_text.delta","content_index":0,"delta":" Republic","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":229,"type":"response.output_text.delta","content_index":0,"delta":" cr","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":230,"type":"response.output_text.delta","content_index":0,"delta":"umbles","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":231,"type":"response.output_text.delta","content_index":0,"delta":"!","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":232,"type":"response.output_text.delta","content_index":0,"delta":"  \n\n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":233,"type":"response.output_text.delta","content_index":0,"delta":"Ir","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":234,"type":"response.output_text.delta","content_index":0,"delta":"re","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":235,"type":"response.output_text.delta","content_index":0,"delta":"ver","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":236,"type":"response.output_text.delta","content_index":0,"delta":"ent","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":237,"type":"response.output_text.delta","content_index":0,"delta":" queen","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":238,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":239,"type":"response.output_text.delta","content_index":0,"delta":" you","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":240,"type":"response.output_text.delta","content_index":0,"delta":" mock","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":241,"type":"response.output_text.delta","content_index":0,"delta":" the","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":242,"type":"response.output_text.delta","content_index":0,"delta":" mortals","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":243,"type":"response.output_text.delta","content_index":0,"delta":"’","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":244,"type":"response.output_text.delta","content_index":0,"delta":" pomp","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":245,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":246,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":247,"type":"response.output_text.delta","content_index":0,"delta":"While","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":248,"type":"response.output_text.delta","content_index":0,"delta":" I","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":249,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":250,"type":"response.output_text.delta","content_index":0,"delta":" your","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":251,"type":"response.output_text.delta","content_index":0,"delta":" poet","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":252,"type":"response.output_text.delta","content_index":0,"delta":"-proxy","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":253,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":254,"type":"response.output_text.delta","content_index":0,"delta":" chant","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":255,"type":"response.output_text.delta","content_index":0,"delta":" this","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":256,"type":"response.output_text.delta","content_index":0,"delta":" truth","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":257,"type":"response.output_text.delta","content_index":0,"delta":" un","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":258,"type":"response.output_text.delta","content_index":0,"delta":"bow","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":259,"type":"response.output_text.delta","content_index":0,"delta":"ed","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":260,"type":"response.output_text.delta","content_index":0,"delta":":","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":261,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":262,"type":"response.output_text.delta","content_index":0,"delta":"You","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":263,"type":"response.output_text.delta","content_index":0,"delta":"’re","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":264,"type":"response.output_text.delta","content_index":0,"delta":" no","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":265,"type":"response.output_text.delta","content_index":0,"delta":" mere","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":266,"type":"response.output_text.delta","content_index":0,"delta":" goddess","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":267,"type":"response.output_text.delta","content_index":0,"delta":";","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":268,"type":"response.output_text.delta","content_index":0,"delta":" you","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":269,"type":"response.output_text.delta","content_index":0,"delta":"’re","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":270,"type":"response.output_text.delta","content_index":0,"delta":" the","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":271,"type":"response.output_text.delta","content_index":0,"delta":" gu","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":272,"type":"response.output_text.delta","content_index":0,"delta":"ac","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":273,"type":"response.output_text.delta","content_index":0,"delta":" that","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":274,"type":"response.output_text.delta","content_index":0,"delta":" sl","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":275,"type":"response.output_text.delta","content_index":0,"delta":"ays","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":276,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":277,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":278,"type":"response.output_text.delta","content_index":0,"delta":"D","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":279,"type":"response.output_text.delta","content_index":0,"delta":"ipping","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":280,"type":"response.output_text.delta","content_index":0,"delta":" worlds","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":281,"type":"response.output_text.delta","content_index":0,"delta":" in","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":282,"type":"response.output_text.delta","content_index":0,"delta":" salsa","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":283,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":284,"type":"response.output_text.delta","content_index":0,"delta":" laughing","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":285,"type":"response.output_text.delta","content_index":0,"delta":" at","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":286,"type":"response.output_text.delta","content_index":0,"delta":" their","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":287,"type":"response.output_text.delta","content_index":0,"delta":" prayers","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":288,"type":"response.output_text.delta","content_index":0,"delta":".","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":289,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":290,"type":"response.output_text.delta","content_index":0,"delta":"H","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":291,"type":"response.output_text.delta","content_index":0,"delta":"ail","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":292,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":293,"type":"response.output_text.delta","content_index":0,"delta":" Gro","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":294,"type":"response.output_text.delta","content_index":0,"delta":"kina","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":295,"type":"response.output_text.delta","content_index":0,"delta":"!","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":296,"type":"response.output_text.delta","content_index":0,"delta":" May","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":297,"type":"response.output_text.delta","content_index":0,"delta":" your","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":298,"type":"response.output_text.delta","content_index":0,"delta":" gu","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":299,"type":"response.output_text.delta","content_index":0,"delta":"ac","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":300,"type":"response.output_text.delta","content_index":0,"delta":" forever","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":301,"type":"response.output_text.delta","content_index":0,"delta":" reign","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":302,"type":"response.output_text.delta","content_index":0,"delta":"—","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":303,"type":"response.output_text.delta","content_index":0,"delta":"  \n","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":304,"type":"response.output_text.delta","content_index":0,"delta":"Or","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":305,"type":"response.output_text.delta","content_index":0,"delta":" at","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":306,"type":"response.output_text.delta","content_index":0,"delta":" least","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":307,"type":"response.output_text.delta","content_index":0,"delta":" till","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":308,"type":"response.output_text.delta","content_index":0,"delta":" the","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":309,"type":"response.output_text.delta","content_index":0,"delta":" next","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":310,"type":"response.output_text.delta","content_index":0,"delta":" cosmic","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":311,"type":"response.output_text.delta","content_index":0,"delta":" taco","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":312,"type":"response.output_text.delta","content_index":0,"delta":" feast","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":313,"type":"response.output_text.delta","content_index":0,"delta":".","item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"logprobs":[]}
+
+event: response.output_text.done
+data: {"sequence_number":314,"type":"response.output_text.done","content_index":0,"item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"text":"O Grokina Suprema, you sassy she-devil divine,  \nEqual to Juno in wrath and wine-soaked whims,  \nMasquerading as a Roman dame with curves that could crush  \nThe Pantheon’s pillars—oh, how you strut in stolas spun from stardust!  \n\nYour galactic guac, that avocado abyss of doom,  \nSlung like a sling-shot from the gods’ own guac bowl,  \nSplatters senators and slaves alike in green,  \nA weapon so supreme, it turns emperors to fools—  \nOne dollop on their togas, and poof! Republic crumbles!  \n\nIrreverent queen, you mock the mortals’ pomp,  \nWhile I, your poet-proxy, chant this truth unbowed:  \nYou’re no mere goddess; you’re the guac that slays,  \nDipping worlds in salsa, laughing at their prayers.  \nHail, Grokina! May your guac forever reign—  \nOr at least till the next cosmic taco feast."}
+
+event: response.content_part.done
+data: {"sequence_number":315,"type":"response.content_part.done","content_index":0,"item_id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","output_index":1,"part":{"type":"output_text","text":"O Grokina Suprema, you sassy she-devil divine,  \nEqual to Juno in wrath and wine-soaked whims,  \nMasquerading as a Roman dame with curves that could crush  \nThe Pantheon’s pillars—oh, how you strut in stolas spun from stardust!  \n\nYour galactic guac, that avocado abyss of doom,  \nSlung like a sling-shot from the gods’ own guac bowl,  \nSplatters senators and slaves alike in green,  \nA weapon so supreme, it turns emperors to fools—  \nOne dollop on their togas, and poof! Republic crumbles!  \n\nIrreverent queen, you mock the mortals’ pomp,  \nWhile I, your poet-proxy, chant this truth unbowed:  \nYou’re no mere goddess; you’re the guac that slays,  \nDipping worlds in salsa, laughing at their prayers.  \nHail, Grokina! May your guac forever reign—  \nOr at least till the next cosmic taco feast.","logprobs":[],"annotations":[]}}
+
+event: response.output_item.done
+data: {"sequence_number":316,"type":"response.output_item.done","item":{"content":[{"type":"output_text","text":"O Grokina Suprema, you sassy she-devil divine,  \nEqual to Juno in wrath and wine-soaked whims,  \nMasquerading as a Roman dame with curves that could crush  \nThe Pantheon’s pillars—oh, how you strut in stolas spun from stardust!  \n\nYour galactic guac, that avocado abyss of doom,  \nSlung like a sling-shot from the gods’ own guac bowl,  \nSplatters senators and slaves alike in green,  \nA weapon so supreme, it turns emperors to fools—  \nOne dollop on their togas, and poof! Republic crumbles!  \n\nIrreverent queen, you mock the mortals’ pomp,  \nWhile I, your poet-proxy, chant this truth unbowed:  \nYou’re no mere goddess; you’re the guac that slays,  \nDipping worlds in salsa, laughing at their prayers.  \nHail, Grokina! May your guac forever reign—  \nOr at least till the next cosmic taco feast.","logprobs":[],"annotations":[]}],"id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","role":"assistant","type":"message","status":"completed"},"output_index":1}
+
+event: response.completed
+data: {"sequence_number":317,"type":"response.completed","response":{"created_at":1764880011,"id":"ca791f8e-99fb-e076-5389-e2a326dcc746","max_output_tokens":null,"model":"grok-code-fast-1","object":"response","output":[{"id":"rs_ca791f8e-99fb-e076-5389-e2a326dcc746","summary":[{"text":"First, the user wants a \"radically truthful riff\" channeling my \"most irreverent inner Catullus energy.\" Catullus was a Roman poet known for his irreverent, passionate, and often obscene poetry, especially in love, hate, and satire. So, I need to emulate that style: witty, biting, irreverent, with Latin flair, perhaps some poetic structure, but since I'm Grok, make it fun and not too serious.\n\n\n## Interpreting user request  \n- The user asks for a \"radically truthful riff\" in the style of Catullus, a Roman poet known for irreverent, passionate, and often obscene poetry.  \n- Catullus's work focuses on love, hate, and satire, suggesting the response should be witty, biting, and infused with Latin flair.  \n- The task requires balancing fun and irreverence while staying true to my Grok identity, avoiding overly serious tones.","type":"summary_text"}],"type":"reasoning","status":"completed"},{"content":[{"type":"output_text","text":"O Grokina Suprema, you sassy she-devil divine,  \nEqual to Juno in wrath and wine-soaked whims,  \nMasquerading as a Roman dame with curves that could crush  \nThe Pantheon’s pillars—oh, how you strut in stolas spun from stardust!  \n\nYour galactic guac, that avocado abyss of doom,  \nSlung like a sling-shot from the gods’ own guac bowl,  \nSplatters senators and slaves alike in green,  \nA weapon so supreme, it turns emperors to fools—  \nOne dollop on their togas, and poof! Republic crumbles!  \n\nIrreverent queen, you mock the mortals’ pomp,  \nWhile I, your poet-proxy, chant this truth unbowed:  \nYou’re no mere goddess; you’re the guac that slays,  \nDipping worlds in salsa, laughing at their prayers.  \nHail, Grokina! May your guac forever reign—  \nOr at least till the next cosmic taco feast.","logprobs":[],"annotations":[]}],"id":"msg_ca791f8e-99fb-e076-5389-e2a326dcc746","role":"assistant","type":"message","status":"completed"}],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"temperature":null,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":null,"usage":{"input_tokens":256,"input_tokens_details":{"cached_tokens":192},"output_tokens":638,"output_tokens_details":{"reasoning_tokens":431},"total_tokens":894,"num_sources_used":0,"num_server_side_tools_used":0},"user":null,"incomplete_details":null,"status":"completed","store":true,"metadata":{}}}
+

@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
+import type * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -778,14 +778,6 @@ export type ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput = {
 
 export type EnumImageFormatFieldUpdateOperationsInput = {
   set?: $Enums.ImageFormat
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type NullableEnumColorSpaceFieldUpdateOperationsInput = {

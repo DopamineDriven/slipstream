@@ -142,9 +142,9 @@ export type GetImgGenFacilitatingModelUtilRT<
 export type GetAllImgGenModelUtilRt<T = ImageGenProviders> = T extends "grok"
   ? GetImgModelUtilRT<"grok">
   : T extends "gemini"
-    ? GetImgModelUtilRT<"gemini"> | GetImgGenFacilitatingModelUtilRT<"gemini">
+    ? GetImgModelUtilRT<"gemini">
     : T extends "openai"
-      ? GetImgModelUtilRT<"openai"> | GetImgGenFacilitatingModelUtilRT<"openai">
+      ? GetImgModelUtilRT<"openai">
       : never;
 
 export type VideoGenProviders = keyof typeof modelIdsByProviderVideoGen;
