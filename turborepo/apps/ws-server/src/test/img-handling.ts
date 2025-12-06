@@ -1,3 +1,4 @@
+import { ReadableStreamReadResult } from "stream/web";
 import type { ImageSpecs } from "@d0paminedriven/metadata";
 import { Fs } from "@d0paminedriven/fs";
 import { ImgMetadataExtractor } from "@d0paminedriven/metadata";
@@ -124,7 +125,8 @@ class Extract {
       const maxBytes = size;
 
       while (totalBytes < maxBytes) {
-        const { done, value } = await reader.read();
+        const { done, value } =
+          (await reader.read()) as ReadableStreamReadResult<Uint8Array>;
         if (done) break;
 
         const bytesToAdd = Math.min(value.length, maxBytes - totalBytes);

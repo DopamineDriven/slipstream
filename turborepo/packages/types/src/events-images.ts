@@ -897,6 +897,7 @@ export type S3Checksum =
 export type S3StorageClass =
   | "DEEP_ARCHIVE"
   | "EXPRESS_ONEZONE"
+  | "FSX_ONTAP"
   | "FSX_OPENZFS"
   | "GLACIER"
   | "GLACIER_IR"

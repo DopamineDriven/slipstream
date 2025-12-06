@@ -87,6 +87,7 @@ export interface ProviderOpts extends Partial<ProviderMap> {
     meta?: string;
     vercel?: string;
     grok?: string;
+    grokMgmtKey?: string;
   };
 }
 export function ProviderBaseMixin<TBase extends Constructor>(Base: TBase) {
@@ -325,6 +326,7 @@ export function GrokMixin<
   return class GrokServiceMixin extends Base {
     #grok?: S;
     #grokApiKey?: string;
+    #grokManagementKey?: string;
     static sharedGrok?: S;
     static grokFactory?: ProviderFactory<S>;
     constructor(...args: any[]) {
@@ -335,6 +337,7 @@ export function GrokMixin<
       if (opts?.grok) this.#grok = opts.grok;
 
       this.#grokApiKey = opts?.apiKeys?.grok;
+      this.#grokManagementKey = opts?.apiKeys?.grokMgmtKey;
     }
     public get grok() {
       if (!this.#grok) {
@@ -360,7 +363,8 @@ export function GrokMixin<
               deps.redis,
               deps.extract,
               deps.s3,
-              this.#grokApiKey ?? ""
+              this.#grokApiKey ?? "",
+              this.#grokManagementKey ?? ""
             );
         }
       }

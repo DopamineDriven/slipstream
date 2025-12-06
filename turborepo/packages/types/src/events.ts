@@ -62,6 +62,9 @@ export type AIChatRequest = {
   isDefaultProvider?: boolean;
   metadata?: UserMetadata;
   batchId?: string;
+  // TODO
+  // enableWebSearch?: boolean;
+  // enableVectorStoreSearch?: boolean;
   imgGenEnabled?: boolean;
   imgGenFields?: AIChatRequestImgGenFields;
 };

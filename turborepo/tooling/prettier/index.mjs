@@ -28,7 +28,7 @@ const config = {
     "decorators-legacy",
     "importAttributes"
   ],
-  importOrderTypeScriptVersion: "5.8.3",
+  importOrderTypeScriptVersion: "5.9.3",
   semi: true,
   singleQuote: false,
   trailingComma: "none",

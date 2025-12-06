@@ -38,6 +38,11 @@ export type Account = Prisma.AccountModel
  */
 export type Session = Prisma.SessionModel
 /**
+ * Model ProviderStore
+ * 
+ */
+export type ProviderStore = Prisma.ProviderStoreModel
+/**
  * Model UserKey
  * 
  */

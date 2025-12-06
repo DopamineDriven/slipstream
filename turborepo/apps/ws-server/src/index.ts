@@ -117,7 +117,8 @@ async function exe() {
       redisInstance,
       extract,
       s3,
-      cfg.X_AI_KEY
+      cfg.X_AI_KEY,
+      cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
@@ -188,8 +189,8 @@ async function exe() {
       providers,
       s3,
       region,
-      extract,
-      imgCompatService
+      imgCompatService,
+      cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     resolver.registerAll();
@@ -240,7 +241,7 @@ async function exe() {
     process.on("SIGTERM", async () => gracefulShutdown("SIGTERM"));
     process.on("SIGINT", async () => gracefulShutdown("SIGINT"));
   } catch (err) {
-    if (err instanceof Error) throw new Error(err.message);
+    if (err instanceof Error) throw new Error(err.message.concat(`${err.stack}`));
     else throw new Error(`something went wrong...`);
   }
 }

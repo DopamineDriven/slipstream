@@ -53,6 +53,7 @@ export const ModelName = {
   Profile: 'Profile',
   Account: 'Account',
   Session: 'Session',
+  ProviderStore: 'ProviderStore',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -153,6 +154,23 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const ProviderStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  storeRef: 'storeRef',
+  storeName: 'storeName',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  providerStoreCreatedAt: 'providerStoreCreatedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
 
 
 export const UserKeyScalarFieldEnum = {
@@ -303,7 +321,6 @@ export const AttachmentProviderScalarFieldEnum = {
   userKeyId: 'userKeyId',
   keyFingerprint: 'keyFingerprint',
   state: 'state',
-  containerRef: 'containerRef',
   providerUri: 'providerUri',
   providerRef: 'providerRef',
   mime: 'mime',
@@ -313,6 +330,7 @@ export const AttachmentProviderScalarFieldEnum = {
   lastCheckedAt: 'lastCheckedAt',
   errorCode: 'errorCode',
   errorMessage: 'errorMessage',
+  storeId: 'storeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -203,9 +203,9 @@ enum AssetStatus {
 }
 
 model User {
-  id              String         @id @default(cuid(2))
+  id              String          @id @default(cuid(2))
   name            String?
-  email           String         @unique
+  email           String          @unique
   emailVerified   DateTime?
   email_verified  Boolean? // will use to point emailVerified of Better Auth to then migrate to emailVerified once next auth is gone
   image           String?
@@ -217,9 +217,10 @@ model User {
   keys            UserKey[]
   attachments     Attachment[]
   conversations   Conversation[]
+  providerStores  ProviderStore[]
   settings        Settings?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
 model Profile {
@@ -270,6 +271,28 @@ model Session {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProviderStore {
+  id         String   @id @default(cuid(2))
+  userId     String
+  provider   Provider
+  storeRef   String // The vector_store_id or collection_id
+  storeName  String
+  fileCount  Int      @default(0)
+  totalBytes BigInt?
+
+  providerStoreCreatedAt DateTime?
+  lastSyncedAt           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files AttachmentProvider[]
+
+  @@unique([userId, provider])
+  @@index([storeRef, provider])
 }
 
 model UserKey {
@@ -451,7 +474,6 @@ model AttachmentProvider {
   state          ProviderAssetState @default(PENDING)
 
   // provider-specific refs
-  containerRef  String?
   providerUri   String?
   providerRef   String?
   mime          String?
@@ -461,19 +483,20 @@ model AttachmentProvider {
   lastCheckedAt DateTime?
   errorCode     String?
   errorMessage  String?
+  storeId       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
-  userKey    UserKey?   @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
+  attachment Attachment     @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userKey    UserKey?       @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
+  store      ProviderStore? @relation(fields: [storeId], references: [id], onDelete: SetNull)
 
   @@unique([attachmentId, provider, keyFingerprint], name: "attachmentId_provider_keyFingerprint")
   @@index([provider, keyFingerprint, expiresAt])
   @@index([provider, providerRef])
   @@index([attachmentId, provider])
   @@index([provider, state, expiresAt])
-  @@index([containerRef, provider])
+  @@index([storeId, provider])
 }
 
 model ImageMetadata {
@@ -588,8 +611,8 @@ model DocumentMetadata {
 
   // For PDFs
   pdfVersion   String? // "1.4", "1.7", etc.
-  isEncrypted  Boolean @default(false)
-  isSearchable Boolean @default(true) // has text layer
+  isEncrypted  Boolean  @default(false)
+  isSearchable Boolean  @default(true) // has text layer
   isLinearized Boolean?
 
   // For text documents

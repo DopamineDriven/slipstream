@@ -394,6 +394,7 @@ export const ModelName = {
   Profile: 'Profile',
   Account: 'Account',
   Session: 'Session',
+  ProviderStore: 'ProviderStore',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
+    modelProps: "user" | "profile" | "account" | "session" | "providerStore" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -720,6 +721,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SessionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderStore: {
+      payload: Prisma.$ProviderStorePayload<ExtArgs>
+      fields: Prisma.ProviderStoreFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderStoreFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderStoreFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderStoreFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderStoreFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        findMany: {
+          args: Prisma.ProviderStoreFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>[]
+        }
+        create: {
+          args: Prisma.ProviderStoreCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        createMany: {
+          args: Prisma.ProviderStoreCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderStoreCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderStoreDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        update: {
+          args: Prisma.ProviderStoreUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderStoreDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderStoreUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderStoreUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderStoreUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStorePayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderStoreAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderStore>
+        }
+        groupBy: {
+          args: Prisma.ProviderStoreGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderStoreCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreCountAggregateOutputType> | number
         }
       }
     }
@@ -1872,6 +1947,23 @@ export const SessionScalarFieldEnum = {
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+export const ProviderStoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  storeRef: 'storeRef',
+  storeName: 'storeName',
+  fileCount: 'fileCount',
+  totalBytes: 'totalBytes',
+  providerStoreCreatedAt: 'providerStoreCreatedAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
+
+
 export const UserKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2020,7 +2112,6 @@ export const AttachmentProviderScalarFieldEnum = {
   userKeyId: 'userKeyId',
   keyFingerprint: 'keyFingerprint',
   state: 'state',
-  containerRef: 'containerRef',
   providerUri: 'providerUri',
   providerRef: 'providerRef',
   mime: 'mime',
@@ -2030,6 +2121,7 @@ export const AttachmentProviderScalarFieldEnum = {
   lastCheckedAt: 'lastCheckedAt',
   errorCode: 'errorCode',
   errorMessage: 'errorMessage',
+  storeId: 'storeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2312,6 +2404,20 @@ export type ListEnumProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+/**
  * Reference to a field of type 'ThemePreference'
  */
 export type EnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThemePreference'>
@@ -2448,20 +2554,6 @@ export type EnumCompatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'CompatStatus[]'
  */
 export type ListEnumCompatStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompatStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'BigInt'
- */
-export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
-    
-
-
-/**
- * Reference to a field of type 'BigInt[]'
- */
-export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 
@@ -2653,6 +2745,7 @@ export type GlobalOmitConfig = {
   profile?: Prisma.ProfileOmit
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
+  providerStore?: Prisma.ProviderStoreOmit
   userKey?: Prisma.UserKeyOmit
   settings?: Prisma.SettingsOmit
   conversation?: Prisma.ConversationOmit

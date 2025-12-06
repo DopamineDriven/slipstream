@@ -20,6 +20,7 @@ export default defineConfig(
   ) =>
     ({
       ...options,
+      cjsDefault: false,
       entry: [
         "src/index.ts",
         "src/utils/index.ts",

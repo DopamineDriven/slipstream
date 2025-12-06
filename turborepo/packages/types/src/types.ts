@@ -12,6 +12,7 @@ import type {
   ImageMetadata,
   Message,
   Profile,
+  ProviderStore,
   Session,
   Settings,
   User,
@@ -29,6 +30,7 @@ export interface UserSingleton<T extends boolean = false> extends User {
   accounts?: AccountSingleton<T>[];
   sessions?: SessionSingleton<T>[];
   profile?: ProfileSingleton<T>;
+  providerStores?: ProviderStoreSingleton<T>[];
   settings?: SettingsSingleton<T>;
 }
 
@@ -50,34 +52,49 @@ export interface SettingsSingleton<T extends boolean = false> extends Settings {
 
 export interface DocumentSingleton extends DocumentMetadata {}
 
-export interface AttachmentProviderSingleton<T extends boolean = false>
-  extends Rm<AttachmentProvider, "size"> {
+export interface AttachmentProviderSingleton<
+  T extends boolean = false
+> extends Rm<AttachmentProvider, "size"> {
   size: BigIntOrNumber<T> | null;
   attachment?: AttachmentSingleton<T>;
   userKey?: UserKeySingleton<T>;
+  store?: ProviderStoreSingleton<T>;
+}
+
+export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
+  ProviderStore,
+  "totalBytes"
+> {
+  totalBytes: BigIntOrNumber<T> | null;
+  files?: AttachmentProviderSingleton<T>[];
 }
 
 export interface ImageSingleton extends ImageMetadata {}
 
-export interface ConvoSettingsSingleton<T extends boolean = false>
-  extends ConversationSettings {
+export interface ConvoSettingsSingleton<
+  T extends boolean = false
+> extends ConversationSettings {
   conversation?: ConversationSingleton<T>;
 }
 
-export interface ImageGenJobSingleton<T extends boolean = false>
-  extends ImageGenJob {
+export interface ImageGenJobSingleton<
+  T extends boolean = false
+> extends ImageGenJob {
   outputs?: ImageGenOutputSingleton<T>[];
   userKey?: UserKeySingleton<T>;
   requestMessage?: MessageSingleton<T>;
 }
 
-export interface ImageGenOutputSingleton<T extends boolean = false>
-  extends ImageGenOutput {
+export interface ImageGenOutputSingleton<
+  T extends boolean = false
+> extends ImageGenOutput {
   job?: ImageGenJobSingleton<T>;
 }
 
-export interface AttachmentSingleton<T extends boolean = false>
-  extends Rm<Attachment, "size"> {
+export interface AttachmentSingleton<T extends boolean = false> extends Rm<
+  Attachment,
+  "size"
+> {
   size: BigIntOrNumber<T> | null;
   providerLinks?: AttachmentProviderSingleton<T>[];
   image: ImageSingleton | null;
@@ -98,16 +115,18 @@ export interface MessageSingleton<T extends boolean = false> extends Message {
   attachments: AttachmentSingleton<T>[];
 }
 
-export interface ConversationSingleton<T extends boolean = false>
-  extends Conversation {
+export interface ConversationSingleton<
+  T extends boolean = false
+> extends Conversation {
   conversationSettings: ConvoSettingsSingleton<T> | null;
   messages: MessageSingleton<T>[];
   attachments?: AttachmentSingleton<T>[];
   user?: UserSingleton<T>;
 }
 
-export interface ConversationSingletonOneOff<T extends boolean = false>
-  extends ConversationSingleton<T> {
+export interface ConversationSingletonOneOff<
+  T extends boolean = false
+> extends ConversationSingleton<T> {
   apiKey?: string | null;
 }
 

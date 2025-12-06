@@ -405,9 +405,8 @@ export class GeminiWorkupService {
       } else {
         // AI message - may have AI-generated attachments
         const partArr = Array.of<Part>();
-        const provider = msg.provider.toLowerCase();
         const model = msg.model ?? "unknown";
-        const modelIdentifier = `[${provider}/${model}]`;
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${model}]`;
 
         // Handle AI-generated attachments if they exist
         if (

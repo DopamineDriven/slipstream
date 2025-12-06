@@ -316,6 +316,7 @@ export type {
   ImageSingleton,
   MessageSingleton,
   ProfileSingleton,
+  ProviderStoreSingleton,
   SessionSingleton,
   SettingsSingleton,
   Signals,

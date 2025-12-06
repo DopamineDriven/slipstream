@@ -780,14 +780,6 @@ export type EnumImageFormatFieldUpdateOperationsInput = {
   set?: $Enums.ImageFormat
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
   set?: $Enums.ColorSpace | null
 }

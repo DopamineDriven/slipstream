@@ -501,10 +501,6 @@ export type UserKeyUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
 }
 
-export type EnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider
-}
-
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }

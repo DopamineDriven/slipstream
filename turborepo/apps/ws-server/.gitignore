@@ -18,3 +18,4 @@ src/test/c**/*
 testing.sh
 
 src/test/anthropic/*
+src/test/xai/**/*

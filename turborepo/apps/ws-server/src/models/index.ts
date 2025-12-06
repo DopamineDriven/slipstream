@@ -5,8 +5,11 @@ import type {
   ExpandedDocSpecs,
   ExpandedImgSpecs
 } from "@d0paminedriven/metadata";
+import { ByteCodec } from "@/byte-codec/index.ts";
+import { MultiErrorReply } from "redis";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
+  AttachmentSingleton,
   GeminiImgGenModels,
   GetModelUtilRT,
   GrokImgGenModels,
@@ -14,6 +17,7 @@ import type {
   MessageSingleton,
   OpenAIImgGenModels,
   Provider,
+  ProviderStoreSingleton,
   UserKeySingleton
 } from "@slipstream/types";
 import { ProviderValidation } from "@slipstream/img-gen";
@@ -25,7 +29,45 @@ export class ModelService extends ProviderValidation {
     super();
   }
 
-  
+  public encodeUTF8(text: string) {
+    return ByteCodec.encode(text);
+  }
+
+  public decodeUTF8(bytes: Uint8Array | NodeJS.NonSharedUint8Array) {
+    return ByteCodec.decode(bytes);
+  }
+
+  public concatBytes(arrays: Uint8Array[]) {
+    const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const arr of arrays) {
+      result.set(arr, offset);
+      offset += arr.length;
+    }
+    return result;
+  }
+
+  public findDoubleNewlineIndex(buffer: Uint8Array) {
+    const LF = 0x0a;
+    const CR = 0x0d;
+
+    for (let i = 0; i < buffer.length - 1; i++) {
+      if (buffer[i] === LF && buffer[i + 1] === LF) return i + 2;
+      if (buffer[i] === CR && buffer[i + 1] === CR) return i + 2;
+      if (
+        buffer[i] === CR &&
+        buffer[i + 1] === LF &&
+        i + 3 < buffer.length &&
+        buffer[i + 2] === CR &&
+        buffer[i + 3] === LF
+      ) {
+        return i + 4;
+      }
+    }
+    return -1;
+  }
+
   public handleBigintToNumber(
     message: MessageSingleton<false>
   ): MessageSingleton<true> {
@@ -33,10 +75,40 @@ export class ModelService extends ProviderValidation {
     const mapIt = attachments.map(t => {
       const { size, ...p } = t;
       const mapProviderSingleton = p?.providerLinks?.map(v => {
-        const { size, userKey, attachment: _att, ...s } = v;
+        const { size, userKey, store, attachment: _att, ...s } = v;
+        let storeT: number | null = null;
+        const {
+          totalBytes: _totalBytes,
+          files: _files,
+          ...rest
+        } = store ?? { totalBytes: null };
+        if (store?.totalBytes) {
+          storeT = Number(store.totalBytes);
+        } else {
+          storeT = null;
+        }
+
         return {
           userKey: userKey as undefined | UserKeySingleton<true>,
           size: size ? Number(size) : null,
+          store:
+            store?.id && store.userId
+              ? ({
+                  ...rest,
+                  id: store.id,
+                  userId: store.userId,
+                  provider: message.provider,
+                  createdAt: store.createdAt ?? null,
+                  updatedAt: store.updatedAt ?? null,
+                  fileCount: store.fileCount ?? MultiErrorReply,
+                  lastSyncedAt: store.lastSyncedAt ?? null,
+                  providerStoreCreatedAt: store.providerStoreCreatedAt ?? null,
+                  storeName: store.storeName ?? null,
+                  storeRef: store.storeRef ?? null,
+                  totalBytes: storeT,
+                  files: undefined
+                } satisfies ProviderStoreSingleton<true>)
+              : undefined,
           ...s
         };
       });
@@ -50,11 +122,12 @@ export class ModelService extends ProviderValidation {
 
     return {
       userKey: userKey as undefined | UserKeySingleton<true>,
-      attachments: mapIt,
+      attachments: mapIt as AttachmentSingleton<true>[],
       imageGenJob: imageGenJob as ImageGenJobSingleton<true> | undefined,
       ...rest
     } satisfies MessageSingleton<true>;
   }
+
   public toPathnameExtTuple(path: string) {
     const extAndPath = (path.split(/\//gim).at(-1) ?? "")?.split(/\./gm);
     if (extAndPath.length > 2) {
