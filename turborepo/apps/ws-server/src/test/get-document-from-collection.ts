@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
 
-const _fs = new Fs(process.cwd());
+const fs = new Fs(process.cwd());
 
 const managementApiKey = process.env.X_AI_MANAGEMENT_API_KEY ?? "";
 
@@ -67,16 +67,41 @@ async function* getAllGrokFiles(collection_id: string, limit = 10) {
     page_number += 1;
   }
 }
-
+const arr = Array.of<{
+    file_metadata: {
+        file_id: string;
+        name: string;
+        size_bytes: string;
+        content_type: string;
+        created_at: string;
+        expires_at: null;
+        hash: string;
+        upload_status: string;
+        processing_status: string;
+        file_path: string;
+    };
+    fields: {
+        attachmentId: string;
+        conversationId: string;
+        messageId: string;
+        originalFilename: string;
+    };
+    status: string;
+}>();
 for await (const x of getAllGrokFiles(
-  "collection_09c83c12-e569-4303-a84e-1793f8c57432"
+  "collection_0ca753a0-e2fd-4050-a86f-dca114aa1a89"
 )) {
   if (x.data) {
     for (const document of x.data) {
+      arr.push(document);
       console.log(document.fields);
     }
   }
 }
+  fs.withWs(
+    "src/test/__out__/xai/inspect/list-collections-documents.json",
+    JSON.stringify(arr, null, 2)
+  );
 // nrr6h4r4480f6kviycyo1zhf
 // (async () => {
 //   return await fetch(
@@ -92,8 +117,5 @@ for await (const x of getAllGrokFiles(
 // })().then(async res => {
 //   const toJson = await res.json();
 
-//   fs.withWs(
-//     "src/test/__out__/xai/inspect/list-collections-documents-with-limit-page-II.json",
-//     JSON.stringify(toJson, null, 2)
-//   );
+
 // });

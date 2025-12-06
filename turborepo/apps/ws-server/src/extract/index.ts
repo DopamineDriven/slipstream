@@ -7,7 +7,7 @@ export class ExtractService extends Fs {
   }
 
   private isValidUrl(ss: string) {
-    return /(https?|s3)/g.test(ss) && URL.canParse(ss);
+    return /(https?|s3|collection)/g.test(ss) && URL.canParse(ss);
   }
   public handleCompatStatus(assetType: $Enums.AssetType, ext: string | null) {
     switch (assetType) {

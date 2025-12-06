@@ -44,7 +44,7 @@
     "@d0paminedriven/turbogen": "^5.6.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
-    "@typescript/native-preview": "^7.0.0-dev.20251204.1",
+    "@typescript/native-preview": "7.0.0-dev.20251206.1",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
     "dotenv": "^17.2.3",
@@ -53,9 +53,9 @@
     "knip": "^5.71.0",
     "prettier": "^3.7.4",
     "tsx": "^4.21.0",
-    "turbo": "^2.6.2",
+    "turbo": "^2.6.3",
     "typescript": "^5.9.3",
-    "vercel": "^48.12.1"
+    "vercel": "^49.1.1"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

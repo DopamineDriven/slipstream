@@ -154,7 +154,7 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
 
   /**
    * ```ts
-   * (property) userProviderKeyMap: Map<`${string}_openai` | `${string}_grok` | `${string}_gemini` | `${string}_anthropic`, string | undefined>
+   * (property) userProviderKeyMap: Map<`${string}_openai` | `${string}_vercel` | `${string}_meta`  |  `${string}_grok` | `${string}_gemini` | `${string}_anthropic`, string | undefined>
    * ```
    */
 
@@ -175,7 +175,7 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
       }
     });
     if (!rec) {
-      console.error(`No API key configured for ${provider}!`);
+      console.info(`No API key configured for ${provider}!`);
       return { apiKey: null, keyId: null };
     }
     try {

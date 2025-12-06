@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@slipstream/tsconfig": "workspace:*",
-    "@typescript/native-preview": "^7.0.0-dev.20251204.1",
+    "@typescript/native-preview": "7.0.0-dev.20251206.1",
     "typescript": "^5.9.3"
   },
   "prettier": "@slipstream/prettier-config"

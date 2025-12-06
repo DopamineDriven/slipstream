@@ -2,6 +2,20 @@ import { createReadStream } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type {
+  CodeInterpreterTool,
+  ContentBlockUnion,
+  FileContentBlock,
+  FileSearchTool,
+  ImageContentBlock,
+  ResponsesContentInputSingleton,
+  ResponsesContentWorkup,
+  TextContentBlock,
+  ToolChoiceUnion,
+  ToolUnion,
+  WebSearchTool,
+  XSearchTool
+} from "@/xai/responses-types.ts";
+import type {
   CreateCollectionRequest,
   CreateCollectionResponse,
   DeleteXaiFileResponse,
@@ -16,11 +30,21 @@ import type { Logger } from "pino";
 import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
+import { ProviderChatRequestEntity } from "@/types/index.ts";
+import { ResponsesStreamParser } from "@/xai/response-sse.ts";
 import { python } from "pythonia";
-import type { AttachmentSingleton, XOR } from "@slipstream/types";
+import type {
+  AttachmentSingleton,
+  GrokModelIdUnion,
+  MessageSingleton,
+  XOR
+} from "@slipstream/types";
 
 export class GrokCollectionsService {
   protected logger: Logger;
+
+  protected readonly baseUrl = "https://api.x.ai/v1/responses";
+  protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
 
   /**
    * Asset cache: attachmentId → file metadata
@@ -270,7 +294,6 @@ export class GrokCollectionsService {
   public async syncFileRegistry(
     userId: string,
     cleanupStaleFiles = false,
-    apiKey?: string,
     mgmtKey?: string
   ): Promise<
     XOR<
@@ -290,7 +313,7 @@ export class GrokCollectionsService {
       }
     >
   > {
-    const key = apiKey ?? this.xaiKey;
+    let key: string;
     const hasGrokMessages = await this.prisma.hasProviderMessages(
       userId,
       "GROK"
@@ -304,12 +327,31 @@ export class GrokCollectionsService {
         collectionId: undefined
       } as const;
     }
-
+    const tryApiKey = await this.prisma.handleApiKeyLookup("grok", userId);
+    if (tryApiKey.apiKey) {
+      key = tryApiKey.apiKey;
+    } else {
+      key = this.xaiKey;
+    }
     const managementKey = mgmtKey ?? this.xaiManagementKey;
 
     console.info(`Starting xAI file registry sync for user ${userId}`);
 
-    // 1. Resolve collection via exact-match filter
+    // reset in-memory caches/registries on new session init (immediately following connection_established event)
+    if (this.collectionRegistry.size > 0) {
+      this.collectionRegistry.clear();
+    }
+    if (this.storeDbRegistry.size > 0) {
+      this.storeDbRegistry.clear();
+    }
+    if (this.assetCache.size > 0) {
+      this.assetCache.clear();
+    }
+    if (this.fileRegistry.size > 0) {
+      this.fileRegistry.clear();
+    }
+
+    // resolve collection via exact-match filter
     const collection = (await this.resolveCollection(
       userId,
       managementKey
@@ -323,36 +365,38 @@ export class GrokCollectionsService {
         collectionId: undefined
       } as const;
     }
-    this.storeDbRegistry.clear();
     const collectionId = collection.collection_id;
     this.collectionRegistry.set(userId, collectionId);
 
-    // 2. Get store DB info
+    // get store DB info
     const storeInfo = await this.prisma.vectorStoreInfoByProvider(
       userId,
       "GROK"
     );
+
     if (storeInfo.hasStore) {
       this.storeDbRegistry.set(userId, storeInfo.dbId);
     }
 
-    // 3. Load DB mappings into assetCache
-    this.assetCache.clear();
+    // load DB mappings into assetCache
     const providerAssets = await this.prisma.findManyByProvider("GROK", userId);
     const dbRecordsToDelete = Array.of<string>();
 
     if (providerAssets.length > 0) {
       for (const asset of providerAssets) {
-        if (asset.providerRef && !asset.isExpired) {
-          dbRecordsToDelete.push(asset.attachmentId);
-          this.assetCache.set(asset.attachmentId, {
-            attachmentId: asset.attachmentId,
-            fileId: asset.providerRef,
-            collectionId: asset.storeRef ?? collectionId,
-            databaseId: asset.id,
-            storeDbId: asset.storeId ?? storeInfo.dbId ?? "",
-            lastAccessedAt: asset.lastCheckedAt
-          });
+        if (asset.providerRef) {
+          if (asset.isExpired === false) {
+            this.assetCache.set(asset.attachmentId, {
+              attachmentId: asset.attachmentId,
+              fileId: asset.providerRef,
+              collectionId: asset.storeRef ?? collectionId,
+              databaseId: asset.id,
+              storeDbId: asset.storeId ?? storeInfo.dbId ?? "",
+              lastAccessedAt: asset.lastCheckedAt
+            });
+          } else {
+            dbRecordsToDelete.push(asset.attachmentId);
+          }
         }
       }
     }
@@ -360,8 +404,7 @@ export class GrokCollectionsService {
       `Populated xAI asset cache with ${this.assetCache.size} entries from database`
     );
 
-    // 4. Rebuild fileRegistry from xAI API, filtered by DB attachmentIds
-    this.fileRegistry.clear();
+    // rebuild fileRegistry from xAI API, filtered by DB attachmentIds
     const totalFiles = { count: 0 };
 
     for await (const batch of this.getAllGrokFiles(
@@ -370,7 +413,7 @@ export class GrokCollectionsService {
       managementKey
     )) {
       if (batch.data.length > 0) {
-        for (const doc of batch.data ?? []) {
+        for (const doc of batch.data) {
           const attachmentId = doc.fields?.attachmentId;
           // Only cache files that exist in our database
           if (attachmentId && dbRecordsToDelete.includes(attachmentId)) {
@@ -386,7 +429,7 @@ export class GrokCollectionsService {
       `xAI file registry sync complete: ${this.fileRegistry.size} files indexed`
     );
 
-    // 5. Reconcile caches (remove stale entries from either cache)
+    // reconcile caches (remove stale entries from either cache)
     if (this.fileRegistry.size !== this.assetCache.size) {
       // Remove assetCache entries not in fileRegistry
       for (const key of this.assetCache.keys()) {
@@ -402,7 +445,7 @@ export class GrokCollectionsService {
       }
     }
 
-    // 6. Optionally cleanup stale files (14-day access window)
+    // optionally cleanup stale files (14-day access window)
     if (cleanupStaleFiles) {
       await this.cleanupStaleFiles(collectionId, userId, key, managementKey);
     }
@@ -543,13 +586,15 @@ export class GrokCollectionsService {
    */
   protected async ensureXaiAssetUploaded(
     attachment: AttachmentSingleton<true>,
-    keyFingerprint: string,
+    keyFingerprint = "server",
     keyId?: string,
-    apiKey?: string,
+    xaiApiKey?: string,
     mgmtKey?: string
   ) {
+    const apiKey = xaiApiKey ?? this.xaiKey;
     const cacheKey = attachment.id; // Same key for both caches
     const managementKey = mgmtKey ?? this.xaiManagementKey;
+
 
     // 1. Check in-memory cache AND verify in fileRegistry
     const cached = this.assetCache.get(cacheKey);
@@ -659,41 +704,7 @@ export class GrokCollectionsService {
         throw new Error("Upload failed: no file ID returned");
       }
 
-      // 5. Update caches
-      this.assetCache.set(cacheKey, {
-        attachmentId: cacheKey,
-        fileId: uploadResult.id,
-        collectionId,
-        databaseId: "", // Populated by upsertGrokAssetMapping in uploadFileAndPromoteToCollection
-        storeDbId: storeDbId ?? "",
-        lastAccessedAt: new Date()
-      });
-
-      // Construct fileRegistry entry from upload result
-      this.fileRegistry.set(cacheKey, {
-        file_metadata: {
-          file_id: uploadResult.id,
-          name: this.toXaiFilename(attachment),
-          size_bytes: String(uploadResult.bytes),
-          content_type:
-            attachment.compatStatus === "ACTIVE"
-              ? (attachment.compatMime ?? "application/octet-stream")
-              : (attachment.mime ?? "application/octet-stream"),
-          created_at: String(uploadResult.created_at),
-          expires_at: null,
-          hash: "",
-          upload_status: "UPLOAD_STATUS_COMPLETED",
-          processing_status: "DOCUMENT_STATUS_PROCESSING",
-          file_path: ""
-        },
-        fields: {
-          conversationId: attachment.conversationId ?? "new-chat",
-          messageId: attachment.messageId ?? "new-message",
-          attachmentId: attachment.id,
-          originalFilename: attachment.filename ?? "content"
-        },
-        status: "DOCUMENT_STATUS_PROCESSING"
-      });
+      // caches are updated in uploadFileAndPromoteToCollection flow
 
       this.logger.info(
         { cacheKey, fileId: uploadResult.id },
@@ -946,8 +957,7 @@ export class GrokCollectionsService {
 
   private async streamUploadFileWorkup(
     att: AttachmentSingleton<true>,
-    apiKey?: string,
-    keyId?: string
+    apiKey?: string
   ) {
     const key = apiKey ?? this.xaiKey;
     const {
@@ -963,9 +973,10 @@ export class GrokCollectionsService {
 
       const rs = createReadStream(absTmpPath);
 
-      const iterate = rs.iterator() as NodeJS.AsyncIterator<Buffer>;
+      const iterate = rs.iterator();
 
       for await (const chunk of iterate) {
+        // eslint-disable-next-line
         arr.push(chunk);
       }
 
@@ -979,7 +990,11 @@ export class GrokCollectionsService {
 
       resolve(this.uploadFile(formData, key));
 
-      return promise.then(res => ({ ...res.json<UploadFileRT>(), keyId }));
+      return promise.then(async res => {
+        console.log(res.ok);
+        const data = await res.json<UploadFileRT>();
+        return data
+      });
     } catch (err) {
       console.error(this.prisma.safeErrMsg(err));
       throw new Error(this.prisma.safeErrMsg(err));
@@ -1036,9 +1051,9 @@ export class GrokCollectionsService {
 
     const toFilename = this.toXaiFilename(att);
 
-    const res = await this.streamUploadFileWorkup(att, key, keyFingerprint);
-
-    if (!res?.id) throw new Error("no id returned with results");
+    const res = await this.streamUploadFileWorkup(att, key);
+    console.log(res);
+    if (!res?.id) throw new Error("no id returned with results".concat(JSON.stringify(res, null, 2)));
     collectionObj.storeRef = this.collectionRegistry.get(att.userId);
     if (!collectionObj.storeRef) {
       const collection = await this.resolveCollection(
@@ -1064,7 +1079,7 @@ export class GrokCollectionsService {
       );
 
       if (fetcher.ok) {
-        await this.prisma.upsertGrokAssetMapping(
+        const upsertRes = await this.prisma.upsertGrokAssetMapping(
           att.userId,
           att.id,
           collectionObj.dbId,
@@ -1079,6 +1094,60 @@ export class GrokCollectionsService {
           att.size ? BigInt(att.size) : undefined,
           new Date(res.created_at).toISOString()
         );
+        this.assetCache.set(att.id, {
+          attachmentId: att.id,
+          fileId: res.id,
+          collectionId: collectionObj.storeRef,
+          databaseId: upsertRes.id, // Populated by upsertGrokAssetMapping in uploadFileAndPromoteToCollection
+          storeDbId: upsertRes.storeId ?? "",
+          lastAccessedAt: upsertRes.lastCheckedAt
+        });
+
+        // Construct fileRegistry entry from upload result
+
+        const richFileData = await this.getFileByCollectionIdAndName(
+          collectionObj.storeRef,
+          att,
+          managementKey
+        );
+
+        const index0 = richFileData.documents.at(0);
+        if (index0) {
+          this.fileRegistry.set(att.id, index0);
+        } else {
+          const { url, mime } = this.urlExtWorkup(att);
+          const urlObj = new URL(url);
+
+          const path = urlObj.pathname;
+
+          const pathname = path.slice(path.lastIndexOf("/") + 1);
+
+          const filename =
+            att.compatStatus === "ACTIVE" ? pathname : pathname.slice(14);
+
+          const dbFile = filename ?? `file.pdf`;
+          this.fileRegistry.set(att.id, {
+            file_metadata: {
+              file_id: res.id,
+              name: this.toXaiFilename(att),
+              size_bytes: String(res.bytes),
+              content_type: mime,
+              created_at: new Date(res.created_at).toISOString(),
+              expires_at: null,
+              hash: "",
+              upload_status: "UPLOAD_STATUS_COMPLETED",
+              processing_status: "DOCUMENT_STATUS_PROCESSING",
+              file_path: ""
+            },
+            fields: {
+              conversationId: att.conversationId ?? "new-chat",
+              messageId: att.messageId ?? "new-message",
+              attachmentId: att.id,
+              originalFilename: dbFile
+            },
+            status: "DOCUMENT_STATUS_PROCESSING"
+          });
+        }
       }
     } catch (err) {
       throw new Error(this.prisma.safeErrMsg(err));
@@ -1214,6 +1283,542 @@ upload_result = asyncio.run(main())
       throw err;
     } finally {
       this.cleanupTmpPostupload(absTmpPath, tmpUniquename);
+    }
+  }
+
+  protected get hasActiveCollection() {
+    return this.collectionRegistry.size > 0;
+  }
+
+  protected getUserCollectionId(userId: string) {
+    return this.collectionRegistry.get(userId);
+  }
+
+  protected getProviderStoreDbId(userId: string) {
+    return this.storeDbRegistry.get(userId);
+  }
+
+  protected resolveResponsesTools(
+    userId: string,
+    {
+      enableFileSearch = true,
+      enableWebSearch = false,
+      enableXSearch = false,
+      enableCodeInterpreter = false,
+      fileSearchMaxResults = 5,
+      web_enable_image_understanding = true,
+      x_enable_image_understanding = true,
+      x_enable_video_understanding = true
+    }: {
+      enableFileSearch?: boolean;
+      enableWebSearch?: boolean;
+      enableXSearch?: boolean;
+      enableCodeInterpreter?: boolean;
+      fileSearchMaxResults?: number;
+      web_enable_image_understanding?: boolean;
+      x_enable_image_understanding?: boolean;
+      x_enable_video_understanding?: boolean;
+    }
+  ) {
+    const tools = Array.of<ToolUnion>();
+
+    // Use pre-synced collection from registry (populated on connection)
+    if (enableFileSearch) {
+      const collectionId = this.collectionRegistry.get(userId);
+      if (collectionId) {
+        tools.push({
+          type: "file_search",
+          vector_store_ids: [collectionId],
+          max_num_results: fileSearchMaxResults
+        } satisfies FileSearchTool);
+      }
+    }
+
+    if (enableWebSearch) {
+      tools.push({
+        type: "web_search",
+        filters: { enable_image_understanding: web_enable_image_understanding }
+      } satisfies WebSearchTool);
+    }
+
+    if (enableXSearch) {
+      tools.push({
+        type: "x_search",
+        filters: {
+          enable_image_understanding: x_enable_image_understanding,
+          enable_video_understanding: x_enable_video_understanding
+        }
+      } satisfies XSearchTool);
+    }
+
+    if (enableCodeInterpreter) {
+      tools.push({ type: "code_interpreter" } satisfies CodeInterpreterTool);
+    }
+    return tools;
+  }
+
+  protected hasFileSearchCapability(userId: string) {
+    return this.collectionRegistry.has(userId);
+  }
+
+  protected async createResponsesStream(
+    controller: AbortController,
+    {
+      msgs,
+      userId,
+      isNewChat,
+      keyId,
+      apiKey,
+      max_tokens,
+      temperature,
+      topP: top_p,
+      model: m,
+      systemPrompt
+    }: ProviderChatRequestEntity,
+    management_api_key?: string,
+    tool_choice_input: ToolChoiceUnion = "auto",
+    logprobs = false,
+    imgDetail?: ImageContentBlock["detail"],
+    enableFileSearch = true,
+    fileSearchMaxResults = 5,
+    enableCodeInterpreter = true,
+    enableWebSearch = true,
+    enableXSearch = false,
+    web_enable_image_understanding = true,
+    x_enable_image_understanding = true,
+    x_enable_video_understanding = true
+  ) {
+    const key = apiKey ?? this.xaiKey;
+
+    const mgmtApiKey = management_api_key ?? this.xaiManagementKey;
+
+    const {
+      input,
+      instructions,
+      max_output_tokens,
+      model,
+      parallel_tool_calls,
+      tool_choice,
+      store,
+      stream,
+      tools,
+      user
+    } = await this.getResponsesApiInputWorkup(
+      isNewChat,
+      (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion,
+      userId,
+      msgs,
+      keyId ?? "server",
+      systemPrompt,
+      max_tokens,
+      tool_choice_input,
+      imgDetail,
+      keyId ?? undefined,
+      apiKey,
+      mgmtApiKey,
+      enableFileSearch,
+      fileSearchMaxResults,
+      enableCodeInterpreter,
+      enableWebSearch,
+      enableXSearch,
+      web_enable_image_understanding,
+      x_enable_image_understanding,
+      x_enable_video_understanding,
+      ["reasoning.encrypted_content"]
+    );
+
+    const requestBody = {
+      model,
+      input,
+      store,
+      stream,
+      instructions,
+      temperature,
+      user,
+      top_p,
+      logprobs,
+      max_output_tokens,
+      tools,
+      include: ["reasoning.encrypted_content"],
+      tool_choice,
+      parallel_tool_calls
+    } satisfies ResponsesContentWorkup;
+
+    const response = await fetch(this.baseUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `xAI Responses API error (${response.status}, ${response.statusText}): ${errorText}`
+      );
+    }
+
+    return ResponsesStreamParser.createXAIResponsesParser(response, controller);
+  }
+
+  protected async formatxAIMsgHistory(
+    msgs: MessageSingleton<true>[],
+    model: GrokModelIdUnion,
+    imgDetail?: ImageContentBlock["detail"],
+    keyFingerprint = "server",
+    keyId?: string,
+    xaiApiKey?: string,
+    xaiMgmntKey?: string
+  ) {
+    const mgmtKey = xaiMgmntKey ?? this.xaiManagementKey;
+    const apiKey = xaiApiKey ?? this.xaiKey;
+    const formatted = Array.of<ResponsesContentInputSingleton>();
+    for (const msg of msgs) {
+      if (msg.senderType === "USER") {
+        const userId = msg.userId ?? "";
+        let collectionId: string | null = null;
+        const usercollectionId = this.getUserCollectionId(userId);
+        if (usercollectionId) {
+          collectionId = usercollectionId;
+        } else {
+          collectionId =
+            // prettier-ignore
+            (this.getUserCollectionId(userId) ??
+                null) ??
+                (await this.resolveCollection(userId, mgmtKey))
+                  ?.collection_id ??
+                null;
+        }
+
+        const content = Array.of<ContentBlockUnion>();
+
+        try {
+          if (
+            msg.attachments &&
+            msg.attachments.length > 0 &&
+            (model === "grok-2-vision-1212" ||
+              model === "grok-4-0709" ||
+              model === "grok-code-fast-1" ||
+              model === "grok-4-1-fast-non-reasoning" ||
+              model === "grok-4-fast-reasoning" ||
+              model === "grok-4-fast-non-reasoning" ||
+              model === "grok-4-1-fast-reasoning")
+          ) {
+            for (const attachment of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                compatCdnUrl,
+                compatMime
+              } = attachment;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+              if (url && mime) {
+                if (
+                  (attachment.assetType === "DOCUMENT" &&
+                   ( model === "grok-2-vision-1212" ||
+                  model === "grok-code-fast-1" ||
+                  model === "grok-4-0709" ||
+                  model === "grok-4-1-fast-non-reasoning" ||
+                  model === "grok-4-fast-reasoning" ||
+                  model === "grok-4-fast-non-reasoning" ||
+                  model === "grok-4-1-fast-reasoning"))
+                ) {
+                  try {
+                    const fileId = await this.ensureXaiAssetUploaded(
+                      attachment,
+                      keyFingerprint,
+                      keyId,
+                      apiKey,
+                      mgmtKey
+                    );
+
+                    const docBlock = {
+                      type: "input_file",
+                      file_id: fileId
+                    } satisfies FileContentBlock;
+                    content.push(docBlock);
+                  } catch (err) {
+                    this.logger.warn(
+                      { err: this.prisma.safeErrMsg(err) },
+                      `Failed to upload PDF to Collections/Files API of collectionId ${collectionId}, falling back to URL`
+                    );
+                  }
+                } else if (
+                  attachment.assetType === "IMAGE" &&
+                  (model === "grok-2-vision-1212" ||
+                    model === "grok-4-0709" ||
+                    model === "grok-4-1-fast-non-reasoning" ||
+                    model === "grok-4-fast-reasoning" ||
+                    model === "grok-4-fast-non-reasoning" ||
+                    model === "grok-4-1-fast-reasoning")
+                ) {
+                  const imgBlock = {
+                    type: "input_image",
+                    image_url: url,
+                    detail: imgDetail ?? "auto"
+                  } satisfies ImageContentBlock;
+                  content.push(imgBlock);
+                } else {
+                  continue;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error(this.prisma.safeErrMsg(err));
+        } finally {
+          content.push({
+            type: "input_text",
+            text: msg.content
+          } satisfies TextContentBlock);
+        }
+        formatted.push({
+          role: "user",
+          content
+        } as const satisfies ResponsesContentInputSingleton);
+      } else {
+        const content = Array.of<ContentBlockUnion>();
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
+        try {
+          if (msg.attachments && msg.attachments.length > 0) {
+            for (const att of msg.attachments) {
+              const {
+                cdnUrl,
+                mime: ogMime,
+                compatStatus,
+                assetType,
+                compatCdnUrl,
+                compatMime
+              } = att;
+              const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
+              const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
+
+              if (url && mime) {
+                if (
+                  assetType === "DOCUMENT" &&
+                  (model === "grok-2-vision-1212" ||
+                    model === "grok-code-fast-1" ||
+                    model === "grok-4-0709" ||
+                    model === "grok-4-1-fast-non-reasoning" ||
+                    model === "grok-4-fast-reasoning" ||
+                    model === "grok-4-fast-non-reasoning" ||
+                    model === "grok-4-1-fast-reasoning")
+                ) {
+                  try {
+                    const file_id = await this.ensureXaiAssetUploaded(
+                      att,
+                      keyFingerprint,
+                      keyId,
+                      apiKey,
+                      mgmtKey
+                    );
+                    const docBlock = {
+                      type: "input_file",
+                      file_id
+                    } satisfies FileContentBlock;
+                    content.push(docBlock);
+                  } catch (err) {
+                    this.logger.warn(
+                      { err: this.prisma.safeErrMsg(err) },
+                      `Failed to upload PDF to Collections/Files API of attachment id ${att.id}, falling back to URL`
+                    );
+                  }
+                  // can have image attachments from image gen models in multi-provider/multi-model convos
+                } else if (
+                  assetType === "IMAGE" &&
+                  (model === "grok-2-vision-1212" ||
+                    model === "grok-4-0709" ||
+                    model === "grok-4-1-fast-non-reasoning" ||
+                    model === "grok-4-fast-reasoning" ||
+                    model === "grok-4-fast-non-reasoning" ||
+                    model === "grok-4-1-fast-reasoning")
+                ) {
+                  const imgBlock = {
+                    type: "input_image",
+                    image_url: url,
+                    detail: imgDetail ?? "auto"
+                  } satisfies ImageContentBlock;
+                  content.push(imgBlock);
+                } else {
+                  continue;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error(this.prisma.safeErrMsg(err));
+        } finally {
+          content.push({
+            type: "input_text",
+            text: `${modelIdentifier}\n\n${msg.content}`
+          } satisfies TextContentBlock);
+        }
+        formatted.push({
+          role: "assistant",
+          content
+        } as const satisfies ResponsesContentInputSingleton);
+      }
+    }
+    return formatted;
+  }
+
+  private formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
+    if (isNewChat) {
+      return systemPrompt;
+    }
+
+    const note =
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+
+    return (
+      systemPrompt ? `${systemPrompt}\n\n${note}` : note
+    ) satisfies ResponsesContentInputSingleton["content"];
+  }
+
+  private async getResponsesApiInputWorkup(
+    isNewChat: boolean,
+    model: GrokModelIdUnion,
+    userId: string,
+    msgs: MessageSingleton<true>[],
+    keyFingerprint: string,
+    systemPrompt?: string,
+    max_output_tokens?: number,
+    tool_choice: ToolChoiceUnion = "auto",
+    detail?: ImageContentBlock["detail"],
+    keyId?: string,
+    xaiKey?: string,
+    mgmtKey?: string,
+    enableFileSearch = true,
+    fileSearchMaxResults = 5,
+    enableCodeInterpreter = true,
+    enableWebSearch = true,
+    enableXSearch = false,
+    web_enable_image_understanding = true,
+    x_enable_image_understanding = true,
+    x_enable_video_understanding = true,
+    include = ["reasoning.encrypted_content"]
+  ) {
+    const apiKey = xaiKey ?? this.xaiKey;
+    const managementKey = mgmtKey ?? this.xaiManagementKey;
+    const systemInstruction = this.formatSystemInstruction(
+      isNewChat,
+      systemPrompt
+    );
+    const tooling = this.handleTooling(
+      model,
+      userId,
+      enableFileSearch,
+      fileSearchMaxResults,
+      enableCodeInterpreter,
+      enableWebSearch,
+      enableXSearch,
+      web_enable_image_understanding,
+      x_enable_image_understanding,
+      x_enable_video_understanding
+    );
+
+    const history = await this.formatxAIMsgHistory(
+      msgs,
+      model,
+      detail,
+      keyFingerprint,
+      keyId,
+      apiKey,
+      managementKey
+    );
+
+    return {
+      input: history,
+      model,
+      instructions: systemInstruction,
+      tools: tooling,
+      tool_choice: tooling
+        ? tooling.length > 0
+          ? "auto"
+          : tool_choice
+        : "none",
+      store: false,
+      include,
+      stream: true,
+      parallel_tool_calls: true,
+      max_output_tokens,
+      user: userId
+    } as const;
+  }
+
+  /**
+   * Model Compatibility
+   *
+   * Supported Models: grok-4, grok-4-fast, grok-4-fast-non-reasoning, grok-4-1-fast, grok-4-1-fast-non-reasoning
+   *
+   * Strongly Recommended: grok-4-1-fast (specifically trained to excel at agentic tool calling)
+   *
+   * grok code fast 1 can definitely work with text based assets, but not image based ones
+   *
+   *
+   */
+  protected handleTooling(
+    model: GrokModelIdUnion,
+    userId: string,
+    enableFileSearch = true,
+    fileSearchMaxResults = 5,
+    enableCodeInterpreter = true,
+    enableWebSearch = true,
+    enableXSearch = false,
+    web_enable_image_understanding = true,
+    x_enable_image_understanding = true,
+    x_enable_video_understanding = true
+  ) {
+    switch (model) {
+      case "grok-4-0709":
+      case "grok-4-1-fast-non-reasoning":
+      case "grok-4-1-fast-reasoning":
+      case "grok-4-fast-non-reasoning":
+      case "grok-4-fast-reasoning": {
+        return this.resolveResponsesTools(userId, {
+          enableFileSearch,
+          fileSearchMaxResults,
+          enableCodeInterpreter,
+          enableWebSearch,
+          enableXSearch,
+          web_enable_image_understanding,
+          x_enable_image_understanding,
+          x_enable_video_understanding
+        });
+      }
+      case "grok-2-vision-1212":
+      case "grok-code-fast-1": {
+        return this.resolveResponsesTools(userId, {
+          enableCodeInterpreter: model === "grok-code-fast-1",
+          fileSearchMaxResults: 10,
+          enableWebSearch: true,
+          web_enable_image_understanding: model === "grok-2-vision-1212",
+          x_enable_image_understanding: model === "grok-2-vision-1212",
+          x_enable_video_understanding: model === "grok-2-vision-1212",
+          enableXSearch,
+          enableFileSearch
+        });
+      }
+      case "grok-2-image-1212":
+      case "grok-3":
+      case "grok-3-mini":
+      default: {
+        return this.resolveResponsesTools(userId, {
+          enableCodeInterpreter: false,
+          enableFileSearch: false,
+          enableWebSearch: false,
+          enableXSearch: false,
+          fileSearchMaxResults: undefined,
+          web_enable_image_understanding: false,
+          x_enable_image_understanding: false,
+          x_enable_video_understanding: false
+        });
+      }
     }
   }
 }

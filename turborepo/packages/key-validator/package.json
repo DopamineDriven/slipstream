@@ -61,7 +61,7 @@
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
-    "@typescript/native-preview": "^7.0.0-dev.20251204.1",
+    "@typescript/native-preview": "7.0.0-dev.20251206.1",
     "chokidar": "^5.0.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",

@@ -15,7 +15,7 @@
     "typegen": "next typegen"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.943.0",
+    "@aws-sdk/client-secrets-manager": "^3.946.0",
     "@base-ui-components/react": "1.0.0-rc.0",
     "@d0paminedriven/metadata": "^4.0.1",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -95,7 +95,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/unist": "^3.0.3",
-    "@typescript/native-preview": "^7.0.0-dev.20251204.1",
+    "@typescript/native-preview": "7.0.0-dev.20251206.1",
     "@vercel/functions": "^3.3.4",
     "autoprefixer": "^10.4.22",
     "babel-plugin-react-compiler": "^1.0.0",

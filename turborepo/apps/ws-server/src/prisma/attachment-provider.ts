@@ -19,7 +19,7 @@ export interface AttachmentSingletonWithProvider<
 export type AttachmentSingletonProviderWorkup<T extends $Enums.Provider> =
   AttachmentSingleton<true> & { provider: T };
 export class PrismaAttachmentProviderService extends PrismaUtilsService {
-  protected extractor: ExtractService;
+  public extractor: ExtractService;
   constructor(prisma: DbService, extractor: ExtractService) {
     super(prisma);
     this.extractor = extractor;

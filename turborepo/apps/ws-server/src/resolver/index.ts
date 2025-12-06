@@ -7,7 +7,6 @@ import type {
   UserData
 } from "@/types/index.ts";
 import OpenAI from "openai";
-import { ExtractService } from "@/extract/index.ts";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
@@ -33,8 +32,8 @@ export class Resolver {
     private providers: ProviderService,
     private s3Service: S3Storage,
     private region: string,
-    private extract: ExtractService,
-    private imgCompatService: ImageCompatService
+    private imgCompatService: ImageCompatService,
+    private xaiManagementApikey: string
   ) {}
 
   // Track high-resolution start times for upload progress per attachment
@@ -606,9 +605,11 @@ export class Resolver {
   public async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
+    const grok = this.providers.getInstance("grok");
     return await Promise.all([
       anthropic.syncFileRegistry(userId, true),
-      gemini.syncFileRegistry(userId, true)
+      gemini.syncFileRegistry(userId, true),
+      grok.syncFileRegistry(userId, true, this.xaiManagementApikey)
     ]);
   }
 
@@ -619,6 +620,7 @@ export class Resolver {
   ) {
     try {
       let providerContext: ClientContextWorkupProps;
+      console.log(_userData);
       const userData = this.wsServer.userDataMap.get(userId);
       if (typeof userData?.providerContext === "undefined") {
         providerContext =
@@ -817,7 +819,7 @@ export class Resolver {
       "region" in userData
     ) {
       console.log(
-        `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} pasted an asset in chat driving this event.`
+        `user ${userId} from ${userData.city}, ${userData.region} ${userData?.postalCode} ${userData.country} attached an asset in chat driving this event.`
       );
     }
     const {
@@ -1522,7 +1524,10 @@ export class Resolver {
         versionId
       );
 
-      const specs = await this.extract.extractRemote(cdnUrl, 64 * 4096);
+      const specs = await this.wsServer.prisma.extractor.extractRemote(
+        cdnUrl,
+        64 * 4096
+      );
       const compatStatus =
         specs.type === "DOCUMENT" &&
         (extension === "pdf" || extension === "md" || extension === "txt") &&

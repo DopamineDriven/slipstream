@@ -5,7 +5,6 @@
       "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "dist",
     "emitDeclarationOnly": true
