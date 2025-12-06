@@ -69,11 +69,9 @@
     "@aws-sdk/s3-request-presigner": "^3.946.0",
     "@aws-sdk/types": "^3.936.0",
     "@smithy/node-http-handler": "^4.4.5",
-    "@slipstream/types": "workspace:*",
-    "sharp": "^0.34.5"
+    "@slipstream/types": "workspace:*"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.1.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",

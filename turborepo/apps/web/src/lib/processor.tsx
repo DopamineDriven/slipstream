@@ -13,7 +13,6 @@ import Link from "next/link";
 import { mathmlTags } from "@/lib/mathml-tags";
 import { slugify } from "@/lib/slugify";
 import { CodeBlock } from "@/ui/atoms/code-block";
-import { transformerMetaWordHighlight } from "@shikijs/transformers";
 import rehypeKatex from "rehype-katex";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeReact from "rehype-react";
@@ -125,8 +124,7 @@ const prettyCodeOptions = {
   },
   onVisitHighlightedChars(node: CharsElement) {
     node.properties.className = ["word"];
-  },
-  transformers: [transformerMetaWordHighlight()]
+  }
 } satisfies RehypePrettyCodeOptions;
 
 function CustomImage({
@@ -166,6 +164,16 @@ const components = {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
   code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
+    const isCodeBlock = "data-language" in props || "data-theme" in props;
+
+    if (isCodeBlock) {
+      // Let the parent <pre> (CodeBlock) handle overflow
+      return (
+        <code className={cn(className)} {...props}>
+          {children}
+        </code>
+      );
+    }
     return (
       <code
         className={cn(

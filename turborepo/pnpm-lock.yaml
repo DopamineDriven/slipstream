@@ -116,6 +116,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@shikijs/transformers':
+        specifier: ^3.19.0
+        version: 3.19.0
       '@slipstream/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -252,9 +255,6 @@ importers:
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
-      '@shikijs/transformers':
-        specifier: ^3.19.0
-        version: 3.19.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -963,13 +963,7 @@ importers:
       '@smithy/node-http-handler':
         specifier: ^4.4.5
         version: 4.4.5
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
     devDependencies:
-      '@d0paminedriven/fs':
-        specifier: ^10.1.0
-        version: 10.1.0
       '@slipstream/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
