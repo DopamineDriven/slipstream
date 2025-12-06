@@ -29,10 +29,6 @@ async function exe() {
 
     const { LoggerService } = await import("@/logger/index.ts");
 
-    const { Fs } = await import("@d0paminedriven/fs");
-
-    const fs = new Fs(process.cwd());
-
     const loggerConfig = {
       serviceName: "ws-server",
       environment: isProd === true ? "production" : "development",
@@ -51,7 +47,7 @@ async function exe() {
 
     const { S3Storage } = await import("@slipstream/storage-s3");
 
-    const s3 = S3Storage.getInstance(config, fs);
+    const s3 = S3Storage.getInstance(config);
 
     const redisUrl = cfg.REDIS_URL ?? "redis://redis:6379",
       ca = cred.unflattenNewlines(cfg.REDIS_CA_PEM),
@@ -162,7 +158,8 @@ async function exe() {
         grok: cfg.X_AI_KEY,
         meta: cfg.LLAMA_API_KEY,
         openai: cfg.OPENAI_API_KEY,
-        vercel: cfg.V0_API_KEY
+        vercel: cfg.V0_API_KEY,
+        grokMgmtKey: cfg.X_AI_MANAGEMENT_API_KEY
       },
       dependencies: {
         extract,

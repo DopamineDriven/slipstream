@@ -227,7 +227,7 @@ export class AnthropicWorkup {
       return { synced: true, totalFiles: 0, lastSync: new Date() };
     const tryApiKey = await this.prisma.handleApiKeyLookup("anthropic", userId);
 
-    this.logger.info(
+    console.info(
       `Starting Anthropic file registry sync -- ${tryApiKey.apiKey === null ? "no anthropic key on file" : "anthropic api key on file"}`
     );
 
@@ -273,7 +273,7 @@ export class AnthropicWorkup {
               this.fileRegistry.set(asset.providerRef, registryEntry);
             }
           } else {
-            this.logger.warn(
+            console.warn(
               {
                 providerRef: asset.providerRef,
                 attachmentId: asset.attachmentId
@@ -284,14 +284,11 @@ export class AnthropicWorkup {
         }
       }
 
-      this.logger.info(
+      console.info(
         `Populated asset cache with ${this.assetCache.size} entries from database`
       );
     } catch (error) {
-      this.logger.error(
-        { error },
-        "Failed to populate asset cache from database"
-      );
+      console.error({ error }, "Failed to populate asset cache from database");
     }
 
     // Clear and rebuild registry
@@ -317,16 +314,12 @@ export class AnthropicWorkup {
       }
 
       totalFiles = batch.count;
-      this.logger.debug(
-        `Synced ${batch.count} files, has_more: ${batch.has_more}`
-      );
+      console.info(`Synced ${batch.count} files, has_more: ${batch.has_more}`);
     }
 
     this.lastRegistrySync = new Date();
 
-    this.logger.info(
-      `File registry sync complete: ${totalFiles} files indexed`
-    );
+    console.info(`File registry sync complete: ${totalFiles} files indexed`);
 
     // Optionally trigger cleanup of stale files
     if (cleanupStaleFiles) {
