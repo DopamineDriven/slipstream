@@ -36,8 +36,7 @@ import { python } from "pythonia";
 import type {
   AttachmentSingleton,
   GrokModelIdUnion,
-  MessageSingleton,
-  XOR
+  MessageSingleton
 } from "@slipstream/types";
 
 export class GrokCollectionsService {
@@ -268,9 +267,11 @@ export class GrokCollectionsService {
       data.documents_count
     );
 
+    this.storeDbRegistry.set(userId, prismaCreate.id);
+
     this.collectionRegistry.set(userId, data.collection_id);
 
-    return prismaCreate;
+    return { dbData: prismaCreate, xaiData: data };
   }
 
   private async resolveCollection(userId: string, mgmtKey?: string) {
@@ -295,84 +296,75 @@ export class GrokCollectionsService {
     userId: string,
     cleanupStaleFiles = false,
     mgmtKey?: string
-  ): Promise<
-    XOR<
-      {
-        readonly synced: true;
-        readonly totalFiles: 0;
-        readonly lastSync: Date;
-        readonly collectionExists: false;
-        readonly collectionId: undefined;
-      },
-      {
-        readonly synced: true;
-        readonly totalFiles: number;
-        readonly lastSync: Date;
-        readonly collectionExists: true;
-        readonly collectionId: string;
-      }
-    >
-  > {
+  ) {
+    this.collectionRegistry.clear();
+    this.storeDbRegistry.clear();
+    this.assetCache.clear();
+    this.fileRegistry.clear();
+
     let key: string;
-    const hasGrokMessages = await this.prisma.hasProviderMessages(
-      userId,
-      "GROK"
-    );
-    if (!hasGrokMessages) {
-      return {
-        synced: true,
-        totalFiles: 0,
-        lastSync: new Date(),
-        collectionExists: false,
-        collectionId: undefined
-      } as const;
+
+    const managementKey = mgmtKey ?? this.xaiManagementKey;
+    let [collectionData, storeDbData] = await Promise.all([
+      this.resolveCollection(userId, managementKey),
+      this.prisma.vectorStoreInfoByProvider(userId, "GROK")
+    ]);
+
+    // 2. Ensure collection exists (create if needed)
+    if (!collectionData) {
+      const created = await this.createUserCollection(userId, managementKey);
+      collectionData = created.xaiData;
+      storeDbData = {
+        dbId: created.dbData.id,
+        fileCount: created.dbData.fileCount,
+        hasStore: true,
+        provider: "GROK",
+        storeName: created.xaiData.collection_name,
+        storeRef: created.xaiData.collection_id
+      };
     }
+
+    // 3. Ensure DB store exists (adopt collection if needed)
+    if (!storeDbData?.dbId) {
+      const dbData = await this.prisma.createVectorStoreGrok(
+        userId,
+        collectionData.collection_id,
+        collectionData.collection_name,
+        collectionData.created_at,
+        collectionData.documents_count
+      );
+      storeDbData = {
+        dbId: dbData.id,
+        fileCount: dbData.fileCount,
+        hasStore: true,
+        provider: "GROK",
+        storeName: collectionData.collection_name,
+        storeRef: collectionData.collection_id
+      };
+      this.storeDbRegistry.set(userId, dbData.id);
+      this.collectionRegistry.set(userId, collectionData.collection_id);
+    }
+    const collectionId = collectionData.collection_id;
+    const storeDbId = storeDbData.dbId;
+
+    this.collectionRegistry.set(userId, collectionId);
+    this.storeDbRegistry.set(userId, storeDbId);
+
     const tryApiKey = await this.prisma.handleApiKeyLookup("grok", userId);
     if (tryApiKey.apiKey) {
       key = tryApiKey.apiKey;
     } else {
       key = this.xaiKey;
     }
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
 
     console.info(`Starting xAI file registry sync for user ${userId}`);
 
     // reset in-memory caches/registries on new session init (immediately following connection_established event)
-    if (this.collectionRegistry.size > 0) {
-      this.collectionRegistry.clear();
-    }
-    if (this.storeDbRegistry.size > 0) {
-      this.storeDbRegistry.clear();
-    }
-    if (this.assetCache.size > 0) {
-      this.assetCache.clear();
-    }
-    if (this.fileRegistry.size > 0) {
-      this.fileRegistry.clear();
-    }
 
-    // resolve collection via exact-match filter
-    const collection = (await this.resolveCollection(
-      userId,
-      managementKey
-    )) satisfies CreateCollectionResponse | undefined;
-    if (typeof collection?.collection_id === "undefined") {
-      return {
-        synced: true,
-        totalFiles: 0,
-        lastSync: new Date(),
-        collectionExists: false,
-        collectionId: undefined
-      } as const;
-    }
-    const collectionId = collection.collection_id;
     this.collectionRegistry.set(userId, collectionId);
 
     // get store DB info
-    const storeInfo = await this.prisma.vectorStoreInfoByProvider(
-      userId,
-      "GROK"
-    );
+    const storeInfo = storeDbData;
 
     if (storeInfo.hasStore) {
       this.storeDbRegistry.set(userId, storeInfo.dbId);
@@ -380,23 +372,18 @@ export class GrokCollectionsService {
 
     // load DB mappings into assetCache
     const providerAssets = await this.prisma.findManyByProvider("GROK", userId);
-    const dbRecordsToDelete = Array.of<string>();
 
     if (providerAssets.length > 0) {
       for (const asset of providerAssets) {
         if (asset.providerRef) {
-          if (asset.isExpired === false) {
-            this.assetCache.set(asset.attachmentId, {
-              attachmentId: asset.attachmentId,
-              fileId: asset.providerRef,
-              collectionId: asset.storeRef ?? collectionId,
-              databaseId: asset.id,
-              storeDbId: asset.storeId ?? storeInfo.dbId ?? "",
-              lastAccessedAt: asset.lastCheckedAt
-            });
-          } else {
-            dbRecordsToDelete.push(asset.attachmentId);
-          }
+          this.assetCache.set(asset.attachmentId, {
+            attachmentId: asset.attachmentId,
+            fileId: asset.providerRef,
+            collectionId: collectionId,
+            databaseId: asset.id,
+            storeDbId: storeDbId,
+            lastAccessedAt: asset.lastCheckedAt
+          });
         }
       }
     }
@@ -415,10 +402,7 @@ export class GrokCollectionsService {
       if (batch.data.length > 0) {
         for (const doc of batch.data) {
           const attachmentId = doc.fields?.attachmentId;
-          // Only cache files that exist in our database
-          if (attachmentId && dbRecordsToDelete.includes(attachmentId)) {
-            this.fileRegistry.set(attachmentId, doc);
-          }
+          this.fileRegistry.set(attachmentId, doc);
         }
       }
       totalFiles.count = batch.count;
@@ -595,7 +579,6 @@ export class GrokCollectionsService {
     const cacheKey = attachment.id; // Same key for both caches
     const managementKey = mgmtKey ?? this.xaiManagementKey;
 
-
     // 1. Check in-memory cache AND verify in fileRegistry
     const cached = this.assetCache.get(cacheKey);
     if (cached?.fileId) {
@@ -617,7 +600,6 @@ export class GrokCollectionsService {
     // 2. Resolve or create user's collection
     let collectionId = this.collectionRegistry.get(attachment.userId);
     let storeDbId = this.storeDbRegistry.get(attachment.userId);
-
     if (!collectionId) {
       const collection = await this.resolveCollection(
         attachment.userId,
@@ -641,9 +623,8 @@ export class GrokCollectionsService {
           attachment.userId,
           managementKey
         );
-        collectionId = createRes.storeRef;
-        storeDbId = createRes.id;
-        this.storeDbRegistry.set(attachment.userId, storeDbId);
+        collectionId = createRes.xaiData.collection_id;
+        storeDbId = createRes.dbData.id;
       }
     }
 
@@ -993,7 +974,7 @@ export class GrokCollectionsService {
       return promise.then(async res => {
         console.log(res.ok);
         const data = await res.json<UploadFileRT>();
-        return data
+        return data;
       });
     } catch (err) {
       console.error(this.prisma.safeErrMsg(err));
@@ -1053,7 +1034,10 @@ export class GrokCollectionsService {
 
     const res = await this.streamUploadFileWorkup(att, key);
     console.log(res);
-    if (!res?.id) throw new Error("no id returned with results".concat(JSON.stringify(res, null, 2)));
+    if (!res?.id)
+      throw new Error(
+        "no id returned with results".concat(JSON.stringify(res, null, 2))
+      );
     collectionObj.storeRef = this.collectionRegistry.get(att.userId);
     if (!collectionObj.storeRef) {
       const collection = await this.resolveCollection(
@@ -1065,8 +1049,8 @@ export class GrokCollectionsService {
         collectionObj.storeRef = collection.collection_id;
       } else {
         const createRes = await this.createUserCollection(att.userId, mgmtKey);
-        collectionObj.storeRef = createRes.storeRef;
-        collectionObj.dbId = createRes.id;
+        collectionObj.storeRef = createRes.xaiData.collection_id;
+        collectionObj.dbId = createRes.dbData.id;
       }
     }
 
@@ -1323,7 +1307,7 @@ upload_result = asyncio.run(main())
     const tools = Array.of<ToolUnion>();
 
     // Use pre-synced collection from registry (populated on connection)
-    if (enableFileSearch) {
+    if (enableFileSearch && this.collectionRegistry.has(userId)) {
       const collectionId = this.collectionRegistry.get(userId);
       if (collectionId) {
         tools.push({
@@ -1519,14 +1503,14 @@ upload_result = asyncio.run(main())
 
               if (url && mime) {
                 if (
-                  (attachment.assetType === "DOCUMENT" &&
-                   ( model === "grok-2-vision-1212" ||
-                  model === "grok-code-fast-1" ||
-                  model === "grok-4-0709" ||
-                  model === "grok-4-1-fast-non-reasoning" ||
-                  model === "grok-4-fast-reasoning" ||
-                  model === "grok-4-fast-non-reasoning" ||
-                  model === "grok-4-1-fast-reasoning"))
+                  attachment.assetType === "DOCUMENT" &&
+                  (model === "grok-2-vision-1212" ||
+                    model === "grok-code-fast-1" ||
+                    model === "grok-4-0709" ||
+                    model === "grok-4-1-fast-non-reasoning" ||
+                    model === "grok-4-fast-reasoning" ||
+                    model === "grok-4-fast-non-reasoning" ||
+                    model === "grok-4-1-fast-reasoning")
                 ) {
                   try {
                     const fileId = await this.ensureXaiAssetUploaded(

@@ -432,6 +432,13 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     return count > 0 ? true : false;
   }
 
+   public async hasProviderStore(userId: string, provider: $Enums.Provider) {
+    const count = await this.prismaClient.providerStore.count({
+      where: { AND: [{ provider, userId }] }
+    });
+    return count > 0 ? true : false;
+  }
+
   private urlExtWorkup<const T extends $Enums.Provider>(
     provider: T,
     attachment: AttachmentSingleton<true>

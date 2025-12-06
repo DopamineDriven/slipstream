@@ -19,7 +19,7 @@ export type S3FinalizePayload = {
   versionId: string;
   contentDisposition: string | undefined;
   cacheControl: string | undefined;
-  extension:S3ExtUnion;
+  extension?:string;
   expires: Date;
   cdnUrl:
     | `https://assets.aicoalesce.com/${string}`
