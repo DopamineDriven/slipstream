@@ -76,7 +76,7 @@ function imgGenToAttachmentWorkup(
         messageId: t.requestMessageId ?? "",
         uploadMethod: "GENERATED",
         generationGroupId: t.generationGroupId
-      } satisfies AttachmentSingleton<true>;
+      } as AttachmentSingleton<true>;
     });
   } else {
     const t = tt;
@@ -141,7 +141,7 @@ function imgGenToAttachmentWorkup(
       messageId: t.requestMessageId ?? "",
       uploadMethod: "GENERATED",
       generationGroupId: t.generationGroupId
-    } satisfies AttachmentSingleton<true>;
+    } as AttachmentSingleton<true>;
   }
 }
 

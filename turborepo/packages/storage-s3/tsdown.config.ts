@@ -20,7 +20,6 @@ export default defineConfig(
   ) =>
     ({
       ...options,
-      cjsDefault: false,
       entry: [
         "src/index.ts",
         "src/utils/index.ts",
@@ -29,7 +28,7 @@ export default defineConfig(
         "!src/test/**"
       ],
       target: ["node25"],
-      dts: true,
+      dts: { tsgo: true },
       fixedExtension: false,
       unbundle: true,
       watch: process.env.NODE_ENV === "development",

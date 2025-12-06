@@ -32,9 +32,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Fs } from "@d0paminedriven/fs";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
-// import { WaiterState } from "@smithy/util-waiter";
 import type { CTR, XOR } from "@slipstream/types";
 
 export class S3Storage extends S3Utils {
@@ -66,8 +64,7 @@ export class S3Storage extends S3Utils {
     abort: () => Promise<void> | void;
   }>();
   private constructor(
-    cfg: StorageConfig,
-    public fs: Fs
+    cfg: StorageConfig
   ) {
     super();
     this.cfg = {
@@ -244,8 +241,7 @@ export class S3Storage extends S3Utils {
       secretAccessKey,
       credentials,
       ...rest
-    }: StorageConfig,
-    fs: Fs
+    }: StorageConfig
   ) {
     if (this.#instance === null) {
       this.#instance = new S3Storage(
@@ -255,8 +251,7 @@ export class S3Storage extends S3Utils {
           secretAccessKey,
           defaultPresignExpiry: defaultPresignExpiry ?? 604800,
           ...rest
-        },
-        fs
+        }
       );
       return this.#instance;
     }
@@ -283,8 +278,8 @@ export class S3Storage extends S3Utils {
   public contentTypeToExt(ContentType?: string) {
     if (ContentType) {
       return ContentType === "application/text"
-        ? this.fs.mimeToExt("text/markdown" as keyof typeof this.fs.toExtObj)
-        : this.fs.mimeToExt(ContentType as keyof typeof this.fs.toExtObj);
+        ? this.mimeToExt("text/markdown" as keyof typeof this.toExtObj)
+        : this.mimeToExt(ContentType as keyof typeof this.toExtObj);
     } else return undefined;
   }
 

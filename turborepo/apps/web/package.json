@@ -33,6 +33,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@shikijs/transformers": "^3.19.0",
     "@slipstream/db": "workspace:*",
     "@slipstream/encryption": "workspace:*",
     "@slipstream/img-gen": "workspace:*",
@@ -80,7 +81,6 @@
   "devDependencies": {
     "@d0paminedriven/fs": "^10.1.0",
     "@playwright/test": "^1.57.0",
-    "@shikijs/transformers": "^3.19.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
