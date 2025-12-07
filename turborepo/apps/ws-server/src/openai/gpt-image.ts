@@ -10,7 +10,6 @@ import type {
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { OpenAIServiceWorkup } from "@/openai/workup.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -27,12 +26,11 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
   constructor(
     logger: LoggerService,
     protected prisma: PrismaService,
-    protected extractor: ExtractService,
     protected s3: S3Storage,
     protected redis: EnhancedRedisPubSub,
     protected apiKey: string
   ) {
-    super(logger, prisma, apiKey, extractor, s3);
+    super(logger, prisma, apiKey, s3);
   }
 
   protected async handleOpenaiAiNativeImageRequestGptImage1({
@@ -176,7 +174,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
         if (streamPartial) {
           partialArr.push(streamPartial);
           const b64 = Buffer.from(streamPartial.b64_json, "base64");
-          const imgSpecs = (await this.extractor.extractRemote(
+          const imgSpecs = (await this.prisma.extractpkg.extractRemote(
             b64,
             4096 * 32
           )) as ExpandedImgSpecs;
@@ -196,7 +194,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             userId,
             size: imgSpecs.byteSize,
             conversationId
-          })
+          });
           tDelta = performance.now() - tInitial;
 
           partialImgArr.push([
@@ -443,7 +441,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
             .concat(partialImgArr.length.toString(10))
             .concat(`.${finalImgObj.output_format}`);
 
-          const getIt = (await this.extractor.extractRemote(
+          const getIt = (await this.prisma.extractpkg.extractRemote(
             b64,
             4096 * 32
           )) as ExpandedImgSpecs;

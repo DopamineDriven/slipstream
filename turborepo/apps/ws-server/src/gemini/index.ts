@@ -1,13 +1,12 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
   Blob,
   FinishReason,
   GenerateContentResponse
 } from "@google/genai";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
@@ -23,10 +22,9 @@ export class GeminiService extends GeminiWorkupService {
     protected prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
-    protected extractor: ExtractService,
     protected apiKey: string
   ) {
-    super(logger, prisma, extractor, apiKey);
+    super(logger, prisma, apiKey);
   }
   public async handleGeminiAiChatRequest({
     chunks,
@@ -95,12 +93,12 @@ export class GeminiService extends GeminiWorkupService {
         textPart: string | undefined = undefined,
         thinkingPart: string | undefined = undefined,
         done: keyof typeof FinishReason | undefined = undefined;
-        if (tInitial === 0) {
-          tInitial = performance.now();
-        }
-        if (chunk.responseId && typeof resId === "undefined") {
-          resId = chunk.responseId;
-        }
+      if (tInitial === 0) {
+        tInitial = performance.now();
+      }
+      if (chunk.responseId && typeof resId === "undefined") {
+        resId = chunk.responseId;
+      }
       if (chunk.candidates) {
         for (const candidate of chunk.candidates) {
           if (candidate.content?.parts) {
@@ -323,12 +321,11 @@ export class GeminiService extends GeminiWorkupService {
           const duration = performance.now() - tInitial;
 
           const b64 = Buffer.from(finalImg.data, "base64");
-          const getIt = (await this.extractor.extractRemote(
+          const getIt = (await this.prisma.extractpkg.extractRemote(
             b64,
             4096 * 48
           )) as ExpandedImgSpecs;
           const format = getIt.format;
-
           const filename = seriesId
             .concat("-")
             .concat((geminiDataArr?.length - 1).toString())

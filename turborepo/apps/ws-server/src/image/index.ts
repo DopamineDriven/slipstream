@@ -1,3 +1,4 @@
+import { ReadableStreamReadResult } from "node:stream/web";
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { PrismaService } from "@/prisma/index.ts";
 import sharp from "sharp";
@@ -27,7 +28,8 @@ export class ImageCompatService {
     const chunks = Array.of<Uint8Array>();
 
     while (true) {
-      const { done, value } = await reader.read();
+      const { done, value } =
+        (await reader.read()) as ReadableStreamReadResult<Uint8Array>;
       if (done) break;
       if (value) {
         chunks.push(value);

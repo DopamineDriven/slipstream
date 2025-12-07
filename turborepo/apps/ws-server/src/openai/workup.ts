@@ -11,7 +11,6 @@ import type {
 import type { Reasoning } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import type {
@@ -38,7 +37,6 @@ export class OpenAIServiceWorkup {
     logger: LoggerService,
     protected prisma: PrismaService,
     protected apiKey: string,
-    protected extractor: ExtractService,
     protected s3: S3Storage
   ) {
     this.logger = logger

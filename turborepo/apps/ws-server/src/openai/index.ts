@@ -3,7 +3,6 @@ import type { ProviderOpenaiRequestEntity } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { OpenAI } from "openai";
 import { Stream } from "openai/core/streaming.mjs";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { OpenAIGPTImageService } from "@/openai/gpt-image.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -20,12 +19,11 @@ export class OpenAIService extends OpenAIGPTImageService {
   constructor(
     logger: LoggerService,
     protected prisma: PrismaService,
-    protected extractor: ExtractService,
     protected s3: S3Storage,
     protected redis: EnhancedRedisPubSub,
     protected apiKey: string
   ) {
-    super(logger, prisma, extractor, s3, redis, apiKey);
+    super(logger, prisma, s3, redis, apiKey);
   }
   protected async handleOpenaiAiChatRequest({
     chunks,
@@ -243,7 +241,7 @@ export class OpenAIService extends OpenAIGPTImageService {
         if (!partialIndex || partialIndex !== s.partial_image_index) {
           partialIndex = s.partial_image_index;
           const { width, height, format } =
-            this.extractor.img.getImageSpecsWorkup(
+            this.prisma.extractor.img.getImageSpecsWorkup(
               Buffer.from(s.partial_image_b64, "base64")
             );
           partialImgAgg = [
@@ -314,7 +312,7 @@ export class OpenAIService extends OpenAIGPTImageService {
             .concat(`.${ext}`);
           const b64 = partialImgAgg[1];
 
-          const getIt = (await this.extractor.extractRemote(
+          const getIt = (await this.prisma.extractpkg.extractRemote(
             Buffer.from(b64, "base64"),
             4096 * 48
           )) as ExpandedImgSpecs;
@@ -630,7 +628,7 @@ export class OpenAIService extends OpenAIGPTImageService {
           const duration = performance.now() - tInitial;
 
           const b64 = Buffer.from(finalImgObj.result, "base64");
-          const getIt = (await this.extractor.extractRemote(
+          const getIt = (await this.prisma.extractpkg.extractRemote(
             b64,
             4096 * 48
           )) as ExpandedImgSpecs;

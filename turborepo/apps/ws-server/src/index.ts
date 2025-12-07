@@ -72,7 +72,11 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const prisma = new PrismaService(db, extract, isProd);
+    const { Extract } = await import("@d0paminedriven/metadata");
+
+    const extractpkg = new Extract();
+
+    const prisma = new PrismaService(db, extract, extractpkg, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 
@@ -111,7 +115,6 @@ async function exe() {
       logger,
       prisma,
       redisInstance,
-      extract,
       s3,
       cfg.X_AI_KEY,
       cfg.X_AI_MANAGEMENT_API_KEY
@@ -121,7 +124,6 @@ async function exe() {
 
     const anthropic = new AnthropicService(
       logger,
-      extract,
       prisma,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
@@ -132,7 +134,6 @@ async function exe() {
     const openai = new OpenAIService(
       logger,
       prisma,
-      extract,
       s3,
       redisInstance,
       cfg.OPENAI_API_KEY
@@ -145,7 +146,6 @@ async function exe() {
       prisma,
       redisInstance,
       s3,
-      extract,
       cfg.GOOGLE_API_KEY
     );
 
@@ -162,7 +162,6 @@ async function exe() {
         grokMgmtKey: cfg.X_AI_MANAGEMENT_API_KEY
       },
       dependencies: {
-        extract,
         logger,
         prisma,
         redis: redisInstance,
@@ -238,7 +237,8 @@ async function exe() {
     process.on("SIGTERM", async () => gracefulShutdown("SIGTERM"));
     process.on("SIGINT", async () => gracefulShutdown("SIGINT"));
   } catch (err) {
-    if (err instanceof Error) throw new Error(err.message.concat(`${err.stack}`));
+    if (err instanceof Error)
+      throw new Error(err.message.concat(`${err.stack}`));
     else throw new Error(`something went wrong...`);
   }
 }
