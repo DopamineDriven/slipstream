@@ -4,7 +4,6 @@ import type {
 } from "@/types/index.ts";
 import type { xAIChatCompletionsRes, xAIImgGenResponse } from "@/xai/sse.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GrokCollectionsService } from "@/xai/collections.ts";
@@ -76,12 +75,11 @@ export class xAIService extends GrokCollectionsService {
     logger: LoggerService,
     protected prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
-    protected extract: ExtractService,
     private s3: S3Storage,
     protected apiKey: string,
     protected managementKey: string
   ) {
-    super(logger, extract, prisma, apiKey, managementKey);
+    super(logger, prisma, apiKey, managementKey);
   }
 
   private handleMostRecentMsgForImg(
@@ -677,7 +675,7 @@ export class xAIService extends GrokCollectionsService {
           const b64 = Buffer.from(d.b64_json, "base64");
 
           const [getIt, seriesId] = await Promise.all([
-            this.extract.extractRemote(
+            this.prisma.extractpkg.extractRemote(
               b64,
               4096 * 48
             ) as Promise<ExpandedImgSpecs>,

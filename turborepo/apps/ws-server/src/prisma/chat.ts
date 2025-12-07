@@ -20,13 +20,14 @@ import type {
   Rm
 } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
-
+import { Extract } from "@d0paminedriven/metadata";
 export class PrismaChatService extends PrismaUserMetaService {
   constructor(
     prisma: DbService,
-    extractor: ExtractService
+    extractor: ExtractService,
+    extractpkg: Extract
   ) {
-    super(prisma, extractor);
+    super(prisma, extractor, extractpkg);
   }
 
   private async handleAiChatReqCreateWithAttachments({

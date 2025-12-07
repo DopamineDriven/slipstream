@@ -3,9 +3,13 @@ import type {
   UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata
 } from "@/types/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type {
+  ExpandedDocSpecs,
+  ExpandedImgSpecs
+} from "@d0paminedriven/metadata";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaAttachmentProviderService } from "@/prisma/attachment-provider.ts";
+import { Extract } from "@d0paminedriven/metadata";
 import type {
   $Enums,
   Attachment,
@@ -18,9 +22,14 @@ import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
 
 export class PrismaAttachmentService extends PrismaAttachmentProviderService {
-
-  constructor(prisma: DbService, extractor: ExtractService) {
+  public extractpkg: Extract;
+  constructor(
+    prisma: DbService,
+    extractor: ExtractService,
+    extractpkg: Extract
+  ) {
     super(prisma, extractor);
+    this.extractpkg = extractpkg;
   }
 
   async createAttachment({
@@ -442,6 +451,10 @@ export class PrismaAttachmentService extends PrismaAttachmentProviderService {
     compatS3ObjectId,
     compatVersionId
   }: UpdateAttachmentCompatProps) {
+    const getMeta = (await this.extractpkg.extractRemote(
+      compatCdnUrl,
+      4096 * 96
+    )) as ExpandedDocSpecs;
     return await this.prismaClient.attachment.update({
       where: { id: attachmentId },
       data: {
@@ -452,7 +465,46 @@ export class PrismaAttachmentService extends PrismaAttachmentProviderService {
         compatExt,
         compatMime,
         compatVersionId,
-        compatS3ObjectId
+        compatS3ObjectId,
+        document: {
+          upsert: {
+            where: { attachmentId },
+            create: {
+              format: getMeta.format ?? "pdf",
+              pageCount: getMeta.pageCount,
+              isLinearized: getMeta.isLinearized,
+              pdfVersion: getMeta.pdfVersion,
+              isEncrypted: getMeta.isEncrypted ?? undefined,
+              isSearchable: getMeta.isSearchable ?? undefined,
+              encoding: getMeta.encoding,
+              author: getMeta.author,
+              keywords: getMeta.keywords ?? undefined,
+              textPreview: getMeta.textPreview,
+              language: getMeta.language,
+              lineCount: getMeta.lineCount,
+              subject: getMeta.subject,
+              wordCount: getMeta.wordCount,
+              createdAt: getMeta.createdDate ?? undefined
+            },
+            update: {
+              format: getMeta.format ?? "pdf",
+              pageCount: getMeta.pageCount,
+              isLinearized: getMeta.isLinearized,
+              pdfVersion: getMeta.pdfVersion,
+              isEncrypted: getMeta.isEncrypted ?? undefined,
+              isSearchable: getMeta.isSearchable ?? undefined,
+              encoding: getMeta.encoding,
+              author: getMeta.author,
+              keywords: getMeta.keywords ?? undefined,
+              textPreview: getMeta.textPreview,
+              language: getMeta.language,
+              lineCount: getMeta.lineCount,
+              subject: getMeta.subject,
+              wordCount: getMeta.wordCount,
+              createdAt: getMeta.createdDate ?? undefined
+            }
+          }
+        }
       }
     });
   }
@@ -479,7 +531,7 @@ export class PrismaAttachmentService extends PrismaAttachmentProviderService {
     checksumAlgo?: $Enums.ChecksumAlgo;
     checksumSha256?: string | null;
   }) {
-    const meta = (await this.extractor.extractRemote(
+    const meta = (await this.extractpkg.extractRemote(
       compatCdnUrl,
       4096 * 32
     )) as ExpandedImgSpecs;

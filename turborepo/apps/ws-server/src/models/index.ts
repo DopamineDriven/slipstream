@@ -2,8 +2,7 @@ import fsSync from "fs";
 import { join, relative, resolve } from "path";
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type {
-  ExpandedDocSpecs,
-  ExpandedImgSpecs
+  ExpandedDocSpecs,ExpandedImgSpecs
 } from "@d0paminedriven/metadata";
 import { ByteCodec } from "@/byte-codec/index.ts";
 import { MultiErrorReply } from "redis";

@@ -1,5 +1,4 @@
 import { AnthropicService } from "@/anthropic/index.ts";
-import { ExtractService } from "@/extract/index.ts";
 import { GeminiService } from "@/gemini/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { LlamaService } from "@/meta/index.ts";
@@ -69,7 +68,6 @@ export interface ProviderDependencies {
   logger: LoggerService;
   prisma: PrismaService;
   redis: EnhancedRedisPubSub;
-  extract: ExtractService;
   isProd: boolean;
   s3: S3Storage;
 }
@@ -155,7 +153,6 @@ export function AnthropicMixin<
             factory?.(deps, this.#anthropicApiKey) ??
             new AnthropicService(
               deps.logger,
-              deps.extract,
               deps.prisma,
               deps.redis,
               this.#anthropicApiKey ?? ""
@@ -225,7 +222,6 @@ export function GeminiMixin<
               deps.prisma,
               deps.redis,
               deps.s3,
-              deps.extract,
               this.#geminiApiKey ?? ""
             );
         }
@@ -291,7 +287,6 @@ export function OpenAIMixin<
             new OpenAIService(
               deps.logger,
               deps.prisma,
-              deps.extract,
               deps.s3,
               deps.redis,
               this.#openaiApiKey ?? ""
@@ -361,7 +356,6 @@ export function GrokMixin<
               deps.logger,
               deps.prisma,
               deps.redis,
-              deps.extract,
               deps.s3,
               this.#grokApiKey ?? "",
               this.#grokManagementKey ?? ""

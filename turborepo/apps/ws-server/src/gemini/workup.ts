@@ -11,7 +11,6 @@ import type {
   UploadFileParameters
 } from "@google/genai";
 import type { Logger } from "pino";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
@@ -38,7 +37,6 @@ export class GeminiWorkupService {
   constructor(
     logger: LoggerService,
     protected prisma: PrismaService,
-    protected extractor: ExtractService,
     protected apiKey: string
   ) {
     this.logger = logger

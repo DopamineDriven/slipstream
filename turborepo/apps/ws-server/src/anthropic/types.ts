@@ -20,3 +20,12 @@ export interface ProviderAnthropicChatRequestEntity
     timezone?: string | null | undefined;
   };
 }
+
+export interface PdfBudgetEntry {
+  attachmentId: string;
+  pageCount: number;
+  filename: string;
+  url: string;
+  turnIndex: number;
+  included: boolean;
+}

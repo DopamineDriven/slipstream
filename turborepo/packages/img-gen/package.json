@@ -51,7 +51,7 @@
     "test": "node --test --import tsx --test-reporter spec"
   },
   "dependencies": {
-    "@d0paminedriven/metadata": "^4.0.1",
+    "@d0paminedriven/metadata": "^6.0.0",
     "@slipstream/types": "workspace:*"
   },
   "devDependencies": {
@@ -67,7 +67,7 @@
     "jiti": "^2.6.1",
     "prettier": "^3.7.4",
     "terser": "^5.44.1",
-    "tsdown": "^0.16.8",
+    "tsdown": "^0.17.0",
     "tslib": "^2.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

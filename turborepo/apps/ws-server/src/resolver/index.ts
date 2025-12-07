@@ -10,6 +10,7 @@ import OpenAI from "openai";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -1091,7 +1092,7 @@ export class Resolver {
       );
 
       const docOrImg =
-        mimeType.startsWith("image") && metadata?.type === "IMAGE"
+        metadata && mimeType.startsWith("image") && metadata?.type === "IMAGE"
           ? {
               image: {
                 cameraMake: null,
@@ -1524,7 +1525,7 @@ export class Resolver {
         versionId
       );
 
-      const specs = await this.wsServer.prisma.extractor.extractRemote(
+      const specs = await this.wsServer.prisma.extractpkg.extractRemote(
         cdnUrl,
         64 * 4096
       );
@@ -1750,7 +1751,7 @@ export class Resolver {
           cdnUrl: attachment.cdnUrl,
           filename: attachment.filename,
           origin: attachment.origin,
-          specs: specs,
+          specs: specs as ExpandedImgSpecs,
           userId,
           conversationId
         });

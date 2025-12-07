@@ -6,7 +6,7 @@ import { EncryptionService } from "@slipstream/encryption";
 import { PrismaAttachmentService } from "./attachment.ts";
 import * as dotenv from "dotenv";
 import { ClientContextWorkupProps, RecordCountsProps } from "@slipstream/types";
-
+import { Extract } from "@d0paminedriven/metadata";
 dotenv.config({quiet: true});
 
 export class PrismaUserMetaService extends PrismaAttachmentService {
@@ -17,9 +17,10 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
   >();
   constructor(
     prisma: DbService,
-    extractor: ExtractService
+    extractor: ExtractService,
+    extractpkg: Extract
   ) {
-    super(prisma, extractor);
+    super(prisma, extractor, extractpkg);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 

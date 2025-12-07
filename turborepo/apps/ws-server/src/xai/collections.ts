@@ -27,7 +27,6 @@ import type {
   UploadFileRT
 } from "@/xai/types.ts";
 import type { Logger } from "pino";
-import { ExtractService } from "@/extract/index.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { ProviderChatRequestEntity } from "@/types/index.ts";
@@ -83,7 +82,6 @@ export class GrokCollectionsService {
 
   constructor(
     logger: LoggerService,
-    protected extract: ExtractService,
     protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string
@@ -818,7 +816,7 @@ export class GrokCollectionsService {
 
     toTmpWorkupObj.tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
 
-    toTmpWorkupObj.tmpName = this.extract.uniqueTmpName(
+    toTmpWorkupObj.tmpName = this.prisma.extractor.uniqueTmpName(
       toTmpWorkupObj.tmpPrefix,
       ext
     );
@@ -858,12 +856,12 @@ export class GrokCollectionsService {
       mime: mimeType
     } = await this.assetToTmpWorkup(att);
 
-    await this.extract.fetchRemoteWriteLocalLargeFiles(
+    await this.prisma.extractor.fetchRemoteWriteLocalLargeFiles(
       remoteUrl,
       absTmpPath,
       false
     );
-    if (this.extract.exists(absTmpPath)) {
+    if (this.prisma.extractor.exists(absTmpPath)) {
       return {
         tmpUniquename,
         absTmpPath,
@@ -881,8 +879,8 @@ export class GrokCollectionsService {
 
   private cleanupTmpPostupload(absTmpPath: string, tmpUniquename: string) {
     try {
-      if (this.extract.exists(absTmpPath)) {
-        this.extract.rmFile(absTmpPath);
+      if (this.prisma.extractor.exists(absTmpPath)) {
+        this.prisma.extractor.rmFile(absTmpPath);
         console.log(
           `cleaned up tmp file ${tmpUniquename} following xAI file upload.`
         );
