@@ -1,4 +1,3 @@
-import { createReadStream } from "node:fs";
 import type {
   AnthropicFileRecord,
   PdfBudgetEntry,
@@ -539,18 +538,26 @@ export class AnthropicWorkup {
     apiKey?: string
   ) {
     const client = this.getClient(apiKey);
-    const { absTmpPath, tmpUniquename } = await this.prisma.fetchRemoteToTmp(
-      "ANTHROPIC",
-      attachment
-    );
-    try {
-      return await client.beta.files.upload({
-        file: createReadStream(absTmpPath),
-        betas: this.handleBetaHeaders(model)
-      } satisfies Anthropic.Beta.FileUploadParams);
-    } finally {
-      this.prisma.cleanupTmpPostupload("ANTHROPIC", absTmpPath, tmpUniquename);
+    let url: string | null;
+    if (attachment.compatStatus === "ACTIVE") {
+      url = attachment.compatCdnUrl ?? attachment.cdnUrl;
+    } else {
+      url = attachment.cdnUrl ?? attachment.compatCdnUrl;
     }
+    if (!url) throw new Error("No CDN URL available for upload");
+    // Fetch the file
+    const response = await fetch(url);
+    if (!response.ok || !response.body) {
+      throw new Error(`Failed to fetch file: ${response.statusText}`);
+    }
+
+    // Upload using Anthropic Files API
+    const file = await client.beta.files.upload({
+      file: response,
+      betas: this.handleBetaHeaders(model)
+    } satisfies Anthropic.Beta.FileUploadParams);
+
+    return file;
   }
 
   private async ensureAnthropicAssetUploaded(

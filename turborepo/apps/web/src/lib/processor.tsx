@@ -164,16 +164,16 @@ const components = {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
   code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
-    const isCodeBlock = "data-language" in props || "data-theme" in props;
+    // const isCodeBlock = "data-language" in props || "data-theme" in props;
 
-    if (isCodeBlock) {
-      // Let the parent <pre> (CodeBlock) handle overflow
-      return (
-        <code className={cn(className)} {...props}>
-          {children}
-        </code>
-      );
-    }
+    // if (isCodeBlock) {
+    //   // Let the parent <pre> (CodeBlock) handle overflow
+    //   return (
+    //     <code className={cn(className)} {...props}>
+    //       {children}
+    //     </code>
+    //   );
+    // }
     return (
       <code
         className={cn(

@@ -23,7 +23,6 @@ import type {
   FieldDefinition,
   GetDocumentsByCollectionId,
   ListCollectionsResponse,
-  PythonBuiltIns,
   UploadFileRT
 } from "@/xai/types.ts";
 import type { Logger } from "pino";
@@ -31,7 +30,6 @@ import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { ProviderChatRequestEntity } from "@/types/index.ts";
 import { ResponsesStreamParser } from "@/xai/response-sse.ts";
-import { python } from "pythonia";
 import type {
   AttachmentSingleton,
   GrokModelIdUnion,
@@ -752,7 +750,8 @@ export class GrokCollectionsService {
    */
   private filenameToHexExtTuple(
     url: string,
-    compatStatus: ("FAILED" | "PENDING" | "ACTIVE" | "ALIASED") | null
+    compatStatus: ("FAILED" | "PENDING" | "ACTIVE" | "ALIASED") | null,
+    encoded = true
   ) {
     const urlObj = new URL(url);
 
@@ -768,7 +767,10 @@ export class GrokCollectionsService {
 
     const ext = dbFile.slice(dbFile.lastIndexOf(".") + 1);
 
-    return [Buffer.from(withoutExt, "utf-8").toString("hex"), ext] as const;
+    const name = encoded
+      ? Buffer.from(withoutExt, "utf-8").toString("hex")
+      : withoutExt;
+    return [name, ext] as const;
   }
 
   private toXaiFilename(att: AttachmentSingleton<true>) {
@@ -1138,136 +1140,6 @@ export class GrokCollectionsService {
     }
   }
 
-  private pythonScript(
-    xaiCollectionId: string,
-    displayFilename: string,
-    absTmpPath: string,
-    mimeType: string,
-    conversationId: string,
-    messageId: string,
-    attachmentId: string,
-    originalFilename: string,
-    apiKey?: string,
-    mgmtKey?: string
-  ) {
-    const key = apiKey ?? this.xaiKey;
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-    // prettier-ignore
-    return  `import asyncio
-import os
-from xai_sdk import AsyncClient
-
-async def main():
-  try:
-      client = AsyncClient(
-          api_key="${key}",
-          management_api_key="${managementKey}"
-      )
-
-      file_path = r"${absTmpPath}"
-
-      if not os.path.exists(file_path):
-          return {"error": f"File not found at {file_path}"}
-
-      with open(file_path, "rb") as file:
-          data = file.read()
-
-      print(f"[Python] Uploading {len(data)} bytes from disk to xAI collection...")
-
-      fields = {
-          "conversationId": "${conversationId}",
-          "messageId": "${messageId}",
-          "attachmentId": "${attachmentId}",
-          "originalFilename": "${originalFilename}"
-      }
-
-      # Upload document
-      result = await client.collections.upload_document(
-          collection_id="${xaiCollectionId}",
-          name="${displayFilename}",
-          data=data,
-          content_type="${mimeType}",
-          fields=fields
-      )
-
-      await client.close()
-
-      # --- SNEK TRANSLATION LAYER ---
-      # Node can't read snek's protobuf -- extract protobuf to return readable JSON
-
-      meta = result.file_metadata
-      print(f"[Python] upload result {meta}")
-      return {
-          "file_id": meta.file_id,
-          "name": meta.name,
-          "size_bytes": meta.size_bytes,
-          "content_type": meta.content_type,
-          "created_at": meta.created_at.seconds, # Extract raw timestamp
-          "hash": meta.hash,
-          "created_at_nanos": meta.created_at.nanos,
-          "status": result.status
-      }
-  except Exception as e:
-      return {"error": str(e)}
-# Run the upload
-upload_result = asyncio.run(main())
-`;
-  }
-
-  /**
-   * NOTE DO NOT USE THIS METHOD
-   * IT IMPROPERLY INDEXES FILES -- MUST USE THE `uploadFileAndPromoteToCollection` method instead
-   */
-  private async uploadFileToCollection(
-    xaiCollectionId: string,
-    att: AttachmentSingleton<true>,
-    apiKey?: string
-  ) {
-    const key = apiKey ?? this.xaiKey;
-    const { tmpUniquename, safeFilename, mimeType, absTmpPath } =
-      await this.remoteToTmpWorkup(att);
-
-    const file = this.toXaiFilename(att);
-    const { fileName } = this.parseFilename(file);
-
-    const uploadScript = this.pythonScript(
-      xaiCollectionId,
-      safeFilename,
-      absTmpPath,
-      mimeType,
-      att.conversationId ?? "new-chat",
-      att.messageId ?? "new-message",
-      att.id,
-      fileName ?? `content`,
-      key
-    );
-
-    try {
-      const builtins = (await python("builtins")) as PythonBuiltIns;
-
-      const exec_func = await builtins.exec;
-
-      const globals_func = await builtins.globals;
-
-      const global_dict = await globals_func();
-
-      await exec_func(uploadScript, global_dict);
-
-      const doc = await global_dict.upload_result;
-
-      if (!doc) {
-        throw new Error("xAI Upload file to collections error (SNEK Bridge)");
-      } else {
-        return doc;
-      }
-    } catch (err) {
-      console.error(this.prisma.safeErrMsg(err));
-      throw err;
-    } finally {
-      this.cleanupTmpPostupload(absTmpPath, tmpUniquename);
-    }
-  }
-
   protected get hasActiveCollection() {
     return this.collectionRegistry.size > 0;
   }
@@ -1344,7 +1216,6 @@ upload_result = asyncio.run(main())
   }
 
   protected async createResponsesStream(
-    controller: AbortController,
     {
       msgs,
       userId,
@@ -1442,12 +1313,28 @@ upload_result = asyncio.run(main())
       );
     }
 
-    return ResponsesStreamParser.createXAIResponsesParser(response, controller);
+    return ResponsesStreamParser.createXAIResponsesParser(response);
+  }
+
+  private canViewImgs(model: GrokModelIdUnion) {
+    return (
+      model === "grok-2-vision-1212" ||
+      model === "grok-4-0709" ||
+      model === "grok-4-1-fast-non-reasoning" ||
+      model === "grok-4-fast-reasoning" ||
+      model === "grok-4-fast-non-reasoning" ||
+      model === "grok-4-1-fast-reasoning"
+    );
+  }
+
+  private canViewDocs(model: GrokModelIdUnion) {
+    return model === "grok-code-fast-1" || this.canViewImgs(model);
   }
 
   protected async formatxAIMsgHistory(
     msgs: MessageSingleton<true>[],
     model: GrokModelIdUnion,
+    userId: string,
     imgDetail?: ImageContentBlock["detail"],
     keyFingerprint = "server",
     keyId?: string,
@@ -1455,38 +1342,32 @@ upload_result = asyncio.run(main())
     xaiMgmntKey?: string
   ) {
     const mgmtKey = xaiMgmntKey ?? this.xaiManagementKey;
+
     const apiKey = xaiApiKey ?? this.xaiKey;
+
     const formatted = Array.of<ResponsesContentInputSingleton>();
-    for (const msg of msgs) {
+
+    const lastIndex = msgs.findLastIndex(
+      m => m.provider === "GROK" && m.senderType === "AI"
+    );
+
+    const isFirstGrokMsg = lastIndex === -1;
+
+    for (const [msgIndex, msg] of msgs.entries()) {
+      const isFreshContext = isFirstGrokMsg || msgIndex > lastIndex;
+      const isCurrentUserMsg = msgIndex === msgs.length - 1;
+      const content = Array.of<ContentBlockUnion>();
+      const textParts = Array.of<string>();
+      const collectionId =
+        this.getUserCollectionId(userId) ??
+        (await this.resolveCollection(userId, mgmtKey))?.collection_id ??
+        null;
       if (msg.senderType === "USER") {
-        const userId = msg.userId ?? "";
-        let collectionId: string | null = null;
-        const usercollectionId = this.getUserCollectionId(userId);
-        if (usercollectionId) {
-          collectionId = usercollectionId;
-        } else {
-          collectionId =
-            // prettier-ignore
-            (this.getUserCollectionId(userId) ??
-                null) ??
-                (await this.resolveCollection(userId, mgmtKey))
-                  ?.collection_id ??
-                null;
-        }
-
-        const content = Array.of<ContentBlockUnion>();
-
         try {
           if (
             msg.attachments &&
             msg.attachments.length > 0 &&
-            (model === "grok-2-vision-1212" ||
-              model === "grok-4-0709" ||
-              model === "grok-code-fast-1" ||
-              model === "grok-4-1-fast-non-reasoning" ||
-              model === "grok-4-fast-reasoning" ||
-              model === "grok-4-fast-non-reasoning" ||
-              model === "grok-4-1-fast-reasoning")
+            (this.canViewDocs(model) || this.canViewImgs(model))
           ) {
             for (const attachment of msg.attachments) {
               const {
@@ -1500,53 +1381,99 @@ upload_result = asyncio.run(main())
               const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
               if (url && mime) {
+                const [filename, ext] = this.filenameToHexExtTuple(
+                  url,
+                  attachment.compatStatus,
+                  false
+                );
+
+                const name = `${filename}.${ext}`;
+
                 if (
                   attachment.assetType === "DOCUMENT" &&
-                  (model === "grok-2-vision-1212" ||
-                    model === "grok-code-fast-1" ||
-                    model === "grok-4-0709" ||
-                    model === "grok-4-1-fast-non-reasoning" ||
-                    model === "grok-4-fast-reasoning" ||
-                    model === "grok-4-fast-non-reasoning" ||
-                    model === "grok-4-1-fast-reasoning")
+                  this.canViewDocs(model)
                 ) {
                   try {
-                    const fileId = await this.ensureXaiAssetUploaded(
-                      attachment,
-                      keyFingerprint,
-                      keyId,
-                      apiKey,
-                      mgmtKey
-                    );
+                    if (isFreshContext) {
+                      try {
+                        const fileId = await this.ensureXaiAssetUploaded(
+                          attachment,
+                          keyFingerprint,
+                          keyId,
+                          apiKey,
+                          mgmtKey
+                        );
+                        if (!isCurrentUserMsg) {
+                          if (collectionId) {
+                            textParts.push(
+                              `[${name}](collections://${collectionId}/files/${fileId})`
+                            );
+                          }
+                        } else {
+                          const docBlock = {
+                            type: "input_file",
+                            file_id: fileId
+                          } satisfies FileContentBlock;
+                          content.push(docBlock);
+                        }
+                      } catch {
+                        const cached = this.assetCache.get(attachment.id);
 
-                    const docBlock = {
-                      type: "input_file",
-                      file_id: fileId
-                    } satisfies FileContentBlock;
-                    content.push(docBlock);
+                        if (cached?.collectionId) {
+                          textParts.push(
+                            `[${name}](collections://${cached.collectionId}/files/${cached.fileId})`
+                          );
+                        } else {
+                          this.logger.info({
+                            fresh_context_attachment_error_xai: `Fresh doc upload for userId ${userId} attachment ${attachment.id} of url ${url} failed`
+                          });
+                        }
+                      }
+                    } else {
+                      const cached = this.assetCache.get(attachment.id);
+                      if (cached && collectionId) {
+                        textParts.push(
+                          `[${name}](collections://${collectionId}/files/${cached.fileId})`
+                        );
+                      } else if (collectionId) {
+                        // Not in cache - ensure it's uploaded for future reference
+                        try {
+                          const fileId = await this.ensureXaiAssetUploaded(
+                            attachment,
+                            keyFingerprint,
+                            keyId,
+                            apiKey,
+                            mgmtKey
+                          );
+
+                          textParts.push(
+                            `[${name}](collections://${collectionId}/files/${fileId})`
+                          );
+                        } catch {
+                          // silent fail for already processed context, not critical
+                        }
+                      }
+                    }
                   } catch (err) {
                     this.logger.warn(
                       { err: this.prisma.safeErrMsg(err) },
-                      `Failed to upload PDF to Collections/Files API of collectionId ${collectionId}, falling back to URL`
+                      `Failed to upload PDF to Collections/Files API of collectionId ${collectionId}.`
                     );
                   }
                 } else if (
                   attachment.assetType === "IMAGE" &&
-                  (model === "grok-2-vision-1212" ||
-                    model === "grok-4-0709" ||
-                    model === "grok-4-1-fast-non-reasoning" ||
-                    model === "grok-4-fast-reasoning" ||
-                    model === "grok-4-fast-non-reasoning" ||
-                    model === "grok-4-1-fast-reasoning")
+                  this.canViewImgs(model)
                 ) {
-                  const imgBlock = {
-                    type: "input_image",
-                    image_url: url,
-                    detail: imgDetail ?? "auto"
-                  } satisfies ImageContentBlock;
-                  content.push(imgBlock);
-                } else {
-                  continue;
+                  if (isFreshContext && isCurrentUserMsg) {
+                    const imgBlock = {
+                      type: "input_image",
+                      image_url: url,
+                      detail: imgDetail ?? "auto"
+                    } satisfies ImageContentBlock;
+                    content.push(imgBlock);
+                  } else {
+                    textParts.push(`![${name}](${url})`);
+                  }
                 }
               }
             }
@@ -1554,14 +1481,15 @@ upload_result = asyncio.run(main())
         } catch (err) {
           console.error(this.prisma.safeErrMsg(err));
         } finally {
-          content.push({
-            type: "input_text",
-            text: msg.content
-          } satisfies TextContentBlock);
+          textParts.push(msg.content);
         }
+        content.push({
+          type: "input_text",
+          text: textParts.join("\n\n")
+        } satisfies TextContentBlock);
         formatted.push({
           role: "user",
-          content
+          content: content
         } as const satisfies ResponsesContentInputSingleton);
       } else {
         const content = Array.of<ContentBlockUnion>();
@@ -1581,65 +1509,89 @@ upload_result = asyncio.run(main())
               const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
               if (url && mime) {
-                if (
-                  assetType === "DOCUMENT" &&
-                  (model === "grok-2-vision-1212" ||
-                    model === "grok-code-fast-1" ||
-                    model === "grok-4-0709" ||
-                    model === "grok-4-1-fast-non-reasoning" ||
-                    model === "grok-4-fast-reasoning" ||
-                    model === "grok-4-fast-non-reasoning" ||
-                    model === "grok-4-1-fast-reasoning")
-                ) {
+                const [filename, ext] = this.filenameToHexExtTuple(
+                  url,
+                  att.compatStatus,
+                  false
+                );
+
+                const name = `${filename}.${ext}`;
+
+                if (assetType === "DOCUMENT" && this.canViewDocs(model)) {
                   try {
-                    const file_id = await this.ensureXaiAssetUploaded(
-                      att,
-                      keyFingerprint,
-                      keyId,
-                      apiKey,
-                      mgmtKey
-                    );
-                    const docBlock = {
-                      type: "input_file",
-                      file_id
-                    } satisfies FileContentBlock;
-                    content.push(docBlock);
+                    if (isFreshContext) {
+                      try {
+                        const fileId = await this.ensureXaiAssetUploaded(
+                          att,
+                          keyFingerprint,
+                          keyId,
+                          apiKey,
+                          mgmtKey
+                        );
+                        if (collectionId) {
+                          textParts.push(
+                            `[${name}](collections://${collectionId}/files/${fileId})`
+                          );
+                        }
+                      } catch {
+                        const cached = this.assetCache.get(att.id);
+                        if (cached?.collectionId) {
+                          textParts.push(
+                            `${modelIdentifier}\n[${name}](collections://${cached?.collectionId}/files/${cached.fileId})`
+                          );
+                        } else {
+                          this.logger.info({
+                            fresh_context_attachment_error_xai: `Fresh doc upload for ${modelIdentifier} attachment ${att.id} of url ${url} failed`
+                          });
+                        }
+                      }
+                    } else {
+                      const cached = this.assetCache.get(att.id);
+                      if (cached && collectionId) {
+                        textParts.push(
+                          `${modelIdentifier}\n[${name}](collections://${collectionId}/files/${cached.fileId})`
+                        );
+                      } else if (collectionId) {
+                        // Not in cache - ensure it's uploaded for future reference
+                        try {
+                          const fileId = await this.ensureXaiAssetUploaded(
+                            att,
+                            keyFingerprint,
+                            keyId,
+                            apiKey,
+                            mgmtKey
+                          );
+
+                          textParts.push(
+                            `${modelIdentifier}\n[${name}](collections://${collectionId}/files/${fileId})`
+                          );
+                        } catch {
+                          // silent fail for already processed context, not critical
+                        }
+                      }
+                    }
                   } catch (err) {
                     this.logger.warn(
                       { err: this.prisma.safeErrMsg(err) },
-                      `Failed to upload PDF to Collections/Files API of attachment id ${att.id}, falling back to URL`
+                      `Failed to upload PDF to Collections/Files API of collectionId ${collectionId}.`
                     );
                   }
                   // can have image attachments from image gen models in multi-provider/multi-model convos
-                } else if (
-                  assetType === "IMAGE" &&
-                  (model === "grok-2-vision-1212" ||
-                    model === "grok-4-0709" ||
-                    model === "grok-4-1-fast-non-reasoning" ||
-                    model === "grok-4-fast-reasoning" ||
-                    model === "grok-4-fast-non-reasoning" ||
-                    model === "grok-4-1-fast-reasoning")
-                ) {
-                  const imgBlock = {
-                    type: "input_image",
-                    image_url: url,
-                    detail: imgDetail ?? "auto"
-                  } satisfies ImageContentBlock;
-                  content.push(imgBlock);
-                } else {
-                  continue;
-                }
+                } else if (assetType === "IMAGE" && this.canViewImgs(model)) {
+                  textParts.push(`${modelIdentifier}\n![${name}](${url})`);
+                } 
               }
             }
           }
         } catch (err) {
           console.error(this.prisma.safeErrMsg(err));
         } finally {
-          content.push({
-            type: "input_text",
-            text: `${modelIdentifier}\n\n${msg.content}`
-          } satisfies TextContentBlock);
+          textParts.push(`${modelIdentifier}\n\n${msg.content}`);
         }
+        content.push({
+          type: "input_text",
+          text: textParts.join(`\n\n`)
+        } satisfies TextContentBlock);
         formatted.push({
           role: "assistant",
           content
@@ -1707,6 +1659,7 @@ upload_result = asyncio.run(main())
     const history = await this.formatxAIMsgHistory(
       msgs,
       model,
+      userId,
       detail,
       keyFingerprint,
       keyId,
@@ -1748,7 +1701,7 @@ upload_result = asyncio.run(main())
     model: GrokModelIdUnion,
     userId: string,
     enableFileSearch = true,
-    fileSearchMaxResults = 5,
+    fileSearchMaxResults = 10,
     enableCodeInterpreter = true,
     enableWebSearch = true,
     enableXSearch = false,

@@ -55,10 +55,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
     const m = model as GrokModelIdUnion;
 
     const xaiApiKey = apiKey ?? this.xaiKey;
+    console.log("[XAI] 1. About to create stream...", Date.now());
     try {
-      const controller = new AbortController();
       const parser = await this.createResponsesStream(
-        controller,
         {
           msgs,
           userId,
@@ -84,8 +83,16 @@ export class GrokResponsesApiService extends GrokImgGenService {
         },
         this.xaiManagementKey,
         "auto",
-        false,
-        "auto"
+        true,
+        "auto",
+        true,
+        10,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
       );
 
       for await (const chunk of parser) {
@@ -152,21 +159,21 @@ export class GrokResponsesApiService extends GrokImgGenService {
             "title" in chunk.data.annotation &&
             "end_index" in chunk.data.annotation
           ) {
-            text = `![[${chunk.data.annotation_index}] ${chunk.data.annotation.title} (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
+            text = `[[${chunk.data.annotation_index}] ${chunk.data.annotation.title} (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
           } else if (
             !("title" in chunk.data.annotation) &&
             "start_index" in chunk.data.annotation &&
             "end_index" in chunk.data.annotation
           ) {
-            text = `![[${chunk.data.annotation_index}] (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
+            text = `[[${chunk.data.annotation_index}] (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
           } else if (
             !("start_index" in chunk.data.annotation) &&
             !("end_index" in chunk.data.annotation) &&
             "title" in chunk.data.annotation
           ) {
-            text = `![[${chunk.data.annotation_index}] ${chunk.data.annotation.title}](${chunk.data.annotation.url})\n`;
+            text = `[[${chunk.data.annotation_index}] ${chunk.data.annotation.title}](${chunk.data.annotation.url})\n`;
           } else {
-            text = `![[${chunk.data.annotation_index}]](${chunk.data.annotation.url})\n`;
+            text = `[[${chunk.data.annotation_index}]](${chunk.data.annotation.url})\n`;
           }
         }
         if (
@@ -355,7 +362,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
               userMsgId,
               imgGenEnabled: false,
               aiMsgId: d.aiMsgId,
-              systemPrompt,
+              systemPrompt,usage,
               thinkingDuration:
                 grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
               thinkingText: grokThinkingAgg,
@@ -375,7 +382,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
             systemPrompt,
             temperature,
             title,
-            userMsgId,
+            userMsgId,usage,
             aiMsgId: d.aiMsgId,
             imgGenEnabled: false,
             thinkingDuration:
@@ -390,7 +397,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
 
           // Clear saved state on successful completion
           void this.redis.del(`stream:state:${conversationId}`);
-          break;
+          return;
         }
       }
     } catch (err) {
