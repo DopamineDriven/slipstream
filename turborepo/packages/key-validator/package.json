@@ -56,12 +56,12 @@
     "format": "prettier --write \"src/**/*.{ts,cts,mts,js,mjs,cjs,json,yaml,yml,css,html,md}\" --ignore-unknown --cache"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.1.0",
+    "@d0paminedriven/fs": "^11.0.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
-    "@typescript/native-preview": "7.0.0-dev.20251206.1",
+    "@typescript/native-preview": "7.0.0-dev.20251207.1",
     "chokidar": "^5.0.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",

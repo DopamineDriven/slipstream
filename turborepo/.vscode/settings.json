@@ -86,7 +86,7 @@
   "typescript.locale": "en",
   "typescript.referencesCodeLens.enabled": true,
   "typescript.referencesCodeLens.showOnAllFunctions": true,
-  "typescript.experimental.useTsgo": true,
+  "typescript.experimental.useTsgo": false,
   "typescript.tsdk": "node_modules/typescript/lib",
   "yaml.hover": true,
   "markdown-pdf.emoji": true,

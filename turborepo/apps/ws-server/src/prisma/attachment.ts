@@ -3,13 +3,9 @@ import type {
   UpdateAttachmentCompatProps,
   UpdateAttachmentMetadata
 } from "@/types/index.ts";
-import type {
-  ExpandedDocSpecs,
-  ExpandedImgSpecs
-} from "@d0paminedriven/metadata";
+import type { ExpandedDocSpecs, ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaAttachmentProviderService } from "@/prisma/attachment-provider.ts";
-import { Extract } from "@d0paminedriven/metadata";
 import type {
   $Enums,
   Attachment,
@@ -22,14 +18,8 @@ import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
 
 export class PrismaAttachmentService extends PrismaAttachmentProviderService {
-  public extractpkg: Extract;
-  constructor(
-    prisma: DbService,
-    extractor: ExtractService,
-    extractpkg: Extract
-  ) {
+  constructor(prisma: DbService, extractor: ExtractService) {
     super(prisma, extractor);
-    this.extractpkg = extractpkg;
   }
 
   async createAttachment({
@@ -451,7 +441,7 @@ export class PrismaAttachmentService extends PrismaAttachmentProviderService {
     compatS3ObjectId,
     compatVersionId
   }: UpdateAttachmentCompatProps) {
-    const getMeta = (await this.extractpkg.extractRemote(
+    const getMeta = (await this.extractor.extractRemote(
       compatCdnUrl,
       4096 * 96
     )) as ExpandedDocSpecs;
@@ -531,7 +521,7 @@ export class PrismaAttachmentService extends PrismaAttachmentProviderService {
     checksumAlgo?: $Enums.ChecksumAlgo;
     checksumSha256?: string | null;
   }) {
-    const meta = (await this.extractpkg.extractRemote(
+    const meta = (await this.extractor.extractRemote(
       compatCdnUrl,
       4096 * 32
     )) as ExpandedImgSpecs;

@@ -1,7 +1,7 @@
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaChatService } from "@/prisma/chat.ts";
 import { DbService } from "@slipstream/db/node";
-import { Extract } from "@d0paminedriven/metadata";
+
 /**
  * **Inheritance chain**
  *
@@ -36,10 +36,9 @@ export class PrismaService extends PrismaChatService {
   constructor(
     prisma: DbService,
     extractor: ExtractService,
-    extractpkg: Extract,
     public isProd: boolean
   ) {
-    super(prisma, extractor, extractpkg);
+    super(prisma, extractor);
   }
 }
 

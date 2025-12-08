@@ -280,7 +280,7 @@ export class AnthropicWorkup {
     ];
   }
 
-  public async syncFileRegistry(userId: string, cleanupStaleFiles = false) {
+  public async syncFileRegistry(userId: string, cleanupStaleFiles = true) {
     const hasAnthropicMessages = await this.prisma.hasProviderMessages(
       userId,
       "ANTHROPIC"
@@ -355,7 +355,7 @@ export class AnthropicWorkup {
 
     // Clear and rebuild registry
     this.fileRegistry.clear();
-
+    const arrToDelete = Array.of<AnthropicFileRecord>();
     for await (const batch of this.getAllAnthropicFiles(apiKey)) {
       for (const file of batch.data) {
         if (dbResId.has(file.id)) {
@@ -372,6 +372,21 @@ export class AnthropicWorkup {
               lastAccessedAt: existingAccessData.get(file.id)
             });
           }
+        } else {
+          const fourWeeks = 28 * 24 * 60 * 60 * 1000;
+          const createdAtVsNow =
+            Date.now() - new Date(file.created_at).getMilliseconds();
+          if (createdAtVsNow > fourWeeks) {
+            arrToDelete.push({
+              id: file.id,
+              size_bytes: file.size_bytes,
+              created_at: file.created_at,
+              filename: file.filename,
+              mime_type: file.mime_type,
+              dbRecordId: undefined,
+              lastAccessedAt: undefined
+            } satisfies AnthropicFileRecord);
+          }
         }
       }
 
@@ -385,7 +400,7 @@ export class AnthropicWorkup {
 
     // Optionally trigger cleanup of stale files
     if (cleanupStaleFiles) {
-      await this.cleanupStaleFiles(apiKey);
+      await this.cleanupStaleFiles(apiKey, 14, arrToDelete);
     }
 
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
@@ -421,7 +436,11 @@ export class AnthropicWorkup {
   }
 
   // Clean up files not accessed in the specified period
-  private async cleanupStaleFiles(apiKey?: string, staleThresholdDays = 14) {
+  private async cleanupStaleFiles(
+    apiKey?: string,
+    staleThresholdDays = 14,
+    providerFiles: AnthropicFileRecord[] = []
+  ) {
     const client = this.getClient(apiKey);
 
     const staleThreshold = new Date(
@@ -491,6 +510,20 @@ export class AnthropicWorkup {
           { error, fileId },
           `Failed to delete stale file ${fileId} from Anthropic`
         );
+      }
+    }
+
+    if (providerFiles.length > 0) {
+      try {
+        for (const file of providerFiles) {
+          const deletion = await client.beta.files.delete(file.id, {
+            betas: ["files-api-2025-04-14"]
+          });
+          const logIt = `id: ${deletion.id}, action: ${deletion.type}`;
+          console.info(logIt);
+        }
+      } catch (error) {
+        console.error(this.prisma.safeErrMsg(error));
       }
     }
 

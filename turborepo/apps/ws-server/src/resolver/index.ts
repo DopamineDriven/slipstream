@@ -6,11 +6,11 @@ import type {
   ProviderChatRequestEntity,
   UserData
 } from "@/types/index.ts";
-import OpenAI from "openai";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
+import type { Responses } from "openai/resources/index.mjs";
 import { ImageCompatService } from "@/image/index.ts";
 import { ProviderService } from "@/providers/index.ts";
 import { WSServer } from "@/ws-server/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
 import { WebSocket } from "ws";
 import type {
   AllModelsUnion,
@@ -99,7 +99,7 @@ export class Resolver {
       prompt: string;
     }
   ) {
-    const content = Array.of<OpenAI.Responses.ResponseInputContent>();
+    const content = Array.of<Responses.ResponseInputContent>();
     const msgs = messages?.[0];
 
     const openaiSvc = this.providers.getInstance("openai");
@@ -264,49 +264,7 @@ export class Resolver {
     } satisfies EventTypeMap["provider_context_pong"];
     ws.send(JSON.stringify(payload));
   }
-  protected equalityCheck(
-    one: ClientContextWorkupProps,
-    two: ClientContextWorkupProps
-  ) {
-    const isSet = { o: one.isSet, t: two.isSet } as const;
 
-    const isDefault = { o: one.isDefault, t: two.isDefault } as const;
-
-    const p = [
-      "anthropic",
-      "gemini",
-      "openai",
-      "meta",
-      "vercel",
-      "grok"
-    ] as const;
-
-    for (const provider of p) {
-      if (isSet.o[provider] !== isSet.t[provider]) return false;
-      if (isDefault.o[provider] !== isDefault.t[provider]) return false;
-    }
-
-    return true;
-  }
-
-  protected hasAllFalseApiKeys(one: ClientContextWorkupProps) {
-    const isSet = { o: one.isSet } as const;
-
-    const p = [
-      "anthropic",
-      "gemini",
-      "openai",
-      "meta",
-      "vercel",
-      "grok"
-    ] as const;
-
-    for (const provider of p) {
-      if (isSet.o[provider] !== false) return false;
-    }
-
-    return true;
-  }
   public async handleProviderContextUpdate(
     _event: EventTypeMap["provider_context_update"],
     ws: WebSocket,
@@ -523,17 +481,17 @@ export class Resolver {
         }
         case "vercel": {
           const svc = this.providers.getRequiredInstance("vercel");
-          await svc.handleV0AiChatRequest({ ...commonProps });
+          await svc.handleV0AiChatRequest(commonProps);
           break;
         }
         case "meta": {
           const svc = this.providers.getRequiredInstance("meta");
-          await svc.handleMetaAiChatRequest({ ...commonProps });
+          await svc.handleMetaAiChatRequest(commonProps);
           break;
         }
         case "grok": {
           const svc = this.providers.getRequiredInstance("grok");
-          await svc.handleXAIAiChatRequest({ ...commonProps });
+          await svc.routeXai(commonProps);
           break;
         }
         case "openai":
@@ -543,6 +501,7 @@ export class Resolver {
             ...commonProps,
             user_location
           });
+          break;
         }
       }
     } catch (err) {
@@ -1525,7 +1484,7 @@ export class Resolver {
         versionId
       );
 
-      const specs = await this.wsServer.prisma.extractpkg.extractRemote(
+      const specs = await this.wsServer.prisma.extractor.extractRemote(
         cdnUrl,
         64 * 4096
       );

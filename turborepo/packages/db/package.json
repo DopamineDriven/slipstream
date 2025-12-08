@@ -94,12 +94,12 @@
     "@prisma/instrumentation": "^6.19.0"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.1.0",
+    "@d0paminedriven/fs": "^11.0.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
-    "@typescript/native-preview": "7.0.0-dev.20251206.1",
+    "@typescript/native-preview": "7.0.0-dev.20251207.1",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "jiti": "^2.6.1",

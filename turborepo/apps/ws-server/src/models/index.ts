@@ -3,7 +3,7 @@ import { join, relative, resolve } from "path";
 import type { InferTopLevelMime } from "@/types/index.ts";
 import type {
   ExpandedDocSpecs,ExpandedImgSpecs
-} from "@d0paminedriven/metadata";
+} from "@d0paminedriven/fs";
 import { ByteCodec } from "@/byte-codec/index.ts";
 import { MultiErrorReply } from "redis";
 import type { $Enums } from "@slipstream/db/node/generated/client";

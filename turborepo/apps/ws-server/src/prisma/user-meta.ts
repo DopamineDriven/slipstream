@@ -3,10 +3,10 @@ import { ExtractService } from "@/extract/index.ts";
 import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
 import { DbService } from "@slipstream/db/node";
 import { EncryptionService } from "@slipstream/encryption";
-import { PrismaAttachmentService } from "./attachment.ts";
+import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import * as dotenv from "dotenv";
-import { ClientContextWorkupProps, RecordCountsProps } from "@slipstream/types";
-import { Extract } from "@d0paminedriven/metadata";
+import type { ClientContextWorkupProps, RecordCountsProps } from "@slipstream/types";
+
 dotenv.config({quiet: true});
 
 export class PrismaUserMetaService extends PrismaAttachmentService {
@@ -17,10 +17,9 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
   >();
   constructor(
     prisma: DbService,
-    extractor: ExtractService,
-    extractpkg: Extract
+    extractor: ExtractService
   ) {
-    super(prisma, extractor, extractpkg);
+    super(prisma, extractor);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 

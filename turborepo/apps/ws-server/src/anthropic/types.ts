@@ -1,4 +1,4 @@
-import { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { ProviderChatRequestEntity } from "@/types/index.ts";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -6,12 +6,11 @@ export interface AnthropicFileRecord {
   created_at: string;
   filename: string;
   mime_type: string;
-  lastAccessedAt?: Date; // Track from our end
+  lastAccessedAt?: Date;
   dbRecordId?: string;
 }
 
-export interface ProviderAnthropicChatRequestEntity
-  extends ProviderChatRequestEntity {
+export interface ProviderAnthropicChatRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
     type: "approximate";
     city?: string | null | undefined;

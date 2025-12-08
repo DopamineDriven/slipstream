@@ -51,16 +51,14 @@
     "test": "node --test --import tsx --test-reporter spec"
   },
   "dependencies": {
-    "@d0paminedriven/metadata": "^6.0.0",
     "@slipstream/types": "workspace:*"
   },
   "devDependencies": {
-    "@d0paminedriven/fs": "^10.1.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
-    "@typescript/native-preview": "7.0.0-dev.20251206.1",
+    "@typescript/native-preview": "7.0.0-dev.20251207.1",
     "chokidar": "^5.0.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",

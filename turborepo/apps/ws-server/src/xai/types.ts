@@ -1,5 +1,13 @@
+import type { S3FinalizePayload } from "@/types/index.ts";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { CTR, Unenumerate } from "@slipstream/types";
+import type {
+  CTR,
+  ImgMetadataEntity,
+  S3Checksum,
+  S3StorageClass,
+  Unenumerate
+} from "@slipstream/types";
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -150,8 +158,6 @@ export type ListCollectionsResponse = {
   }[];
 };
 
-export type CollectionResSingleton = Unenumerate<ListCollectionsResponse>;
-
 export type CreateCollectionResponse = {
   collection_id: string;
   collection_name: string;
@@ -212,3 +218,67 @@ export type DeleteXaiFileResponse = {
   deleted: boolean;
   object: string;
 };
+
+export interface xAIImgGenResponse {
+  data: {
+    b64_json: string;
+    revised_prompt: string;
+  }[];
+}
+
+export type ImageGenPartialArr = [
+  number, // partial-to-final-index tracking (0 <= n <= 3) n partial images + final response)
+  string, // cdnUrl (cloudfront url returned post-s3 upload)
+  string, // itemId (shared by all partials and final image)
+  number, // width
+  number, // height
+  string, // mime type
+  string, // s3 bucket
+  string, // s3 key
+  string, // s3 versionId
+  string, // s3ObjectId
+  string | undefined, // filename
+  string | undefined, // extension
+  string | undefined, // etag
+  number | undefined, // size
+  string | undefined, // s3 last modified
+  string | undefined, // content disposition
+  string | undefined, // cache control
+  S3Checksum | undefined, // s3 checksum={checksumSha256, checksumAlgo}
+  S3StorageClass | undefined, // s3 storage class
+  string, // generationGroupId (unique resp_id via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37 )
+  ImgMetadataEntity | undefined, // ImageMetadata via extractor package
+  number | undefined, // upload duration
+  string | undefined, // requestMessageId
+  string | undefined, // jobId
+  string | undefined, // revised_prompt
+  S3FinalizePayload,
+  ExpandedImgSpecs
+];
+
+export type ImgGenMessageSingletonProps =
+  | {
+      role: "user" | "assistant";
+      content:
+        | string
+        | readonly (
+            | { type: "text"; text: string }
+            | {
+                type: "image_url";
+                image_url: {
+                  url: string;
+                  detail?: "low" | "medium" | "high";
+                };
+              }
+          )[];
+    }
+  | { role: "system"; content: string };
+
+export type ImageGenMessagesProps = readonly ImgGenMessageSingletonProps[];
+
+export type ImgGenMessageParts =
+  | { type: "text"; text: string }
+  | {
+      type: "image_url";
+      image_url: { url: string; detail?: "low" | "medium" | "high" };
+    };

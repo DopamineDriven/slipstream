@@ -1,5 +1,5 @@
 import type { ProviderGeminiChatRequestEntity } from "@/gemini/types.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type {
   Blob,
   FinishReason,
@@ -14,15 +14,15 @@ import type {
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 import { S3Storage } from "@slipstream/storage-s3";
-import { GeminiWorkupService } from "./workup.ts";
+import { GeminiWorkupService } from "@/gemini/workup.ts";
 
 export class GeminiService extends GeminiWorkupService {
   constructor(
     logger: LoggerService,
-    protected prisma: PrismaService,
+    prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
     protected s3: S3Storage,
-    protected apiKey: string
+    apiKey: string
   ) {
     super(logger, prisma, apiKey);
   }
@@ -321,7 +321,7 @@ export class GeminiService extends GeminiWorkupService {
           const duration = performance.now() - tInitial;
 
           const b64 = Buffer.from(finalImg.data, "base64");
-          const getIt = (await this.prisma.extractpkg.extractRemote(
+          const getIt = (await this.prisma.extractor.extractRemote(
             b64,
             4096 * 48
           )) as ExpandedImgSpecs;

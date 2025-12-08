@@ -1,5 +1,5 @@
 import type { S3FinalizePayload } from "@/types/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type {
   ImgMetadataEntity,
   S3Checksum,
