@@ -377,18 +377,15 @@ export class ResponsesStreamParser
   implements AsyncIterable<XAIResponsesSSEEvent>
 {
   private readonly readable: ReadableStream<XAIResponsesSSEEvent>;
-  public controller: AbortController;
-
   constructor(
     sourceStream: ReadableStream<Uint8Array>,
-    controller: AbortController
   ) {
     super();
     const decoder = new TextDecoder();
 
     let buffer = "";
 
-    this.controller = controller;
+
 
     const transformStream = new TransformStream<
       Uint8Array,
@@ -431,11 +428,12 @@ export class ResponsesStreamParser
   > {
     const reader = this.readable.getReader();
     try {
+        // const controller = new AbortController();
       while (true) {
-        if (this.controller.signal.aborted) {
-          // ← Just check the signal
-          break;
-        }
+        // if (controller.signal.aborted) {
+        //   // ← Just check the signal
+        //   break;
+        // }
         const { done, value } = await reader.read();
         if (done) return;
         yield value;
@@ -447,11 +445,10 @@ export class ResponsesStreamParser
 
   public static createXAIResponsesParser(
     response: Response,
-    controller: AbortController
   ): ResponsesStreamParser {
     if (!response.body) {
       throw new Error("Response body is not available for SSE parsing.");
     }
-    return new ResponsesStreamParser(response.body, controller);
+    return new ResponsesStreamParser(response.body);
   }
 }
