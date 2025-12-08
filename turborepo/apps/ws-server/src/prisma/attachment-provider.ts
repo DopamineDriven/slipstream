@@ -3,12 +3,12 @@ import { resolve } from "node:path";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import { DbService } from "@slipstream/db/node";
-import {
+import type {
   AttachmentProviderSingleton,
   AttachmentSingleton,
   XOR
 } from "@slipstream/types";
+import { DbService } from "@slipstream/db/node";
 
 export interface AttachmentSingletonWithProvider<
   T extends $Enums.Provider
@@ -432,7 +432,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     return count > 0 ? true : false;
   }
 
-   public async hasProviderStore(userId: string, provider: $Enums.Provider) {
+  public async hasProviderStore(userId: string, provider: $Enums.Provider) {
     const count = await this.prismaClient.providerStore.count({
       where: { AND: [{ provider, userId }] }
     });

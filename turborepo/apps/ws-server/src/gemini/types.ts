@@ -3,7 +3,7 @@ import type {
   S3FinalizePayload,
   UserData
 } from "@/types/index.ts";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type {
   AIChatRequestImgGenFields,
   ImgMetadataEntity,

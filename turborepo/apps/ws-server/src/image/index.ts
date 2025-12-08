@@ -1,5 +1,5 @@
 import { ReadableStreamReadResult } from "node:stream/web";
-import type { ExpandedImgSpecs } from "@d0paminedriven/metadata";
+import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import { PrismaService } from "@/prisma/index.ts";
 import sharp from "sharp";
 import type { $Enums } from "@slipstream/db/node/generated/client";

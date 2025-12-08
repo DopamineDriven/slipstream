@@ -1,18 +1,18 @@
 import type { ProviderAnthropicChatRequestEntity } from "@/anthropic/types.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
+import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-import { AnthropicWorkup } from "./workup.ts";
 
 export class AnthropicService extends AnthropicWorkup {
   constructor(
     logger: LoggerService,
-    protected prisma: PrismaService,
+    prisma: PrismaService,
     private redis: EnhancedRedisPubSub,
-    protected apiKey: string
+    apiKey: string
   ) {
     super(logger, prisma, apiKey);
   }

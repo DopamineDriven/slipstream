@@ -81,10 +81,11 @@
       "xai": [
         "dist/xai/collections.d.ts",
         "dist/xai/event-types.ts",
+        "dist/xai/img-gen.ts",
         "dist/xai/index.d.ts",
         "dist/xai/response-sse.d.ts",
+        "dist/xai/responses-api.d.ts",
         "dist/xai/responses-types.d.ts",
-        "dist/xai/sse.d.ts",
         "dist/xai/types.d.ts"
       ]
     }
@@ -110,8 +111,8 @@
     "@aws-sdk/credential-providers": "^3.946.0",
     "@aws-sdk/s3-request-presigner": "^3.946.0",
     "@aws-sdk/types": "^3.936.0",
-    "@d0paminedriven/fs": "^10.1.0",
-    "@d0paminedriven/metadata": "^6.0.0",
+    "@d0paminedriven/fs": "^11.0.0",
+    "@d0paminedriven/metadata": "^6.0.1",
     "@google/genai": "^1.31.0",
     "@napi-rs/canvas": "^0.1.84",
     "@opentelemetry/api": "^1.9.0",
@@ -130,7 +131,7 @@
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "@types/ws": "^8.18.1",
-    "@typescript/native-preview": "7.0.0-dev.20251206.1",
+    "@typescript/native-preview": "7.0.0-dev.20251207.1",
     "bullmq": "^5.65.1",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",

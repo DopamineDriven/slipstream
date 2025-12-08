@@ -91,7 +91,7 @@ export class GeminiWorkupService {
   // Note: markFileAccessed is not needed for Google's TTL-based system
   // Files automatically expire after 48 hours regardless of access patterns
 
-  private async cleanupStaleFiles(apiKey?: string) {
+  private async cleanupStaleFiles(apiKey: string) {
     const client = this.getClient(apiKey);
     const filesToDelete = Array.of<string>();
     const dbRecordsToDelete = Array.of<string>();

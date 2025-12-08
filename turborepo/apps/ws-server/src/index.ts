@@ -72,11 +72,7 @@ async function exe() {
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
-    const { Extract } = await import("@d0paminedriven/metadata");
-
-    const extractpkg = new Extract();
-
-    const prisma = new PrismaService(db, extract, extractpkg, isProd);
+    const prisma = new PrismaService(db, extract, isProd);
 
     const port = cfg.PORT ? Number.parseInt(cfg.PORT) : 4000;
 

@@ -6,7 +6,7 @@ import type {
   WebSearchTool,
   XSearchTool
 } from "@/xai/responses-types.ts";
-import { GrokModelIdUnion, Unenumerate } from "@slipstream/types";
+import type { GrokModelIdUnion, Unenumerate } from "@slipstream/types";
 
 export namespace OutputItemAdded {
   export interface ReasoningItem {
@@ -69,11 +69,11 @@ export namespace OutputItemAdded {
     call_id: string;
     input: string;
     name:
-      | "x_keyword_search"
-      | "x_semantic_search"
-      | "search_pdf_attachment"
-      | "x_user_search"
-      | (string & {});
+    | "x_keyword_search"
+    | "x_semantic_search"
+    | "search_pdf_attachment"
+    | "x_user_search"
+    | (string & {});
   }
 
   export type Item =
@@ -143,9 +143,9 @@ export namespace OutputItemDone {
       text: string;
       logprobs: never[];
       annotations:
-        | MessageAnnotationFull[]
-        | MessageAnnotationMinimal[]
-        | never[];
+      | MessageAnnotationFull[]
+      | MessageAnnotationMinimal[]
+      | never[];
     }[];
     id: string;
     role: "assistant";
@@ -182,11 +182,11 @@ export namespace OutputItemDone {
      */
     input: string;
     name:
-      | "x_keyword_search"
-      | "x_semantic_search"
-      | "search_pdf_attachment"
-      | "x_user_search"
-      | (string & {});
+    | "x_keyword_search"
+    | "x_semantic_search"
+    | "search_pdf_attachment"
+    | "x_user_search"
+    | (string & {});
   }
 
   export type Item =
