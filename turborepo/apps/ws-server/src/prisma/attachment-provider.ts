@@ -142,6 +142,17 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     });
   }
 
+  public async updateGrokStore(
+    userId: string,
+    fileCount: number,
+    lastSyncedAt: Date
+  ) {
+    return await this.prismaClient.providerStore.update({
+      data: { fileCount, lastSyncedAt },
+      where: { userId_provider: { userId, provider: "GROK" } }
+    });
+  }
+
   public async upsertGrokAssetMapping(
     userId: string,
     attachmentId: string,
@@ -189,8 +200,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         mime,
         providerRef: fileId,
         readyAt: created_at,
-        lastCheckedAt: created_at,
-        storeId
+        lastCheckedAt: created_at
       },
       create: {
         state: "ACTIVE",
@@ -374,7 +384,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     provider: providerLink.provider,
                     providerRef: providerLink.providerRef,
                     isExpired:
-                      14 * 24 * 60 * 60 * 1000 <
+                      60 * 24 * 60 * 60 * 1000 <
                       Date.now() -
                         (providerLink.lastCheckedAt?.getTime() ??
                           providerLink.createdAt.getTime()),

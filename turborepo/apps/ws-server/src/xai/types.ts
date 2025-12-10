@@ -1,4 +1,4 @@
-import type { S3FinalizePayload } from "@/types/index.ts";
+import type { ProviderChatRequestEntity, S3FinalizePayload } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
@@ -282,3 +282,8 @@ export type ImgGenMessageParts =
       type: "image_url";
       image_url: { url: string; detail?: "low" | "medium" | "high" };
     };
+
+
+export interface GrokProviderChatRequestEntity extends ProviderChatRequestEntity{
+  management_api_key?: string;
+}

@@ -15,27 +15,24 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   });
   prismaClient.$connect();
   try {
-    const data = await prismaClient.attachment.findMany({
-      where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
-      include: { providerLinks: { where: { provider } } }
+    const data = await prismaClient.providerStore.findUnique({
+      where: { userId_provider: { userId, provider } },
+      include: { files: { where: { provider } } }
     });
-    const mapper = data.map(v => {
-      const { providerLinks, size, ...rest } = v;
-      const mapProviderLinks = providerLinks.map(vv => {
-        const { size, ...resttt } = vv;
-        return {
-          ...resttt,
-          size: size ? Number(size) : null
-        };
-      });
-
+    const { totalBytes, files, ...resttt } = data ?? {};
+    const mapper = files?.map(t => {
+      const { size, ...rest } = t;
       return {
         ...rest,
-        providerLinks: mapProviderLinks,
         size: size ? Number(size) : null
       };
     });
-    return mapper;
+
+    return {
+      ...resttt,
+      totalBytes: totalBytes ? Number(totalBytes) : null,
+      files: mapper
+    };
   } catch (err) {
     throw new Error(
       typeof err === "string"
@@ -52,8 +49,8 @@ const data = async (provider: $Enums.Provider, userId: string) => {
 (async () => {
   return await data("GROK", "nrr6h4r4480f6kviycyo1zhf");
 })().then(d => {
-  fs.withWs(
-    "src/test/__out__/xai/provider-links/inspect.json",
+    fs.withWs(
+    "src/test/__out__/xai/provider-store-with-links/inspect.json",
     JSON.stringify(d, null, 2)
   );
   console.log(d ?? 0);

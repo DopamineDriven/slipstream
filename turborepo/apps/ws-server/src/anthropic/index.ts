@@ -1,9 +1,11 @@
-import type { ProviderAnthropicChatRequestEntity } from "@/anthropic/types.ts";
+import type {
+  CreateMessageStreamRT,
+  ProviderAnthropicChatRequestEntity
+} from "@/anthropic/types.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { AnthropicModelIdUnion, EventTypeMap } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
@@ -48,50 +50,25 @@ export class AnthropicService extends AnthropicWorkup {
       anthropicCi = 0;
 
     const anthropic = this.getClient(apiKey ?? undefined);
-    const keyFingerprint = keyId ?? "server";
 
-    // Use Files API for PDFs
-    const { messages, system } = await this.formatAnthropicHistoryWithFiles(
+    const { params, options } = await this.createStreamWorkup({
       isNewChat,
       msgs,
-      model,
+      userId,
+      apiKey,
+      keyId,
+      max_tokens,
+      model: m,
       systemPrompt,
-      keyFingerprint,
-      keyId ?? undefined,
-      apiKey
-    );
-
-    const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
-      model,
-      max_tokens
-    );
-    this.logger.debug(messages, "[anthropic]: debugging full content");
-    /**
-     * tools failing on anthropic following bash_tool_20251022 release...
-     * Keeping this commented out for now
-     */
-    const _tools = this.webSearchTool(user_location);
-
-    const betas = this.handleBetaHeaders(model);
+      temperature,
+      topP,
+      user_location
+    });
 
     const stream = (await anthropic.beta.messages.create(
-      {
-        max_tokens: maxTokens,
-        stream: true,
-        thinking,
-        top_p: topP,
-        temperature,
-        system,
-        model,
-        metadata: { user_id: userId },
-        messages,
-        service_tier: "auto",
-        betas
-      },
-      { stream: true }
-    )) satisfies Stream<Anthropic.Beta.BetaRawMessageStreamEvent> & {
-      _request_id?: string | null;
-    };
+      params,
+      options
+    )) satisfies CreateMessageStreamRT;
 
     for await (const chunk of stream) {
       let text: string | undefined = undefined,

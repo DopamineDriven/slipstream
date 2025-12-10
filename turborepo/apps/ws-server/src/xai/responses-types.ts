@@ -103,6 +103,10 @@ export type InputReasoningProps = {
   summary: "auto" | "concise" | "detailed" | null;
 };
 
+export type TextFormat = {
+  format: { type: "text" | "json_object" | "json_schema" };
+};
+
 export type ResponsesContentInputSingleton = {
   role: ResponsesRole;
   content: string | ContentBlockUnion[];
@@ -116,7 +120,7 @@ export type ResponsesContentWorkup = {
   logprobs?: boolean | null;
   max_output_tokens?: null | number;
   model: GrokModelIdUnion;
-  include: ["reasoning.encrypted_content"] | null, // "reasoning.encrypted_content"
+  include: ["reasoning.encrypted_content"] | null; // "reasoning.encrypted_content"
   /**
    * An alternate way to specify the system prompt. Note that this cannot be used alongside `previous_response_id`, where the system prompt of the previous message will be used.
    */
@@ -129,6 +133,7 @@ export type ResponsesContentWorkup = {
    **/
   store?: boolean | null;
   stream: boolean | null;
+  text?: TextFormat;
   /**
    * min: 0, default: 1, max: 2
    */
@@ -152,3 +157,38 @@ export type ResponsesContentWorkup = {
 export type ToolMap<V extends WebSearchTool | XSearchTool> = {
   type: V["type"];
 } & V["filters"];
+
+export type ToolRequestInput = (
+  | ToolMap<XSearchTool | WebSearchTool>
+  | CodeInterpreterTool
+  | FileSearchTool
+)[];
+
+export type LogProbsFields = {
+  token: string;
+  logprob: number;
+  bytes: number[];
+  top_logprobs: never[];
+};
+
+export interface Usage {
+  input_tokens: number;
+  input_tokens_details: {
+    cached_tokens: number;
+  };
+  output_tokens: number;
+  output_tokens_details: {
+    reasoning_tokens: number;
+  };
+  total_tokens: number;
+  num_sources_used: number;
+  num_server_side_tools_used?: number;
+  server_side_tool_usage_details?: {
+    web_search_calls: number;
+    x_search_calls: number;
+    code_interpreter_calls: number;
+    file_search_calls: number;
+    mcp_calls: number;
+    document_search_calls: number;
+  };
+}

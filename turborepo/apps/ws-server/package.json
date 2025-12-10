@@ -86,7 +86,8 @@
         "dist/xai/response-sse.d.ts",
         "dist/xai/responses-api.d.ts",
         "dist/xai/responses-types.d.ts",
-        "dist/xai/types.d.ts"
+        "dist/xai/types.d.ts",
+        "dist/xai/workup.d.ts"
       ]
     }
   },
@@ -106,14 +107,14 @@
   "prettier": "@slipstream/prettier-config",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
-    "@aws-sdk/client-s3": "^3.946.0",
-    "@aws-sdk/client-secrets-manager": "^3.946.0",
-    "@aws-sdk/credential-providers": "^3.946.0",
-    "@aws-sdk/s3-request-presigner": "^3.946.0",
+    "@aws-sdk/client-s3": "^3.947.0",
+    "@aws-sdk/client-secrets-manager": "^3.947.0",
+    "@aws-sdk/credential-providers": "^3.947.0",
+    "@aws-sdk/s3-request-presigner": "^3.947.0",
     "@aws-sdk/types": "^3.936.0",
     "@d0paminedriven/fs": "^11.0.0",
     "@d0paminedriven/metadata": "^6.0.1",
-    "@google/genai": "^1.31.0",
+    "@google/genai": "^1.32.0",
     "@napi-rs/canvas": "^0.1.84",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-prometheus": "^0.208.0",
@@ -128,10 +129,10 @@
     "@slipstream/redis-service": "workspace:*",
     "@slipstream/storage-s3": "workspace:*",
     "@slipstream/types": "workspace:*",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "@types/pg": "^8.15.6",
     "@types/ws": "^8.18.1",
-    "@typescript/native-preview": "7.0.0-dev.20251207.1",
+    "@typescript/native-preview": "7.0.0-dev.20251208.1",
     "bullmq": "^5.65.1",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
@@ -162,10 +163,10 @@
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "terser": "^5.44.1",
-    "tsdown": "^0.17.0",
+    "tsdown": "^0.17.2",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
-    "typescript-eslint": "^8.48.1",
+    "typescript-eslint": "^8.49.0",
     "wait-on": "^9.0.3"
   }
 }

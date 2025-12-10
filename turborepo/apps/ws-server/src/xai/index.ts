@@ -33,7 +33,11 @@ export class xAIService extends GrokResponsesApiService {
       case "grok-4-fast-reasoning":
       case "grok-code-fast-1":
       default: {
-        return this.handleXAIAiResponsesApiRequest({ model, ...rest });
+        return this.handleXAIAiResponsesApiRequest({
+          management_api_key: this.xaiManagementKey,
+          model,
+          ...rest
+        });
       }
     }
   }

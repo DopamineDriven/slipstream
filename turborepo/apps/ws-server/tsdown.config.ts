@@ -60,6 +60,7 @@ export default defineConfig(
         "src/xai/responses-api.ts",
         "src/xai/responses-types.ts",
         "src/xai/types.ts",
+        "src/xai/workup.ts",
         "!src/__out__/**/*",
         "!src/test/**/*",
         "!public/**/*"

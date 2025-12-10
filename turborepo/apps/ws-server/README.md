@@ -2,6 +2,68 @@
 
 *details coming soon*
 
+inside of src:
+
+.
+├── anthropic
+│   ├── index.ts
+│   ├── types.ts
+│   └── workup.ts
+├── byte-codec
+│   └── index.ts
+├── extract
+│   └── index.ts
+├── gemini
+│   ├── index.ts
+│   ├── types.ts
+│   └── workup.ts
+├── image
+│   └── index.ts
+├── index.ts
+├── logger
+│   └── index.ts
+├── meta
+│   └── index.ts
+├── mixins
+│   └── index.ts
+├── models
+│   └── index.ts
+├── openai
+│   ├── gpt-image.ts
+│   ├── index.ts
+│   ├── types.ts
+│   └── workup.ts
+├── pdf
+│   └── index.ts
+├── prisma
+│   ├── attachment-provider.ts
+│   ├── attachment.ts
+│   ├── chat.ts
+│   ├── index.ts
+│   ├── user-meta.ts
+│   └── utils.ts
+├── providers
+│   └── index.ts
+├── resolver
+│   └── index.ts
+├── types
+│   └── index.ts
+├── vercel
+│   ├── index.ts
+│   └── sse.ts
+├── ws-server
+│   └── index.ts
+└── xai
+    ├── collections.ts
+    ├── event-types.ts
+    ├── img-gen.ts
+    ├── index.ts
+    ├── response-sse.ts
+    ├── responses-api.ts
+    ├── responses-types.ts
+    ├── types.ts
+    └── workup.ts
+
 
 ```ts
 class GrokCollectionsService{

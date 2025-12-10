@@ -204,3 +204,58 @@ export function parseDraftId(draftId: string) {
     o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
   ) as [string, string, string, number];
 }
+// export type IsNever<T> = [T] extends [never] ? true : false;
+
+// /**
+//  * Check if a key's value type is never
+//  */
+// export type IsKeyNever<T, K extends keyof T> = IsNever<T[K]>;
+
+// /**
+//  * Extract keys whose values are NOT never
+//  */
+// export type NonNeverKeys<T> = {
+//   [K in keyof T]: IsNever<T[K]> extends true ? never : K;
+// }[keyof T];
+
+// /**
+//  * Extract keys whose values ARE never
+//  */
+// export type NeverKeys<T> = {
+//   [K in keyof T]: IsNever<T[K]> extends true ? K : never;
+// }[keyof T];
+
+// /**
+//  * Strip all `never`-valued keys from a type
+//  */
+// export type StripNever<T> = {
+//   [K in NonNeverKeys<T>]: T[K];
+// };
+
+// /**
+//  * Get the non-never type of a key, or `never` if the key doesn't exist or is never
+//  */
+// export type NonNeverValue<T, K extends PropertyKey> = K extends keyof T
+//   ? IsNever<T[K]> extends true
+//     ? never
+//     : T[K]
+//   : never;
+
+// // ============================================================================
+// // Type Predicates for Field Checking
+// // ============================================================================
+
+// /**
+//  * Check if object has a key with a non-never, non-undefined value
+//  * Returns a type predicate that narrows the object type
+//  */
+// export function has<const T extends object, const K extends string>(
+//   obj: T,
+//   key: K
+// ): obj is T & Record<K, Exclude<NonNeverValue<T, K>,null>> {
+//   return (
+//     key in obj &&
+//     typeof (obj as Record<string, unknown>)[key] !== "undefined" &&
+//     (obj as Record<string, unknown>)[key] !== null
+//   );
+// }
