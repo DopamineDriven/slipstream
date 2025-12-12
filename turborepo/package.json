@@ -2,7 +2,7 @@
   "name": "@slipstream/root",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
+  "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501",
   "scripts": {
     "build:credentials": "turbo build --filter=@slipstream/credentials",
     "build:db": "turbo build --filter=@slipstream/db",
@@ -43,18 +43,18 @@
     "@changesets/cli": "^2.29.8",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
-    "@typescript/native-preview": "7.0.0-dev.20251208.1",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.10.2",
+    "@types/node": "catalog:node25",
+    "@typescript/native-preview": "catalog:tsgo7",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "knip": "^5.72.0",
+    "knip": "^5.73.3",
     "prettier": "^3.7.4",
     "tsx": "^4.21.0",
     "turbo": "^2.6.3",
-    "typescript": "^5.9.3",
-    "vercel": "^49.1.2"
+    "typescript": "catalog:ts6",
+    "vercel": "^50.0.0"
   },
   "prettier": "@slipstream/prettier-config",
   "engines": {

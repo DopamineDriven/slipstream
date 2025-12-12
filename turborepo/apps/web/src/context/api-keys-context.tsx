@@ -50,6 +50,15 @@ function equalityCheck(
   return true;
 }
 
+function eqCheck(
+  one: ClientContextWorkupProps | null,
+  two: ClientContextWorkupProps | null
+) {
+  if (one && two) return equalityCheck(one, two);
+  // return false if one or both are null
+  else return false;
+}
+
 export function ApiKeysProvider({
   children
 }: Readonly<{
@@ -73,8 +82,7 @@ export function ApiKeysProvider({
   useEffect(() => {
     const handleConnection = (ev: EventTypeMap["connection_established"]) => {
       if (
-        providerContextRef.current === null ||
-        equalityCheck(providerContextRef.current, ev.providerContext) === false
+        eqCheck(providerContextRef.current, ev.providerContext) === false
       ) {
         setProviderContext(ev.providerContext);
         setIsAwaitingInitial(false);
@@ -87,8 +95,7 @@ export function ApiKeysProvider({
       ev: EventTypeMap["provider_context_update_ack"]
     ) => {
       if (
-        providerContextRef.current === null ||
-        equalityCheck(providerContextRef.current, ev.providerContext) === false
+        eqCheck(providerContextRef.current, ev.providerContext) === false
       ) {
         setProviderContext(ev.providerContext);
         setIsAwaitingUpdateAck(false);
@@ -101,8 +108,8 @@ export function ApiKeysProvider({
       ev: EventTypeMap["provider_context_pong"]
     ) => {
       if (
-        providerContextRef.current === null ||
-        equalityCheck(providerContextRef.current, ev.providerContext) === false
+
+        eqCheck(providerContextRef.current, ev.providerContext) === false
       ) {
         setProviderContext(ev.providerContext);
         setIsAwaitingPong(false);

@@ -122,6 +122,7 @@
     "WS_HOSTNAME",
     "X_AI_KEY",
     "X_AI_COLLECTION",
-    "X_AI_MANAGEMENT_API_KEY"
+    "X_AI_MANAGEMENT_API_KEY",
+    "X_AI_TEAM_ID"
   ]
 }

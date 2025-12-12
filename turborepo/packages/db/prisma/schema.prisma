@@ -371,6 +371,7 @@ model Message {
   content          String
   thinkingText     String?
   thinkingDuration Int?
+  responseOutput   String? // JSON serialized response output
   isImageGen       Boolean      @default(false)
   messageType      MessageType  @default(TEXT)
   liked            Boolean?     @default(false)

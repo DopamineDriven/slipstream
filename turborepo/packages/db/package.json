@@ -87,29 +87,31 @@
     }
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^6.19.0",
-    "@prisma/client": "^6.19.0",
+    "@prisma/adapter-pg": "^6.19.1",
+    "@prisma/client": "^6.19.1",
     "@prisma/extension-accelerate": "^2.0.2",
     "@prisma/extension-optimize": "^2.0.1",
-    "@prisma/instrumentation": "^6.19.0"
+    "@prisma/instrumentation": "^6.19.1",
+    "jiti": "^2.6.1"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "^11.0.0",
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.10.2",
-    "@typescript/native-preview": "7.0.0-dev.20251208.1",
+    "@types/node": "catalog:node25",
+    "@typescript/native-preview": "catalog:tsgo7",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
-    "jiti": "^2.6.1",
     "prettier": "^3.7.4",
-    "prisma": "^6.19.0",
+    "prisma": "^6.19.1",
+    "rolldown": "1.0.0-beta.54",
+    "rolldown-plugin-dts": "^0.18.3",
     "terser": "^5.44.1",
-    "tsdown": "^0.17.2",
+    "tsdown": "catalog:tsdown",
     "tslib": "^2.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
+    "typescript": "catalog:ts6",
     "typescript-eslint": "^8.49.0"
   },
   "prettier": "@slipstream/prettier-config"

@@ -19,3 +19,13 @@ onlyBuiltDependencies:
   - puppeteer
   - sharp
   - unrs-resolver
+
+catalogs:
+  ts6:
+    typescript: ^5.9.3
+  tsgo7:
+    "@typescript/native-preview": ^7.0.0-dev.20251211.1
+  node25:
+    "@types/node": ^25.0.1
+  tsdown:
+    tsdown: ^0.17.3

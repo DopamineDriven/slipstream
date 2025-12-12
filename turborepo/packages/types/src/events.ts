@@ -11,8 +11,6 @@ import type {
   AssetUploadInstructionsMethod,
   AttachmentMetadata,
   ClientContextWorkupProps,
-  ImgColorModel,
-  ImgColorSpace,
   MetadataUnion,
   S3ObjectId,
   UserMetadata,
@@ -25,8 +23,9 @@ import type {
   ImageGenProviders,
   Provider
 } from "@/models.ts";
+import type { DocumentSingleton, ImageSingleton } from "@/types.ts";
 import type { CTR, DX, Rm } from "@/utils.ts";
-import { $Enums } from "@slipstream/db/node/generated/client";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 
 export interface AIChatResEntity<T extends `ai_chat_${AIChatEventTypeUnion}`> {
   type: T;
@@ -94,6 +93,7 @@ export type AIChatResponseDb = DX<
     usage?: number;
     thinkingDuration?: number;
     thinkingText?: string;
+    responseOutput?: string;
     imgGenFields?: AIChatResponseImgGenFieldsFinal;
   }
 >;
@@ -859,29 +859,8 @@ export type AIChatResRT = {
         revisedPrompt: string | null;
         attachmentId: string;
       } | null;
-      image: {
-        createdAt: Date;
-        updatedAt: Date;
-        width: number;
-        height: number;
-        format: $Enums.ImageFormat;
-        aspectRatio: number | null;
-        frames: number;
-        hasAlpha: boolean | null;
-        animated: boolean;
-        orientation: number | null;
-        colorSpace: ImgColorSpace | null;
-        colorModel: ImgColorModel | null;
-        exifDateTimeOriginal: Date | null;
-        cameraMake: string | null;
-        cameraModel: string | null;
-        lensModel: string | null;
-        gpsLat: number | null;
-        gpsLon: number | null;
-        dominantColorHex: string | null;
-        iccProfile: string | null;
-        attachmentId: string;
-      } | null;
+      image: ImageSingleton | null;
+      document: DocumentSingleton | null;
     } & {
       createdAt: Date;
       id: string;
@@ -941,6 +920,7 @@ export type AIChatResRT = {
     conversationId: string;
     provider: $Enums.Provider;
     model: string | null;
+    responseOutput: string | null;
     thinkingDuration: number | null;
     thinkingText: string | null;
     senderType: $Enums.SenderType;

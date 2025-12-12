@@ -454,14 +454,19 @@ export function AIChatProvider({
       }
 
       // Image generation final response - complete fields with final images
-      if (evt.imgGenEnabled) {
-        setImgGenEnabled(true);
-        if (evt.imgGenFields) {
-          // Set the complete final fields, including all images
-          setImgGenFields(evt.imgGenFields);
-        }
+      if (
+        evt.imgGenFields &&
+        (imgGenFieldsRef.current?.activeImage?.cdnUrl == null ||
+          (evt.imgGenFields?.activeImage?.cdnUrl &&
+            evt.imgGenFields.activeImage.cdnUrl !==
+              imgGenFieldsRef.current.activeImage.cdnUrl))
+      ) {
+        setImgGenFields(evt.imgGenFields);
       }
-      setIsComplete(evt.done);
+
+      setTimeout(() => {
+        setIsComplete(evt.done);
+      }, 200);
       if (evt.done) {
         console.log("[AIChatContext] Stream completed");
         setIsStreaming(false);

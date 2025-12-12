@@ -15,6 +15,7 @@ export function createUserMessage(
   return {
     id: params.id,
     userId: params.userId,
+    responseOutput: null,
     provider: params.provider,
     isImageGen: params.isImageGen,
     createdAt:
@@ -28,7 +29,7 @@ export function createUserMessage(
     userKeyId: params.userKeyId ?? null,
     conversationId: params.conversationId,
     model: params.model,
-    messageType: params.imageGenJob ? "IMAGE_GEN" : "TEXT",
+    messageType: params.messageType,
     senderType: "USER" as const,
     content: params.content,
     thinkingText: params.thinkingText ?? null,
@@ -61,6 +62,7 @@ export function createAIMessage(
         : new Date(params.updatedAt),
     userKeyId: params.userKeyId ?? null,
     conversationId: params.conversationId,
+    responseOutput: params.responseOutput,
     isImageGen: params.isImageGen,
     model: params.model,
     senderType: "AI" as const,
@@ -70,10 +72,7 @@ export function createAIMessage(
     liked: params.liked ?? null,
     disliked: params.disliked ?? null,
     tryAgain: params.tryAgain ?? null,
-    messageType:
-      params.attachments && params.attachments.length > 0
-        ? "IMAGE_GEN"
-        : "TEXT",
+    messageType: params.messageType,
     imageGenJob: params.imageGenJob ?? null,
     attachments: params.attachments ?? []
   };
