@@ -1,28 +1,4 @@
-import type {
-  OutputItemAdded,
-  OutputItemAddedEventTypes,
-  OutputItemDone,
-  OutputItemDoneEventTypes,
-  OutputTextAnnotationAddedEventType,
-  ResponseCompletedType,
-  ResponseContentPartAddedType,
-  ResponseContentPartDoneType,
-  ResponseCustomToolCallInputDelta,
-  ResponseCustomToolCallInputDone,
-  ResponseFileSearchCallCompletedType,
-  ResponseFileSearchCallInProgressType,
-  ResponseFileSearchCallSearchingType,
-  ResponseInitType,
-  ResponseOutputTextDelta,
-  ResponseOutputTextDone,
-  ResponseReasoningSummaryPartAddedType,
-  ResponseReasoningSummaryPartDoneType,
-  ResponseReasoningSummaryTextDeltaType,
-  ResponseReasoningSummaryTextDoneType,
-  ResponseWebSearchCallCompleted,
-  ResponseWebSearchCallInProgress,
-  ResponseWebSearchCallSearching
-} from "@/xai/event-types.ts";
+import type { xAIResponses } from "@/xai/event-types.ts";
 
 export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
   type: infer K extends string;
@@ -32,6 +8,7 @@ export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
       data: Extract<TUnion, { type: K }>;
     }
   : never;
+
 export type XAIResponsesSSEEvent = SSEEvent<XAIResponsesEvent>;
 
 export type XAIResponsesEventType =
@@ -58,99 +35,55 @@ export type XAIResponsesEventType =
   | "response.custom_tool_call_input.delta"
   | "response.custom_tool_call_input.done";
 
-export interface ResponseCreatedEvent extends ResponseInitType<"created"> {}
-
-export interface ResponseInProgressEvent extends ResponseInitType<"in_progress"> {}
-
-export interface ResponseCompletedEvent extends ResponseCompletedType {}
-
-export interface OutputItemAddedEvent extends OutputItemAddedEventTypes {}
-
-export interface OutputItemDoneEvent extends OutputItemDoneEventTypes {}
-
-export interface ContentPartAddedEvent extends ResponseContentPartAddedType {}
-
-export interface ContentPartDoneEvent extends ResponseContentPartDoneType {}
-
-export interface OutputTextDeltaEvent extends ResponseOutputTextDelta {}
-
-export interface OutputTextDoneEvent extends ResponseOutputTextDone {}
-
-export interface OutputTextAnnotationAddedEvent extends OutputTextAnnotationAddedEventType {}
-
-export interface ReasoningSummaryPartAddedEvent extends ResponseReasoningSummaryPartAddedType {}
-
-export interface ReasoningSummaryPartDoneEvent extends ResponseReasoningSummaryPartDoneType {}
-
-export interface ReasoningSummaryTextDeltaEvent extends ResponseReasoningSummaryTextDeltaType {}
-
-export interface ReasoningSummaryTextDoneEvent extends ResponseReasoningSummaryTextDoneType {}
-
-export interface WebSearchCallInProgressEvent extends ResponseWebSearchCallInProgress {}
-
-export interface WebSearchCallSearchingEvent extends ResponseWebSearchCallSearching {}
-
-export interface WebSearchCallCompletedEvent extends ResponseWebSearchCallCompleted {}
-
-export interface FileSearchCallInProgressEvent extends ResponseFileSearchCallInProgressType {}
-
-export interface FileSearchCallSearchingEvent extends ResponseFileSearchCallSearchingType {}
-
-export interface FileSearchCallCompletedEvent extends ResponseFileSearchCallCompletedType {}
-
-export interface CustomToolCallInputDeltaEvent extends ResponseCustomToolCallInputDelta {}
-
-export interface CustomToolCallInputDoneEvent extends ResponseCustomToolCallInputDone {}
-
 export type XAIResponsesEvent =
-  | ResponseCreatedEvent
-  | ResponseInProgressEvent
-  | ResponseCompletedEvent
-  | OutputItemAddedEvent
-  | OutputItemDoneEvent
-  | ContentPartAddedEvent
-  | ContentPartDoneEvent
-  | OutputTextDeltaEvent
-  | OutputTextDoneEvent
-  | OutputTextAnnotationAddedEvent
-  | ReasoningSummaryPartAddedEvent
-  | ReasoningSummaryPartDoneEvent
-  | ReasoningSummaryTextDeltaEvent
-  | ReasoningSummaryTextDoneEvent
-  | WebSearchCallInProgressEvent
-  | WebSearchCallSearchingEvent
-  | WebSearchCallCompletedEvent
-  | FileSearchCallInProgressEvent
-  | FileSearchCallSearchingEvent
-  | FileSearchCallCompletedEvent
-  | CustomToolCallInputDeltaEvent
-  | CustomToolCallInputDoneEvent;
+  | xAIResponses.Created
+  | xAIResponses.InProgress
+  | xAIResponses.Completed
+  | xAIResponses.OutputItem.Added.EventTypes
+  | xAIResponses.OutputItem.Done.EventTypes
+  | xAIResponses.ContentPart.Added
+  | xAIResponses.ContentPart.Done
+  | xAIResponses.OutputText.Delta
+  | xAIResponses.OutputText.Done
+  | xAIResponses.OutputText.AnnotationAdded
+  | xAIResponses.ReasoningSummaryPart.Added
+  | xAIResponses.ReasoningSummaryPart.Done
+  | xAIResponses.ReasoningSummaryText.Delta
+  | xAIResponses.ReasoningSummaryText.Done
+  | xAIResponses.WebSearchCall.InProgress
+  | xAIResponses.WebSearchCall.Searching
+  | xAIResponses.WebSearchCall.Completed
+  | xAIResponses.FileSearchCall.InProgress
+  | xAIResponses.FileSearchCall.Searching
+  | xAIResponses.FileSearchCall.Completed
+  | xAIResponses.CustomToolCallInput.Delta
+  | xAIResponses.CustomToolCallInput.Done;
 
 export type XAIResponsesEventTypes = XAIResponsesEvent["type"];
 
 export type MapIT = {
-  "response.created": ResponseCreatedEvent;
-  "response.in_progress": ResponseInProgressEvent;
-  "response.completed": ResponseCompletedEvent;
-  "response.output_item.added": OutputItemAddedEvent;
-  "response.output_item.done": OutputItemDoneEvent;
-  "response.content_part.added": ContentPartAddedEvent;
-  "response.content_part.done": ContentPartDoneEvent;
-  "response.output_text.delta": OutputTextDeltaEvent;
-  "response.output_text.done": OutputTextDoneEvent;
-  "response.output_text.annotation.added": OutputTextAnnotationAddedEvent;
-  "response.reasoning_summary_part.added": ReasoningSummaryPartAddedEvent;
-  "response.reasoning_summary_part.done": ReasoningSummaryPartDoneEvent;
-  "response.reasoning_summary_text.delta": ReasoningSummaryTextDeltaEvent;
-  "response.reasoning_summary_text.done": ReasoningSummaryTextDoneEvent;
-  "response.web_search_call.in_progress": WebSearchCallInProgressEvent;
-  "response.web_search_call.searching": WebSearchCallSearchingEvent;
-  "response.web_search_call.completed": WebSearchCallCompletedEvent;
-  "response.file_search_call.in_progress": FileSearchCallInProgressEvent;
-  "response.file_search_call.searching": FileSearchCallSearchingEvent;
-  "response.file_search_call.completed": FileSearchCallCompletedEvent;
-  "response.custom_tool_call_input.delta": CustomToolCallInputDeltaEvent;
-  "response.custom_tool_call_input.done": CustomToolCallInputDoneEvent;
+  "response.created": xAIResponses.Created;
+  "response.in_progress": xAIResponses.InProgress;
+  "response.completed": xAIResponses.Completed;
+  "response.output_item.added": xAIResponses.OutputItem.Added.EventTypes;
+  "response.output_item.done": xAIResponses.OutputItem.Done.EventTypes;
+  "response.content_part.added": xAIResponses.ContentPart.Added;
+  "response.content_part.done": xAIResponses.ContentPart.Done;
+  "response.output_text.delta": xAIResponses.OutputText.Delta;
+  "response.output_text.done": xAIResponses.OutputText.Done;
+  "response.output_text.annotation.added": xAIResponses.OutputText.AnnotationAdded;
+  "response.reasoning_summary_part.added": xAIResponses.ReasoningSummaryPart.Added;
+  "response.reasoning_summary_part.done": xAIResponses.ReasoningSummaryPart.Done;
+  "response.reasoning_summary_text.delta": xAIResponses.ReasoningSummaryText.Delta;
+  "response.reasoning_summary_text.done": xAIResponses.ReasoningSummaryText.Done;
+  "response.web_search_call.in_progress": xAIResponses.WebSearchCall.InProgress;
+  "response.web_search_call.searching": xAIResponses.WebSearchCall.Searching;
+  "response.web_search_call.completed": xAIResponses.WebSearchCall.Completed;
+  "response.file_search_call.in_progress": xAIResponses.FileSearchCall.InProgress;
+  "response.file_search_call.searching": xAIResponses.FileSearchCall.Searching;
+  "response.file_search_call.completed": xAIResponses.FileSearchCall.Completed;
+  "response.custom_tool_call_input.delta": xAIResponses.CustomToolCallInput.Delta;
+  "response.custom_tool_call_input.done": xAIResponses.CustomToolCallInput.Done;
 };
 
 export type CollapseAll<S extends string> = S extends `${infer A}_${infer B}`
@@ -171,66 +104,70 @@ export class ResponseSSEWorkupService {
   // Event type guards
   protected isTextDeltaEvent(
     event: XAIResponsesEvent
-  ): event is OutputTextDeltaEvent {
+  ): event is xAIResponses.OutputText.Delta {
     return event.type === "response.output_text.delta";
   }
 
   protected isReasoningSummaryDeltaEvent(
     event: XAIResponsesEvent
-  ): event is ReasoningSummaryTextDeltaEvent {
+  ): event is xAIResponses.ReasoningSummaryText.Delta {
     return event.type === "response.reasoning_summary_text.delta";
   }
 
   protected isResponseCompletedEvent(
     event: XAIResponsesEvent
-  ): event is ResponseCompletedEvent {
+  ): event is xAIResponses.Completed {
     return event.type === "response.completed";
   }
 
   protected isResponseCreatedEvent(
     event: XAIResponsesEvent
-  ): event is ResponseCreatedEvent {
+  ): event is xAIResponses.Created {
     return event.type === "response.created";
   }
 
   protected isResponseInProgressEvent(
     event: XAIResponsesEvent
-  ): event is ResponseInProgressEvent {
+  ): event is xAIResponses.InProgress {
     return event.type === "response.in_progress";
   }
 
   protected isAnnotationAddedEvent(
     event: XAIResponsesEvent
-  ): event is OutputTextAnnotationAddedEvent {
+  ): event is xAIResponses.OutputText.AnnotationAdded {
     return event.type === "response.output_text.annotation.added";
   }
 
   protected isOutputItemAddedEvent(
     event: XAIResponsesEvent
-  ): event is OutputItemAddedEvent {
+  ): event is xAIResponses.OutputItem.Added.EventTypes {
     return event.type === "response.output_item.added";
   }
 
   protected isOutputItemDoneEvent(
     event: XAIResponsesEvent
-  ): event is OutputItemDoneEvent {
+  ): event is xAIResponses.OutputItem.Done.EventTypes {
     return event.type === "response.output_item.done";
   }
 
   // Output item type guards
   protected isWebSearchCall(
     item:
-      | WebSearchCallCompletedEvent
-      | WebSearchCallInProgressEvent
-      | WebSearchCallSearchingEvent
-      | OutputItemDone.WebSearchItem
-      | OutputItemAdded.WebSearchItem
+      | xAIResponses.WebSearchCall.Searching
+      | xAIResponses.WebSearchCall.InProgress
+      | xAIResponses.WebSearchCall.Completed
+      | (
+          | xAIResponses.OutputItem.Done.WebSearchItem
+          | xAIResponses.OutputItem.Added.WebSearchItem
+        )
   ): item is
-    | WebSearchCallCompletedEvent
-    | WebSearchCallInProgressEvent
-    | WebSearchCallSearchingEvent
-    | OutputItemDone.WebSearchItem
-    | OutputItemAdded.WebSearchItem {
+    | xAIResponses.WebSearchCall.Searching
+    | xAIResponses.WebSearchCall.InProgress
+    | xAIResponses.WebSearchCall.Completed
+    | (
+        | xAIResponses.OutputItem.Done.WebSearchItem
+        | xAIResponses.OutputItem.Added.WebSearchItem
+      ) {
     return (
       item.type === "response.web_search_call.completed" ||
       item.type === "response.web_search_call.in_progress" ||
@@ -241,17 +178,21 @@ export class ResponseSSEWorkupService {
 
   protected isFileSearchCall(
     item:
-      | OutputItemAdded.FileSearchItem
-      | OutputItemDone.FileSearchItem
-      | FileSearchCallCompletedEvent
-      | FileSearchCallInProgressEvent
-      | FileSearchCallSearchingEvent
+      | (
+          | xAIResponses.OutputItem.Added.FileSearchItem
+          | xAIResponses.OutputItem.Done.FileSearchItem
+        )
+      | xAIResponses.FileSearchCall.Completed
+      | xAIResponses.FileSearchCall.InProgress
+      | xAIResponses.FileSearchCall.Searching
   ): item is
-    | OutputItemAdded.FileSearchItem
-    | OutputItemDone.FileSearchItem
-    | FileSearchCallCompletedEvent
-    | FileSearchCallInProgressEvent
-    | FileSearchCallSearchingEvent {
+    | (
+        | xAIResponses.OutputItem.Added.FileSearchItem
+        | xAIResponses.OutputItem.Done.FileSearchItem
+      )
+    | xAIResponses.FileSearchCall.Completed
+    | xAIResponses.FileSearchCall.InProgress
+    | xAIResponses.FileSearchCall.Searching {
     return (
       item.type === "file_search_call" ||
       item.type === "response.file_search_call.completed" ||
@@ -262,15 +203,19 @@ export class ResponseSSEWorkupService {
 
   protected isCustomToolCall(
     item:
-      | OutputItemAdded.CustomToolCallItem
-      | OutputItemDone.CustomToolCallItem
-      | CustomToolCallInputDeltaEvent
-      | CustomToolCallInputDoneEvent
+      | (
+          | xAIResponses.OutputItem.Added.CustomToolCallItem
+          | xAIResponses.OutputItem.Done.CustomToolCallItem
+        )
+      | xAIResponses.CustomToolCallInput.Delta
+      | xAIResponses.CustomToolCallInput.Done
   ): item is
-    | OutputItemAdded.CustomToolCallItem
-    | OutputItemDone.CustomToolCallItem
-    | CustomToolCallInputDeltaEvent
-    | CustomToolCallInputDoneEvent {
+    | (
+        | xAIResponses.OutputItem.Added.CustomToolCallItem
+        | xAIResponses.OutputItem.Done.CustomToolCallItem
+      )
+    | xAIResponses.CustomToolCallInput.Delta
+    | xAIResponses.CustomToolCallInput.Done {
     return (
       item.type === "custom_tool_call" ||
       item.type === "response.custom_tool_call_input.delta" ||
@@ -280,15 +225,19 @@ export class ResponseSSEWorkupService {
 
   protected isMessageOutput(
     item:
-      | OutputItemAdded.MessageItem
-      | OutputItemDone.MessageItem
-      | OutputTextDeltaEvent
-      | OutputTextDoneEvent
+      | (
+          | xAIResponses.OutputItem.Added.MessageItem
+          | xAIResponses.OutputItem.Done.MessageItem
+        )
+      | xAIResponses.OutputText.Delta
+      | xAIResponses.OutputText.Done
   ): item is
-    | OutputItemAdded.MessageItem
-    | OutputItemDone.MessageItem
-    | OutputTextDeltaEvent
-    | OutputTextDoneEvent {
+    | (
+        | xAIResponses.OutputItem.Added.MessageItem
+        | xAIResponses.OutputItem.Done.MessageItem
+      )
+    | xAIResponses.OutputText.Delta
+    | xAIResponses.OutputText.Done {
     return (
       item.type === "message" ||
       item.type === "response.output_text.delta" ||
@@ -298,19 +247,23 @@ export class ResponseSSEWorkupService {
 
   protected isReasoningSummaryOutput(
     item:
-      | OutputItemAdded.ReasoningItem
-      | OutputItemDone.ReasoningItem
-      | ReasoningSummaryPartAddedEvent
-      | ReasoningSummaryPartDoneEvent
-      | ReasoningSummaryTextDeltaEvent
-      | ReasoningSummaryTextDoneEvent
+      | (
+          | xAIResponses.OutputItem.Added.ReasoningItem
+          | xAIResponses.OutputItem.Done.ReasoningItem
+        )
+      | xAIResponses.ReasoningSummaryPart.Added
+      | xAIResponses.ReasoningSummaryPart.Done
+      | xAIResponses.ReasoningSummaryText.Delta
+      | xAIResponses.ReasoningSummaryText.Done
   ): item is
-    | OutputItemAdded.ReasoningItem
-    | OutputItemDone.ReasoningItem
-    | ReasoningSummaryPartAddedEvent
-    | ReasoningSummaryPartDoneEvent
-    | ReasoningSummaryTextDeltaEvent
-    | ReasoningSummaryTextDoneEvent {
+    | (
+        | xAIResponses.OutputItem.Added.ReasoningItem
+        | xAIResponses.OutputItem.Done.ReasoningItem
+      )
+    | xAIResponses.ReasoningSummaryPart.Added
+    | xAIResponses.ReasoningSummaryPart.Done
+    | xAIResponses.ReasoningSummaryText.Delta
+    | xAIResponses.ReasoningSummaryText.Done {
     return (
       item.type === "reasoning" ||
       item.type === "response.reasoning_summary_part.added" ||
@@ -377,15 +330,11 @@ export class ResponsesStreamParser
   implements AsyncIterable<XAIResponsesSSEEvent>
 {
   private readonly readable: ReadableStream<XAIResponsesSSEEvent>;
-  constructor(
-    sourceStream: ReadableStream<Uint8Array>,
-  ) {
+  constructor(sourceStream: ReadableStream<Uint8Array>) {
     super();
     const decoder = new TextDecoder();
 
     let buffer = "";
-
-
 
     const transformStream = new TransformStream<
       Uint8Array,
@@ -428,7 +377,7 @@ export class ResponsesStreamParser
   > {
     const reader = this.readable.getReader();
     try {
-        // const controller = new AbortController();
+      // const controller = new AbortController();
       while (true) {
         // if (controller.signal.aborted) {
         //   // ← Just check the signal
@@ -444,7 +393,7 @@ export class ResponsesStreamParser
   }
 
   public static createXAIResponsesParser(
-    response: Response,
+    response: Response
   ): ResponsesStreamParser {
     if (!response.body) {
       throw new Error("Response body is not available for SSE parsing.");

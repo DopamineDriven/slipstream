@@ -19,7 +19,7 @@ export type S3FinalizePayload = {
   versionId: string;
   contentDisposition: string | undefined;
   cacheControl: string | undefined;
-  extension?:string;
+  extension?: string;
   expires: Date;
   cdnUrl:
     | `https://assets.aicoalesce.com/${string}`
@@ -228,7 +228,6 @@ export type HandleAiChatReqUpdateWithImgGenSansAttachmentsProps = {
   messageData: MessageDataWorkupProps;
 };
 
-
 // new (suggested) way per prisma example repo -- should this be instantiated in the constructor of the PrismaService?
 export type InferPromiseRT<T> = T extends Promise<infer U> ? U : T;
 export type InferTopLevelMime<T extends string> =
@@ -411,8 +410,11 @@ export interface ProviderChatRequestEntity {
   imgGenFields?: AIChatRequestImgGenFields;
 }
 
-
-export interface ImageGenReqDbRes<T extends boolean = false> extends ConversationSingleton<T> {apiKey?: string | null;};
+export interface ImageGenReqDbRes<
+  T extends boolean = false
+> extends ConversationSingleton<T> {
+  apiKey?: string | null;
+}
 
 export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
   user_location?: {
@@ -438,141 +440,3 @@ export interface ProviderOpenaiRequestEntity extends ProviderChatRequestEntity {
     }[];
   };
 }
-
-export type S3ExtUnion =
-  | "pdf"
-  | "jpg"
-  | "jpeg"
-  | "mp4"
-  | "mp3"
-  | "heic"
-  | "heif"
-  | "tif"
-  | "apng"
-  | "glb"
-  | "gltf"
-  | "obj"
-  | "ktx"
-  | "ktx2"
-  | "fbx"
-  | "usd"
-  | "cad"
-  | "usdz"
-  | "png"
-  | "gif"
-  | "bmp"
-  | "jxl"
-  | "jp2"
-  | "jpx"
-  | "jxr"
-  | "jls"
-  | "raw"
-  | "dng"
-  | "cr2"
-  | "nef"
-  | "arw"
-  | "hdr"
-  | "pic"
-  | "rgbe"
-  | "xyze"
-  | "webp"
-  | "avif"
-  | "svg"
-  | "ico"
-  | "tiff"
-  | "mpd"
-  | "epub"
-  | "ttf"
-  | "cjs"
-  | "gz"
-  | "jar"
-  | "json"
-  | "jsonld"
-  | "jsonc"
-  | "json5"
-  | "webmanifest"
-  | "doc"
-  | "node"
-  | "js"
-  | "bin"
-  | "ogx"
-  | "rtf"
-  | "sql"
-  | "toml"
-  | "azw"
-  | "mpkg"
-  | "m3u8"
-  | "pkpass"
-  | "xul"
-  | "xls"
-  | "eot"
-  | "ppt"
-  | "odp"
-  | "ods"
-  | "odt"
-  | "pptx"
-  | "xlsx"
-  | "docx"
-  | "rar"
-  | "vsd"
-  | "wasm"
-  | "7z"
-  | "abw"
-  | "bz"
-  | "bz2"
-  | "cda"
-  | "csh"
-  | "arc"
-  | "php"
-  | "mdx"
-  | "ndjson"
-  | "pyc"
-  | "sh"
-  | "tar"
-  | "zip"
-  | "xhtml"
-  | "xml"
-  | "yml"
-  | "aac"
-  | "mid"
-  | "m4a"
-  | "opus"
-  | "ogg"
-  | "wav"
-  | "weba"
-  | "midi"
-  | "otf"
-  | "woff"
-  | "woff2"
-  | "hjif"
-  | "hmpg"
-  | "ivs"
-  | "aces"
-  | "avci"
-  | "dpx"
-  | "emf"
-  | "cur"
-  | "ics"
-  | "css"
-  | "csv"
-  | "sse"
-  | "html"
-  | "md"
-  | "txt"
-  | "rs"
-  | "ts"
-  | "vtt"
-  | "c"
-  | "cs"
-  | "cpp"
-  | "java"
-  | "py"
-  | "rb"
-  | "tex"
-  | "3gp"
-  | "3g2"
-  | "mpeg"
-  | "ogv"
-  | "webm"
-  | "avi"
-  | undefined;

@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "@slipstream/tsconfig": "workspace:*",
-    "@typescript/native-preview": "7.0.0-dev.20251207.1",
-    "typescript": "^5.9.3"
+    "@typescript/native-preview": "catalog:tsgo7",
+    "typescript": "catalog:ts6"
   },
   "prettier": "@slipstream/prettier-config"
 }

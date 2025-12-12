@@ -71,6 +71,7 @@ export interface CredentialEntity {
   OPENAI_WEBHOOK_DEEP_REASONING?: string;
   X_AI_COLLECTION?: string;
   X_AI_MANAGEMENT_API_KEY?: string;
+  X_AI_TEAM_ID?: string;
 }
 export type CredentialsResult<T extends "success" | "failure" = "success"> =
   T extends "success"

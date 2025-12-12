@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "@/utils/auth-client";
+import type { ChatInterfaceProps } from "@/types/ui";
 import type { Properties } from "csstype";
 import React, {
   Suspense,
@@ -28,21 +28,8 @@ import { ChatFeed } from "@/ui/chat/chat-feed";
 import { ChatHero } from "@/ui/chat/chat-hero";
 import { ChatInput } from "@/ui/chat/chat-input";
 import { FloatingScrollButton } from "@/ui/chat/floating-bob";
-import type {
-  AttachmentSingleton,
-  MessageSingleton,
-  Provider
-} from "@slipstream/types";
+import type { AttachmentSingleton, MessageSingleton } from "@slipstream/types";
 import { toPrismaFormat } from "@slipstream/types";
-
-interface ChatInterfaceProps {
-  initialMessages?: MessageSingleton<true>[] | null;
-  conversationTitle?: string | null;
-  conversationId: string; // From the dynamic route param - not used, context drives everything
-  user: User;
-  lastModel?: string | null;
-  lastProvider?: Provider | null;
-}
 
 export function ChatInterface({
   initialMessages,
@@ -195,6 +182,7 @@ export function ChatInterface({
         messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
         disliked: null,
         createdAt: new Date(),
+        responseOutput: null,
         liked: null,
         senderType: "USER",
         thinkingDuration: null,
@@ -335,6 +323,7 @@ export function ChatInterface({
         model: selectedModel.modelId,
         conversationId: activeConversationId,
         isImageGen: imgGenEnabled,
+        responseOutput: null,
         thinkingText: isThinking
           ? thinkingText
           : thinkingDuration
@@ -494,6 +483,7 @@ export function ChatInterface({
         model: selectedModel.modelId,
         conversationId: activeConversationId ?? "new-chat",
         createdAt: new Date(),
+        responseOutput: null,
         messageType: imgGenEnabled ? "IMAGE_GEN" : "TEXT",
         disliked: null,
         liked: null,
@@ -568,8 +558,9 @@ export function ChatInterface({
             user={user}
             isConnected={isConnected}
             activeConversationId={activeConversationId}
-            conversationId={activeConversationId ?? conversationId}
-          >            <FloatingScrollButton isHome={isHome} /></ChatInput>
+            conversationId={activeConversationId ?? conversationId}>
+            <FloatingScrollButton isHome={isHome} />
+          </ChatInput>
         </Suspense>
       </div>
     </ChatScrollProvider>

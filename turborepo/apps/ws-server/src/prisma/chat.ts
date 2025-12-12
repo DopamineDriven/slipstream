@@ -910,7 +910,7 @@ export class PrismaChatService extends PrismaUserMetaService {
             create: {
               messageType: data?.imgGenEnabled === true ? "IMAGE_GEN" : "TEXT",
               attachments: mapImgs ? { create: mapImgs } : undefined,
-              senderType: "AI",
+              senderType: "AI",responseOutput: data.responseOutput ?? undefined,
               provider: this.providerToPrismaFormat(provider),
               model: data.model,
               thinkingDuration: data.thinkingDuration,

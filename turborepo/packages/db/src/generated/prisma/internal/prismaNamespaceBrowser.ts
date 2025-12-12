@@ -248,6 +248,7 @@ export const MessageScalarFieldEnum = {
   content: 'content',
   thinkingText: 'thinkingText',
   thinkingDuration: 'thinkingDuration',
+  responseOutput: 'responseOutput',
   isImageGen: 'isImageGen',
   messageType: 'messageType',
   liked: 'liked',

@@ -113,7 +113,7 @@ async function exe() {
       redisInstance,
       s3,
       cfg.X_AI_KEY,
-      cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
@@ -155,7 +155,7 @@ async function exe() {
         meta: cfg.LLAMA_API_KEY,
         openai: cfg.OPENAI_API_KEY,
         vercel: cfg.V0_API_KEY,
-        grokMgmtKey: cfg.X_AI_MANAGEMENT_API_KEY
+        grokMgmtKey: process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
       },
       dependencies: {
         logger,
@@ -182,7 +182,7 @@ async function exe() {
       s3,
       region,
       imgCompatService,
-      cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     resolver.registerAll();
@@ -266,5 +266,12 @@ declare global {
   }
   interface Response {
     json<T = unknown>(): Promise<T>;
+  }
+}
+
+declare module "pythonia" {
+  export interface Python {
+    // eslint-disable-next-line @typescript-eslint/prefer-function-type
+    <T = unknown>(fileName: string): Promise<T>
   }
 }

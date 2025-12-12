@@ -1,4 +1,7 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import Anthropic from "@anthropic-ai/sdk";
+import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
+import type { MessageSingleton } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -28,3 +31,34 @@ export interface PdfBudgetEntry {
   turnIndex: number;
   included: boolean;
 }
+
+export type RequestOptions = Parameters<
+  InstanceType<typeof Anthropic>["messages"]["create"]
+>["1"];
+
+export type MessageInputParams = {
+  isNewChat: boolean;
+  msgs: MessageSingleton<true>[];
+  userId: string;
+  apiKey: string | undefined;
+  keyId: string | null;
+  max_tokens: number | undefined;
+  model: string | undefined;
+  systemPrompt: string | undefined;
+  temperature: number | undefined;
+  topP: number | undefined;
+  user_location:
+    | {
+        type: "approximate";
+        city?: string | null | undefined;
+        country?: string | null | undefined;
+        region?: string | null | undefined;
+        timezone?: string | null | undefined;
+      }
+    | undefined;
+};
+
+export type CreateMessageStreamRT =
+  Stream<Anthropic.Beta.BetaRawMessageStreamEvent> & {
+    _request_id?: string | null;
+  };

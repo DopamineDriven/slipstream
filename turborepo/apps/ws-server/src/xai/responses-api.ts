@@ -1,4 +1,4 @@
-import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GrokImgGenService } from "@/xai/img-gen.ts";
@@ -17,7 +17,6 @@ export class GrokResponsesApiService extends GrokImgGenService {
   ) {
     super(redis, s3, logger, prisma, apiKey, managementKey);
   }
-
   protected async handleXAIAiResponsesApiRequest({
     chunks,
     conversationId,
@@ -39,26 +38,30 @@ export class GrokResponsesApiService extends GrokImgGenService {
     requestMessageId,
     jobId,
     title,
-    topP
-  }: ProviderChatRequestEntity) {
+    topP,
+    management_api_key
+  }: GrokProviderChatRequestEntity) {
     const provider = "grok" as const;
-
-    let grokThinkingStartTime: number | null = null,
+    const mgmtKey = management_api_key ?? this.xaiManagementKey;
+    let grokThinkingStartTime = 0,
+      grokThinkingEndTime = 0,
       grokThinkingDuration = 0,
       grokIsCurrentlyThinking = false,
       grokThinkingAgg = "",
       grokAgg = "",
-      iThink = 0,
-      hasAggregateFinal = false,
       usage = 0;
 
     const m = model as GrokModelIdUnion;
 
     const xaiApiKey = apiKey ?? this.xaiKey;
     console.log("[XAI] 1. About to create stream...", Date.now());
+    const collectionId = await this.getUserCollectionIdWithFallback(
+      userId,
+      mgmtKey
+    );
     try {
-      const parser = await this.createResponsesStream(
-        {
+      const parser = await this.createResponsesStream({
+        workup: {
           msgs,
           userId,
           jobId,
@@ -79,27 +82,33 @@ export class GrokResponsesApiService extends GrokImgGenService {
           chunks,
           thinkingChunks,
           imgGenEnabled,
-          imgGenFields
+          imgGenFields,
+          management_api_key
         },
-        this.xaiManagementKey,
-        "auto",
-        true,
-        "auto",
-        true,
-        10,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      );
+        payload: {
+          collectionId,
+          enableCodeInterpreter: true,
+          enableFileSearch: true,
+          enableWebSearch: true,
+          enableXSearch: true,
+          fileSearchMaxResults: 10,
+          imgDetail: "auto",
+          store: false,
+          stream: true,
+          user: userId,
+          parallel_tool_calls: true,
+          logprobs: true,
+          tool_choice_input: "auto",
+          web_enable_image_understanding: true,
+          x_enable_image_understanding: true,
+          x_enable_video_understanding: true
+        }
+      });
 
       for await (const chunk of parser) {
         let text: string | undefined = undefined,
           thinkingText: string | undefined = undefined,
-          done: boolean | undefined = undefined,
-          finalThinkingChunk = "";
+          responseOutput: string | undefined = undefined;
 
         // Final usage-only chunk
         if (chunk.event === "response.created") {
@@ -109,73 +118,58 @@ export class GrokResponsesApiService extends GrokImgGenService {
           if (chunk.data.item.type === "reasoning") {
             if (
               grokIsCurrentlyThinking === false &&
-              grokThinkingStartTime === null
+              grokThinkingStartTime === 0
             ) {
               grokThinkingStartTime = performance.now();
               grokIsCurrentlyThinking = true;
             }
           }
+          if (chunk.data.item.type === "message") {
+            if (
+              grokThinkingStartTime !== 0 &&
+              grokIsCurrentlyThinking === true
+            ) {
+              grokThinkingEndTime = performance.now();
+              grokIsCurrentlyThinking = false;
+              grokThinkingDuration =
+                grokThinkingEndTime - grokThinkingStartTime;
+            }
+          }
         }
         if (chunk.event === "response.output_item.done") {
           if (chunk.data.item.type === "reasoning") {
-            /**
-             * `grok-code-fast-1` and `grok-3-mini` should never hit this block, they don't obfuscate CoT
-             *
-             * `grok-4-1-fast-reasoning`, `grok-4-fast-reasoning`, and `grok-4-0709` should always hit this block
-             */
             if ("encrypted_content" in chunk.data.item) {
               thinkingText = chunk.data.item.encrypted_content;
             }
           }
-        }
-        /**
-         * `grok-code-fast-1` and `grok-3-mini` should always hit this block if reasoning enabled; they don't obfuscate CoT
-         *
-         * `grok-4-1-fast-reasoning`, `grok-4-fast-reasoning`, and `grok-4-0709` should never hit this block
-         */
-        if (chunk.event === "response.reasoning_summary_text.delta") {
-          if (
-            grokIsCurrentlyThinking === false &&
-            grokThinkingStartTime === null
-          ) {
-            grokThinkingStartTime = performance.now();
-            grokIsCurrentlyThinking = true;
+          if (chunk.data.item.type === "file_search_call") {
+            const { results, ...rest } = chunk.data.item;
+            if (results) {
+              this.parseFileSearchResults({ ...rest, results });
+            }
           }
+        }
+
+        if (chunk.event === "response.reasoning_summary_text.delta") {
           thinkingText = chunk.data.delta;
         }
         if (chunk.event === "response.output_text.delta") {
-          if (
-            grokIsCurrentlyThinking === true &&
-            grokThinkingStartTime !== null
-          ) {
-            grokIsCurrentlyThinking = false;
-            grokThinkingDuration = performance.now() - grokThinkingStartTime;
-          }
           text = chunk.data.delta;
         }
-        if (chunk.event === "response.output_text.annotation.added") {
-          if (
-            "start_index" in chunk.data.annotation &&
-            "title" in chunk.data.annotation &&
-            "end_index" in chunk.data.annotation
-          ) {
-            text = `[[${chunk.data.annotation_index}] ${chunk.data.annotation.title} (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
-          } else if (
-            !("title" in chunk.data.annotation) &&
-            "start_index" in chunk.data.annotation &&
-            "end_index" in chunk.data.annotation
-          ) {
-            text = `[[${chunk.data.annotation_index}] (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
-          } else if (
-            !("start_index" in chunk.data.annotation) &&
-            !("end_index" in chunk.data.annotation) &&
-            "title" in chunk.data.annotation
-          ) {
-            text = `[[${chunk.data.annotation_index}] ${chunk.data.annotation.title}](${chunk.data.annotation.url})\n`;
-          } else {
-            text = `[[${chunk.data.annotation_index}]](${chunk.data.annotation.url})\n`;
-          }
-        }
+        // NOTE: GROK TENDS TO INCLUDE THIS DIRECTLY AT THE END OF THE MESSAGE STREAM
+        // if (chunk.event === "response.output_text.annotation.added") {
+        //   if (
+        //     "start_index" in chunk.data.annotation &&
+        //     "title" in chunk.data.annotation &&
+        //     "end_index" in chunk.data.annotation
+        //   ) {
+        //     text = `\n[[${chunk.data.annotation_index}] ${chunk.data.annotation.title} (${chunk.data.annotation.start_index}-${chunk.data.annotation.end_index})](${chunk.data.annotation.url})\n`;
+        //     this.logger.info(chunk.data);
+        //   } else {
+        //     this.logger.info(chunk.data);
+        //     text = `\n[[${chunk.data.annotation_index}]](${chunk.data.annotation.url})\n`;
+        //   }
+        // }
         if (
           chunk.event === "response.completed" &&
           chunk.data.response.status === "completed"
@@ -183,36 +177,32 @@ export class GrokResponsesApiService extends GrokImgGenService {
           if (chunk.data.response.usage) {
             usage = chunk.data.response.usage.total_tokens;
           }
+
           if (chunk.data.response.output) {
-            for (const output of chunk.data.response.output)
-              if (output.type === "file_search_call") {
-                if (output.results && output.results.length > 0) {
-                  for (const results of output.results) {
-                    this.logger.debug(results);
-                  }
-                }
-              }
+            responseOutput = JSON.stringify(chunk.data.response.output);
+            // for (const output of chunk.data.response.output)
+            //   if (output.type === "file_search_call") {
+            //     if (output.results && output.results.length > 0) {
+            //       for (const results of output.results) {
+            //         this.logger.debug(results);
+            //       }
+            //     }
+            //   }
           }
-          done = true;
+        }
+        if (
+          grokThinkingStartTime !== 0 &&
+          grokThinkingEndTime !== 0 &&
+          grokThinkingDuration === 0
+        ) {
+          grokThinkingDuration = grokThinkingEndTime - grokThinkingStartTime;
         }
         if (
           thinkingText &&
-          grokIsCurrentlyThinking &&
-          (m === "grok-4-1-fast-reasoning" ||
-            m === "grok-code-fast-1" ||
-            m === "grok-3-mini" ||
-            m === "grok-4-0709" ||
-            m === "grok-4-fast-reasoning")
+          grokIsCurrentlyThinking
         ) {
-          iThink++;
-          console.info(`[${iThink}]: ${thinkingText}`);
-          if (hasAggregateFinal) {
-            grokThinkingAgg += finalThinkingChunk;
-            if (finalThinkingChunk) thinkingChunks.push(finalThinkingChunk);
-          } else {
-            grokThinkingAgg += thinkingText;
-            thinkingChunks.push(thinkingText);
-          }
+          grokThinkingAgg += thinkingText;
+          thinkingChunks.push(thinkingText);
 
           ws.send(
             JSON.stringify({
@@ -225,12 +215,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
               provider,
               systemPrompt,
               temperature,
-              thinkingText:
-                m === "grok-3-mini" || m === "grok-code-fast-1"
-                  ? hasAggregateFinal
-                    ? finalThinkingChunk
-                    : thinkingText
-                  : thinkingText,
+              thinkingText,
               isThinking: true,
               thinkingDuration: grokThinkingStartTime
                 ? performance.now() - grokThinkingStartTime
@@ -253,12 +238,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
             thinkingDuration: grokThinkingStartTime
               ? performance.now() - grokThinkingStartTime
               : undefined,
-            thinkingText:
-              m === "grok-3-mini" || m === "grok-code-fast-1"
-                ? hasAggregateFinal
-                  ? finalThinkingChunk
-                  : thinkingText
-                : thinkingText,
+            thinkingText,
             systemPrompt,
             temperature,
             topP,
@@ -283,7 +263,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
               imgGenEnabled: false,
               temperature,
               thinkingDuration:
-                grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+                grokThinkingDuration !== 0 ? grokThinkingDuration : undefined,
               isThinking: grokIsCurrentlyThinking,
               topP,
               model: m,
@@ -301,7 +281,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
             imgGenEnabled: false,
             title,
             thinkingDuration:
-              grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
+              grokThinkingDuration !== 0 ? grokThinkingDuration : undefined,
             isThinking: grokIsCurrentlyThinking,
             thinkingText: grokThinkingAgg,
             systemPrompt,
@@ -331,14 +311,15 @@ export class GrokResponsesApiService extends GrokImgGenService {
           }
         }
 
-        if (done) {
+        if (responseOutput) {
           const d = await this.prisma.handleAiChatResponse({
             jobId,
             requestMessageId,
             usage,
             chunk: grokAgg,
             conversationId,
-            done,
+            responseOutput,
+            done: true,
             imgGenEnabled: false,
             provider,
             userMsgId,
@@ -362,7 +343,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
               userMsgId,
               imgGenEnabled: false,
               aiMsgId: d.aiMsgId,
-              systemPrompt,usage,
+              systemPrompt,
+              usage,
               thinkingDuration:
                 grokThinkingDuration > 0 ? grokThinkingDuration : undefined,
               thinkingText: grokThinkingAgg,
@@ -371,7 +353,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
               topP,
               model: m,
               chunk: grokAgg,
-              done
+              done: true
             } satisfies EventTypeMap["ai_chat_response"])
           );
 
@@ -382,7 +364,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
             systemPrompt,
             temperature,
             title,
-            userMsgId,usage,
+            userMsgId,
+            usage,
             aiMsgId: d.aiMsgId,
             imgGenEnabled: false,
             thinkingDuration:
@@ -392,12 +375,12 @@ export class GrokResponsesApiService extends GrokImgGenService {
             provider,
             model: m,
             chunk: grokAgg,
-            done
+            done: true
           });
 
           // Clear saved state on successful completion
           void this.redis.del(`stream:state:${conversationId}`);
-          return;
+          break;
         }
       }
     } catch (err) {

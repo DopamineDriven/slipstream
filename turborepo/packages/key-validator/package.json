@@ -60,19 +60,19 @@
     "@slipstream/eslint-config": "workspace:*",
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
-    "@types/node": "^24.10.1",
-    "@typescript/native-preview": "7.0.0-dev.20251207.1",
+    "@types/node": "catalog:node25",
+    "@typescript/native-preview": "catalog:tsgo7",
     "chokidar": "^5.0.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "jiti": "^2.6.1",
     "prettier": "^3.7.4",
     "terser": "^5.44.1",
-    "tsdown": "^0.17.0",
+    "tsdown": "catalog:tsdown",
     "tslib": "^2.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.48.1"
+    "typescript": "catalog:ts6",
+    "typescript-eslint": "^8.49.0"
   },
   "prettier": "@slipstream/prettier-config"
 }

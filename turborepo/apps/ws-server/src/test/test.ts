@@ -1,6 +1,7 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 import type { Provider } from "@slipstream/types";
+import { res } from "./xai/grok-code-fast-1-res.ts";
 
 dotenv.config({ quiet: true });
 
@@ -111,7 +112,7 @@ class ScriptGen extends Fs {
       });
       const sss = { messages: cleanS, ...rest };
       this.withWs(
-        `src/__out__/conversations/${sss.title}/${sss.id}.json`,
+        `src/__out__/conversations/${sss.title && sss.title.length < 128 ?  sss.title: "summoning-the-muse"}/${sss.id}.json`,
         JSON.stringify(sss, null, 2)
       );
       return s;
@@ -281,7 +282,7 @@ header-includes: |
       res(
         this.withWs(
           `src/test/__out__/condensed/${toSlug}.md`,
-          this.withFrontmatter(data.join(`\n`), title)
+          this.withFrontmatter(data.join(`\n`), toSlug)
         )
       )
     );
@@ -299,7 +300,7 @@ header-includes: |
     if (!data) return;
     if (!raw) return;
     if (!raw.title) return;
-    const toSlug = raw.title
+    const toSlug = raw.title.length > 128 ? "summoning-the-muse": raw.title
       .replace(/ /gim, "-")
       .replace(/:/gim, "--")
       .replace(/'/gim, "");

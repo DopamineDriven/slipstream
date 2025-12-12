@@ -1,12 +1,14 @@
+import { createReadStream } from "node:fs";
 import type {
   AnthropicFileRecord,
+  MessageInputParams,
   PdfBudgetEntry,
-  ProviderAnthropicChatRequestEntity
+  RequestOptions
 } from "@/anthropic/types.ts";
 import type { Logger as PinoLogger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
-import { Anthropic } from "@anthropic-ai/sdk";
+import { Anthropic, toFile } from "@anthropic-ai/sdk";
 import type {
   AnthropicModelIdUnion,
   AttachmentSingleton,
@@ -113,14 +115,16 @@ export class AnthropicWorkup {
       text: `[Document: "${entry.filename}" (${entry.pageCount} pages) - ${entry.url}]`
     };
   }
-  protected handleBetaHeaders(model: AnthropicModelIdUnion) {
+  private handleBetaHeaders(model: AnthropicModelIdUnion) {
     switch (model) {
       // effort parameter is only supported by claude-opus-4.5
       case "claude-opus-4-5-20251101": {
         return [
           "effort-2025-11-24",
           "files-api-2025-04-14",
-          "extended-cache-ttl-2025-04-11"
+          "extended-cache-ttl-2025-04-11",
+          "web-fetch-2025-09-10",
+          "code-execution-2025-08-25"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
       // context window 1m is only supported by claude-sonnet-4 & claude-sonnet-4.5
@@ -129,7 +133,9 @@ export class AnthropicWorkup {
         return [
           "files-api-2025-04-14",
           "extended-cache-ttl-2025-04-11",
-          "context-1m-2025-08-07"
+          "context-1m-2025-08-07",
+          "web-fetch-2025-09-10",
+          "code-execution-2025-08-25"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
       // output context window expansion 64k->128k is only supported by claude-sonnet-3.7
@@ -137,14 +143,23 @@ export class AnthropicWorkup {
         return [
           "files-api-2025-04-14",
           "extended-cache-ttl-2025-04-11",
-          "output-128k-2025-02-19"
+          "output-128k-2025-02-19",
+          "web-fetch-2025-09-10",
+          "code-execution-2025-08-25"
         ] satisfies Anthropic.Beta.AnthropicBeta[];
       }
       case "claude-3-5-haiku-20241022":
-      case "claude-3-haiku-20240307":
       case "claude-opus-4-20250514":
       case "claude-opus-4-1-20250805":
-      case "claude-haiku-4-5-20251001":
+      case "claude-haiku-4-5-20251001": {
+        return [
+          "files-api-2025-04-14",
+          "extended-cache-ttl-2025-04-11",
+          "web-fetch-2025-09-10",
+          "code-execution-2025-08-25"
+        ] satisfies Anthropic.Beta.AnthropicBeta[];
+      }
+      case "claude-3-haiku-20240307":
       default: {
         return [
           "files-api-2025-04-14",
@@ -256,7 +271,7 @@ export class AnthropicWorkup {
     }
   }
 
-  protected handleMaxTokensAndThinking(
+  private handleMaxTokensAndThinking(
     mod: AnthropicModelIdUnion,
     max_tokens?: number
   ) {
@@ -266,17 +281,52 @@ export class AnthropicWorkup {
     };
   }
 
-  protected webSearchTool(
-    user_location: ProviderAnthropicChatRequestEntity["user_location"]
+  private webSearchTool(
+    user_location:
+      | Anthropic.Beta.Messages.BetaWebSearchTool20250305.UserLocation
+      | null
+      | undefined
   ) {
-    return [
-      {
-        type: "web_search_20250305",
-        cache_control: { type: "ephemeral", ttl: "1h" },
-        name: "web_search",
-        user_location
-      } satisfies Anthropic.Beta.BetaWebSearchTool20250305
-    ];
+    return {
+      type: "web_search_20250305",
+      name: "web_search",
+      user_location
+    } as const satisfies Anthropic.Beta.BetaWebSearchTool20250305;
+  }
+
+  private webFetchTool() {
+    return {
+      name: "web_fetch",
+      type: "web_fetch_20250910",
+      citations: { enabled: true }
+    } as const satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  private codeExecutionTool() {
+    return {
+      type: "code_execution_20250825",
+      name: "code_execution"
+    } as const satisfies Anthropic.Beta.BetaToolUnion;
+  }
+
+  private tooling(
+    m: AnthropicModelIdUnion,
+    user_location:
+      | Anthropic.Beta.Messages.BetaWebSearchTool20250305.UserLocation
+      | null
+      | undefined
+  ) {
+    if (m === "claude-3-haiku-20240307") {
+      return [
+        this.webSearchTool(user_location)
+      ] satisfies Anthropic.Beta.BetaToolUnion[];
+    } else {
+      return [
+        this.webSearchTool(user_location),
+        this.webFetchTool(),
+        this.codeExecutionTool()
+      ] satisfies Anthropic.Beta.BetaToolUnion[];
+    }
   }
 
   public async syncFileRegistry(userId: string, cleanupStaleFiles = true) {
@@ -546,18 +596,20 @@ export class AnthropicWorkup {
     }
     if (!url) throw new Error("No CDN URL available for upload");
     // Fetch the file
-    const response = await fetch(url);
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch file: ${response.statusText}`);
+    const { absTmpPath, tmpUniquename, mime } =
+      await this.prisma.fetchRemoteToTmp("ANTHROPIC", attachment);
+
+    try {
+      const file = await toFile(createReadStream(absTmpPath), tmpUniquename, {
+        type: mime
+      });
+      return await client.beta.files.upload({
+        file,
+        betas: this.handleBetaHeaders(model)
+      } satisfies Anthropic.Beta.FileUploadParams);
+    } finally {
+      this.prisma.cleanupTmpPostupload("ANTHROPIC", absTmpPath, tmpUniquename);
     }
-
-    // Upload using Anthropic Files API
-    const file = await client.beta.files.upload({
-      file: response,
-      betas: this.handleBetaHeaders(model)
-    } satisfies Anthropic.Beta.FileUploadParams);
-
-    return file;
   }
 
   private async ensureAnthropicAssetUploaded(
@@ -682,7 +734,7 @@ export class AnthropicWorkup {
     }
   }
 
-  protected async formatAnthropicHistoryWithFiles(
+  private async formatAnthropicHistoryWithFiles(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     model: AnthropicModelIdUnion,
@@ -1080,5 +1132,63 @@ export class AnthropicWorkup {
         };
       }
     }
+  }
+
+  protected async createStreamWorkup({
+    isNewChat,
+    msgs,
+    userId,
+    apiKey,
+    keyId,
+    max_tokens,
+    model: m,
+    systemPrompt,
+    temperature,
+    topP,
+    user_location
+  }: MessageInputParams) {
+    const model = m as AnthropicModelIdUnion;
+
+    const keyFingerprint = keyId ?? "server";
+
+    // Use Files API for PDFs
+    const { messages, system } = await this.formatAnthropicHistoryWithFiles(
+      isNewChat,
+      msgs,
+      model,
+      systemPrompt,
+      keyFingerprint,
+      keyId ?? undefined,
+      apiKey
+    );
+
+    this.logger.info(messages);
+
+    const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
+      model,
+      max_tokens
+    );
+
+    const tools = this.tooling(model, user_location);
+
+    const betas = this.handleBetaHeaders(model);
+    return {
+      params: {
+        max_tokens: maxTokens,
+        stream: true,
+        thinking,
+        top_p: topP,
+        temperature,
+        system,
+        model,
+        tools,
+        tool_choice: { type: "auto" },
+        metadata: { user_id: userId },
+        messages,
+        service_tier: "auto",
+        betas
+      } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming,
+      options: { stream: true } satisfies RequestOptions
+    };
   }
 }

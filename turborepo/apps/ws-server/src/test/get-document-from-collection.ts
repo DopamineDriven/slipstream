@@ -68,40 +68,43 @@ async function* getAllGrokFiles(collection_id: string, limit = 10) {
   }
 }
 const arr = Array.of<{
-    file_metadata: {
-        file_id: string;
-        name: string;
-        size_bytes: string;
-        content_type: string;
-        created_at: string;
-        expires_at: null;
-        hash: string;
-        upload_status: string;
-        processing_status: string;
-        file_path: string;
-    };
-    fields: {
-        attachmentId: string;
-        conversationId: string;
-        messageId: string;
-        originalFilename: string;
-    };
-    status: string;
+  file_metadata: {
+    file_id: string;
+    name: string;
+    size_bytes: string;
+    content_type: string;
+    created_at: string;
+    expires_at: null;
+    hash: string;
+    upload_status: string;
+    processing_status: string;
+    file_path: string;
+  };
+  fields: {
+    attachmentId: string;
+    conversationId: string;
+    messageId: string;
+    originalFilename: string;
+  };
+  status: string;
 }>();
+const sizeTrack = { size: 0 };
 for await (const x of getAllGrokFiles(
-  "collection_0ca753a0-e2fd-4050-a86f-dca114aa1a89"
+  "collection_5934cf24-b069-47c1-8964-7e495696c3b4"
 )) {
   if (x.data) {
     for (const document of x.data) {
+      sizeTrack.size += Number.parseInt(document.file_metadata.size_bytes);
       arr.push(document);
       console.log(document.fields);
     }
   }
 }
-  fs.withWs(
-    "src/test/__out__/xai/inspect/list-collections-documents.json",
-    JSON.stringify(arr, null, 2)
-  );
+
+fs.withWs(
+  "src/test/__out__/xai/inspect/list-collections-documents.json",
+  JSON.stringify(arr, null, 2)
+);
 // nrr6h4r4480f6kviycyo1zhf
 // (async () => {
 //   return await fetch(
@@ -117,5 +120,5 @@ for await (const x of getAllGrokFiles(
 // })().then(async res => {
 //   const toJson = await res.json();
 
-
 // });
+console.log(sizeTrack)

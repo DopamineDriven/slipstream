@@ -44,6 +44,7 @@
   "eslint.enable": true,
   "eslint.useFlatConfig": true,
   "eslint.nodePath": "node_modules",
+  "terminal.integrated.suggest.enabled": false,
   "eslint.rules.customizations": [
     {
       "rule": "*",

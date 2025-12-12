@@ -1,4 +1,6 @@
+import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import type { GrokModelIdUnion, XOR } from "@slipstream/types";
+import { xAIResponses } from "./event-types.ts";
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
 
@@ -103,20 +105,26 @@ export type InputReasoningProps = {
   summary: "auto" | "concise" | "detailed" | null;
 };
 
+export type TextFormat = {
+  format: { type: "text" | "json_object" | "json_schema" };
+};
+
 export type ResponsesContentInputSingleton = {
   role: ResponsesRole;
   content: string | ContentBlockUnion[];
 };
 
+export type ResponsesComprehensive = (ResponsesContentInputSingleton | xAIResponses.OutputItem.Done.Item)
+
 export type ResponsesContentWorkup = {
-  input: ResponsesContentInputSingleton[];
+  input: ResponsesComprehensive[];
   /**
    * defaults to false.
    */
   logprobs?: boolean | null;
   max_output_tokens?: null | number;
   model: GrokModelIdUnion;
-  include: ["reasoning.encrypted_content"] | null, // "reasoning.encrypted_content"
+  include: ["reasoning.encrypted_content"] | null; // "reasoning.encrypted_content"
   /**
    * An alternate way to specify the system prompt. Note that this cannot be used alongside `previous_response_id`, where the system prompt of the previous message will be used.
    */
@@ -129,6 +137,7 @@ export type ResponsesContentWorkup = {
    **/
   store?: boolean | null;
   stream: boolean | null;
+  text?: TextFormat;
   /**
    * min: 0, default: 1, max: 2
    */
@@ -152,3 +161,82 @@ export type ResponsesContentWorkup = {
 export type ToolMap<V extends WebSearchTool | XSearchTool> = {
   type: V["type"];
 } & V["filters"];
+
+export type ToolRequestInput = (
+  | ToolMap<XSearchTool | WebSearchTool>
+  | CodeInterpreterTool
+  | FileSearchTool
+)[];
+
+export type LogProbsFields = {
+  token: string;
+  logprob: number;
+  bytes: number[];
+  top_logprobs: never[];
+};
+
+export interface Usage {
+  input_tokens: number;
+  input_tokens_details: {
+    cached_tokens: number;
+  };
+  output_tokens: number;
+  output_tokens_details: {
+    reasoning_tokens: number;
+  };
+  total_tokens: number;
+  num_sources_used: number;
+  num_server_side_tools_used?: number;
+  server_side_tool_usage_details?: {
+    web_search_calls: number;
+    x_search_calls: number;
+    code_interpreter_calls: number;
+    file_search_calls: number;
+    mcp_calls: number;
+    document_search_calls: number;
+  };
+}
+
+export interface CreateResponseStreamInputProps {
+  collectionId?: string;
+  tool_choice_input?: ToolChoiceUnion;
+  logprobs?: boolean;
+  imgDetail?: ImageContentBlock["detail"];
+  enableFileSearch?: boolean;
+  fileSearchMaxResults?: number;
+  enableCodeInterpreter?: boolean;
+  enableWebSearch?: boolean;
+  enableXSearch?: boolean;
+  web_enable_image_understanding?: boolean;
+  x_enable_image_understanding?: boolean;
+  x_enable_video_understanding?: boolean;
+  parallel_tool_calls?: boolean | null;
+  previous_response_id?: string | null;
+  reasoning?: InputReasoningProps;
+    /**
+   * defaults to true
+   **/
+  store?: boolean | null;
+  stream?: boolean | null;
+  text?: TextFormat;
+
+    /**
+   * An integer between 0 and 8 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used.
+   */
+  top_logprobs?: number | null;
+  /**
+   * A unique identifier representing your end-user, which can help xAI to monitor and detect abuse.
+   */
+  user?: string | null;
+}
+
+export interface GrokChatReqSubset extends GrokProviderChatRequestEntity {}
+
+export type CreateResponseStreamProps = {
+  workup: GrokChatReqSubset;
+  payload: CreateResponseStreamInputProps;
+};
+
+export type M = GrokChatReqSubset & CreateResponseStreamInputProps
+
+

@@ -439,7 +439,6 @@ export class Resolver {
         }
       );
     }
-
     console.log(`key looked up for ${provider}, ${keyId ?? "no key"}`);
     const commonProps = {
       chunks,
@@ -1508,10 +1507,19 @@ export class Resolver {
                   ? "ALIASED"
                   : "PENDING"
             : "PENDING";
+
+      const urlObj = new URL(cdnUrl);
+
+      const path = urlObj.pathname;
+
+      const pathname = path.slice(path.lastIndexOf("/") + 1);
+
+      const filename = pathname.slice(14);
       const attachment = await this.wsServer.prisma.updateAttachment({
         data: {
           bucket: finalBucket,
           cacheControl,
+          filename,
           checksumAlgo: checksum?.algo,
           checksumSha256: checksum?.value,
           contentDisposition,
