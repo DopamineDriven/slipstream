@@ -145,11 +145,74 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   public async updateGrokStore(
     userId: string,
     fileCount: number,
+    totalSize: number,
     lastSyncedAt: Date
   ) {
     return await this.prismaClient.providerStore.update({
-      data: { fileCount, lastSyncedAt },
-      where: { userId_provider: { userId, provider: "GROK" } }
+      data: { fileCount, lastSyncedAt, totalBytes: BigInt(totalSize) },
+      where: { userId_provider: { userId, provider: "GROK" } },
+      select: { id: true }
+    });
+  }
+
+  public async createGrokCollectionDocument(
+    userId: string,
+    attachmentId: string,
+    storeId: string,
+    storeRef: string,
+    keyFingerprint = "server",
+    mime: string,
+    fileId: string,
+    keyId?: string,
+    size?: bigint,
+    created_at?: string
+  ) {
+    return await this.prismaClient.$transaction(async prisma => {
+      const [create, store] = await Promise.all([
+        prisma.attachmentProvider.create({
+          data: {
+            state: "ACTIVE",
+            errorCode: null,
+            errorMessage: null,
+            size,
+            userKeyId: keyId,
+            providerUri: `collections://${storeRef}/files/${fileId}`,
+            provider: "GROK",
+            keyFingerprint,
+            attachmentId,
+            storeId,
+            mime,
+            providerRef: fileId,
+            readyAt: created_at,
+            lastCheckedAt: created_at
+          },
+          select: {
+            id: true,
+            attachmentId: true,
+            providerRef: true,
+            lastCheckedAt: true
+          }
+        }),
+        prisma.providerStore.update({
+          where: { userId_provider: { provider: "GROK", userId } },
+          data: {
+            fileCount: { increment: 1 },
+            lastSyncedAt: new Date(Date.now()),
+            storeRef,
+            totalBytes: { increment: size ?? 0n }
+          },
+          select: { storeRef: true, id: true }
+        })
+      ]);
+
+      return {
+        attachmentId: create.attachmentId,
+        fileId: create.providerRef ?? fileId,
+        collectionId: store.storeRef,
+        databaseId: create.id,
+        storeDbId: store.id,
+        lastAccessedAt: create.lastCheckedAt ?? new Date(Date.now())
+      };
     });
   }
 
@@ -166,7 +229,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     size?: bigint,
     created_at?: string
   ) {
-    return await this.prismaClient.attachmentProvider.upsert({
+    const record = await this.prismaClient.attachmentProvider.upsert({
       where: {
         attachmentId_provider_keyFingerprint: {
           attachmentId,
@@ -177,14 +240,9 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       select: {
         id: true,
         attachmentId: true,
-        mime: true,
-        store: { where: { userId, provider: "GROK", storeRef } },
         providerRef: true,
-        userKeyId: true,
         storeId: true,
-        expiresAt: true,
-        lastCheckedAt: true,
-        keyFingerprint: true
+        lastCheckedAt: true
       },
       update: {
         state: "ACTIVE",
@@ -220,6 +278,15 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         lastCheckedAt: created_at
       }
     });
+
+    return {
+      attachmentId: record.attachmentId,
+      fileId: record.providerRef ?? fileId,
+      collectionId: storeRef,
+      databaseId: record.id,
+      storeDbId: record.storeId ?? storeId,
+      lastAccessedAt: record.lastCheckedAt ?? new Date()
+    };
   }
 
   public async findActiveAnthropicAsset(
@@ -375,7 +442,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     storeRef: providerLink.store?.storeRef
                   });
                 }
-                if (provider === "GROK" && providerLink) {
+                if (provider === "GROK") {
                   aggArr.push({
                     attachmentId: attachment.id,
                     expiresAt: providerLink.expiresAt,
@@ -384,7 +451,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     provider: providerLink.provider,
                     providerRef: providerLink.providerRef,
                     isExpired:
-                      60 * 24 * 60 * 60 * 1000 <
+                      30 * 24 * 60 * 60 * 1000 <
                       Date.now() -
                         (providerLink.lastCheckedAt?.getTime() ??
                           providerLink.createdAt.getTime()),

@@ -175,7 +175,6 @@ for (const text of arr) {
   };
   aggregate.push(expandedObj);
 
-
   /**
  * output:
  *

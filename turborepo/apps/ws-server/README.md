@@ -66,6 +66,40 @@ inside of src:
 
 
 ```ts
+import { python } from "pythonia"
+
+export type MaybePromise<T> = T | Promise<T>;
+
+export type XAIReturnedDocMetadata = {
+  file_id: string;
+  name: string;
+  size_bytes: number;
+  content_type: string;
+  created_at_nanos: number;
+  created_at: number; // unix timestamp (seconds)
+  hash: string;
+  status: number;
+};
+
+export type GlobalDictProps = {
+  upload_result: Promise<XAIReturnedDocMetadata>;
+};
+
+export type PythonExecType = (
+  uploadScript: string,
+  global_dict: {
+    upload_result: Promise<XAIReturnedDocMetadata>;
+  }
+) => MaybePromise<unknown>;
+
+export type PythonGlobalsType = () => Promise<GlobalDictProps>;
+
+export type PythonBuiltIns = {
+  exec: Promise<PythonExecType>;
+  globals: Promise<PythonGlobalsType>;
+};
+
+// methods removed from src/xai/collections.ts
 class GrokCollectionsService{
   // other code...
   private pythonScript(

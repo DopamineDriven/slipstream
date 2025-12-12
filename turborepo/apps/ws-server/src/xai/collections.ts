@@ -1,16 +1,19 @@
 import type {
   ContentBlockUnion,
+  CreateResponseStreamProps,
   FileContentBlock,
   ImageContentBlock,
+  ResponsesComprehensive,
   ResponsesContentInputSingleton,
   ResponsesContentWorkup,
   TextContentBlock,
   ToolChoiceUnion
 } from "@/xai/responses-types.ts";
 import type {
+  AssetCache,
+  CollectionDocument,
   CreateCollectionResponse,
-  DocumentResSingleton,
-  GrokProviderChatRequestEntity
+  DocumentResSingleton
 } from "@/xai/types.ts";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
@@ -33,37 +36,32 @@ export class GrokCollectionsService extends GrokWorkupService {
    * Asset cache: attachmentId → file metadata
    * Same key as fileRegistry for smooth interop (mirrors Gemini pattern)
    */
-  private assetCache = new Map<
-    string,
-    {
-      attachmentId: string;
-      fileId: string; // xAI file_id (e.g., file_a4315326-...)
-      collectionId: string; // xAI collection_id
-      databaseId: string; // AttachmentProvider.id
-      storeDbId: string; // ProviderStore.id
-      lastAccessedAt: Date | null;
-    }
-  >();
+  private assetCache: Map<string, AssetCache> = new Map<string, AssetCache>();
 
   /**
    * File registry: attachmentId → full xAI document metadata
    * Same key as assetCache for smooth interop (mirrors Gemini pattern)
    */
-  private fileRegistry = new Map<string, DocumentResSingleton>();
+  private fileRegistry: Map<string, DocumentResSingleton> = new Map<
+    string,
+    DocumentResSingleton
+  >();
 
   private lastRegistrySync: Date | null = null;
 
   /**
-   * Collection registry: userId → collection_id
+   * env: "dev" | "prod"
+   * Collection registry: (collection_name=env-userId) userId  → collection_id
    * Avoids repeated collection lookups per user
    */
-  private collectionRegistry = new Map<string, string>();
+  private collectionRegistry: Map<string, string> = new Map<string, string>();
 
   /**
-   * Store DB registry: userId → ProviderStore.id
+   * env: "dev" | "prod"
+   * Store DB registry: (collection_name=env-userId) userId → ProviderStore.id
    * Quick lookup for database store record
    */
-  private storeDbRegistry = new Map<string, string>();
+  private storeDbRegistry: Map<string, string> = new Map<string, string>();
 
   constructor(
     logger: LoggerService,
@@ -195,7 +193,7 @@ export class GrokCollectionsService extends GrokWorkupService {
           this.assetCache.set(asset.attachmentId, {
             attachmentId: asset.attachmentId,
             fileId: asset.providerRef,
-            collectionId: collectionId,
+            collectionId,
             databaseId: asset.id,
             storeDbId: storeDbId,
             lastAccessedAt: asset.lastCheckedAt
@@ -208,21 +206,37 @@ export class GrokCollectionsService extends GrokWorkupService {
     );
 
     // rebuild fileRegistry from xAI API, filtered by DB attachmentIds
-    const totalFiles = { count: 0 };
-
-    for await (const batch of this.getAllGrokFiles(
+    const totalFiles = { count: 0, size: 0 };
+    const failedToIndex = Array.of<CollectionDocument>();
+    for await (const batch of this.getAllCollectionDocuments(
       collectionId,
       10,
       managementKey
     )) {
       if (batch.data.length > 0) {
         for (const doc of batch.data) {
-          const attachmentId = doc.fields?.attachmentId;
+          if (doc.status === "DOCUMENT_STATUS_FAILED") {
+            failedToIndex.push(doc);
+          }
+          totalFiles.size += Number.parseInt(doc.file_metadata.size_bytes);
+          totalFiles.count += 1;
+          const attachmentId = doc.fields.attachmentId;
           this.fileRegistry.set(attachmentId, doc);
         }
       }
-      totalFiles.count = batch.count;
     }
+    await this.prisma.updateGrokStore(
+      userId,
+      totalFiles.count,
+      totalFiles.size,
+      new Date(Date.now())
+    );
+    const consolemsg =
+      failedToIndex.length === 0
+        ? `All xAI documents in collection ${collectionId} indexed successfully.`
+        : `Found ${failedToIndex.length} xAI documents in collection ${collectionId} that failed to index; regenerating indices...`;
+
+    console.info(consolemsg);
 
     this.lastRegistrySync = new Date();
     console.info(
@@ -244,7 +258,6 @@ export class GrokCollectionsService extends GrokWorkupService {
         }
       }
     }
-
     // optionally cleanup stale files (14-day access window)
     if (cleanupStaleFiles) {
       await this.cleanupStaleFiles(collectionId, userId, key, managementKey);
@@ -276,6 +289,7 @@ export class GrokCollectionsService extends GrokWorkupService {
           ...cached,
           lastAccessedAt: lastCheckedAt
         });
+        void this.prisma.markProviderLastCheckedAt(cached.databaseId, "GROK");
       }
     } catch (error) {
       this.logger.warn(
@@ -434,7 +448,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     const doc = existingDoc.documents.at(0);
 
     if (existingDoc.documents.length > 0 && doc) {
-      // Found! Persist to database and update caches
+      //  database and update caches
       const dbRecord = await this.prisma.upsertGrokAssetMapping(
         attachment.userId,
         attachment.id,
@@ -450,14 +464,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         doc.file_metadata.created_at
       );
 
-      this.assetCache.set(cacheKey, {
-        attachmentId: cacheKey,
-        fileId: doc.file_metadata.file_id,
-        collectionId,
-        databaseId: dbRecord.id,
-        storeDbId: storeDbId ?? "",
-        lastAccessedAt: new Date()
-      });
+      this.assetCache.set(cacheKey, dbRecord);
 
       this.fileRegistry.set(cacheKey, doc);
 
@@ -553,7 +560,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       );
 
       if (fetcher.ok) {
-        const upsertRes = await this.prisma.upsertGrokAssetMapping(
+        const createCollectionDoc = await this.prisma.createGrokCollectionDocument(
           att.userId,
           att.id,
           collectionObj.dbId,
@@ -563,19 +570,12 @@ export class GrokCollectionsService extends GrokWorkupService {
             ? (att.compatMime ?? "application/octet-stream")
             : (att.mime ?? "application/octet-stream"),
           res.id,
-          new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
           keyFingerprint,
           att.size ? BigInt(att.size) : undefined,
           new Date(res.created_at).toISOString()
         );
-        this.assetCache.set(att.id, {
-          attachmentId: att.id,
-          fileId: res.id,
-          collectionId: collectionObj.storeRef,
-          databaseId: upsertRes.id, // Populated by upsertGrokAssetMapping in uploadFileAndPromoteToCollection
-          storeDbId: upsertRes.storeId ?? "",
-          lastAccessedAt: upsertRes.lastCheckedAt
-        });
+
+        this.assetCache.set(att.id, createCollectionDoc);
 
         // Construct fileRegistry entry from upload result
 
@@ -585,42 +585,19 @@ export class GrokCollectionsService extends GrokWorkupService {
           managementKey
         );
 
-        const index0 = richFileData.documents.at(0);
-        if (index0) {
-          this.fileRegistry.set(att.id, index0);
+        if (
+          richFileData.documents.length === 1 &&
+          richFileData.documents?.[0]
+        ) {
+          this.fileRegistry.set(att.id, richFileData.documents[0]);
         } else {
-          const { url, mime } = this.urlExtWorkup(att);
-          const urlObj = new URL(url);
+          const getDocumentMetadata = await this.getDocumentMetadata(
+            collectionObj.storeRef,
+            res.id,
+            managementKey
+          );
 
-          const path = urlObj.pathname;
-
-          const pathname = path.slice(path.lastIndexOf("/") + 1);
-
-          const filename =
-            att.compatStatus === "ACTIVE" ? pathname : pathname.slice(14);
-
-          const dbFile = filename ?? `file.pdf`;
-          this.fileRegistry.set(att.id, {
-            file_metadata: {
-              file_id: res.id,
-              name: this.toXaiFilename(att),
-              size_bytes: String(res.bytes),
-              content_type: mime,
-              created_at: new Date(res.created_at).toISOString(),
-              expires_at: null,
-              hash: "",
-              upload_status: "UPLOAD_STATUS_COMPLETED",
-              processing_status: "DOCUMENT_STATUS_PROCESSING",
-              file_path: ""
-            },
-            fields: {
-              conversationId: att.conversationId ?? "new-chat",
-              messageId: att.messageId ?? "new-message",
-              attachmentId: att.id,
-              originalFilename: dbFile
-            },
-            status: "DOCUMENT_STATUS_PROCESSING"
-          });
+          this.fileRegistry.set(att.id, getDocumentMetadata);
         }
       }
     } catch (err) {
@@ -669,8 +646,8 @@ export class GrokCollectionsService extends GrokWorkupService {
     return this.collectionRegistry.has(userId);
   }
 
-  protected async createResponsesStream(
-    {
+  protected async createResponsesStream({
+    workup: {
       msgs,
       userId,
       isNewChat,
@@ -682,20 +659,24 @@ export class GrokCollectionsService extends GrokWorkupService {
       model: m,
       systemPrompt,
       management_api_key
-    }: GrokProviderChatRequestEntity,
-    collectionId?: string,
-    tool_choice_input: ToolChoiceUnion = "auto",
-    logprobs = false,
-    imgDetail?: ImageContentBlock["detail"],
-    enableFileSearch = true,
-    fileSearchMaxResults = 5,
-    enableCodeInterpreter = true,
-    enableWebSearch = true,
-    enableXSearch = false,
-    web_enable_image_understanding = true,
-    x_enable_image_understanding = true,
-    x_enable_video_understanding = true
-  ) {
+    },
+    payload: {
+      collectionId,
+      tool_choice_input = "auto",
+      logprobs,
+      imgDetail = "auto",
+      enableFileSearch = true,
+      fileSearchMaxResults = 5,
+      enableCodeInterpreter = true,
+      enableWebSearch = true,
+      stream = true,
+      enableXSearch = false,
+      web_enable_image_understanding,
+      x_enable_image_understanding,
+      x_enable_video_understanding,
+      parallel_tool_calls: parallel_tool_calling = true
+    }
+  }: CreateResponseStreamProps) {
     const key = apiKey ?? this.xaiKey;
 
     const mgmtApiKey = management_api_key ?? this.xaiManagementKey;
@@ -706,10 +687,10 @@ export class GrokCollectionsService extends GrokWorkupService {
       instructions,
       max_output_tokens,
       model,
-      parallel_tool_calls,
+      parallel_tool_calls = parallel_tool_calling,
       tool_choice,
       store,
-      stream,
+      stream: streaming = stream,
       tools,
       user
     } = await this.getResponsesApiInputWorkup(
@@ -734,6 +715,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       web_enable_image_understanding,
       x_enable_image_understanding,
       x_enable_video_understanding,
+      parallel_tool_calling ?? undefined,
       ["reasoning.encrypted_content"]
     );
 
@@ -741,7 +723,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       model,
       input,
       store,
-      stream,
+      stream: streaming,
       instructions,
       temperature,
       user,
@@ -787,23 +769,24 @@ export class GrokCollectionsService extends GrokWorkupService {
 
     const apiKey = xaiApiKey ?? this.xaiKey;
 
-    const formatted = Array.of<ResponsesContentInputSingleton>();
+    const formatted = Array.of<ResponsesComprehensive>();
 
     const lastIndex = msgs.findLastIndex(
       m => m.provider === "GROK" && m.senderType === "AI"
     );
 
     const isFirstGrokMsg = lastIndex === -1;
-    const content = Array.of<ContentBlockUnion>();
-    const textParts = Array.of<string>();
+
     for (const [msgIndex, msg] of msgs.entries()) {
       const isFreshContext = isFirstGrokMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
       const collectionId =
-        this.getUserCollectionId(userId) ??
+        this.collectionRegistry.get(userId) ??
         (await this.resolveCollection(userId, mgmtKey))?.collection_id ??
         null;
       if (msg.senderType === "USER") {
+        const content = Array.of<ContentBlockUnion>();
+        const textParts = Array.of<string>();
         try {
           if (
             msg.attachments &&
@@ -933,6 +916,16 @@ export class GrokCollectionsService extends GrokWorkupService {
           content: content
         } as const satisfies ResponsesContentInputSingleton);
       } else {
+        const textParts = Array.of<string>();
+        const content = Array.of<ContentBlockUnion>();
+        // const grokResponse = msg.responseOutput;
+        // if (msg.provider === "GROK" && grokResponse) {
+        //   const union =
+        //     JSON.parse<xAIResponses.OutputItem.Done.Item[]>(grokResponse);
+        //   for (const u of union) {
+        //     formatted.push(u satisfies ResponsesComprehensive);
+        //   }
+        // } else {
         const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
         try {
           if (msg.attachments && msg.attachments.length > 0) {
@@ -1035,9 +1028,10 @@ export class GrokCollectionsService extends GrokWorkupService {
         formatted.push({
           role: "assistant",
           content
-        } as const satisfies ResponsesContentInputSingleton);
+        } as const satisfies ResponsesComprehensive);
       }
     }
+
     return formatted;
   }
 
@@ -1063,7 +1057,8 @@ export class GrokCollectionsService extends GrokWorkupService {
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true,
-    include = ["reasoning.encrypted_content"]
+    parallel_tool_calls = true,
+    include = ["reasoning.encrypted_content" as const]
   ) {
     const apiKey = xaiKey ?? this.xaiKey;
     const managementKey = mgmtKey ?? this.xaiManagementKey;
@@ -1073,7 +1068,6 @@ export class GrokCollectionsService extends GrokWorkupService {
     );
     const tooling = this.handleTooling(
       model,
-      userId,
       collectionId,
       enableFileSearch,
       fileSearchMaxResults,
@@ -1096,20 +1090,18 @@ export class GrokCollectionsService extends GrokWorkupService {
       managementKey
     );
 
+    this.logger.info(history);
+
     return {
       input: history,
       model,
       instructions: systemInstruction,
       tools: tooling,
-      tool_choice: tooling
-        ? tooling.length > 0
-          ? "auto"
-          : tool_choice
-        : "none",
+      tool_choice: tool_choice ?? "auto",
       store: false,
       include,
       stream: true,
-      parallel_tool_calls: true,
+      parallel_tool_calls,
       max_output_tokens,
       user: userId
     } as const;

@@ -298,7 +298,6 @@ export class AnthropicWorkup {
     return {
       name: "web_fetch",
       type: "web_fetch_20250910",
-      allowed_callers: ["code_execution_20250825", "direct"],
       citations: { enabled: true }
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
@@ -306,8 +305,7 @@ export class AnthropicWorkup {
   private codeExecutionTool() {
     return {
       type: "code_execution_20250825",
-      name: "code_execution",
-      allowed_callers: ["code_execution_20250825", "direct"]
+      name: "code_execution"
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
 
@@ -1163,6 +1161,8 @@ export class AnthropicWorkup {
       keyId ?? undefined,
       apiKey
     );
+
+    this.logger.info(messages);
 
     const { max_tokens: maxTokens, thinking } = this.handleMaxTokensAndThinking(
       model,

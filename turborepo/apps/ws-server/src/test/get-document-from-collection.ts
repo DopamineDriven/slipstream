@@ -90,7 +90,7 @@ const arr = Array.of<{
 }>();
 const sizeTrack = { size: 0 };
 for await (const x of getAllGrokFiles(
-  "collection_b338d912-6f45-4c57-9646-4dfe957974d9"
+  "collection_5934cf24-b069-47c1-8964-7e495696c3b4"
 )) {
   if (x.data) {
     for (const document of x.data) {

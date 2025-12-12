@@ -16,8 +16,26 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({
+      take: 1000,
       where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
-      include: { providerLinks: { where: { provider } } }
+      include: {
+        providerLinks: {
+          where: { provider },
+          include: {
+            store: {
+              select: {
+                fileCount: true,
+                id: true,
+                lastSyncedAt: true,
+                provider: true,
+                storeRef: true,
+                storeName: true
+              },
+              where: { userId }
+            }
+          }
+        }
+      }
     });
     const mapper = data.map(v => {
       const { providerLinks, size, ...rest } = v;
@@ -49,11 +67,11 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   }
 };
 
-(async () => {
-  return await data("GROK", "nrr6h4r4480f6kviycyo1zhf");
-})().then(d => {
+(async (provider: $Enums.Provider) => {
+  return await data(provider, "nrr6h4r4480f6kviycyo1zhf");
+})("GROK").then(d => {
   fs.withWs(
-    "src/test/__out__/xai/provider-links/inspect.json",
+    "src/test/__out__/xai/provider-links/inspect-it.json",
     JSON.stringify(d, null, 2)
   );
   console.log(d ?? 0);

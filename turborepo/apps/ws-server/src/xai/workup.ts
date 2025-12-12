@@ -11,10 +11,12 @@ import type {
   XSearchTool
 } from "@/xai/responses-types.ts";
 import type {
+  CollectionDocument,
   CreateCollectionRequest,
   DeleteXaiFileResponse,
   FieldDefinition,
   GetDocumentsByCollectionId,
+  GetFilesRT,
   ListCollectionsResponse,
   UploadFileRT
 } from "@/xai/types.ts";
@@ -32,6 +34,10 @@ export class GrokWorkupService {
     protected xaiManagementKey: string
   ) {}
 
+  protected getEnv(isProd: boolean) {
+    return isProd === true ? ("prod" as const) : ("dev" as const);
+  }
+
   protected canViewImgs(model: GrokModelIdUnion) {
     return (
       model === "grok-2-vision-1212" ||
@@ -47,21 +53,6 @@ export class GrokWorkupService {
     return this.canViewImgs(model);
   }
 
-  protected isCoTEncrypted(m: GrokModelIdUnion) {
-    return (
-      m === "grok-4-1-fast-reasoning" ||
-      m === "grok-4-0709" ||
-      m === "grok-4-fast-reasoning"
-    );
-  }
-
-  protected isCoTSurfaced(m: GrokModelIdUnion) {
-    return m === "grok-code-fast-1" || m === "grok-3-mini";
-  }
-
-  protected isReasoningModel(m: GrokModelIdUnion) {
-    return this.isCoTEncrypted(m) || this.isCoTSurfaced(m);
-  }
   protected urlExtWorkup(attachment: AttachmentSingleton<true>) {
     const urlExtRecord = { url: "", ext: "", mime: "", xaiFilename: "" };
     try {
@@ -335,13 +326,88 @@ export class GrokWorkupService {
     }
     return aggregate;
   }
+  protected async *getAllUserFiles(limit = 50, apiKey = this.xaiKey) {
+    let has_more = true;
+    let count = 0;
+    let pagination_token: string | undefined = undefined;
+    let page_number = 0;
 
-  protected async *getAllGrokFiles(
+    while (has_more) {
+      const url = pagination_token
+        ? `https://api.x.ai/v1/files?limit=${limit}&pagination_token=${pagination_token}`
+        : `https://api.x.ai/v1/files?limit=${limit}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        }
+      });
+      console.log(response);
+
+      const page = await response.json<GetFilesRT>();
+      console.log(page);
+
+      has_more = typeof page.pagination_token !== "undefined";
+      pagination_token = page.pagination_token;
+      count += page.data?.length ?? 0;
+
+      yield {
+        page,
+        count,
+        page_number,
+        has_more
+      };
+
+      page_number += 1;
+    }
+  }
+
+  protected async *getAllCollections(
+    limit = 10,
+    mgmtKey = this.xaiManagementKey
+  ) {
+    let has_more = true;
+    let count = 0;
+    let pagination_token: string | undefined = undefined;
+    let page_number = 0;
+
+    while (has_more) {
+      const url = pagination_token
+        ? `https://management-api.x.ai/v1/collections?limit=${limit}&pagination_token=${pagination_token}`
+        : `https://management-api.x.ai/v1/collections?limit=${limit}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mgmtKey}`
+        }
+      });
+
+      const page = await response.json<ListCollectionsResponse>();
+
+      has_more = typeof page.pagination_token !== "undefined";
+      pagination_token = page.pagination_token;
+      count += page.collections?.length ?? 0;
+
+      yield {
+        data: page.collections,
+        count,
+        page_number,
+        has_more
+      };
+
+      page_number += 1;
+    }
+  }
+
+  protected async *getAllCollectionDocuments(
     collection_id: string,
     limit = 10,
-    managementKey?: string
+    mgmtKey = this.xaiManagementKey
   ) {
-    const mgmtKey = managementKey ?? this.xaiManagementKey;
     let has_more = true;
     let count = 0;
     let pagination_token: string | undefined = undefined;
@@ -466,21 +532,27 @@ export class GrokWorkupService {
     ] as const satisfies FieldDefinition[];
   }
 
+  protected getCollectionName(userId: string) {
+    const env = this.getEnv(this.prisma.isProd);
+    const collection_name = `${env}-${userId}`;
+    return collection_name;
+  }
+
   protected createUserCollectionWorkup(userId: string) {
     const fieldDefs = this.createUserCollectionFieldDefs;
-
+    const collection_name = this.getCollectionName(userId);
     return {
       chunk_configuration: {
         inject_name_into_chunks: true,
         strip_whitespace: true,
         tokens_configuration: {
-          chunk_overlap_tokens: 200,
+          chunk_overlap_tokens: 256,
           encoding_name: "o200k_base",
           max_chunk_size_tokens: 1024
         }
       },
-      collection_name: userId,
-      index_configuration: { model_name: "grok-embedding-beta" },
+      collection_name,
+      index_configuration: { model_name: "grok-embedding-small" },
       field_definitions: fieldDefs,
       metric_space: "HNSW_METRIC_COSINE"
     } as const satisfies CreateCollectionRequest;
@@ -488,8 +560,9 @@ export class GrokWorkupService {
 
   protected async resolveCollection(userId: string, mgmtKey?: string) {
     const managementKey = mgmtKey ?? this.xaiManagementKey;
+    const collection_name = this.getCollectionName(userId);
     const fetcher = await fetch(
-      `https://management-api.x.ai/v1/collections?filter=collection_name:${userId}`,
+      `https://management-api.x.ai/v1/collections?filter=collection_name:${collection_name}`,
       {
         method: "GET",
         headers: {
@@ -523,31 +596,54 @@ export class GrokWorkupService {
     ).then(res => res.json<GetDocumentsByCollectionId>());
   }
 
-  /**
-   * UPLOADING FILES IS A TWO-STEP DANCE
-   * (1) UPLOAD TO XAI USING A FILE VIA FORMDATA PER XAI REQUIREMENTS
-   * (2) PROMOTE TO COLLECTION WITH RELEVANT METADATA INCLUDED
-   */
-  protected async uploadFile(formData: FormData, apiKey?: string) {
-    const key = apiKey ?? this.xaiKey;
+  protected async regenerateDocumentIndices(
+    collection_id: string,
+    file_id: string,
+    managementApiKey = this.xaiManagementKey
+  ) {
+    const res = await fetch(
+      `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${managementApiKey}`
+        }
+      }
+    );
+    return await res.json<{}>(); // returns '{}' -- poll using getDocumentMetadata after triggering perhaps?
+  }
+
+  protected async getDocumentMetadata(
+    collection_id: string,
+    file_id: string,
+    managementApiKey = this.xaiManagementKey
+  ) {
+    const toPoll = await fetch(
+      `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${managementApiKey}`
+        }
+      }
+    );
+    return await toPoll.json<CollectionDocument>();
+  }
+
+  protected async uploadFile(formData: FormData, apiKey = this.xaiKey) {
     return await fetch("https://api.x.ai/v1/files?purpose=assistants", {
       headers: {
-        Authorization: `Bearer ${key}`
+        Authorization: `Bearer ${apiKey}`
       },
       method: "POST",
       body: formData
     });
   }
 
-  /**
-   * STEP ONE
-   */
-
   protected async streamUploadFileWorkup(
     att: AttachmentSingleton<true>,
-    apiKey?: string
+    key = this.xaiKey
   ) {
-    const key = apiKey ?? this.xaiKey;
     const {
       absTmpPath,
       tmpUniquename,
@@ -575,7 +671,8 @@ export class GrokWorkupService {
 
       const file = new File([buf], safeFilename, { type: mime });
 
-      formData.set("file", file, safeFilename);
+      formData.append("file", file);
+      formData.append("purpose", "assistants");
 
       const { promise, resolve } = Promise.withResolvers<Response>();
 
@@ -608,6 +705,7 @@ export class GrokWorkupService {
       attachmentId,
       conversationId,
       fileName: originalFilename,
+      extension,
       messageId
     } = this.parseFilename(xaiFilename);
     return await fetch(
@@ -623,7 +721,7 @@ export class GrokWorkupService {
             conversationId,
             messageId,
             attachmentId,
-            originalFilename
+            originalFilename: originalFilename.concat(`.${extension}`)
           }
         })
       }
@@ -644,7 +742,6 @@ export class GrokWorkupService {
   }
 
   protected resolveResponsesTools(
-    userId: string,
     collectionId: string | undefined,
     {
       enableFileSearch = true,
@@ -702,6 +799,16 @@ export class GrokWorkupService {
     return tools;
   }
 
+  protected canUseServerTools(m: GrokModelIdUnion) {
+    return (
+      m === "grok-4-0709" ||
+      m === "grok-4-1-fast-non-reasoning" ||
+      m === "grok-4-1-fast-reasoning" ||
+      m === "grok-4-fast-reasoning" ||
+      m === "grok-4-fast-non-reasoning"
+    );
+  }
+
   /**
    * Model Compatibility
    *
@@ -715,7 +822,6 @@ export class GrokWorkupService {
    */
   protected handleTooling(
     model: GrokModelIdUnion,
-    userId: string,
     collectionId?: string,
     enableFileSearch = true,
     fileSearchMaxResults = 10,
@@ -726,40 +832,17 @@ export class GrokWorkupService {
     x_enable_image_understanding = true,
     x_enable_video_understanding = true
   ) {
-    switch (model) {
-      case "grok-4-0709":
-      case "grok-4-1-fast-non-reasoning":
-      case "grok-4-1-fast-reasoning":
-      case "grok-4-fast-non-reasoning":
-      case "grok-4-fast-reasoning": {
-        return this.resolveResponsesTools(userId, collectionId, {
-          enableFileSearch,
-          fileSearchMaxResults,
-          enableCodeInterpreter,
-          enableWebSearch,
-          enableXSearch,
-          web_enable_image_understanding,
-          x_enable_image_understanding,
-          x_enable_video_understanding
-        });
-      }
-      case "grok-2-vision-1212":
-      case "grok-code-fast-1":
-      case "grok-2-image-1212":
-      case "grok-3":
-      case "grok-3-mini":
-      default: {
-        return this.resolveResponsesTools(userId, collectionId, {
-          enableCodeInterpreter: false,
-          enableFileSearch: false,
-          enableWebSearch: false,
-          enableXSearch: false,
-          fileSearchMaxResults: undefined,
-          web_enable_image_understanding: false,
-          x_enable_image_understanding: false,
-          x_enable_video_understanding: false
-        });
-      }
+    if (this.canUseServerTools(model)) {
+      return this.resolveResponsesTools(collectionId, {
+        enableFileSearch,
+        fileSearchMaxResults,
+        enableCodeInterpreter,
+        enableWebSearch,
+        enableXSearch,
+        web_enable_image_understanding,
+        x_enable_image_understanding,
+        x_enable_video_understanding
+      });
     }
   }
 }

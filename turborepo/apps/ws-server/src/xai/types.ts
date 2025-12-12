@@ -1,6 +1,8 @@
-import type { ProviderChatRequestEntity, S3FinalizePayload } from "@/types/index.ts";
+import type {
+  ProviderChatRequestEntity,
+  S3FinalizePayload
+} from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
-import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   CTR,
   ImgMetadataEntity,
@@ -10,24 +12,6 @@ import type {
 } from "@slipstream/types";
 
 export type MaybePromise<T> = T | Promise<T>;
-
-export interface UrlExtWorkupProps {
-  id: string;
-  compatStatus: $Enums.CompatStatus | null;
-  ext: string | null;
-  compatExt: string | null;
-  cdnUrl: string | null;
-  compatCdnUrl: string | null;
-  mime: string | null;
-  compatMime: string | null;
-}
-
-export interface AssetToTmpWorkupProps extends UrlExtWorkupProps {
-  userId: string;
-  conversationId: string | null;
-  messageId: string | null;
-  assetType: $Enums.AssetType;
-}
 
 export type XAIReturnedDocMetadata = {
   file_id: string;
@@ -71,7 +55,8 @@ export type GrokEncodingNameUnion =
   | "cl100k_base"
   | "p50k_base"
   | "p50k_edit"
-  | "r50k_base";
+  | "r50k_base"
+  | (string & {});
 
 export type TokensConfiguration = {
   max_chunk_size_tokens: number;
@@ -89,10 +74,54 @@ export type AstConfiguration = {
   encoding_name: GrokEncodingNameUnion;
 };
 
-export type ChunkConfiguration = {
-  chars_configuration?: CharsConfiguration;
-  tokens_configuration?: TokensConfiguration;
-  ast_configuration?: AstConfiguration;
+export type TableConfiguration = {
+  max_chunk_size_tokens: number;
+  encoding_name: GrokEncodingNameUnion;
+};
+
+export type MarkdownTokensConfiguration = {
+  max_chunk_size_tokens: number;
+  chunk_overlap_tokens: number;
+  encoding_name: GrokEncodingNameUnion;
+};
+
+export type MarkdownCharsConfiguration = {
+  max_chunk_size_chars: number;
+  chunk_overlap_chars: number;
+};
+
+export type CodeTokensConfiguration = {
+  max_chunk_size_tokens: number;
+  chunk_overlap_tokens: number;
+  encoding_name: GrokEncodingNameUnion;
+};
+
+export type CodeCharsConfiguration = {
+  max_chunk_size_chars: number;
+  chunk_overlap_chars: number;
+};
+
+export type ChunkConfigurationTarget =
+  | { chars_configuration: CharsConfiguration }
+  | { tokens_configuration: TokensConfiguration }
+  | { ast_configuration: AstConfiguration }
+  | {
+      table_configuration: TableConfiguration;
+    }
+  | {
+      markdown_tokens_configuration: MarkdownTokensConfiguration;
+    }
+  | {
+      markdown_chars_configuration: MarkdownCharsConfiguration;
+    }
+  | {
+      code_tokens_configuration: CodeTokensConfiguration;
+    }
+  | {
+      code_chars_configuration: CodeCharsConfiguration;
+    };
+
+export type ChunkConfiguration = ChunkConfigurationTarget & {
   strip_whitespace: boolean;
   inject_name_into_chunks: boolean;
 };
@@ -100,15 +129,22 @@ export type ChunkConfiguration = {
 export type GrokEmbeddingModels =
   | "grok-embedding-large"
   | "grok-embedding-beta"
-  | "grok-embedding-small";
+  | "grok-embedding-small"
+  | (string & {});
 
 export type IndexConfiguration = {
   model_name: GrokEmbeddingModels;
 };
 
-type MetricSpaceWorkup = "UNKNOWN" | "COSINE" | "EUCLIDEAN" | "INNER_PRODUCT";
+type DocumentStatusSuffix = "UNKNOWN" | "FAILED" | "PROCESSING" | "PROCESSED";
 
-export type MetricSpace = `HNSW_METRIC_${MetricSpaceWorkup}`;
+export type DocumentStatus =
+  | `DOCUMENT_STATUS_${DocumentStatusSuffix}`
+  | (string & {});
+
+type MetricSpaceSuffix = "UNKNOWN" | "COSINE" | "EUCLIDEAN" | "INNER_PRODUCT";
+
+export type MetricSpace = `HNSW_METRIC_${MetricSpaceSuffix}` | (string & {});
 
 export type CreateCollectionRequest = {
   collection_name: string;
@@ -122,91 +158,92 @@ export type CreateCollectionRequest = {
 
 export type UploadFileRT = {
   bytes: number;
-  created_at: number;
-  expires_at: null;
-  filename: string;
-  id: string;
-  object: "file";
-  purpose: string;
+  created_at: number; // milliseconds
+  expires_at: null; // always null
+  filename: string; // always `${conversationId}-${messageId}-${attachmentId}-${hexEncodedFilename}.${extension}` format
+  id: string; // always prefixed with "file_" + uuid
+  object: "file"; // always "file"
+  purpose: string; // always an empty string ""
 };
 
-export type ListCollectionsResponse = {
-  collections: {
-    collection_id: string;
-    collection_name: string;
-    created_at: string;
-    index_configuration: {
-      model_name: string;
-    };
-    chunk_configuration: {
-      tokens_configuration: {
-        max_chunk_size_tokens: number;
-        chunk_overlap_tokens: number;
-        encoding_name: string;
-      };
-      strip_whitespace: boolean;
-      inject_name_into_chunks: boolean;
-    };
-    documents_count: number;
-    field_definitions: {
-      key: string;
-      required: boolean;
-      inject_into_chunk: boolean;
-      unique: boolean;
-      description: string;
-    }[];
-  }[];
+export type GetFilesRT = {
+  data: UploadFileRT[];
+  pagination_token?: string;
 };
 
-export type CreateCollectionResponse = {
+export interface Collection {
   collection_id: string;
   collection_name: string;
   created_at: string;
-  index_configuration: {
-    model_name: string;
-  };
-  chunk_configuration: {
-    tokens_configuration: {
-      max_chunk_size_tokens: number;
-      chunk_overlap_tokens: number;
-      encoding_name: string;
-    };
-    strip_whitespace: boolean;
-    inject_name_into_chunks: boolean;
-  };
+  index_configuration: IndexConfiguration;
+  chunk_configuration: ChunkConfiguration;
   documents_count: number;
-  field_definitions: {
-    key: string;
-    required: boolean;
-    inject_into_chunk: boolean;
-    unique: boolean;
-    description: string;
-  }[];
+  field_definitions: FieldDefinition[];
+  collection_description?: string;
+}
+
+export type ListCollectionsResponse = {
+  collections: Collection[];
+  pagination_token?: string;
 };
 
+export interface CreateCollectionResponse extends Collection {}
+
+export interface DocumentFields {
+  attachmentId: string;
+  conversationId: string;
+  messageId: string;
+  originalFilename: string;
+}
+
+export interface CollectionDocument {
+  file_metadata: DocumentFilemetadata;
+  fields: DocumentFields;
+  status: DocumentStatus;
+  error_message: string;
+  last_indexed_at: string | null;
+}
+
+export type UploadStatus =
+  | "Initializing"
+  | "Uploading"
+  | "Complete"
+  | "Failed"
+  | (string & {});
+
+export type ProcessingStatus =
+  | "Pending"
+  | "Processing"
+  | "Complete"
+  | "Failed"
+  | "Skipped"
+  | (string & {});
+
+export interface DocumentFilemetadata {
+  file_id: string;
+  name: string;
+  size_bytes: string;
+  content_type: string;
+  created_at: string;
+  expires_at: null;
+  hash: string;
+  upload_status: UploadStatus;
+  processing_status: ProcessingStatus;
+  file_path: string;
+}
+
 export type GetDocumentsByCollectionId = {
-  documents: {
-    file_metadata: {
-      file_id: string;
-      name: string;
-      size_bytes: string;
-      content_type: string;
-      created_at: string;
-      expires_at: null;
-      hash: string;
-      upload_status: string;
-      processing_status: string;
-      file_path: string;
-    };
-    fields: {
-      attachmentId: string;
-      conversationId: string;
-      messageId: string;
-      originalFilename: string;
-    };
-    status: string;
-  }[];
+  documents: CollectionDocument[];
   pagination_token?: string;
+};
+
+export type AssetCache = {
+  attachmentId: string;
+  fileId: string; // xAI file_id (e.g., file_a4315326-...)
+  collectionId: string; // xAI collection_id
+  databaseId: string; // AttachmentProvider.id
+  storeDbId: string; // ProviderStore.id
+  lastAccessedAt: Date | null;
 };
 
 export type DocumentResSingleton = Unenumerate<
@@ -256,26 +293,6 @@ export type ImageGenPartialArr = [
   ExpandedImgSpecs
 ];
 
-export type ImgGenMessageSingletonProps =
-  | {
-      role: "user" | "assistant";
-      content:
-        | string
-        | readonly (
-            | { type: "text"; text: string }
-            | {
-                type: "image_url";
-                image_url: {
-                  url: string;
-                  detail?: "low" | "medium" | "high";
-                };
-              }
-          )[];
-    }
-  | { role: "system"; content: string };
-
-export type ImageGenMessagesProps = readonly ImgGenMessageSingletonProps[];
-
 export type ImgGenMessageParts =
   | { type: "text"; text: string }
   | {
@@ -283,7 +300,6 @@ export type ImgGenMessageParts =
       image_url: { url: string; detail?: "low" | "medium" | "high" };
     };
 
-
-export interface GrokProviderChatRequestEntity extends ProviderChatRequestEntity{
+export interface GrokProviderChatRequestEntity extends ProviderChatRequestEntity {
   management_api_key?: string;
 }

@@ -462,7 +462,7 @@ const grokFileService = new GrokFileServiceWorkup(
   fs,
   process.env.X_AI_KEY ?? "",
   process.env.X_AI_MANAGEMENT_API_KEY ?? "",
-  process.env.X_AI_COLLECTION ?? ""
+ "collection_b338d912-6f45-4c57-9646-4dfe957974d9"
 );
 
 (async () => {

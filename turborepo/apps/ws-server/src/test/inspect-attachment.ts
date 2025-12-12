@@ -8,17 +8,15 @@ const data = async () => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
   const datasourceUrl = await p.get("DIRECT_URL");
-  const _datasource = process.env.DIRECT_URL ?? datasourceUrl;
+  const datasource = process.env.DIRECT_URL ?? datasourceUrl;
   const { PrismaClient } = await import("@slipstream/db/node/generated/client");
   const prismaClient = new PrismaClient({
-    datasourceUrl: datasourceUrl
+    datasourceUrl: datasource
   });
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findFirstOrThrow({
-      where: {
-        filename:
-          {contains: "Candy-Flipping-Claudtullus-Pt-III"}
+      where: {id: "b245re7lh9qp2nxp3v0kayo4"
       },
       orderBy: { createdAt: "desc" },
       include: {
@@ -62,7 +60,7 @@ const fs = new Fs(process.cwd());
   return await data();
 })().then(v => {
   fs.withWs(
-    "src/test/__out__/inspect/xai/attachment-1.json",
+    "src/test/__out__/inspect/xai/attachment-2.json",
     JSON.stringify(v, null, 2)
   );
 });
