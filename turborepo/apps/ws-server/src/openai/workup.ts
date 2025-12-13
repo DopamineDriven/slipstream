@@ -813,7 +813,7 @@ export class OpenAIServiceWorkup {
           ) {
             return { effort, summary } as const satisfies Reasoning;
           } else {
-            return { effort: "xhigh", summary } as const satisfies Reasoning;
+            return { effort: "high", summary } as const satisfies Reasoning;
           }
         }
       }

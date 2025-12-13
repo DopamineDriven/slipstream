@@ -182,7 +182,6 @@ export class OpenAIService extends OpenAIGPTImageService {
             "medium",
             imgGenEnabled
           ),
-          temperature,
           include: [
             "web_search_call.action.sources",
             "web_search_call.results",
@@ -190,7 +189,6 @@ export class OpenAIService extends OpenAIGPTImageService {
             "file_search_call.results"
           ],
           max_output_tokens: max_tokens,
-          top_p: topP,
           safety_identifier: userId,
           truncation: "auto",
           reasoning,
