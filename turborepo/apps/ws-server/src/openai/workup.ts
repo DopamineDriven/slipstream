@@ -8,7 +8,7 @@ import type {
   ResponseInput,
   ResponseTextConfig
 } from "openai/resources/responses/responses.mjs";
-import type { Reasoning } from "openai/resources/shared.mjs";
+import type { Reasoning, ReasoningEffort } from "openai/resources/shared.mjs";
 import type { Logger as PinoLogger } from "pino";
 import { OpenAI } from "openai";
 import { LoggerService } from "@/logger/index.ts";
@@ -60,6 +60,49 @@ export class OpenAIServiceWorkup {
     return client;
   }
 
+  protected isImgGenModel(m: OpenAiModelIdUnion) {
+    return (
+      m === "dall-e-2" ||
+      m === "dall-e-3" ||
+      m === "gpt-image-1" ||
+      m === "gpt-image-1-mini"
+    );
+  }
+
+  protected isDeepResearchModel(m: OpenAiModelIdUnion) {
+    return (
+      m === "gpt-5-pro" ||
+      m === "gpt-5.2-pro" ||
+      m === "o1-pro" ||
+      m === "o3-pro" ||
+      m === "o3-deep-research" ||
+      m === "o4-mini-deep-research"
+    );
+  }
+
+  protected isImgGenFacilitating(m: OpenAiModelIdUnion) {
+    return (
+      m === "gpt-4.1" ||
+      m === "gpt-4.1-mini" ||
+      m === "gpt-4.1-nano" ||
+      m === "gpt-5" ||
+      m === "gpt-5-chat-latest" ||
+      m === "gpt-5-mini" ||
+      m === "gpt-5-nano" ||
+      m === "gpt-5-pro" ||
+      m === "gpt-5.1" ||
+      m === "gpt-5.2" ||
+      m === "gpt-5.2-pro" ||
+      m === "o3" ||
+      m === "gpt-4o" ||
+      m === "gpt-4o-mini"
+    );
+  }
+
+  protected isImgGenCapable(m: OpenAiModelIdUnion) {
+    return this.isImgGenModel(m) || this.isImgGenFacilitating(m);
+  }
+
   protected responsesImgGen(
     imgGenEnabled: AIChatRequest["imgGenEnabled"],
     mo: AIChatRequest["model"],
@@ -69,25 +112,7 @@ export class OpenAIServiceWorkup {
     const model = mo as OpenAiModelIdUnion;
     if (imgGenEnabled === false) return undefined;
     if (!imgFields) return undefined;
-    if (
-      model === "gpt-3.5-turbo" ||
-      model === "gpt-4" ||
-      model === "gpt-4-turbo" ||
-      model === "gpt-5-codex" ||
-      model === "o3-mini" ||
-      model === "o1" ||
-      model === "o3-deep-research" ||
-      model === "gpt-5.1-chat-latest" ||
-      model === "gpt-5.1-codex" ||
-      model === "gpt-5.1-codex-mini" ||
-      model === "o4-mini-deep-research" ||
-      model === "o4-mini" ||
-      model === "o3-pro" ||
-      model === "chatgpt-4o-latest" ||
-      model === "sora-2" ||
-      model === "sora-2-pro" ||
-      model === "o1-pro"
-    ) {
+    if (!this.isImgGenCapable(model)) {
       return;
     }
 
@@ -246,10 +271,9 @@ export class OpenAIServiceWorkup {
         }) as "1536x1024" | "1024x1536" | "1024x1024" | undefined) ??
         ("auto" as const),
       output_background: bg,
-      targetApi:
-        this.imageGenToolCompat(model) === true
-          ? ("responses" as const)
-          : ("images" as const),
+      targetApi: this.isImgGenFacilitating(model)
+        ? ("responses" as const)
+        : ("images" as const),
       partialImagesRequested: this.prisma.handlePartialImgGen("openai", model, {
         partialImagesRequested: output_partial_images
       }),
@@ -293,7 +317,7 @@ export class OpenAIServiceWorkup {
         uploaded.id,
         keyId,
         BigInt(uploaded.bytes),
-        new Date(uploaded.created_at*1000).toISOString()
+        new Date(uploaded.created_at * 1000).toISOString()
       );
 
       return { file_id: uploaded.id, db_id: upsert.id };
@@ -703,153 +727,165 @@ export class OpenAIServiceWorkup {
   }
 
   protected openaiReasoning(
-    model: OpenAiModelIdUnion,
-    effort: Reasoning["effort"] = "medium",
+    m: OpenAiModelIdUnion,
+    effort: ReasoningEffort = "high",
     summary: Reasoning["summary"] = "auto",
     imgGenEnabled = false
   ) {
-    switch (model) {
-      // gpt-5-pro is required to have high effort for reasoning and a detailed summary
+    if (!this.isReasoningModel(m)) return;
+    switch (m) {
+      // gpt-5-pro only supports high reasoning
       case "gpt-5-pro": {
-        return { effort: "high", summary: "detailed" } as const;
+        return { effort: "high", summary } as const satisfies Reasoning;
       }
-      case "gpt-5.1":
-      case "gpt-5":
-      case "gpt-5-mini":
-      case "gpt-5-nano":
-      case "gpt-5-chat-latest":
-      case "o3": {
-        if (imgGenEnabled) {
-          return { effort: "minimal" } satisfies Reasoning;
-        }
-        return { effort, summary } satisfies Reasoning;
-      }
-      case "gpt-5.1-chat-latest":
-      case "gpt-5.1-codex-mini":
-      case "gpt-5.1-codex":
-      case "gpt-5-codex":
       case "o1":
-      case "o3-mini":
-      case "o3-pro":
       case "o1-pro":
       case "o3-deep-research":
-      case "o4-mini-deep-research":
-      case "o4-mini": {
-        return { effort, summary } satisfies Reasoning;
+      case "o3":
+      case "o3-pro":
+      case "o4-mini-deep-research": {
+        if (imgGenEnabled === true) {
+          return { effort: "low", summary } as const satisfies Reasoning;
+        } else {
+          if (effort === "high" || effort === "low" || effort === "medium") {
+            return { effort, summary } as const satisfies Reasoning;
+          } else {
+            return { effort: "high", summary } as const satisfies Reasoning;
+          }
+        }
       }
-      case "gpt-3.5-turbo":
-      case "gpt-4":
-      case "gpt-4-turbo":
-      case "gpt-4.1":
-      case "gpt-4.1-mini":
-      case "gpt-4.1-nano":
-      case "gpt-4o":
-      case "sora-2":
-      case "sora-2-pro":
-      case "chatgpt-4o-latest":
-      case "gpt-4o-mini":
-      case "dall-e-2":
-      case "dall-e-3":
-      case "gpt-image-1":
-      case "gpt-image-1-mini":
+      case "gpt-5":
+      case "gpt-5-mini":
+      case "gpt-5-nano": {
+        if (imgGenEnabled === true) {
+          return { effort: "minimal", summary } as const satisfies Reasoning;
+        } else {
+          if (
+            effort === "high" ||
+            effort === "low" ||
+            effort === "medium" ||
+            effort === "minimal"
+          ) {
+            return { effort, summary } as const satisfies Reasoning;
+          } else {
+            return { effort: "high", summary } as const satisfies Reasoning;
+          }
+        }
+      }
+      case "gpt-5.1": {
+        if (imgGenEnabled === true) {
+          return { effort: "low", summary } as const satisfies Reasoning;
+        } else {
+          if (
+            effort === "high" ||
+            effort === "low" ||
+            effort === "medium" ||
+            effort === "none"
+          ) {
+            return { effort, summary } as const satisfies Reasoning;
+          } else {
+            return { effort: "high", summary } as const satisfies Reasoning;
+          }
+        }
+      }
+      case "gpt-5.1-codex-max": {
+        if (
+          effort === "high" ||
+          effort === "low" ||
+          effort === "medium" ||
+          effort === "xhigh"
+        ) {
+          return { effort, summary } as const satisfies Reasoning;
+        } else {
+          return { effort: "xhigh", summary } as const satisfies Reasoning;
+        }
+      }
+      case "gpt-5.2": {
+        if (imgGenEnabled === true) {
+          return { effort: "low", summary } as const satisfies Reasoning;
+        } else {
+          if (
+            effort === "xhigh" ||
+            effort === "high" ||
+            effort === "low" ||
+            effort === "medium" ||
+            effort === "none"
+          ) {
+            return { effort, summary } as const satisfies Reasoning;
+          } else {
+            return { effort: "xhigh", summary } as const satisfies Reasoning;
+          }
+        }
+      }
+      case "gpt-5.2-pro": {
+        if (effort === "xhigh") {
+          return { effort, summary } as const satisfies Reasoning;
+        } else {
+          return { effort: "xhigh", summary } as const satisfies Reasoning;
+        }
+      }
+      case "o3-mini":
+      case "gpt-5.2-chat-latest":
+      case "gpt-5-codex":
+      case "gpt-5-chat-latest":
+      case "gpt-5.1-codex":
+      case "gpt-5.1-codex-mini":
+      case "o4-mini":
+      case "gpt-5.1-chat-latest":
       default: {
-        return undefined;
+        if (effort === "high" || effort === "low" || effort === "medium") {
+          return { effort, summary } as const satisfies Reasoning;
+        } else {
+          return { effort: "medium", summary } as const satisfies Reasoning;
+        }
       }
     }
+  }
+
+  protected isReasoningModel(m: OpenAiModelIdUnion) {
+    return (
+      m === "gpt-5" ||
+      m === "gpt-5-chat-latest" ||
+      m === "gpt-5-codex" ||
+      m === "gpt-5-mini" ||
+      m === "gpt-5-nano" ||
+      m === "gpt-5-pro" ||
+      m === "o1" ||
+      m === "o3" ||
+      m === "o3-mini" ||
+      m === "o4-mini" ||
+      m === "gpt-5.2-pro" ||
+      m === "gpt-5.2" ||
+      m === "gpt-5.2-chat-latest" ||
+      m === "gpt-5.1" ||
+      m === "gpt-5.1-chat-latest" ||
+      m === "gpt-5.1-codex-max" ||
+      m === "gpt-5.1-codex" ||
+      m === "gpt-5.1-codex-mini" ||
+      m === "o3-pro" ||
+      m === "o1-pro" ||
+      m === "o3-deep-research" ||
+      m === "o4-mini-deep-research"
+    );
   }
 
   protected canCallImageApi(model: OpenAiModelIdUnion) {
-    switch (model) {
-      case "gpt-image-1":
-      case "gpt-image-1-mini":
-      case "dall-e-2":
-      case "dall-e-3": {
-        return true;
-      }
-      case "gpt-5.1":
-      case "chatgpt-4o-latest":
-      case "gpt-5-chat-latest":
-      case "gpt-5.1-chat-latest":
-      case "gpt-5.1-codex":
-      case "gpt-5.1-codex-mini":
-      case "o1":
-      case "o1-pro":
-      case "o3-deep-research":
-      case "o4-mini-deep-research":
-      case "sora-2":
-      case "sora-2-pro":
-      case "gpt-5-pro":
-      case "gpt-5-codex":
-      case "gpt-5":
-      case "gpt-5-mini":
-      case "gpt-5-nano":
-      case "gpt-4.1":
-      case "gpt-4.1-mini":
-      case "gpt-4.1-nano":
-      case "o3":
-      case "gpt-4o":
-      case "gpt-4o-mini":
-      case "o3-mini":
-      case "o3-pro":
-      case "o4-mini":
-      case "gpt-3.5-turbo":
-      case "gpt-4":
-      case "gpt-4-turbo":
-      default: {
-        return false;
-      }
-    }
+    return this.isImgGenModel(model);
   }
 
   protected imageGenToolCompat(model: OpenAiModelIdUnion) {
-    switch (model) {
-      case "gpt-5.1":
-      case "gpt-5":
-      case "gpt-5-mini":
-      case "gpt-5-nano":
-      case "gpt-4.1":
-      case "gpt-4.1-mini":
-      case "gpt-4.1-nano":
-      case "gpt-5-pro":
-      case "o3":
-      case "gpt-4o":
-      case "gpt-5-chat-latest":
-      case "gpt-4o-mini": {
-        return true;
-      }
-      case "gpt-5.1-chat-latest":
-      case "gpt-5.1-codex":
-      case "gpt-5.1-codex-mini":
-      case "dall-e-2":
-      case "dall-e-3":
-      case "gpt-image-1":
-      case "gpt-image-1-mini":
-      case "gpt-5-codex":
-      case "chatgpt-4o-latest":
-      case "o1":
-      case "o1-pro":
-      case "o3-deep-research":
-      case "o4-mini-deep-research":
-      case "sora-2":
-      case "sora-2-pro":
-      case "o3-mini":
-      case "o3-pro":
-      case "o4-mini":
-      case "gpt-3.5-turbo":
-      case "gpt-4":
-      case "gpt-4-turbo":
-      default: {
-        return false;
-      }
-    }
+    return this.isImgGenFacilitating(model);
   }
 
   protected openAiVerbosity(
     model: OpenAiModelIdUnion,
-    verbosity?: string,
+    verbosity: ResponseTextConfig["verbosity"] = "medium",
     imgGenEnabled = false
   ) {
     switch (model) {
+      case "gpt-5.1-codex-max":
+      case "gpt-5.2":
+      case "gpt-5.2-pro":
       case "gpt-5-pro": {
         return { verbosity: "high" } as const;
       }
@@ -861,19 +897,14 @@ export class OpenAIServiceWorkup {
         if (imgGenEnabled) {
           return { verbosity: "low" } satisfies ResponseTextConfig;
         }
-        const v = verbosity
-          ? (verbosity as ResponseTextConfig["verbosity"])
-          : ("medium" satisfies ResponseTextConfig["verbosity"]);
-        return { verbosity: v } satisfies ResponseTextConfig;
+        return { verbosity } satisfies ResponseTextConfig;
       }
+      case "gpt-5.2-chat-latest":
       case "gpt-5-codex":
       case "gpt-5.1-chat-latest":
       case "gpt-5.1-codex":
       case "gpt-5.1-codex-mini": {
-        const v = verbosity
-          ? (verbosity as ResponseTextConfig["verbosity"])
-          : ("medium" satisfies ResponseTextConfig["verbosity"]);
-        return { verbosity: v } satisfies ResponseTextConfig;
+        return { verbosity } satisfies ResponseTextConfig;
       }
       case "o3":
       case "o3-mini":
@@ -899,7 +930,7 @@ export class OpenAIServiceWorkup {
       case "o4-mini-deep-research":
       case "gpt-4o-mini":
       default: {
-        return undefined;
+        return { verbosity } as const satisfies ResponseTextConfig;
       }
     }
   }

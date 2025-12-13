@@ -13,6 +13,8 @@ dotenv.config({ quiet: true });
 
 const providerModelImagesApi = {
   openai: [
+    "gpt-5.2",
+    "gpt-5.2-pro",
     "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
@@ -53,14 +55,18 @@ const providerModelVideosApi = {
 
 const providerModelChatApi = {
   openai: [
+    "gpt-5.2",
+    "gpt-5.2-chat-latest",
     "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5.1-chat-latest",
+    "gpt-5.1-codex-max",
     "gpt-5.1-codex",
     "gpt-5.1-codex-mini",
     "gpt-5-codex",
+    "gpt-5.2-pro",
     "gpt-5-pro",
     "gpt-5-chat-latest",
     "gpt-4.1",
@@ -94,6 +100,7 @@ const providerModelChatApi = {
     "gemini-2.5-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
+    "deep-research-pro-preview-12-2025",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
     "imagen-4.0-generate-001",
@@ -398,6 +405,11 @@ function formattedOpenAi(props: OpenAiResponse) {
       return { id, displayName: "GPT-5 Chat", ...rest };
     if (id === "gpt-5.1-chat-latest")
       return { id, displayName: "GPT-5.1 Chat", ...rest };
+    if (id === "gpt-5.2-chat-latest")
+      return { id, displayName: "GPT-5.2 Chat" };
+    if (id === "gpt-5.2-pro") return { id, displayName: "GPT-5.2 pro" };
+    if (id === "gpt-5.1-codex-max")
+      return { id, displayName: "GPT-5.1-Codex-Max" };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });

@@ -19,27 +19,15 @@ export class xAIService extends GrokResponsesApiService {
   }
   public async routeXai({ model: m, ...rest }: ProviderChatRequestEntity) {
     const model = (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion;
-    switch (model) {
-      case "grok-2-image-1212": {
-        return this.handleXAIAiImageGenRequest({ model, ...rest });
-      }
-      case "grok-2-vision-1212":
-      case "grok-3":
-      case "grok-3-mini":
-      case "grok-4-0709":
-      case "grok-4-1-fast-non-reasoning":
-      case "grok-4-1-fast-reasoning":
-      case "grok-4-fast-non-reasoning":
-      case "grok-4-fast-reasoning":
-      case "grok-code-fast-1":
-      default: {
-        return this.handleXAIAiResponsesApiRequest({
-          management_api_key: this.xaiManagementKey,
-          model,
-          ...rest
-        });
-      }
+    if (this.isImgGenModel(model)) {
+      return this.handleXAIAiImageGenRequest({ model, ...rest });
+    } else {
+      return this.handleXAIAiResponsesApiRequest({
+        management_api_key: this.xaiManagementKey,
+        model,
+        ...rest
+      });
     }
   }
 }
-// codex resume 019aeb73-466c-78e3-beea-34f50e76f617
+

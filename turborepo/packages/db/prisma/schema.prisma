@@ -19,10 +19,12 @@ generator edge {
 }
 
 enum ReasoningEffort {
+  none
   minimal
   low
   medium
   high
+  xhigh
 }
 
 enum OutputVerbosity {

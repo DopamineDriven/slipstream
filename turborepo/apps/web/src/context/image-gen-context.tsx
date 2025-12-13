@@ -74,6 +74,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
+        case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-flash-lite":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
@@ -104,9 +105,13 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "gpt-5-chat-latest":
         case "gpt-5-mini":
         case "gpt-5-nano":
+        case "gpt-5.2-pro":
+        case "gpt-5.2":
         case "gpt-5": {
           return true;
         }
+        case "gpt-5.1-codex-max":
+        case "gpt-5.2-chat-latest":
         case "gpt-5.1-chat-latest":
         case "gpt-5.1-codex":
         case "gpt-5.1-codex-mini":
@@ -180,6 +185,7 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
+        case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-flash":
         case "gemini-2.5-flash-lite":
         case "gemini-2.5-pro":
@@ -202,6 +208,10 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "gpt-image-1-mini": {
           return true;
         }
+        case "gpt-5.1-codex-max":
+        case "gpt-5.2":
+        case "gpt-5.2-chat-latest":
+        case "gpt-5.2-pro":
         case "gpt-5.1":
         case "gpt-5.1-chat-latest":
         case "gpt-5.1-codex":
@@ -282,6 +292,7 @@ function handleOutputSize(
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
         case "gemini-2.5-flash-lite":
+        case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
         case "veo-3.0-fast-generate-001":
@@ -313,6 +324,8 @@ function handleOutputSize(
             return data.output_size;
           } else return "auto";
         }
+        case "gpt-5.2":
+        case "gpt-5.2-pro":
         case "gpt-5-chat-latest":
         case "gpt-5.1":
         case "gpt-4.1":
@@ -333,6 +346,8 @@ function handleOutputSize(
             return data.output_size;
           } else return "auto";
         }
+        case "gpt-5.1-codex-max":
+        case "gpt-5.2-chat-latest":
         case "sora-2":
         case "sora-2-pro":
         case "o1":
@@ -390,11 +405,15 @@ function _handlePartialImgGen(
           case "sora-2-pro":
           case "gpt-3.5-turbo":
           case "gpt-4":
+          case "gpt-5.1-codex-max":
+          case "gpt-5.2-chat-latest":
           case "gpt-4-turbo":
-          case "gpt-5-codex":
-          case "gpt-5-pro": {
+          case "gpt-5-codex": {
             return undefined;
           }
+          case "gpt-5.2":
+          case "gpt-5.2-pro":
+          case "gpt-5-pro":
           case "gpt-5-chat-latest":
           case "gpt-5.1":
           case "gpt-4.1":
@@ -468,6 +487,7 @@ function handleImgGenOutputQuality(
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
+        case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-flash-lite":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
@@ -513,6 +533,8 @@ function handleImgGenOutputQuality(
         case "gpt-5-nano":
         case "gpt-image-1":
         case "gpt-image-1-mini":
+        case "gpt-5.2":
+        case "gpt-5.2-pro":
         case "o3": {
           if (
             data?.output_quality &&
@@ -521,6 +543,8 @@ function handleImgGenOutputQuality(
             return data.output_quality as "high" | "medium" | "low" | "auto";
           } else return "auto";
         }
+        case "gpt-5.1-codex-max":
+        case "gpt-5.2-chat-latest":
         case "gpt-5.1-chat-latest":
         case "gpt-5.1-codex":
         case "gpt-5.1-codex-mini":

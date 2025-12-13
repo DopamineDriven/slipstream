@@ -382,8 +382,9 @@ export interface Dalle3Opts extends SharedOpenAIImageOpts<"dall-e-3"> {
   style?: "natural" | "vivid";
 }
 
-export interface GptImage1Opts
-  extends SharedOpenAIImageOpts<"gpt-image-1" | "gpt-image-1-mini"> {
+export interface GptImage1Opts extends SharedOpenAIImageOpts<
+  "gpt-image-1" | "gpt-image-1-mini"
+> {
   /**
    *
    * **Only supported for `gpt-image-1`. Unsupported for `gpt-image-1-mini`**
@@ -1102,6 +1103,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   output_format: "jpeg" | "webp" | "png";
   output_compression: number | undefined;
   model:
+    | "gpt-5.2"
     | "gpt-5.1"
     | "gpt-image-1"
     | "gpt-image-1-mini"
@@ -1110,6 +1112,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
     | "gpt-5-nano"
     | "gpt-4.1"
     | "gpt-5-pro"
+    | "gpt-5.2-pro"
     | "gpt-5-chat-latest"
     | "gpt-4.1-mini"
     | "gpt-4.1-nano"
@@ -1135,6 +1138,8 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-5-chat-latest"
           | "gpt-5-pro"
           | "gpt-5-mini"
+          | "gpt-5.2"
+          | "gpt-5.2-pro"
           | "gpt-5.1"
           | "gpt-5-nano"
           | "gpt-4.1"
@@ -1145,12 +1150,14 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
           | "gpt-4o-mini"
       ? GptImageAndFacilitatorsImgGenWorkupRT
       : T extends
+            | "gpt-5.2-chat-latest"
             | "gpt-5-codex"
             | "gpt-3.5-turbo"
             | "gpt-4-turbo"
             | "gpt-5.1-chat-latest"
             | "gpt-5.1-codex"
             | "gpt-5.1-codex-mini"
+            | "gpt-5.1-codex-max"
             | "chatgpt-4o-latest"
             | "o1-pro"
             | "o1"
@@ -1179,9 +1186,13 @@ export type ImgGenWorkupRTObj = {
   "gpt-4o": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4o-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5-chat-latest": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.2": GptImageAndFacilitatorsImgGenWorkupRT;
+  "gpt-5.2-pro": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-5.1": GptImageAndFacilitatorsImgGenWorkupRT;
   o1: undefined;
   "o1-pro": undefined;
+  "gpt-5.2-chat-latest": undefined;
+  "gpt-5.1-codex-max": undefined;
   "sora-2": undefined;
   "sora-2-pro": undefined;
   "gpt-5-codex": undefined;

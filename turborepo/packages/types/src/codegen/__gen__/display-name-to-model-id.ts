@@ -1,13 +1,17 @@
 export const displayNameToModelId = {
   openai: {
+    "GPT-5.2": "gpt-5.2",
+    "GPT-5.2 Chat": "gpt-5.2-chat-latest",
     "GPT-5.1": "gpt-5.1",
     "GPT-5": "gpt-5",
     "GPT-5 mini": "gpt-5-mini",
     "GPT-5 nano": "gpt-5-nano",
     "GPT-5.1 Chat": "gpt-5.1-chat-latest",
+    "GPT-5.1-Codex-Max": "gpt-5.1-codex-max",
     "GPT-5.1 Codex": "gpt-5.1-codex",
     "GPT-5.1 Codex mini": "gpt-5.1-codex-mini",
     "GPT-5-Codex": "gpt-5-codex",
+    "GPT-5.2 pro": "gpt-5.2-pro",
     "GPT-5 pro": "gpt-5-pro",
     "GPT-5 Chat": "gpt-5-chat-latest",
     "GPT-4.1": "gpt-4.1",
@@ -41,6 +45,8 @@ export const displayNameToModelId = {
     "Nano Banana": "gemini-2.5-flash-image",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
+    "Deep Research Pro Preview (Dec-12-2025)":
+      "deep-research-pro-preview-12-2025",
     "Gemini 2.0 Flash": "gemini-2.0-flash",
     "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
     "Imagen 4": "imagen-4.0-generate-001",

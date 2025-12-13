@@ -130,7 +130,7 @@ export function MessageBubble({
   );
 
   const imageGenerationData = useMemo(() => {
-    const imageUrls: string[] = [];
+    const imageUrls = Array.of<string>();
     let isGenerating = true,
       prompt: string | undefined,
       width = 0,
@@ -143,7 +143,7 @@ export function MessageBubble({
       const normalized = normalizeImgGenFields(liveImgGenFields);
       if (normalized) {
         // Collect all images in order (partials then finals)
-        const allImages: AttachmentSingleton<true>[] = [];
+        const allImages = Array.of<AttachmentSingleton<true>>();
 
         if (normalized?.partialImages && normalized.partialImages?.length > 0) {
           const partials = normalized?.partialImages?.filter(
