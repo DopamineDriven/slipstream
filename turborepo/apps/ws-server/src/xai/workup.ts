@@ -53,6 +53,10 @@ export class GrokWorkupService {
     return this.canViewImgs(model);
   }
 
+  protected isImgGenModel(model: GrokModelIdUnion){
+    return model ==="grok-2-image-1212";
+  }
+
   protected urlExtWorkup(attachment: AttachmentSingleton<true>) {
     const urlExtRecord = { url: "", ext: "", mime: "", xaiFilename: "" };
     try {

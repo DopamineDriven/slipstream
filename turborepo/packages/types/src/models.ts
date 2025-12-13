@@ -44,11 +44,13 @@ export const allImgSupportingProviderModels = {
 
 export const providerModelImageGenFacilitatingApi = {
   openai: [
+    "gpt-5.2",
     "gpt-5.1",
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
     "gpt-5-chat-latest",
+    "gpt-5.2-pro",
     "gpt-5-pro",
     "gpt-4.1",
     "gpt-4.1-mini",
@@ -702,14 +704,14 @@ export const imgMimeSupportByProvider = {
 // to be handed off to models on the backend, for example
 export const docMimeSupportByProvider = {
   meta: ["application/pdf"],
-  grok: [],
+  grok: ["application/pdf", "text/markdown", "text/plain"],
   openai: ["application/pdf"],
   vercel: ["application/pdf"],
   /**
    * https://ai.google.dev/gemini-api/docs/document-processing#technical-details
    */
   gemini: ["application/pdf"],
-  anthropic: ["application/pdf"]
+  anthropic: ["application/pdf", "text/plain", "text/rtf", "text/csv"]
 } as const;
 
 export const audioMimeSupportByProvider = {

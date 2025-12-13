@@ -18,6 +18,7 @@ import {
   PartMediaResolutionLevel,
   ThinkingLevel
 } from "@google/genai";
+import type { GeminiModelAspectRatioWorkup } from "@slipstream/img-gen";
 import type {
   AttachmentSingleton,
   GeminiModelIdUnion,
@@ -305,7 +306,7 @@ export class GeminiWorkupService {
         error instanceof Error
           ? error.message
           : "Failed to upload file to Google Files API" +
-            this.prisma.safeErrMsg(error)
+              this.prisma.safeErrMsg(error)
       );
     } finally {
       this.prisma.cleanupTmpPostupload("GEMINI", absTmpPath, tmpUniquename);
@@ -686,6 +687,7 @@ export class GeminiWorkupService {
     switch (m) {
       case "gemini-2.5-pro":
       case "gemini-3-pro-preview":
+      case "deep-research-pro-preview-12-2025":
       case "gemini-2.5-flash": {
         return [
           { googleSearch: {} },
@@ -851,6 +853,7 @@ export class GeminiWorkupService {
         apiKey,
         m
       );
+
     const out = imgGenFields?.output_size as
       | "1:1"
       | "2:3"
@@ -860,10 +863,14 @@ export class GeminiWorkupService {
       | "9:16"
       | "16:9"
       | "21:9"
+      | undefined satisfies
+      | GeminiModelAspectRatioWorkup[
+          | "gemini-3-pro-image-preview"
+          | "gemini-2.5-flash-image"]
       | undefined;
 
     const aspectRatio = this.prisma.handleOutputSize("gemini", m, {
-      output_size: out
+      output_size: out ?? "16:9"
     });
     const imageSize = this.prisma.handleImgGenOutputQuality("gemini", m, {
       output_quality: imgGenFields?.output_quality as

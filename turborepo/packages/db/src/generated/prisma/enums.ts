@@ -10,10 +10,12 @@
 */
 
 export const ReasoningEffort = {
+  none: 'none',
   minimal: 'minimal',
   low: 'low',
   medium: 'medium',
-  high: 'high'
+  high: 'high',
+  xhigh: 'xhigh'
 } as const
 
 export type ReasoningEffort = (typeof ReasoningEffort)[keyof typeof ReasoningEffort]

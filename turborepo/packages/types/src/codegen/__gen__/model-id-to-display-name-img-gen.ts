@@ -1,5 +1,7 @@
 export const modelIdToDisplayNameImgGen = {
   openai: {
+    "gpt-5.2": "GPT-5.2",
+    "gpt-5.2-pro": "GPT-5.2 pro",
     "gpt-5.1": "GPT-5.1",
     "gpt-5": "GPT-5",
     "gpt-5-mini": "GPT-5 mini",

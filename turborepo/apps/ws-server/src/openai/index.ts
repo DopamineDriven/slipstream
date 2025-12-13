@@ -114,21 +114,9 @@ export class OpenAIService extends OpenAIGPTImageService {
     );
 
     if (
-      imgGenFields &&
+      typeof imgGenFields !== "undefined" &&
       imgGenEnabled &&
-      (m === "o3" ||
-        m === "gpt-4.1" ||
-        m === "gpt-4.1-mini" ||
-        m === "gpt-4.1-nano" ||
-        m === "gpt-5.1" ||
-        m === "gpt-5" ||
-        m === "gpt-5-mini" ||
-        m === "gpt-5-nano" ||
-        m === "gpt-5-chat-latest" ||
-        m === "gpt-5-pro" ||
-        m === "gpt-4o" ||
-        m === "gpt-4o-mini") &&
-      this.imageGenToolCompat(m) &&
+      this.isImgGenFacilitating(m) &&
       typeof resImg !== "undefined"
     ) {
       const r = resImg as GptImageAndFacilitatorsImgGenWorkupRT;
@@ -1055,49 +1043,14 @@ export class OpenAIService extends OpenAIGPTImageService {
 
   public async routeOpenAI({ model, ...rest }: ProviderOpenaiRequestEntity) {
     const m = model as OpenAiModelIdUnion;
-    console.log(`[openai::isImgGenEnabled]: ` + rest.imgGenEnabled);
-    switch (m) {
-      case "dall-e-2":
-      case "dall-e-3":
-      case "gpt-image-1":
-      case "gpt-image-1-mini": {
-        return this.handleOpenaiAiNativeImageRequestGptImage1({
-          model: m,
-          ...rest
-        });
-      }
-      case "gpt-5.1":
-      case "gpt-5.1-chat-latest":
-      case "gpt-5.1-codex":
-      case "gpt-5.1-codex-mini":
-      case "o3-deep-research":
-      case "o4-mini-deep-research":
-      case "chatgpt-4o-latest":
-      case "o3":
-      case "o3-mini":
-      case "o3-pro":
-      case "o4-mini":
-      case "gpt-3.5-turbo":
-      case "gpt-4":
-      case "gpt-4-turbo":
-      case "gpt-4.1":
-      case "gpt-5-pro":
-      case "o1":
-      case "o1-pro":
-      case "sora-2-pro":
-      case "sora-2":
-      case "gpt-5":
-      case "gpt-5-mini":
-      case "gpt-5-chat-latest":
-      case "gpt-5-codex":
-      case "gpt-5-nano":
-      case "gpt-4.1-mini":
-      case "gpt-4.1-nano":
-      case "gpt-4o":
-      case "gpt-4o-mini":
-      default: {
-        return this.handleOpenaiAiChatRequest({ model: m, ...rest });
-      }
+    console.info(`[openai::isImgGenEnabled]: ` + rest.imgGenEnabled);
+    if (this.isImgGenModel(m)) {
+      return this.handleOpenaiAiNativeImageRequestGptImage1({
+        model: m,
+        ...rest
+      });
+    } else {
+      return this.handleOpenaiAiChatRequest({ model: m, ...rest });
     }
   }
 }

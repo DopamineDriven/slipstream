@@ -1,105 +1,58 @@
 import type {
   AIChatRequest,
   AllModelsUnion,
+  DX,
+  GeminiImgGenModels,
+  GeminiModelIdUnion,
   GetModelUtilRT,
   GoogleImagenGenerateImagesConfig,
   GoogleSafetyFilterLevel,
+  OpenAIImgCapableModels,
+  OpenAiModelIdUnion,
   Provider,
   Rm
 } from "@slipstream/types";
 
-type OpenAIModelAspectRatio = {
-  "gpt-5.1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-5"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-5-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-5-nano"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-5.1-chat-latest"?: undefined;
-  "gpt-5.1-codex"?: undefined;
-  "gpt-5.1-codex-mini"?: undefined;
-  "gpt-5-codex"?: undefined;
-  "gpt-5-pro"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-5-chat-latest"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-4.1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-4.1-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-4.1-nano"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-4o"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-4o-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-image-1"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "gpt-image-1-mini"?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "dall-e-3"?: "1792x1024" | "1024x1792" | "1024x1024" | "auto";
-  "dall-e-2"?: "256x256" | "512x512" | "1024x1024" | "auto";
-  "chatgpt-4o-latest"?: undefined;
-  "o4-mini"?: undefined;
-  "o4-mini-deep-research"?: undefined;
-  "o3-deep-research"?: undefined;
-  o3?: "1536x1024" | "1024x1536" | "1024x1024" | "auto";
-  "o3-pro"?: undefined;
-  "o3-mini"?: undefined;
-  o1?: undefined;
-  "o1-pro"?: undefined;
-  "gpt-4"?: undefined;
-  "gpt-4-turbo"?: undefined;
-  "gpt-3.5-turbo"?: undefined;
-  "sora-2"?: undefined;
-  "sora-2-pro"?: undefined;
+export type OpenAIModelAspectRatioWorkup = DX<
+  Record<
+    Exclude<OpenAIImgCapableModels, "dall-e-2" | "dall-e-3">,
+    "1536x1024" | "1024x1536" | "1024x1024" | "auto"
+  > &
+    Record<Exclude<OpenAiModelIdUnion, OpenAIImgCapableModels>, undefined> & {
+      "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
+      "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
+    }
+>;
+
+export type OpenAIModelAspectRatio = {
+  [P in keyof OpenAIModelAspectRatioWorkup]?: OpenAIModelAspectRatioWorkup[P];
 };
 
-type GeminiModelAspectRatio = {
-  "gemini-3-pro-image-preview":
-    | "1:1"
-    | "2:3"
-    | "3:2"
-    | "3:4"
-    | "4:3"
-    | "9:16"
-    | "16:9"
-    | "21:9"
-    | undefined;
-  "gemini-2.5-flash-image":
-    | "1:1"
-    | "2:3"
-    | "3:2"
-    | "3:4"
-    | "4:3"
-    | "9:16"
-    | "16:9"
-    | "21:9"
-    | undefined;
-  "imagen-4.0-ultra-generate-001":
-    | "1:1"
-    | "3:4"
-    | "4:3"
-    | "9:16"
-    | "16:9"
-    | undefined;
-  "imagen-4.0-fast-generate-001":
-    | "1:1"
-    | "3:4"
-    | "4:3"
-    | "9:16"
-    | "16:9"
-    | undefined;
-  "imagen-4.0-generate-001":
-    | "1:1"
-    | "3:4"
-    | "4:3"
-    | "9:16"
-    | "16:9"
-    | undefined;
-  "gemini-3-pro-preview": undefined;
-  "gemini-2.5-pro": undefined;
-  "gemini-2.5-flash": undefined;
-  "gemini-2.5-flash-lite": undefined;
-  "gemini-2.0-flash": undefined;
-  "gemini-2.0-flash-lite": undefined;
-  "veo-3.1-generate-preview": undefined;
-  "veo-3.1-fast-generate-preview": undefined;
-  "veo-3.0-generate-001": undefined;
-  "veo-3.0-fast-generate-001": undefined;
-  "veo-2.0-generate-001": undefined;
+export type GeminiModelAspectRatioWorkup = DX<
+  Record<
+    Exclude<
+      GeminiImgGenModels,
+      | "imagen-4.0-ultra-generate-001"
+      | "imagen-4.0-generate-001"
+      | "imagen-4.0-fast-generate-001"
+    >,
+    "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "9:16" | "16:9" | "21:9"
+  > &
+    Record<
+      Exclude<
+        GeminiImgGenModels,
+        "gemini-3-pro-image-preview" | "gemini-2.5-flash-image"
+      >,
+      "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
+    > &
+    Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
+>;
+
+export type GeminiModelAspectRatio = {
+  [P in keyof GeminiModelAspectRatioWorkup]?: GeminiModelAspectRatioWorkup[P];
 };
 
-type OutputSizeProps<P extends Provider = Provider> = {
+export type OutputSizeProps<P extends Provider = Provider> = {
   openai?: OpenAIModelAspectRatio[GetModelUtilRT<"openai">];
   anthropic?: {
     [M in GetModelUtilRT<"anthropic">]: undefined;
