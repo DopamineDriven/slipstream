@@ -9,7 +9,6 @@ src/test/openai/*
 src/test/xai/*.txt
 src/test/xai/**/*.sse
 src/test/xai/*.ts
-src/test/google/**/*.sse
 
 src/test/v0/*
 src/test/sanity/*
@@ -19,3 +18,4 @@ testing.sh
 
 src/test/anthropic/*
 src/test/xai/**/*
+src/test/google/**/*

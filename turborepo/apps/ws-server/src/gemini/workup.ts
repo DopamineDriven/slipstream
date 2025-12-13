@@ -61,7 +61,9 @@ export class GeminiWorkupService {
     }
     return this.defaultClient;
   }
-
+  protected handleThinking(start: number) {
+    return performance.now() - start;
+  }
   private async *getAllGoogleFiles(apiKey?: string, limit = 10) {
     const genai = this.getClient(apiKey);
 
