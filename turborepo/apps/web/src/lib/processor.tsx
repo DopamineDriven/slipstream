@@ -10,9 +10,12 @@ import React, { createElement, Fragment } from "react";
 import * as jsxRuntime from "react/jsx-runtime";
 import Image from "next/image";
 import Link from "next/link";
+import { imgSrcMapper } from "@/lib/img-helper";
 import { mathmlTags } from "@/lib/mathml-tags";
 import { slugify } from "@/lib/slugify";
+import { cn } from "@/lib/utils";
 import { CodeBlock } from "@/ui/atoms/code-block";
+import { transformerMetaWordHighlight } from "@shikijs/transformers";
 import rehypeKatex from "rehype-katex";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeReact from "rehype-react";
@@ -23,8 +26,6 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { VFile } from "vfile";
-import { imgSrcMapper } from "./img-helper";
-import { cn } from "./utils";
 
 interface CustomImageProps extends ComponentPropsWithRef<typeof Image> {
   "data-zoomable"?: boolean;
@@ -124,7 +125,8 @@ const prettyCodeOptions = {
   },
   onVisitHighlightedChars(node: CharsElement) {
     node.properties.className = ["word"];
-  }
+  },
+  transformers: [transformerMetaWordHighlight()]
 } satisfies RehypePrettyCodeOptions;
 
 function CustomImage({
@@ -164,22 +166,12 @@ const components = {
     return <CodeBlock {...props}>{children}</CodeBlock>;
   },
   code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
-    // const isCodeBlock = "data-language" in props || "data-theme" in props;
-
-    // if (isCodeBlock) {
-    //   // Let the parent <pre> (CodeBlock) handle overflow
-    //   return (
-    //     <code className={cn(className)} {...props}>
-    //       {children}
-    //     </code>
-    //   );
-    // }
     return (
       <code
         className={cn(
           "inline wrap-anywhere! break-all! whitespace-pre-wrap!",
           "font-mono text-sm",
-          "rounded-md px-1 py-0.5",
+          "px-1 py-0.5",
           "box-decoration-clone",
           "text-foreground/85",
           "max-w-none min-w-0 overflow-visible border-none",
