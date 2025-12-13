@@ -734,7 +734,7 @@ export class AnthropicWorkup {
     }
   }
 
-  private async formatAnthropicHistoryWithFiles(
+  private async _formatAnthropicHistoryWithFiles(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     model: AnthropicModelIdUnion,
@@ -989,10 +989,13 @@ export class AnthropicWorkup {
           }
         })
       );
+      const systemNote = `Note: Previous responses may be tagged with their source model for context.
+
+        Attachments marked [seen] have already been reviewed in earlier turns; do not re-fetch or re-extract these unless additional context needs warrant their retrieval.`;
 
       const enhancedSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\nNote: Previous responses may be tagged with their source model for context.`
-        : "Previous responses in this conversation may be tagged with their source model for context.";
+        ? `${systemPrompt}\n\n${systemNote}`
+        : systemNote;
 
       return {
         messages,
@@ -1133,7 +1136,161 @@ export class AnthropicWorkup {
       }
     }
   }
+  protected async formatAnthropicHistoryWithFiles(
+    isNewChat: boolean,
+    msgs: MessageSingleton<true>[],
+    model: AnthropicModelIdUnion,
+    systemPrompt?: string,
+    keyFingerprint = "server",
+    keyId?: string,
+    apiKey?: string
+  ) {
+    const lastClaudeIndex = msgs.findLastIndex(
+      m => m.provider === "ANTHROPIC" && m.senderType === "AI"
+    );
+    const isFirstClaudeMsg = lastClaudeIndex === -1;
 
+    const messages: Anthropic.Beta.BetaMessageParam[] = [];
+
+    for (const [msgIndex, msg] of msgs.entries()) {
+      const isFreshContext = isFirstClaudeMsg || msgIndex > lastClaudeIndex;
+
+      if (msg.senderType === "USER") {
+        const content: Anthropic.Beta.BetaContentBlockParam[] = [];
+        const textParts: string[] = [];
+
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const attachment of msg.attachments) {
+            const url =
+              attachment.compatStatus === "ACTIVE"
+                ? attachment.compatCdnUrl
+                : attachment.cdnUrl;
+            const mime =
+              attachment.compatStatus === "ACTIVE"
+                ? attachment.compatMime
+                : attachment.mime;
+
+            if (!url || !mime) continue;
+
+            const filename = attachment.filename ?? "attachment";
+
+            if (isFreshContext) {
+              if (attachment.assetType === "DOCUMENT") {
+                try {
+                  const fileId = await this.ensureAnthropicAssetUploaded(
+                    attachment,
+                    model,
+                    keyFingerprint,
+                    keyId,
+                    apiKey
+                  );
+                  content.push({
+                    type: "document",
+                    source: { type: "file", file_id: fileId },
+                    citations: { enabled: true }
+                  } satisfies Anthropic.Beta.BetaRequestDocumentBlock);
+                } catch {
+                  content.push({
+                    type: "document",
+                    source: { type: "url", url },
+                    citations: { enabled: true }
+                  } satisfies Anthropic.Beta.BetaRequestDocumentBlock);
+                }
+              } else if (attachment.assetType === "IMAGE") {
+                const sizeInMB = (attachment.size ?? 0) / 1024 / 1024;
+
+                if (sizeInMB >= 1) {
+                  try {
+                    const fileId = await this.ensureAnthropicAssetUploaded(
+                      attachment,
+                      model,
+                      keyFingerprint,
+                      keyId,
+                      apiKey
+                    );
+                    content.push({
+                      type: "image",
+                      source: { type: "file", file_id: fileId }
+                    } satisfies Anthropic.Beta.BetaImageBlockParam);
+                  } catch {
+                    content.push({
+                      type: "image",
+                      source: { type: "url", url }
+                    } satisfies Anthropic.Beta.BetaImageBlockParam);
+                  }
+                } else {
+                  content.push({
+                    type: "image",
+                    source: { type: "url", url }
+                  } satisfies Anthropic.Beta.BetaImageBlockParam);
+                }
+              }
+            } else {
+              // Stale context
+              if (attachment.assetType === "IMAGE") {
+                textParts.push(`![${filename}](${url})`);
+              } else {
+                textParts.push(`[${filename}](${url})`);
+              }
+            }
+          }
+        }
+
+        textParts.push(msg.content);
+        content.push({
+          type: "text",
+          text: textParts.join("\n\n")
+        } satisfies Anthropic.Beta.BetaTextBlockParam);
+
+        messages.push({ role: "user", content });
+      } else {
+        const textParts: string[] = [];
+
+        if (msg.attachments && msg.attachments.length > 0) {
+          for (const attachment of msg.attachments) {
+            const url =
+              attachment.compatStatus === "ACTIVE"
+                ? attachment.compatCdnUrl
+                : attachment.cdnUrl;
+
+            if (!url) continue;
+
+            const filename = attachment.filename ?? "attachment";
+
+            if (attachment.assetType === "IMAGE") {
+              textParts.push(`![${filename}](${url})`);
+            } else {
+              textParts.push(`[${filename}](${url})`);
+            }
+          }
+        }
+
+        textParts.push(
+          `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${msg.content}\n</model>`
+        );
+
+        messages.push({ role: "assistant", content: textParts.join("\n\n") });
+      }
+    }
+
+    const systemNote = `Note: Previous responses may be tagged with their source model for context.
+
+        Attachments marked [seen] have already been reviewed in earlier turns; do not re-fetch or re-extract these unless additional context needs warrant their retrieval.`;
+
+    const enhancedSystemPrompt = systemPrompt
+      ? `${systemPrompt}\n\n${systemNote}`
+      : systemNote;
+
+    return {
+      messages,
+      system: [
+        {
+          type: "text",
+          text: enhancedSystemPrompt
+        }
+      ] satisfies Anthropic.Beta.BetaTextBlockParam[]
+    };
+  }
   protected async createStreamWorkup({
     isNewChat,
     msgs,
