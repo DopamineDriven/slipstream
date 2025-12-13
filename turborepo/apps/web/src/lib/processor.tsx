@@ -114,6 +114,7 @@ const prettyCodeOptions = {
   grid: true,
   keepBackground: true,
   theme: "dark-plus",
+  defaultLang: { block: "text", inline: "text" },
   bypassInlineCode: false,
   onVisitLine(node: LineElement) {
     if (node.children.length === 0) {
@@ -164,23 +165,6 @@ const components = {
   a: CustomLink,
   pre: ({ children, ...props }: ComponentPropsWithRef<"pre">) => {
     return <CodeBlock {...props}>{children}</CodeBlock>;
-  },
-  code: ({ children, className, ...props }: ComponentPropsWithRef<"code">) => {
-    return (
-      <code
-        className={cn(
-          "inline wrap-anywhere! break-all! whitespace-pre-wrap!",
-          "font-mono text-sm",
-          "px-1 py-0.5",
-          "box-decoration-clone",
-          "text-foreground/85",
-          "max-w-none min-w-0 overflow-visible border-none",
-          className
-        )}
-        {...props}>
-        {children}
-      </code>
-    );
   },
   h1: createHeading(1),
   h2: createHeading(2),

@@ -170,7 +170,14 @@
   --color-brand-text: oklch(24.84% 0.02 255);
   --color-brand-text-muted: oklch(51.03% 0.015 255);
   --color-brand-text-emphasis: oklch(18.15% 0.025 255);
-
+  --color-pre-token-regex-important-variable: oklch(33.581% 0.12548 23.959);
+  --color-pre-token-function-classname: oklch(63.075% 0.13435 60.247);
+  --color-pre-code-class-language: oklch(24.776% 0.00003 271.152);
+  --color-pre-token-atrule-attrval-keyword: oklch(54.201% 0.2263 311.436);
+  --color-pre-token-operator-entity-url-langcss-style: oklch(
+    56.233% 0.1106 236.093
+  );
+  /*oklch(56.233% 0.1106 236.093)*/
   --radius-sm: 0.25rem;
   --radius-radius: 0.65rem;
 
@@ -292,6 +299,13 @@
     --color-brand-text: oklch(100% 0.005 255);
     --color-brand-text-muted: oklch(70.79% 0.008 255);
     --color-brand-text-emphasis: oklch(100% 0.005 255);
+    --color-pre-token-regex-important-variable: oklch(86.06% 0.1731 91.94);
+    --color-pre-token-function-classname: oklch(72.53% 0.1752 349.76);
+    --color-pre-code-class-language: oklch(97.015% 0.00011 271.152);
+    --color-pre-token-atrule-attrval-keyword: oklch(71.37% 0.1434 254.62);
+    --color-pre-token-operator-entity-url-langcss-style: oklch(
+      90.52% 0.1657 98.11
+    );
   }
 }
 
@@ -582,7 +596,7 @@ code > [data-line]::before {
 }
 
 pre {
-  @apply border-accent-foreground relative m-0 overflow-x-auto rounded-lg border border-solid bg-transparent p-0 text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
+  @apply text-pre-code-class-language relative m-0 overflow-x-auto rounded-lg border-none bg-transparent p-0;
 }
 
 @media (width < 768px) {
@@ -595,14 +609,14 @@ pre code {
   @apply bg-transparent p-0 text-inherit;
 }
 
-code:not(pre code)::-webkit-scrollbar {
+code:not(figure[data-rehype-pretty-code-figure] code)::-webkit-scrollbar {
   height: 6px;
 }
-code:not(pre code)::-webkit-scrollbar-thumb {
+code:not(figure[data-rehype-pretty-code-figure] code)::-webkit-scrollbar-thumb {
   background: color-mix(in oklab, var(--color-brand-primary) 35%, transparent);
   border-radius: 999px;
 }
-code:not(pre code) {
+code:not(figure[data-rehype-pretty-code-figure] code) {
   display: inline;
   max-width: 100%;
   vertical-align: baseline;
@@ -613,15 +627,23 @@ code:not(pre code) {
   box-decoration-break: clone;
 }
 
+
+
 pre .token.comment,
 pre .token.prolog,
 pre .token.doctype,
 pre .token.cdata {
-  @apply text-[oklch(51.028%_0.00006_271.152)] dark:text-[oklch(71.37%_0.0192_261.32)];
+  color: oklch(51.028% 0.00006 271.152);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: oklch(71.37% 0.0192 261.32);
+  }
 }
 
 pre .token.punctuation {
-  @apply text-[oklch(42.024%_0.00005_271.152)] dark:text-[oklch(87.17%_0.0093_258.34)];
+  color: oklch(42.024% 0.00005 271.152);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: oklch(87.17% 0.0093 258.34);
+  }
 }
 
 pre .token.property,
@@ -631,7 +653,10 @@ pre .token.number,
 pre .token.constant,
 pre .token.symbol,
 pre .token.deleted {
-  @apply text-[oklch(54.586%_0.20291_356.499)] dark:text-[oklch(80.03%_0.1821_151.71)];
+  color: oklch(54.586% 0.20291 356.499);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: oklch(80.03% 0.1821 151.71);
+  }
 }
 
 pre .token.selector,
@@ -640,7 +665,10 @@ pre .token.string,
 pre .token.char,
 pre .token.builtin,
 pre .token.inserted {
-  @apply text-[oklch(57.729%_0.12624_156.126)] dark:text-[oklch(72.17%_0.1767_305.5)];
+  color: oklch(57.729% 0.12624 156.126);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: oklch(72.17% 0.1767 305.5) /* #c084fc */;
+  }
 }
 
 pre .token.operator,
@@ -648,28 +676,28 @@ pre .token.entity,
 pre .token.url,
 pre .language-css .token.string,
 pre .style .token.string {
-  @apply text-[oklch(56.233%_0.1106_236.093)] dark:text-[oklch(90.52%_0.1657_98.11)];
+  color: var(--color-pre-token-operator-entity-url-langcss-style);
 }
 
 pre .token.atrule,
 pre .token.attr-value,
 pre .token.keyword {
-  @apply text-[oklch(54.201%_0.2263_311.436)] dark:text-[oklch(71.37%_0.1434_254.62)];
+  color: var(--color-pre-token-atrule-attrval-keyword);
 }
 
 pre .token.function,
 pre .token.class-name {
-  @apply text-[oklch(63.075%_0.13435_60.247)] dark:text-[oklch(72.53%_0.1752_349.76)];
+  color: var(--color-pre-token-function-classname);
 }
 
 pre .token.regex,
 pre .token.important,
 pre .token.variable {
-  @apply text-[oklch(33.581%_0.12548_23.959)] dark:text-[oklch(86.06%_0.1731_91.94)];
+  color: var(--color-pre-token-regex-important-variable);
 }
 
 pre code[class*="language-"] {
-  @apply text-[oklch(24.776%_0.00003_271.152)] dark:text-[oklch(97.015%_0.00011_271.152)];
+  color: var(--color-pre-code-class-language);
 }
 
 .katex {
