@@ -87,7 +87,7 @@ export class OpenAIServiceWorkup {
       m === "gpt-4.1-nano" ||
       m === "gpt-5" ||
       m === "gpt-5-chat-latest" ||
-      m === "gpt-5-mini" ||
+      // m === "gpt-5-mini" -> not img gen facilitating
       m === "gpt-5-nano" ||
       m === "gpt-5-pro" ||
       m === "gpt-5.1" ||
