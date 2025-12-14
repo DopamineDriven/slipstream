@@ -104,8 +104,6 @@ export class OpenAIService extends OpenAIGPTImageService {
       });
     }
 
-    const reasoning = this.openaiReasoning(m, "medium", "auto", imgGenEnabled);
-
     const resImg = this.responsesImgGen(
       imgGenEnabled ?? false,
       m,
@@ -148,11 +146,10 @@ export class OpenAIService extends OpenAIGPTImageService {
           input: formatted,
           instructions: this.buildInstructions(systemPrompt),
           store: false,
+          reasoning: this.openaiReasoning(m, "low", "auto", true),
           model: m,
           text: this.openAiVerbosity(m, "medium", imgGenEnabled),
-          temperature,
           max_output_tokens: max_tokens,
-          top_p: topP,
           safety_identifier: userId,
           include: ["message.input_image.image_url"],
           truncation: "auto",
@@ -167,7 +164,7 @@ export class OpenAIService extends OpenAIGPTImageService {
         hasFiles,
         loc,
         vectorStoreId ? [vectorStoreId] : undefined,
-        imgGenEnabled,
+        false,
         undefined
       );
       str = await client.responses.create(
@@ -184,6 +181,7 @@ export class OpenAIService extends OpenAIGPTImageService {
           ),
           include: [
             "web_search_call.action.sources",
+            "reasoning.encrypted_content",
             "web_search_call.results",
             "message.input_image.image_url",
             "file_search_call.results"
@@ -191,7 +189,12 @@ export class OpenAIService extends OpenAIGPTImageService {
           max_output_tokens: max_tokens,
           safety_identifier: userId,
           truncation: "auto",
-          reasoning,
+          reasoning: this.openaiReasoning(
+            m,
+            m === "gpt-5.2" ? "xhigh" : "medium",
+            "auto",
+            false
+          ),
           parallel_tool_calls: true,
           tools
         },

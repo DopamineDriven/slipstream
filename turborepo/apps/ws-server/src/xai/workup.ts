@@ -53,8 +53,8 @@ export class GrokWorkupService {
     return this.canViewImgs(model);
   }
 
-  protected isImgGenModel(model: GrokModelIdUnion){
-    return model ==="grok-2-image-1212";
+  protected isImgGenModel(model: GrokModelIdUnion) {
+    return model === "grok-2-image-1212";
   }
 
   protected urlExtWorkup(attachment: AttachmentSingleton<true>) {
@@ -287,8 +287,14 @@ export class GrokWorkupService {
   protected parseFileSearchResults(
     input: CTR<xAIResponses.OutputItem.Done.FileSearchItem, "results">
   ) {
-    const textArr = Array.of<string>();
+    const textArr = Array.of<{
+      score: number;
+      file_id: string;
+      text: string;
+    }>();
     const aggregate = Array.of<{
+      score: number;
+      file_id: string;
       originalFilename: string;
       resultBody: string;
       decodedFilename: {
@@ -300,10 +306,14 @@ export class GrokWorkupService {
       };
     }>();
     for (const result of input.results) {
-      textArr.push(result.text);
+      textArr.push({
+        score: result.score,
+        file_id: result.file_id,
+        text: result.text
+      });
     }
 
-    for (const text of textArr) {
+    for (const { text, file_id, score } of textArr) {
       const tt = text
         .split(/\noriginalFilename:+(.*?)\n/)
         .map(t => t.trimStart());
@@ -323,6 +333,8 @@ export class GrokWorkupService {
       const { hexEncodedFilename, ...rest } = resObj;
 
       const expandedObj = {
+        score,
+        file_id,
         decodedFilename: this.parseFilename(hexEncodedFilename),
         ...rest
       };
