@@ -132,8 +132,11 @@ export class AnthropicService extends AnthropicWorkup {
             );
           }
         }
-      } else if (chunk.type === "message_delta") {
-        done = chunk.delta.stop_reason;
+      }
+      if (chunk.type === "message_delta") {
+        if (chunk.delta.stop_reason) {
+          done = chunk.delta.stop_reason;
+        }
         if (chunk.usage.input_tokens) usage = chunk.usage.input_tokens;
         if (usage && chunk.usage.output_tokens)
           usage += chunk.usage.output_tokens;
@@ -160,6 +163,10 @@ export class AnthropicService extends AnthropicWorkup {
           anthropicThinkingAgg += thinkingText;
           thinkingChunks.push(thinkingText);
         }
+        if (text) {
+          anthropicAgg += text;
+          chunks.push(text);
+        }
         ws.send(
           JSON.stringify({
             type: "ai_chat_chunk",
@@ -169,6 +176,7 @@ export class AnthropicService extends AnthropicWorkup {
             title,
             model,
             userMsgId,
+            chunk: text,
             systemPrompt,
             temperature,
             topP,
@@ -193,6 +201,7 @@ export class AnthropicService extends AnthropicWorkup {
           title,
           systemPrompt,
           temperature,
+          chunk: text,
           topP,
           provider,
           thinkingText: thinkingText,
@@ -235,7 +244,7 @@ export class AnthropicService extends AnthropicWorkup {
             temperature,
             topP,
             chunk: text,
-            isThinking: false,
+            isThinking: anthropicIsCurrentlyThinking,
             thinkingDuration:
               anthropicThinkingDuration > 0
                 ? anthropicThinkingDuration
@@ -262,6 +271,7 @@ export class AnthropicService extends AnthropicWorkup {
               : undefined,
 
           chunk: text,
+          isThinking: anthropicIsCurrentlyThinking,
           done: false
         });
         if (chunks.length % 10 === 0) {

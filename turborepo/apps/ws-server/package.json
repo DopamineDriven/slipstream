@@ -48,6 +48,8 @@
       "openai": [
         "dist/openai/gpt-image.d.ts",
         "dist/openai/index.d.ts",
+        "dist/openai/responses-chat.d.ts",
+        "dist/openai/responses-img-gen.d.ts",
         "dist/openai/types.d.ts",
         "dist/openai/workup.d.ts"
       ],

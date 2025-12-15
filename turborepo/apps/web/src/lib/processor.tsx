@@ -225,7 +225,7 @@ const components = {
   }: ComponentPropsWithRef<"blockquote">) => (
     <blockquote
       className={cn(
-        "mb-2 border-l-4 pl-4 wrap-anywhere break-all whitespace-pre-wrap italic",
+        "mb-2 border-l-4 pl-4 wrap-anywhere break-all hyphens-auto whitespace-pre-wrap italic",
         className
       )}
       {...props}>
