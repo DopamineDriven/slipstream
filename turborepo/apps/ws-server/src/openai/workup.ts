@@ -1,4 +1,5 @@
 import { createReadStream } from "node:fs";
+import { readFile } from "node:fs/promises";
 import type { ImageGenPartialArr } from "@/openai/types.ts";
 import type {
   InferPromiseRT,
@@ -60,6 +61,33 @@ export class OpenAIServiceWorkup {
     return client;
   }
 
+  protected handleImgExtension(
+    ext:
+      | "png"
+      | "jpeg"
+      | "webp"
+      | "apng"
+      | "gif"
+      | "bmp"
+      | "avif"
+      | "heic"
+      | "svg"
+      | "ico"
+      | "tiff"
+      | "unknown"
+      | "jpg"
+  ) {
+    return ext === "png"
+      ? "image/png"
+      : ext === "webp"
+        ? "image/webp"
+        : ext === "jpeg"
+          ? "image/jpeg"
+          : ext === "jpg"
+            ? "image/jpeg"
+            : "application/octet-stream";
+  }
+
   protected isImgGenModel(m: OpenAiModelIdUnion) {
     return (
       m === "dall-e-2" ||
@@ -87,7 +115,7 @@ export class OpenAIServiceWorkup {
       m === "gpt-4.1-nano" ||
       m === "gpt-5" ||
       m === "gpt-5-chat-latest" ||
-      // m === "gpt-5-mini" -> not img gen facilitating
+      m === "gpt-5-mini" ||
       m === "gpt-5-nano" ||
       m === "gpt-5-pro" ||
       m === "gpt-5.1" ||
@@ -229,12 +257,7 @@ export class OpenAIServiceWorkup {
     });
     const sharedOpts = {
       input_image_mask,
-      isPureImgGenModel:
-        (pureImgGenModel ?? model === "gpt-image-1")
-          ? true
-          : model === "gpt-image-1-mini"
-            ? true
-            : false,
+      isPureImgGenModel: pureImgGenModel ?? this.isImgGenModel(model),
       msgBoundImgAssets,
       n: this.prisma.handleImgGenCount("openai", model, { n }),
       moderation: moderate,
@@ -323,6 +346,22 @@ export class OpenAIServiceWorkup {
       return { file_id: uploaded.id, db_id: upsert.id };
     } catch (err) {
       throw new Error(this.prisma.safeErrMsg(err));
+    } finally {
+      this.prisma.cleanupTmpPostupload("OPENAI", absTmpPath, tmpUniquename);
+    }
+  }
+
+  private async encodeImageAsDataUrl(
+    attachment: AttachmentSingleton<true>
+  ): Promise<string> {
+    const { absTmpPath, tmpUniquename, mime } =
+      await this.prisma.fetchRemoteToTmp("OPENAI", attachment);
+    try {
+      const fileBuffer = await readFile(absTmpPath);
+      const base64 = fileBuffer.toString("base64");
+      const contentType =
+        mime ?? attachment.compatMime ?? attachment.mime ?? "application/octet-stream";
+      return `data:${contentType};base64,${base64}`;
     } finally {
       this.prisma.cleanupTmpPostupload("OPENAI", absTmpPath, tmpUniquename);
     }
@@ -465,7 +504,8 @@ export class OpenAIServiceWorkup {
     const content = Array.of<
       | {
           type: "input_image";
-          image_url: string;
+          image_url?: string;
+          file_id?: string;
           detail: "auto" | "low" | "high";
         }
       | {
@@ -484,7 +524,23 @@ export class OpenAIServiceWorkup {
       if (!url) continue;
 
       if (mime.startsWith("image/")) {
-        content.push({ type: "input_image", image_url: url, detail: "auto" });
+        try {
+          const { file_id } = await this.ensureAssetUploadedToOpenAI(
+            att,
+            client,
+            keyFingerprint
+          );
+          content.push({ type: "input_image", file_id, detail: "auto" });
+          continue;
+        } catch (error) {
+          this.logger.warn(
+            { attachmentId: att.id, error },
+            "Failed to upload image to OpenAI, falling back to base64 data URL"
+          );
+          const image_url = await this.encodeImageAsDataUrl(att);
+          content.push({ type: "input_image", image_url, detail: "auto" });
+          continue;
+        }
       } else {
         const { file_id } = await this.ensureAssetUploadedToOpenAI(
           att,
@@ -503,7 +559,8 @@ export class OpenAIServiceWorkup {
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     client: OpenAI,
-    keyFingerprint = "server"
+    keyFingerprint = "server",
+    opts?: { onlyMostRecentUser?: boolean }
   ) {
     if (isNewChat) {
       const first = msgs[0];
@@ -528,6 +585,29 @@ export class OpenAIServiceWorkup {
             { role: "user", content: first.content }
           ] as const satisfies ResponseInput);
     } else {
+      if (opts?.onlyMostRecentUser) {
+        const lastUser = [...msgs].reverse().find(t => t.senderType === "USER");
+        if (lastUser) {
+          const attContent = await this.buildAttachmentContentAsync(
+            lastUser.attachments,
+            client,
+            keyFingerprint
+          );
+          return attContent.length
+            ? ([
+                {
+                  role: "user",
+                  content: [
+                    ...attContent,
+                    { type: "input_text", text: lastUser.content }
+                  ]
+                }
+              ] as const satisfies ResponseInput)
+            : ([
+                { role: "user", content: lastUser.content }
+              ] as const satisfies ResponseInput);
+        }
+      }
       const history = this.prependProviderModelTag(msgs.slice(0, -1));
       const last = msgs.at(-1);
       if (last?.senderType === "USER") {
@@ -638,7 +718,10 @@ export class OpenAIServiceWorkup {
       if (typeof m.content === "string") return false;
       if (m.role !== "user") return false;
       return m.content.some(
-        t => t.type === "input_image" && typeof t?.image_url !== "undefined"
+        t =>
+          t.type === "input_image" &&
+          (typeof t?.image_url !== "undefined" ||
+            typeof t?.file_id !== "undefined")
       );
     });
   }
@@ -704,22 +787,28 @@ export class OpenAIServiceWorkup {
     const pureImgModel = this.canCallImageApi(model);
     if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [{ ...imgGen }] satisfies OpenAI.Responses.Tool[];
+        return [
+          imgGen,
+          {
+            type: "web_search",
+            user_location
+          }
+        ] satisfies OpenAI.Responses.Tool[];
       }
       return [
-        { type: "file_search", vector_store_ids },
+        { type: "file_search", vector_store_ids, max_num_results: 10 },
         {
-          type: "web_search_preview",
+          type: "web_search",
           user_location
         }
       ] satisfies OpenAI.Responses.Tool[];
     } else {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
-        return [{ ...imgGen }] satisfies OpenAI.Responses.Tool[];
+        return [imgGen] satisfies OpenAI.Responses.Tool[];
       }
       return [
         {
-          type: "web_search_preview",
+          type: "web_search",
           user_location
         }
       ] satisfies OpenAI.Responses.Tool[];
@@ -885,12 +974,12 @@ export class OpenAIServiceWorkup {
     switch (model) {
       case "gpt-5.1-codex-max":
       case "gpt-5.2":
+      case "gpt-5.1":
       case "gpt-5.2-pro":
+      case "gpt-5":
       case "gpt-5-pro": {
         return { verbosity: "high" } as const;
       }
-      case "gpt-5.1":
-      case "gpt-5":
       case "gpt-5-mini":
       case "gpt-5-chat-latest":
       case "gpt-5-nano": {

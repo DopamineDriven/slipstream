@@ -37,6 +37,8 @@ export default defineConfig(
         "src/models/index.ts",
         "src/openai/gpt-image.ts",
         "src/openai/index.ts",
+        "src/openai/responses-chat.ts",
+        "src/openai/responses-img-gen.ts",
         "src/openai/types.ts",
         "src/openai/workup.ts",
         "src/pdf/index.ts",

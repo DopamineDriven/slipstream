@@ -342,6 +342,7 @@ export class GrokWorkupService {
     }
     return aggregate;
   }
+
   protected async *getAllUserFiles(limit = 50, apiKey = this.xaiKey) {
     let has_more = true;
     let count = 0;
@@ -360,10 +361,10 @@ export class GrokWorkupService {
           Authorization: `Bearer ${apiKey}`
         }
       });
-      console.log(response);
 
       const page = await response.json<GetFilesRT>();
-      console.log(page);
+
+      console.info(page);
 
       has_more = typeof page.pagination_token !== "undefined";
       pagination_token = page.pagination_token;
@@ -828,11 +829,10 @@ export class GrokWorkupService {
   /**
    * Model Compatibility
    *
-   * Supported Models: grok-4, grok-4-fast, grok-4-fast-non-reasoning, grok-4-1-fast, grok-4-1-fast-non-reasoning
+   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning
    *
-   * Strongly Recommended: grok-4-1-fast (specifically trained to excel at agentic tool calling)
+   * Strongly Recommended: grok-4-1-fast-reasoning (specifically trained to excel at agentic tool calling)
    *
-   * grok code fast 1 can definitely work with text based assets, but not image based ones
    *
    *
    */

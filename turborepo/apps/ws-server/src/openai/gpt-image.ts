@@ -33,7 +33,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     super(logger, prisma, apiKey, s3);
   }
 
-  protected async handleOpenaiAiNativeImageRequestGptImage1({
+  protected async handleOpenaiNativeImageRequestGptImage1({
     chunks,
     conversationId,
     isNewChat,
@@ -83,7 +83,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       isNewChat,
       msgs,
       client,
-      userId
+      userId,
+      { onlyMostRecentUser: true }
     );
 
     // image api doesn't return a resp_id like responses api does:
