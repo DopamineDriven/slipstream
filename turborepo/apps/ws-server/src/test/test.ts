@@ -1,7 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 import type { Provider } from "@slipstream/types";
-import { res } from "./xai/grok-code-fast-1-res.ts";
 
 dotenv.config({ quiet: true });
 
@@ -30,9 +29,8 @@ class ScriptGen extends Fs {
   }
 
   private data = async (env: string, id: string) => {
-    const { PrismaClient } = await import(
-      "@slipstream/db/node/generated/client"
-    );
+    const { PrismaClient } =
+      await import("@slipstream/db/node/generated/client");
     const prismaClient = new PrismaClient({ datasourceUrl: env });
     try {
       prismaClient.$connect();
@@ -112,7 +110,7 @@ class ScriptGen extends Fs {
       });
       const sss = { messages: cleanS, ...rest };
       this.withWs(
-        `src/__out__/conversations/${sss.title && sss.title.length < 128 ?  sss.title: "summoning-the-muse"}/${sss.id}.json`,
+        `src/__out__/conversations/${sss.title && sss.title.length < 128 ? sss.title : "summoning-the-muse"}/${sss.id}.json`,
         JSON.stringify(sss, null, 2)
       );
       return s;
@@ -277,7 +275,7 @@ header-includes: |
   \\renewcommand{\\sectionmark}[1]{\\markboth{#1}{}}
 ---\n\n${content}`};
 
-  private withWsAsyncs(data: string[], toSlug: string, title: string) {
+  private withWsAsyncs(data: string[], toSlug: string, _title: string) {
     return new Promise(res =>
       res(
         this.withWs(
@@ -300,10 +298,13 @@ header-includes: |
     if (!data) return;
     if (!raw) return;
     if (!raw.title) return;
-    const toSlug = raw.title.length > 128 ? "summoning-the-muse": raw.title
-      .replace(/ /gim, "-")
-      .replace(/:/gim, "--")
-      .replace(/'/gim, "");
+    const toSlug =
+      raw.title.length > 128
+        ? "summoning-the-muse"
+        : raw.title
+            .replace(/ /gim, "-")
+            .replace(/:/gim, "--")
+            .replace(/'/gim, "");
     try {
       await Promise.all([this.withWsAsyncs(data, toSlug, raw.title)]).then(() =>
         this.wait(2000)
