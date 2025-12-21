@@ -307,7 +307,7 @@ export class GrokCollectionsService extends GrokWorkupService {
   ) {
     const managementKey = mgmntKey ?? this.xaiManagementKey;
     const key = apiKey ?? this.xaiKey;
-    const STALE_THRESHOLD_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
+    const STALE_THRESHOLD_MS = 120 * 24 * 60 * 60 * 1000; // 14 days
     const now = Date.now();
 
     const filesToDelete = Array.of<{

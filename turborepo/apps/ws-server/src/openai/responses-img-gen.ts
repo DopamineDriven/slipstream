@@ -90,15 +90,20 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const hasImages = this.hasImages(formatted);
 
     const hasFiles = this.hasFiles(formatted);
+    const hasExistingOpenAIAssets =
+      hasFiles ||
+      (await this.prisma.hasProviderMessages(userId, "OPENAI"));
 
     const fileIds = this.fileIds(formatted);
 
     let vectorStoreId: string | undefined;
-    if (fileIds.length > 0) {
+    if (hasExistingOpenAIAssets) {
       vectorStoreId = await this.ensureUserVectorStoreId(client, null, userId);
-      await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
-        file_ids: fileIds
-      });
+      if (fileIds.length > 0) {
+        await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
+          file_ids: fileIds
+        });
+      }
     }
 
     const resImg = this.responsesImgGen(
@@ -113,7 +118,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     outputFormat = r.output_format;
     const tools = this.handleTooling(
       m,
-      hasFiles,
+      hasExistingOpenAIAssets,
       loc,
       vectorStoreId ? [vectorStoreId] : undefined,
       true,

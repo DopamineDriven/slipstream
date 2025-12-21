@@ -775,17 +775,17 @@ export class OpenAIServiceWorkup {
         : undefined
     ) satisfies OpenAI.Responses.WebSearchTool.UserLocation | null | undefined;
   }
-
+  // To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2
   protected handleTooling(
     model: OpenAiModelIdUnion,
-    hasFiles: boolean,
+    fileSearchEnabled: boolean,
     user_location?: OpenAI.Responses.WebSearchPreviewTool.UserLocation,
     vector_store_ids?: string[],
     imgGenEnabled = false,
     imgGen?: OpenAI.Responses.Tool.ImageGeneration
   ) {
     const pureImgModel = this.canCallImageApi(model);
-    if (hasFiles && vector_store_ids && vector_store_ids.length >= 1) {
+    if (fileSearchEnabled && vector_store_ids && vector_store_ids.length >= 1) {
       if (imgGenEnabled === true && imgGen && pureImgModel === false) {
         return [
           imgGen,
@@ -1024,3 +1024,4 @@ export class OpenAIServiceWorkup {
     }
   }
 }
+// To continue this session, run codex resume 019b2b4a-3e12-7c90-8276-49994f1d3bd2

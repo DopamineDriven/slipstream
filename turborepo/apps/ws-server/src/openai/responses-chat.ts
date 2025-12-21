@@ -66,20 +66,25 @@ export class OpenAIResponsesChatService extends OpenAIResponsesImgGenService {
     const _hasImages = this.hasImages(formatted);
 
     const hasFiles = this.hasFiles(formatted);
+    const hasExistingOpenAIAssets =
+      hasFiles ||
+      (await this.prisma.hasProviderMessages(userId, "OPENAI"));
 
     const fileIds = this.fileIds(formatted);
 
     let vectorStoreId: string | undefined;
-    if (fileIds.length > 0) {
+    if (hasExistingOpenAIAssets) {
       vectorStoreId = await this.ensureUserVectorStoreId(client, null, userId);
-      await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
-        file_ids: fileIds
-      });
+      if (fileIds.length > 0) {
+        await client.vectorStores.fileBatches.createAndPoll(vectorStoreId, {
+          file_ids: fileIds
+        });
+      }
     }
 
     const tools = this.handleTooling(
       m,
-      hasFiles,
+      hasExistingOpenAIAssets,
       loc,
       vectorStoreId ? [vectorStoreId] : undefined,
       false,

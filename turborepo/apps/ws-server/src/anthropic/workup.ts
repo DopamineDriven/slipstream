@@ -947,7 +947,7 @@ export class AnthropicWorkup {
                       // Smaller images use URLs for faster processing
                       const imageBlock = {
                         type: "text",
-                        text: `\n\n![${attachment.filename}](${url})\n\n`
+                        text: `\n\n[seen] ![${attachment.filename}](${url})\n\n`
                       } as const satisfies Anthropic.Beta.BetaContentBlockParam;
                       content.push(imageBlock);
                     } else if (mime.includes("application")) {
@@ -1228,9 +1228,9 @@ export class AnthropicWorkup {
             } else {
               // Stale context
               if (attachment.assetType === "IMAGE") {
-                textParts.push(`![${filename}](${url})`);
+                textParts.push(`[seen] ![${filename}](${url})`);
               } else {
-                textParts.push(`[${filename}](${url})`);
+                textParts.push(`[seen] [${filename}](${url})`);
               }
             }
           }
@@ -1258,9 +1258,9 @@ export class AnthropicWorkup {
             const filename = attachment.filename ?? "attachment";
 
             if (attachment.assetType === "IMAGE") {
-              textParts.push(`![${filename}](${url})`);
+              textParts.push(`[seen] ![${filename}](${url})`);
             } else {
-              textParts.push(`[${filename}](${url})`);
+              textParts.push(`[seen] [${filename}](${url})`);
             }
           }
         }

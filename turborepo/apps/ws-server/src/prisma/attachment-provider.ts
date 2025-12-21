@@ -451,7 +451,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     provider: providerLink.provider,
                     providerRef: providerLink.providerRef,
                     isExpired:
-                      30 * 24 * 60 * 60 * 1000 <
+                      120 * 24 * 60 * 60 * 1000 <
                       Date.now() -
                         (providerLink.lastCheckedAt?.getTime() ??
                           providerLink.createdAt.getTime()),
