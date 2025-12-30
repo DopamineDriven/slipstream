@@ -7,13 +7,20 @@ import { DbService, PrismaClient } from "@slipstream/db/node";
 export class PrismaUtilsService extends ModelService {
   protected readonly prismaClient: PrismaClient;
 
-  constructor(prisma: DbService) {
+  constructor(prisma: DbService,     public isProd: boolean) {
     super();
     this.prismaClient = prisma.prismaClient;
   }
 
 
+  public getEnv() {
+    return this.isProd === true ? ("prod" as const) : ("dev" as const);
+  }
 
+  public vectorStoreDisplayName(userId: string){
+    const env = this.getEnv();
+    return `${env}-${userId}`;
+  }
   protected parseDraftId(draftId: string) {
     if (/^(?:[A-Za-z0-9_-]+~){3}(?:0|[1-9][0-9]*)$/.test(draftId) === false) {
       throw new Error(`invalid draftId ${draftId}`);

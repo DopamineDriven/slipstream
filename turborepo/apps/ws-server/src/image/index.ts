@@ -15,8 +15,7 @@ type PhotoHeuristic = {
 export class ImageCompatService {
   constructor(
     private s3: S3Storage,
-    private prisma: PrismaService,
-    private isProd: boolean
+    private prisma: PrismaService
   ) {}
   private async urlToBuff(cdnUrl: string) {
     const response = await fetch(cdnUrl, { method: "GET" });
@@ -287,7 +286,7 @@ export class ImageCompatService {
     const transformed = await this.sharpWorkup(buf, specs);
     if (!transformed) return;
 
-    const toS3 = await this.s3.uploadCompatGenerated(transformed, this.isProd, {
+    const toS3 = await this.s3.uploadCompatGenerated(transformed, this.prisma.isProd, {
       attachmentId: id,
       target,
       contentType: `image/${target}`,

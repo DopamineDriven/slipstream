@@ -1,11 +1,5 @@
 export { ProviderValidation } from "@/provider-validation/index.ts";
-export type {
-  GeminiModelAspectRatio,
-  GeminiModelAspectRatioWorkup,
-  OpenAIModelAspectRatio,
-  OpenAIModelAspectRatioWorkup,
-  OutputSizeProps
-} from "@/provider-validation/index.ts";
+
 
 declare global {
   interface JSON {

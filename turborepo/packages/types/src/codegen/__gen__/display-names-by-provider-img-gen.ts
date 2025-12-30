@@ -14,12 +14,14 @@ export const displayNameModelsByProviderImgGen = {
     "GPT-4o",
     "GPT-4o mini",
     "o3",
+    "GPT Image 1.5",
     "GPT Image 1",
     "GPT Image 1 mini",
     "DALL·E 3",
     "DALL·E 2"
   ],
   gemini: [
+    "Deep Research Pro Preview (Dec-12-2025)",
     "Nano Banana Pro",
     "Nano Banana",
     "Imagen 4",

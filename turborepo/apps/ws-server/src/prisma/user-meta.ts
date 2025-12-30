@@ -1,13 +1,16 @@
 import type { UserData } from "@/types/index.ts";
 import { ExtractService } from "@/extract/index.ts";
-import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
-import { DbService } from "@slipstream/db/node";
-import { EncryptionService } from "@slipstream/encryption";
 import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import * as dotenv from "dotenv";
-import type { ClientContextWorkupProps, RecordCountsProps } from "@slipstream/types";
+import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
+import type {
+  ClientContextWorkupProps,
+  RecordCountsProps
+} from "@slipstream/types";
+import { DbService } from "@slipstream/db/node";
+import { EncryptionService } from "@slipstream/encryption";
 
-dotenv.config({quiet: true});
+dotenv.config({ quiet: true });
 
 export class PrismaUserMetaService extends PrismaAttachmentService {
   protected encryption: EncryptionService;
@@ -15,11 +18,8 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
     Lowercase<$Enums.Provider>,
     string | undefined
   >();
-  constructor(
-    prisma: DbService,
-    extractor: ExtractService
-  ) {
-    super(prisma, extractor);
+  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+    super(prisma, extractor, isProd);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }
 
@@ -40,6 +40,28 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
         createdAt: { gte: since }
       }
     });
+  }
+
+  public async resolveApiKey(
+    userId: string,
+    fallbackApiKey: string,
+    provider: Lowercase<$Enums.Provider>
+  ) {
+    let key: string;
+
+    const tryApiKey = await this.handleApiKeyLookup(provider, userId);
+
+    if (tryApiKey.apiKey) {
+      key = tryApiKey.apiKey;
+    } else {
+      key = fallbackApiKey;
+    }
+
+    console.info(
+      `${tryApiKey.apiKey === null ? "no " + provider + " key on file" : provider + " api key on file"}`
+    );
+
+    return key;
   }
   protected formatClientContextProps(props: RecordCountsProps) {
     const isDefault = Object.fromEntries(

@@ -24,9 +24,10 @@ import { DbService } from "@slipstream/db/node";
 export class PrismaChatService extends PrismaUserMetaService {
   constructor(
     prisma: DbService,
-    extractor: ExtractService
+    extractor: ExtractService,
+    isProd: boolean
   ) {
-    super(prisma, extractor);
+    super(prisma, extractor,isProd);
   }
 
   private async handleAiChatReqCreateWithAttachments({
@@ -612,6 +613,7 @@ export class PrismaChatService extends PrismaUserMetaService {
           keyId,
           ...data
         });
+
       /** CREATE */
       if (conversationId === "new-chat") {
         /** CREATE, WITH ATTACHMENTS */

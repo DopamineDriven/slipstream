@@ -7,6 +7,7 @@ import type {
   ConversationSingletonOneOff as ConversationSingleton,
   CTR,
   EventTypeMap,
+  GetModelUtilRT,
   MessageSingleton,
   Provider,
   RTC,
@@ -100,15 +101,15 @@ export type MessageDataWorkupProps = {
   content: string;
   provider: $Enums.Provider;
   senderType: "USER";
-  model: AllModelsUnion;
+  model?: AllModelsUnion;
   userId: string;
   userKeyId: string | null;
   imageGenJob: {
     create: {
       userKeyId: string | null;
       userId: string;
-      inputFidelity: "low" | "high" | undefined;
-      moderation: "auto" | "low" | undefined;
+      inputFidelity: "low" | "high" |  (string & {})| undefined;
+      moderation: (string & {}) | "auto" | "low" | undefined;
       negativePrompt: string | undefined;
       nRequested: number | undefined;
       nCompleted: 0;
@@ -119,11 +120,11 @@ export type MessageDataWorkupProps = {
       outputSize: string | undefined;
       progress: 0;
       seed: number | undefined;
-      personGeneration: "DONT_ALLOW" | "ALLOW_ADULT" | "ALLOW_ALL" | undefined;
+      personGeneration:(string & {}) |  "DONT_ALLOW" | "ALLOW_ADULT" | "ALLOW_ALL" | undefined;
       stage: "QUEUED";
       outputQuality: string | undefined;
       topP: number | undefined;
-      model: AllModelsUnion;
+      model: GetModelUtilRT<Provider>;
       prompt: string;
       provider: $Enums.Provider;
     };

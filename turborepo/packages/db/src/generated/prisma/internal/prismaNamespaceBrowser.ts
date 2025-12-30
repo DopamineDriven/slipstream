@@ -54,6 +54,7 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   ProviderStore: 'ProviderStore',
+  ProviderStoreDocument: 'ProviderStoreDocument',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -171,6 +172,27 @@ export const ProviderStoreScalarFieldEnum = {
 } as const
 
 export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
+
+
+export const ProviderStoreDocumentScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  provider: 'provider',
+  docRef: 'docRef',
+  docUri: 'docUri',
+  filename: 'filename',
+  state: 'state',
+  indexedAt: 'indexedAt',
+  mimeType: 'mimeType',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  size: 'size'
+} as const
+
+export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
 
 
 export const UserKeyScalarFieldEnum = {

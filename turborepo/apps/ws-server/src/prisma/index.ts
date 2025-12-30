@@ -36,9 +36,9 @@ export class PrismaService extends PrismaChatService {
   constructor(
     prisma: DbService,
     extractor: ExtractService,
-    public isProd: boolean
+     isProd: boolean
   ) {
-    super(prisma, extractor);
+    super(prisma, extractor, isProd);
   }
 }
 

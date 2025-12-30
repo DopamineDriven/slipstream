@@ -1,3 +1,4 @@
+/// <reference types="@google/genai" />
 import type { Socket } from "net";
 import * as dotenv from "dotenv";
 import type { Signals } from "@slipstream/types";
@@ -113,7 +114,7 @@ async function exe() {
       redisInstance,
       s3,
       cfg.X_AI_KEY,
-      process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     const { AnthropicService } = await import("@/anthropic/index.ts");
@@ -155,7 +156,8 @@ async function exe() {
         meta: cfg.LLAMA_API_KEY,
         openai: cfg.OPENAI_API_KEY,
         vercel: cfg.V0_API_KEY,
-        grokMgmtKey: process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
+        grokMgmtKey:
+          process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
       },
       dependencies: {
         logger,
@@ -174,7 +176,7 @@ async function exe() {
 
     const { ImageCompatService } = await import("@/image/index.ts");
 
-    const imgCompatService = new ImageCompatService(s3, prisma, isProd);
+    const imgCompatService = new ImageCompatService(s3, prisma);
 
     const resolver = new Resolver(
       wsServer,
@@ -182,7 +184,7 @@ async function exe() {
       s3,
       region,
       imgCompatService,
-      process.env.X_AI_MANAGEMENT_API_KEY ??cfg.X_AI_MANAGEMENT_API_KEY
+      process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
 
     resolver.registerAll();
@@ -272,6 +274,6 @@ declare global {
 declare module "pythonia" {
   export interface Python {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    <T = unknown>(fileName: string): Promise<T>
+    <T = unknown>(fileName: string): Promise<T>;
   }
 }

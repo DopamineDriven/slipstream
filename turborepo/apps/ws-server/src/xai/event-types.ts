@@ -1,10 +1,8 @@
 import type {
   InputReasoningProps,
-  LogProbsFields,
   TextFormat,
   ToolChoiceUnion,
-  ToolRequestInput,
-  Usage
+  ToolRequestInput
 } from "@/xai/responses-types.ts";
 import type { GrokModelIdUnion } from "@slipstream/types";
 
@@ -33,9 +31,9 @@ export namespace xAIResponses {
   }
   export namespace ReasoningSummaryPart {
     export interface Part {
-        text: string;
-        type: "summary_text";
-      }
+      text: string;
+      type: "summary_text";
+    }
     export interface Added {
       sequence_number: number;
       type: "response.reasoning_summary_part.added";
@@ -135,7 +133,7 @@ export namespace xAIResponses {
   }
   export namespace OutputItem {
     export namespace Added {
-      export interface ReasoningItem {
+      export interface Reasoning {
         /**
          * id starts with `rs_`
          */
@@ -144,7 +142,7 @@ export namespace xAIResponses {
         type: "reasoning";
         status: "in_progress";
       }
-      export interface MessageItem {
+      export interface Message {
         type: "message";
         status: "in_progress";
         content: [];
@@ -154,7 +152,7 @@ export namespace xAIResponses {
         id: string;
         role: "assistant";
       }
-      export interface FileSearchItem {
+      export interface FileSearchCall {
         /**
          * id starts with `fs_`
          */
@@ -164,27 +162,36 @@ export namespace xAIResponses {
         queries: [];
         results: [];
       }
-      export interface WebSearchItem {
+
+      export namespace WebSearchCall {
+        export namespace Action {
+          export interface Search {
+            type: "search";
+            query: string;
+            sources: [];
+          }
+        }
+        export interface Action extends Action.Search {}
+      }
+      export interface WebSearchCall {
         /**
          * id starts with `ws_`
          */
         id: string;
         type: "web_search_call";
         status: "in_progress";
-        action: {
-          type: "search";
-          query: string;
-          sources: [];
-        };
+        action: WebSearchCall.Action;
       }
-      export type CustomToolCallName =
-        | "x_keyword_search"
-        | "x_semantic_search"
-        | "search_pdf_attachment"
-        | "read_attachment"
-        | "x_user_search"
-        | (string & {});
-      export interface CustomToolCallItem {
+      export namespace CustomToolCall {
+        export type Name =
+          | "x_keyword_search"
+          | "x_semantic_search"
+          | "search_pdf_attachment"
+          | "read_attachment"
+          | "x_user_search"
+          | (string & {});
+      }
+      export interface CustomToolCall {
         type: "custom_tool_call";
         status: "in_progress";
         /**
@@ -200,33 +207,33 @@ export namespace xAIResponses {
          */
         call_id: string;
         input: string;
-        name: CustomToolCallName;
-      }
-      export type Item =
-        | ReasoningItem
-        | MessageItem
-        | FileSearchItem
-        | WebSearchItem
-        | CustomToolCallItem;
-      export interface EventTypes {
-        sequence_number: number;
-        type: "response.output_item.added";
-        item: Item;
-        output_index: number;
+        name: CustomToolCall.Name;
       }
     }
+    export interface Added {
+      sequence_number: number;
+      type: "response.output_item.added";
+      item:
+        | Added.Reasoning
+        | Added.Message
+        | Added.FileSearchCall
+        | Added.WebSearchCall
+        | Added.CustomToolCall;
+      output_index: number;
+    }
     export namespace Done {
-      export interface ReasoningItem {
+      export namespace Reasoning {
+        export interface SummaryText {
+          text: string;
+          type: "summary_text";
+        }
+      }
+      export interface Reasoning {
         id: string;
         type: "reasoning";
         status: "completed";
         encrypted_content: string;
-        summary:
-          | {
-              text: string;
-              type: "summary_text";
-            }[]
-          | never[];
+        summary: Reasoning.SummaryText[] | never[];
       }
       export interface MessageAnnotationFull {
         type: "url_citation";
@@ -239,40 +246,51 @@ export namespace xAIResponses {
         type: "url_citation";
         url: string;
       }
-      export interface MessageItem {
+      export interface Message {
         type: "message";
         status: "completed";
-        content: ContentPart.OutputText[];
+        content: ContentPart.Done.OutputText[];
         id: string;
         role: "assistant";
       }
-      export interface FileSearchItemResultsSingleton {
-        file_id: string;
-        filename: string;
-        score: number;
-        text: string;
+      export namespace FileSearchCall {
+        export interface Results {
+          file_id: string;
+          filename: string;
+          score: number;
+          text: string;
+        }
       }
-      export interface FileSearchItem {
+      export interface FileSearchCall {
         id: string;
         type: "file_search_call";
         status: "completed";
         queries: string[];
-        results?: xAIResponses.OutputItem.Done.FileSearchItemResultsSingleton[];
+        results?: FileSearchCall.Results[];
       }
-      export interface WebSearchItem {
+      export namespace WebSearchCall {
+        export interface Action {
+          type: "search";
+          query: string;
+          sources: never[] | unknown[];
+        }
+      }
+      export interface WebSearchCall {
         id: string;
         type: "web_search_call";
         status: "completed" | "failed";
-        action: { type: "search"; query: string; sources: never[] | unknown[] };
+        action: WebSearchCall.Action;
       }
-      export type CustomToolCallName =
-        | "x_keyword_search"
-        | "x_semantic_search"
-        | "search_pdf_attachment"
-        | "read_attachment"
-        | "x_user_search"
-        | (string & {});
-      export interface CustomToolCallItem {
+      export namespace CustomToolCall {
+        export type Name =
+          | "x_keyword_search"
+          | "x_semantic_search"
+          | "search_pdf_attachment"
+          | "read_attachment"
+          | "x_user_search"
+          | (string & {});
+      }
+      export interface CustomToolCall {
         type: "custom_tool_call";
         status: "completed";
         /**
@@ -293,84 +311,83 @@ export namespace xAIResponses {
          * `'{"query":"Catullus OR catullian filter:poetry OR riff OR parody","limit":10,"mode":"Top"}'`
          */
         input: string;
-        name: CustomToolCallName;
+        name: CustomToolCall.Name;
       }
-      export type Item =
-        | ReasoningItem
-        | MessageItem
-        | FileSearchItem
-        | WebSearchItem
-        | CustomToolCallItem;
-      export interface EventTypes {
-        sequence_number: number;
-        type: "response.output_item.done";
-        item: Item;
-        output_index: number;
-      }
+    }
+    export interface Done {
+      sequence_number: number;
+      type: "response.output_item.done";
+      item:
+        | Done.Reasoning
+        | Done.Message
+        | Done.FileSearchCall
+        | Done.WebSearchCall
+        | Done.CustomToolCall;
+      output_index: number;
     }
   }
   export namespace ContentPart {
-    export interface OutputText {
-      type: "output_text";
-      text: string;
-      logprobs: number[] | never[];
-      annotations: OutputText.UrlCitation[] | never[];
-    }
     export interface Added {
       sequence_number: number;
       type: "response.content_part.added";
       content_index: number;
       item_id: string;
       output_index: number;
-      part: Part.Added;
+      part: Added.OutputText;
     }
-    export namespace Part {
-      export interface Added {
+    export namespace Added {
+      export interface OutputText {
         type: "output_text";
         text: string;
         logprobs: never[];
         annotations: never[];
       }
-      export interface Done {
+    }
+    export namespace Done {
+      export interface OutputText {
         type: "output_text";
         text: string;
         logprobs: number[] | never[];
-        annotations: OutputText.UrlCitation[] | never[];
+        annotations: OutputText.Annotation.Added["annotation"][] | never[];
       }
     }
     export interface Done {
       sequence_number: number;
-      type: "response.content_part.added";
+      type: "response.content_part.done";
       content_index: number;
       item_id: string;
       output_index: number;
-      part: Part.Done;
+      part: Done.OutputText;
     }
   }
   export namespace OutputText {
-    export interface UrlCitationWithSpecificity {
-      type: "url_citation";
-      url: string;
-      start_index: number;
-      end_index: number;
-      title: string;
+    export namespace Annotation {
+      export namespace Added {
+        export interface UrlCitationWithSpecificity {
+          type: "url_citation";
+          url: string;
+          start_index: number;
+          end_index: number;
+          title: string;
+        }
+        export interface UrlCitationSansSpecificity {
+          type: "url_citation";
+          url: string;
+        }
+      }
+      export interface Added {
+        sequence_number: number;
+        type: "response.output_text.annotation.added";
+        annotation:
+          | Added.UrlCitationSansSpecificity
+          | Added.UrlCitationWithSpecificity;
+        annotation_index: number;
+        content_index: number;
+        item_id: string;
+        output_index: number;
+      }
     }
-    export interface UrlCitationSansSpecificity {
-      type: "url_citation";
-      url: string;
-    }
-    export type UrlCitation =
-      | UrlCitationSansSpecificity
-      | UrlCitationWithSpecificity;
-    export interface AnnotationAdded {
-      sequence_number: number;
-      type: "response.output_text.annotation.added";
-      annotation: UrlCitationSansSpecificity | UrlCitationWithSpecificity;
-      annotation_index: number;
-      content_index: number;
-      item_id: string;
-      output_index: number;
-    }
+    export interface Annotation extends Annotation.Added {}
     export interface Delta {
       sequence_number: number;
       type: "response.output_text.delta";
@@ -378,7 +395,7 @@ export namespace xAIResponses {
       delta: string;
       item_id: string;
       output_index: number;
-      logprobs: never[] | LogProbsFields[];
+      logprobs: never[] | LogProbs[];
     }
     export interface Done {
       sequence_number: number;
@@ -400,9 +417,7 @@ export namespace xAIResponses {
       created_at: number;
       model: GrokModelIdUnion;
       status: V extends "completed" ? V : "in_progress";
-      output: V extends "completed"
-        ? xAIResponses.OutputItem.Done.Item[]
-        : never[];
+      output: V extends "completed" ? OutputItem.Done["item"][] : never[];
       max_output_tokens: number | null;
       parallel_tool_calls: boolean;
       previous_response_id: string | null;
@@ -417,7 +432,51 @@ export namespace xAIResponses {
       store: boolean;
       metadata: Record<string, never>;
       usage?: Usage;
-      logprobs: never[] | LogProbsFields[];
+      logprobs: never[] | LogProbs[];
     };
+  }
+  export namespace LogProbs {
+    export interface Fields {
+      token: string;
+      logprob: number;
+      bytes: number[];
+      top_logprobs: never[];
+    }
+  }
+  export interface LogProbs extends LogProbs.Fields {}
+  export namespace Usage {
+    export namespace InputTokens {
+      export interface Details {
+        cached_tokens: number;
+      }
+    }
+    export interface InputTokens extends InputTokens.Details {}
+    export namespace OutputTokens {
+      export interface Details {
+        reasoning_tokens: number;
+      }
+    }
+    export interface OutputTokens extends OutputTokens.Details {}
+    export namespace ServerSideToolUsage {
+      export interface Details {
+        web_search_calls: number;
+        x_search_calls: number;
+        code_interpreter_calls: number;
+        file_search_calls: number;
+        mcp_calls: number;
+        document_search_calls: number;
+      }
+    }
+    export interface ServerSideToolUsage extends ServerSideToolUsage.Details {}
+  }
+  export interface Usage {
+    input_tokens: number;
+    input_tokens_details: Usage.InputTokens;
+    output_tokens: number;
+    output_tokens_details: Usage.OutputTokens;
+    total_tokens: number;
+    num_sources_used: number;
+    num_server_side_tools_used?: number;
+    server_side_tool_usage_details?: Usage.ServerSideToolUsage;
   }
 }

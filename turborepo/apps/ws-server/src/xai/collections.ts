@@ -10,12 +10,9 @@ import type {
   ToolChoiceUnion
 } from "@/xai/responses-types.ts";
 import type {
-  AssetCache,
   CollectionDocument,
-  CreateCollectionResponse,
-  DocumentResSingleton
+  CreateCollectionResponse
 } from "@/xai/types.ts";
-import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { ResponsesStreamParser } from "@/xai/response-sse.ts";
@@ -27,55 +24,13 @@ import type {
 } from "@slipstream/types";
 
 export class GrokCollectionsService extends GrokWorkupService {
-  protected logger: Logger;
-
-  protected readonly baseUrl = "https://api.x.ai/v1/responses";
-  protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-
-  /**
-   * Asset cache: attachmentId → file metadata
-   * Same key as fileRegistry for smooth interop (mirrors Gemini pattern)
-   */
-  private assetCache: Map<string, AssetCache> = new Map<string, AssetCache>();
-
-  /**
-   * File registry: attachmentId → full xAI document metadata
-   * Same key as assetCache for smooth interop (mirrors Gemini pattern)
-   */
-  private fileRegistry: Map<string, DocumentResSingleton> = new Map<
-    string,
-    DocumentResSingleton
-  >();
-
-  private lastRegistrySync: Date | null = null;
-
-  /**
-   * env: "dev" | "prod"
-   * Collection registry: (collection_name=env-userId) userId  → collection_id
-   * Avoids repeated collection lookups per user
-   */
-  private collectionRegistry: Map<string, string> = new Map<string, string>();
-
-  /**
-   * env: "dev" | "prod"
-   * Store DB registry: (collection_name=env-userId) userId → ProviderStore.id
-   * Quick lookup for database store record
-   */
-  private storeDbRegistry: Map<string, string> = new Map<string, string>();
-
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
     xaiKey: string,
     xaiManagementKey: string
   ) {
-    super(prisma, xaiKey, xaiManagementKey);
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[grok] " }
-      );
+    super(logger, prisma, xaiKey, xaiManagementKey);
   }
 
   private async createUserCollection(userId: string, mgmtKey?: string) {
@@ -129,6 +84,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       const created = await this.createUserCollection(userId, managementKey);
       collectionData = created.xaiData;
       storeDbData = {
+        totalBytes: 0,
         dbId: created.dbData.id,
         fileCount: created.dbData.fileCount,
         hasStore: true,
@@ -148,6 +104,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         collectionData.documents_count
       );
       storeDbData = {
+        totalBytes: 0,
         dbId: dbData.id,
         fileCount: dbData.fileCount,
         hasStore: true,
@@ -195,7 +152,7 @@ export class GrokCollectionsService extends GrokWorkupService {
             fileId: asset.providerRef,
             collectionId,
             databaseId: asset.id,
-            storeDbId: storeDbId,
+            storeDbId,
             lastAccessedAt: asset.lastCheckedAt
           });
         }
@@ -307,7 +264,7 @@ export class GrokCollectionsService extends GrokWorkupService {
   ) {
     const managementKey = mgmntKey ?? this.xaiManagementKey;
     const key = apiKey ?? this.xaiKey;
-    const STALE_THRESHOLD_MS = 120 * 24 * 60 * 60 * 1000; // 14 days
+    const STALE_THRESHOLD_MS = 120 * 365.25 * 24 * 60 * 60 * 1000; // 120 years
     const now = Date.now();
 
     const filesToDelete = Array.of<{
@@ -457,8 +414,8 @@ export class GrokCollectionsService extends GrokWorkupService {
         keyFingerprint,
         doc.file_metadata.content_type,
         doc.file_metadata.file_id,
-        // No TTL for xAI, use 14-day window from now for tracking
-        new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        // No TTL for xAI, use 120-year window from now for tracking
+        new Date(Date.now() + 120 * 365.25 * 24 * 60 * 60 * 1000).toISOString(),
         keyId,
         BigInt(Number.parseInt(doc.file_metadata.size_bytes)),
         doc.file_metadata.created_at
@@ -523,7 +480,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     };
     const key = apiKey ?? this.xaiKey;
 
-    const toFilename = this.toXaiFilename(att);
+    const toFilename = this.prisma.toVectorStoreFilename(att);
 
     const res = await this.streamUploadFileWorkup(att, key);
     console.log(res);
@@ -560,20 +517,21 @@ export class GrokCollectionsService extends GrokWorkupService {
       );
 
       if (fetcher.ok) {
-        const createCollectionDoc = await this.prisma.createGrokCollectionDocument(
-          att.userId,
-          att.id,
-          collectionObj.dbId,
-          collectionObj.storeRef,
-          keyFingerprint,
-          att.compatStatus === "ACTIVE"
-            ? (att.compatMime ?? "application/octet-stream")
-            : (att.mime ?? "application/octet-stream"),
-          res.id,
-          keyFingerprint,
-          att.size ? BigInt(att.size) : undefined,
-          new Date(res.created_at).toISOString()
-        );
+        const createCollectionDoc =
+          await this.prisma.createGrokCollectionDocument(
+            att.userId,
+            att.id,
+            collectionObj.dbId,
+            collectionObj.storeRef,
+            keyFingerprint,
+            att.compatStatus === "ACTIVE"
+              ? (att.compatMime ?? "application/octet-stream")
+              : (att.mime ?? "application/octet-stream"),
+            res.id,
+            keyFingerprint,
+            att.size ? BigInt(att.size) : undefined,
+            new Date(res.created_at).toISOString()
+          );
 
         this.assetCache.set(att.id, createCollectionDoc);
 
@@ -607,14 +565,6 @@ export class GrokCollectionsService extends GrokWorkupService {
     }
   }
 
-  protected get hasActiveCollection() {
-    return this.collectionRegistry.size > 0;
-  }
-
-  protected getUserCollectionId(userId: string) {
-    return this.collectionRegistry.get(userId);
-  }
-
   protected async getUserCollectionIdWithFallback(
     userId: string,
     mgmtApiKey?: string
@@ -637,15 +587,6 @@ export class GrokCollectionsService extends GrokWorkupService {
       this.logger.info(err);
     }
   }
-
-  protected getProviderStoreDbId(userId: string) {
-    return this.storeDbRegistry.get(userId);
-  }
-
-  protected hasFileSearchCapability(userId: string) {
-    return this.collectionRegistry.has(userId);
-  }
-
   protected async createResponsesStream({
     workup: {
       msgs,
@@ -805,7 +746,7 @@ export class GrokCollectionsService extends GrokWorkupService {
               const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
               if (url && mime) {
-                const [filename, ext] = this.filenameToHexExtTuple(
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
                   url,
                   attachment.compatStatus,
                   false
@@ -942,7 +883,7 @@ export class GrokCollectionsService extends GrokWorkupService {
               const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
 
               if (url && mime) {
-                const [filename, ext] = this.filenameToHexExtTuple(
+                const [filename, ext] = this.prisma.filenameToHexExtTuple(
                   url,
                   att.compatStatus,
                   false

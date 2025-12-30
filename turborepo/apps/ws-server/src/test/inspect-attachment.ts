@@ -1,6 +1,5 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import { UserKeySingleton } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -15,33 +14,17 @@ const data = async () => {
   });
   prismaClient.$connect();
   try {
-    const data = await prismaClient.attachment.findFirstOrThrow({
-      where: {id: "b245re7lh9qp2nxp3v0kayo4"
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        providerLinks: { include: { userKey: true } },
-        document: true,
-        image: true,
-        imageGenOutput: true
-      }
+    const data = await prismaClient.attachment.findMany({
+      where: { userId: "nrr6h4r4480f6kviycyo1zhf" },
+      take: 1000,
+      orderBy: { createdAt: "desc" }
     });
 
-    const { size, ...p } = data;
-    const mapProviderSingleton = p?.providerLinks?.map(v => {
-      const { size, userKey, ...s } = v;
-      return {
-        userKey: userKey as undefined | UserKeySingleton<true>,
-        size: size ? Number(size) : null,
-        ...s
-      };
+    const dataMap = data.map(att => {
+      const { size, ...attRest } = att;
+      return { size: size ? Number(size) : null, ...attRest };
     });
-
-    return {
-      ...p,
-      size: size ? Number(size) : null,
-      providerLinks: mapProviderSingleton
-    };
+    return dataMap;
   } catch (err) {
     throw new Error(
       typeof err === "string"
@@ -60,7 +43,7 @@ const fs = new Fs(process.cwd());
   return await data();
 })().then(v => {
   fs.withWs(
-    "src/test/__out__/inspect/xai/attachment-2.json",
+    "src/test/__out__/attachments/dev/attachment-dev.json",
     JSON.stringify(v, null, 2)
   );
 });

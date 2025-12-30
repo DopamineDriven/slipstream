@@ -9,6 +9,7 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
+  OpenAIImgCapableModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -38,7 +39,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     max_tokens,
     jobId,
     requestMessageId,
-    model = "gpt-5" satisfies OpenAiModelIdUnion,
+    model = "gpt-image-1.5" satisfies OpenAiModelIdUnion,
     systemPrompt,
     temperature,
     title,
@@ -50,7 +51,9 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
   }: ProviderOpenaiRequestEntity) {
     // use most recent message id for image gen requests to update Im
 
-    const m = model as OpenAiModelIdUnion;
+    const m = this.prisma.openAIImgGenCapable(model as OpenAiModelIdUnion)
+      ? (model as OpenAIImgCapableModels)
+      : "gpt-5.2";
 
     const provider = "openai" as const;
 
@@ -91,8 +94,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
 
     const hasFiles = this.hasFiles(formatted);
     const hasExistingOpenAIAssets =
-      hasFiles ||
-      (await this.prisma.hasProviderMessages(userId, "OPENAI"));
+      hasFiles || (await this.prisma.hasProviderMessages(userId, "OPENAI"));
 
     const fileIds = this.fileIds(formatted);
 
@@ -125,8 +127,8 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
       {
         type: "image_generation",
         background: r.output_background,
-        input_fidelity: hasImages ? (r.input_fidelity ?? "high") : undefined,
-        model: "gpt-image-1",
+        input_fidelity: hasImages ? "high" : r.input_fidelity,
+        model: "gpt-image-1.5",
         moderation: "low",
         output_compression: r.output_compression,
         output_format: r.output_format,
@@ -139,6 +141,7 @@ export class OpenAIResponsesImgGenService extends OpenAIGPTImageService {
     const streamRes = await client.responses.create(
       {
         stream: true,
+        stream_options: { include_obfuscation: false },
         input: formatted,
         instructions: this.buildInstructions(systemPrompt),
         store: false,

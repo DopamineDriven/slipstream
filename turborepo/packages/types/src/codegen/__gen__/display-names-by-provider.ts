@@ -19,6 +19,7 @@ export const displayNameModelsByProvider = {
     "GPT-4.1 nano",
     "GPT-4o",
     "GPT-4o mini",
+    "GPT Image 1.5",
     "GPT Image 1",
     "GPT Image 1 mini",
     "DALL·E 3",
@@ -40,6 +41,7 @@ export const displayNameModelsByProvider = {
   ],
   gemini: [
     "Gemini 3 Pro Preview",
+    "Gemini 3 Flash Preview",
     "Gemini 2.5 Pro",
     "Nano Banana Pro",
     "Nano Banana",

@@ -1,320 +1,56 @@
-import type { GenerateContentResponseProps } from "@/gemini/types.ts";
+import type {
+  GeminiEventMap,
+  GenerateContentResponseProps
+} from "@/gemini/types.ts";
 import type {
   Content,
   ContentUnion,
-  File,
   GenerateContentConfig,
   GenerateContentParameters,
   Part,
   PartMediaResolution,
-  ToolConfig,
-  UploadFileParameters
+  ToolConfig
 } from "@google/genai";
-import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import {
   GoogleGenAI,
+  Interactions,
   PartMediaResolutionLevel,
   ThinkingLevel
 } from "@google/genai";
-import type { GeminiModelAspectRatioWorkup } from "@slipstream/img-gen";
 import type {
   AttachmentSingleton,
+  CTR,
+  GeminiImageSize as GeminiModelAspectRatioWorkup,
   GeminiModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
+import { FileSearchStoreService } from "./fss.ts";
 
-export class GeminiWorkupService {
-  protected defaultClient: GoogleGenAI;
-  protected logger: Logger;
-  protected apiVersion = "v1alpha" as const;
-  private assetCache = new Map<
-    string,
-    { fileUri: string; expiresAt: Date; databaseId: string }
-  >();
-  private fileRegistry = new Map<string, File>();
-  private lastRegistrySync: Date | null = null;
+/**
+ The following models support File Search Tooling:
+ ```json
+[
+  "deep-research-pro-preview-12-2025",
+  "gemini-3-flash-preview",
+  "gemini-3-pro-preview",
+  "gemini-2.5-pro",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite"
+]
+```
+ */
+
+export class GeminiWorkupService extends FileSearchStoreService {
+
   constructor(
     logger: LoggerService,
-    protected prisma: PrismaService,
-    protected apiKey: string
+     prisma: PrismaService,
+     apiKey: string
   ) {
-    this.logger = logger
-      .getPinoInstance()
-      .child(
-        { pid: process.pid, node_version: process.version },
-        { msgPrefix: "[gemini] " }
-      );
-    this.defaultClient = new GoogleGenAI({
-      apiKey: this.apiKey,
-      apiVersion: this.apiVersion
-    });
+    super(logger,prisma,apiKey)
   }
-
-  protected getClient(overrideKey?: string) {
-    if (overrideKey) {
-      return new GoogleGenAI({
-        apiKey: overrideKey,
-        apiVersion: this.apiVersion
-      });
-    }
-    return this.defaultClient;
-  }
-  protected handleThinking(start: number) {
-    return performance.now() - start;
-  }
-  private async *getAllGoogleFiles(apiKey?: string, limit = 10) {
-    const genai = this.getClient(apiKey);
-
-    const pager = await genai.files.list({
-      config: { pageSize: limit }
-    });
-    let has_more = true,
-      count = 0,
-      page_number = 0,
-      page = pager.page;
-    while (has_more) {
-      has_more = pager.hasNextPage();
-      count += page.length;
-
-      yield {
-        page,
-        count,
-        has_more,
-        page_number
-      };
-      page_number += 1;
-      if (!has_more) {
-        break;
-      }
-      page = await pager.nextPage();
-    }
-  }
-  // Note: markFileAccessed is not needed for Google's TTL-based system
-  // Files automatically expire after 48 hours regardless of access patterns
-
-  private async cleanupStaleFiles(apiKey: string) {
-    const client = this.getClient(apiKey);
-    const filesToDelete = Array.of<string>();
-    const dbRecordsToDelete = Array.of<string>();
-    const toTuple = Array.from(this.fileRegistry.entries());
-    const assetCacheFileNames = Array.from(this.assetCache.keys());
-    for (const [name, record] of toTuple) {
-      // Check if file has expired (Google Files have 48-hour TTL)
-      if (record.expirationTime) {
-        const expired = new Date(record.expirationTime).getTime();
-
-        if (expired < Date.now()) {
-          filesToDelete.push(name);
-          // Collect database record IDs if available
-          if (record.name && assetCacheFileNames.includes(record.name)) {
-            const dbId = this.assetCache.get(record.name)?.databaseId;
-            const expires = this.assetCache.get(record.name)?.expiresAt;
-            if (dbId && expires && expires.getTime() < Date.now()) {
-              dbRecordsToDelete.push(dbId);
-            }
-          }
-        }
-      }
-    }
-
-    if (filesToDelete.length === 0) {
-      console.info("No stale files to clean up from google files api");
-      return;
-    }
-
-    // Delete from database first (in transaction)
-
-    if (dbRecordsToDelete.length > 0) {
-      try {
-        await this.prisma.deleteStaleIds(dbRecordsToDelete);
-        this.logger.debug(
-          dbRecordsToDelete,
-          `Deleted ${dbRecordsToDelete.length} stale database records`
-        );
-        console.info(
-          `cleaned up ${dbRecordsToDelete.length} files in cleanupStaleFiles for GEMINI - target -> database`
-        );
-      } catch (error) {
-        this.logger.warn(
-          { error },
-          "Failed to delete stale files in cleanupStaleFiles for GEMINI - target -> database"
-        );
-      }
-    }
-    console.info(
-      `no files to delete in cleanupStaleFiles for GEMINI - target -> database`
-    );
-
-    // Then delete from Google Files API
-    for (const name of filesToDelete) {
-      try {
-        await client.files.delete({ name });
-        // Remove from registry and cache
-        this.fileRegistry.delete(name);
-        // Also remove from assetCache if present (cache key matches the file name)
-        if (this.assetCache.has(name)) {
-          this.assetCache.delete(name);
-        }
-        console.info(
-          filesToDelete,
-          `Cleaned up ${filesToDelete.length} stale files for GEMINI - target->google files api`
-        );
-      } catch (error) {
-        this.logger.warn(
-          { error, name },
-          `Failed to delete stale file ${name} for GEMINI - target->google files api`
-        );
-      }
-    }
-    console.log(
-      `Cleanup complete: ${filesToDelete.length} files removed for GEMINI - target->google files api`
-    );
-  }
-
-  public async syncFileRegistry(userId: string, cleanupStaleFiles = false) {
-    const hasGeminiMessages = await this.prisma.hasProviderMessages(
-      userId,
-      "GEMINI"
-    );
-    if (!hasGeminiMessages) {
-      return { synced: true, totalFiles: 0, lastSync: new Date() };
-    }
-    const tryApiKey = await this.prisma.handleApiKeyLookup("gemini", userId);
-
-    console.info(
-      `Starting Google Gemini file registry sync -- ${tryApiKey.apiKey === null ? "no gemini key on file" : "gemini api key on file"}`
-    );
-
-    let totalFiles = 0;
-
-    const apiKey = tryApiKey.apiKey ?? this.apiKey;
-    this.assetCache.clear();
-    try {
-      const providerAssets = await this.prisma.findManyByProvider(
-        "GEMINI",
-        userId
-      );
-      // Populate asset cache with active database mappings (gated by environment (database) and api key (user-key vs default server key))
-      if (providerAssets.length > 0) {
-        for (const asset of providerAssets) {
-          if (asset.providerUri && asset.expiresAt && !asset.isExpired) {
-            this.assetCache.set(asset.providerRef, {
-              expiresAt: asset.expiresAt,
-              fileUri: asset.providerUri,
-              databaseId: asset.id
-            });
-          }
-        }
-      }
-
-      console.info(
-        `Populated Gemini asset cache with ${this.assetCache.size} entries from database`
-      );
-    } catch (error) {
-      console.error({ error }, "Failed to populate asset cache from database");
-    }
-    // Clear and rebuild registry
-    this.fileRegistry.clear();
-    // Populate file registry cache but cross-compare with asset-cache entries before persisting (ensure database-existence for user before adding--
-    // if a user is using the default server api key there will be many files not relevant to the user in the google files api)
-    for await (const batch of this.getAllGoogleFiles(apiKey)) {
-      for (const file of batch.page) {
-        if (file.name && file.expirationTime && file.uri && file.sizeBytes) {
-          if (this.assetCache.has(file.name)) {
-            this.fileRegistry.set(file.name, {
-              name: file.name,
-              sizeBytes: file.sizeBytes,
-              createTime: file.createTime,
-              uri: file.uri,
-              displayName: file.displayName,
-              mimeType: file.mimeType,
-              error: file.error,
-              expirationTime: file.expirationTime,
-              sha256Hash: file.sha256Hash,
-              source: file.source,
-              state: file.state,
-              videoMetadata: file.videoMetadata,
-              updateTime: file.updateTime,
-              downloadUri: file.downloadUri
-            });
-          }
-        }
-      }
-
-      totalFiles = batch.count;
-      console.debug(`Synced ${batch.count} files, has_more: ${batch.has_more}`);
-    }
-
-    this.lastRegistrySync = new Date();
-    console.info(
-      `File registry and Asset cache sync complete for Gemini: ${totalFiles} files indexed`
-    );
-
-    // Optionally trigger cleanup of stale files
-    if (cleanupStaleFiles) {
-      await this.cleanupStaleFiles(apiKey);
-    }
-    // the same api key (for me) is used in prod and dev -- therefore, not all fileRegistry cached files will be available in either environment (shared file registry, database partitioned by env)
-    if (this.fileRegistry.size !== this.assetCache.size) {
-      if (this.fileRegistry.size > this.assetCache.size) {
-        const fileRegistryCacheKeys = Array.from(this.fileRegistry.keys());
-        for (const fileKey of fileRegistryCacheKeys) {
-          if (!this.assetCache.has(fileKey)) {
-            this.fileRegistry.delete(fileKey);
-          }
-        }
-      }
-      if (this.assetCache.size > this.fileRegistry.size) {
-        const dbCacheKeys = Array.from(this.assetCache.keys());
-
-        for (const dbKey of dbCacheKeys) {
-          if (!this.fileRegistry.has(dbKey)) {
-            this.assetCache.delete(dbKey);
-          }
-        }
-      }
-    }
-
-    return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
-  }
-
-  private async uploadRemoteAssetToGoogle(
-    attachment: AttachmentSingleton<true>,
-    apiKey?: string
-  ) {
-    const { absTmpPath, mime, tmpUniquename } =
-      await this.prisma.fetchRemoteToTmp("GEMINI", attachment);
-
-    const mimeType = mime === "application/text" ? "text/markdown" : mime;
-    try {
-      const ai = this.getClient(apiKey);
-      const uploadedFile = await ai.files.upload({
-        file: absTmpPath,
-        config: {
-          mimeType,
-          name: `files/${attachment.id}`,
-          displayName: attachment.filename ?? undefined
-        }
-      } satisfies UploadFileParameters);
-
-      return uploadedFile;
-    } catch (error) {
-      this.logger.error(
-        `Error uploading file to Google for attachment: ${attachment.id} - ${this.prisma.safeErrMsg(error)}`
-      );
-      throw new Error(
-        error instanceof Error
-          ? error.message
-          : "Failed to upload file to Google Files API" +
-              this.prisma.safeErrMsg(error)
-      );
-    } finally {
-      this.prisma.cleanupTmpPostupload("GEMINI", absTmpPath, tmpUniquename);
-    }
-  }
-
   /**
    * gemini-3-* only
    */
@@ -347,8 +83,282 @@ export class GeminiWorkupService {
         level: PartMediaResolutionLevel.MEDIA_RESOLUTION_UNSPECIFIED
       } satisfies PartMediaResolution;
   }
+  protected async *resilientStream(
+    gemini: GoogleGenAI,
+    params: Interactions.CreateAgentInteractionParamsStreaming,
+    interactionId?: string,
+    lastEventId?: string
+  ): AsyncGenerator<Interactions.InteractionSSEEvent> {
+    let attempts = 0;
+    const maxAttempts = 5;
 
-  private async formatHistoryForSession(
+    while (attempts < maxAttempts) {
+      try {
+        const stream = interactionId
+          ? await gemini.interactions.get(
+              interactionId,
+              {
+                stream: true,
+                api_version: "v1alpha",
+                last_event_id: lastEventId
+              },
+              { stream: true }
+            )
+          : await gemini.interactions.create(params, { stream: true });
+
+        for await (const event of stream) {
+          yield event;
+          if (event.event_id) lastEventId = event.event_id;
+          if (event.event_type === "interaction.start") {
+            interactionId = event.interaction?.id;
+          }
+        }
+        return; // Completed successfully
+      } catch (err) {
+        attempts++;
+        this.logger.warn(
+          { err, attempts, interactionId, lastEventId },
+          "deep_research_stream_interrupted"
+        );
+        await this.prisma.extractor.wait(2000 * attempts); // Exponential backoff
+      }
+    }
+
+    throw new Error(
+      `Failed to complete research after ${maxAttempts} attempts`
+    );
+  }
+
+  protected interactionsHandler = <
+    const K extends keyof GeminiEventMap = keyof GeminiEventMap
+  >(
+    event: K,
+    handler: (data: GeminiEventMap[K]) => void
+  ) => ({ event, handler });
+
+  protected getPreviousInteractionId(msgs: MessageSingleton<true>[]) {
+    // Find the last message from the AI that used the Deep Research model
+    const lastResearchIndex = msgs.findLastIndex(
+      m =>
+        m.provider === "GEMINI" &&
+        m.senderType === "AI" &&
+        m.model === "deep-research-pro-preview-12-2025" &&
+        m.responseOutput &&
+        m.responseOutput.length > 0
+    );
+
+    if (lastResearchIndex !== -1) {
+      // Return the stored Interaction ID
+      return msgs[lastResearchIndex]?.responseOutput ?? undefined;
+    }
+
+    return undefined;
+  }
+
+  protected async formatHistoryForDeepResearch(
+    msgs: MessageSingleton<true>[],
+    keyFingerprint: string,
+    keyId?: string,
+    apiKey?: string
+  ): Promise<Interactions.Turn[]> {
+    const formattedTurns = Array.of<Interactions.Turn>();
+
+    for (const msg of msgs) {
+      const role = msg.senderType === "USER" ? "user" : "model";
+      const contentItems =
+        Array.of<
+          Exclude<CTR<Interactions.Turn, "content">["content"], string>[number]
+        >();
+      if (msg.attachments && msg.attachments.length > 0) {
+        for (const attachment of msg.attachments) {
+          try {
+            if (
+              attachment?.compatCdnUrl &&
+              attachment?.cdnUrl &&
+              attachment?.mime &&
+              attachment?.compatMime &&
+              attachment?.compatStatus
+            ) {
+              const { fileUri, mimeType } = await this.ensureAssetUploaded(
+                attachment,
+                keyFingerprint,
+                keyId ?? undefined,
+                apiKey
+              );
+
+              // Switch on your Enum for strict typing
+              switch (attachment.assetType) {
+                case "IMAGE":
+                  contentItems.push({
+                    type: "image",
+                    uri: fileUri,
+                    mime_type: mimeType
+                  });
+                  break;
+
+                case "DOCUMENT":
+                  contentItems.push({
+                    type: "document",
+                    uri: fileUri,
+                    mime_type: mimeType
+                  });
+                  break;
+
+                case "VIDEO":
+                  // Note: Deep Research docs didn't explicitly forbid video, only audio.
+                  // If the underlying model (Gemini 3) supports it, this is how you pass it.
+                  contentItems.push({
+                    type: "video",
+                    uri: fileUri,
+                    mime_type: mimeType
+                  });
+                  break;
+
+                case "AUDIO":
+                case "UNKNOWN":
+                default:
+                  // Deep Research currently docs state: "Audio inputs are not supported."
+                  this.logger.warn(
+                    `Skipping unsupported asset type for Deep Research: ${attachment.assetType}`
+                  );
+                  break;
+              }
+            }
+          } catch (err) {
+            this.logger.warn(
+              `Error preparing attachment ${attachment.id}: ${this.prisma.safeErrMsg(err)}`
+            );
+          }
+        }
+      }
+
+      let textContent = msg.content;
+      if (msg.senderType === "AI") {
+        const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "unknown"}]`;
+        textContent = `${modelIdentifier}\n${msg.content}`;
+      }
+
+      contentItems.push({
+        type: "text",
+        text: textContent
+      });
+
+      formattedTurns.push({ content: contentItems, role });
+    }
+
+    return formattedTurns;
+  }
+
+  protected handleInteractionResults(event: Interactions.ContentDelta) {
+    if (
+      event.delta &&
+      "result" in event.delta &&
+      typeof event.delta.result !== "undefined"
+    ) {
+      if (typeof event.delta.result === "string") {
+        if (event.delta.type === "code_execution_result") {
+          event.delta;
+        }
+      } else if (
+        Array.isArray(event.delta.result) &&
+        event.delta.result.length > 0 &&
+        (event.delta.type === "url_context_result" ||
+          event.delta.type === "google_search_result" ||
+          event.delta.type === "file_search_result")
+      ) {
+        switch (event.delta.type) {
+          case "file_search_result": {
+            for (const res of event.delta.result) {
+              this.logger.info(
+                {
+                  store: res.file_search_store ?? "no-store",
+                  title: res.title,
+                  text: res.text
+                },
+                "gemini_file_search_result"
+              );
+            }
+            break;
+          }
+          case "google_search_result": {
+            for (const res of event.delta.result) {
+              if (res.url && res.title) {
+                this.logger.info(
+                  {
+                    url: res.url,
+                    title: res.title,
+                    renderedContent:
+                      res.rendered_content ?? "no rendered content"
+                  },
+                  "gemini_url_context_result"
+                );
+              }
+            }
+            break;
+          }
+          case "url_context_result": {
+            for (const res of event.delta.result) {
+              if (res.url && res.status) {
+                this.logger.info(
+                  {
+                    url: res.url,
+                    status: res.status
+                  },
+                  "gemini_url_context_result"
+                );
+              }
+            }
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      } else if (
+        event.delta.result &&
+        "items" in event.delta.result &&
+        typeof event.delta.result.items !== "undefined" &&
+        (event.delta.type === "function_result" ||
+          event.delta.type === "mcp_server_tool_result")
+      ) {
+        switch (event.delta.type) {
+          case "function_result": {
+            const { items } = event.delta.result;
+            for (const item of items) {
+              if (typeof item === "string") {
+                console.log(item);
+              } else {
+                if (item.data) {
+                  // handle base64 string upload to s3
+                }
+                if (item.uri) {
+                  // handle fetch then base64 upload to s3
+                }
+                //it's an image
+              }
+            }
+            break;
+          }
+          case "mcp_server_tool_result": {
+            event.delta.result.items;
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+        for (const it of event.delta.result.items) {
+          const item = it as Interactions.ImageContent | string;
+          if (typeof item === "string") {
+            item;
+          } else {
+            item;
+          }
+        }
+      }
+    }
+  }
+  protected async formatHistoryForSession(
     msgs: MessageSingleton<true>[],
     keyFingerprint: string,
     keyId?: string,
@@ -454,7 +464,7 @@ export class GeminiWorkupService {
     return formatted;
   }
 
-  private formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
+  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
     if (isNewChat) {
       return systemPrompt;
     }
@@ -467,7 +477,7 @@ export class GeminiWorkupService {
     ) satisfies ContentUnion;
   }
 
-  private async getHistoryAndInstruction(
+  protected async getHistoryAndInstruction(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
     keyFingerprint: string,
@@ -503,7 +513,9 @@ export class GeminiWorkupService {
     // Use Google Files API naming convention for cache key and registry key
     const fileKey = `files/${attachment.id}`;
     const now = new Date();
-
+    // TODO improve this handling
+    const fssRef = this.fssRegistry.get(attachment.userId) ?? "";
+    const storeDbId = this.storeDbRegistry.get(attachment.userId) ?? "";
     // Check in-memory cache AND verify file exists in registry
     const cached = this.assetCache.get(fileKey);
     if (cached && new Date(cached.expiresAt).getTime() > now.getTime()) {
@@ -575,13 +587,13 @@ export class GeminiWorkupService {
           BigInt(Number.parseInt(existingInRegistry.sizeBytes)),
           existingInRegistry.createTime
         );
-
         this.assetCache.set(fileKey, {
           fileUri: existingInRegistry.uri,
           expiresAt,
+          storeDbId,
+          storeRef: fssRef,
           databaseId: d.id
         });
-
         this.logger.debug(
           { fileKey, state: existingInRegistry.state },
           `Found file in registry, skipping upload: files/${attachment.id}`
@@ -628,6 +640,8 @@ export class GeminiWorkupService {
       // Update in-memory cache
       this.assetCache.set(fileKey, {
         fileUri: uploadedFile.uri,
+        storeRef: fssRef,
+        storeDbId,
         expiresAt: new Date(uploadedFile.expirationTime),
         databaseId: dbRecord.id
       });
@@ -732,6 +746,8 @@ export class GeminiWorkupService {
       /**
        * gemini-3-* only
        */
+      case "deep-research-pro-preview-12-2025":
+      case "gemini-3-flash-preview":
       case "gemini-3-pro-preview": {
         return {
           includeThoughts: true,

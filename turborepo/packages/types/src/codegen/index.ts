@@ -27,12 +27,14 @@ const providerModelImagesApi = {
     "gpt-4o",
     "gpt-4o-mini",
     "o3",
+    "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
     "dall-e-3",
     "dall-e-2"
   ],
   gemini: [
+    "deep-research-pro-preview-12-2025",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
     "imagen-4.0-generate-001",
@@ -74,6 +76,7 @@ const providerModelChatApi = {
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
     "dall-e-3",
@@ -95,6 +98,7 @@ const providerModelChatApi = {
   ],
   gemini: [
     "gemini-3-pro-preview",
+    "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
@@ -410,6 +414,7 @@ function formattedOpenAi(props: OpenAiResponse) {
     if (id === "gpt-5.2-pro") return { id, displayName: "GPT-5.2 pro" };
     if (id === "gpt-5.1-codex-max")
       return { id, displayName: "GPT-5.1-Codex-Max" };
+    if (id === "gpt-image-1.5") return { id, displayName: "GPT Image 1.5" };
     const displayName = prettyModelName(id);
     return { id, displayName, ...rest };
   });

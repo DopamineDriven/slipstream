@@ -567,6 +567,7 @@ export type AttachmentWhereInput = {
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
+  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
   video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
@@ -627,6 +628,7 @@ export type AttachmentOrderByWithRelationInput = {
   conversation?: Prisma.ConversationOrderByWithRelationInput
   message?: Prisma.MessageOrderByWithRelationInput
   providerLinks?: Prisma.AttachmentProviderOrderByRelationAggregateInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
   image?: Prisma.ImageMetadataOrderByWithRelationInput
   video?: Prisma.VideoMetadataOrderByWithRelationInput
@@ -690,6 +692,7 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
   message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   providerLinks?: Prisma.AttachmentProviderListRelationFilter
+  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
   video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
@@ -857,6 +860,7 @@ export type AttachmentCreateInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -915,6 +919,7 @@ export type AttachmentUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -971,6 +976,7 @@ export type AttachmentUpdateInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -1029,6 +1035,7 @@ export type AttachmentUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -1196,6 +1203,11 @@ export type AttachmentOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type AttachmentScalarRelationFilter = {
+  is?: Prisma.AttachmentWhereInput
+  isNot?: Prisma.AttachmentWhereInput
+}
+
 export type AttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
@@ -1359,11 +1371,6 @@ export type AttachmentSumOrderByAggregateInput = {
   size?: Prisma.SortOrder
 }
 
-export type AttachmentScalarRelationFilter = {
-  is?: Prisma.AttachmentWhereInput
-  isNot?: Prisma.AttachmentWhereInput
-}
-
 export type AttachmentCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
@@ -1404,6 +1411,20 @@ export type AttachmentUncheckedUpdateManyWithoutUserNestedInput = {
   update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+}
+
+export type AttachmentCreateNestedOneWithoutProviderStoreDocsInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+}
+
+export type AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput = {
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
+  upsert?: Prisma.AttachmentUpsertWithoutProviderStoreDocsInput
+  connect?: Prisma.AttachmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput, Prisma.AttachmentUpdateWithoutProviderStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
 }
 
 export type AttachmentCreateNestedManyWithoutConversationInput = {
@@ -1647,6 +1668,7 @@ export type AttachmentCreateWithoutUserInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
@@ -1703,6 +1725,7 @@ export type AttachmentUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -1790,6 +1813,250 @@ export type AttachmentScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
 }
 
+export type AttachmentCreateWithoutProviderStoreDocsInput = {
+  id?: string
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
+  id?: string
+  conversationId?: string | null
+  draftId?: string | null
+  batchId?: string | null
+  generationGroupId?: string | null
+  seriesId?: string | null
+  userId: string
+  messageId?: string | null
+  s3ObjectId?: string | null
+  origin?: $Enums.AssetOrigin
+  status?: $Enums.AssetStatus
+  uploadMethod?: $Enums.UploadMethod
+  assetType?: $Enums.AssetType
+  uploadDuration?: number | null
+  cdnUrl?: string | null
+  publicUrl?: string | null
+  sourceUrl?: string | null
+  thumbnailKey?: string | null
+  compatMime?: string | null
+  compatExt?: string | null
+  compatVersionId?: string | null
+  compatKey?: string | null
+  compatS3ObjectId?: string | null
+  compatStatus?: $Enums.CompatStatus | null
+  compatReadyAt?: Date | string | null
+  compatCdnUrl?: string | null
+  bucket: string
+  key: string
+  versionId?: string | null
+  region?: string
+  cacheControl?: string | null
+  contentDisposition?: string | null
+  contentEncoding?: string | null
+  expiresAt?: Date | string | null
+  size?: bigint | number | null
+  filename?: string | null
+  ext?: string | null
+  mime?: string | null
+  etag?: string | null
+  checksumAlgo?: $Enums.ChecksumAlgo
+  checksumSha256?: string | null
+  storageClass?: string | null
+  sseAlgorithm?: string | null
+  sseKmsKeyId?: string | null
+  s3LastModified?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+}
+
+export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
+  where: Prisma.AttachmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+}
+
+export type AttachmentUpsertWithoutProviderStoreDocsInput = {
+  update: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+  create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
+  where?: Prisma.AttachmentWhereInput
+}
+
+export type AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput = {
+  where?: Prisma.AttachmentWhereInput
+  data: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+}
+
+export type AttachmentUpdateWithoutProviderStoreDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+}
+
+export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.StringFieldUpdateOperationsInput | string
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+}
+
 export type AttachmentCreateWithoutConversationInput = {
   id?: string
   draftId?: string | null
@@ -1838,6 +2105,7 @@ export type AttachmentCreateWithoutConversationInput = {
   updatedAt?: Date | string
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -1895,6 +2163,7 @@ export type AttachmentUncheckedCreateWithoutConversationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -1976,6 +2245,7 @@ export type AttachmentCreateWithoutMessageInput = {
   updatedAt?: Date | string
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2033,6 +2303,7 @@ export type AttachmentUncheckedCreateWithoutMessageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2114,6 +2385,7 @@ export type AttachmentCreateWithoutProviderLinksInput = {
   updatedAt?: Date | string
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2171,6 +2443,7 @@ export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2242,6 +2515,7 @@ export type AttachmentUpdateWithoutProviderLinksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -2299,6 +2573,7 @@ export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2355,6 +2630,7 @@ export type AttachmentCreateWithoutImageInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
@@ -2412,6 +2688,7 @@ export type AttachmentUncheckedCreateWithoutImageInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2483,6 +2760,7 @@ export type AttachmentUpdateWithoutImageInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
@@ -2540,6 +2818,7 @@ export type AttachmentUncheckedUpdateWithoutImageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2595,6 +2874,7 @@ export type AttachmentCreateWithoutVideoInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
@@ -2652,6 +2932,7 @@ export type AttachmentUncheckedCreateWithoutVideoInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2723,6 +3004,7 @@ export type AttachmentUpdateWithoutVideoInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
@@ -2780,6 +3062,7 @@ export type AttachmentUncheckedUpdateWithoutVideoInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -2835,6 +3118,7 @@ export type AttachmentCreateWithoutAudioInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -2892,6 +3176,7 @@ export type AttachmentUncheckedCreateWithoutAudioInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -2963,6 +3248,7 @@ export type AttachmentUpdateWithoutAudioInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -3020,6 +3306,7 @@ export type AttachmentUncheckedUpdateWithoutAudioInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3075,6 +3362,7 @@ export type AttachmentCreateWithoutDocumentInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -3132,6 +3420,7 @@ export type AttachmentUncheckedCreateWithoutDocumentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -3203,6 +3492,7 @@ export type AttachmentUpdateWithoutDocumentInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -3260,6 +3550,7 @@ export type AttachmentUncheckedUpdateWithoutDocumentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3315,6 +3606,7 @@ export type AttachmentCreateWithoutImageGenOutputInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
   message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
   providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
   image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
@@ -3372,6 +3664,7 @@ export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
   image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
   document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
@@ -3443,6 +3736,7 @@ export type AttachmentUpdateWithoutImageGenOutputInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -3500,6 +3794,7 @@ export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3605,6 +3900,7 @@ export type AttachmentUpdateWithoutUserInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
@@ -3661,6 +3957,7 @@ export type AttachmentUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -3816,6 +4113,7 @@ export type AttachmentUpdateWithoutConversationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -3873,6 +4171,7 @@ export type AttachmentUncheckedUpdateWithoutConversationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4028,6 +4327,7 @@ export type AttachmentUpdateWithoutMessageInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
   providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
   image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
@@ -4085,6 +4385,7 @@ export type AttachmentUncheckedUpdateWithoutMessageInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
   image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
   document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
@@ -4149,10 +4450,12 @@ export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
 
 export type AttachmentCountOutputType = {
   providerLinks: number
+  providerStoreDocs: number
 }
 
 export type AttachmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   providerLinks?: boolean | AttachmentCountOutputTypeCountProviderLinksArgs
+  providerStoreDocs?: boolean | AttachmentCountOutputTypeCountProviderStoreDocsArgs
 }
 
 /**
@@ -4170,6 +4473,13 @@ export type AttachmentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type AttachmentCountOutputTypeCountProviderLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AttachmentProviderWhereInput
+}
+
+/**
+ * AttachmentCountOutputType without action
+ */
+export type AttachmentCountOutputTypeCountProviderStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderStoreDocumentWhereInput
 }
 
 
@@ -4225,6 +4535,7 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
+  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
   video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
@@ -4398,6 +4709,7 @@ export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
   message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
   providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
+  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
   video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
@@ -4423,6 +4735,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     conversation: Prisma.$ConversationPayload<ExtArgs> | null
     message: Prisma.$MessagePayload<ExtArgs> | null
     providerLinks: Prisma.$AttachmentProviderPayload<ExtArgs>[]
+    providerStoreDocs: Prisma.$ProviderStoreDocumentPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
     image: Prisma.$ImageMetadataPayload<ExtArgs> | null
     video: Prisma.$VideoMetadataPayload<ExtArgs> | null
@@ -4876,6 +5189,7 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
   conversation<T extends Prisma.Attachment$conversationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$conversationArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   message<T extends Prisma.Attachment$messageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$messageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   providerLinks<T extends Prisma.Attachment$providerLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$providerLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerStoreDocs<T extends Prisma.Attachment$providerStoreDocsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$providerStoreDocsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStoreDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   image<T extends Prisma.Attachment$imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$imageArgs<ExtArgs>>): Prisma.Prisma__ImageMetadataClient<runtime.Types.Result.GetResult<Prisma.$ImageMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   video<T extends Prisma.Attachment$videoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Attachment$videoArgs<ExtArgs>>): Prisma.Prisma__VideoMetadataClient<runtime.Types.Result.GetResult<Prisma.$VideoMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -5414,6 +5728,30 @@ export type Attachment$providerLinksArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+}
+
+/**
+ * Attachment.providerStoreDocs
+ */
+export type Attachment$providerStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderStoreDocument
+   */
+  select?: Prisma.ProviderStoreDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderStoreDocument
+   */
+  omit?: Prisma.ProviderStoreDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderStoreDocumentInclude<ExtArgs> | null
+  where?: Prisma.ProviderStoreDocumentWhereInput
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
 }
 
 /**

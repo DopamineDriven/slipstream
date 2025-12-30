@@ -1,17 +1,85 @@
 import type {
   GeminiImgGenModels,
+  GeminiModelIdUnion,
+  GetModelUtilRT,
   GrokImgGenModels,
   OpenAIImgGenFacilitatingModels,
   OpenAIImgGenModels,
-  OpenAiModelIdUnion
+  OpenAiModelIdUnion,
+  Provider
 } from "@/models.ts";
 import type {
   DocumentSingleton,
   ImageGenOutputSingleton,
   ImageSingleton
 } from "@/types.ts";
-import type { Rm } from "@/utils.ts";
+import type { DX, Rm } from "@/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+
+export type OpenAIModelAspectRatioWorkup = DX<
+  Record<
+    Exclude<OpenAIImgCapableModels, "dall-e-2" | "dall-e-3">,
+    "1536x1024" | "1024x1536" | "1024x1024" | "auto"
+  > &
+    Record<Exclude<OpenAiModelIdUnion, OpenAIImgCapableModels>, undefined> & {
+      "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
+      "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
+    }
+>;
+export type OpenAIImgNativeGPTImgAR = Record<
+  Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
+  "1536x1024" | "1024x1536" | "1024x1024" | "auto"
+>;
+export type OpenAINativeImgModelAspectRatioWorkup =
+  OpenAIImgNativeGPTImgAR & {
+    "dall-e-3": "1792x1024" | "1024x1792" | "1024x1024" | "auto";
+    "dall-e-2": "256x256" | "512x512" | "1024x1024" | "auto";
+  };
+
+export type OpenAIModelAspectRatio = {
+  [P in keyof OpenAIModelAspectRatioWorkup]?: OpenAIModelAspectRatioWorkup[P];
+};
+
+export type GeminiModelAspectRatioWorkup = DX<
+  Record<
+    Exclude<
+      GeminiImgGenModels,
+      | "imagen-4.0-ultra-generate-001"
+      | "imagen-4.0-generate-001"
+      | "imagen-4.0-fast-generate-001"
+    >,
+    "1:1" | "2:3" | "3:2" | "3:4" | "4:3" | "9:16" | "16:9" | "21:9"
+  > &
+    Record<
+      Exclude<
+        GeminiImgGenModels,
+        "gemini-3-pro-image-preview" | "gemini-2.5-flash-image"
+      >,
+      "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
+    > &
+    Record<Exclude<GeminiModelIdUnion, GeminiImgGenModels>, undefined>
+>;
+
+export type GeminiModelAspectRatio = {
+  [P in keyof GeminiModelAspectRatioWorkup]?: GeminiModelAspectRatioWorkup[P];
+};
+
+export type OutputSizeProps<P extends Provider = Provider> = {
+  openai?: OpenAIModelAspectRatio[GetModelUtilRT<"openai">];
+  anthropic?: {
+    [M in GetModelUtilRT<"anthropic">]: undefined;
+  }[GetModelUtilRT<"anthropic">];
+  grok?: {
+    [S in GetModelUtilRT<"grok">]?: undefined;
+  }[GetModelUtilRT<"grok">];
+  meta?: {
+    [P in GetModelUtilRT<"meta">]?: undefined;
+  }[GetModelUtilRT<"meta">];
+  gemini?: GeminiModelAspectRatio[GetModelUtilRT<"gemini">];
+  vercel?: {
+    [P in GetModelUtilRT<"vercel">]?: undefined;
+  }[GetModelUtilRT<"vercel">];
+}[P];
 
 export type NanoBananaOutputSize =
   | "1:1"
@@ -58,9 +126,65 @@ export type OpenAIImgCapableModels =
   | OpenAIImgGenFacilitatingModels
   | OpenAIImgGenModels;
 
-/**
- * --- Image Handling ---
- */
+export type GeminiImageSize = DX<
+  Record<
+    Exclude<
+      GeminiImgGenModels,
+      | "gemini-2.5-flash-image"
+      | "gemini-3-pro-image-preview"
+      | "deep-research-pro-preview-12-2025"
+    >,
+    "1:1" | "3:4" | "4:3" | "9:16" | "16:9"
+  > &
+    Record<
+      Exclude<
+        GeminiImgGenModels,
+        | "imagen-4.0-fast-generate-001"
+        | "imagen-4.0-generate-001"
+        | "imagen-4.0-ultra-generate-001"
+      >,
+      | "1:1"
+      | "2:3"
+      | "3:2"
+      | "3:4"
+      | "4:3"
+      | "4:5"
+      | "5:4"
+      | "9:16"
+      | "16:9"
+      | "21:9"
+    >
+>;
+
+export type GeminiImageQuality = DX<
+  Record<
+    Exclude<
+      GeminiImgGenModels,
+      | "gemini-2.5-flash-image"
+      | "gemini-3-pro-image-preview"
+      | "deep-research-pro-preview-12-2025"
+    >,
+    "1K" | "2K"
+  > &
+    Record<
+      Exclude<
+        GeminiImgGenModels,
+        | "imagen-4.0-fast-generate-001"
+        | "imagen-4.0-generate-001"
+        | "imagen-4.0-ultra-generate-001"
+      >,
+      "1K" | "2K" | "4K"
+    >
+>;
+
+export type OpenAINativeImgModelQualityWorkup =
+  Record<
+    Exclude<OpenAIImgGenModels, "dall-e-2" | "dall-e-3">,
+    "low" | "medium" | "high" | "auto"
+  > & {
+    "dall-e-3": "standard" | "hd" | "auto";
+    "dall-e-2": "standard" | "auto";
+  }
 
 /**
  * OpenAI Image Size & Quality Options
@@ -68,55 +192,13 @@ export type OpenAIImgCapableModels =
  * Note: gpt-image-1-mini has the same available options as gpt-image-1
  */
 export type OpenAISizeQualityOpts = {
-  quality: {
-    "dall-e-3": "standard" | "hd" | "auto";
-    "dall-e-2": "standard" | "auto";
-    "gpt-image-1": "low" | "medium" | "high" | "auto";
-    "gpt-image-1-mini": "low" | "medium" | "high" | "auto";
-  };
-  size: {
-    "dall-e-2": "1024x1024" | "256x256" | "512x512" | "auto";
-    "dall-e-3": "1024x1024" | "1792x1024" | "1024x1792" | "auto";
-    "gpt-image-1": "1024x1024" | "1536x1024" | "1024x1536" | "auto";
-    "gpt-image-1-mini": "1024x1024" | "1536x1024" | "1024x1536" | "auto";
-  };
+  quality: OpenAINativeImgModelQualityWorkup;
+  size: OpenAINativeImgModelAspectRatioWorkup;
 };
 
 export type GoogleImgSizeQualityOpts = {
-  size: {
-    "imagen-4.0-fast-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-    "imagen-4.0-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-    "imagen-4.0-ultra-generate-001": "1:1" | "3:4" | "4:3" | "9:16" | "16:9";
-    "gemini-3-pro-image-preview":
-      | "1:1"
-      | "2:3"
-      | "3:2"
-      | "3:4"
-      | "4:3"
-      | "4:5"
-      | "5:4"
-      | "9:16"
-      | "16:9"
-      | "21:9";
-    "gemini-2.5-flash-image":
-      | "1:1"
-      | "2:3"
-      | "3:2"
-      | "3:4"
-      | "4:3"
-      | "4:5"
-      | "5:4"
-      | "9:16"
-      | "16:9"
-      | "21:9";
-  };
-  quality: {
-    "gemini-3-pro-image-preview": "1K" | "2K" | "4K";
-    "gemini-2.5-flash-image": "1K" | "2K" | "4K";
-    "imagen-4.0-fast-generate-001": "1K" | "2K";
-    "imagen-4.0-generate-001": "1K" | "2K";
-    "imagen-4.0-ultra-generate-001": "1K" | "2K";
-  };
+  size: GeminiImageSize;
+  quality: GeminiImageQuality;
 };
 
 export type GoogleImgOutputFormat = {
@@ -383,7 +465,7 @@ export interface Dalle3Opts extends SharedOpenAIImageOpts<"dall-e-3"> {
 }
 
 export interface GptImage1Opts extends SharedOpenAIImageOpts<
-  "gpt-image-1" | "gpt-image-1-mini"
+  "gpt-image-1" | "gpt-image-1-mini" | "gpt-image-1.5"
 > {
   /**
    *
@@ -457,7 +539,7 @@ export type OpenAIImageGenOpts = Dalle3Opts | Dalle2Opts | GptImage1Opts;
 export type ImagenOptions = {
   model: Exclude<
     GeminiImgGenModels,
-    "gemini-2.5-flash-image" | "gemini-3-pro-image-preview"
+    "gemini-2.5-flash-image" | "gemini-3-pro-image-preview" | "deep-research-pro-preview-12-2025"
   >;
   /**
    * The text prompt describing the image.
@@ -489,13 +571,13 @@ export type ImagenOptions = {
    * Supported values:
    * "1:1", "9:16", "16:9", "3:4", "4:3"
    */
-  aspectRatio?: "1:1" | "9:16" | "16:9" | "3:4" | "4:3";
+  aspectRatio?: GeminiImageSize['imagen-4.0-generate-001'];
 
   /**
    * The output resolution. Only available for Imagen 4.
    * Default: "1K"
    */
-  sampleImageSize?: "1K" | "2K";
+  sampleImageSize?:GeminiImageQuality['imagen-4.0-generate-001']
 
   /**
    * A seed value for reproducible results.
@@ -533,7 +615,12 @@ export type NanoBananaImageGenOpts = {
   /**
    * The model ID.
    */
-  model: "gemini-2.5-flash-image" | "gemini-3-pro-image-preview";
+  model: Exclude<
+        GeminiImgGenModels,
+        | "imagen-4.0-fast-generate-001"
+        | "imagen-4.0-generate-001"
+        | "imagen-4.0-ultra-generate-001"
+      >
 
   /**
    * The prompt, which can be simple text or a mix of
@@ -593,17 +680,7 @@ export type NanoBananaImageGenOpts = {
        *
        * "21:9" (1536x672)
        */
-      aspectRatio?:
-        | "1:1"
-        | "2:3"
-        | "3:2"
-        | "3:4"
-        | "4:3"
-        | "4:5"
-        | "5:4"
-        | "9:16"
-        | "16:9"
-        | "21:9";
+      aspectRatio?:GeminiImageSize['gemini-3-pro-image-preview']
     };
 
     /**
@@ -667,13 +744,13 @@ export type AIChatRequestImgGenFields = {
    *
    * values include "high" | "low" | null
    */
-  input_fidelity?: string;
+  input_fidelity?: "high" | "low" | null | (string & {});
   /**
    * gpt-image-1 & gpt-image-1-mini only
    *
    * values include "low" | "auto"
    */
-  moderation?: string;
+  moderation?: "low" | "auto" | (string & {});
   /**
    * gpt-image-1, gpt-image-1-mini, gemini-2.5-flash-image, dall-e-2, grok-2-image-1212:
    *
@@ -1073,8 +1150,8 @@ export type Dalle3ImgGenWorkupRT = {
   msgBoundImgAssets: boolean;
   n: number;
   model: "dall-e-3";
-  output_quality: "auto" | "standard" | "hd";
-  output_size: "auto" | "1024x1024" | "1792x1024" | "1024x1792";
+  output_quality: SharedOpenAIImageOpts<"dall-e-3">['quality'];
+  output_size: SharedOpenAIImageOpts<"dall-e-3">['size'];
   targetApi: "images";
 };
 
@@ -1084,8 +1161,8 @@ export type Dalle2ImgGenWorkupRT = {
   msgBoundImgAssets: boolean;
   n: number;
   model: "dall-e-2";
-  output_quality: "auto" | "standard";
-  output_size: "auto" | "256x256" | "512x512" | "1024x1024";
+  output_quality:  SharedOpenAIImageOpts<"dall-e-2">['quality'];
+  output_size: SharedOpenAIImageOpts<"dall-e-2">['size'];
   targetApi: "images";
 };
 
@@ -1105,6 +1182,7 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
   model:
     | "gpt-5.2"
     | "gpt-5.1"
+    | "gpt-image-1.5"
     | "gpt-image-1"
     | "gpt-image-1-mini"
     | "gpt-5"
@@ -1119,8 +1197,8 @@ export type GptImageAndFacilitatorsImgGenWorkupRT = {
     | "o3"
     | "gpt-4o"
     | "gpt-4o-mini";
-  output_quality: "low" | "auto" | "high" | "medium";
-  output_size: "auto" | "1024x1024" | "1024x1536" | "1536x1024";
+  output_quality: SharedOpenAIImageOpts<"gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini">['quality'];
+  output_size: SharedOpenAIImageOpts<"gpt-image-1" | "gpt-image-1.5" | "gpt-image-1-mini">['size'];
   output_background: "auto" | "transparent" | "opaque" | undefined;
   targetApi: "responses" | "images";
   partialImagesRequested: number | undefined;
@@ -1132,6 +1210,7 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
   : T extends "dall-e-2"
     ? Dalle2ImgGenWorkupRT
     : T extends
+          | "gpt-image-1.5"
           | "gpt-image-1"
           | "gpt-image-1-mini"
           | "gpt-5"
@@ -1173,6 +1252,7 @@ export type ImgGenWorkupRT<T extends OpenAiModelIdUnion> = T extends "dall-e-3"
 export type ImgGenWorkupRTObj = {
   "dall-e-2": Dalle2ImgGenWorkupRT;
   "dall-e-3": Dalle3ImgGenWorkupRT;
+  "gpt-image-1.5": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-image-1-mini": GptImageAndFacilitatorsImgGenWorkupRT;
   "gpt-4.1-nano": GptImageAndFacilitatorsImgGenWorkupRT;

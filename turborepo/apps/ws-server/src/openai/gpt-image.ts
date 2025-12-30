@@ -17,6 +17,7 @@ import type {
   AIChatResponseImgGenSubFields,
   EventTypeMap,
   GptImageAndFacilitatorsImgGenWorkupRT,
+  OpenAIImgGenModels,
   OpenAiModelIdUnion
 } from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
@@ -49,15 +50,14 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
     systemPrompt,
     temperature,
     topP,
-    model = "gpt-image-1" satisfies OpenAiModelIdUnion,
+    model = "gpt-image-1.5" satisfies OpenAiModelIdUnion,
     title,
     currentMsgBoundAssets,
     imgGenEnabled,
     imgGenFields
   }: ProviderOpenaiRequestEntity) {
-    // use most recent message id for image gen requests to update Im
 
-    const m = model as OpenAiModelIdUnion;
+    const m = model as OpenAIImgGenModels;
 
     const provider = "openai" as const;
 
@@ -86,11 +86,37 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       userId,
       { onlyMostRecentUser: true }
     );
+    const imgOnly = Array.of<{
+    type: "input_image";
+    image_url?: string | undefined;
+    file_id?: string | undefined;
+    detail: "auto" | "low" | "high";
+}>();
+
+const promptOnly = {
+  text: ""
+};
+    for (const f of formatted) {
+      if (f.role==="user") {
+        for (const c of f.content){
+          if (typeof c !=="string") {
+            if (c.type==="input_image") {
+              imgOnly.push(c);
+            }
+            if (c.type==="input_text") {
+              promptOnly.text=c.text;
+            }
+          }
+        }
+      }
+    }
 
     // image api doesn't return a resp_id like responses api does:
     const generationGroupId = await this.generateId("generationGroupId");
     const itemId = await this.generateId("itemId");
     const _hasImages = this.hasImages(formatted);
+
+
 
     const _hasFiles = this.hasFiles(formatted);
 
@@ -133,7 +159,7 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
       });
       const o = (await client.images.generate(
         {
-          prompt: msgs.find(id => id.id === userMsgId)?.content ?? "",
+          prompt: promptOnly.text,
           background: r.output_background,
           output_compression: r.output_compression,
           user: userId,
@@ -143,8 +169,8 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           // n=1 for streaming, no higher; n = 10 max for non-streaming, coming soon
           n: 1,
           partial_images,
-          quality: r.output_quality,
-          size: r.output_size,
+          quality: r.output_quality ?? "high",
+          size: r.output_size ?? "auto",
           stream: true
         },
         { stream: true }
@@ -157,10 +183,12 @@ export class OpenAIGPTImageService extends OpenAIServiceWorkup {
           started = false,
           done = false,
           rtHelper: S3FinalizePayload | undefined;
-        if (started === false) {
+
+          if (started === false) {
           started = true;
           text = "Image generation in progress...";
         }
+
         if (stream.type === "image_generation.partial_image") {
           streamPartial = {
             ...stream
