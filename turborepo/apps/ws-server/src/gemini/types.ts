@@ -10,6 +10,7 @@ import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AIChatRequestImgGenFields,
   CTR,
+  Equal,
   ImgMetadataEntity,
   MessageSingleton,
   S3Checksum,
@@ -33,6 +34,25 @@ export type GeminiEventMap = UnionToRecord<InteractionDeltas>;
 export interface ProviderGeminiChatRequestEntity extends ProviderChatRequestEntity {
   userData?: UserData;
 }
+
+export type StoreDocDbRegistryProps = {
+  id: string | null;
+  storeId: string | null;
+  storeRef: string | null;
+  attachmentId: string | null;
+  provider: $Enums.Provider | null;
+  docRef: string | null;
+  docUri: string | null;
+  filename: string | null;
+  state: $Enums.ProviderDocState | null;
+  indexedAt: Date | null;
+  mimeType: string | null;
+  errorMessage: string | null;
+  lastAccessed: Date | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  size: number | null;
+};
 
 export type AssetCacheProps = {
   fileUri: string;
@@ -124,6 +144,31 @@ export interface FssDoc {
   updateTime?: string;
 }
 
+export interface FssDocSurfacedMeta {
+  attachmentId: string;
+  conversationId: string;
+  messageId: string;
+  originalFilename: string;
+  name?: string;
+  displayName?: string;
+  state?:
+    | "STATE_UNSPECIFIED"
+    | "STATE_PENDING"
+    | "STATE_ACTIVE"
+    | "STATE_FAILED";
+  sizeBytes?: string;
+  mimeType?: string;
+  createTime?: string;
+  updateTime?: string;
+}
+export type SurfaceMeta<T extends boolean = true> = T extends false
+  ? FssDoc
+  : FssDocSurfacedMeta;
+
+export type EqCheck = Equal<FssDoc[], SurfaceMeta<false>[]>
+
+export type OOO = SurfaceMeta<true>;
+
 export interface EphemeralFile extends GeminiFile {}
 export type CustomMetadataSingleton = {
   /** Required. The key of the metadata to store. */
@@ -155,6 +200,7 @@ export type FSSAssetCacheProps = {
 };
 
 export type GenerateContentResponseProps = {
+  userId: string;
   isNewChat: boolean;
   msgs: MessageSingleton<true>[];
   model: string;

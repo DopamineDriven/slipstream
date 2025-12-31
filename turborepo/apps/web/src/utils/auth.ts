@@ -2,6 +2,7 @@ import type { BetterAuthOptions } from "better-auth";
 import { cache } from "react";
 import { headers } from "next/headers";
 import { prismaClient } from "@/lib/prisma";
+import { getSiteUrl } from "@/lib/site-url";
 import jsonData from "@/utils/__out__/random-name-gen.json" with { type: "json" };
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -13,6 +14,7 @@ import { anonymous } from "better-auth/plugins/anonymous";
 
 export const auth = betterAuth({
   trustedOrigins: req => {
+    if (!req) return [new URL(getSiteUrl(process.env.VERCEL_ENV)).origin];
     const url = new URL(req.url);
     const origin = url.origin;
     return [origin];

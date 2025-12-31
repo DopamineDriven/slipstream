@@ -26,7 +26,7 @@ export class GeminiChatService extends GeminiWorkupService {
   ) {
     super(logger, prisma, apiKey);
   }
-  public async handleGeminiAiChatRequest({
+  protected async handleGeminiAiChatRequest({
     chunks,
     conversationId,
     isNewChat,
@@ -53,6 +53,7 @@ export class GeminiChatService extends GeminiWorkupService {
     const provider = "gemini" as const;
     const model = m as GeminiModelIdUnion;
     const params = await this.contentGen({
+      userId,
       isNewChat,
       keyId,
       model,

@@ -63,6 +63,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
     case "gemini": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "deep-research-pro-preview-12-2025":
         case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image":
         case "imagen-4.0-fast-generate-001":
@@ -74,7 +75,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
-        case "deep-research-pro-preview-12-2025":
+        case "gemini-3-flash-preview":
         case "gemini-2.5-flash-lite":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
@@ -90,6 +91,7 @@ function isImgGenCapableModel<const T extends Provider = Provider>(
     case "openai": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gpt-image-1.5":
         case "dall-e-2":
         case "dall-e-3":
         case "gpt-image-1":
@@ -182,6 +184,7 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
         case "imagen-4.0-ultra-generate-001": {
           return true;
         }
+        case "gemini-3-flash-preview":
         case "gemini-3-pro-preview":
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
@@ -202,6 +205,7 @@ function _isPureImgGenModel<const T extends Provider = Provider>(
     case "openai": {
       const m = model as GetModelUtilRT<typeof p>;
       switch (m) {
+        case "gpt-image-1.5":
         case "dall-e-2":
         case "dall-e-3":
         case "gpt-image-1":
@@ -266,6 +270,7 @@ function handleOutputSize(
     }
     case "gemini": {
       switch (model) {
+        case "deep-research-pro-preview-12-2025":
         case "gemini-3-pro-image-preview":
         case "gemini-2.5-flash-image": {
           if (
@@ -292,7 +297,7 @@ function handleOutputSize(
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
         case "gemini-2.5-flash-lite":
-        case "deep-research-pro-preview-12-2025":
+        case "gemini-3-flash-preview":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
         case "veo-3.0-fast-generate-001":
@@ -324,6 +329,7 @@ function handleOutputSize(
             return data.output_size;
           } else return "auto";
         }
+        case "gpt-image-1.5":
         case "gpt-5.2":
         case "gpt-5.2-pro":
         case "gpt-5-chat-latest":
@@ -411,6 +417,7 @@ function _handlePartialImgGen(
           case "gpt-5-codex": {
             return undefined;
           }
+          case "gpt-image-1.5":
           case "gpt-5.2":
           case "gpt-5.2-pro":
           case "gpt-5-pro":
@@ -474,6 +481,7 @@ function handleImgGenOutputQuality(
             return data.output_quality as "1K" | "2K";
           } else return "1K";
         }
+        case "deep-research-pro-preview-12-2025":
         case "gemini-2.5-flash-image":
         case "gemini-3-pro-image-preview": {
           if (
@@ -487,7 +495,7 @@ function handleImgGenOutputQuality(
         case "gemini-2.0-flash":
         case "gemini-2.0-flash-lite":
         case "gemini-2.5-flash":
-        case "deep-research-pro-preview-12-2025":
+        case "gemini-3-flash-preview":
         case "gemini-2.5-flash-lite":
         case "gemini-2.5-pro":
         case "veo-2.0-generate-001":
@@ -520,6 +528,7 @@ function handleImgGenOutputQuality(
             return data.output_quality as "standard" | "hd" | "auto";
           } else return "auto";
         }
+        case "gpt-image-1.5":
         case "gpt-5.1":
         case "gpt-4.1":
         case "gpt-4.1-mini":

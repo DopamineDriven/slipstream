@@ -1,22 +1,23 @@
 import type {
   AssetCacheProps,
-  DbDocsCacheProps,
   DocCountProps,
   EphemeralFile,
   FssDoc,
-  FssImportFileParams,
-  FssRecordProps
+  FssDocSurfacedMeta,
+  FssRecordProps,
+  StoreDocDbRegistryProps
 } from "@/gemini/types.ts";
 import type {
   DocumentState,
   File,
   FileSearchStore,
-  UploadFileParameters
+  UploadToFileSearchStoreParameters
 } from "@google/genai";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { GoogleGenAI } from "@google/genai";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type { AttachmentSingleton } from "@slipstream/types";
 
 export class FileSearchStoreService {
@@ -31,7 +32,6 @@ export class FileSearchStoreService {
    * this also corresponds to the fileRegistry.name field and, equivalently, to the providerAttachment.providerRef field in the database
    */
   protected assetCache = new Map<string, AssetCacheProps>();
-  protected dbDocsCache = new Map<string, DbDocsCacheProps>();
   /**
    * key is equal to `files/${attachment.id}`;
    */
@@ -48,6 +48,11 @@ export class FileSearchStoreService {
    * Avoids repeated fss lookups per user
    */
   protected fssRegistry: Map<string, string> = new Map<string, string>();
+
+  /**
+   * fss db document registry
+   */
+  protected storeDocDbRegistry = new Map<string, StoreDocDbRegistryProps>();
 
   protected lastRegistrySync: Date | null = null;
   constructor(
@@ -77,45 +82,108 @@ export class FileSearchStoreService {
     return this.defaultClient;
   }
 
-  protected dbToFssState = {
+  protected fssToDbState = {
     STATE_ACTIVE: "ACTIVE",
     STATE_FAILED: "FAILED",
     STATE_PENDING: "PROCESSING",
     STATE_UNSPECIFIED: "PENDING"
-  } as const;
+  } as const satisfies Record<
+    keyof typeof DocumentState,
+    keyof typeof $Enums.ProviderDocState
+  >;
 
-  protected toDbState(state: keyof typeof DocumentState) {
-    return this.dbToFssState[state];
+  protected dbToFssState = {
+    ACTIVE: "STATE_ACTIVE",
+    FAILED: "STATE_FAILED",
+    PROCESSING: "STATE_PENDING",
+    PENDING: "STATE_UNSPECIFIED"
+  } as const satisfies Record<
+    keyof typeof $Enums.ProviderDocState,
+    keyof typeof DocumentState
+  >;
+
+  protected async createFssRemote(genai: GoogleGenAI, userId: string) {
+    const displayName = this.prisma.vectorStoreDisplayName(userId);
+    return await genai.fileSearchStores.create({ config: { displayName } });
   }
 
-  protected async createFss(userId: string, apiKey = this.apiKey) {
-    const genai = this.getClient(apiKey);
-    const displayName = this.prisma.vectorStoreDisplayName(userId);
+  protected async getFssRemote(genai: GoogleGenAI, fssRef: string) {
+    return await genai.fileSearchStores.get({ name: fssRef });
+  }
 
-    const fss = await genai.fileSearchStores.create({
-      config: { displayName }
-    });
-    if (fss.name && fss.displayName && fss.createTime) {
+  protected async createDbFssViaFssRemote(
+    genai: GoogleGenAI,
+    fssRef: string,
+    userId: string
+  ) {
+    const fss = await this.getFssRemote(genai, fssRef);
+    const {
+      name,
+      displayName,
+      createTime,
+      updateTime,
+      sizeBytes,
+      activeDocumentsCount,
+      ...rest
+    } = fss;
+    if (name && displayName && createTime && updateTime) {
+      let totalBytes = 0n;
+      let counts = 0;
+      if (sizeBytes) totalBytes = BigInt(Number.parseInt(sizeBytes));
+      if (activeDocumentsCount) counts = Number.parseInt(activeDocumentsCount);
       const prismaCreate = await this.prisma.createVectorStoreGemini(
         userId,
-        fss.name,
-        fss.displayName,
-        fss.createTime,
+        name,
+        displayName,
+        createTime,
+        updateTime,
+        counts,
+        totalBytes
+      );
+
+      this.storeDbRegistry.set(userId, prismaCreate.id);
+
+      this.fssRegistry.set(userId, name);
+
+      return {
+        dbData: prismaCreate,
+        fssData: {
+          name,
+          displayName,
+          createTime,
+          updateTime,
+          sizeBytes: Number(totalBytes).toString(),
+          activeDocumentsCount: counts.toString(),
+          ...rest
+        }
+      };
+    } else {
+      throw new Error(
+        "something went wrong while creating the database FSS via the remote FSS..."
+      );
+    }
+  }
+
+  protected async createFss(genai: GoogleGenAI, userId: string) {
+    const fss = await this.createFssRemote(genai, userId);
+    const { name, displayName, createTime, updateTime, ...rest } = fss;
+    if (name && displayName && createTime && updateTime) {
+      const prismaCreate = await this.prisma.createVectorStoreGemini(
+        userId,
+        name,
+        displayName,
+        createTime,
+        updateTime,
         0
       );
 
       this.storeDbRegistry.set(userId, prismaCreate.id);
 
-      this.fssRegistry.set(userId, fss.name);
+      this.fssRegistry.set(userId, name);
 
       return {
         dbData: prismaCreate,
-        fssData: {
-          displayName: fss.displayName,
-          name: fss.name,
-          createTime: fss.createTime,
-          totalDocs: prismaCreate.docs.length
-        }
+        fssData: { name, displayName, createTime, updateTime, ...rest }
       };
     } else {
       throw new Error("something went wrong while creating the FSS...");
@@ -156,7 +224,7 @@ export class FileSearchStoreService {
    */
   private async *getIndexedDocsFSS(
     /**
-     * the FSS (resource) name (*not display name*)
+     * the FSS (resource) name
      */
     parent: string,
     apiKey = this.apiKey,
@@ -222,6 +290,7 @@ export class FileSearchStoreService {
 
   // Note: markFileAccessed is not needed for Google's TTL-based system
   // Files automatically expire after 48 hours regardless of access patterns
+  // IMPORTANT: THIS IS ONLY FOR EPHEMERAL (NON-STORE-EMBEDDED) FILES
 
   private async cleanupStaleFiles(apiKey: string) {
     const client = this.getClient(apiKey);
@@ -378,30 +447,147 @@ export class FileSearchStoreService {
     return totalFiles;
   }
 
-  private async syncFssDocs(fssRef: string, apiKey = this.apiKey) {
+  private surfaceCustomMetaSingleton(data: FssDoc) {
+    const t = data;
+    const { customMetadata, ...rest } = t;
+    const tuples = Array.of<readonly [string, string]>();
+    let metaObj: {
+      attachmentId: string;
+      conversationId: string;
+      messageId: string;
+      originalFilename: string;
+    };
+    if (t.displayName) {
+      const { attachmentId, conversationId, extension, fileName, messageId } =
+        this.prisma.parseFilename(t.displayName);
+      const originalFilename = `${fileName}.${extension}`;
+      metaObj = {
+        attachmentId,
+        messageId,
+        conversationId,
+        originalFilename
+      };
+      return {
+        ...rest,
+        ...metaObj
+      } satisfies FssDocSurfacedMeta as FssDocSurfacedMeta;
+    } else {
+      if (customMetadata && customMetadata.length > 0) {
+        for (const { key, stringValue } of customMetadata) {
+          if (key && stringValue) tuples.push([key, stringValue] as const);
+        }
+      }
+      metaObj = Object.fromEntries(tuples) as {
+        attachmentId: string;
+        conversationId: string;
+        messageId: string;
+        originalFilename: string;
+      };
+      return {
+        ...rest,
+        ...metaObj
+      } satisfies FssDocSurfacedMeta as FssDocSurfacedMeta;
+    }
+  }
 
-    for await (const s of this.getIndexedDocsFSS(fssRef, apiKey, 20)) {
-      if (s.page.length > 0) {
-        for (const doc of s.page) {
-          let attachmentId: string | null = null;
-          if (
-            doc.customMetadata &&
-            doc.displayName &&
-            doc.name &&
-            doc.createTime &&
-            doc.updateTime &&
-            doc.customMetadata.length > 0
-          ) {
-            attachmentId = doc.displayName;
-            for (const meta of doc.customMetadata) {
-              if (meta.key && meta.key === "attachmentId" && meta.stringValue) {
-                attachmentId = meta.stringValue;
-                this.fssDocRegistry.set(`files/${attachmentId}`, doc);
-              }
+  private restoreOriginalFssDoc(data: FssDocSurfacedMeta) {
+    const {
+      attachmentId,
+      conversationId,
+      messageId,
+      originalFilename,
+      ...rest
+    } = data;
+    return {
+      ...rest,
+      customMetadata: [
+        { key: `attachmentId`, stringValue: attachmentId },
+        { key: "conversationId", stringValue: conversationId },
+        { key: "messageId", stringValue: messageId },
+        { key: "originalFilename", stringValue: originalFilename }
+      ]
+    } satisfies FssDoc as FssDoc;
+  }
+
+  private restoreCustomMeta(data: FssDocSurfacedMeta): FssDoc;
+  private restoreCustomMeta(data: FssDocSurfacedMeta[]): FssDoc[];
+  private restoreCustomMeta(data: FssDocSurfacedMeta[] | FssDocSurfacedMeta) {
+    if (Array.isArray(data)) {
+      return data.map(t => this.restoreOriginalFssDoc(t));
+    } else return this.restoreOriginalFssDoc(data);
+  }
+
+  private surfaceCustomMeta(data: FssDoc[]): FssDocSurfacedMeta[];
+  private surfaceCustomMeta(data: FssDoc): FssDocSurfacedMeta;
+  private surfaceCustomMeta(data: FssDoc[] | FssDoc) {
+    if (Array.isArray(data)) {
+      return data.map(t => this.surfaceCustomMetaSingleton(t));
+    } else return this.surfaceCustomMetaSingleton(data);
+  }
+  private fssDocEpimerize(data: FssDocSurfacedMeta[]): FssDoc[];
+  private fssDocEpimerize(data: FssDocSurfacedMeta): FssDoc;
+  private fssDocEpimerize(data: FssDoc[]): FssDocSurfacedMeta[];
+  private fssDocEpimerize(data: FssDoc): FssDocSurfacedMeta;
+  private fssDocEpimerize(
+    data: (FssDoc | FssDocSurfacedMeta)[] | (FssDoc | FssDocSurfacedMeta)
+  ) {
+    if (Array.isArray(data)) {
+      return data.map(t => {
+        if ("attachmentId" in t) {
+          return this.restoreCustomMeta(t);
+        } else return this.surfaceCustomMeta(t);
+      });
+    } else {
+      if ("attachmentId" in data) {
+        return this.restoreCustomMeta(data);
+      } else return this.surfaceCustomMeta(data);
+    }
+  }
+
+  private async syncProviderStoreDocs(userId: string) {
+    try {
+      const providerStoreDocs = (await this.prisma.findManyProviderStoreDocs(
+        "GEMINI",
+        userId
+      )) satisfies StoreDocDbRegistryProps[];
+      if (providerStoreDocs.length > 0) {
+        for (const providerDoc of providerStoreDocs) {
+          this.storeDocDbRegistry.set(
+            `files/${providerDoc.attachmentId}`,
+            providerDoc
+          );
+        }
+      }
+
+      console.info(
+        `Populated Gemini provider store docs cache with ${this.storeDocDbRegistry.size} entries from database`
+      );
+    } catch (err) {
+      console.info(
+        `Failed to populate Gemini provider store docs cache from database: ${this.prisma.safeErrMsg(err)}`
+      );
+    }
+  }
+
+  private async syncFssDocs(fssRef: string, apiKey = this.apiKey) {
+    try {
+      for await (const s of this.getIndexedDocsFSS(fssRef, apiKey, 20)) {
+        if (s.page.length > 0) {
+          for (const doc of s.page) {
+            if (doc.displayName && doc.name) {
+              const { attachmentId } = this.fssDocEpimerize(doc);
+              this.fssDocRegistry.set(`files/${attachmentId}`, doc);
             }
           }
         }
       }
+      console.info(
+        `Populated Gemini fss doc registry cache with ${this.fssDocRegistry.size} entries from store ${fssRef}`
+      );
+    } catch (err) {
+      console.info(
+        `Failed to populate Gemini fss doc registry cache targeting store ${fssRef}: ${this.prisma.safeErrMsg(err)}`
+      );
     }
   }
 
@@ -460,23 +646,99 @@ export class FileSearchStoreService {
     }
   }
 
+  private async documentRegistriesEq(
+    genai: GoogleGenAI,
+    userId: string,
+    storeId: string,
+    fssRef: string,
+    storeDocDbRegistry: Map<string, StoreDocDbRegistryProps>,
+    fssDocRegistry: Map<string, FssDoc>
+  ) {
+    if (storeDocDbRegistry.size !== fssDocRegistry.size) {
+      if (storeDocDbRegistry.size < fssDocRegistry.size) {
+        const fssDocsToSync = Array.of<FssDoc>();
+        for (const [fileKey, fssDoc] of Array.from(fssDocRegistry.entries())) {
+          if (!storeDocDbRegistry.has(fileKey)) {
+            fssDocsToSync.push(fssDoc);
+          }
+        }
+        const res = await this.prisma.createManyProviderStoreDocsGemini(
+          fssDocsToSync,
+          storeId,
+          userId
+        );
+        for (const doc of res.docs) {
+          const { attachment: _att, store: _store, ...rest } = doc;
+          storeDocDbRegistry.set(`files/${doc.attachmentId}`, rest);
+        }
+      }
+      if (storeDocDbRegistry.size > fssDocRegistry.size) {
+        const fssDocsToIndex = Array.of<string>();
+        for (const storeDoc of Array.from(storeDocDbRegistry.values())) {
+          if (
+            storeDoc.attachmentId &&
+            !fssDocRegistry.has(`files/${storeDoc.attachmentId}`)
+          ) {
+            fssDocsToIndex.push(storeDoc.attachmentId);
+          }
+        }
+
+        const getAttachments =
+          await this.prisma.getManyAttachments(fssDocsToIndex);
+        const cleanupAgg = Array.of<readonly [string, string]>();
+        for (const attachment of getAttachments) {
+          try {
+            const { absTmpPath, mime, tmpUniquename } =
+              await this.prisma.fetchRemoteToTmp("GEMINI", attachment);
+            cleanupAgg.push([absTmpPath, tmpUniquename]);
+            const displayName = this.prisma.toVectorStoreFilename(attachment);
+            const fssDoc = await this.fssUploadDirect(
+              genai,
+              fssRef,
+              absTmpPath,
+              displayName,
+              mime,
+              3000,
+              20
+            );
+            fssDocRegistry.set(`files/${attachment.id}`, fssDoc);
+          } catch (err) {
+            console.info(
+              `error in documentRegistriesEq when uploading direct to FSS ${this.prisma.safeErrMsg(err)}`
+            );
+          }
+        }
+        if (cleanupAgg.length > 0) {
+          for (const [absTmpPath, tmpUniquename] of cleanupAgg) {
+            this.prisma.cleanupTmpPostupload(
+              "GEMINI",
+              absTmpPath,
+              tmpUniquename
+            );
+          }
+        }
+      }
+    }
+  }
+
   public async syncFileRegistry(userId: string, cleanupStaleFiles = false) {
     this.fssRegistry.clear();
     this.fssDocRegistry.clear();
-  
+    this.storeDocDbRegistry.clear();
+
     this.storeDbRegistry.clear();
     this.assetCache.clear();
     this.fileRegistry.clear();
 
     const key = await this.prisma.resolveApiKey(userId, this.apiKey, "gemini");
-
+    const genai = this.getClient(key);
     let [fssRecord, storeDbData] = await Promise.all([
       this.pullFssRecord(userId, key),
       this.prisma.vectorStoreInfoByProvider(userId, "GEMINI")
     ]);
 
-    if (fssRecord.hasStore === false) {
-      const { dbData, fssData } = await this.createFss(userId, key);
+    if (fssRecord.hasStore === false && storeDbData.hasStore === false) {
+      const { dbData, fssData } = await this.createFss(genai, userId);
       storeDbData = {
         dbId: dbData.id,
         totalBytes: dbData.totalBytes ?? 0,
@@ -488,13 +750,11 @@ export class FileSearchStoreService {
       };
     }
 
-    if (!storeDbData.dbId) {
-      const dbData = await this.prisma.createVectorStoreGemini(
-        userId,
+    if (fssRecord.hasStore === true && storeDbData.hasStore === false) {
+      const { dbData } = await this.createDbFssViaFssRemote(
+        genai,
         fssRecord.storeRef,
-        fssRecord.storeDisplayName,
-        fssRecord.createdAt,
-        fssRecord.totalDocuments
+        userId
       );
       storeDbData = {
         dbId: dbData.id,
@@ -505,47 +765,31 @@ export class FileSearchStoreService {
         storeName: fssRecord.storeDisplayName,
         storeRef: fssRecord.storeRef
       };
-      this.storeDbRegistry.set(userId, dbData.id);
-      this.fssRegistry.set(userId, fssRecord.storeRef);
     }
 
     const fssRef = fssRecord.storeRef;
-    const storeDbId = storeDbData.dbId;
+    // definitely has it by this point
+    const storeDbId = storeDbData.dbId ?? "";
 
     this.storeDbRegistry.set(userId, storeDbId);
     this.fssRegistry.set(userId, fssRef);
 
-    const providerAssets = await this.prisma.findManyByProvider(
-      "GEMINI",
-      userId
-    );
+    const [hasGeminiMessages, hasGeminiStoreDocs] = await Promise.all([
+      this.prisma.hasProviderMessages(userId, "GEMINI"),
+      this.prisma.hasProviderStoreDocs(userId, "GEMINI")
+    ]);
 
-    if (providerAssets.length > 0) {
-      for (const asset of providerAssets) {
-        if (asset.providerRef && asset.expiresAt) {
-          this.assetCache.set(asset.attachmentId, {
-            fileUri: asset.providerRef,
-            expiresAt: asset.expiresAt,
-            storeDbId,
-            databaseId: asset.id,
-            storeRef: fssRef
-          });
-        }
-      }
+    if (hasGeminiStoreDocs) {
+      await this.syncProviderStoreDocs(userId);
     }
-
-    const hasGeminiMessages = await this.prisma.hasProviderMessages(
-      userId,
-      "GEMINI"
-    );
-
-    if (!hasGeminiMessages) {
-      return { synced: true, totalFiles: 0, lastSync: new Date() };
+    if (fssRecord.totalDocuments > 0) {
+      await this.syncFssDocs(fssRef, key);
+    }
+    if (hasGeminiMessages) {
+      await this.syncAssetCache(userId, fssRef, storeDbId);
     }
 
     let totalFiles = 0;
-
-    await this.syncAssetCache(userId, fssRef, storeDbId);
 
     totalFiles = await this.syncEphemeralRegistry(key);
 
@@ -556,54 +800,285 @@ export class FileSearchStoreService {
 
     // Optionally trigger cleanup of stale files
     if (cleanupStaleFiles) {
-      await this.cleanupStaleFiles(key);
+      void this.cleanupStaleFiles(key);
     }
+
+    await this.documentRegistriesEq(
+      genai,
+      userId,
+      storeDbId,
+      fssRef,
+      this.storeDocDbRegistry,
+      this.fssDocRegistry
+    );
 
     this.ephemeralRegistryEq(this.fileRegistry, this.assetCache);
 
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
   }
 
-  private fssImportConfig(
+  private fssUploadDirectParams(
+    fileSearchStoreName: string,
+    absPath: string,
     displayName: string,
-    {
-      attachmentId,
-      conversationId,
-      extension,
-      fileName,
-      messageId
-    }: {
-      conversationId: string;
-      messageId: string;
-      attachmentId: string;
-      fileName: string;
-      extension: string;
-    }
+    mimeType?: string
   ) {
+    const { attachmentId, conversationId, messageId, extension, fileName } =
+      this.prisma.parseFilename(displayName);
     return {
-      chunkingConfig: {
-        whiteSpaceConfig: {
-          /**
-           * internally capped at 512 as of 2025-12-29
-           */
-          maxTokensPerChunk: 512,
-          /**
-           * internally capped at 128 as of 2025-12-29
-           */
-          maxOverlapTokens: 128
-        }
-      },
-      customMetadata: [
-        { key: "displayName", stringValue: displayName },
-        { key: "attachmentId", stringValue: attachmentId },
-        { key: "conversationId", stringValue: conversationId },
-        { key: "messageId", stringValue: messageId },
-        { key: "originalFilename", stringValue: `${fileName}.${extension}` }
-      ]
-    };
+      file: absPath,
+      fileSearchStoreName,
+      config: {
+        /**can be up to 512 chars in length */
+        displayName,
+        mimeType,
+        chunkingConfig: {
+          whiteSpaceConfig: {
+            /**
+             * internally capped at 512 as of 2025-12-29
+             */
+            maxTokensPerChunk: 512,
+            /**
+             * internally capped at 128 as of 2025-12-29
+             */
+            maxOverlapTokens: 128
+          }
+        },
+        customMetadata: [
+          { key: "attachmentId", stringValue: attachmentId },
+          { key: "conversationId", stringValue: conversationId },
+          { key: "messageId", stringValue: messageId },
+          {
+            key: "originalFilename",
+            stringValue: `${fileName}.${extension}`
+          }
+        ]
+      }
+    } satisfies UploadToFileSearchStoreParameters;
+  }
+  /**
+   * `name` must have the following shape
+   *
+   * ```ts
+   * const name = `files/${attachmentId}`
+   * ```
+   */
+  private async uploadDirect(
+    genai: GoogleGenAI,
+    absTmpPath: string,
+    name: string,
+    mimeType: string,
+    /**can be up to 512 chars in length */
+    displayName: string
+  ) {
+    return await genai.files.upload({
+      file: absTmpPath,
+      config: {
+        name,
+        mimeType,
+        displayName
+      }
+    });
   }
 
-  protected async fssDocPersistBackground() {}
+  private async getNewlyIndexedDoc(genai: GoogleGenAI, docRef: string) {
+    return await genai.fileSearchStores.documents.get({
+      name: docRef
+    });
+  }
+
+  private async fssUploadDirect(
+    genai: GoogleGenAI,
+    fileSearchStoreName: string,
+    absPath: string,
+    displayName: string,
+    mimeType: string,
+    pollIntervalMs = 3000,
+    maxAttempts = 20
+  ) {
+    let operation = await genai.fileSearchStores.uploadToFileSearchStore(
+      this.fssUploadDirectParams(
+        fileSearchStoreName,
+        absPath,
+        displayName,
+        mimeType
+      )
+    );
+
+    let attempts = 0;
+    /**
+     * `operation.name` is always defined contrary to its conditional type definition;
+     * the operations api (polling) would break if `operation.name` resolved to undefined
+     */
+    const opName = operation.name ?? "";
+    /**
+     * plucked from `operation.name`
+     *
+     * Upload Direct: `"fileSearchStores/devnrr6h4r4480f6kviycyo1zhf-ms61ejujh04k/upload/operations/ddgx0syru0mkkomaqc0q6q4qwog-en33z6nn50mm"`
+     *
+     * Import (Promote): `"fileSearchStores/devnrr6h4r4480f6kviycyo1zhf-ms61ejujh04k/operations/ddgx0syru0mkkomaqc0q6q4qwog-en33z6nn50mm"`
+     */
+    const docId = opName.slice(opName.lastIndexOf("/") + 1);
+
+    const docRef = `${fileSearchStoreName}/documents/${docId}`;
+
+    while (!operation.done) {
+      if (operation.error) {
+        throw new Error(
+          `FSS upload direct failed: ${this.prisma.safeErrMsg(operation.error)}`
+        );
+      }
+
+      attempts++;
+
+      if (attempts >= maxAttempts) {
+        throw new Error(
+          `FSS upload direct timed out after ${maxAttempts} attempts`
+        );
+      }
+
+      await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+      operation = await genai.operations.get({
+        operation
+      });
+    }
+
+    const doc = await this.getNewlyIndexedDoc(genai, docRef);
+
+    return doc;
+  }
+
+  private async shouldIndexDocCheck(
+    genai: GoogleGenAI,
+    absTmpPath: string,
+    displayName: string,
+    attachmentId: string,
+    assetType: "DOCUMENT" | "IMAGE" | "VIDEO" | "AUDIO" | "UNKNOWN",
+    mimeType: string,
+    userId: string,
+    fileSearchStoreName?: string
+  ) {
+    if (assetType !== "DOCUMENT") return;
+    if (!fileSearchStoreName) return;
+    const cacheKey = `files/${attachmentId}`;
+    if (
+      this.fssDocRegistry.has(cacheKey) &&
+      this.storeDocDbRegistry.has(cacheKey)
+    )
+      return;
+
+    const storeId = this.storeDbRegistry.get(userId);
+    const storeRef = fileSearchStoreName;
+    if (
+      this.fssDocRegistry.has(cacheKey) &&
+      !this.storeDocDbRegistry.has(cacheKey)
+    ) {
+      const fssDoc = this.fssDocRegistry.get(cacheKey);
+      if (
+        fssDoc &&
+        storeId &&
+        fssDoc.name &&
+        fssDoc.displayName &&
+        fssDoc.state &&
+        fssDoc.mimeType &&
+        fssDoc.sizeBytes &&
+        fssDoc.sizeBytes &&
+        storeRef &&
+        fssDoc.updateTime
+      ) {
+        const record = {
+          userId,
+          attachmentId,
+          storeId,
+          docRef: fssDoc.name,
+          docUri: `https://generativelanguage.googleapis.com/v1beta/${fssDoc.name}`,
+          storeRef,
+          filename: fssDoc.displayName,
+          indexedAt: new Date(fssDoc.updateTime),
+          mimeType: fssDoc.mimeType,
+          state: this.fssToDbState[fssDoc.state],
+          size: BigInt(Number.parseInt(fssDoc.sizeBytes))
+        };
+        const toDb = await this.prisma.createGeminiStoreDoc(record);
+        this.storeDocDbRegistry.set(cacheKey, toDb);
+        // this.storeDocDbRegistry.set(cacheKey, toDb)
+      }
+    }
+    if (
+      !this.fssDocRegistry.has(cacheKey) &&
+      !this.storeDocDbRegistry.has(cacheKey) &&
+      storeId &&
+      storeRef
+    ) {
+      const fss = await this.fssUploadDirect(
+        genai,
+        fileSearchStoreName,
+        absTmpPath,
+        displayName,
+        mimeType
+      );
+      this.fssDocRegistry.set(cacheKey, fss);
+      if (
+        fss.state &&
+        fss.createTime &&
+        fss.displayName &&
+        fss.name &&
+        fss.sizeBytes &&
+        fss.mimeType &&
+        fss.updateTime
+      ) {
+        const record = {
+          userId,
+          attachmentId,
+          storeId,
+          docRef: fss.name,
+          docUri: `https://generativelanguage.googleapis.com/v1beta/${fss.name}`,
+          storeRef,
+          filename: fss.displayName,
+          indexedAt: new Date(fss.updateTime),
+          mimeType: fss.mimeType,
+          state: this.fssToDbState[fss.state],
+          size: BigInt(Number.parseInt(fss.sizeBytes))
+        };
+        const toDb = await this.prisma.createGeminiStoreDoc(record);
+        this.storeDocDbRegistry.set(cacheKey, toDb);
+      }
+    }
+  }
+  /**
+   * standalone one-off to handle indexing docs that might already be uploaded remotely
+   * due to implementing this feature and conversation histories having pre-existing docs
+   * that aren't yet indexed
+   */
+  protected async indexFssDocWithGoogle(
+    attachment: AttachmentSingleton<true>,
+    apiKey = this.apiKey
+  ) {
+    const { absTmpPath, mime, tmpUniquename } =
+      await this.prisma.fetchRemoteToTmp("GEMINI", attachment);
+    const displayName = this.prisma.toVectorStoreFilename(attachment);
+    const mimeType = mime === "application/text" ? "text/markdown" : mime;
+    const fileSearchStoreName = this.fssRegistry.get(attachment.userId);
+    try {
+      const ai = this.getClient(apiKey);
+      await this.shouldIndexDocCheck(
+        ai,
+        absTmpPath,
+        displayName,
+        attachment.id,
+        attachment.assetType,
+        mimeType,
+        attachment.userId,
+        fileSearchStoreName
+      );
+    } catch (err) {
+      throw new Error(
+        `failed to index fss doc with google store ${fileSearchStoreName} ${this.prisma.safeErrMsg(err)}`
+      );
+    } finally {
+      this.prisma.cleanupTmpPostupload("GEMINI", absTmpPath, tmpUniquename);
+    }
+  }
 
   protected async uploadRemoteAssetToGoogle(
     attachment: AttachmentSingleton<true>,
@@ -617,51 +1092,26 @@ export class FileSearchStoreService {
     const fileSearchStoreName = this.fssRegistry.get(attachment.userId);
     try {
       const ai = this.getClient(apiKey);
-      const uploadedFile = await ai.files.upload({
-        file: absTmpPath,
-        config: {
-          mimeType,
-          name: fileName,
-          displayName
-        }
-      } satisfies UploadFileParameters);
-      if (
-        attachment.assetType === "DOCUMENT" &&
-        !this.fssDocRegistry.has(fileName) &&
+      const uploadedFile = await this.uploadDirect(
+        ai,
+        absTmpPath,
+        fileName,
+        mimeType,
+        displayName
+      );
+
+      await this.shouldIndexDocCheck(
+        ai,
+        absTmpPath,
+        displayName,
+        attachment.id,
+        attachment.assetType,
+        mime,
+        attachment.userId,
         fileSearchStoreName
-      ) {
-        const config = this.fssImportConfig(
-          displayName,
-          this.prisma.parseFilename(displayName)
-        );
-        const fssImportParams = {
-          fileName,
-          fileSearchStoreName,
-          config
-        } satisfies FssImportFileParams;
+      );
 
-        let operation = await ai.fileSearchStores.importFile(fssImportParams);
-
-        // Poll until completion
-        while (!operation.done) {
-          await new Promise(resolve => setTimeout(resolve, 10000));
-          operation = await ai.operations.get({
-            operation
-          });
-        }
-
-        if (!operation.response?.documentName)
-          throw new Error("no fss doc name");
-        const name =
-          `${fileSearchStoreName}/documents/${operation.response.documentName}` as const;
-
-        void (await ai.fileSearchStores.documents.get({
-          name
-        }));
-        return uploadedFile;
-      } else {
-        return uploadedFile;
-      }
+      return uploadedFile;
     } catch (error) {
       this.logger.error(
         `Error uploading file to Google for attachment: ${attachment.id} - ${this.prisma.safeErrMsg(error)}`
@@ -676,8 +1126,4 @@ export class FileSearchStoreService {
       this.prisma.cleanupTmpPostupload("GEMINI", absTmpPath, tmpUniquename);
     }
   }
-
-  protected promoteUploadedDocFss() {}
-
-  protected importDocumentFssWorkup() {}
 }

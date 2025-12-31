@@ -43,13 +43,8 @@ import { FileSearchStoreService } from "./fss.ts";
  */
 
 export class GeminiWorkupService extends FileSearchStoreService {
-
-  constructor(
-    logger: LoggerService,
-     prisma: PrismaService,
-     apiKey: string
-  ) {
-    super(logger,prisma,apiKey)
+  constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
+    super(logger, prisma, apiKey);
   }
   /**
    * gemini-3-* only
@@ -513,7 +508,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     // Use Google Files API naming convention for cache key and registry key
     const fileKey = `files/${attachment.id}`;
     const now = new Date();
-    // TODO improve this handling
+
     const fssRef = this.fssRegistry.get(attachment.userId) ?? "";
     const storeDbId = this.storeDbRegistry.get(attachment.userId) ?? "";
     // Check in-memory cache AND verify file exists in registry
@@ -598,7 +593,19 @@ export class GeminiWorkupService extends FileSearchStoreService {
           { fileKey, state: existingInRegistry.state },
           `Found file in registry, skipping upload: files/${attachment.id}`
         );
-
+        if (attachment.assetType === "DOCUMENT" && fssRef) {
+          if (!this.fssDocRegistry.has(fileKey)) {
+            void this.indexFssDocWithGoogle(attachment, apiKey).catch(err => {
+              this.logger.warn(
+                {
+                  attachmentId: attachment.id,
+                  err: this.prisma.safeErrMsg(err)
+                },
+                "Background FSS indexing failed for cached ephemeral file"
+              );
+            });
+          }
+        }
         return {
           fileUri: existingInRegistry.uri,
           mimeType: existingInRegistry.mimeType
@@ -697,18 +704,26 @@ export class GeminiWorkupService extends FileSearchStoreService {
     } satisfies ToolConfig;
   }
 
-  private getTools(model?: GeminiModelIdUnion) {
+  private getTools(userId: string, model?: GeminiModelIdUnion) {
     const m = model ?? "gemini-2.5-pro";
 
     switch (m) {
       case "gemini-2.5-pro":
       case "gemini-3-pro-preview":
+      case "gemini-3-flash-preview":
       case "deep-research-pro-preview-12-2025":
       case "gemini-2.5-flash": {
-        return [
-          { googleSearch: {} },
-          { urlContext: {} }
-        ] satisfies GenerateContentConfig["tools"];
+        const fssRef = this.fssRegistry.get(userId);
+        if (fssRef) {
+          return [
+            { urlContext: {} },
+            { fileSearch: { fileSearchStoreNames: [fssRef] } }
+          ] satisfies GenerateContentConfig["tools"];
+        } else
+          return [
+            { googleSearch: {} },
+            { urlContext: {} }
+          ] satisfies GenerateContentConfig["tools"];
       }
       case "gemini-3-pro-image-preview": {
         return [{ googleSearch: {} }] satisfies GenerateContentConfig["tools"];
@@ -793,6 +808,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   private async contentGenChat({
+    userId,
     isNewChat,
     keyId,
     model,
@@ -808,7 +824,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     const m = model as GeminiModelIdUnion;
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng);
-    const tools = this.getTools(m);
+    const tools = this.getTools(userId, m);
     const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =
@@ -842,6 +858,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
   }
 
   private async contentGenNanoBananas({
+    userId,
     isNewChat,
     keyId,
     model,
@@ -858,7 +875,7 @@ export class GeminiWorkupService extends FileSearchStoreService {
     // fallback to platform provided server api key for users that don't have a Google API Key on file
     const keyFingerprint = keyId ?? "server";
     const toolConfig = this.getToolConfig(latlng);
-    const tools = this.getTools(m);
+    const tools = this.getTools(userId, m);
     const thinkingConfig = this.getThinkingConfig(m);
     const maxOutputTokens = max_tokens;
     const { history: contents, systemInstruction } =

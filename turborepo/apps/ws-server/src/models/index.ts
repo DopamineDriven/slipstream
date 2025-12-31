@@ -5,19 +5,13 @@ import type {
   ExpandedDocSpecs,ExpandedImgSpecs
 } from "@d0paminedriven/fs";
 import { ByteCodec } from "@/byte-codec/index.ts";
-import { MultiErrorReply } from "redis";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
-  AttachmentSingleton,
   GeminiImgGenModels,
   GetModelUtilRT,
   GrokImgGenModels,
-  ImageGenJobSingleton,
-  MessageSingleton,
   OpenAIImgGenModels,
-  Provider,
-  ProviderStoreSingleton,
-  UserKeySingleton
+  Provider
 } from "@slipstream/types";
 import { ProviderValidation } from "@slipstream/img-gen";
 import { providerModelChatApi } from "@slipstream/types";
@@ -67,65 +61,6 @@ export class ModelService extends ProviderValidation {
     return -1;
   }
 
-  public handleBigintToNumber(
-    message: MessageSingleton<false>
-  ): MessageSingleton<true> {
-    const { attachments, userKey, imageGenJob, ...rest } = message;
-    const mapIt = attachments.map(t => {
-      const { size, ...p } = t;
-      const mapProviderSingleton = p?.providerLinks?.map(v => {
-        const { size, userKey, store, attachment: _att, ...s } = v;
-        let storeT: number | null = null;
-        const {
-          totalBytes: _totalBytes,
-          files: _files,
-          ...rest
-        } = store ?? { totalBytes: null };
-        if (store?.totalBytes) {
-          storeT = Number(store.totalBytes);
-        } else {
-          storeT = null;
-        }
-
-        return {
-          userKey: userKey as undefined | UserKeySingleton<true>,
-          size: size ? Number(size) : null,
-          store:
-            store?.id && store.userId
-              ? ({
-                  ...rest,
-                  id: store.id,
-                  userId: store.userId,
-                  provider: message.provider,
-                  createdAt: store.createdAt ?? null,
-                  updatedAt: store.updatedAt ?? null,
-                  fileCount: store.fileCount ?? MultiErrorReply,
-                  lastSyncedAt: store.lastSyncedAt ?? null,
-                  providerStoreCreatedAt: store.providerStoreCreatedAt ?? null,
-                  storeName: store.storeName ?? null,
-                  storeRef: store.storeRef ?? null,
-                  totalBytes: storeT,
-                  files: undefined
-                } satisfies ProviderStoreSingleton<true>)
-              : undefined,
-          ...s
-        };
-      });
-
-      return {
-        ...p,
-        size: size ? Number(size) : null,
-        providerLinks: mapProviderSingleton
-      };
-    });
-
-    return {
-      userKey: userKey as undefined | UserKeySingleton<true>,
-      attachments: mapIt as AttachmentSingleton<true>[],
-      imageGenJob: imageGenJob as ImageGenJobSingleton<true> | undefined,
-      ...rest
-    } satisfies MessageSingleton<true>;
-  }
 
   public toPathnameExtTuple(path: string) {
     const extAndPath = (path.split(/\//gim).at(-1) ?? "")?.split(/\./gm);

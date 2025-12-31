@@ -467,7 +467,7 @@ export class Resolver {
       switch (provider) {
         case "gemini": {
           const svc = this.providers.getRequiredInstance("gemini");
-          await svc.handleGeminiAiChatRequest({ ...commonProps, userData });
+          await svc.routeGemini({ ...commonProps, userData });
           break;
         }
         case "anthropic": {

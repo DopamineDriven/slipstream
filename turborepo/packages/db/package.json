@@ -105,7 +105,7 @@
     "eslint": "catalog:eslint",
     "prettier": "^3.7.4",
     "prisma": "^6.19.1",
-    "rolldown": "1.0.0-beta.57",
+    "rolldown": "1.0.0-beta.58",
     "rolldown-plugin-dts": "^0.20.0",
     "terser": "^5.44.1",
     "tsdown": "catalog:tsdown",
