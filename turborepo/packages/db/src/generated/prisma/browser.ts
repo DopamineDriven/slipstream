@@ -43,6 +43,11 @@ export type Session = Prisma.SessionModel
  */
 export type ProviderStore = Prisma.ProviderStoreModel
 /**
+ * Model ProviderStoreDocument
+ * 
+ */
+export type ProviderStoreDocument = Prisma.ProviderStoreDocumentModel
+/**
  * Model UserKey
  * 
  */

@@ -268,12 +268,12 @@ export class Resolver {
   public async handleProviderContextUpdate(
     _event: EventTypeMap["provider_context_update"],
     ws: WebSocket,
-    _userId: string,
+    userId: string,
     _userData?: UserData
   ) {
     const providerContext =
-      await this.wsServer.prisma.injectClientApiKeyProps(_userId);
-    const userRecord = this.wsServer.userDataMap.get(_userId);
+      await this.wsServer.prisma.injectClientApiKeyProps(userId);
+    const userRecord = this.wsServer.userDataMap.get(userId);
 
     const payload = {
       type: "provider_context_update_ack",
@@ -282,7 +282,7 @@ export class Resolver {
     ws.send(JSON.stringify(payload));
     if (userRecord?.providerContext) {
       userRecord.providerContext = providerContext;
-      this.wsServer.userDataMap.set(_userId, userRecord);
+      this.wsServer.userDataMap.set(userId, userRecord);
       return;
     }
   }
@@ -467,7 +467,7 @@ export class Resolver {
       switch (provider) {
         case "gemini": {
           const svc = this.providers.getRequiredInstance("gemini");
-          await svc.handleGeminiAiChatRequest({ ...commonProps, userData });
+          await svc.routeGemini({ ...commonProps, userData });
           break;
         }
         case "anthropic": {

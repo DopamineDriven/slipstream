@@ -1,0 +1,94 @@
+diff --git a/dist/node/node.d.ts b/dist/node/node.d.ts
+index bc7365e795551b19fe390a25421e2611de75b168..9be690e9ae9946a8831958768842fac9d76008f7 100644
+--- a/dist/node/node.d.ts
++++ b/dist/node/node.d.ts
+@@ -1,6 +1,7 @@
+ /// <reference types="node" />
++/// <reference path="../../../../../@modelcontextprotocol/sdk/dist/esm/client/index.js" />
+ 
+-import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
++import type { Client } from '@modelcontextprotocol/sdk';
+ import { GoogleAuthOptions } from 'google-auth-library';
+ import { ReadableStream as ReadableStream_2 } from 'stream/web';
+ 
+@@ -1821,7 +1822,7 @@ declare namespace ContentDelta {
+     }
+     namespace FunctionResultDelta {
+         interface Items {
+-            items?: Array<string | InteractionsAPI.ImageContent | unknown>;
++            items?: Array<string | InteractionsAPI.ImageContent>;
+         }
+     }
+     interface CodeExecutionCallDelta {
+@@ -1914,7 +1915,7 @@ declare namespace ContentDelta {
+     }
+     namespace MCPServerToolResultDelta {
+         interface Items {
+-            items?: Array<string | InteractionsAPI.ImageContent | unknown>;
++            items?: Array<string | InteractionsAPI.ImageContent>;
+         }
+     }
+     interface FileSearchResultDelta {
+@@ -3864,7 +3865,7 @@ declare interface FunctionResultContent {
+     /**
+      * The result of the tool call.
+      */
+-    result: FunctionResultContent.Items | unknown | string;
++    result: FunctionResultContent.Items | string;
+     type: 'function_result';
+     /**
+      * Whether the tool call resulted in an error.
+@@ -3878,7 +3879,7 @@ declare interface FunctionResultContent {
+ 
+ declare namespace FunctionResultContent {
+     interface Items {
+-        items?: Array<string | InteractionsAPI.ImageContent | unknown>;
++        items?: Array<string | InteractionsAPI.ImageContent>;
+     }
+ }
+ 
+@@ -5407,7 +5408,7 @@ export declare class HttpResponse {
+      */
+     responseInternal: Response;
+     constructor(response: Response);
+-    json(): Promise<unknown>;
++    json<T = unknown>(): Promise<T>;
+ }
+ 
+ /** An image. */
+@@ -6994,7 +6995,7 @@ declare interface MCPServerToolResultContent {
+     /**
+      * The result of the tool call.
+      */
+-    result: MCPServerToolResultContent.Items | unknown | string;
++    result: MCPServerToolResultContent.Items | string;
+     type: 'mcp_server_tool_result';
+     /**
+      * Name of the tool which is called for this specific tool call.
+@@ -7008,7 +7009,7 @@ declare interface MCPServerToolResultContent {
+ 
+ declare namespace MCPServerToolResultContent {
+     interface Items {
+-        items?: Array<string | InteractionsAPI.ImageContent | unknown>;
++        items?: Array<string | InteractionsAPI.ImageContent>;
+     }
+ }
+ 
+@@ -7076,7 +7077,7 @@ export declare enum MediaResolution {
+  * This type contains `RequestInit` options that may be available on the current runtime,
+  * including per-platform extensions like `dispatcher`, `agent`, `client`, etc.
+  */
+-declare type MergedRequestInit = RequestInits & 
++declare type MergedRequestInit = RequestInits &
+ /** We don't include these in the types as they'll be overridden for every request. */
+ Partial<Record<'body' | 'headers' | 'method' | 'signal', never>>;
+ 
+@@ -8557,7 +8558,7 @@ export declare interface Schema {
+     type?: Type;
+ }
+ 
+-export declare type SchemaUnion = Schema | unknown;
++export declare type SchemaUnion = Schema;
+ 
+ /** An image mask representing a brush scribble. */
+ export declare interface ScribbleImage {

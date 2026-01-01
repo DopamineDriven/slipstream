@@ -14,12 +14,15 @@ export const displayNameToModelIdImgGen = {
     "GPT-4o": "gpt-4o",
     "GPT-4o mini": "gpt-4o-mini",
     o3: "o3",
+    "GPT Image 1.5": "gpt-image-1.5",
     "GPT Image 1": "gpt-image-1",
     "GPT Image 1 mini": "gpt-image-1-mini",
     "DALL·E 3": "dall-e-3",
     "DALL·E 2": "dall-e-2"
   },
   gemini: {
+    "Deep Research Pro Preview (Dec-12-2025)":
+      "deep-research-pro-preview-12-2025",
     "Nano Banana Pro": "gemini-3-pro-image-preview",
     "Nano Banana": "gemini-2.5-flash-image",
     "Imagen 4": "imagen-4.0-generate-001",

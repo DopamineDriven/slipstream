@@ -95,7 +95,9 @@ class ExtractSSE extends Fs {
     }
   }
 }
+const argv3 = process.argv[3];
+if (argv3) {
+  const s = new ExtractSSE(`src/test/openai/${argv3}.txt`);
 
-const s = new ExtractSSE("src/test/openai/sse-chunks-3-responses.txt");
-
-s.exe("both").then(() => {});
+  s.exe("both").then(() => {});
+}

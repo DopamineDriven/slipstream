@@ -19,6 +19,7 @@ export const modelIdsByProvider = {
     "gpt-4.1-nano",
     "gpt-4o",
     "gpt-4o-mini",
+    "gpt-image-1.5",
     "gpt-image-1",
     "gpt-image-1-mini",
     "dall-e-3",
@@ -40,6 +41,7 @@ export const modelIdsByProvider = {
   ],
   gemini: [
     "gemini-3-pro-preview",
+    "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",

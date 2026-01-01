@@ -58,7 +58,7 @@ async function* getAllGrokFiles(collection_id: string, limit = 10) {
     count += page.documents?.length ?? 0;
 
     yield {
-      data: page.documents,
+      data: page,
       count,
       page_number,
       has_more
@@ -90,13 +90,13 @@ const arr = Array.of<{
 }>();
 const sizeTrack = { size: 0 };
 for await (const x of getAllGrokFiles(
-  "collection_5934cf24-b069-47c1-8964-7e495696c3b4"
+  "collection_1a143a9a-f734-41cb-9cd4-693bf00be9dc"
 )) {
   if (x.data) {
-    for (const document of x.data) {
+    console.log(x.data.pagination_token ?? "no pagination token");
+    for (const document of x.data.documents) {
       sizeTrack.size += Number.parseInt(document.file_metadata.size_bytes);
       arr.push(document);
-      console.log(document.fields);
     }
   }
 }
@@ -121,4 +121,4 @@ fs.withWs(
 //   const toJson = await res.json();
 
 // });
-console.log(sizeTrack)
+console.log(sizeTrack);

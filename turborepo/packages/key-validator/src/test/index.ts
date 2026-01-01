@@ -74,7 +74,7 @@ const fs = new Fs(process.cwd());
   const parseOpenAi = JSON.parse(await openAiData.text()) as OpenAiResponse;
   const parseGrok = JSON.parse(await grokData.text()) as GrokModelsResponse;
   const parseIt = JSON.parse(await data.text()) as AnthropicResponse;
-
+const openaiSorted = parseOpenAi.data?.sort((o,p) => o.created - p.created);
   fs.withWs(
     "src/test/__out__/llama-results.json",
     JSON.stringify(parseLlama, null, 2)
@@ -89,7 +89,7 @@ const fs = new Fs(process.cwd());
   );
   fs.withWs(
     "src/test/__out__/openai-results.json",
-    JSON.stringify(parseOpenAi, null, 2)
+    JSON.stringify(openaiSorted, null, 2)
   );
   fs.withWs(
     "src/test/__out__/gemini-results.json",

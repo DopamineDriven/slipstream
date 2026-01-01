@@ -156,6 +156,9 @@ export class GrokResponsesApiService extends GrokImgGenService {
         if (chunk.event === "response.output_text.delta") {
           text = chunk.data.delta;
         }
+        if (chunk.event ==="response.output_text.annotation.added") {
+          chunk.data.annotation
+        }
         // NOTE: GROK TENDS TO INCLUDE THIS DIRECTLY AT THE END OF THE MESSAGE STREAM
         // if (chunk.event === "response.output_text.annotation.added") {
         //   if (

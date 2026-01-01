@@ -93,7 +93,8 @@ export class OpenAIServiceWorkup {
       m === "dall-e-2" ||
       m === "dall-e-3" ||
       m === "gpt-image-1" ||
-      m === "gpt-image-1-mini"
+      m === "gpt-image-1-mini" ||
+      m === "gpt-image-1.5"
     );
   }
 
@@ -360,7 +361,10 @@ export class OpenAIServiceWorkup {
       const fileBuffer = await readFile(absTmpPath);
       const base64 = fileBuffer.toString("base64");
       const contentType =
-        mime ?? attachment.compatMime ?? attachment.mime ?? "application/octet-stream";
+        mime ??
+        attachment.compatMime ??
+        attachment.mime ??
+        "application/octet-stream";
       return `data:${contentType};base64,${base64}`;
     } finally {
       this.prisma.cleanupTmpPostupload("OPENAI", absTmpPath, tmpUniquename);
@@ -916,6 +920,7 @@ export class OpenAIServiceWorkup {
       case "o3-mini":
       case "gpt-5.2-chat-latest":
       case "gpt-5-codex":
+      case "gpt-image-1.5":
       case "gpt-5-chat-latest":
       case "gpt-5.1-codex":
       case "gpt-5.1-codex-mini":
@@ -951,6 +956,7 @@ export class OpenAIServiceWorkup {
       m === "gpt-5.1-codex-max" ||
       m === "gpt-5.1-codex" ||
       m === "gpt-5.1-codex-mini" ||
+      m === "gpt-image-1.5" ||
       m === "o3-pro" ||
       m === "o1-pro" ||
       m === "o3-deep-research" ||
@@ -988,6 +994,7 @@ export class OpenAIServiceWorkup {
         }
         return { verbosity } satisfies ResponseTextConfig;
       }
+      case "gpt-image-1.5":
       case "gpt-5.2-chat-latest":
       case "gpt-5-codex":
       case "gpt-5.1-chat-latest":

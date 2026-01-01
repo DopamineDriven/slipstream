@@ -1,11 +1,15 @@
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import type { FssDoc, StoreDocDbRegistryProps } from "@/gemini/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AttachmentProviderSingleton,
   AttachmentSingleton,
+  ProviderStoreDocumentSingleton,
+  ProviderStoreSingleton,
+  Rm,
   XOR
 } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
@@ -20,9 +24,23 @@ export type AttachmentSingletonProviderWorkup<T extends $Enums.Provider> =
   AttachmentSingleton<true> & { provider: T };
 export class PrismaAttachmentProviderService extends PrismaUtilsService {
   public extractor: ExtractService;
-  constructor(prisma: DbService, extractor: ExtractService) {
-    super(prisma);
+  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+    super(prisma, isProd);
     this.extractor = extractor;
+  }
+
+    public async updateGeminiStore(
+    userId: string,
+    fileCount: number,
+    totalSize: number,
+    lastSyncedAt: Date
+  ) {
+    
+    return await this.prismaClient.providerStore.update({
+      data: { fileCount, lastSyncedAt, totalBytes: BigInt(totalSize) },
+      where: { userId_provider: { userId, provider: "GROK" } },
+      select: { id: true }
+    });
   }
 
   public async findActiveOpenAIAsset(
@@ -152,6 +170,102 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       data: { fileCount, lastSyncedAt, totalBytes: BigInt(totalSize) },
       where: { userId_provider: { userId, provider: "GROK" } },
       select: { id: true }
+    });
+  }
+
+  public async createGeminiStoreDoc({
+    attachmentId,
+    docRef,
+    docUri,
+    filename,
+    indexedAt,
+    mimeType,
+    state,
+    storeId,
+    storeRef,
+    userId,
+    size
+  }: {
+    userId: string;
+    attachmentId: string;
+    storeId: string;
+    docRef: string;
+    docUri: string;
+    storeRef: string;
+    filename: string;
+    indexedAt: Date;
+    mimeType: string;
+    state: $Enums.ProviderDocState;
+    size?: bigint;
+  }) {
+    return await this.prismaClient.$transaction(async prisma => {
+      const [doc, store] = await Promise.all([
+        prisma.providerStoreDocument.create({
+          data: {
+            state,
+            indexedAt,
+            size,
+            mimeType,
+            docRef,
+            filename,
+            docUri,
+            provider: "GEMINI",
+            attachmentId,
+            storeId,
+            lastAccessed: indexedAt
+          },
+          select: {
+            filename: true,
+            id: true,
+            createdAt: true,
+            mimeType: true,
+            provider: true,
+            errorMessage: true,
+            size: true,
+            updatedAt: true,
+            indexedAt: true,
+            attachmentId: true,
+            state: true,
+            docRef: true,
+            docUri: true,
+            lastAccessed: true
+          }
+        }),
+        prisma.providerStore.update({
+          where: { userId_provider: { provider: "GEMINI", userId } },
+          data: {
+            fileCount: { increment: 1 },
+            lastSyncedAt: new Date(Date.now()),
+            storeRef,
+            totalBytes: { increment: size ?? 0n }
+          },
+          select: {
+            storeRef: true,
+            id: true,
+            fileCount: true,
+            totalBytes: true
+          }
+        })
+      ]);
+
+      return {
+        attachmentId: doc.attachmentId,
+        docRef: doc.docRef,
+        docUri: doc.docUri,
+        state: doc.state,
+        storeRef: store.storeRef,
+        id: doc.id,
+        storeId: store.id,
+        size: store.totalBytes ? Number(store.totalBytes) : null,
+        filename: doc.filename,
+        createdAt: doc.createdAt,
+        errorMessage: doc.errorMessage,
+        indexedAt: doc.indexedAt,
+        lastAccessed: doc.lastAccessed,
+        mimeType: doc.mimeType,
+        provider: "GEMINI",
+        updatedAt: doc.updatedAt
+      } satisfies StoreDocDbRegistryProps;
     });
   }
 
@@ -373,6 +487,104 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     } else return;
   }
 
+  // public async findManyStoreDocsByProvider(
+  //   provider: $Enums.Provider,
+  //   userId: string
+  // ) {
+  //   const storeName = this.vectorStoreDisplayName(userId);
+  //   const prismaTransaction = await this.prismaClient.$transaction(
+  //     async prisma => {
+  //       const docsFindManyRes = await prisma.providerStore.findFirst({
+  //         where: {
+  //           AND: [{ docs: { some: { provider } }, storeName }]
+  //         },
+  //         include: {docs: true}
+  //       });
+  //     }
+  //   );
+  // }
+
+  public async hasProviderStoreDocs(userId: string, provider: $Enums.Provider) {
+    const count = await this.prismaClient.attachment.count({
+      where: { AND: [{ providerStoreDocs: { some: { provider } }, userId }] }
+    });
+    return count > 0 ? true : false;
+  }
+
+  public async findManyProviderStoreDocs(
+    provider: $Enums.Provider,
+    userId: string
+  ) {
+    return await this.prismaClient.$transaction(async prisma => {
+      const providerDocsFindMany = await prisma.attachment.findMany({
+        where: { AND: [{ providerStoreDocs: { some: { provider } }, userId }] },
+        select: {
+          id: true,
+          compatCdnUrl: true,
+          providerStoreDocs: {
+            where: { provider },
+            select: {
+              id: true,
+              createdAt: true,
+              lastAccessed: true,
+              docRef: true,
+              docUri: true,
+              updatedAt: true,
+              indexedAt: true,
+              provider: true,
+              errorMessage: true,
+              filename: true,
+              mimeType: true,
+              state: true,
+              size: true,
+              store: { select: { id: true, storeRef: true, storeName: true } }
+            }
+          }
+        }
+      });
+
+      const arr = Array.of<{
+        id: string;
+        size: number | null;
+        filename: string;
+        createdAt: Date;
+        updatedAt: Date;
+        attachmentId: string;
+        provider: $Enums.Provider;
+        state: $Enums.ProviderDocState;
+        errorMessage: string | null;
+        storeId: string;
+        storeRef: string;
+        storeName: string;
+        docRef: string;
+        docUri: string | null;
+        indexedAt: Date | null;
+        mimeType: string;
+        lastAccessed: Date | null;
+      }>();
+
+      for (const attachment of providerDocsFindMany) {
+        const attachmentId = attachment.id;
+        if (attachment.providerStoreDocs.length > 0) {
+          for (const doc of attachment.providerStoreDocs) {
+            const { store, size, ...docRest } = doc;
+            const { storeRef, storeName, id: storeId } = store;
+            const record = {
+              storeRef,
+              storeName,
+              storeId,
+              attachmentId,
+              size: size ? Number(size) : null,
+              ...docRest
+            };
+            arr.push(record);
+          }
+        }
+      }
+      return arr;
+    });
+  }
+
   public async findManyByProvider(provider: $Enums.Provider, userId: string) {
     const prismaTransaction = await this.prismaClient.$transaction(
       async prisma => {
@@ -415,6 +627,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
           storeId?: string | null;
           storeRef?: string | null;
         }>();
+
         for (const attachment of attachmentFindManyRes) {
           if (attachment.providerLinks.length > 0) {
             for (const providerLink of attachment.providerLinks) {
@@ -450,8 +663,11 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     keyFingerprint: providerLink.keyFingerprint,
                     provider: providerLink.provider,
                     providerRef: providerLink.providerRef,
+                    /**
+                     * 120-year window for xAI
+                     */
                     isExpired:
-                      120 * 24 * 60 * 60 * 1000 <
+                      120 * 365.25 * 24 * 60 * 60 * 1000 <
                       Date.now() -
                         (providerLink.lastCheckedAt?.getTime() ??
                           providerLink.createdAt.getTime()),
@@ -663,6 +879,310 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     }
   }
 
+  public urlExtWorkupEmbeddings(attachment: AttachmentSingleton<true>) {
+    const urlExtRecord = { url: "", ext: "", mime: "", embeddedFilename: "" };
+    try {
+      if (!attachment.compatStatus)
+        throw new Error(
+          `no compat status provided in attachment record ${attachment.id}`
+        );
+      if (
+        attachment.compatStatus === "ACTIVE" &&
+        attachment.compatExt &&
+        attachment.compatCdnUrl &&
+        attachment.compatMime
+      ) {
+        urlExtRecord.ext = attachment.compatExt;
+        urlExtRecord.mime = attachment.compatMime;
+        urlExtRecord.url = attachment.compatCdnUrl;
+        urlExtRecord.embeddedFilename = this.toVectorStoreFilename(attachment);
+      }
+      if (
+        attachment.compatStatus === "ALIASED" &&
+        attachment.ext &&
+        attachment.mime &&
+        attachment.cdnUrl
+      ) {
+        urlExtRecord.ext = attachment.ext;
+        urlExtRecord.mime = attachment.mime;
+        urlExtRecord.url = attachment.cdnUrl;
+        urlExtRecord.embeddedFilename = this.toVectorStoreFilename(attachment);
+      }
+    } catch (err) {
+      throw new Error("error in urlExtWorkup ".concat(this.safeErrMsg(err)));
+    } finally {
+      return urlExtRecord;
+    }
+  }
+  /**
+   * all cdnUrls have a final path prefixed with a timestamp (ms), eg:
+   *
+   * `https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758334065329-IMG_6695.png`
+   *
+   *  -> `pathname.slice(14)` simply excises the predictably prefixed `1758334065329-` from the filename
+   *
+   * that said, converted (comapt) attachments lack the timestamp and have the following shape instead:
+   *
+   * `https://assets.aicoalesce.com/upload/converted/att_wtywhioyfurelljpivpbgdk3.pdf`
+   *
+   * so we don't slice when `compatStatus === "ACTIVE"`, we just take the top-level pathname as is
+   */
+  public filenameToHexExtTuple(
+    url: string,
+    compatStatus: ("FAILED" | "PENDING" | "ACTIVE" | "ALIASED") | null,
+    encoded = true
+  ) {
+    const urlObj = new URL(url);
+
+    const path = urlObj.pathname;
+
+    const pathname = path.slice(path.lastIndexOf("/") + 1);
+
+    const filename = compatStatus === "ACTIVE" ? pathname : pathname.slice(14);
+
+    const dbFile = filename ?? `file.pdf`;
+
+    const [withoutExt, ext] = [
+      dbFile.slice(0, dbFile.lastIndexOf(".")),
+      dbFile.slice(dbFile.lastIndexOf(".") + 1)
+    ];
+
+    const name = encoded
+      ? Buffer.from(withoutExt, "utf-8").toString("hex")
+      : withoutExt;
+    return [name, ext] as const;
+  }
+
+  public toVectorStoreFilename(att: AttachmentSingleton<true>) {
+    let url: string;
+    if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
+      url = att.compatCdnUrl;
+    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
+      url = att.cdnUrl;
+    } else {
+      url = "";
+    }
+    const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
+    if (att.conversationId && att.messageId) {
+      return `${att.conversationId}-${att.messageId}-${att.id}-${filename}.${ext}`;
+    } else {
+      throw new Error(`no conversationId or messageId set for ${att.id}`);
+    }
+  }
+  public canParseFilename(filename: string) {
+    return /^(?:[a-z0-9]+-){3}[a-f0-9]+\.[a-z0-9]+$/.test(filename);
+  }
+
+  public parseFilename(filename: string) {
+    if (!this.canParseFilename(filename))
+      throw new Error(
+        "always guard parseFilename with its canParseFilename helper!"
+      );
+
+    const [conversationId, messageId, attachmentId, fileNameExt] =
+      filename.split("-") as [string, string, string, string];
+
+    const [fileNameHex, extension] = [
+      fileNameExt.slice(0, fileNameExt.lastIndexOf(".")),
+      fileNameExt.slice(fileNameExt.lastIndexOf(".") + 1)
+    ];
+
+    const fileName = Buffer.from(fileNameHex, "hex").toString("utf-8");
+
+    return {
+      conversationId,
+      messageId,
+      attachmentId,
+      fileName,
+      extension
+    };
+  }
+
+  public async getManyAttachments(ids: string[]) {
+    const attachments = await this.prismaClient.attachment.findMany({
+      where: { id: { in: ids } },
+      include: { image: true, document: true, imageGenOutput: true }
+    });
+
+    return attachments.map(v => {
+      const { size, ...rest } = v;
+      return {
+        ...rest,
+        size: size ? Number(size) : null
+      };
+    });
+  }
+
+  public bigintToIntProviderStoreDocs(
+    data: Rm<ProviderStoreSingleton<false | true>, "files"> & {
+      docs: ProviderStoreDocumentSingleton<false | true>[];
+    }
+  ) {
+    const { totalBytes, docs, ...rest } = data;
+
+    const docsMapped = docs.map(t => {
+      const { size, attachment: _attachment, store: _store, ...doc } = t;
+      return {
+        storeRef: rest.storeRef,
+        size: size ? Number(size) : null,
+        ...doc
+      } satisfies StoreDocDbRegistryProps;
+    });
+    const providerStoreOut = {
+      ...rest,
+      totalBytes: totalBytes ? Number(totalBytes) : null,
+      docs: docsMapped
+    } satisfies Rm<ProviderStoreSingleton<true>, "files"> & {
+      docs: ProviderStoreDocumentSingleton<true>[];
+    };
+
+    return providerStoreOut satisfies Rm<
+      ProviderStoreSingleton<true>,
+      "files"
+    > & {
+      docs: StoreDocDbRegistryProps[];
+    } as Rm<ProviderStoreSingleton<true>, "files"> & {
+      docs: StoreDocDbRegistryProps[];
+    };
+  }
+  public async createManyProviderStoreDocsGemini(
+    fssDocs: FssDoc[],
+    storeId: string,
+    userId: string
+  ) {
+    const arr = Array.of<{
+      readonly storeId: string;
+      readonly attachmentId: string;
+      readonly docRef: string;
+      readonly filename: string;
+      readonly mimeType: string;
+      readonly provider: "GEMINI";
+      readonly createdAt: string;
+      readonly updatedAt: string;
+      readonly lastAccessed: string;
+      readonly size: number;
+      readonly docUri: `https://generativelanguage.googleapis.com/v1beta/${string}`;
+      readonly state: "ACTIVE" | "FAILED" | "PENDING" | "PROCESSING";
+      readonly indexedAt: string;
+    }>();
+    const provider = "GEMINI";
+    const agg = { size: 0 };
+    try {
+      for (const dd of fssDocs) {
+        if (
+          dd.displayName &&
+          dd.name &&
+          dd.createTime &&
+          dd.customMetadata &&
+          dd.mimeType &&
+          dd.sizeBytes &&
+          dd.state &&
+          dd.updateTime
+        ) {
+          const filename = dd.displayName;
+          const { attachmentId } = this.parseFilename(dd.displayName);
+          const docUri =
+            `https://generativelanguage.googleapis.com/v1beta/${dd.name}` as const;
+          const docRef = dd.name;
+          const state =
+            dd.state === "STATE_ACTIVE"
+              ? "ACTIVE"
+              : dd.state === "STATE_FAILED"
+                ? "FAILED"
+                : dd.state === "STATE_PENDING"
+                  ? "PROCESSING"
+                  : "PENDING";
+
+          const indexedAt = dd.updateTime;
+          const createdAt = dd.createTime;
+          const updatedAt = dd.updateTime;
+          const lastAccessed = dd.updateTime;
+          const size = Number.parseInt(dd.sizeBytes);
+          const record = {
+            attachmentId,
+            docRef,
+            docUri,
+            state,
+            size,
+            filename,
+            createdAt,
+            mimeType: dd.mimeType,
+            provider,
+            updatedAt,
+            indexedAt,
+            lastAccessed,
+            storeId
+          } as const;
+          arr.push(record);
+          agg.size += size;
+        }
+      }
+      const dataOne =
+        await this.prismaClient.providerStoreDocument.createManyAndReturn({
+          data: arr
+        });
+      const data = await this.prismaClient.providerStore.update({
+        where: { userId_provider: { userId, provider } },
+        data: {
+          totalBytes: { increment: BigInt(agg.size) },
+          lastSyncedAt: new Date(Date.now()),
+          fileCount: { increment: fssDocs.length }
+        }
+      });
+      const r = { docs: dataOne, ...data };
+      return this.bigintToIntProviderStoreDocs(r);
+    } catch (err) {
+      throw new Error(
+        `something went wrong in createManyProviderStoreDocsGemini...${this.safeErrMsg(err)}`
+      );
+    }
+  }
+
+  public async createVectorStoreGemini(
+    userId: string,
+    storeRef: string,
+    storeDisplayName: string,
+    createdAt: string,
+    updatedAt: string,
+    documentsCount: number,
+    totalBytes = 0n
+  ) {
+    try {
+      const data = await this.prismaClient.providerStore.create({
+        data: {
+          storeName: storeDisplayName,
+          providerStoreCreatedAt: new Date(createdAt),
+          totalBytes,
+          fileCount: documentsCount,
+          provider: "GEMINI",
+          storeRef,
+          createdAt,
+          userId,
+          updatedAt,
+          lastSyncedAt: new Date(updatedAt)
+        },
+        select: {
+          storeRef: true,
+          id: true,
+          fileCount: true,
+          storeName: true,
+          createdAt: true,
+          updatedAt: true,
+          lastSyncedAt: true,
+          userId: true,
+          totalBytes: true
+        }
+      });
+      const { totalBytes: size, ...spread } = data;
+      return {
+        totalBytes: size ? Number(size) : null,
+        ...spread
+      };
+    } catch (err) {
+      throw new Error(`something went wrong...${this.safeErrMsg(err)}`);
+    }
+  }
+
   public async createVectorStoreGrok(
     userId: string,
     storeId: string,
@@ -738,6 +1258,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   ): Promise<
     XOR<
       {
+        readonly totalBytes: 0;
         readonly storeRef: undefined;
         readonly dbId: undefined;
         readonly hasStore: false;
@@ -746,6 +1267,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         readonly provider: $Enums.Provider;
       },
       {
+        readonly totalBytes: number;
         readonly storeRef: string;
         readonly dbId: string;
         readonly hasStore: true;
@@ -757,10 +1279,22 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   > {
     const getStore = await this.prismaClient.providerStore.findUnique({
       where: { userId_provider: { provider, userId } },
-      select: { id: true, storeRef: true, fileCount: true, storeName: true }
+      select: {
+        id: true,
+        storeRef: true,
+        fileCount: true,
+        storeName: true,
+        totalBytes: true
+      }
     });
+
+    let size = 0;
+    if (getStore?.totalBytes) {
+      size = Number(getStore.totalBytes);
+    }
     if (getStore === null) {
       return {
+        totalBytes: 0,
         storeRef: undefined,
         storeName: undefined,
         dbId: undefined,
@@ -770,6 +1304,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       } as const;
     } else {
       return {
+        totalBytes: size,
         storeRef: getStore.storeRef,
         dbId: getStore.id,
         storeName: getStore.storeName,

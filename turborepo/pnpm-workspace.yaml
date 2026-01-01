@@ -3,6 +3,20 @@ packages:
   - packages/*
   - tooling/*
 
+catalogs:
+  eslint:
+    eslint: ^9.39.2
+  node25:
+    '@types/node': ^25.0.3
+  ts6:
+    typescript: ^5.9.3
+  tsdown:
+    tsdown: ^0.18.4
+  tsgo7:
+    '@typescript/native-preview': ^7.0.0-dev.20251226.1
+  tseslint:
+    typescript-eslint: ^8.51.0
+
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@prisma/client'
@@ -20,12 +34,5 @@ onlyBuiltDependencies:
   - sharp
   - unrs-resolver
 
-catalogs:
-  ts6:
-    typescript: ^5.9.3
-  tsgo7:
-    "@typescript/native-preview": ^7.0.0-dev.20251211.1
-  node25:
-    "@types/node": ^25.0.1
-  tsdown:
-    tsdown: ^0.17.3
+patchedDependencies:
+  '@google/genai': patches/@google__genai.patch

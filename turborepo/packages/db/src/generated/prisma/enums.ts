@@ -21,6 +21,16 @@ export const ReasoningEffort = {
 export type ReasoningEffort = (typeof ReasoningEffort)[keyof typeof ReasoningEffort]
 
 
+export const ProviderDocState = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  ACTIVE: 'ACTIVE',
+  FAILED: 'FAILED'
+} as const
+
+export type ProviderDocState = (typeof ProviderDocState)[keyof typeof ProviderDocState]
+
+
 export const OutputVerbosity = {
   low: 'low',
   medium: 'medium',
@@ -197,6 +207,8 @@ export const MessageType = {
   AUDIO_GEN: 'AUDIO_GEN',
   COMPUTER_USE: 'COMPUTER_USE',
   IMAGE_GEN: 'IMAGE_GEN',
+  DOC_GEN: 'DOC_GEN',
+  DEEP_RESEARCH: 'DEEP_RESEARCH',
   TEXT: 'TEXT',
   VIDEO_GEN: 'VIDEO_GEN'
 } as const

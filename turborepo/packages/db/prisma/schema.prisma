@@ -27,6 +27,13 @@ enum ReasoningEffort {
   xhigh
 }
 
+enum ProviderDocState {
+  PENDING
+  PROCESSING
+  ACTIVE
+  FAILED
+}
+
 enum OutputVerbosity {
   low
   medium
@@ -172,6 +179,8 @@ enum MessageType {
   AUDIO_GEN
   COMPUTER_USE
   IMAGE_GEN
+  DOC_GEN
+  DEEP_RESEARCH
   TEXT
   VIDEO_GEN
 }
@@ -290,11 +299,39 @@ model ProviderStore {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   files AttachmentProvider[]
+  docs  ProviderStoreDocument[]
 
   @@unique([userId, provider])
   @@index([storeRef, provider])
+}
+
+model ProviderStoreDocument {
+  id           String   @id @default(cuid(2))
+  storeId      String
+  attachmentId String
+  provider     Provider
+
+  docRef       String
+  docUri       String?
+  filename     String
+  // Indexing lifecycle
+  state        ProviderDocState @default(PENDING)
+  indexedAt    DateTime?
+  mimeType     String
+  errorMessage String?
+  lastAccessed DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  size         BigInt?
+
+  store      ProviderStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  attachment Attachment    @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, attachmentId])
+  @@index([storeId, state])
+  @@index([attachmentId])
 }
 
 model UserKey {
@@ -447,15 +484,16 @@ model Attachment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  conversation   Conversation?        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  message        Message?             @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  providerLinks  AttachmentProvider[]
-  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  image          ImageMetadata?
-  video          VideoMetadata?
-  document       DocumentMetadata?
-  audio          AudioMetadata?
-  imageGenOutput ImageGenOutput?      @relation("ImageGenOutputToAttachment")
+  conversation      Conversation?           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message           Message?                @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  providerLinks     AttachmentProvider[]
+  providerStoreDocs ProviderStoreDocument[]
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image             ImageMetadata?
+  video             VideoMetadata?
+  document          DocumentMetadata?
+  audio             AudioMetadata?
+  imageGenOutput    ImageGenOutput?         @relation("ImageGenOutputToAttachment")
 
   @@index([checksumSha256])
   @@index([assetType, createdAt])

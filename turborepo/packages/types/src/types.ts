@@ -13,6 +13,7 @@ import type {
   Message,
   Profile,
   ProviderStore,
+  ProviderStoreDocument,
   Session,
   Settings,
   User,
@@ -67,6 +68,16 @@ export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
 > {
   totalBytes: BigIntOrNumber<T> | null;
   files?: AttachmentProviderSingleton<T>[];
+  docs?: ProviderStoreDocumentSingleton<T>[];
+}
+
+export interface ProviderStoreDocumentSingleton<
+  T extends boolean = false
+> extends Rm<ProviderStoreDocument, "size"> {
+  size: BigIntOrNumber<T> | null;
+
+  store?: ProviderStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
 }
 
 export interface ImageSingleton extends ImageMetadata {}
@@ -97,6 +108,8 @@ export interface AttachmentSingleton<T extends boolean = false> extends Rm<
 > {
   size: BigIntOrNumber<T> | null;
   providerLinks?: AttachmentProviderSingleton<T>[];
+
+  providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
   imageGenOutput: ImageGenOutputSingleton<T> | null;

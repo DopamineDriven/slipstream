@@ -259,3 +259,33 @@ export function parseDraftId(draftId: string) {
 //     (obj as Record<string, unknown>)[key] !== null
 //   );
 // }
+export type CommonDiscriminants =
+  | "type"
+  | "kind"
+  | "event"
+  | "tag"
+  | "_tag"
+  | "__typename";
+
+export type LiteralUnion<TKnown extends string> = TKnown | (string & {});
+
+export type DiscriminatedUnionToRecord<
+  TUnion extends Record<TKey, string>,
+  TKey extends LiteralUnion<CommonDiscriminants>
+> = TKey extends keyof TUnion
+  ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
+  : never;
+
+export type UnionToRecord<
+  TUnion extends { type: string },
+  TDiscriminant extends string = TUnion["type"]
+> = {
+  [K in TDiscriminant]: Extract<TUnion, { type: K }>;
+};
+
+export type SSEEventFromType<TUnion extends { type: string }> = {
+  [K in TUnion["type"]]: {
+    event: K;
+    data: Extract<TUnion, { type: K }>;
+  };
+}[TUnion["type"]];

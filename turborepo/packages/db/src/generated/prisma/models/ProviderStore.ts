@@ -270,6 +270,7 @@ export type ProviderStoreWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ProviderStore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   files?: Prisma.AttachmentProviderListRelationFilter
+  docs?: Prisma.ProviderStoreDocumentListRelationFilter
 }
 
 export type ProviderStoreOrderByWithRelationInput = {
@@ -286,6 +287,7 @@ export type ProviderStoreOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   files?: Prisma.AttachmentProviderOrderByRelationAggregateInput
+  docs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput
 }
 
 export type ProviderStoreWhereUniqueInput = Prisma.AtLeast<{
@@ -306,6 +308,7 @@ export type ProviderStoreWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"ProviderStore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   files?: Prisma.AttachmentProviderListRelationFilter
+  docs?: Prisma.ProviderStoreDocumentListRelationFilter
 }, "id" | "userId_provider">
 
 export type ProviderStoreOrderByWithAggregationInput = {
@@ -357,6 +360,7 @@ export type ProviderStoreCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
   files?: Prisma.AttachmentProviderCreateNestedManyWithoutStoreInput
+  docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateInput = {
@@ -372,6 +376,7 @@ export type ProviderStoreUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   files?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutStoreInput
+  docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUpdateInput = {
@@ -387,6 +392,7 @@ export type ProviderStoreUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
   files?: Prisma.AttachmentProviderUpdateManyWithoutStoreNestedInput
+  docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateInput = {
@@ -402,6 +408,7 @@ export type ProviderStoreUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutStoreNestedInput
+  docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreCreateManyInput = {
@@ -512,6 +519,11 @@ export type ProviderStoreSumOrderByAggregateInput = {
   totalBytes?: Prisma.SortOrder
 }
 
+export type ProviderStoreScalarRelationFilter = {
+  is?: Prisma.ProviderStoreWhereInput
+  isNot?: Prisma.ProviderStoreWhereInput
+}
+
 export type ProviderStoreNullableScalarRelationFilter = {
   is?: Prisma.ProviderStoreWhereInput | null
   isNot?: Prisma.ProviderStoreWhereInput | null
@@ -579,6 +591,20 @@ export type NullableBigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
+export type ProviderStoreCreateNestedOneWithoutDocsInput = {
+  create?: Prisma.XOR<Prisma.ProviderStoreCreateWithoutDocsInput, Prisma.ProviderStoreUncheckedCreateWithoutDocsInput>
+  connectOrCreate?: Prisma.ProviderStoreCreateOrConnectWithoutDocsInput
+  connect?: Prisma.ProviderStoreWhereUniqueInput
+}
+
+export type ProviderStoreUpdateOneRequiredWithoutDocsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProviderStoreCreateWithoutDocsInput, Prisma.ProviderStoreUncheckedCreateWithoutDocsInput>
+  connectOrCreate?: Prisma.ProviderStoreCreateOrConnectWithoutDocsInput
+  upsert?: Prisma.ProviderStoreUpsertWithoutDocsInput
+  connect?: Prisma.ProviderStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProviderStoreUpdateToOneWithWhereWithoutDocsInput, Prisma.ProviderStoreUpdateWithoutDocsInput>, Prisma.ProviderStoreUncheckedUpdateWithoutDocsInput>
+}
+
 export type ProviderStoreCreateNestedOneWithoutFilesInput = {
   create?: Prisma.XOR<Prisma.ProviderStoreCreateWithoutFilesInput, Prisma.ProviderStoreUncheckedCreateWithoutFilesInput>
   connectOrCreate?: Prisma.ProviderStoreCreateOrConnectWithoutFilesInput
@@ -607,6 +633,7 @@ export type ProviderStoreCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   files?: Prisma.AttachmentProviderCreateNestedManyWithoutStoreInput
+  docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateWithoutUserInput = {
@@ -621,6 +648,7 @@ export type ProviderStoreUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   files?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutStoreInput
+  docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreCreateOrConnectWithoutUserInput = {
@@ -666,6 +694,82 @@ export type ProviderStoreScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ProviderStore"> | Date | string
 }
 
+export type ProviderStoreCreateWithoutDocsInput = {
+  id?: string
+  provider: $Enums.Provider
+  storeRef: string
+  storeName: string
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  providerStoreCreatedAt?: Date | string | null
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
+  files?: Prisma.AttachmentProviderCreateNestedManyWithoutStoreInput
+}
+
+export type ProviderStoreUncheckedCreateWithoutDocsInput = {
+  id?: string
+  userId: string
+  provider: $Enums.Provider
+  storeRef: string
+  storeName: string
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  providerStoreCreatedAt?: Date | string | null
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  files?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutStoreInput
+}
+
+export type ProviderStoreCreateOrConnectWithoutDocsInput = {
+  where: Prisma.ProviderStoreWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProviderStoreCreateWithoutDocsInput, Prisma.ProviderStoreUncheckedCreateWithoutDocsInput>
+}
+
+export type ProviderStoreUpsertWithoutDocsInput = {
+  update: Prisma.XOR<Prisma.ProviderStoreUpdateWithoutDocsInput, Prisma.ProviderStoreUncheckedUpdateWithoutDocsInput>
+  create: Prisma.XOR<Prisma.ProviderStoreCreateWithoutDocsInput, Prisma.ProviderStoreUncheckedCreateWithoutDocsInput>
+  where?: Prisma.ProviderStoreWhereInput
+}
+
+export type ProviderStoreUpdateToOneWithWhereWithoutDocsInput = {
+  where?: Prisma.ProviderStoreWhereInput
+  data: Prisma.XOR<Prisma.ProviderStoreUpdateWithoutDocsInput, Prisma.ProviderStoreUncheckedUpdateWithoutDocsInput>
+}
+
+export type ProviderStoreUpdateWithoutDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeRef?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  providerStoreCreatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
+  files?: Prisma.AttachmentProviderUpdateManyWithoutStoreNestedInput
+}
+
+export type ProviderStoreUncheckedUpdateWithoutDocsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeRef?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  providerStoreCreatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutStoreNestedInput
+}
+
 export type ProviderStoreCreateWithoutFilesInput = {
   id?: string
   provider: $Enums.Provider
@@ -678,6 +782,7 @@ export type ProviderStoreCreateWithoutFilesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
+  docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateWithoutFilesInput = {
@@ -692,6 +797,7 @@ export type ProviderStoreUncheckedCreateWithoutFilesInput = {
   lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreCreateOrConnectWithoutFilesInput = {
@@ -722,6 +828,7 @@ export type ProviderStoreUpdateWithoutFilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
+  docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateWithoutFilesInput = {
@@ -736,6 +843,7 @@ export type ProviderStoreUncheckedUpdateWithoutFilesInput = {
   lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreCreateManyUserInput = {
@@ -763,6 +871,7 @@ export type ProviderStoreUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.AttachmentProviderUpdateManyWithoutStoreNestedInput
+  docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateWithoutUserInput = {
@@ -777,6 +886,7 @@ export type ProviderStoreUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutStoreNestedInput
+  docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateManyWithoutUserInput = {
@@ -799,10 +909,12 @@ export type ProviderStoreUncheckedUpdateManyWithoutUserInput = {
 
 export type ProviderStoreCountOutputType = {
   files: number
+  docs: number
 }
 
 export type ProviderStoreCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | ProviderStoreCountOutputTypeCountFilesArgs
+  docs?: boolean | ProviderStoreCountOutputTypeCountDocsArgs
 }
 
 /**
@@ -822,6 +934,13 @@ export type ProviderStoreCountOutputTypeCountFilesArgs<ExtArgs extends runtime.T
   where?: Prisma.AttachmentProviderWhereInput
 }
 
+/**
+ * ProviderStoreCountOutputType without action
+ */
+export type ProviderStoreCountOutputTypeCountDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderStoreDocumentWhereInput
+}
+
 
 export type ProviderStoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -837,6 +956,7 @@ export type ProviderStoreSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   files?: boolean | Prisma.ProviderStore$filesArgs<ExtArgs>
+  docs?: boolean | Prisma.ProviderStore$docsArgs<ExtArgs>
   _count?: boolean | Prisma.ProviderStoreCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["providerStore"]>
 
@@ -888,6 +1008,7 @@ export type ProviderStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ProviderStoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   files?: boolean | Prisma.ProviderStore$filesArgs<ExtArgs>
+  docs?: boolean | Prisma.ProviderStore$docsArgs<ExtArgs>
   _count?: boolean | Prisma.ProviderStoreCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProviderStoreIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -902,6 +1023,7 @@ export type $ProviderStorePayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     files: Prisma.$AttachmentProviderPayload<ExtArgs>[]
+    docs: Prisma.$ProviderStoreDocumentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1311,6 +1433,7 @@ export interface Prisma__ProviderStoreClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   files<T extends Prisma.ProviderStore$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderStore$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  docs<T extends Prisma.ProviderStore$docsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderStore$docsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStoreDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1768,6 +1891,30 @@ export type ProviderStore$filesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+}
+
+/**
+ * ProviderStore.docs
+ */
+export type ProviderStore$docsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderStoreDocument
+   */
+  select?: Prisma.ProviderStoreDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderStoreDocument
+   */
+  omit?: Prisma.ProviderStoreDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderStoreDocumentInclude<ExtArgs> | null
+  where?: Prisma.ProviderStoreDocumentWhereInput
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
 }
 
 /**

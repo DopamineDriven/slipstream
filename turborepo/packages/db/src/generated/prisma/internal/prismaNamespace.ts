@@ -395,6 +395,7 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   ProviderStore: 'ProviderStore',
+  ProviderStoreDocument: 'ProviderStoreDocument',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "providerStore" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
+    modelProps: "user" | "profile" | "account" | "session" | "providerStore" | "providerStoreDocument" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -795,6 +796,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProviderStoreCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProviderStoreCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderStoreDocument: {
+      payload: Prisma.$ProviderStoreDocumentPayload<ExtArgs>
+      fields: Prisma.ProviderStoreDocumentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderStoreDocumentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderStoreDocumentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderStoreDocumentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderStoreDocumentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderStoreDocumentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>[]
+        }
+        create: {
+          args: Prisma.ProviderStoreDocumentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        createMany: {
+          args: Prisma.ProviderStoreDocumentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProviderStoreDocumentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderStoreDocumentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        update: {
+          args: Prisma.ProviderStoreDocumentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderStoreDocumentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderStoreDocumentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderStoreDocumentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProviderStoreDocumentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentPayload>
+        }
+        aggregate: {
+          args: Prisma.ProviderStoreDocumentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderStoreDocument>
+        }
+        groupBy: {
+          args: Prisma.ProviderStoreDocumentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreDocumentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderStoreDocumentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreDocumentCountAggregateOutputType> | number
         }
       }
     }
@@ -1964,6 +2039,27 @@ export const ProviderStoreScalarFieldEnum = {
 export type ProviderStoreScalarFieldEnum = (typeof ProviderStoreScalarFieldEnum)[keyof typeof ProviderStoreScalarFieldEnum]
 
 
+export const ProviderStoreDocumentScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  attachmentId: 'attachmentId',
+  provider: 'provider',
+  docRef: 'docRef',
+  docUri: 'docUri',
+  filename: 'filename',
+  state: 'state',
+  indexedAt: 'indexedAt',
+  mimeType: 'mimeType',
+  errorMessage: 'errorMessage',
+  lastAccessed: 'lastAccessed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  size: 'size'
+} as const
+
+export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
+
+
 export const UserKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2419,6 +2515,20 @@ export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'ProviderDocState'
+ */
+export type EnumProviderDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProviderDocState'>
+    
+
+
+/**
+ * Reference to a field of type 'ProviderDocState[]'
+ */
+export type ListEnumProviderDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProviderDocState[]'>
+    
+
+
+/**
  * Reference to a field of type 'ThemePreference'
  */
 export type EnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThemePreference'>
@@ -2747,6 +2857,7 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
   providerStore?: Prisma.ProviderStoreOmit
+  providerStoreDocument?: Prisma.ProviderStoreDocumentOmit
   userKey?: Prisma.UserKeyOmit
   settings?: Prisma.SettingsOmit
   conversation?: Prisma.ConversationOmit

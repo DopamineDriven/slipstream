@@ -11,9 +11,11 @@ import type {
   XSearchTool
 } from "@/xai/responses-types.ts";
 import type {
+    AssetCache,
   CollectionDocument,
   CreateCollectionRequest,
   DeleteXaiFileResponse,
+  DocumentResSingleton,
   FieldDefinition,
   GetDocumentsByCollectionId,
   GetFilesRT,
@@ -26,13 +28,56 @@ import type {
   CTR,
   GrokModelIdUnion
 } from "@slipstream/types";
-
+import type { Logger } from "pino";
+import { LoggerService } from "@/logger/index.ts";
 export class GrokWorkupService {
+  protected logger: Logger;
+    protected readonly baseUrl = "https://api.x.ai/v1/responses";
+    protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
+
+    /**
+     * Asset cache: attachmentId → file metadata
+     * Same key as fileRegistry for smooth interop (mirrors Gemini pattern)
+     */
+    protected assetCache = new Map<string, AssetCache>();
+
+    /**
+     * File registry: attachmentId → full xAI document metadata
+     * Same key as assetCache for smooth interop (mirrors Gemini pattern)
+     */
+    protected fileRegistry = new Map<
+      string,
+      DocumentResSingleton
+    >();
+
+    protected lastRegistrySync: Date | null = null;
+
+    /**
+     * env: "dev" | "prod"
+     * Collection registry: (collection_name=env-userId) userId  → collection_id
+     * Avoids repeated collection lookups per user
+     */
+    protected collectionRegistry = new Map<string, string>();
+
+    /**
+     * env: "dev" | "prod"
+     * Store DB registry: (collection_name=env-userId) userId → ProviderStore.id
+     * Quick lookup for database store record
+     */
+    protected storeDbRegistry = new Map<string, string>();
   constructor(
+    logger: LoggerService,
     protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string
-  ) {}
+  ) {
+        this.logger = logger
+      .getPinoInstance()
+      .child(
+        { pid: process.pid, node_version: process.version },
+        { msgPrefix: "[grok] " }
+      );
+  }
 
   protected getEnv(isProd: boolean) {
     return isProd === true ? ("prod" as const) : ("dev" as const);
@@ -57,98 +102,6 @@ export class GrokWorkupService {
     return model === "grok-2-image-1212";
   }
 
-  protected urlExtWorkup(attachment: AttachmentSingleton<true>) {
-    const urlExtRecord = { url: "", ext: "", mime: "", xaiFilename: "" };
-    try {
-      if (!attachment.compatStatus)
-        throw new Error(
-          `no compat status provided in attachment record ${attachment.id}`
-        );
-      if (
-        attachment.compatStatus === "ACTIVE" &&
-        attachment.compatExt &&
-        attachment.compatCdnUrl &&
-        attachment.compatMime
-      ) {
-        urlExtRecord.ext = attachment.compatExt;
-        urlExtRecord.mime = attachment.compatMime;
-        urlExtRecord.url = attachment.compatCdnUrl;
-        urlExtRecord.xaiFilename = this.toXaiFilename(attachment);
-      }
-      if (
-        attachment.compatStatus === "ALIASED" &&
-        attachment.ext &&
-        attachment.mime &&
-        attachment.cdnUrl
-      ) {
-        urlExtRecord.ext = attachment.ext;
-        urlExtRecord.mime = attachment.mime;
-        urlExtRecord.url = attachment.cdnUrl;
-        urlExtRecord.xaiFilename = this.toXaiFilename(attachment);
-      }
-    } catch (err) {
-      throw new Error(
-        "error in urlExtWorkup ".concat(this.prisma.safeErrMsg(err))
-      );
-    } finally {
-      return urlExtRecord;
-    }
-  }
-  /**
-   * all cdnUrls have a final path prefixed with a timestamp (ms), eg:
-   *
-   * `https://assets.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1758334065329-IMG_6695.png`
-   *
-   *  -> `pathname.slice(14)` simply excises the predictably prefixed `1758334065329-` from the filename
-   *
-   * that said, converted (comapt) attachments lack the timestamp and have the following shape instead:
-   *
-   * `https://assets.aicoalesce.com/upload/converted/att_wtywhioyfurelljpivpbgdk3.pdf`
-   *
-   * so we don't slice when `compatStatus === "ACTIVE"`, we just take the top-level pathname as is
-   */
-  protected filenameToHexExtTuple(
-    url: string,
-    compatStatus: ("FAILED" | "PENDING" | "ACTIVE" | "ALIASED") | null,
-    encoded = true
-  ) {
-    const urlObj = new URL(url);
-
-    const path = urlObj.pathname;
-
-    const pathname = path.slice(path.lastIndexOf("/") + 1);
-
-    const filename = compatStatus === "ACTIVE" ? pathname : pathname.slice(14);
-
-    const dbFile = filename ?? `file.pdf`;
-
-    const withoutExt = dbFile.slice(0, dbFile.lastIndexOf("."));
-
-    const ext = dbFile.slice(dbFile.lastIndexOf(".") + 1);
-
-    const name = encoded
-      ? Buffer.from(withoutExt, "utf-8").toString("hex")
-      : withoutExt;
-    return [name, ext] as const;
-  }
-
-  protected toXaiFilename(att: AttachmentSingleton<true>) {
-    let url: string;
-    if (att.compatStatus === "ACTIVE" && att.compatCdnUrl) {
-      url = att.compatCdnUrl;
-    } else if (att.compatStatus === "ALIASED" && att.cdnUrl) {
-      url = att.cdnUrl;
-    } else {
-      url = "";
-    }
-    const [filename, ext] = this.filenameToHexExtTuple(url, att.compatStatus);
-    if (att.conversationId && att.messageId) {
-      return `${att.conversationId}-${att.messageId}-${att.id}-${filename}.${ext}`;
-    } else {
-      throw new Error(`no conversationId or messageId set for ${att.id}`);
-    }
-  }
-
   protected async assetToTmpWorkup({
     assetType,
     compatStatus,
@@ -158,7 +111,12 @@ export class GrokWorkupService {
     userId,
     ...rest
   }: AttachmentSingleton<true>) {
-    const { ext, mime, url, xaiFilename } = this.urlExtWorkup({
+    const {
+      ext,
+      mime,
+      url,
+      embeddedFilename: xaiFilename
+    } = this.prisma.urlExtWorkupEmbeddings({
       ...rest,
       assetType,
       compatStatus,
@@ -255,37 +213,8 @@ export class GrokWorkupService {
     }
   }
 
-  protected canParseFilename(filename: string) {
-    return /^(?:[a-z0-9]+-){3}[a-f0-9]+\.[a-z0-9]+$/.test(filename);
-  }
-
-  protected parseFilename(filename: string) {
-    if (!this.canParseFilename(filename))
-      throw new Error(
-        "always guard parseFilename with its canParseFilename helper!"
-      );
-
-    const [conversationId, messageId, attachmentId, fileNameExt] =
-      filename.split("-") as [string, string, string, string];
-
-    const [fileNameHex, extension] = [
-      fileNameExt.slice(0, fileNameExt.lastIndexOf(".")),
-      fileNameExt.slice(fileNameExt.lastIndexOf(".") + 1)
-    ];
-
-    const fileName = Buffer.from(fileNameHex, "hex").toString("utf-8");
-
-    return {
-      conversationId,
-      messageId,
-      attachmentId,
-      fileName,
-      extension
-    };
-  }
-
   protected parseFileSearchResults(
-    input: CTR<xAIResponses.OutputItem.Done.FileSearchItem, "results">
+    input: CTR<xAIResponses.OutputItem.Done.FileSearchCall, "results">
   ) {
     const textArr = Array.of<{
       score: number;
@@ -335,7 +264,7 @@ export class GrokWorkupService {
       const expandedObj = {
         score,
         file_id,
-        decodedFilename: this.parseFilename(hexEncodedFilename),
+        decodedFilename: this.prisma.parseFilename(hexEncodedFilename),
         ...rest
       };
       aggregate.push(expandedObj);
@@ -600,7 +529,7 @@ export class GrokWorkupService {
     managementKey?: string
   ) {
     const mgmtKey = managementKey ?? this.xaiManagementKey;
-    const name = this.toXaiFilename(att);
+    const name = this.prisma.toVectorStoreFilename(att);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents?filter=name:${name}`,
       {
@@ -724,7 +653,7 @@ export class GrokWorkupService {
       fileName: originalFilename,
       extension,
       messageId
-    } = this.parseFilename(xaiFilename);
+    } = this.prisma.parseFilename(xaiFilename);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents/${documentId}`,
       {

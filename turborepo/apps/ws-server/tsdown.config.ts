@@ -27,6 +27,8 @@ export default defineConfig(
         "src/anthropic/workup.ts",
         "src/byte-codec/index.ts",
         "src/extract/index.ts",
+        "src/gemini/chat.ts",
+        "src/gemini/fss.ts",
         "src/gemini/index.ts",
         "src/gemini/types.ts",
         "src/gemini/workup.ts",

@@ -15,12 +15,12 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   });
   prismaClient.$connect();
   try {
-    const data = await prismaClient.providerStore.findUnique({
+    const data = await prismaClient.providerStore.findUniqueOrThrow({
       where: { userId_provider: { userId, provider } },
-      include: { files: { where: { provider } } }
+      include: { docs: { where: { provider } } }
     });
-    const { totalBytes, files, ...resttt } = data ?? {};
-    const mapper = files?.map(t => {
+    const { totalBytes, docs, ...resttt } = data;
+    const mapper = docs?.map(t => {
       const { size, ...rest } = t;
       return {
         ...rest,
@@ -31,7 +31,7 @@ const data = async (provider: $Enums.Provider, userId: string) => {
     return {
       ...resttt,
       totalBytes: totalBytes ? Number(totalBytes) : null,
-      files: mapper
+      docs: mapper
     };
   } catch (err) {
     throw new Error(

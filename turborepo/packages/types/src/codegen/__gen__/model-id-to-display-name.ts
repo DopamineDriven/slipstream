@@ -19,6 +19,7 @@ export const modelIdToDisplayName = {
     "gpt-4.1-nano": "GPT-4.1 nano",
     "gpt-4o": "GPT-4o",
     "gpt-4o-mini": "GPT-4o mini",
+    "gpt-image-1.5": "GPT Image 1.5",
     "gpt-image-1": "GPT Image 1",
     "gpt-image-1-mini": "GPT Image 1 mini",
     "dall-e-3": "DALL·E 3",
@@ -40,6 +41,7 @@ export const modelIdToDisplayName = {
   },
   gemini: {
     "gemini-3-pro-preview": "Gemini 3 Pro Preview",
+    "gemini-3-flash-preview": "Gemini 3 Flash Preview",
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-3-pro-image-preview": "Nano Banana Pro",
     "gemini-2.5-flash-image": "Nano Banana",

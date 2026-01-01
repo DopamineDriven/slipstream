@@ -1,6 +1,6 @@
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
+import { xAIResponses } from "@/xai/event-types.ts";
 import type { GrokModelIdUnion, XOR } from "@slipstream/types";
-import { xAIResponses } from "./event-types.ts";
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
 
@@ -31,7 +31,7 @@ export type WebSearchTool = {
   type: "web_search";
   filters?: XOR<
     { allowed_domains?: string[]; enable_image_understanding?: boolean },
-    { excluded_doamins?: string[]; enable_image_understanding?: boolean }
+    { excluded_domains?: string[]; enable_image_understanding?: boolean }
   >;
 };
 
@@ -114,7 +114,9 @@ export type ResponsesContentInputSingleton = {
   content: string | ContentBlockUnion[];
 };
 
-export type ResponsesComprehensive = (ResponsesContentInputSingleton | xAIResponses.OutputItem.Done.Item)
+export type ResponsesComprehensive =
+  | ResponsesContentInputSingleton
+  | xAIResponses.OutputItem.Done['item'];
 
 export type ResponsesContentWorkup = {
   input: ResponsesComprehensive[];
@@ -197,7 +199,7 @@ export interface Usage {
   };
 }
 
-export interface CreateResponseStreamInputProps {
+export type CreateResponseStreamInputProps = {
   collectionId?: string;
   tool_choice_input?: ToolChoiceUnion;
   logprobs?: boolean;
@@ -213,14 +215,14 @@ export interface CreateResponseStreamInputProps {
   parallel_tool_calls?: boolean | null;
   previous_response_id?: string | null;
   reasoning?: InputReasoningProps;
-    /**
+  /**
    * defaults to true
    **/
   store?: boolean | null;
   stream?: boolean | null;
   text?: TextFormat;
 
-    /**
+  /**
    * An integer between 0 and 8 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used.
    */
   top_logprobs?: number | null;
@@ -237,6 +239,66 @@ export type CreateResponseStreamProps = {
   payload: CreateResponseStreamInputProps;
 };
 
-export type M = GrokChatReqSubset & CreateResponseStreamInputProps
+export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
+  type: infer K extends string;
+}
+  ? {
+      event: K;
+      data: Extract<TUnion, { type: K }>;
+    }
+  : never;
 
+export type XAIResponsesSSEEvent = SSEEvent<XAIResponsesEvent>;
 
+export type UnionToRecord<
+  TUnion extends { type: string },
+  TDiscriminant extends string = TUnion["type"]
+> = {
+  [K in TDiscriminant]: Extract<TUnion, { type: K }>;
+};
+
+export type xAIRecord = UnionToRecord<XAIResponsesEvent>;
+
+export type XAIResponsesEventType = keyof xAIRecord;
+
+export type XAIResponsesEvent =
+  | xAIResponses.Created
+  | xAIResponses.InProgress
+  | xAIResponses.Completed
+  | xAIResponses.OutputItem.Added
+  | xAIResponses.OutputItem.Done
+  | xAIResponses.ContentPart.Added
+  | xAIResponses.ContentPart.Done
+  | xAIResponses.OutputText.Delta
+  | xAIResponses.OutputText.Done
+  | xAIResponses.OutputText.Annotation
+  | xAIResponses.ReasoningSummaryPart.Added
+  | xAIResponses.ReasoningSummaryPart.Done
+  | xAIResponses.ReasoningSummaryText.Delta
+  | xAIResponses.ReasoningSummaryText.Done
+  | xAIResponses.WebSearchCall.InProgress
+  | xAIResponses.WebSearchCall.Searching
+  | xAIResponses.WebSearchCall.Completed
+  | xAIResponses.FileSearchCall.InProgress
+  | xAIResponses.FileSearchCall.Searching
+  | xAIResponses.FileSearchCall.Completed
+  | xAIResponses.CustomToolCallInput.Delta
+  | xAIResponses.CustomToolCallInput.Done;
+
+export type XAIResponsesEventTypes = XAIResponsesEvent["type"];
+
+export type MapIT = { [P in keyof xAIRecord]: xAIRecord[P] };
+
+export type CollapseAll<S extends string> = S extends `${infer A}_${infer B}`
+  ? CollapseAll<`${A}${Capitalize<B>}`>
+  : S extends `${infer A}.${infer B}`
+    ? CollapseAll<`${Capitalize<A>}${Capitalize<B>}`>
+    : S;
+
+export type ToTypeNameObject<
+  T extends XAIResponsesEventTypes = XAIResponsesEventTypes
+> = Record<CollapseAll<T>, XAIResponsesEventMap<T>>;
+
+export type XAIResponsesEventMap<
+  T extends XAIResponsesEventTypes = XAIResponsesEventTypes
+> = { [P in T]: MapIT[P] }[T];

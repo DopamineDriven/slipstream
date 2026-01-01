@@ -14,6 +14,7 @@ import { modelIdsByProvider } from "@/codegen/__gen__/model-ids-by-provider.ts";
 
 export type ImageGenModels =
   | "gpt-image-1"
+  | "gpt-image-1.5"
   | "gpt-image-1-mini"
   | "dall-e-2"
   | "dall-e-3"
@@ -25,10 +26,17 @@ export type ImageGenModels =
   | "gemini-3-pro-image-preview";
 
 export const providerModelImageGenApi = {
-  openai: ["gpt-image-1", "gpt-image-1-mini", "dall-e-2", "dall-e-3"],
+  openai: [
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-1-mini",
+    "dall-e-2",
+    "dall-e-3"
+  ],
   gemini: [
     "gemini-3-pro-image-preview",
     "gemini-2.5-flash-image",
+    "deep-research-pro-preview-12-2025",
     "imagen-4.0-fast-generate-001",
     "imagen-4.0-generate-001",
     "imagen-4.0-ultra-generate-001"
@@ -59,7 +67,7 @@ export const providerModelImageGenFacilitatingApi = {
     "gpt-4o-mini",
     "o3"
   ],
-  gemini: ["gemini-2.5-flash-image", "gemini-3-pro-image-preview"]
+  gemini: ["gemini-2.5-flash-image", "gemini-3-pro-image-preview", "deep-research-pro-preview-12-2025"]
 } as const;
 
 export const imageModelSets = {

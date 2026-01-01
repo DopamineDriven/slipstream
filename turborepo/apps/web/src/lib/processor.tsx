@@ -114,7 +114,7 @@ const prettyCodeOptions = {
   grid: true,
   keepBackground: true,
   theme: "dark-plus",
-  defaultLang: { block: "text", inline: "text" },
+  defaultLang: { block: "markdown", inline: "markdown" },
   bypassInlineCode: false,
   onVisitLine(node: LineElement) {
     if (node.children.length === 0) {
