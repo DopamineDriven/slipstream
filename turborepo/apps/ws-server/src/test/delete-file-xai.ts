@@ -2,17 +2,14 @@ import JSONDATA from "@/test/__out__/xai/inspect/list-files-xai.json" with { typ
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
-const data = JSONDATA as {
-  bytes: number;
-  created_at: number;
-  expires_at: null;
-  filename: string;
-  id: string;
-  object: string;
-  purpose: string;
-}[];
+const { pages } = JSONDATA;
+const file_ids = Array.of<string>();
+for (const page of pages) {
+  for (const d of page.data) {
+    file_ids.push(d.id);
+  }
+}
 
-const file_ids = data.map(f => f.id);
 dotenv.config({ quiet: true });
 
 const fs = new Fs(process.cwd());

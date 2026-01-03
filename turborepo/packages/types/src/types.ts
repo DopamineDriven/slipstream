@@ -59,7 +59,6 @@ export interface AttachmentProviderSingleton<
   size: BigIntOrNumber<T> | null;
   attachment?: AttachmentSingleton<T>;
   userKey?: UserKeySingleton<T>;
-  store?: ProviderStoreSingleton<T>;
 }
 
 export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
@@ -67,7 +66,6 @@ export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
   "totalBytes"
 > {
   totalBytes: BigIntOrNumber<T> | null;
-  files?: AttachmentProviderSingleton<T>[];
   docs?: ProviderStoreDocumentSingleton<T>[];
 }
 

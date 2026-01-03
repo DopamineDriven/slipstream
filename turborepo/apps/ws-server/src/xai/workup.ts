@@ -1,77 +1,44 @@
 import { createReadStream } from "node:fs";
-import { tmpdir } from "node:os";
-import { resolve } from "node:path";
-import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
-  CodeInterpreterTool,
-  FileSearchTool,
-  ResponsesContentInputSingleton,
-  ToolUnion,
-  WebSearchTool,
-  XSearchTool
-} from "@/xai/responses-types.ts";
-import type {
-    AssetCache,
+  Collection,
   CollectionDocument,
   CreateCollectionRequest,
+  CreateGrokProviderStoreDocParams,
   DeleteXaiFileResponse,
-  DocumentResSingleton,
+  DocumentStatus,
   FieldDefinition,
+  FileErrorRT,
+  FilesDbRegistryProps,
   GetDocumentsByCollectionId,
   GetFilesRT,
   ListCollectionsResponse,
-  UploadFileRT
+  UploadFileRT,
+  xAIDocDbRegistryProps
 } from "@/xai/types.ts";
-import { PrismaService } from "@/prisma/index.ts";
-import type {
-  AttachmentSingleton,
-  CTR,
-  GrokModelIdUnion
-} from "@slipstream/types";
 import type { Logger } from "pino";
 import { LoggerService } from "@/logger/index.ts";
+import { PrismaService } from "@/prisma/index.ts";
+import type { ProviderDocState } from "@slipstream/db/enums-node";
+import type { AttachmentSingleton, GrokModelIdUnion } from "@slipstream/types";
+
 export class GrokWorkupService {
   protected logger: Logger;
-    protected readonly baseUrl = "https://api.x.ai/v1/responses";
-    protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
-
-    /**
-     * Asset cache: attachmentId → file metadata
-     * Same key as fileRegistry for smooth interop (mirrors Gemini pattern)
-     */
-    protected assetCache = new Map<string, AssetCache>();
-
-    /**
-     * File registry: attachmentId → full xAI document metadata
-     * Same key as assetCache for smooth interop (mirrors Gemini pattern)
-     */
-    protected fileRegistry = new Map<
-      string,
-      DocumentResSingleton
-    >();
-
-    protected lastRegistrySync: Date | null = null;
-
-    /**
-     * env: "dev" | "prod"
-     * Collection registry: (collection_name=env-userId) userId  → collection_id
-     * Avoids repeated collection lookups per user
-     */
-    protected collectionRegistry = new Map<string, string>();
-
-    /**
-     * env: "dev" | "prod"
-     * Store DB registry: (collection_name=env-userId) userId → ProviderStore.id
-     * Quick lookup for database store record
-     */
-    protected storeDbRegistry = new Map<string, string>();
+  protected readonly baseUrl = "https://api.x.ai/v1/responses";
+  protected readonly baseImgGenUrl = "https://api.x.ai/v1/images/generations";
+  protected storeDbDocRegistry = new Map<string, xAIDocDbRegistryProps>();
+  protected fileDbRegistry = new Map<string, FilesDbRegistryProps>();
+  protected fileCache = new Map<string, UploadFileRT>();
+  protected docCache = new Map<string, CollectionDocument>();
+  protected lastRegistrySync: Date | null = null;
+  protected collectionRegistry = new Map<string, string>();
+  protected storeDbRegistry = new Map<string, string>();
   constructor(
     logger: LoggerService,
     protected prisma: PrismaService,
     protected xaiKey: string,
     protected xaiManagementKey: string
   ) {
-        this.logger = logger
+    this.logger = logger
       .getPinoInstance()
       .child(
         { pid: process.pid, node_version: process.version },
@@ -79,10 +46,15 @@ export class GrokWorkupService {
       );
   }
 
-  protected getEnv(isProd: boolean) {
-    return isProd === true ? ("prod" as const) : ("dev" as const);
+  protected xaiURI(collection_id: string, file_id: string) {
+    return `collections://${collection_id}/files/${file_id}` as const;
   }
-
+  protected xaiToDbState = {
+    DOCUMENT_STATUS_FAILED: "FAILED",
+    DOCUMENT_STATUS_PROCESSED: "ACTIVE",
+    DOCUMENT_STATUS_PROCESSING: "PROCESSING",
+    DOCUMENT_STATUS_UNKNOWN: "PENDING"
+  } as const satisfies Record<DocumentStatus, ProviderDocState>;
   protected canViewImgs(model: GrokModelIdUnion) {
     return (
       model === "grok-2-vision-1212" ||
@@ -102,211 +74,290 @@ export class GrokWorkupService {
     return model === "grok-2-image-1212";
   }
 
-  protected async assetToTmpWorkup({
-    assetType,
-    compatStatus,
-    conversationId,
-    messageId,
-    id,
-    userId,
-    ...rest
-  }: AttachmentSingleton<true>) {
-    const {
-      ext,
-      mime,
-      url,
-      embeddedFilename: xaiFilename
-    } = this.prisma.urlExtWorkupEmbeddings({
-      ...rest,
-      assetType,
-      compatStatus,
-      conversationId,
-      messageId,
-      id,
-      userId
-    });
-
-    const toTmpWorkupObj = {
-      absTmpPath: "",
-      tmpPrefix: "",
-      tmpName: "",
-      safeFilename: ""
-    };
-
-    toTmpWorkupObj.tmpPrefix = `xai-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
-
-    toTmpWorkupObj.tmpName = this.prisma.extractor.uniqueTmpName(
-      toTmpWorkupObj.tmpPrefix,
-      ext
-    );
-
-    const urlObj = new URL(url);
-
-    let usefulName: string;
-
-    if (conversationId && messageId) {
-      // will always be defined as message and convoId for incoming assets are
-      // database derived and incoming user messages are persisted fully so AI SDKs always receive db-synced data
-      usefulName = xaiFilename;
-    } else {
-      usefulName = urlObj.pathname.replace(/\//gim, "-");
-    }
-    toTmpWorkupObj.safeFilename = usefulName;
-    toTmpWorkupObj.absTmpPath = resolve(tmpdir(), toTmpWorkupObj.tmpName);
-    return {
-      tmpFilenamePrefix: toTmpWorkupObj.tmpPrefix,
-      tmpUniquename: toTmpWorkupObj.tmpName,
-      absTmpPath: toTmpWorkupObj.absTmpPath,
-      ext,
-      remoteUrl: url,
-      safeFilename: toTmpWorkupObj.safeFilename,
-      mime
-    };
-  }
-
-  protected async remoteToTmpWorkup(att: AttachmentSingleton<true>) {
-    const {
-      absTmpPath,
-      ext,
-      tmpUniquename,
-      tmpFilenamePrefix,
-      safeFilename,
-      remoteUrl,
-      mime: mimeType
-    } = await this.assetToTmpWorkup(att);
-
-    await this.prisma.extractor.fetchRemoteWriteLocalLargeFiles(
-      remoteUrl,
-      absTmpPath,
-      false
-    );
-    if (this.prisma.extractor.exists(absTmpPath)) {
-      return {
-        tmpUniquename,
-        absTmpPath,
-        ext,
-        tmpFilenamePrefix,
-        safeFilename,
-        mimeType
-      };
-    } else {
-      throw new Error(
-        `no tmp file exists having filename ${tmpUniquename} at absolute path ${absTmpPath}`
-      );
-    }
-  }
-
-  protected cleanupTmpPostupload(absTmpPath: string, tmpUniquename: string) {
-    try {
-      if (this.prisma.extractor.exists(absTmpPath)) {
-        this.prisma.extractor.rmFile(absTmpPath);
-        console.log(
-          `cleaned up tmp file ${tmpUniquename} following xAI file upload.`
-        );
-      }
-    } catch (err) {
-      console.warn(
-        `cleanup of tmp file ${tmpUniquename} having path ${absTmpPath} failed following xAI file upload.`.concat(
-          this.prisma.safeErrMsg(err)
-        )
-      );
-    }
-  }
-
-  protected parseFileSearchResults(
-    input: CTR<xAIResponses.OutputItem.Done.FileSearchCall, "results">
-  ) {
-    const textArr = Array.of<{
-      score: number;
-      file_id: string;
-      text: string;
-    }>();
-    const aggregate = Array.of<{
-      score: number;
-      file_id: string;
-      originalFilename: string;
-      resultBody: string;
-      decodedFilename: {
-        conversationId: string;
-        messageId: string;
-        attachmentId: string;
-        fileName: string;
-        extension: string;
-      };
-    }>();
-    for (const result of input.results) {
-      textArr.push({
-        score: result.score,
-        file_id: result.file_id,
-        text: result.text
-      });
-    }
-
-    for (const { text, file_id, score } of textArr) {
-      const tt = text
-        .split(/\noriginalFilename:+(.*?)\n/)
-        .map(t => t.trimStart());
-
-      const resObj = {
-        hexEncodedFilename: "",
-        originalFilename: "",
-        resultBody: ""
-      };
-
-      for (const [ttIndex, ttData] of tt.entries()) {
-        if (ttIndex === 0) resObj.hexEncodedFilename = ttData;
-        if (ttIndex === 1) resObj.originalFilename = ttData;
-        if (ttIndex === 2) resObj.resultBody = ttData;
-      }
-
-      const { hexEncodedFilename, ...rest } = resObj;
-
-      const expandedObj = {
-        score,
-        file_id,
-        decodedFilename: this.prisma.parseFilename(hexEncodedFilename),
-        ...rest
-      };
-      aggregate.push(expandedObj);
-    }
-    return aggregate;
-  }
-
-  protected async *getAllUserFiles(limit = 50, apiKey = this.xaiKey) {
-    let has_more = true;
-    let count = 0;
-    let pagination_token: string | undefined = undefined;
-    let page_number = 0;
-
-    while (has_more) {
-      const url = pagination_token
-        ? `https://api.x.ai/v1/files?limit=${limit}&pagination_token=${pagination_token}`
-        : `https://api.x.ai/v1/files?limit=${limit}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`
+  protected async syncFilesRegistry(apiKey = this.xaiKey) {
+    let totalFiles = 0;
+    for await (const batch of this.getAllFilesxAI(apiKey)) {
+      for (const file of batch.data) {
+        if (file.filename && file.id && file.bytes) {
+          totalFiles += 1;
+          const { attachmentId } = this.prisma.parseFilename(file.filename);
+          this.fileCache.set(attachmentId, file);
         }
-      });
+      }
+    }
+    console.debug(`Synced ${totalFiles} Grok files to fileCache.`);
+    return totalFiles;
+  }
 
-      const page = await response.json<GetFilesRT>();
+  protected async syncFilesDbRegistry(userId: string) {
+    try {
+      const attachmentProviderFiles = await this.prisma.findManyByProvider(
+        "GROK",
+        userId
+      );
+      if (attachmentProviderFiles.length > 0) {
+        for (const providerDoc of attachmentProviderFiles) {
+          const {
+            ...rest
+          } = providerDoc;
+          this.fileDbRegistry.set(providerDoc.attachmentId, { ...rest });
+        }
+      }
 
-      console.info(page);
+      console.info(
+        `Populated Grok fileDbRegistry with ${this.fileDbRegistry.size} entries from database`
+      );
+    } catch (err) {
+      console.info(
+        `Failed to populate Grok fileDbRegistry from database: ${this.prisma.safeErrMsg(err)}`
+      );
+    }
+  }
 
-      has_more = typeof page.pagination_token !== "undefined";
-      pagination_token = page.pagination_token;
-      count += page.data?.length ?? 0;
+  protected async syncProviderStoreDbDocs(userId: string) {
+    try {
+      const providerStoreDocs = (await this.prisma.findManyProviderStoreDocs(
+        "GROK",
+        userId
+      )) satisfies xAIDocDbRegistryProps[];
+      if (providerStoreDocs.length > 0) {
+        for (const providerDoc of providerStoreDocs) {
+          this.storeDbDocRegistry.set(providerDoc.attachmentId, providerDoc);
+        }
+      }
 
-      yield {
-        page,
-        count,
-        page_number,
-        has_more
-      };
+      console.info(
+        `Populated Grok storeDbDocRegistry with ${this.storeDbDocRegistry.size} entries from database`
+      );
+    } catch (err) {
+      console.info(
+        `Failed to populate Grok storeDbDocRegistry from database: ${this.prisma.safeErrMsg(err)}`
+      );
+    }
+  }
 
-      page_number += 1;
+  protected async syncCollectionDocs(
+    collectionId: string,
+    mgmntKey = this.xaiManagementKey
+  ) {
+    try {
+      for await (const s of this.getAllCollectionDocuments(
+        collectionId,
+        20,
+        mgmntKey
+      )) {
+        if (s.data.length > 0) {
+          for (const doc of s.data) {
+            if (doc.file_metadata.file_id && doc.file_metadata.name) {
+              const { attachmentId } = this.prisma.parseFilename(
+                doc.file_metadata.name
+              );
+              this.docCache.set(attachmentId, doc);
+            }
+          }
+        }
+      }
+      console.info(
+        `Populated Grok docs cache with ${this.docCache.size} entries from store ${collectionId}`
+      );
+    } catch (err) {
+      console.info(
+        `Failed to populate Grok docs cache targeting store ${collectionId}: ${this.prisma.safeErrMsg(err)}`
+      );
+    }
+  }
+
+  protected fileRegistriesEq() {
+    if (this.fileCache.size !== this.fileDbRegistry.size) {
+      if (this.fileCache.size > this.fileDbRegistry.size) {
+        for (const fileKey of Array.from(this.fileCache.keys())) {
+          if (!this.fileDbRegistry.has(fileKey)) {
+            this.fileCache.delete(fileKey);
+          }
+        }
+      }
+      if (this.fileDbRegistry.size > this.fileCache.size) {
+        for (const dbKey of Array.from(this.fileDbRegistry.keys())) {
+          if (!this.fileCache.has(dbKey)) {
+            this.fileDbRegistry.delete(dbKey);
+          }
+        }
+      }
+    }
+
+    console.info(
+      `Grok fileRegistriesEquality complete: fileDbRegistry: ${this.fileDbRegistry.size}, fileCache: ${this.fileCache.size}`
+    );
+  }
+
+  protected async docRegistriesEq(
+    userId: string,
+    storeRef: string,
+    storeDbId: string,
+    apiKey = this.xaiKey,
+    managementKey = this.xaiManagementKey
+  ) {
+    if (this.storeDbDocRegistry.size !== this.docCache.size) {
+      if (this.storeDbDocRegistry.size < this.docCache.size) {
+        const cachedDocsToSync = Array.of<CreateGrokProviderStoreDocParams>();
+        let aggsize = 0n;
+        for (const [cacheKey, doc] of Array.from(this.docCache.entries())) {
+          if (!this.storeDbDocRegistry.has(cacheKey)) {
+            const size = BigInt(Number.parseInt(doc.file_metadata.size_bytes));
+            aggsize += size;
+            const s = {
+              attachmentId: doc.fields.attachmentId,
+              docRef: doc.file_metadata.file_id,
+              docUri: this.xaiURI(storeRef, doc.file_metadata.file_id),
+              filename: doc.file_metadata.name,
+              last_indexed_at: doc.last_indexed_at
+                ? new Date(doc.last_indexed_at)
+                : new Date(doc.file_metadata.created_at),
+              mimeType: doc.file_metadata.content_type,
+              state: this.xaiToDbState[doc.status],
+              storeId: storeDbId,
+              storeRef,
+              userId,
+              size
+            } satisfies CreateGrokProviderStoreDocParams;
+            cachedDocsToSync.push(s);
+          }
+        }
+        const res = await this.prisma.createManyGrokProviderDocs({
+          data: cachedDocsToSync,
+          userId,
+          aggsize
+        });
+        for (const dbDoc of res) {
+          this.storeDbDocRegistry.set(dbDoc.attachmentId, dbDoc);
+        }
+      }
+      if (this.storeDbDocRegistry.size > this.docCache.size) {
+        const xaiDocsToIndex = Array.of<xAIDocDbRegistryProps>();
+        for (const [storeKey, storeDoc] of Array.from(
+          this.storeDbDocRegistry.entries()
+        )) {
+          if (!this.docCache.has(storeKey)) {
+            xaiDocsToIndex.push(storeDoc);
+          }
+        }
+        const exists = Array.of<{ attId: string; file_id: string }>();
+        // ensure xai actually has the record on file before executing promotion
+        for (const dbDoc of xaiDocsToIndex) {
+          const res = await this.getFileById(dbDoc.docRef, apiKey);
+          if (res.ok) {
+            exists.push({ attId: dbDoc.attachmentId, file_id: res.file.id });
+          } else {
+            // else it returns an error in the response, no regular xai file exists
+            // purge db stores and in memory caches
+            if (this.fileCache.has(dbDoc.attachmentId)) {
+              this.fileCache.delete(dbDoc.attachmentId);
+            }
+            if (this.fileDbRegistry.has(dbDoc.attachmentId)) {
+              const fileDb = this.fileDbRegistry.get(dbDoc.attachmentId);
+              if (fileDb?.id) {
+                await this.prisma.removeFileAttachmentProvider(fileDb.id);
+                this.fileDbRegistry.delete(dbDoc.attachmentId);
+              }
+            }
+            await this.prisma.removeDocFromProviderStore("GROK", userId, dbDoc);
+            this.storeDbDocRegistry.delete(dbDoc.attachmentId);
+          }
+        }
+        if (exists.length > 0) {
+          for (const rec of exists) {
+            // double check *to be 100% certain* before trying to promote a file that may already be indexed
+            const getAtt = await this.prisma.getTargetedAtt(rec.attId);
+            const findByName = await this.getDocByCollectionAndName(
+              storeRef,
+              getAtt,
+              managementKey
+            );
+            const isInArr =
+              findByName.documents.findLastIndex(
+                t => t.file_metadata.file_id === rec.file_id
+              ) === -1;
+            if (isInArr) {
+              const retrieveFile = await this.getDocByCollectionAndId(
+                storeRef,
+                rec.file_id,
+                managementKey
+              );
+              this.docCache.set(rec.attId, retrieveFile);
+            } else {
+              const displayName = this.prisma.toVectorStoreFilename(getAtt);
+              const promoteAndGo = await this.promoteDocWithPolling(
+                storeRef,
+                userId,
+                rec.file_id,
+                displayName,
+                true,
+                managementKey
+              );
+              this.docCache.set(rec.attId, promoteAndGo.doc);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private async fetchPage(url: URL | string | Request, apiKey = this.xaiKey) {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` }
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`${res.status} ${res.statusText}: ${txt}`);
+    }
+    return await res.json<GetFilesRT>();
+  }
+
+  /**
+   * 2026-01-01
+   * xai's pagination_token is broken.
+   * paginates in place despite passing in the proper `paginateion_token`...
+   * results in infinite looping
+   *
+   * Temporary workaround: set limit to n=2000
+   */
+  private async *getAllFilesxAI(apiKey = this.xaiKey, limit = 2000) {
+    let token: string | null = null;
+    const seenTokens = new Set<string>();
+
+    for (let pageNumber = 0; ; pageNumber++) {
+      const url = new URL("https://api.x.ai/v1/files");
+      url.searchParams.set("limit", String(limit));
+      url.searchParams.set("sort_by", "created_at");
+      url.searchParams.set("order", "desc");
+      if (token) url.searchParams.set("pagination_token", token);
+
+      const page = await this.fetchPage(url, apiKey);
+      const next = page.pagination_token;
+
+      const firstId = page.data?.[0]?.id;
+      const lastId = page.data?.[page.data.length - 1]?.id;
+      this.logger.info(
+        {
+          pageNumber,
+          token,
+          next,
+          n: page.data.length,
+          firstId,
+          lastId
+        },
+        "xaiFetchAllFiles"
+      );
+
+      yield page;
+
+      if (next == null) break;
+      if (next === token) break;
+      if (seenTokens.has(next)) break;
+      if (page.data.length === 0) break;
+
+      seenTokens.add(next);
+      token = next;
     }
   }
 
@@ -389,46 +440,55 @@ export class GrokWorkupService {
     }
   }
 
-  protected async removeFileFromCollection(
+  protected async removeDocFromCollection(
+    userId: string,
+    attachmentId: string,
     collection_id: string,
     file_id: string,
-    managementKey?: string
+    managementKey = this.xaiManagementKey
   ) {
-    const mgmtKey = managementKey ?? this.xaiManagementKey;
-    return await fetch(
+    const softDelete = await fetch(
       `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${mgmtKey}`
+          Authorization: `Bearer ${managementKey}`
         }
       }
     );
+    const dbDoc = this.storeDbDocRegistry.get(attachmentId);
+    if (softDelete.ok && dbDoc?.id) {
+      this.docCache.delete(attachmentId);
+      await this.prisma.removeDocFromProviderStore("GROK", userId, dbDoc);
+      this.storeDbDocRegistry.delete(attachmentId);
+    }
+    return softDelete;
   }
 
-  protected async deleteFileWorkup(
+  protected async hardDeleteFileRemote(
     ok: boolean,
     file_id: string,
-    apiKey?: string
+    apiKey = this.xaiKey
   ) {
-    const key = apiKey ?? this.xaiKey;
     if (ok) {
       return await fetch(`https://api.x.ai/v1/files/${file_id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`
+          Authorization: `Bearer ${apiKey}`
         }
       }).then(d => d.json<DeleteXaiFileResponse>());
     } else {
       throw new Error(
-        `removeFileFromCollection error: file_id ${file_id} unable to be unlinked from associated collection, delete file operation aborted`
+        `removeDocFromCollection error: file_id ${file_id} unable to be unlinked from associated collection, delete file operation aborted`
       );
     }
   }
 
   protected async deleteFileFromXAI(
+    userId: string,
+    attachmentId: string,
     collection_id: string,
     file_id: string,
     apiKey?: string,
@@ -441,11 +501,19 @@ export class GrokWorkupService {
       resolve,
       reject: _reject
     } = Promise.withResolvers<Response>();
-    resolve(this.removeFileFromCollection(collection_id, file_id, mgmtKey));
-    return promise.then(res => this.deleteFileWorkup(res.ok, file_id, key));
+    resolve(
+      this.removeDocFromCollection(
+        userId,
+        attachmentId,
+        collection_id,
+        file_id,
+        mgmtKey
+      )
+    );
+    return promise.then(res => this.hardDeleteFileRemote(res.ok, file_id, key));
   }
 
-  protected get createUserCollectionFieldDefs() {
+  private get createUserCollectionFieldDefs() {
     return [
       {
         key: "conversationId",
@@ -465,28 +533,22 @@ export class GrokWorkupService {
         key: "attachmentId",
         required: true,
         inject_into_chunk: false,
-        unique: true, // Prevent duplicate uploads
+        unique: true,
         description: "Original attachment ID"
       },
       {
         key: "originalFilename",
         required: true,
-        inject_into_chunk: true, // Helps with "which document said X?" queries
+        inject_into_chunk: true,
         unique: false,
         description: "Human-readable source filename"
       }
     ] as const satisfies FieldDefinition[];
   }
 
-  protected getCollectionName(userId: string) {
-    const env = this.getEnv(this.prisma.isProd);
-    const collection_name = `${env}-${userId}`;
-    return collection_name;
-  }
-
   protected createUserCollectionWorkup(userId: string) {
     const fieldDefs = this.createUserCollectionFieldDefs;
-    const collection_name = this.getCollectionName(userId);
+    const collection_name = this.prisma.vectorStoreDisplayName(userId);
     return {
       chunk_configuration: {
         inject_name_into_chunks: true,
@@ -504,31 +566,250 @@ export class GrokWorkupService {
     } as const satisfies CreateCollectionRequest;
   }
 
-  protected async resolveCollection(userId: string, mgmtKey?: string) {
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-    const collection_name = this.getCollectionName(userId);
-    const fetcher = await fetch(
-      `https://management-api.x.ai/v1/collections?filter=collection_name:${collection_name}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${managementKey}`
-        }
-      }
-    );
-    const json = await fetcher.json<ListCollectionsResponse>();
-    const index0 = json.collections?.at(0);
+  protected async createUserCollection(
+    userId: string,
+    mgmtKey = this.xaiManagementKey
+  ) {
+    const res = await fetch("https://management-api.x.ai/v1/collections", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${mgmtKey}`
+      },
+      body: JSON.stringify(this.createUserCollectionWorkup(userId))
+    });
 
-    return index0;
+    const data = await res.json<Collection>();
+
+    const prismaCreate = await this.prisma.createGrokVectorStore(
+      userId,
+      data.collection_id,
+      data.collection_name,
+      data.created_at,
+      data.created_at,
+      data.documents_count,
+      0n
+    );
+
+    this.storeDbRegistry.set(userId, prismaCreate.id);
+
+    this.collectionRegistry.set(userId, data.collection_id);
+
+    return { dbData: prismaCreate, xaiData: data };
   }
 
-  protected async getFileByCollectionIdAndName(
+  private async pullCollectionRecord(
+    userId: string,
+    key = this.xaiManagementKey
+  ) {
+    const displayName = this.prisma.vectorStoreDisplayName(userId);
+    for await (const collection of this.getAllCollections(10, key)) {
+      for (const store of collection.data) {
+        if (store.collection_id && store.collection_name) {
+          if (displayName === store.collection_name) {
+            return {
+              hasStore: true,
+              store
+            } as const;
+          }
+        }
+      }
+    }
+    return {
+      hasStore: false,
+      store: undefined
+    } as const as { hasStore: false; store: undefined | Collection };
+  }
+
+  protected async resolveCollection(
+    userId: string,
+    mgmtKey = this.xaiManagementKey
+  ) {
+    return await this.pullCollectionRecord(userId, mgmtKey);
+  }
+
+  private isTerminalDocStatus(status: DocumentStatus) {
+    return (
+      status === "DOCUMENT_STATUS_FAILED" ||
+      status === "DOCUMENT_STATUS_PROCESSED"
+    );
+  }
+
+  private pollingDelay(pollIntervalMs: number, attempts: number) {
+    return Math.min(pollIntervalMs * Math.pow(1.5, attempts), 30000);
+  }
+
+  protected async pollDocumentIndexing(
+    collectionId: string,
+    userId: string,
+    file_id: string,
+    managementKey = this.xaiManagementKey,
+    pollIntervalMs = 3000,
+    maxAttempts = 20
+  ) {
+    let attempts = 1;
+    let doc = await this.getDocByCollectionAndId(
+      collectionId,
+      file_id,
+      managementKey
+    );
+    // set cache immediately, update after polling (regardless of stash'n'dash or nice'n'slow)
+    this.docCache.set(doc.fields.attachmentId, doc);
+    while (!this.isTerminalDocStatus(doc.status) && attempts < maxAttempts) {
+      await new Promise(resolve =>
+        setTimeout(resolve, this.pollingDelay(pollIntervalMs, attempts))
+      );
+
+      doc = await this.getDocByCollectionAndId(
+        collectionId,
+        file_id,
+        managementKey
+      );
+
+      attempts++;
+    }
+    this.docCache.set(doc.fields.attachmentId, doc);
+    const result = doc;
+    const storeDbId = this.storeDbRegistry.get(userId);
+    if (storeDbId) {
+      const dbUpsert = await this.prisma.upsertGrokProviderDoc({
+        attachmentId: doc.fields.attachmentId,
+        docRef: doc.file_metadata.file_id,
+        docUri: this.xaiURI(collectionId, result.file_metadata.file_id),
+        filename: doc.file_metadata.name,
+        last_indexed_at: doc.last_indexed_at
+          ? new Date(doc.last_indexed_at)
+          : new Date(doc.file_metadata.created_at),
+        mimeType: doc.file_metadata.content_type,
+        state: this.xaiToDbState[doc.status],
+        storeId: storeDbId,
+        storeRef: collectionId,
+        userId: userId,
+        size: BigInt(Number.parseInt(doc.file_metadata.size_bytes))
+      });
+      this.storeDbDocRegistry.set(dbUpsert.attachmentId, dbUpsert);
+    }
+    if (doc.status === "DOCUMENT_STATUS_FAILED") {
+      return {
+        ok: false,
+        doc
+      } as const;
+    } else {
+      return {
+        ok: true,
+        doc
+      } as const;
+    }
+  }
+
+  protected async promoteDocWithPolling(
+    collectionId: string,
+    userId: string,
+    file_id: string,
+    xaiFilename: string,
+    fireAndForget: true,
+    managementKey?: string,
+    pollIntervalMs?: number,
+    maxAttempts?: number
+  ): Promise<{
+    readonly ok: true;
+    readonly doc: CollectionDocument;
+  }>;
+  protected async promoteDocWithPolling(
+    collectionId: string,
+    userId: string,
+    file_id: string,
+    xaiFilename: string,
+    fireAndForget: false,
+    managementKey?: string,
+    pollIntervalMs?: number,
+    maxAttempts?: number
+  ): Promise<
+    | {
+        readonly ok: true;
+        readonly doc: CollectionDocument;
+      }
+    | {
+        readonly ok: false;
+        readonly doc: CollectionDocument;
+      }
+  >;
+  protected async promoteDocWithPolling(
+    collectionId: string,
+    userId: string,
+    file_id: string,
+    xaiFilename: string,
+    fireAndForget: boolean,
+    managementKey = this.xaiManagementKey,
+    pollIntervalMs = 3000,
+    maxAttempts = 20
+  ) {
+    try {
+      await this.promoteToCollection(
+        file_id,
+        collectionId,
+        xaiFilename,
+        managementKey
+      );
+    } catch (err) {
+      throw new Error(this.prisma.safeErrMsg(err));
+    } finally {
+      if (fireAndForget === true) {
+        const doc = await this.getDocByCollectionAndId(collectionId, file_id);
+        this.docCache.set(doc.fields.attachmentId, doc);
+        void this.pollDocumentIndexing(
+          collectionId,
+          userId,
+          file_id,
+          managementKey,
+          pollIntervalMs,
+          maxAttempts
+        );
+        return {
+          ok: true,
+          doc
+        } as const;
+      } else {
+        return await this.pollDocumentIndexing(
+          collectionId,
+          userId,
+          file_id,
+          managementKey,
+          pollIntervalMs,
+          maxAttempts
+        );
+      }
+    }
+  }
+
+  protected async getFileById(file_id: string, apiKey = this.xaiKey) {
+    const res = await fetch(`https://api.x.ai/v1/files/${file_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      }
+    });
+    if (res.ok) {
+      const file = await res.json<UploadFileRT>();
+      return {
+        ok: true,
+        file
+      } as const;
+    } else {
+      const file = await res.json<FileErrorRT>();
+      return {
+        ok: false,
+        file
+      } as const;
+    }
+  }
+
+  protected async getDocByCollectionAndName(
     collectionId: string,
     att: AttachmentSingleton<true>,
-    managementKey?: string
+    managementKey = this.xaiManagementKey
   ) {
-    const mgmtKey = managementKey ?? this.xaiManagementKey;
     const name = this.prisma.toVectorStoreFilename(att);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents?filter=name:${name}`,
@@ -536,10 +817,27 @@ export class GrokWorkupService {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${mgmtKey}`
+          Authorization: `Bearer ${managementKey}`
         }
       }
     ).then(res => res.json<GetDocumentsByCollectionId>());
+  }
+
+  protected async getDocByCollectionAndId(
+    collectionId: string,
+    file_id: string,
+    managementKey = this.xaiManagementKey
+  ) {
+    return await fetch(
+      `https://management-api.x.ai/v1/collections/${collectionId}/documents/${file_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${managementKey}`
+        }
+      }
+    ).then(t => t.json<CollectionDocument>());
   }
 
   protected async regenerateDocumentIndices(
@@ -556,27 +854,10 @@ export class GrokWorkupService {
         }
       }
     );
-    return await res.json<{}>(); // returns '{}' -- poll using getDocumentMetadata after triggering perhaps?
+    return await res.json<{}>();
   }
 
-  protected async getDocumentMetadata(
-    collection_id: string,
-    file_id: string,
-    managementApiKey = this.xaiManagementKey
-  ) {
-    const toPoll = await fetch(
-      `https://management-api.x.ai/v1/collections/${collection_id}/documents/${file_id}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${managementApiKey}`
-        }
-      }
-    );
-    return await toPoll.json<CollectionDocument>();
-  }
-
-  protected async uploadFile(formData: FormData, apiKey = this.xaiKey) {
+  private async uploadFile(formData: FormData, apiKey = this.xaiKey) {
     return await fetch("https://api.x.ai/v1/files?purpose=assistants", {
       headers: {
         Authorization: `Bearer ${apiKey}`
@@ -586,16 +867,32 @@ export class GrokWorkupService {
     });
   }
 
+  private async updateFilename(
+    file_id: string,
+    filename: string,
+    apiKey = this.xaiKey
+  ) {
+    const fd =new FormData();
+    fd.append("filename", filename);
+   return await fetch(
+      `https://api.x.ai/v1/files/${file_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        method: "PUT",
+        body: fd
+      }
+    );
+  }
+
   protected async streamUploadFileWorkup(
     att: AttachmentSingleton<true>,
     key = this.xaiKey
   ) {
-    const {
-      absTmpPath,
-      tmpUniquename,
-      mimeType: mime,
-      safeFilename
-    } = await this.remoteToTmpWorkup(att);
+    const { absTmpPath, tmpUniquename, mime } =
+      await this.prisma.fetchRemoteToTmp("GROK", att);
     try {
       const formData = new FormData();
 
@@ -609,15 +906,18 @@ export class GrokWorkupService {
         any
       >;
 
+      const displayName = this.prisma.toVectorStoreFilename(att);
+
       for await (const chunk of iterate) {
         arr.push(chunk);
       }
 
       const buf = Buffer.concat(arr);
 
-      const file = new File([buf], safeFilename, { type: mime });
+      const file = new File([buf], displayName, { type: mime });
 
       formData.append("file", file);
+
       formData.append("purpose", "assistants");
 
       const { promise, resolve } = Promise.withResolvers<Response>();
@@ -633,161 +933,508 @@ export class GrokWorkupService {
       console.error(this.prisma.safeErrMsg(err));
       throw new Error(this.prisma.safeErrMsg(err));
     } finally {
-      this.cleanupTmpPostupload(absTmpPath, tmpUniquename);
+      this.prisma.cleanupTmpPostupload("GROK", absTmpPath, tmpUniquename);
     }
   }
 
-  /**
-   * STEP TWO
-   */
   protected async promoteToCollection(
     documentId: string,
     collectionId: string,
     xaiFilename: string,
-    mgmtKey?: string
+    mgmtKey = this.xaiManagementKey
   ) {
-    const key = mgmtKey ?? this.xaiManagementKey;
-    const {
-      attachmentId,
-      conversationId,
-      fileName: originalFilename,
-      extension,
-      messageId
-    } = this.prisma.parseFilename(xaiFilename);
+    const { attachmentId, conversationId, fileName, extension, messageId } =
+      this.prisma.parseFilename(xaiFilename);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents/${documentId}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`
+          Authorization: `Bearer ${mgmtKey}`
         },
         body: JSON.stringify({
           fields: {
             conversationId,
             messageId,
             attachmentId,
-            originalFilename: originalFilename.concat(`.${extension}`)
+            originalFilename: `${fileName}.${extension}`
           }
         })
       }
     );
   }
 
-  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
-    if (isNewChat) {
-      return systemPrompt;
-    }
-
-    const note =
-      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
-
-    return (
-      systemPrompt ? `${systemPrompt}\n\n${note}` : note
-    ) satisfies ResponsesContentInputSingleton["content"];
-  }
-
-  protected resolveResponsesTools(
-    collectionId: string | undefined,
-    {
-      enableFileSearch = true,
-      enableWebSearch = false,
-      enableXSearch = false,
-      enableCodeInterpreter = false,
-      fileSearchMaxResults = 5,
-      web_enable_image_understanding = true,
-      x_enable_image_understanding = true,
-      x_enable_video_understanding = true
-    }: {
-      enableFileSearch?: boolean;
-      enableWebSearch?: boolean;
-      enableXSearch?: boolean;
-      enableCodeInterpreter?: boolean;
-      fileSearchMaxResults?: number;
-      web_enable_image_understanding?: boolean;
-      x_enable_image_understanding?: boolean;
-      x_enable_video_understanding?: boolean;
-    }
+  protected async uploadFileAndPromoteToCollection(
+    att: AttachmentSingleton<true>,
+    apiKey = this.xaiKey,
+    mgmtKey = this.xaiManagementKey
   ) {
-    const tools = Array.of<ToolUnion>();
+    const collectionObj = { storeRef: undefined, dbId: "" } as {
+      storeRef: string | undefined;
+      dbId: string;
+    };
 
-    // Use pre-synced collection from registry (populated on connection)
-    if (enableFileSearch && collectionId) {
-      if (collectionId) {
-        tools.push({
-          type: "file_search",
-          vector_store_ids: [collectionId],
-          max_num_results: fileSearchMaxResults
-        } satisfies FileSearchTool);
+    const toFilename = this.prisma.toVectorStoreFilename(att);
+
+    const res = await this.streamUploadFileWorkup(att, apiKey);
+
+    if (!res?.id) {
+      throw new Error(
+        "no id returned with results ".concat(JSON.stringify(res, null, 2))
+      );
+    }
+
+    this.fileCache.set(att.id, res);
+
+    const keyId = await this.prisma.getUserKeyIdByProvider(att.userId, "GROK");
+    const { mime } = this.prisma.urlExtWorkupEmbeddings(att);
+    const fileDbSync = await this.prisma.upsertGrokAssetMapping(
+      att.id,
+      keyId,
+      mime,
+      res.id,
+      keyId,
+      BigInt(res.bytes),
+      new Date(res.created_at)
+    );
+    this.fileDbRegistry.set(att.id, {
+      ...fileDbSync,
+      provider: "GROK",
+      isExpired: false,
+      providerRef: res.id
+    });
+
+    collectionObj.storeRef = this.collectionRegistry.get(att.userId);
+    if (!collectionObj.storeRef) {
+      const collection = await this.resolveCollection(att.userId, mgmtKey);
+      if (collection.hasStore === true) {
+        this.collectionRegistry.set(att.userId, collection.store.collection_id);
+        collectionObj.storeRef = collection.store.collection_id;
+      } else {
+        const createRes = await this.createUserCollection(att.userId, mgmtKey);
+        collectionObj.storeRef = createRes.xaiData.collection_id;
+        collectionObj.dbId = createRes.dbData.id;
       }
     }
 
-    if (enableWebSearch) {
-      tools.push({
-        type: "web_search",
-        filters: { enable_image_understanding: web_enable_image_understanding }
-      } satisfies WebSearchTool);
+    try {
+      const result = await this.promoteDocWithPolling(
+        collectionObj.storeRef,
+        att.userId,
+        res.id,
+        toFilename,
+        true,
+        mgmtKey
+      );
+      if (result.ok === true && collectionObj.storeRef) {
+        this.docCache.set(att.id, result.doc);
+        const dbDocData = await this.prisma.upsertGrokProviderDoc({
+          attachmentId: att.id,
+          docRef: result.doc.file_metadata.file_id,
+          docUri: this.xaiURI(
+            collectionObj.storeRef,
+            result.doc.file_metadata.file_id
+          ),
+          filename: result.doc.file_metadata.name,
+          last_indexed_at: result.doc.last_indexed_at
+            ? new Date(result.doc.last_indexed_at)
+            : new Date(result.doc.file_metadata.created_at),
+          mimeType: result.doc.file_metadata.content_type,
+          state: this.xaiToDbState[result.doc.status],
+          storeId: collectionObj.dbId,
+          storeRef: collectionObj.storeRef,
+          userId: att.userId,
+          size: BigInt(Number.parseInt(result.doc.file_metadata.size_bytes))
+        });
+        this.storeDbDocRegistry.set(att.id, dbDocData);
+      }
+    } catch (err) {
+      throw new Error(this.prisma.safeErrMsg(err));
+    } finally {
+      return res;
     }
-
-    if (enableXSearch) {
-      tools.push({
-        type: "x_search",
-        filters: {
-          enable_image_understanding: x_enable_image_understanding,
-          enable_video_understanding: x_enable_video_understanding
-        }
-      } satisfies XSearchTool);
-    }
-
-    if (enableCodeInterpreter) {
-      tools.push({ type: "code_interpreter" } satisfies CodeInterpreterTool);
-    }
-    return tools;
   }
 
-  protected canUseServerTools(m: GrokModelIdUnion) {
-    return (
-      m === "grok-4-0709" ||
-      m === "grok-4-1-fast-non-reasoning" ||
-      m === "grok-4-1-fast-reasoning" ||
-      m === "grok-4-fast-reasoning" ||
-      m === "grok-4-fast-non-reasoning"
+  protected async ensureUserCollection(
+    userId: string,
+    managementKey = this.xaiManagementKey
+  ) {
+    let collectionId = this.collectionRegistry.get(userId);
+    let storeDbId = this.storeDbRegistry.get(userId);
+    if (collectionId && storeDbId) {
+      return {
+        collectionId,
+        storeDbId
+      };
+    }
+
+    const collection = await this.resolveCollection(userId, managementKey);
+
+    if (collection.hasStore) {
+      collectionId = collection.store.collection_id;
+      this.collectionRegistry.set(userId, collectionId);
+
+      const storeInfo = await this.prisma.vectorStoreInfoByProvider(
+        userId,
+        "GROK"
+      );
+      if (storeInfo.hasStore) {
+        storeDbId = storeInfo.dbId;
+      } else {
+        const dbStore = await this.prisma.createGrokVectorStore(
+          userId,
+          collectionId,
+          collection.store.collection_name,
+          collection.store.created_at,
+          collection.store.created_at,
+          0,
+          0n
+        );
+        storeDbId = dbStore.id;
+      }
+      this.storeDbRegistry.set(userId, storeDbId);
+      return { collectionId, storeDbId };
+    }
+    const { dbData, xaiData } = await this.createUserCollection(
+      userId,
+      managementKey
     );
+    return {
+      collectionId: xaiData.collection_id,
+      storeDbId: dbData.id
+    };
+  }
+
+  protected async getUserCollectionIdWithFallback(
+    userId: string,
+    mgmtApiKey = this.xaiManagementKey
+  ) {
+    try {
+      const { collectionId } = await this.ensureUserCollection(
+        userId,
+        mgmtApiKey
+      );
+      return collectionId;
+    } catch (err) {
+      throw new Error(this.prisma.safeErrMsg(err));
+    }
+  }
+
+  protected async markFileAccessed(
+    attachmentId: string,
+    dbRecordId: string,
+    _fileId: string
+  ) {
+    try {
+      const cached = this.fileDbRegistry.get(attachmentId);
+      if (cached) {
+        const { lastCheckedAt } = await this.prisma.markProviderLastCheckedAt(
+          dbRecordId,
+          "GROK"
+        );
+        this.fileDbRegistry.set(attachmentId, {
+          ...cached,
+          lastCheckedAt
+        });
+      }
+    } catch (error) {
+      console.warn(
+        `Failed to mark xAI file as accessed ${this.prisma.safeErrMsg(error)}`
+      );
+    }
+  }
+
+  protected async promoteFileBgAndCreateDbDoc(
+    att: AttachmentSingleton<true>,
+    collection_id: string,
+    storeDbId: string,
+    file_id: string,
+    xaiManagementKey = this.xaiManagementKey
+  ) {
+    const displayName = this.prisma.toVectorStoreFilename(att);
+
+    const promoteDocBg = await this.promoteDocWithPolling(
+      collection_id,
+      att.userId,
+      file_id,
+      displayName,
+      // (true==="stash'n'dash") | (false==="soft'n'slow")
+      true,
+      xaiManagementKey
+    );
+
+    this.docCache.set(att.id, promoteDocBg.doc);
+
+    const {
+      name,
+      file_id: fileId,
+      created_at,
+      size_bytes,
+      content_type
+    } = promoteDocBg.doc.file_metadata;
+
+    const rec = await this.prisma.upsertGrokProviderDoc({
+      attachmentId: att.id,
+      docRef: fileId,
+      docUri: this.xaiURI(collection_id, fileId),
+      filename: name,
+      last_indexed_at: promoteDocBg.doc.last_indexed_at
+        ? new Date(promoteDocBg.doc.last_indexed_at)
+        : new Date(created_at),
+      mimeType: content_type,
+      state: this.xaiToDbState[promoteDocBg.doc.status],
+      storeId: storeDbId,
+      storeRef: collection_id,
+      userId: att.userId,
+      size: BigInt(Number.parseInt(size_bytes))
+    });
+    this.storeDbDocRegistry.set(att.id, rec);
+    return { docDb: rec, docXai: promoteDocBg.doc };
+  }
+
+  public async syncFileRegistry(
+    userId: string,
+    cleanupStaleFiles = false,
+    mgmtKey = this.xaiManagementKey
+  ) {
+    this.collectionRegistry.clear();
+    this.storeDbRegistry.clear();
+    this.docCache.clear();
+    this.fileCache.clear();
+    this.fileDbRegistry.clear();
+    this.storeDbDocRegistry.clear();
+
+    const key = await this.prisma.resolveApiKey(userId, this.xaiKey, "grok");
+    let collection_id: string;
+    let storeDbId: string;
+    let [collectionData, storeDbData] = await Promise.all([
+      this.resolveCollection(userId, mgmtKey),
+      this.prisma.vectorStoreInfoByProvider(userId, "GROK")
+    ]);
+
+    if (collectionData.hasStore === false) {
+      const { dbData, xaiData } = await this.createUserCollection(
+        userId,
+        mgmtKey
+      );
+      collectionData.store = xaiData;
+      collection_id = xaiData.collection_id;
+      storeDbData = {
+        totalBytes: 0,
+        dbId: dbData.id,
+        fileCount: dbData.fileCount,
+        hasStore: true,
+        provider: "GROK",
+        storeName: xaiData.collection_name,
+        storeRef: xaiData.collection_id
+      };
+    } else {
+      collection_id = collectionData.store.collection_id;
+      this.collectionRegistry.set(userId, collection_id);
+    }
+
+    if (!storeDbData?.dbId) {
+      if (collectionData.hasStore) {
+        const dbData = await this.prisma.createGrokVectorStore(
+          userId,
+          collectionData.store.collection_id,
+          collectionData.store.collection_name,
+          collectionData.store.created_at,
+          collectionData.store.created_at,
+          collectionData.store.documents_count,
+          0n
+        );
+        collection_id = collectionData.store.collection_id;
+        storeDbId = dbData.id;
+        storeDbData = {
+          totalBytes: dbData.totalBytes ?? 0,
+          dbId: dbData.id,
+          fileCount: dbData.fileCount,
+          hasStore: true,
+          provider: "GROK",
+          storeName: collectionData.store.collection_name,
+          storeRef: collection_id
+        };
+        this.storeDbRegistry.set(userId, dbData.id);
+        this.collectionRegistry.set(userId, collection_id);
+      } else {
+        const { dbData, xaiData } = await this.createUserCollection(
+          userId,
+          mgmtKey
+        );
+        storeDbId = dbData.id;
+        collectionData.store = xaiData;
+        collection_id = xaiData.collection_id;
+        storeDbData = {
+          totalBytes: 0,
+          dbId: dbData.id,
+          fileCount: dbData.fileCount,
+          hasStore: true,
+          provider: "GROK",
+          storeName: xaiData.collection_name,
+          storeRef: collection_id
+        };
+      }
+    } else {
+      storeDbId = storeDbData.dbId;
+      this.storeDbRegistry.set(userId, storeDbId);
+    }
+
+    if (storeDbData.hasStore) {
+      this.storeDbRegistry.set(userId, storeDbData.dbId);
+    }
+
+    const [hasProviderFiles, hasProviderStoreDocs] = await Promise.all([
+      this.prisma.hasProviderMessages(userId, "GROK"),
+      this.prisma.hasProviderStoreDocs(userId, "GROK")
+    ]);
+    if (hasProviderFiles) {
+      await Promise.all([
+        this.syncFilesDbRegistry(userId),
+        this.syncFilesRegistry(key)
+      ]);
+      this.fileRegistriesEq();
+    }
+    if (hasProviderStoreDocs) {
+      await Promise.all([
+        this.syncProviderStoreDbDocs(userId),
+        this.syncCollectionDocs(collection_id, mgmtKey)
+      ]);
+      await this.docRegistriesEq(
+        userId,
+        collection_id,
+        storeDbId,
+        key,
+        mgmtKey
+      );
+    }
+
+    this.lastRegistrySync = new Date();
+    console.info(
+      `xAI in memory cache sync complete: \n FileCache: ${this.fileCache.size} \n FileDbCache: ${this.fileDbRegistry.size} \n DocCache: ${this.docCache.size} \n DocDbCache: ${this.storeDbDocRegistry.size}`
+    );
+
+    // do not use until refactored
+    if (cleanupStaleFiles) {
+      void this.cleanupStaleFiles(collection_id, userId, key, mgmtKey);
+    }
+
+    return {
+      synced: true,
+      totalFiles: this.fileCache.size,
+      totalDbFiles: this.fileDbRegistry.size,
+      titalDocs: this.docCache.size,
+      totalDbDocs: this.storeDbDocRegistry.size,
+      lastSync: this.lastRegistrySync,
+      collectionExists: true,
+      collection_id
+    } as const;
+  }
+
+  protected async unlinkDocFromStoreAndDeleteFileFromRemote(
+    userId: string,
+    attachmentId: string,
+    collectionId: string,
+    fileId: string,
+    key = this.xaiKey,
+    managementKey = this.xaiManagementKey
+  ) {
+    try {
+      const deleteRes = await this.deleteFileFromXAI(
+        userId,
+        attachmentId,
+        collectionId,
+        fileId,
+        key,
+        managementKey
+      );
+
+      if (deleteRes.deleted && this.fileCache.has(attachmentId)) {
+        this.fileCache.delete(attachmentId);
+        const dbId = this.fileDbRegistry.get(attachmentId);
+
+        if (dbId?.id) {
+          const hasFile = await this.prisma.hasProviderAttachmentFile(
+            attachmentId,
+            deleteRes.id,
+            "GROK"
+          );
+          if (hasFile) {
+            await this.prisma.removeFileAttachmentProvider(dbId.id);
+            this.fileDbRegistry.delete(attachmentId);
+          }
+        }
+      }
+      this.logger.debug({ fileId, attachmentId }, "Deleted xAI file");
+      return {
+        id: fileId,
+        success: true
+      } as const;
+    } catch (error) {
+      this.logger.warn({ error, fileId }, "Failed to delete xAI file");
+      return {
+        id: fileId,
+        success: false
+      } as const;
+    }
   }
 
   /**
-   * Model Compatibility
+   * TODO
    *
-   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning
-   *
-   * Strongly Recommended: grok-4-1-fast-reasoning (specifically trained to excel at agentic tool calling)
-   *
-   *
-   *
+   * massively overhaul this method once db migration is complete
+   * following attachment provider <-> provider store decoupling
    */
-  protected handleTooling(
-    model: GrokModelIdUnion,
-    collectionId?: string,
-    enableFileSearch = true,
-    fileSearchMaxResults = 10,
-    enableCodeInterpreter = true,
-    enableWebSearch = true,
-    enableXSearch = false,
-    web_enable_image_understanding = true,
-    x_enable_image_understanding = true,
-    x_enable_video_understanding = true
+  private async cleanupStaleFiles(
+    collectionId: string,
+    userId: string,
+    key = this.xaiKey,
+    managementKey = this.xaiManagementKey
   ) {
-    if (this.canUseServerTools(model)) {
-      return this.resolveResponsesTools(collectionId, {
-        enableFileSearch,
-        fileSearchMaxResults,
-        enableCodeInterpreter,
-        enableWebSearch,
-        enableXSearch,
-        web_enable_image_understanding,
-        x_enable_image_understanding,
-        x_enable_video_understanding
-      });
+    const STALE_THRESHOLD_MS = 120 * 365.25 * 24 * 60 * 60 * 1000; // 120 years
+    const now = Date.now();
+
+    const filesToDelete = Array.of<{
+      fileId: string;
+      attachmentId: string;
+      dbId: string;
+    }>();
+
+    for (const [attachmentId, cached] of this.fileDbRegistry.entries()) {
+      const lastAccessed = cached.lastCheckedAt?.getTime() ?? 0;
+      if (now - lastAccessed > STALE_THRESHOLD_MS) {
+        filesToDelete.push({
+          fileId: cached.providerRef,
+          attachmentId,
+          dbId: cached.id
+        });
+      }
     }
+
+    if (filesToDelete.length === 0) {
+      console.info(`No stale xAI files to clean up for user ${userId}`);
+      return;
+    }
+
+    console.info(
+      `Cleaning up ${filesToDelete.length} stale xAI files for user ${userId}`
+    );
+
+    // Then delete from xAI collections API (unlink from collection, then delete file)
+    for (const { fileId, attachmentId } of filesToDelete) {
+      await this.unlinkDocFromStoreAndDeleteFileFromRemote(
+        userId,
+        attachmentId,
+        collectionId,
+        fileId,
+        key,
+        managementKey
+      );
+    }
+
+    console.info(
+      `xAI cleanup complete: ${filesToDelete.length} files removed for user ${userId}`
+    );
   }
 }

@@ -1,17 +1,23 @@
 import type {
+  CodeInterpreterTool,
   ContentBlockUnion,
   CreateResponseStreamProps,
   FileContentBlock,
+  FileSearchTool,
   ImageContentBlock,
   ResponsesComprehensive,
   ResponsesContentInputSingleton,
   ResponsesContentWorkup,
+  ResponsesToolsParams,
   TextContentBlock,
-  ToolChoiceUnion
+  ToolChoiceUnion,
+  ToolUnion,
+  WebSearchTool,
+  XSearchTool
 } from "@/xai/responses-types.ts";
 import type {
-  CollectionDocument,
-  CreateCollectionResponse
+  FilesDbRegistryProps,
+  xAIDocDbRegistryProps
 } from "@/xai/types.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
@@ -19,9 +25,11 @@ import { ResponsesStreamParser } from "@/xai/response-sse.ts";
 import { GrokWorkupService } from "@/xai/workup.ts";
 import type {
   AttachmentSingleton,
+  CTR,
   GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
+import type { xAIResponses } from "@/xai/event-types.ts";
 
 export class GrokCollectionsService extends GrokWorkupService {
   constructor(
@@ -33,574 +41,317 @@ export class GrokCollectionsService extends GrokWorkupService {
     super(logger, prisma, xaiKey, xaiManagementKey);
   }
 
-  private async createUserCollection(userId: string, mgmtKey?: string) {
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-    const res = await fetch("https://management-api.x.ai/v1/collections", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${managementKey}`
-      },
-      body: JSON.stringify(this.createUserCollectionWorkup(userId))
-    });
-
-    const data = await res.json<CreateCollectionResponse>();
-
-    const prismaCreate = await this.prisma.createVectorStoreGrok(
-      userId,
-      data.collection_id,
-      data.collection_name,
-      data.created_at,
-      data.documents_count
-    );
-
-    this.storeDbRegistry.set(userId, prismaCreate.id);
-
-    this.collectionRegistry.set(userId, data.collection_id);
-
-    return { dbData: prismaCreate, xaiData: data };
-  }
-
-  public async syncFileRegistry(
-    userId: string,
-    cleanupStaleFiles = false,
-    mgmtKey?: string
+  protected async ensureXaiFile(
+    att: AttachmentSingleton<true>,
+    keyFingerprint = "server",
+    xaiApiKey = this.xaiKey
   ) {
-    this.collectionRegistry.clear();
-    this.storeDbRegistry.clear();
-    this.assetCache.clear();
-    this.fileRegistry.clear();
-
-    let key: string;
-
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-    let [collectionData, storeDbData] = await Promise.all([
-      this.resolveCollection(userId, managementKey),
-      this.prisma.vectorStoreInfoByProvider(userId, "GROK")
-    ]);
-
-    // 2. Ensure collection exists (create if needed)
-    if (!collectionData) {
-      const created = await this.createUserCollection(userId, managementKey);
-      collectionData = created.xaiData;
-      storeDbData = {
-        totalBytes: 0,
-        dbId: created.dbData.id,
-        fileCount: created.dbData.fileCount,
-        hasStore: true,
-        provider: "GROK",
-        storeName: created.xaiData.collection_name,
-        storeRef: created.xaiData.collection_id
-      };
-    }
-
-    // 3. Ensure DB store exists (adopt collection if needed)
-    if (!storeDbData?.dbId) {
-      const dbData = await this.prisma.createVectorStoreGrok(
-        userId,
-        collectionData.collection_id,
-        collectionData.collection_name,
-        collectionData.created_at,
-        collectionData.documents_count
-      );
-      storeDbData = {
-        totalBytes: 0,
-        dbId: dbData.id,
-        fileCount: dbData.fileCount,
-        hasStore: true,
-        provider: "GROK",
-        storeName: collectionData.collection_name,
-        storeRef: collectionData.collection_id
-      };
-      this.storeDbRegistry.set(userId, dbData.id);
-      this.collectionRegistry.set(userId, collectionData.collection_id);
-    }
-    const collectionId = collectionData.collection_id;
-    const storeDbId = storeDbData.dbId;
-
-    this.collectionRegistry.set(userId, collectionId);
-    this.storeDbRegistry.set(userId, storeDbId);
-
-    const tryApiKey = await this.prisma.handleApiKeyLookup("grok", userId);
-    if (tryApiKey.apiKey) {
-      key = tryApiKey.apiKey;
-    } else {
-      key = this.xaiKey;
-    }
-
-    console.info(`Starting xAI file registry sync for user ${userId}`);
-
-    // reset in-memory caches/registries on new session init (immediately following connection_established event)
-
-    this.collectionRegistry.set(userId, collectionId);
-
-    // get store DB info
-    const storeInfo = storeDbData;
-
-    if (storeInfo.hasStore) {
-      this.storeDbRegistry.set(userId, storeInfo.dbId);
-    }
-
-    // load DB mappings into assetCache
-    const providerAssets = await this.prisma.findManyByProvider("GROK", userId);
-
-    if (providerAssets.length > 0) {
-      for (const asset of providerAssets) {
-        if (asset.providerRef) {
-          this.assetCache.set(asset.attachmentId, {
-            attachmentId: asset.attachmentId,
-            fileId: asset.providerRef,
-            collectionId,
-            databaseId: asset.id,
-            storeDbId,
-            lastAccessedAt: asset.lastCheckedAt
-          });
-        }
+    const xaiFileCache = this.fileCache.get(att.id);
+    const dbFileCache = this.fileDbRegistry.get(att.id);
+    if (dbFileCache && xaiFileCache) return xaiFileCache.id;
+    else if (dbFileCache && !xaiFileCache) {
+      const file_id = dbFileCache.providerRef;
+      const checkApi = await this.getFileById(file_id, xaiApiKey);
+      if (checkApi.ok) {
+        this.fileCache.set(att.id, checkApi.file);
+        return checkApi.file.id;
+      } else {
+        // remove from db (Does not Exist Remotely)
+        await this.prisma.removeFileAttachmentProvider(dbFileCache.id);
+        this.fileDbRegistry.delete(att.id);
+        const createFileXai = await this.streamUploadFileWorkup(att, xaiApiKey);
+        this.fileCache.set(att.id, createFileXai);
+        const { mime } = this.prisma.urlExtWorkupEmbeddings(att);
+        const createAttProviderFile = await this.prisma.upsertGrokAssetMapping(
+          att.id,
+          keyFingerprint,
+          mime,
+          createFileXai.id,
+          keyFingerprint,
+          BigInt(createFileXai.bytes),
+          new Date(createFileXai.created_at)
+        );
+        const rec = {
+          ...createAttProviderFile,
+          isExpired: false,
+          providerRef: createFileXai.id
+        } satisfies FilesDbRegistryProps;
+        this.fileDbRegistry.set(att.id, rec);
+        return createFileXai.id;
       }
-    }
-    console.info(
-      `Populated xAI asset cache with ${this.assetCache.size} entries from database`
-    );
-
-    // rebuild fileRegistry from xAI API, filtered by DB attachmentIds
-    const totalFiles = { count: 0, size: 0 };
-    const failedToIndex = Array.of<CollectionDocument>();
-    for await (const batch of this.getAllCollectionDocuments(
-      collectionId,
-      10,
-      managementKey
-    )) {
-      if (batch.data.length > 0) {
-        for (const doc of batch.data) {
-          if (doc.status === "DOCUMENT_STATUS_FAILED") {
-            failedToIndex.push(doc);
-          }
-          totalFiles.size += Number.parseInt(doc.file_metadata.size_bytes);
-          totalFiles.count += 1;
-          const attachmentId = doc.fields.attachmentId;
-          this.fileRegistry.set(attachmentId, doc);
-        }
-      }
-    }
-    await this.prisma.updateGrokStore(
-      userId,
-      totalFiles.count,
-      totalFiles.size,
-      new Date(Date.now())
-    );
-    const consolemsg =
-      failedToIndex.length === 0
-        ? `All xAI documents in collection ${collectionId} indexed successfully.`
-        : `Found ${failedToIndex.length} xAI documents in collection ${collectionId} that failed to index; regenerating indices...`;
-
-    console.info(consolemsg);
-
-    this.lastRegistrySync = new Date();
-    console.info(
-      `xAI file registry sync complete: ${this.fileRegistry.size} files indexed`
-    );
-
-    // reconcile caches (remove stale entries from either cache)
-    if (this.fileRegistry.size !== this.assetCache.size) {
-      // Remove assetCache entries not in fileRegistry
-      for (const key of this.assetCache.keys()) {
-        if (!this.fileRegistry.has(key)) {
-          this.assetCache.delete(key);
-        }
-      }
-      // Remove fileRegistry entries not in assetCache
-      for (const key of this.fileRegistry.keys()) {
-        if (!this.assetCache.has(key)) {
-          this.fileRegistry.delete(key);
-        }
-      }
-    }
-    // optionally cleanup stale files (14-day access window)
-    if (cleanupStaleFiles) {
-      await this.cleanupStaleFiles(collectionId, userId, key, managementKey);
-    }
-
-    return {
-      synced: true,
-      totalFiles: this.fileRegistry.size,
-      lastSync: this.lastRegistrySync,
-      collectionExists: true,
-      collectionId
-    } as const;
-  }
-
-  private async markFileAccessed(
-    attachmentId: string,
-    dbRecordId: string,
-    _fileId: string
-  ) {
-    try {
-      const { lastCheckedAt } = await this.prisma.markProviderLastCheckedAt(
-        dbRecordId,
+    } else if (xaiFileCache && !dbFileCache) {
+      const dbExists = await this.prisma.hasProviderAttachmentFile(
+        att.id,
+        xaiFileCache.id,
         "GROK"
       );
-
-      const cached = this.assetCache.get(attachmentId);
-      if (cached && lastCheckedAt) {
-        this.assetCache.set(attachmentId, {
-          ...cached,
-          lastAccessedAt: lastCheckedAt
-        });
-        void this.prisma.markProviderLastCheckedAt(cached.databaseId, "GROK");
+      if (dbExists) {
+        const getFile = await this.prisma.getProviderAttachmentFile(
+          att.id,
+          keyFingerprint,
+          "GROK"
+        );
+        const rec = {
+          ...getFile,
+          isExpired: false,
+          providerRef: xaiFileCache.id
+        } satisfies FilesDbRegistryProps;
+        this.fileDbRegistry.set(att.id, rec);
+        return xaiFileCache.id;
+      } else {
+        const { mime } = this.prisma.urlExtWorkupEmbeddings(att);
+        const createFile = await this.prisma.upsertGrokAssetMapping(
+          att.id,
+          keyFingerprint,
+          mime,
+          xaiFileCache.id,
+          keyFingerprint,
+          BigInt(xaiFileCache.bytes),
+          new Date(xaiFileCache.created_at)
+        );
+        const rec = {
+          ...createFile,
+          isExpired: false,
+          providerRef: xaiFileCache.id
+        } satisfies FilesDbRegistryProps;
+        this.fileDbRegistry.set(att.id, rec);
+        return xaiFileCache.id;
       }
-    } catch (error) {
-      this.logger.warn(
-        { error, attachmentId },
-        "Failed to mark xAI file as accessed"
+    } else {
+      const file = await this.streamUploadFileWorkup(att, xaiApiKey);
+      this.fileCache.set(att.id, file);
+      const { mime } = this.prisma.urlExtWorkupEmbeddings(att);
+      const createFile = await this.prisma.upsertGrokAssetMapping(
+        att.id,
+        keyFingerprint,
+        mime,
+        file.id,
+        keyFingerprint,
+        BigInt(file.bytes),
+        new Date(file.created_at)
       );
+      const rec = {
+        ...createFile,
+        isExpired: false,
+        providerRef: file.id
+      } satisfies FilesDbRegistryProps;
+      this.fileDbRegistry.set(att.id, rec);
+      return file.id;
     }
   }
 
-  private async cleanupStaleFiles(
-    collectionId: string,
-    userId: string,
-    apiKey?: string,
-    mgmntKey?: string
+  protected async ensureXaiDoc(
+    att: AttachmentSingleton<true>,
+    collection_id: string,
+    storeDbId: string,
+    file_id: string,
+    xaiManagementKey = this.xaiManagementKey
   ) {
-    const managementKey = mgmntKey ?? this.xaiManagementKey;
-    const key = apiKey ?? this.xaiKey;
-    const STALE_THRESHOLD_MS = 120 * 365.25 * 24 * 60 * 60 * 1000; // 120 years
-    const now = Date.now();
-
-    const filesToDelete = Array.of<{
-      fileId: string;
-      attachmentId: string;
-      dbId: string;
-    }>();
-
-    for (const [attachmentId, cached] of this.assetCache.entries()) {
-      const lastAccessed = cached.lastAccessedAt?.getTime() ?? 0;
-      if (now - lastAccessed > STALE_THRESHOLD_MS) {
-        filesToDelete.push({
-          fileId: cached.fileId,
-          attachmentId,
-          dbId: cached.databaseId
-        });
-      }
-    }
-
-    if (filesToDelete.length === 0) {
-      console.info(`No stale xAI files to clean up for user ${userId}`);
-      return;
-    }
-
-    console.info(
-      `Cleaning up ${filesToDelete.length} stale xAI files for user ${userId}`
+    const xaiDocCache = this.docCache.get(att.id);
+    const dbDocCache = this.storeDbDocRegistry.get(att.id);
+    const dbExists = await this.prisma.hasProviderStoreDocument(
+      att.id,
+      file_id,
+      storeDbId,
+      "GROK"
     );
-
-    // Delete from database first (in transaction)
-    const dbIds = filesToDelete.map(f => f.dbId);
-    try {
-      await this.prisma.deleteStaleIds(dbIds);
-      console.info(`Deleted ${dbIds.length} stale xAI database records`);
-    } catch (error) {
-      this.logger.warn(
-        { error },
-        "Failed to delete stale xAI database records"
+    if (!xaiDocCache && !dbDocCache) {
+      const probeWithName = await this.getDocByCollectionAndName(
+        collection_id,
+        att,
+        xaiManagementKey
       );
-    }
+      const fileIndex = probeWithName.documents.findLastIndex(
+        o => o.file_metadata.file_id === file_id
+      );
 
-    // Then delete from xAI collections API (unlink from collection, then delete file)
-    for (const { fileId, attachmentId } of filesToDelete) {
-      try {
-        await this.deleteFileFromXAI(collectionId, fileId, key, managementKey);
-
-        // Clear from caches
-        this.assetCache.delete(attachmentId);
-        this.fileRegistry.delete(attachmentId);
-
-        this.logger.debug({ fileId, attachmentId }, "Deleted stale xAI file");
-      } catch (error) {
-        this.logger.warn({ error, fileId }, "Failed to delete stale xAI file");
+      if (fileIndex === -1) {
+        const { docDb, docXai } = await this.promoteFileBgAndCreateDbDoc(
+          att,
+          collection_id,
+          storeDbId,
+          file_id,
+          xaiManagementKey
+        );
+        return this.xaiURI(docDb.storeRef, docXai.file_metadata.file_id);
+      } else {
+        const retrievedFile = probeWithName.documents.at(fileIndex);
+        if (retrievedFile) {
+          this.docCache.set(att.id, retrievedFile);
+          if (dbExists) {
+            const rec = await this.prisma.getProviderStoreDoc(
+              att.id,
+              storeDbId
+            );
+            const obj = {
+              ...rec,
+              storeRef: collection_id,
+              storeId: storeDbId
+            } satisfies xAIDocDbRegistryProps;
+            this.storeDbDocRegistry.set(att.id, obj);
+            return this.xaiURI(collection_id, file_id);
+          }
+          const rec = await this.prisma.upsertGrokProviderDoc({
+            attachmentId: att.id,
+            docRef: retrievedFile.file_metadata.file_id,
+            docUri: this.xaiURI(
+              collection_id,
+              retrievedFile.file_metadata.file_id
+            ),
+            filename: retrievedFile.file_metadata.name,
+            last_indexed_at: retrievedFile.last_indexed_at
+              ? new Date(retrievedFile.last_indexed_at)
+              : new Date(retrievedFile.file_metadata.created_at),
+            mimeType: retrievedFile.file_metadata.content_type,
+            state: this.xaiToDbState[retrievedFile.status],
+            storeId: storeDbId,
+            storeRef: collection_id,
+            userId: att.userId,
+            size: BigInt(
+              Number.parseInt(retrievedFile.file_metadata.size_bytes)
+            )
+          });
+          this.storeDbDocRegistry.set(att.id, rec);
+          return this.xaiURI(collection_id, file_id);
+        }
       }
     }
+    if (xaiDocCache && !dbDocCache) {
+      if (dbExists) {
+        const rec = await this.prisma.getProviderStoreDoc(att.id, storeDbId);
+        const obj = {
+          ...rec,
+          storeRef: collection_id,
+          storeId: storeDbId
+        } satisfies xAIDocDbRegistryProps;
+        this.storeDbDocRegistry.set(att.id, obj);
+        return this.xaiURI(collection_id, file_id);
+      } else {
+        const rec = await this.prisma.upsertGrokProviderDoc({
+          attachmentId: att.id,
+          docRef: xaiDocCache.file_metadata.file_id,
+          docUri: this.xaiURI(collection_id,xaiDocCache.file_metadata.file_id),
+          filename: xaiDocCache.file_metadata.name,
+          last_indexed_at: xaiDocCache.last_indexed_at
+            ? new Date(xaiDocCache.last_indexed_at)
+            : new Date(Date.now()),
+          mimeType: xaiDocCache.file_metadata.content_type,
+          state: this.xaiToDbState[xaiDocCache.status],
+          storeId: storeDbId,
+          storeRef: collection_id,
+          userId: att.userId,
+          size: BigInt(Number.parseInt(xaiDocCache.file_metadata.size_bytes))
+        });
+        this.storeDbDocRegistry.set(att.id, rec);
+        return this.xaiURI(collection_id, file_id);
+      }
+    }
+    if (!xaiDocCache && dbDocCache) {
+      const probeWithName = await this.getDocByCollectionAndName(
+        collection_id,
+        att,
+        xaiManagementKey
+      );
+      const fileIndex = probeWithName.documents.findLastIndex(
+        o => o.file_metadata.file_id === file_id
+      );
 
-    console.info(
-      `xAI cleanup complete: ${filesToDelete.length} files removed for user ${userId}`
-    );
+      if (fileIndex === -1) {
+        const { docDb, docXai } = await this.promoteFileBgAndCreateDbDoc(
+          att,
+          collection_id,
+          storeDbId,
+          file_id,
+          xaiManagementKey
+        );
+        return this.xaiURI(docDb.storeRef, docXai.file_metadata.file_id);
+      }
+    }
+    if (!xaiDocCache && dbDocCache) {
+      // stale record
+      if (dbExists) {
+        const rec = await this.prisma.getProviderStoreDoc(att.id, storeDbId);
+        const obj = {
+          ...rec,
+          storeRef: collection_id,
+          storeId: storeDbId
+        } satisfies xAIDocDbRegistryProps;
+        await this.prisma.removeDocFromProviderStore("GROK", att.userId, obj);
+        this.storeDbDocRegistry.delete(att.id);
+        const { docDb, docXai } = await this.promoteFileBgAndCreateDbDoc(
+          att,
+          collection_id,
+          storeDbId,
+          file_id,
+          xaiManagementKey
+        );
+        return this.xaiURI(docDb.storeRef, docXai.file_metadata.file_id);
+      } else {
+        this.storeDbDocRegistry.delete(att.id);
+        const { docDb, docXai } = await this.promoteFileBgAndCreateDbDoc(
+          att,
+          collection_id,
+          storeDbId,
+          file_id,
+          xaiManagementKey
+        );
+        return this.xaiURI(docDb.storeRef, docXai.file_metadata.file_id);
+      }
+    }
+    return this.xaiURI(collection_id, file_id);
   }
 
-  /**
-   * Ensures an attachment is uploaded to xAI and cached.
-   * Uses the same cache key pattern as Gemini (attachmentId).
-   *
-   * Flow:
-   * 1. Check in-memory cache + verify in fileRegistry
-   * 2. Resolve/create user's collection
-   * 3. Check xAI via exact-match filter (O(1) lookup)
-   * 4. If not found, upload via stepwise approach (upload file → promote to collection)
-   * 5. Persist to database and update both caches
-   */
   protected async ensureXaiAssetUploaded(
     attachment: AttachmentSingleton<true>,
     keyFingerprint = "server",
-    keyId?: string,
-    xaiApiKey?: string,
-    mgmtKey?: string
+    _keyId=keyFingerprint,
+    xaiApiKey = this.xaiKey,
+    mgmtKey = this.xaiManagementKey
   ) {
-    const apiKey = xaiApiKey ?? this.xaiKey;
-    const cacheKey = attachment.id; // Same key for both caches
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-
-    // 1. Check in-memory cache AND verify in fileRegistry
-    const cached = this.assetCache.get(cacheKey);
-    if (cached?.fileId) {
-      const registryEntry = this.fileRegistry.get(cacheKey);
-      if (registryEntry && registryEntry.status !== "DOCUMENT_STATUS_FAILED") {
-        this.logger.debug(
-          { cacheKey, fileId: cached.fileId },
-          `Reusing cached & verified xAI file: ${attachment.id}`
-        );
-        // Mark as accessed in background (don't await)
-        void this.markFileAccessed(cacheKey, cached.databaseId, cached.fileId);
-        return cached.fileId;
-      }
-      // Stale cache entry - clear both
-      this.assetCache.delete(cacheKey);
-      this.fileRegistry.delete(cacheKey);
-    }
-
-    // 2. Resolve or create user's collection
-    let collectionId = this.collectionRegistry.get(attachment.userId);
-    let storeDbId = this.storeDbRegistry.get(attachment.userId);
-    if (!collectionId) {
-      const collection = await this.resolveCollection(
-        attachment.userId,
-        managementKey
-      );
-      if (collection) {
-        collectionId = collection.collection_id;
-        this.collectionRegistry.set(attachment.userId, collectionId);
-        // Also lookup/cache store DB ID
-        const storeInfo = await this.prisma.vectorStoreInfoByProvider(
-          attachment.userId,
-          "GROK"
-        );
-        if (storeInfo.hasStore) {
-          storeDbId = storeInfo.dbId;
-          this.storeDbRegistry.set(attachment.userId, storeDbId);
-        }
-      } else {
-        // Create new collection for user
-        const createRes = await this.createUserCollection(
-          attachment.userId,
-          managementKey
-        );
-        collectionId = createRes.xaiData.collection_id;
-        storeDbId = createRes.dbData.id;
-      }
-    }
-
-    // 3. Check if document exists via exact-match filter (O(1) lookup)
-    const existingDoc = await this.getFileByCollectionIdAndName(
-      collectionId,
+    const fileId = await this.ensureXaiFile(
       attachment,
-      managementKey
+      keyFingerprint,
+      xaiApiKey
     );
-    const doc = existingDoc.documents.at(0);
 
-    if (existingDoc.documents.length > 0 && doc) {
-      //  database and update caches
-      const dbRecord = await this.prisma.upsertGrokAssetMapping(
-        attachment.userId,
-        attachment.id,
-        storeDbId ?? "",
-        collectionId,
-        keyFingerprint,
-        doc.file_metadata.content_type,
-        doc.file_metadata.file_id,
-        // No TTL for xAI, use 120-year window from now for tracking
-        new Date(Date.now() + 120 * 365.25 * 24 * 60 * 60 * 1000).toISOString(),
-        keyId,
-        BigInt(Number.parseInt(doc.file_metadata.size_bytes)),
-        doc.file_metadata.created_at
+    const { collectionId, storeDbId } = await this.ensureUserCollection(
+      attachment.userId,
+      mgmtKey
+    );
+
+    void this.ensureXaiDoc(
+      attachment,
+      collectionId,
+      storeDbId,
+      fileId,
+      mgmtKey
+    ).catch(err => {
+      this.logger.warn(
+        { attachmentId: attachment.id, err: this.prisma.safeErrMsg(err) },
+        "Background xAI doc indexing failed"
       );
+    });
 
-      this.assetCache.set(cacheKey, dbRecord);
-
-      this.fileRegistry.set(cacheKey, doc);
-
-      this.logger.debug(
-        { cacheKey, fileId: doc.file_metadata.file_id },
-        "Found via exact-match filter, cached"
-      );
-
-      return doc.file_metadata.file_id;
+    const fileDb = this.fileDbRegistry.get(attachment.id);
+    if (fileDb?.id) {
+      void this.markFileAccessed(attachment.id, fileDb.id, fileId);
     }
 
-    // 4. Not found → upload via stepwise approach
-    try {
-      const uploadResult = await this.uploadFileAndPromoteToCollection(
-        attachment,
-        keyFingerprint,
-        apiKey,
-        managementKey
-      );
-
-      if (!uploadResult?.id) {
-        throw new Error("Upload failed: no file ID returned");
-      }
-
-      // caches are updated in uploadFileAndPromoteToCollection flow
-
-      this.logger.info(
-        { cacheKey, fileId: uploadResult.id },
-        `Uploaded new file to xAI collection`
-      );
-
-      return uploadResult.id;
-    } catch (error) {
-      this.logger.error(
-        { error, attachmentId: attachment.id },
-        "Failed to upload file to xAI"
-      );
-      throw new Error(this.prisma.safeErrMsg(error));
-    }
+    return { fileId, docUri: this.xaiURI(collectionId, fileId) };
   }
 
-  /**
-   * TANDEM->
-   * STEP ONE + STEP TWO
-   */
-  private async uploadFileAndPromoteToCollection(
-    att: AttachmentSingleton<true>,
-    keyFingerprint: string,
-    apiKey?: string,
-    mgmtKey?: string
-  ) {
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
-    const collectionObj = { storeRef: undefined, dbId: "" } as {
-      storeRef: string | undefined;
-      dbId: string;
-    };
-    const key = apiKey ?? this.xaiKey;
-
-    const toFilename = this.prisma.toVectorStoreFilename(att);
-
-    const res = await this.streamUploadFileWorkup(att, key);
-    console.log(res);
-    if (!res?.id)
-      throw new Error(
-        "no id returned with results".concat(JSON.stringify(res, null, 2))
-      );
-    collectionObj.storeRef = this.collectionRegistry.get(att.userId);
-    if (!collectionObj.storeRef) {
-      const collection = await this.resolveCollection(
-        att.userId,
-        managementKey
-      );
-      if (collection) {
-        this.collectionRegistry.set(att.userId, collection.collection_id);
-        collectionObj.storeRef = collection.collection_id;
-      } else {
-        const createRes = await this.createUserCollection(att.userId, mgmtKey);
-        this.collectionRegistry.set(
-          att.userId,
-          createRes.xaiData.collection_id
-        );
-        collectionObj.storeRef = createRes.xaiData.collection_id;
-        collectionObj.dbId = createRes.dbData.id;
-      }
-    }
-
-    try {
-      const fetcher = await this.promoteToCollection(
-        res.id,
-        collectionObj.storeRef,
-        toFilename,
-        managementKey
-      );
-
-      if (fetcher.ok) {
-        const createCollectionDoc =
-          await this.prisma.createGrokCollectionDocument(
-            att.userId,
-            att.id,
-            collectionObj.dbId,
-            collectionObj.storeRef,
-            keyFingerprint,
-            att.compatStatus === "ACTIVE"
-              ? (att.compatMime ?? "application/octet-stream")
-              : (att.mime ?? "application/octet-stream"),
-            res.id,
-            keyFingerprint,
-            att.size ? BigInt(att.size) : undefined,
-            new Date(res.created_at).toISOString()
-          );
-
-        this.assetCache.set(att.id, createCollectionDoc);
-
-        // Construct fileRegistry entry from upload result
-
-        const richFileData = await this.getFileByCollectionIdAndName(
-          collectionObj.storeRef,
-          att,
-          managementKey
-        );
-
-        if (
-          richFileData.documents.length === 1 &&
-          richFileData.documents?.[0]
-        ) {
-          this.fileRegistry.set(att.id, richFileData.documents[0]);
-        } else {
-          const getDocumentMetadata = await this.getDocumentMetadata(
-            collectionObj.storeRef,
-            res.id,
-            managementKey
-          );
-
-          this.fileRegistry.set(att.id, getDocumentMetadata);
-        }
-      }
-    } catch (err) {
-      throw new Error(this.prisma.safeErrMsg(err));
-    } finally {
-      return res;
-    }
-  }
-
-  protected async getUserCollectionIdWithFallback(
-    userId: string,
-    mgmtApiKey?: string
-  ) {
-    const mgmtKey = mgmtApiKey ?? this.xaiManagementKey;
-    try {
-      const inMemory = this.collectionRegistry.get(userId);
-      if (inMemory) {
-        return inMemory;
-      } else {
-        const collection = await this.resolveCollection(userId, mgmtKey);
-        if (collection?.collection_id) {
-          if (!this.collectionRegistry.has(userId)) {
-            this.collectionRegistry.set(userId, collection.collection_id);
-          }
-          return collection.collection_id;
-        }
-      }
-    } catch (err) {
-      this.logger.info(err);
-    }
-  }
   protected async createResponsesStream({
-    workup: {
-      msgs,
-      userId,
-      isNewChat,
-      keyId,
-      apiKey,
-      max_tokens,
-      temperature,
-      topP: top_p,
-      model: m,
-      systemPrompt,
-      management_api_key
-    },
+    msgs,
+    userId,
+    isNewChat,
+    keyId,
+    apiKey,
+    max_tokens,
+    temperature,
+    topP: top_p,
+    model: m,
+    systemPrompt,
+    management_api_key,
     payload: {
       collectionId,
       tool_choice_input = "auto",
@@ -703,13 +454,9 @@ export class GrokCollectionsService extends GrokWorkupService {
     imgDetail?: ImageContentBlock["detail"],
     keyFingerprint = "server",
     keyId?: string,
-    xaiApiKey?: string,
-    xaiMgmntKey?: string
+    apiKey = this.xaiKey,
+    mgmtKey = this.xaiManagementKey
   ) {
-    const mgmtKey = xaiMgmntKey ?? this.xaiManagementKey;
-
-    const apiKey = xaiApiKey ?? this.xaiKey;
-
     const formatted = Array.of<ResponsesComprehensive>();
 
     const lastIndex = msgs.findLastIndex(
@@ -721,10 +468,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     for (const [msgIndex, msg] of msgs.entries()) {
       const isFreshContext = isFirstGrokMsg || msgIndex > lastIndex;
       const isCurrentUserMsg = msgIndex === msgs.length - 1;
-      const collectionId =
-        this.collectionRegistry.get(userId) ??
-        (await this.resolveCollection(userId, mgmtKey))?.collection_id ??
-        null;
+      const collectionId = this.collectionRegistry.get(userId) ?? null;
       if (msg.senderType === "USER") {
         const content = Array.of<ContentBlockUnion>();
         const textParts = Array.of<string>();
@@ -734,6 +478,8 @@ export class GrokCollectionsService extends GrokWorkupService {
             msg.attachments.length > 0 &&
             (this.canViewDocs(model) || this.canViewImgs(model))
           ) {
+            let currentUserFileCount = 0;
+
             for (const attachment of msg.attachments) {
               const {
                 cdnUrl,
@@ -759,65 +505,35 @@ export class GrokCollectionsService extends GrokWorkupService {
                   this.canViewDocs(model)
                 ) {
                   try {
+                    const { fileId, docUri } =
+                      await this.ensureXaiAssetUploaded(
+                        attachment,
+                        keyFingerprint,
+                        keyId,
+                        apiKey,
+                        mgmtKey
+                      );
                     if (isFreshContext) {
                       try {
-                        const fileId = await this.ensureXaiAssetUploaded(
-                          attachment,
-                          keyFingerprint,
-                          keyId,
-                          apiKey,
-                          mgmtKey
-                        );
                         if (!isCurrentUserMsg) {
-                          if (collectionId) {
-                            textParts.push(
-                              `[${name}](collections://${collectionId}/files/${fileId})`
-                            );
-                          }
+                          textParts.push(`[${name}](${docUri})`);
                         } else {
-                          const docBlock = {
-                            type: "input_file",
-                            file_id: fileId
-                          } satisfies FileContentBlock;
-                          content.push(docBlock);
+                          if (currentUserFileCount === 0) {
+                            const docBlock = {
+                              type: "input_file",
+                              file_id: fileId
+                            } satisfies FileContentBlock;
+                            content.push(docBlock);
+                            currentUserFileCount += 1;
+                          } else {
+                            textParts.push(`[${name}](${docUri})`);
+                          }
                         }
                       } catch {
-                        const cached = this.assetCache.get(attachment.id);
-
-                        if (cached?.collectionId) {
-                          textParts.push(
-                            `[${name}](collections://${cached.collectionId}/files/${cached.fileId})`
-                          );
-                        } else {
-                          this.logger.info({
-                            fresh_context_attachment_error_xai: `Fresh doc upload for userId ${userId} attachment ${attachment.id} of url ${url} failed`
-                          });
-                        }
+                        textParts.push(`[${name}](${docUri})`);
                       }
                     } else {
-                      const cached = this.assetCache.get(attachment.id);
-                      if (cached && collectionId) {
-                        textParts.push(
-                          `[${name}](collections://${collectionId}/files/${cached.fileId})`
-                        );
-                      } else if (collectionId) {
-                        // Not in cache - ensure it's uploaded for future reference
-                        try {
-                          const fileId = await this.ensureXaiAssetUploaded(
-                            attachment,
-                            keyFingerprint,
-                            keyId,
-                            apiKey,
-                            mgmtKey
-                          );
-
-                          textParts.push(
-                            `[${name}](collections://${collectionId}/files/${fileId})`
-                          );
-                        } catch {
-                          // silent fail for already processed context, not critical
-                        }
-                      }
+                      textParts.push(`[${name}](${docUri})`);
                     }
                   } catch (err) {
                     this.logger.warn(
@@ -859,14 +575,6 @@ export class GrokCollectionsService extends GrokWorkupService {
       } else {
         const textParts = Array.of<string>();
         const content = Array.of<ContentBlockUnion>();
-        // const grokResponse = msg.responseOutput;
-        // if (msg.provider === "GROK" && grokResponse) {
-        //   const union =
-        //     JSON.parse<xAIResponses.OutputItem.Done.Item[]>(grokResponse);
-        //   for (const u of union) {
-        //     formatted.push(u satisfies ResponsesComprehensive);
-        //   }
-        // } else {
         const modelIdentifier = `[${msg.provider.toLowerCase()}/${msg.model ?? "model"}]`;
         try {
           if (msg.attachments && msg.attachments.length > 0) {
@@ -893,57 +601,14 @@ export class GrokCollectionsService extends GrokWorkupService {
 
                 if (assetType === "DOCUMENT" && this.canViewDocs(model)) {
                   try {
-                    if (isFreshContext) {
-                      try {
-                        const fileId = await this.ensureXaiAssetUploaded(
-                          att,
-                          keyFingerprint,
-                          keyId,
-                          apiKey,
-                          mgmtKey
-                        );
-                        if (collectionId) {
-                          textParts.push(
-                            `[${name}](collections://${collectionId}/files/${fileId})`
-                          );
-                        }
-                      } catch {
-                        const cached = this.assetCache.get(att.id);
-                        if (cached?.collectionId) {
-                          textParts.push(
-                            `${modelIdentifier}\n[${name}](collections://${cached?.collectionId}/files/${cached.fileId})`
-                          );
-                        } else {
-                          this.logger.info({
-                            fresh_context_attachment_error_xai: `Fresh doc upload for ${modelIdentifier} attachment ${att.id} of url ${url} failed`
-                          });
-                        }
-                      }
-                    } else {
-                      const cached = this.assetCache.get(att.id);
-                      if (cached && collectionId) {
-                        textParts.push(
-                          `${modelIdentifier}\n[${name}](collections://${collectionId}/files/${cached.fileId})`
-                        );
-                      } else if (collectionId) {
-                        // Not in cache - ensure it's uploaded for future reference
-                        try {
-                          const fileId = await this.ensureXaiAssetUploaded(
-                            att,
-                            keyFingerprint,
-                            keyId,
-                            apiKey,
-                            mgmtKey
-                          );
-
-                          textParts.push(
-                            `${modelIdentifier}\n[${name}](collections://${collectionId}/files/${fileId})`
-                          );
-                        } catch {
-                          // silent fail for already processed context, not critical
-                        }
-                      }
-                    }
+                    const { docUri } = await this.ensureXaiAssetUploaded(
+                      att,
+                      keyFingerprint,
+                      keyId,
+                      apiKey,
+                      mgmtKey
+                    );
+                    textParts.push(`${modelIdentifier}\n[${name}](${docUri})`);
                   } catch (err) {
                     this.logger.warn(
                       { err: this.prisma.safeErrMsg(err) },
@@ -975,6 +640,169 @@ export class GrokCollectionsService extends GrokWorkupService {
 
     return formatted;
   }
+  protected parseFileSearchResults(
+    input: CTR<xAIResponses.OutputItem.Done.FileSearchCall, "results">
+  ) {
+    const textArr = Array.of<{
+      score: number;
+      file_id: string;
+      text: string;
+    }>();
+    const aggregate = Array.of<{
+      score: number;
+      file_id: string;
+      originalFilename: string;
+      resultBody: string;
+      decodedFilename: {
+        conversationId: string;
+        messageId: string;
+        attachmentId: string;
+        fileName: string;
+        extension: string;
+      };
+    }>();
+    for (const result of input.results) {
+      textArr.push({
+        score: result.score,
+        file_id: result.file_id,
+        text: result.text
+      });
+    }
+
+    for (const { text, file_id, score } of textArr) {
+      const tt = text
+        .split(/\noriginalFilename:+(.*?)\n/)
+        .map(t => t.trimStart());
+
+      const resObj = {
+        hexEncodedFilename: "",
+        originalFilename: "",
+        resultBody: ""
+      };
+
+      for (const [ttIndex, ttData] of tt.entries()) {
+        if (ttIndex === 0) resObj.hexEncodedFilename = ttData;
+        if (ttIndex === 1) resObj.originalFilename = ttData;
+        if (ttIndex === 2) resObj.resultBody = ttData;
+      }
+
+      const { hexEncodedFilename, ...rest } = resObj;
+
+      const expandedObj = {
+        score,
+        file_id,
+        decodedFilename: this.prisma.parseFilename(hexEncodedFilename),
+        ...rest
+      };
+      aggregate.push(expandedObj);
+    }
+    return aggregate;
+  }
+  protected formatSystemInstruction(isNewChat: boolean, systemPrompt?: string) {
+    if (isNewChat) {
+      return systemPrompt;
+    }
+
+    const note =
+      "Note: Previous responses may be tagged with their source model for context in the form of [PROVIDER/MODEL] notation.";
+
+    return (
+      systemPrompt ? `${systemPrompt}\n\n${note}` : note
+    ) satisfies ResponsesContentInputSingleton["content"];
+  }
+
+  protected resolveResponsesTools({
+    collectionId,
+    enableFileSearch = true,
+    enableWebSearch = false,
+    enableXSearch = false,
+    enableCodeInterpreter = false,
+    fileSearchMaxResults = 5,
+    web_enable_image_understanding = true,
+    x_enable_image_understanding = true,
+    x_enable_video_understanding = true
+  }: ResponsesToolsParams) {
+    const tools = Array.of<ToolUnion>();
+
+    if (enableFileSearch && collectionId) {
+      if (collectionId) {
+        tools.push({
+          type: "file_search",
+          vector_store_ids: [collectionId],
+          max_num_results: fileSearchMaxResults
+        } satisfies FileSearchTool);
+      }
+    }
+
+    if (enableWebSearch) {
+      tools.push({
+        type: "web_search",
+        filters: { enable_image_understanding: web_enable_image_understanding }
+      } satisfies WebSearchTool);
+    }
+
+    if (enableXSearch) {
+      tools.push({
+        type: "x_search",
+        filters: {
+          enable_image_understanding: x_enable_image_understanding,
+          enable_video_understanding: x_enable_video_understanding
+        }
+      } satisfies XSearchTool);
+    }
+
+    if (enableCodeInterpreter) {
+      tools.push({ type: "code_interpreter" } satisfies CodeInterpreterTool);
+    }
+    return tools;
+  }
+
+  protected canUseServerTools(m: GrokModelIdUnion) {
+    return (
+      m === "grok-4-0709" ||
+      m === "grok-4-1-fast-non-reasoning" ||
+      m === "grok-4-1-fast-reasoning" ||
+      m === "grok-4-fast-reasoning" ||
+      m === "grok-4-fast-non-reasoning"
+    );
+  }
+
+  /**
+   * Model Compatibility
+   *
+   * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning
+   *
+   * Strongly Recommended: grok-4-1-fast-reasoning (specifically trained to excel at agentic tool calling)
+   *
+   *
+   *
+   */
+  protected handleTooling(
+    model: GrokModelIdUnion,
+    collectionId?: string,
+    enableFileSearch = true,
+    fileSearchMaxResults = 10,
+    enableCodeInterpreter = true,
+    enableWebSearch = true,
+    enableXSearch = false,
+    web_enable_image_understanding = true,
+    x_enable_image_understanding = true,
+    x_enable_video_understanding = true
+  ) {
+    if (this.canUseServerTools(model)) {
+      return this.resolveResponsesTools({
+        collectionId,
+        enableFileSearch,
+        fileSearchMaxResults,
+        enableCodeInterpreter,
+        enableWebSearch,
+        enableXSearch,
+        web_enable_image_understanding,
+        x_enable_image_understanding,
+        x_enable_video_understanding
+      });
+    }
+  }
 
   private async getResponsesApiInputWorkup(
     isNewChat: boolean,
@@ -987,8 +815,8 @@ export class GrokCollectionsService extends GrokWorkupService {
     tool_choice: ToolChoiceUnion = "auto",
     detail?: ImageContentBlock["detail"],
     keyId?: string,
-    xaiKey?: string,
-    mgmtKey?: string,
+    apiKey = this.xaiKey,
+    managementKey = this.xaiManagementKey,
     collectionId?: string,
     enableFileSearch = true,
     fileSearchMaxResults = 5,
@@ -1001,8 +829,6 @@ export class GrokCollectionsService extends GrokWorkupService {
     parallel_tool_calls = true,
     include = ["reasoning.encrypted_content" as const]
   ) {
-    const apiKey = xaiKey ?? this.xaiKey;
-    const managementKey = mgmtKey ?? this.xaiManagementKey;
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt

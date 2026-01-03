@@ -18,47 +18,50 @@ type FileData = {
 
 type GetFilesRT = {
   data: FileData[];
-  pagination_token?: string;
+  pagination_token: string | null; // <- make it explicit; it's not optional anymore
 };
 
 class GetGrokFilesScript {
-  constructor(protected apiKey: string) {}
+  constructor(private apiKey: string) {}
 
-  public async *getAllFilesxAI(limit = 50) {
-    let has_more = true;
-    let count = 0;
-    let pagination_token: string | undefined = undefined;
-    let page_number = 0;
+  private async fetchPage(url: URL): Promise<GetFilesRT> {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${this.apiKey}` },
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${await res.text()}`);
+    return (await res.json()) as GetFilesRT;
+  }
 
-    while (has_more) {
-      const url = pagination_token
-        ? `https://api.x.ai/v1/files?limit=${limit}&pagination_token=${pagination_token}`
-        : `https://api.x.ai/v1/files?limit=${limit}`;
+  public async *getAllFilesxAI(limit = 1000) {
+    let token: string | null = null;
+    const seenTokens = new Set<string>();
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      console.log(response);
+    for (let pageNumber = 0; ; pageNumber++) {
+      const url = new URL("https://api.x.ai/v1/files");
+      url.searchParams.set("limit", String(limit));
+      url.searchParams.set("sort_by", "created_at");
+      url.searchParams.set("order", "desc");
+      if (token) url.searchParams.set("pagination_token", token);
 
-      const page = await response.json<GetFilesRT>();
-      console.log(page);
+      const page = await this.fetchPage(url);
+      const next = page.pagination_token;
 
-      has_more = typeof page.pagination_token !== "undefined";
-      pagination_token = page.pagination_token;
-      count += page.data?.length ?? 0;
+      // debug prove progress
+      const firstId = page.data?.[0]?.id;
+      const lastId = page.data?.[page.data.length - 1]?.id;
+      console.log({ pageNumber, token, next, n: page.data.length, firstId, lastId });
 
-      yield {
-        page,
-        count,
-        page_number,
-        has_more
-      };
+      yield page;
 
-      page_number += 1;
+      // --- stop conditions ---
+      if (next == null) break;
+      if (next === token) break;
+      if (seenTokens.has(next)) break;
+      if (page.data.length === 0) break;
+      // -----------------------
+
+      seenTokens.add(next);
+      token = next;
     }
   }
 }
@@ -67,14 +70,14 @@ const grokFiles = new GetGrokFilesScript(apiKey);
 const track = { size: 0, count: 0 };
 const arr = Array.of<GetFilesRT>();
 (async () => {
-  for await (const x of grokFiles.getAllFilesxAI(50)) {
-    if (x.page.data.length > 0) {
-      for (const document of x.page.data) {
+  for await (const x of grokFiles.getAllFilesxAI(2000)) {
+    if (x.data.length > 0) {
+      for (const document of x.data) {
         track.size += document.bytes;
         track.count += 1;
       }
       // get file data + pagination token
-      arr.push(x.page);
+      arr.push(x);
     }
   }
   return { pages: arr, totalBytes: track.size, totalCount: track.count };

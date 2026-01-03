@@ -174,7 +174,8 @@ export class FileSearchStoreService {
         displayName,
         createTime,
         updateTime,
-        0
+        0,
+        0n
       );
 
       this.storeDbRegistry.set(userId, prismaCreate.id);
@@ -983,7 +984,6 @@ export class FileSearchStoreService {
         fssDoc.mimeType &&
         fssDoc.sizeBytes &&
         fssDoc.sizeBytes &&
-        storeRef &&
         fssDoc.updateTime
       ) {
         const record = {
@@ -1001,7 +1001,6 @@ export class FileSearchStoreService {
         };
         const toDb = await this.prisma.createGeminiStoreDoc(record);
         this.storeDocDbRegistry.set(cacheKey, toDb);
-        // this.storeDocDbRegistry.set(cacheKey, toDb)
       }
     }
     if (

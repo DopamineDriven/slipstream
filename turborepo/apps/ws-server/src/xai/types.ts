@@ -3,12 +3,11 @@ import type {
   S3FinalizePayload
 } from "@/types/index.ts";
 import type { ExpandedImgSpecs } from "@d0paminedriven/fs";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
-  CTR,
   ImgMetadataEntity,
   S3Checksum,
-  S3StorageClass,
-  Unenumerate
+  S3StorageClass
 } from "@slipstream/types";
 
 export type MaybePromise<T> = T | Promise<T>;
@@ -55,8 +54,7 @@ export type GrokEncodingNameUnion =
   | "cl100k_base"
   | "p50k_base"
   | "p50k_edit"
-  | "r50k_base"
-  | (string & {});
+  | "r50k_base";
 
 export type TokensConfiguration = {
   max_chunk_size_tokens: number;
@@ -126,25 +124,25 @@ export type ChunkConfiguration = ChunkConfigurationTarget & {
   inject_name_into_chunks: boolean;
 };
 
-export type GrokEmbeddingModels =
-  | "grok-embedding-large"
-  | "grok-embedding-beta"
-  | "grok-embedding-small"
-  | (string & {});
+export type GrokEmbeddingModelType = "large" | "beta" | "small";
+
+export type GrokEmbeddingModels = `grok-embedding-${GrokEmbeddingModelType}`;
 
 export type IndexConfiguration = {
   model_name: GrokEmbeddingModels;
 };
 
-type DocumentStatusSuffix = "UNKNOWN" | "FAILED" | "PROCESSING" | "PROCESSED";
+export type DocumentStatusSuffix =
+  | "UNKNOWN"
+  | "FAILED"
+  | "PROCESSING"
+  | "PROCESSED";
 
-export type DocumentStatus =
-  | `DOCUMENT_STATUS_${DocumentStatusSuffix}`
-  | (string & {});
+export type DocumentStatus = `DOCUMENT_STATUS_${DocumentStatusSuffix}`;
 
 type MetricSpaceSuffix = "UNKNOWN" | "COSINE" | "EUCLIDEAN" | "INNER_PRODUCT";
 
-export type MetricSpace = `HNSW_METRIC_${MetricSpaceSuffix}` | (string & {});
+export type MetricSpace = `HNSW_METRIC_${MetricSpaceSuffix}`;
 
 export type CreateCollectionRequest = {
   collection_name: string;
@@ -166,9 +164,14 @@ export type UploadFileRT = {
   purpose: string; // always an empty string ""
 };
 
+export type FileErrorRT = {
+  code: string;
+  error: string;
+};
+
 export type GetFilesRT = {
   data: UploadFileRT[];
-  pagination_token?: string;
+  pagination_token: string | null;
 };
 
 export interface Collection {
@@ -187,8 +190,6 @@ export type ListCollectionsResponse = {
   pagination_token?: string;
 };
 
-export interface CreateCollectionResponse extends Collection {}
-
 export interface DocumentFields {
   attachmentId: string;
   conversationId: string;
@@ -204,20 +205,14 @@ export interface CollectionDocument {
   last_indexed_at: string | null;
 }
 
-export type UploadStatus =
-  | "Initializing"
-  | "Uploading"
-  | "Complete"
-  | "Failed"
-  | (string & {});
+export type UploadStatus = "Initializing" | "Uploading" | "Complete" | "Failed";
 
 export type ProcessingStatus =
   | "Pending"
   | "Processing"
   | "Complete"
   | "Failed"
-  | "Skipped"
-  | (string & {});
+  | "Skipped";
 
 export interface DocumentFilemetadata {
   file_id: string;
@@ -246,10 +241,24 @@ export type AssetCache = {
   lastAccessedAt: Date | null;
 };
 
-export type DocumentResSingleton = Unenumerate<
-  CTR<GetDocumentsByCollectionId["documents"]>
->;
-
+export type xAIDocDbRegistryProps = {
+  id: string;
+  storeId: string;
+  storeRef: string;
+  attachmentId: string;
+  provider: $Enums.Provider;
+  docRef: string;
+  docUri: string | null;
+  filename: string;
+  state: $Enums.ProviderDocState | null;
+  indexedAt: Date | null;
+  mimeType: string;
+  errorMessage: string | null;
+  lastAccessed: Date | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  size: number | null;
+};
 export type DeleteXaiFileResponse = {
   id: string;
   deleted: boolean;
@@ -303,3 +312,30 @@ export type ImgGenMessageParts =
 export interface GrokProviderChatRequestEntity extends ProviderChatRequestEntity {
   management_api_key?: string;
 }
+
+export type FilesDbRegistryProps = {
+  id: string;
+  attachmentId: string;
+  expiresAt: Date | null;
+  provider: $Enums.Provider;
+  keyFingerprint: string;
+  userKeyId: string | null;
+  providerRef: string;
+  isExpired: boolean;
+  providerUri: string | null;
+  lastCheckedAt: Date | null;
+};
+
+export type CreateGrokProviderStoreDocParams = {
+  userId: string;
+  attachmentId: string;
+  storeId: string;
+  docRef: string;
+  docUri: string;
+  storeRef: string;
+  filename: string;
+  last_indexed_at: Date;
+  mimeType: string;
+  state: $Enums.ProviderDocState;
+  size?: bigint;
+};

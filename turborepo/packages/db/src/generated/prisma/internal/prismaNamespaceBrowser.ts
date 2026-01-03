@@ -353,9 +353,9 @@ export const AttachmentProviderScalarFieldEnum = {
   lastCheckedAt: 'lastCheckedAt',
   errorCode: 'errorCode',
   errorMessage: 'errorMessage',
-  storeId: 'storeId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  indexedStoreRefs: 'indexedStoreRefs'
 } as const
 
 export type AttachmentProviderScalarFieldEnum = (typeof AttachmentProviderScalarFieldEnum)[keyof typeof AttachmentProviderScalarFieldEnum]

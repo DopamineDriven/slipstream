@@ -104,7 +104,7 @@
     "scminput": false
   },
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma-insider"
+    "editor.defaultFormatter": "Prisma.prisma"
   },
   "python.analysis.enableColorPicker": false,
   "prisma.pinToPrisma6": true

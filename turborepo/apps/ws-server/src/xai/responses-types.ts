@@ -116,7 +116,7 @@ export type ResponsesContentInputSingleton = {
 
 export type ResponsesComprehensive =
   | ResponsesContentInputSingleton
-  | xAIResponses.OutputItem.Done['item'];
+  | xAIResponses.OutputItem.Done["item"];
 
 export type ResponsesContentWorkup = {
   input: ResponsesComprehensive[];
@@ -230,12 +230,11 @@ export type CreateResponseStreamInputProps = {
    * A unique identifier representing your end-user, which can help xAI to monitor and detect abuse.
    */
   user?: string | null;
-}
+};
 
 export interface GrokChatReqSubset extends GrokProviderChatRequestEntity {}
 
-export type CreateResponseStreamProps = {
-  workup: GrokChatReqSubset;
+export interface CreateResponseStreamProps extends GrokChatReqSubset {
   payload: CreateResponseStreamInputProps;
 };
 
@@ -302,3 +301,15 @@ export type ToTypeNameObject<
 export type XAIResponsesEventMap<
   T extends XAIResponsesEventTypes = XAIResponsesEventTypes
 > = { [P in T]: MapIT[P] }[T];
+
+export type ResponsesToolsParams = {
+  collectionId?: string;
+  enableFileSearch?: boolean;
+  enableWebSearch?: boolean;
+  enableXSearch?: boolean;
+  enableCodeInterpreter?: boolean;
+  fileSearchMaxResults?: number;
+  web_enable_image_understanding?: boolean;
+  x_enable_image_understanding?: boolean;
+  x_enable_video_understanding?: boolean;
+};

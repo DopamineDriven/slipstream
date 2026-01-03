@@ -1,27 +1,19 @@
 import type {
   AttachmentProviderSingleton,
-  MessageSingleton,
-  ProviderStoreSingleton
+  MessageSingleton
 } from "@slipstream/types";
 
-export function handleBigintToNumber(
-  message: MessageSingleton<false>
-): MessageSingleton<true> {
+export function handleBigintToNumber(message: MessageSingleton<false | true>) {
   const { attachments, ...rest } = message;
   const mapIt = attachments.map(t => {
     const { size, ...p } = t;
     const mapProviderSingleton = p?.providerLinks?.map(v => {
-      const { size, store, attachment: _att, ...s } = v;
+      const { size, attachment: _att, ...s } = v;
 
-      const { totalBytes, ...restStore } = store ?? {};
       return {
         size: size ? Number(size) : null,
-        ...s,
-        store: {
-          ...restStore,
-          totalBytes: totalBytes ? Number(totalBytes) : null
-        } as ProviderStoreSingleton<true>
-      } as AttachmentProviderSingleton<true>;
+        ...s
+      } satisfies AttachmentProviderSingleton<true>;
     });
     return {
       ...p,
@@ -29,5 +21,8 @@ export function handleBigintToNumber(
       providerLinks: mapProviderSingleton
     };
   });
-  return { attachments: mapIt, ...rest } as MessageSingleton<true>;
+  return {
+    attachments: mapIt,
+    ...rest
+  } satisfies MessageSingleton<true> as MessageSingleton<true>;
 }

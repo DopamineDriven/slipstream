@@ -17,10 +17,10 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   try {
     const data = await prismaClient.providerStore.findUnique({
       where: { userId_provider: { userId, provider } },
-      include: { files: { where: { provider } } }
+      include: { docs: { where: { provider } } }
     });
-    const { totalBytes, files, ...resttt } = data ?? {};
-    const mapper = files?.map(t => {
+    const { totalBytes, docs, ...resttt } = data ?? {};
+    const mapper = docs?.map(t => {
       const { size, ...rest } = t;
       return {
         ...rest,
@@ -50,7 +50,7 @@ const data = async (provider: $Enums.Provider, userId: string) => {
   return await data("GROK", "nrr6h4r4480f6kviycyo1zhf");
 })().then(d => {
     fs.withWs(
-    "src/test/__out__/xai/provider-store-with-links/inspect.json",
+    "src/test/__out__/xai/provider-store-with-docs/inspect.json",
     JSON.stringify(d, null, 2)
   );
   console.log(d ?? 0);

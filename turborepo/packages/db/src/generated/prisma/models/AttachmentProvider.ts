@@ -50,9 +50,9 @@ export type AttachmentProviderMinAggregateOutputType = {
   lastCheckedAt: Date | null
   errorCode: string | null
   errorMessage: string | null
-  storeId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  indexedStoreRefs: string | null
 }
 
 export type AttachmentProviderMaxAggregateOutputType = {
@@ -71,9 +71,9 @@ export type AttachmentProviderMaxAggregateOutputType = {
   lastCheckedAt: Date | null
   errorCode: string | null
   errorMessage: string | null
-  storeId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  indexedStoreRefs: string | null
 }
 
 export type AttachmentProviderCountAggregateOutputType = {
@@ -92,9 +92,9 @@ export type AttachmentProviderCountAggregateOutputType = {
   lastCheckedAt: number
   errorCode: number
   errorMessage: number
-  storeId: number
   createdAt: number
   updatedAt: number
+  indexedStoreRefs: number
   _all: number
 }
 
@@ -123,9 +123,9 @@ export type AttachmentProviderMinAggregateInputType = {
   lastCheckedAt?: true
   errorCode?: true
   errorMessage?: true
-  storeId?: true
   createdAt?: true
   updatedAt?: true
+  indexedStoreRefs?: true
 }
 
 export type AttachmentProviderMaxAggregateInputType = {
@@ -144,9 +144,9 @@ export type AttachmentProviderMaxAggregateInputType = {
   lastCheckedAt?: true
   errorCode?: true
   errorMessage?: true
-  storeId?: true
   createdAt?: true
   updatedAt?: true
+  indexedStoreRefs?: true
 }
 
 export type AttachmentProviderCountAggregateInputType = {
@@ -165,9 +165,9 @@ export type AttachmentProviderCountAggregateInputType = {
   lastCheckedAt?: true
   errorCode?: true
   errorMessage?: true
-  storeId?: true
   createdAt?: true
   updatedAt?: true
+  indexedStoreRefs?: true
   _all?: true
 }
 
@@ -273,9 +273,9 @@ export type AttachmentProviderGroupByOutputType = {
   lastCheckedAt: Date | null
   errorCode: string | null
   errorMessage: string | null
-  storeId: string | null
   createdAt: Date
   updatedAt: Date
+  indexedStoreRefs: string | null
   _count: AttachmentProviderCountAggregateOutputType | null
   _avg: AttachmentProviderAvgAggregateOutputType | null
   _sum: AttachmentProviderSumAggregateOutputType | null
@@ -317,12 +317,11 @@ export type AttachmentProviderWhereInput = {
   lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
   errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  storeId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
-  store?: Prisma.XOR<Prisma.ProviderStoreNullableScalarRelationFilter, Prisma.ProviderStoreWhereInput> | null
 }
 
 export type AttachmentProviderOrderByWithRelationInput = {
@@ -341,12 +340,11 @@ export type AttachmentProviderOrderByWithRelationInput = {
   lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  storeId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder
   attachment?: Prisma.AttachmentOrderByWithRelationInput
   userKey?: Prisma.UserKeyOrderByWithRelationInput
-  store?: Prisma.ProviderStoreOrderByWithRelationInput
 }
 
 export type AttachmentProviderWhereUniqueInput = Prisma.AtLeast<{
@@ -369,12 +367,11 @@ export type AttachmentProviderWhereUniqueInput = Prisma.AtLeast<{
   lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
   errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  storeId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
   attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
   userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
-  store?: Prisma.XOR<Prisma.ProviderStoreNullableScalarRelationFilter, Prisma.ProviderStoreWhereInput> | null
 }, "id" | "attachmentId_provider_keyFingerprint">
 
 export type AttachmentProviderOrderByWithAggregationInput = {
@@ -393,9 +390,9 @@ export type AttachmentProviderOrderByWithAggregationInput = {
   lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  storeId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AttachmentProviderCountOrderByAggregateInput
   _avg?: Prisma.AttachmentProviderAvgOrderByAggregateInput
   _max?: Prisma.AttachmentProviderMaxOrderByAggregateInput
@@ -422,9 +419,9 @@ export type AttachmentProviderScalarWhereWithAggregatesInput = {
   lastCheckedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null
   errorCode?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  storeId?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string
+  indexedStoreRefs?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
 }
 
 export type AttachmentProviderCreateInput = {
@@ -443,9 +440,9 @@ export type AttachmentProviderCreateInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderLinksInput
   userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput
-  store?: Prisma.ProviderStoreCreateNestedOneWithoutFilesInput
 }
 
 export type AttachmentProviderUncheckedCreateInput = {
@@ -464,9 +461,9 @@ export type AttachmentProviderUncheckedCreateInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderUpdateInput = {
@@ -485,9 +482,9 @@ export type AttachmentProviderUpdateInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput
   userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput
-  store?: Prisma.ProviderStoreUpdateOneWithoutFilesNestedInput
 }
 
 export type AttachmentProviderUncheckedUpdateInput = {
@@ -506,9 +503,9 @@ export type AttachmentProviderUncheckedUpdateInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderCreateManyInput = {
@@ -527,9 +524,9 @@ export type AttachmentProviderCreateManyInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderUpdateManyMutationInput = {
@@ -548,6 +545,7 @@ export type AttachmentProviderUpdateManyMutationInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderUncheckedUpdateManyInput = {
@@ -566,9 +564,9 @@ export type AttachmentProviderUncheckedUpdateManyInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderListRelationFilter = {
@@ -603,9 +601,9 @@ export type AttachmentProviderCountOrderByAggregateInput = {
   lastCheckedAt?: Prisma.SortOrder
   errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  indexedStoreRefs?: Prisma.SortOrder
 }
 
 export type AttachmentProviderAvgOrderByAggregateInput = {
@@ -628,9 +626,9 @@ export type AttachmentProviderMaxOrderByAggregateInput = {
   lastCheckedAt?: Prisma.SortOrder
   errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  indexedStoreRefs?: Prisma.SortOrder
 }
 
 export type AttachmentProviderMinOrderByAggregateInput = {
@@ -649,55 +647,13 @@ export type AttachmentProviderMinOrderByAggregateInput = {
   lastCheckedAt?: Prisma.SortOrder
   errorCode?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  indexedStoreRefs?: Prisma.SortOrder
 }
 
 export type AttachmentProviderSumOrderByAggregateInput = {
   size?: Prisma.SortOrder
-}
-
-export type AttachmentProviderCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput> | Prisma.AttachmentProviderCreateWithoutStoreInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput | Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyStoreInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-}
-
-export type AttachmentProviderUncheckedCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput> | Prisma.AttachmentProviderCreateWithoutStoreInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput | Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyStoreInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-}
-
-export type AttachmentProviderUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput> | Prisma.AttachmentProviderCreateWithoutStoreInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput | Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutStoreInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutStoreInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyStoreInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutStoreInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutStoreInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutStoreInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutStoreInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
-}
-
-export type AttachmentProviderUncheckedUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput> | Prisma.AttachmentProviderCreateWithoutStoreInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput | Prisma.AttachmentProviderCreateOrConnectWithoutStoreInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutStoreInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutStoreInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyStoreInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutStoreInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutStoreInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutStoreInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutStoreInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
 }
 
 export type AttachmentProviderCreateNestedManyWithoutUserKeyInput = {
@@ -788,96 +744,6 @@ export type EnumProviderAssetStateFieldUpdateOperationsInput = {
   set?: $Enums.ProviderAssetState
 }
 
-export type AttachmentProviderCreateWithoutStoreInput = {
-  id?: string
-  provider: $Enums.Provider
-  keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachment: Prisma.AttachmentCreateNestedOneWithoutProviderLinksInput
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput
-}
-
-export type AttachmentProviderUncheckedCreateWithoutStoreInput = {
-  id?: string
-  attachmentId: string
-  provider: $Enums.Provider
-  userKeyId?: string | null
-  keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type AttachmentProviderCreateOrConnectWithoutStoreInput = {
-  where: Prisma.AttachmentProviderWhereUniqueInput
-  create: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput>
-}
-
-export type AttachmentProviderCreateManyStoreInputEnvelope = {
-  data: Prisma.AttachmentProviderCreateManyStoreInput | Prisma.AttachmentProviderCreateManyStoreInput[]
-  skipDuplicates?: boolean
-}
-
-export type AttachmentProviderUpsertWithWhereUniqueWithoutStoreInput = {
-  where: Prisma.AttachmentProviderWhereUniqueInput
-  update: Prisma.XOR<Prisma.AttachmentProviderUpdateWithoutStoreInput, Prisma.AttachmentProviderUncheckedUpdateWithoutStoreInput>
-  create: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutStoreInput, Prisma.AttachmentProviderUncheckedCreateWithoutStoreInput>
-}
-
-export type AttachmentProviderUpdateWithWhereUniqueWithoutStoreInput = {
-  where: Prisma.AttachmentProviderWhereUniqueInput
-  data: Prisma.XOR<Prisma.AttachmentProviderUpdateWithoutStoreInput, Prisma.AttachmentProviderUncheckedUpdateWithoutStoreInput>
-}
-
-export type AttachmentProviderUpdateManyWithWhereWithoutStoreInput = {
-  where: Prisma.AttachmentProviderScalarWhereInput
-  data: Prisma.XOR<Prisma.AttachmentProviderUpdateManyMutationInput, Prisma.AttachmentProviderUncheckedUpdateManyWithoutStoreInput>
-}
-
-export type AttachmentProviderScalarWhereInput = {
-  AND?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
-  OR?: Prisma.AttachmentProviderScalarWhereInput[]
-  NOT?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
-  id?: Prisma.StringFilter<"AttachmentProvider"> | string
-  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string
-  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider
-  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
-  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
-  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null
-  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  storeId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-}
-
 export type AttachmentProviderCreateWithoutUserKeyInput = {
   id?: string
   provider: $Enums.Provider
@@ -894,8 +760,8 @@ export type AttachmentProviderCreateWithoutUserKeyInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderLinksInput
-  store?: Prisma.ProviderStoreCreateNestedOneWithoutFilesInput
 }
 
 export type AttachmentProviderUncheckedCreateWithoutUserKeyInput = {
@@ -913,9 +779,9 @@ export type AttachmentProviderUncheckedCreateWithoutUserKeyInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderCreateOrConnectWithoutUserKeyInput = {
@@ -944,6 +810,30 @@ export type AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput = {
   data: Prisma.XOR<Prisma.AttachmentProviderUpdateManyMutationInput, Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyInput>
 }
 
+export type AttachmentProviderScalarWhereInput = {
+  AND?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  OR?: Prisma.AttachmentProviderScalarWhereInput[]
+  NOT?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  id?: Prisma.StringFilter<"AttachmentProvider"> | string
+  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string
+  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider
+  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
+  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
+  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null
+  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
+  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
+  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+}
+
 export type AttachmentProviderCreateWithoutAttachmentInput = {
   id?: string
   provider: $Enums.Provider
@@ -960,8 +850,8 @@ export type AttachmentProviderCreateWithoutAttachmentInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
   userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput
-  store?: Prisma.ProviderStoreCreateNestedOneWithoutFilesInput
 }
 
 export type AttachmentProviderUncheckedCreateWithoutAttachmentInput = {
@@ -979,9 +869,9 @@ export type AttachmentProviderUncheckedCreateWithoutAttachmentInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderCreateOrConnectWithoutAttachmentInput = {
@@ -1010,86 +900,6 @@ export type AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput = {
   data: Prisma.XOR<Prisma.AttachmentProviderUpdateManyMutationInput, Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentInput>
 }
 
-export type AttachmentProviderCreateManyStoreInput = {
-  id?: string
-  attachmentId: string
-  provider: $Enums.Provider
-  userKeyId?: string | null
-  keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type AttachmentProviderUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput
-  userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput
-}
-
-export type AttachmentProviderUncheckedUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type AttachmentProviderUncheckedUpdateManyWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
 export type AttachmentProviderCreateManyUserKeyInput = {
   id?: string
   attachmentId: string
@@ -1105,9 +915,9 @@ export type AttachmentProviderCreateManyUserKeyInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderUpdateWithoutUserKeyInput = {
@@ -1126,8 +936,8 @@ export type AttachmentProviderUpdateWithoutUserKeyInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput
-  store?: Prisma.ProviderStoreUpdateOneWithoutFilesNestedInput
 }
 
 export type AttachmentProviderUncheckedUpdateWithoutUserKeyInput = {
@@ -1145,9 +955,9 @@ export type AttachmentProviderUncheckedUpdateWithoutUserKeyInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutUserKeyInput = {
@@ -1165,9 +975,9 @@ export type AttachmentProviderUncheckedUpdateManyWithoutUserKeyInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderCreateManyAttachmentInput = {
@@ -1185,9 +995,9 @@ export type AttachmentProviderCreateManyAttachmentInput = {
   lastCheckedAt?: Date | string | null
   errorCode?: string | null
   errorMessage?: string | null
-  storeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  indexedStoreRefs?: string | null
 }
 
 export type AttachmentProviderUpdateWithoutAttachmentInput = {
@@ -1206,8 +1016,8 @@ export type AttachmentProviderUpdateWithoutAttachmentInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput
-  store?: Prisma.ProviderStoreUpdateOneWithoutFilesNestedInput
 }
 
 export type AttachmentProviderUncheckedUpdateWithoutAttachmentInput = {
@@ -1225,9 +1035,9 @@ export type AttachmentProviderUncheckedUpdateWithoutAttachmentInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutAttachmentInput = {
@@ -1245,9 +1055,9 @@ export type AttachmentProviderUncheckedUpdateManyWithoutAttachmentInput = {
   lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1268,12 +1078,11 @@ export type AttachmentProviderSelect<ExtArgs extends runtime.Types.Extensions.In
   lastCheckedAt?: boolean
   errorCode?: boolean
   errorMessage?: boolean
-  storeId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  indexedStoreRefs?: boolean
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1292,12 +1101,11 @@ export type AttachmentProviderSelectCreateManyAndReturn<ExtArgs extends runtime.
   lastCheckedAt?: boolean
   errorCode?: boolean
   errorMessage?: boolean
-  storeId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  indexedStoreRefs?: boolean
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1316,12 +1124,11 @@ export type AttachmentProviderSelectUpdateManyAndReturn<ExtArgs extends runtime.
   lastCheckedAt?: boolean
   errorCode?: boolean
   errorMessage?: boolean
-  storeId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  indexedStoreRefs?: boolean
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectScalar = {
@@ -1340,26 +1147,23 @@ export type AttachmentProviderSelectScalar = {
   lastCheckedAt?: boolean
   errorCode?: boolean
   errorMessage?: boolean
-  storeId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  indexedStoreRefs?: boolean
 }
 
-export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "storeId" | "createdAt" | "updatedAt", ExtArgs["result"]["attachmentProvider"]>
+export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "createdAt" | "updatedAt" | "indexedStoreRefs", ExtArgs["result"]["attachmentProvider"]>
 export type AttachmentProviderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }
 export type AttachmentProviderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }
 export type AttachmentProviderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
   userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
-  store?: boolean | Prisma.AttachmentProvider$storeArgs<ExtArgs>
 }
 
 export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1367,7 +1171,6 @@ export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.
   objects: {
     attachment: Prisma.$AttachmentPayload<ExtArgs>
     userKey: Prisma.$UserKeyPayload<ExtArgs> | null
-    store: Prisma.$ProviderStorePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1385,9 +1188,9 @@ export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.
     lastCheckedAt: Date | null
     errorCode: string | null
     errorMessage: string | null
-    storeId: string | null
     createdAt: Date
     updatedAt: Date
+    indexedStoreRefs: string | null
   }, ExtArgs["result"]["attachmentProvider"]>
   composites: {}
 }
@@ -1784,7 +1587,6 @@ export interface Prisma__AttachmentProviderClient<T, Null = never, ExtArgs exten
   readonly [Symbol.toStringTag]: "PrismaPromise"
   attachment<T extends Prisma.AttachmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AttachmentDefaultArgs<ExtArgs>>): Prisma.Prisma__AttachmentClient<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   userKey<T extends Prisma.AttachmentProvider$userKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AttachmentProvider$userKeyArgs<ExtArgs>>): Prisma.Prisma__UserKeyClient<runtime.Types.Result.GetResult<Prisma.$UserKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  store<T extends Prisma.AttachmentProvider$storeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AttachmentProvider$storeArgs<ExtArgs>>): Prisma.Prisma__ProviderStoreClient<runtime.Types.Result.GetResult<Prisma.$ProviderStorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1829,9 +1631,9 @@ export interface AttachmentProviderFieldRefs {
   readonly lastCheckedAt: Prisma.FieldRef<"AttachmentProvider", 'DateTime'>
   readonly errorCode: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly errorMessage: Prisma.FieldRef<"AttachmentProvider", 'String'>
-  readonly storeId: Prisma.FieldRef<"AttachmentProvider", 'String'>
   readonly createdAt: Prisma.FieldRef<"AttachmentProvider", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AttachmentProvider", 'DateTime'>
+  readonly indexedStoreRefs: Prisma.FieldRef<"AttachmentProvider", 'String'>
 }
     
 
@@ -2244,25 +2046,6 @@ export type AttachmentProvider$userKeyArgs<ExtArgs extends runtime.Types.Extensi
    */
   include?: Prisma.UserKeyInclude<ExtArgs> | null
   where?: Prisma.UserKeyWhereInput
-}
-
-/**
- * AttachmentProvider.store
- */
-export type AttachmentProvider$storeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ProviderStore
-   */
-  select?: Prisma.ProviderStoreSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ProviderStore
-   */
-  omit?: Prisma.ProviderStoreOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ProviderStoreInclude<ExtArgs> | null
-  where?: Prisma.ProviderStoreWhereInput
 }
 
 /**
