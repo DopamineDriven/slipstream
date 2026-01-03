@@ -299,9 +299,8 @@ model ProviderStore {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  files AttachmentProvider[]
-  docs  ProviderStoreDocument[]
+  user User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docs ProviderStoreDocument[]
 
   @@unique([userId, provider])
   @@index([storeRef, provider])
@@ -515,29 +514,28 @@ model AttachmentProvider {
   state          ProviderAssetState @default(PENDING)
 
   // provider-specific refs
-  providerUri   String?
-  providerRef   String?
-  mime          String?
-  size          BigInt?
-  readyAt       DateTime?
-  expiresAt     DateTime? // ~48h TTL minus safety margin for gemini
-  lastCheckedAt DateTime?
-  errorCode     String?
-  errorMessage  String?
-  storeId       String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  providerUri      String?
+  providerRef      String?
+  mime             String?
+  size             BigInt?
+  readyAt          DateTime?
+  expiresAt        DateTime? // ~48h TTL minus safety margin for gemini
+  lastCheckedAt    DateTime?
+  errorCode        String?
+  errorMessage     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  // prisma doesn't allow optional lists.... :|
+  indexedStoreRefs String? // using | as delimiters at rest to separate storeRefs due to prisma's limitations with conditional lists...
 
-  attachment Attachment     @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
-  userKey    UserKey?       @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
-  store      ProviderStore? @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userKey    UserKey?   @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
 
   @@unique([attachmentId, provider, keyFingerprint], name: "attachmentId_provider_keyFingerprint")
   @@index([provider, keyFingerprint, expiresAt])
   @@index([provider, providerRef])
   @@index([attachmentId, provider])
   @@index([provider, state, expiresAt])
-  @@index([storeId, provider])
 }
 
 model ImageMetadata {

@@ -1,6 +1,10 @@
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { FssDoc, StoreDocDbRegistryProps } from "@/gemini/types.ts";
+import type {
+  CreateGrokProviderStoreDocParams,
+  xAIDocDbRegistryProps
+} from "@/xai/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaUtilsService } from "@/prisma/utils.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
@@ -9,7 +13,6 @@ import type {
   AttachmentSingleton,
   ProviderStoreDocumentSingleton,
   ProviderStoreSingleton,
-  Rm,
   XOR
 } from "@slipstream/types";
 import { DbService } from "@slipstream/db/node";
@@ -27,20 +30,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
     super(prisma, isProd);
     this.extractor = extractor;
-  }
-
-    public async updateGeminiStore(
-    userId: string,
-    fileCount: number,
-    totalSize: number,
-    lastSyncedAt: Date
-  ) {
-    
-    return await this.prismaClient.providerStore.update({
-      data: { fileCount, lastSyncedAt, totalBytes: BigInt(totalSize) },
-      where: { userId_provider: { userId, provider: "GROK" } },
-      select: { id: true }
-    });
   }
 
   public async findActiveOpenAIAsset(
@@ -160,19 +149,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     });
   }
 
-  public async updateGrokStore(
-    userId: string,
-    fileCount: number,
-    totalSize: number,
-    lastSyncedAt: Date
-  ) {
-    return await this.prismaClient.providerStore.update({
-      data: { fileCount, lastSyncedAt, totalBytes: BigInt(totalSize) },
-      where: { userId_provider: { userId, provider: "GROK" } },
-      select: { id: true }
-    });
-  }
-
   public async createGeminiStoreDoc({
     attachmentId,
     docRef,
@@ -241,9 +217,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
           },
           select: {
             storeRef: true,
-            id: true,
-            fileCount: true,
-            totalBytes: true
+            id: true
           }
         })
       ]);
@@ -256,7 +230,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         storeRef: store.storeRef,
         id: doc.id,
         storeId: store.id,
-        size: store.totalBytes ? Number(store.totalBytes) : null,
+        size: doc.size ? Number(doc.size) : null,
         filename: doc.filename,
         createdAt: doc.createdAt,
         errorMessage: doc.errorMessage,
@@ -269,94 +243,249 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     });
   }
 
-  public async createGrokCollectionDocument(
-    userId: string,
+  public async createManyGrokProviderDocs({
+    userId,
+    data: props,
+    aggsize
+  }: {
+    userId: string;
+    data: CreateGrokProviderStoreDocParams[];
+    aggsize: bigint;
+  }) {
+    const data = props.map(t => {
+      const { last_indexed_at, userId: _userId, storeRef: _s, ...rest } = t;
+      return {
+        ...rest,
+        indexedAt: last_indexed_at,
+        lastAccessed: last_indexed_at,
+        provider: "GROK"
+      } as const;
+    });
+    const dataOne =
+      await this.prismaClient.providerStoreDocument.createManyAndReturn({
+        data: data
+      });
+
+    const cleanedOne = dataOne.map(t => this.convertProviderStoreDocBigInt(t));
+    const dataTwo = await this.prismaClient.providerStore.update({
+      where: { userId_provider: { userId, provider: "GROK" } },
+      data: {
+        totalBytes: { increment: aggsize },
+        lastSyncedAt: new Date(Date.now()),
+        fileCount: { increment: data.length }
+      },
+      select: { storeRef: true }
+    });
+
+    const res = cleanedOne.map(t => {
+      return { ...t, storeRef: dataTwo.storeRef };
+    });
+    return res;
+  }
+
+  private async handleGrokDocCheck(
     attachmentId: string,
+    docRef: string,
     storeId: string,
-    storeRef: string,
-    keyFingerprint = "server",
-    mime: string,
-    fileId: string,
-    keyId?: string,
-    size?: bigint,
-    created_at?: string
+    storeRef: string
   ) {
+    const exists = await this.hasProviderStoreDocument(
+      attachmentId,
+      docRef,
+      storeId,
+      "GROK"
+    );
+    if (exists) {
+      const { id } =
+        await this.prismaClient.providerStoreDocument.findUniqueOrThrow({
+          where: { storeId_attachmentId: { attachmentId, storeId } },
+          select: { id: true }
+        });
+      return {
+        exists: true,
+        id,
+        storeRef,
+        storeId
+      } as const;
+    } else {
+      return {
+        exists: false,
+        id: undefined,
+        storeRef,
+        storeId
+      } as const;
+    }
+  }
+
+  public async upsertGrokProviderDoc({
+    attachmentId,
+    docRef,
+    docUri,
+    filename,
+    last_indexed_at,
+    mimeType,
+    state,
+    storeId,
+    storeRef,
+    userId,
+    size
+  }: CreateGrokProviderStoreDocParams) {
+    const docExists = await this.handleGrokDocCheck(
+      attachmentId,
+      docRef,
+      storeId,
+      storeRef
+    );
     return await this.prismaClient.$transaction(async prisma => {
-      const [create, store] = await Promise.all([
-        prisma.attachmentProvider.create({
+      if (docExists.exists === false) {
+        const [doc, store] = await Promise.all([
+          prisma.providerStoreDocument.create({
+            data: {
+              state,
+              indexedAt: last_indexed_at,
+              size,
+              mimeType,
+              docRef,
+              filename,
+              docUri,
+              provider: "GROK",
+              attachmentId,
+              storeId,
+              lastAccessed: last_indexed_at
+            },
+            select: {
+              filename: true,
+              id: true,
+              createdAt: true,
+              mimeType: true,
+              provider: true,
+              errorMessage: true,
+              size: true,
+              updatedAt: true,
+              indexedAt: true,
+              attachmentId: true,
+              state: true,
+              docRef: true,
+              docUri: true,
+              lastAccessed: true
+            }
+          }),
+          prisma.providerStore.update({
+            where: { userId_provider: { provider: "GROK", userId } },
+            data: {
+              fileCount: { increment: 1 },
+              lastSyncedAt: new Date(Date.now()),
+              storeRef,
+              totalBytes: { increment: size ?? 0n }
+            },
+            select: {
+              storeRef: true,
+              id: true
+            }
+          })
+        ]);
+        return {
+          attachmentId: doc.attachmentId,
+          docRef: doc.docRef,
+          docUri: doc.docUri,
+          state: doc.state,
+          storeRef: store.storeRef,
+          id: doc.id,
+          storeId: store.id,
+          size: doc.size ? Number(doc.size) : null,
+          filename: doc.filename,
+          createdAt: doc.createdAt,
+          errorMessage: doc.errorMessage,
+          indexedAt: doc.indexedAt,
+          lastAccessed: doc.lastAccessed,
+          mimeType: doc.mimeType,
+          provider: "GROK",
+          updatedAt: doc.updatedAt
+        } satisfies xAIDocDbRegistryProps;
+      } else {
+        const doc = await prisma.providerStoreDocument.update({
+          where: { id: docExists.id },
           data: {
-            state: "ACTIVE",
-            errorCode: null,
-            errorMessage: null,
+            state,
+            indexedAt: last_indexed_at,
             size,
-            userKeyId: keyId,
-            providerUri: `collections://${storeRef}/files/${fileId}`,
+            mimeType,
+            docRef,
+            filename,
+            updatedAt: new Date(Date.now()),
+            docUri,
             provider: "GROK",
-            keyFingerprint,
             attachmentId,
             storeId,
-            mime,
-            providerRef: fileId,
-            readyAt: created_at,
-            lastCheckedAt: created_at
+            lastAccessed: last_indexed_at
           },
           select: {
+            filename: true,
             id: true,
+            createdAt: true,
+            mimeType: true,
+            provider: true,
+            errorMessage: true,
+            size: true,
+            updatedAt: true,
+            indexedAt: true,
             attachmentId: true,
-            providerRef: true,
-            lastCheckedAt: true
+            state: true,
+            docRef: true,
+            docUri: true,
+            lastAccessed: true
           }
-        }),
-        prisma.providerStore.update({
-          where: { userId_provider: { provider: "GROK", userId } },
-          data: {
-            fileCount: { increment: 1 },
-            lastSyncedAt: new Date(Date.now()),
-            storeRef,
-            totalBytes: { increment: size ?? 0n }
-          },
-          select: { storeRef: true, id: true }
-        })
-      ]);
+        });
 
-      return {
-        attachmentId: create.attachmentId,
-        fileId: create.providerRef ?? fileId,
-        collectionId: store.storeRef,
-        databaseId: create.id,
-        storeDbId: store.id,
-        lastAccessedAt: create.lastCheckedAt ?? new Date(Date.now())
-      };
+        return {
+          attachmentId: doc.attachmentId,
+          docRef: doc.docRef,
+          docUri: doc.docUri,
+          state: doc.state,
+          storeRef,
+          id: doc.id,
+          storeId,
+          size: doc.size ? Number(doc.size) : null,
+          filename: doc.filename,
+          createdAt: doc.createdAt,
+          errorMessage: doc.errorMessage,
+          indexedAt: doc.indexedAt,
+          lastAccessed: doc.lastAccessed,
+          mimeType: doc.mimeType,
+          provider: "GROK",
+          updatedAt: doc.updatedAt
+        } satisfies xAIDocDbRegistryProps;
+      }
     });
+  }
+  public async getUserKeyIdByProvider(
+    userId: string,
+    provider: $Enums.Provider
+  ) {
+    const keyId = await this.prismaClient.userKey.findUnique({
+      where: { userId_provider: { userId, provider } },
+      select: { id: true }
+    });
+    if (!keyId?.id) return "server";
+    else return keyId.id;
   }
 
   public async upsertGrokAssetMapping(
-    userId: string,
     attachmentId: string,
-    storeId: string,
-    storeRef: string,
     keyFingerprint = "server",
     mime: string,
     fileId: string,
-    expirationTime: string,
     keyId?: string,
     size?: bigint,
-    created_at?: string
+    created_at?: Date
   ) {
-    const record = await this.prismaClient.attachmentProvider.upsert({
+    const newFile = await this.prismaClient.attachmentProvider.upsert({
       where: {
         attachmentId_provider_keyFingerprint: {
           attachmentId,
           provider: "GROK",
           keyFingerprint
         }
-      },
-      select: {
-        id: true,
-        attachmentId: true,
-        providerRef: true,
-        storeId: true,
-        lastCheckedAt: true
       },
       update: {
         state: "ACTIVE",
@@ -366,7 +495,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         userKeyId: keyId,
         providerUri: undefined,
         provider: "GROK",
-        expiresAt: new Date(expirationTime),
         keyFingerprint,
         attachmentId,
         mime,
@@ -378,11 +506,8 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         state: "ACTIVE",
         errorCode: null,
         errorMessage: null,
-        storeId,
         size,
-        expiresAt: new Date(expirationTime),
         userKeyId: keyId,
-        providerUri: undefined,
         provider: "GROK",
         keyFingerprint,
         attachmentId,
@@ -392,15 +517,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         lastCheckedAt: created_at
       }
     });
-
-    return {
-      attachmentId: record.attachmentId,
-      fileId: record.providerRef ?? fileId,
-      collectionId: storeRef,
-      databaseId: record.id,
-      storeDbId: record.storeId ?? storeId,
-      lastAccessedAt: record.lastCheckedAt ?? new Date()
-    };
+    return this.convertProviderAttBigInt(newFile);
   }
 
   public async findActiveAnthropicAsset(
@@ -487,28 +604,43 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     } else return;
   }
 
-  // public async findManyStoreDocsByProvider(
-  //   provider: $Enums.Provider,
-  //   userId: string
-  // ) {
-  //   const storeName = this.vectorStoreDisplayName(userId);
-  //   const prismaTransaction = await this.prismaClient.$transaction(
-  //     async prisma => {
-  //       const docsFindManyRes = await prisma.providerStore.findFirst({
-  //         where: {
-  //           AND: [{ docs: { some: { provider } }, storeName }]
-  //         },
-  //         include: {docs: true}
-  //       });
-  //     }
-  //   );
-  // }
-
   public async hasProviderStoreDocs(userId: string, provider: $Enums.Provider) {
     const count = await this.prismaClient.attachment.count({
       where: { AND: [{ providerStoreDocs: { some: { provider } }, userId }] }
     });
-    return count > 0 ? true : false;
+    return count > 0;
+  }
+
+  public async removeDocFromProviderStore(
+    provider: $Enums.Provider,
+    userId: string,
+    doc: xAIDocDbRegistryProps
+  ) {
+    return await this.prismaClient.$transaction(async p => {
+      const updateStore = await p.providerStore.update({
+        where: { userId_provider: { userId, provider } },
+        data: {
+          totalBytes: { decrement: doc.size ? BigInt(doc.size) : 0n },
+          fileCount: { decrement: 1 },
+          docs: { delete: { id: doc.id } }
+        },
+        select: { storeRef: true, id: true }
+      });
+
+      return {
+        storeRef: updateStore.storeRef,
+        storeId: updateStore.id,
+        id: doc.id,
+        filename: doc.filename
+      };
+    });
+  }
+
+  public async removeFileAttachmentProvider(id: string) {
+    return await this.prismaClient.attachmentProvider.delete({
+      where: { id },
+      select: { id: true, providerRef: true }
+    });
   }
 
   public async findManyProviderStoreDocs(
@@ -603,11 +735,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                 userKeyId: true,
                 lastCheckedAt: true,
                 providerUri: true,
-                createdAt: true,
-                store: {
-                  where: { provider },
-                  select: { id: true, storeRef: true }
-                }
+                createdAt: true
               }
             },
             key: true
@@ -624,8 +752,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
           isExpired: boolean;
           providerUri: string | null;
           lastCheckedAt: Date | null;
-          storeId?: string | null;
-          storeRef?: string | null;
         }>();
 
         for (const attachment of attachmentFindManyRes) {
@@ -650,9 +776,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                           providerLink.createdAt.getTime()),
                     userKeyId: providerLink.userKeyId,
                     providerUri: providerLink.providerUri,
-                    lastCheckedAt: providerLink.lastCheckedAt,
-                    storeId: providerLink.store?.id,
-                    storeRef: providerLink.store?.storeRef
+                    lastCheckedAt: providerLink.lastCheckedAt
                   });
                 }
                 if (provider === "GROK") {
@@ -663,19 +787,10 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     keyFingerprint: providerLink.keyFingerprint,
                     provider: providerLink.provider,
                     providerRef: providerLink.providerRef,
-                    /**
-                     * 120-year window for xAI
-                     */
-                    isExpired:
-                      120 * 365.25 * 24 * 60 * 60 * 1000 <
-                      Date.now() -
-                        (providerLink.lastCheckedAt?.getTime() ??
-                          providerLink.createdAt.getTime()),
+                    isExpired: false,
                     userKeyId: providerLink.userKeyId,
                     providerUri: providerLink.providerUri,
-                    lastCheckedAt: providerLink.lastCheckedAt,
-                    storeId: providerLink.store?.id,
-                    storeRef: providerLink.store?.storeRef
+                    lastCheckedAt: providerLink.lastCheckedAt
                   });
                 }
                 if (
@@ -693,9 +808,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
                     isExpired: providerLink.expiresAt.getTime() < Date.now(),
                     userKeyId: providerLink.userKeyId,
                     providerUri: providerLink.providerUri,
-                    lastCheckedAt: providerLink.lastCheckedAt,
-                    storeId: providerLink.store?.id,
-                    storeRef: providerLink.store?.storeRef
+                    lastCheckedAt: providerLink.lastCheckedAt
                   });
                 }
               }
@@ -722,16 +835,100 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     const count = await this.prismaClient.attachment.count({
       where: { AND: [{ providerLinks: { some: { provider } }, userId }] }
     });
-    return count > 0 ? true : false;
+    return count > 0;
   }
 
+  public async providerFileAndDocCheck(
+    fileId: string,
+    docId: string,
+    provider: $Enums.Provider
+  ) {
+    return await this.prismaClient.$transaction(async p => {
+      const fileCount = await p.attachmentProvider.count({
+        where: { id: fileId, provider }
+      });
+      const docCount = await p.providerStoreDocument.count({
+        where: { id: docId, provider }
+      });
+      return {
+        hasFile: fileCount > 0,
+        hasDoc: docCount > 0
+      };
+    });
+  }
+
+  private convertProviderAttBigInt(
+    obj: AttachmentProviderSingleton<true | false>
+  ) {
+    const { size, attachment: _att, userKey: _uk, ...rest } = obj;
+    return {
+      size: size ? Number(size) : null,
+      ...rest
+    } satisfies AttachmentProviderSingleton<true>;
+  }
+
+  private convertProviderStoreDocBigInt(
+    obj: ProviderStoreDocumentSingleton<true | false>
+  ) {
+    const { size, attachment: _att, store: _st, ...rest } = obj;
+    return {
+      size: size ? Number(size) : null,
+      ...rest
+    } satisfies ProviderStoreDocumentSingleton<true>;
+  }
+
+  public async getProviderAttachmentFile(
+    attachmentId: string,
+    keyFingerprint: string,
+    provider: $Enums.Provider
+  ) {
+    return this.convertProviderAttBigInt(
+      await this.prismaClient.attachmentProvider.findUniqueOrThrow({
+        where: {
+          attachmentId_provider_keyFingerprint: {
+            attachmentId,
+            provider,
+            keyFingerprint
+          }
+        }
+      })
+    );
+  }
+  public async hasProviderAttachmentFile(
+    attachmentId: string,
+    providerRef: string,
+    provider: $Enums.Provider
+  ) {
+    const count = await this.prismaClient.attachmentProvider.count({
+      where: { attachmentId, providerRef, provider }
+    });
+    return count > 0;
+  }
+
+  public async hasProviderStoreDocument(
+    attachmentId: string,
+    docRef: string,
+    storeId: string,
+    provider: $Enums.Provider
+  ) {
+    const count = await this.prismaClient.providerStoreDocument.count({
+      where: { attachmentId, docRef, provider, storeId }
+    });
+    return count > 0;
+  }
   public async hasProviderStore(userId: string, provider: $Enums.Provider) {
     const count = await this.prismaClient.providerStore.count({
       where: { AND: [{ provider, userId }] }
     });
-    return count > 0 ? true : false;
+    return count > 0;
   }
-
+  public async getProviderStoreDoc(attachmentId: string, storeId: string) {
+    return this.convertProviderStoreDocBigInt(
+      await this.prismaClient.providerStoreDocument.findUniqueOrThrow({
+        where: { storeId_attachmentId: { attachmentId, storeId } }
+      })
+    );
+  }
   private urlExtWorkup<const T extends $Enums.Provider>(
     provider: T,
     attachment: AttachmentSingleton<true>
@@ -781,6 +978,15 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       ...rest
     }: AttachmentSingleton<true>
   ) {
+    const displayName = this.toVectorStoreFilename({
+      assetType,
+      compatStatus,
+      conversationId,
+      messageId,
+      id,
+      userId,
+      ...rest
+    });
     const { ext, mime, url } = this.urlExtWorkup(provider, {
       ...rest,
       assetType,
@@ -790,7 +996,6 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       id,
       userId
     });
-
     const tmpPrefix = `${provider.toLowerCase()}-tmp-${userId}-${id}-${(compatStatus ?? "ALIASED").toLowerCase()}`;
     const tmpName = this.extractor.uniqueTmpName(tmpPrefix, ext);
     const urlObj = new URL(url);
@@ -799,10 +1004,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     if (conversationId && messageId) {
       // will always be defined as message and convoId for incoming assets are database derived
       // and incoming user messages are persisted fully so AI SDKs always receive db-synced data
-      usefulName =
-        provider === "GEMINI"
-          ? `${id}.${ext}`
-          : `${conversationId}-${messageId}-${id}-${assetType.toLowerCase()}.${ext}`;
+      usefulName = provider === "GEMINI" ? `${id}.${ext}` : displayName;
     } else {
       usefulName = urlObj.pathname.replace(/\//gim, "-");
     }
@@ -998,6 +1200,18 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     };
   }
 
+  public async getTargetedAtt(id: string) {
+    const attachment = await this.prismaClient.attachment.findUniqueOrThrow({
+      where: { id },
+      include: { image: true, document: true, imageGenOutput: true }
+    });
+    const att = {
+      ...attachment,
+      size: attachment.size ? Number(attachment.size) : null
+    };
+    return att;
+  }
+
   public async getManyAttachments(ids: string[]) {
     const attachments = await this.prismaClient.attachment.findMany({
       where: { id: { in: ids } },
@@ -1014,7 +1228,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
   }
 
   public bigintToIntProviderStoreDocs(
-    data: Rm<ProviderStoreSingleton<false | true>, "files"> & {
+    data: ProviderStoreSingleton<false | true> & {
       docs: ProviderStoreDocumentSingleton<false | true>[];
     }
   ) {
@@ -1032,16 +1246,13 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       ...rest,
       totalBytes: totalBytes ? Number(totalBytes) : null,
       docs: docsMapped
-    } satisfies Rm<ProviderStoreSingleton<true>, "files"> & {
+    } satisfies ProviderStoreSingleton<true> & {
       docs: ProviderStoreDocumentSingleton<true>[];
     };
 
-    return providerStoreOut satisfies Rm<
-      ProviderStoreSingleton<true>,
-      "files"
-    > & {
+    return providerStoreOut satisfies ProviderStoreSingleton<true> & {
       docs: StoreDocDbRegistryProps[];
-    } as Rm<ProviderStoreSingleton<true>, "files"> & {
+    } as ProviderStoreSingleton<true> & {
       docs: StoreDocDbRegistryProps[];
     };
   }
@@ -1183,73 +1394,51 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     }
   }
 
-  public async createVectorStoreGrok(
+  public async createGrokVectorStore(
     userId: string,
-    storeId: string,
-    storeName: string,
+    storeRef: string,
+    storeDisplayName: string,
     createdAt: string,
-    documentsCount: number
+    updatedAt: string,
+    documentsCount: number,
+    totalBytes = 0n
   ) {
-    return await this.prismaClient.$transaction(async prisma => {
-      const data = await prisma.providerStore.create({
+    try {
+      const data = await this.prismaClient.providerStore.create({
         data: {
-          storeName,
+          storeName: storeDisplayName,
           providerStoreCreatedAt: new Date(createdAt),
-          totalBytes: 0n,
+          totalBytes,
           fileCount: documentsCount,
           provider: "GROK",
-          storeRef: storeId,
+          storeRef,
+          createdAt,
           userId,
-          lastSyncedAt: new Date(createdAt)
+          updatedAt,
+          lastSyncedAt: new Date(updatedAt)
         },
         select: {
-          files: {
-            where: { provider: "GROK" },
-            select: {
-              attachmentId: true,
-              lastCheckedAt: true,
-              providerRef: true,
-              id: true,
-              expiresAt: true,
-              size: true,
-              providerUri: true,
-              keyFingerprint: true,
-              userKeyId: true,
-              createdAt: true,
-              errorCode: true,
-              errorMessage: true,
-              provider: true,
-              readyAt: true,
-              updatedAt: true,
-              state: true,
-              storeId: true,
-              mime: true
-            }
-          },
           storeRef: true,
           id: true,
           fileCount: true,
+          storeName: true,
+          createdAt: true,
+          updatedAt: true,
           lastSyncedAt: true,
           userId: true,
-          totalBytes: true,
-          provider: true
+          totalBytes: true
         }
       });
-      const { files, totalBytes, ...spread } = data;
-      const o = files.map(v => {
-        const { size, ...rest } = v;
-
-        return {
-          size: size ? Number(size) : null,
-          ...rest
-        };
-      });
+      const { totalBytes: size, ...spread } = data;
       return {
-        totalBytes: totalBytes ? Number(totalBytes) : null,
-        files: o satisfies AttachmentProviderSingleton<true>[],
+        totalBytes: size ? Number(size) : null,
         ...spread
       };
-    });
+    } catch (err) {
+      throw new Error(
+        `something went wrong creating Grok vector store...${this.safeErrMsg(err)}`
+      );
+    }
   }
 
   public async vectorStoreInfoByProvider(

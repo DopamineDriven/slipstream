@@ -20,20 +20,7 @@ const data = async (provider: $Enums.Provider, userId: string) => {
       where: { AND: [{ providerLinks: { some: { provider } }, userId }] },
       include: {
         providerLinks: {
-          where: { provider },
-          include: {
-            store: {
-              select: {
-                fileCount: true,
-                id: true,
-                lastSyncedAt: true,
-                provider: true,
-                storeRef: true,
-                storeName: true
-              },
-              where: { userId }
-            }
-          }
+          where: { provider }
         }
       }
     });

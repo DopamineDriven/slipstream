@@ -61,30 +61,28 @@ export class GrokResponsesApiService extends GrokImgGenService {
     );
     try {
       const parser = await this.createResponsesStream({
-        workup: {
-          msgs,
-          userId,
-          jobId,
-          max_tokens,
-          model,
-          requestMessageId,
-          temperature,
-          title,
-          topP,
-          systemPrompt,
-          isNewChat,
-          keyId: keyId ?? "",
-          apiKey: xaiApiKey,
-          conversationId,
-          userMsgId,
-          ws,
-          streamChannel,
-          chunks,
-          thinkingChunks,
-          imgGenEnabled,
-          imgGenFields,
-          management_api_key
-        },
+        msgs,
+        userId,
+        jobId,
+        max_tokens,
+        model,
+        requestMessageId,
+        temperature,
+        title,
+        topP,
+        systemPrompt,
+        isNewChat,
+        keyId: keyId ?? "",
+        apiKey: xaiApiKey,
+        conversationId,
+        userMsgId,
+        ws,
+        streamChannel,
+        chunks,
+        thinkingChunks,
+        imgGenEnabled,
+        imgGenFields,
+        management_api_key,
         payload: {
           collectionId,
           enableCodeInterpreter: true,
@@ -156,8 +154,8 @@ export class GrokResponsesApiService extends GrokImgGenService {
         if (chunk.event === "response.output_text.delta") {
           text = chunk.data.delta;
         }
-        if (chunk.event ==="response.output_text.annotation.added") {
-          chunk.data.annotation
+        if (chunk.event === "response.output_text.annotation.added") {
+          chunk.data.annotation;
         }
         // NOTE: GROK TENDS TO INCLUDE THIS DIRECTLY AT THE END OF THE MESSAGE STREAM
         // if (chunk.event === "response.output_text.annotation.added") {
@@ -200,10 +198,7 @@ export class GrokResponsesApiService extends GrokImgGenService {
         ) {
           grokThinkingDuration = grokThinkingEndTime - grokThinkingStartTime;
         }
-        if (
-          thinkingText &&
-          grokIsCurrentlyThinking
-        ) {
+        if (thinkingText && grokIsCurrentlyThinking) {
           grokThinkingAgg += thinkingText;
           thinkingChunks.push(thinkingText);
 

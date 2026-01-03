@@ -568,7 +568,7 @@ export class Resolver {
     return await Promise.all([
       anthropic.syncFileRegistry(userId, true),
       gemini.syncFileRegistry(userId, true),
-      grok.syncFileRegistry(userId, true, this.xaiManagementApikey)
+      grok.syncFileRegistry(userId, false, this.xaiManagementApikey)
     ]);
   }
 
