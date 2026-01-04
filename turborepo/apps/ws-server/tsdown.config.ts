@@ -55,6 +55,8 @@ export default defineConfig(
         "src/types/index.ts",
         "src/vercel/index.ts",
         "src/vercel/sse.ts",
+        "src/voyage/index.ts",
+        "src/voyage/types.ts",
         "src/ws-server/index.ts",
         "src/xai/collections.ts",
         "src/xai/event-types.ts",
