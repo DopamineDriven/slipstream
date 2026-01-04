@@ -97,9 +97,7 @@ export class GrokWorkupService {
       );
       if (attachmentProviderFiles.length > 0) {
         for (const providerDoc of attachmentProviderFiles) {
-          const {
-            ...rest
-          } = providerDoc;
+          const { ...rest } = providerDoc;
           this.fileDbRegistry.set(providerDoc.attachmentId, { ...rest });
         }
       }
@@ -316,10 +314,14 @@ export class GrokWorkupService {
   /**
    * 2026-01-01
    * xai's pagination_token is broken.
-   * paginates in place despite passing in the proper `paginateion_token`...
-   * results in infinite looping
+   * paginates in place despite passing in the proper `pagination_token`...
+   * this results in infinite looping
    *
-   * Temporary workaround: set limit to n=2000
+   * Temporary workaround: set limit to n=2000 and handle defensively
+   *
+   * using a Set to track pagination_tokens
+   *
+   * break if previous_pagination_token = current_pagination_token between two consecutive fetches
    */
   private async *getAllFilesxAI(apiKey = this.xaiKey, limit = 2000) {
     let token: string | null = null;
@@ -460,7 +462,15 @@ export class GrokWorkupService {
     const dbDoc = this.storeDbDocRegistry.get(attachmentId);
     if (softDelete.ok && dbDoc?.id) {
       this.docCache.delete(attachmentId);
-      await this.prisma.removeDocFromProviderStore("GROK", userId, dbDoc);
+      const existsInDb = await this.prisma.hasProviderStoreDocument(
+        dbDoc.attachmentId,
+        dbDoc.docRef,
+        dbDoc.storeId,
+        "GROK"
+      );
+      if (existsInDb) {
+        await this.prisma.removeDocFromProviderStore("GROK", userId, dbDoc);
+      }
       this.storeDbDocRegistry.delete(attachmentId);
     }
     return softDelete;
@@ -872,19 +882,16 @@ export class GrokWorkupService {
     filename: string,
     apiKey = this.xaiKey
   ) {
-    const fd =new FormData();
+    const fd = new FormData();
     fd.append("filename", filename);
-   return await fetch(
-      `https://api.x.ai/v1/files/${file_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        method: "PUT",
-        body: fd
-      }
-    );
+    return await fetch(`https://api.x.ai/v1/files/${file_id}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      method: "PUT",
+      body: fd
+    });
   }
 
   protected async streamUploadFileWorkup(

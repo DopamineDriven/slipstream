@@ -8,6 +8,7 @@ dotenv.config({ quiet: true });
 type MapItRT =
   | {
       thinking: string | null;
+      thoughtFor: number | null;
       msgNumber: number;
       content: string;
       timestamp: Date;
@@ -31,6 +32,20 @@ type MapItRT =
 class ScriptGen extends Fs {
   constructor(public override cwd: string) {
     super(process.cwd() ?? cwd);
+  }
+
+  private safeErrMsg(err: unknown) {
+    if (err instanceof Error) {
+      return err.message;
+    } else if (typeof err === "object" && err != null) {
+      return JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+    } else if (typeof err === "string") {
+      return err;
+    } else if (typeof err === "number") {
+      return err.toPrecision(5);
+    } else if (typeof err === "boolean") {
+      return `${err}`;
+    } else return String(err);
   }
 
   private data = async (env: string, id: string) => {
@@ -71,7 +86,7 @@ class ScriptGen extends Fs {
         }
       });
     } catch (err) {
-      console.error(err);
+      console.error(this.safeErrMsg(err));
     } finally {
       prismaClient.$disconnect();
     }
@@ -144,6 +159,7 @@ class ScriptGen extends Fs {
       const content = msg.content,
         timestamp = new Date(msg.createdAt),
         id = msg.id,
+        thoughtFor = msg.senderType === "USER" ? null : msg.thinkingDuration,
         provider = msg.provider.toLowerCase() as Provider,
         model = msg.model ?? "",
         sender = msg.senderType as "USER" | "AI" | "SYSTEM",
@@ -166,7 +182,7 @@ class ScriptGen extends Fs {
                 attObj.cdnUrl = t.compatCdnUrl;
               }
               if (t.filename) {
-                attObj.filename;
+                attObj.filename = t.filename;
               }
               if (t.compatExt) {
                 attObj.ext = t.compatExt;
@@ -190,7 +206,7 @@ class ScriptGen extends Fs {
                 attObj.cdnUrl = t.cdnUrl;
               }
               if (t.filename) {
-                attObj.filename;
+                attObj.filename = t.filename;
               }
               if (t.ext) {
                 attObj.ext = t.ext;
@@ -217,6 +233,7 @@ class ScriptGen extends Fs {
         thinking,
         msgNumber: i,
         content,
+        thoughtFor,
         timestamp,
         id,
         provider,
@@ -274,14 +291,16 @@ class ScriptGen extends Fs {
           })
           .join("\n\n");
       };
-
+      const thinkingDur = p.thoughtFor
+        ? `\n\n*thought for ${p.thoughtFor / 1000} seconds*\n\n`
+        : `\n\n`;
       const agg =
         p.sender === "AI"
           ? withThinking === "true"
             ? p.thinking
-              ? `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-              : `${p.msgNumber}. ${p.model} (${handleProvider})\n\n${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
-            : `${p.msgNumber}. ${p.model} (${handleProvider}) \n\n${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
+              ? `${p.msgNumber}. ${p.model} (${handleProvider}) ${thinkingDur}${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider})${thinkingDur}${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model}(${handleProvider}) ${thinkingDur}${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
           : p.assetUrl.length > 0
             ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
@@ -289,44 +308,19 @@ class ScriptGen extends Fs {
       arr.push(agg);
     }
 
-    this.withWs("src/test/__out__/testing/the-genesis-log.md", arr.join(`\n`));
-
     return arr;
   }
   // prettier-ignore
-  private withFrontmatter = (content: string, title: string | null) => {
-    const t = title ?? "no-title";
+  private withFrontmatter = (content: string, title: string) => {
   // prettier-ignore
-    return`---
-papersize: letterpaper
-geometry: portrait,margin=0.75in
-fontsize: 10pt
-header-includes: |
-  \\usepackage{fontspec}
-  \\newfontfamily\\FiraCode{Fira Code}
-  \\usepackage{listings}
-  \\lstset{
-    basicstyle=\\FiraCode\\small,
-    breaklines=true,
-    aboveskip=4pt,
-    belowskip=4pt
-  }
-  \\usepackage{fancyhdr}
-  \\usepackage[useregional=false,style=iso]{datetime2}
-  \\DTMsetdatestyle{iso}
-  \\pagestyle{fancy}
-  \\fancyhf{}
-  \\fancyhead[C]{${t}}
-  \\fancyfoot[C]{\\thepage}
-  \\renewcommand{\\sectionmark}[1]{\\markboth{#1}{}}
----\n\n${content}`};
+    return`### ${title}\n\n${content}`};
 
-  private withWsAsyncs(data: string[], toSlug: string, _title: string) {
+  private toTranscript(data: string[], toSlug: string, title: string) {
     return new Promise(res =>
       res(
         this.withWs(
-          `src/test/__out__/condensed/${toSlug}.md`,
-          this.withFrontmatter(data.join(`\n`), toSlug)
+          `src/test/__out__/condensed/test/${toSlug}.md`,
+          this.withFrontmatter(data.join(`\n`), title)
         )
       )
     );
@@ -345,41 +339,20 @@ header-includes: |
     if (!raw) return;
     if (!raw.title) return;
     const toSlug =
-      raw.title.length > 128
-        ? "summoning-the-muse"
+      raw.title.length > 96
+        ? raw.title
+            .replace(/ /gim, "-")
+            .replace(/:/gim, "--")
+            .replace(/'/gim, "")
+            .slice(0, 95)
         : raw.title
             .replace(/ /gim, "-")
             .replace(/:/gim, "--")
             .replace(/'/gim, "");
     try {
-      await Promise.all([this.withWsAsyncs(data, toSlug, raw.title)]).then(() =>
-        this.wait(2000)
-          .then(() => {
-            if (this.exists(`src/test/__out__/condensed/${toSlug}.md`)) {
-              return;
-            } else {
-              return this.wait(3000).then(() => {
-                return;
-              });
-            }
-          })
-          .then(() =>
-            this.executeCommand({
-              command: `pandoc -i src/test/__out__/condensed/${toSlug}.md -o src/test/__out__/condensed/${toSlug}.pdf --pdf-engine=xelatex`,
-              cwd: this.cwd
-            })
-          )
-      );
+      await this.toTranscript(data, toSlug, raw.title);
     } catch (err) {
-      throw new Error(
-        "error in script-gen".concat(
-          typeof err === "string"
-            ? err
-            : err instanceof Error
-              ? err.message
-              : JSON.stringify(err, null, 2)
-        )
-      );
+      throw new Error("error in script-gen: ".concat(this.safeErrMsg(err)));
     }
   }
 }

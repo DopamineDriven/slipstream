@@ -119,6 +119,7 @@
     "VERCEL_URL",
     "VERCEL_ENV",
     "V0_API_KEY",
+    "VOYAGE_API_KEY",
     "WS_HOSTNAME",
     "X_AI_KEY",
     "X_AI_COLLECTION",

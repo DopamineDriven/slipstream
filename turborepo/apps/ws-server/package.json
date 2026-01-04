@@ -79,6 +79,10 @@
         "dist/vercel/index.d.ts",
         "dist/vercel/sse.d.ts"
       ],
+      "voyage": [
+        "dist/voyage/index.d.ts",
+        "dist/voyage/types.d.ts"
+      ],
       "ws-server": [
         "dist/ws-server/index.d.ts"
       ],

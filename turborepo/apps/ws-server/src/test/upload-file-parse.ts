@@ -2,50 +2,6 @@ const data = {
   grok: [
     {
       file_metadata: {
-        file_id: "file_7cd22b74-aab2-466e-8b47-ce46ab5c6c9b",
-        name: "tyxreuwdclogyetxrros5nbj-t121sxae1732ai5piyfu5n5c-v12hvmt8zj9cla09ut8gk9wm-43616e64792d466c697070696e672d436c61756474756c6c75732d506172742d4949.pdf",
-        size_bytes: "678404",
-        content_type: "application/pdf",
-        created_at: "2026-01-02T07:10:54.305022Z",
-        expires_at: null,
-        hash: "8117d5d8bfdfa80724a6a08ea0af588c1d460af3ee3f351f77400fa792533bf8",
-        upload_status: "Complete",
-        processing_status: "Complete",
-        file_path: ""
-      },
-      fields: {
-        attachmentId: "v12hvmt8zj9cla09ut8gk9wm",
-        conversationId: "tyxreuwdclogyetxrros5nbj",
-        messageId: "t121sxae1732ai5piyfu5n5c",
-        originalFilename: "Candy-Flipping-Claudtullus-Part-II.pdf"
-      },
-      status: "DOCUMENT_STATUS_PROCESSED",
-      last_indexed_at: "2026-01-02T07:11:35.305050Z"
-    },
-    {
-      file_metadata: {
-        file_id: "file_a63e4f40-0a59-461f-8f38-7552bb5f6617",
-        name: "tyxreuwdclogyetxrros5nbj-lp70vkt2nhp22nab85e48m2c-xelvypwgyevsisbnfos0l19t-43616e64792d466c697070696e672d436c61756474756c6c75732d506172742d49.pdf",
-        size_bytes: "1674702",
-        content_type: "application/pdf",
-        created_at: "2026-01-02T07:10:53.234878Z",
-        expires_at: null,
-        hash: "52cf9d3459583c4043cfbeae89faf43cbc3085fc83bd2948052d4a12564d8159",
-        upload_status: "Complete",
-        processing_status: "Complete",
-        file_path: ""
-      },
-      fields: {
-        attachmentId: "xelvypwgyevsisbnfos0l19t",
-        conversationId: "tyxreuwdclogyetxrros5nbj",
-        messageId: "lp70vkt2nhp22nab85e48m2c",
-        originalFilename: "Candy-Flipping-Claudtullus-Part-I.pdf"
-      },
-      status: "DOCUMENT_STATUS_PROCESSED",
-      last_indexed_at: "2026-01-02T07:11:34.443235Z"
-    },
-    {
-      file_metadata: {
         file_id: "file_c1f902f6-0c95-4767-8bcc-b8c424e856a9",
         name: "tyxreuwdclogyetxrros5nbj-cq78v2joe7ugdy4suewmjfnx-ozr1x12ftpx4bek6tulr7yn2-43616e64792d466c697070696e672d436c61756474756c6c75732d506172742d494949.pdf",
         size_bytes: "381023",
@@ -90,62 +46,6 @@ const data = {
     }
   ],
   gemini: [
-    {
-      name: "fileSearchStores/prodnrr6h4r4480f6kviycyo1zh-ft60ir8w2cpz/documents/tyxreuwdclogyetxrros5nbjlp7-xd9je5v94rb6",
-      displayName:
-        "tyxreuwdclogyetxrros5nbj-lp70vkt2nhp22nab85e48m2c-xelvypwgyevsisbnfos0l19t-43616e64792d466c697070696e672d436c61756474756c6c75732d506172742d49.pdf",
-      customMetadata: [
-        {
-          key: "attachmentId",
-          stringValue: "xelvypwgyevsisbnfos0l19t"
-        },
-        {
-          key: "conversationId",
-          stringValue: "tyxreuwdclogyetxrros5nbj"
-        },
-        {
-          key: "messageId",
-          stringValue: "lp70vkt2nhp22nab85e48m2c"
-        },
-        {
-          key: "originalFilename",
-          stringValue: "Candy-Flipping-Claudtullus-Part-I.pdf"
-        }
-      ],
-      updateTime: "2026-01-02T07:12:34.226159Z",
-      createTime: "2026-01-02T07:12:33.153761Z",
-      state: "STATE_ACTIVE",
-      sizeBytes: "1674702",
-      mimeType: "application/pdf"
-    },
-    {
-      name: "fileSearchStores/prodnrr6h4r4480f6kviycyo1zh-ft60ir8w2cpz/documents/tyxreuwdclogyetxrros5nbjt12-8yau4hzi7usz",
-      displayName:
-        "tyxreuwdclogyetxrros5nbj-t121sxae1732ai5piyfu5n5c-v12hvmt8zj9cla09ut8gk9wm-43616e64792d466c697070696e672d436c61756474756c6c75732d506172742d4949.pdf",
-      customMetadata: [
-        {
-          key: "attachmentId",
-          stringValue: "v12hvmt8zj9cla09ut8gk9wm"
-        },
-        {
-          key: "conversationId",
-          stringValue: "tyxreuwdclogyetxrros5nbj"
-        },
-        {
-          key: "messageId",
-          stringValue: "t121sxae1732ai5piyfu5n5c"
-        },
-        {
-          key: "originalFilename",
-          stringValue: "Candy-Flipping-Claudtullus-Part-II.pdf"
-        }
-      ],
-      updateTime: "2026-01-02T07:12:40.708296Z",
-      createTime: "2026-01-02T07:12:39.816597Z",
-      state: "STATE_ACTIVE",
-      sizeBytes: "678404",
-      mimeType: "application/pdf"
-    },
     {
       name: "fileSearchStores/prodnrr6h4r4480f6kviycyo1zh-ft60ir8w2cpz/documents/tyxreuwdclogyetxrros5nbjcq7-tzbxugp92qej",
       displayName:
