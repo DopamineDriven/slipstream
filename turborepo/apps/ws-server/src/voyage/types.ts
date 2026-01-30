@@ -1,7 +1,13 @@
 import type { Include } from "@/types/index.ts";
 
 export namespace Voyage {
-  export type EndpointUnion = "embeddings" | "contextualizedembeddings" | "multimodalembeddings" | "rerank" | "files" | "batches";
+  export type EndpointUnion =
+    | "embeddings"
+    | "contextualizedembeddings"
+    | "multimodalembeddings"
+    | "rerank"
+    | "files"
+    | "batches";
   export type PromiseConditional<T> = Promise<T> | PromiseLike<T>;
   export namespace PyBuiltIns {
     export type Exec = <const V = unknown>(
@@ -17,12 +23,12 @@ export namespace Voyage {
     globals: Promise<() => PyBuiltIns.BuiltIns>;
   }
   export type ModelUnion =
-|"rerank-1"
-| "rerank-2"
-| "rerank-2.5"
-| "rerank-2-lite"
-| "rerank-2.5-lite"
-|"rerank-lite-1"
+    | "rerank-1"
+    | "rerank-2"
+    | "rerank-2.5"
+    | "rerank-2-lite"
+    | "rerank-2.5-lite"
+    | "rerank-lite-1"
     | "voyage-01"
     | "voyage-02"
     | "voyage-2"
@@ -30,18 +36,16 @@ export namespace Voyage {
     | "voyage-3-large"
     | "voyage-3-lite"
     | "voyage-3.5"
-
-    | "voyage-3.5-large"
-        | "voyage-3.5-lite"
-
-        | "voyage-code-2"
+    | "voyage-3.5-lite"
+    | "voyage-4-large"
+    | "voyage-4"
+    | "voyage-4-lite"
+    | "voyage-code-2"
     | "voyage-code-3"
-        | "voyage-context-3"
+    | "voyage-context-3"
     | "voyage-finance-2"
-        | "voyage-large-2"
-
-        |"voyage-large-2-instruct"
-
+    | "voyage-large-2"
+    | "voyage-large-2-instruct"
     | "voyage-law-2"
     | "voyage-lite-01"
     | "voyage-lite-01-instruct"
@@ -83,7 +87,9 @@ export namespace Voyage {
       | "voyage-3.5"
       | "voyage-3-large"
       | "voyage-3.5-lite"
-      | "voyage-3.5-large"
+      | "voyage-4-large"
+      | "voyage-4-lite"
+      | "voyage-4"
     >;
     export interface Usage {
       total_tokens: number;
@@ -95,7 +101,7 @@ export namespace Voyage {
         index: number;
       }
     }
-    export interface List<T extends Model = "voyage-3.5-large"> {
+    export interface List<T extends Model = "voyage-4-large"> {
       object: "list";
       data: readonly List.Embedding[];
       model: T;
@@ -104,9 +110,9 @@ export namespace Voyage {
     export namespace Output {
       export type EncodingFormat = "base64" | null;
       export type DType = "float" | "int8" | "uint8" | "binary" | "ubinary";
-      export type Dimension<T extends Model = "voyage-3.5-large"> =
+      export type Dimension<T extends Model = "voyage-4-large"> =
         T extends DynamicModel ? 256 | 512 | 1024 | 2048 | null : null;
-      export interface Success<T extends Model = "voyage-3.5-large"> {
+      export interface Success<T extends Model = "voyage-4-large"> {
         response: List<T>;
         success: true;
       }
@@ -115,7 +121,7 @@ export namespace Voyage {
         success: false;
       }
     }
-    export interface Input<T extends Model = "voyage-3.5-large"> {
+    export interface Input<T extends Model = "voyage-4-large"> {
       inputs: readonly string[];
       input_type: InputType;
       model: T;
@@ -123,12 +129,12 @@ export namespace Voyage {
       output_dtype?: Output.DType;
       encoding_format?: Output.EncodingFormat;
     }
-    export type Output<T extends Model = "voyage-3.5-large"> =
-      | Output.Success<T>['response']
-      | Output.Error['response'];
+    export type Output<T extends Model = "voyage-4-large"> =
+      | Output.Success<T>["response"]
+      | Output.Error["response"];
   }
 
-  export interface Embeddings<T extends Embeddings.Model = "voyage-3.5-large"> {
+  export interface Embeddings<T extends Embeddings.Model = "voyage-4-large"> {
     input: Embeddings.Input<T>;
     output: Embeddings.Output<T>;
   }
@@ -190,8 +196,8 @@ export namespace Voyage {
       }
     }
     export type Output<T extends InputType = "document"> =
-      | Output.Success<T>['response']
-      | Output.Error['response'];
+      | Output.Success<T>["response"]
+      | Output.Error["response"];
 
     export type Model = "voyage-context-3";
 
@@ -279,7 +285,7 @@ export namespace Voyage {
         success: false;
       }
     }
-    export type Output = Output.Error['response'] | Output.Success['response'];
+    export type Output = Output.Error["response"] | Output.Success["response"];
     /**
      * Note: Only one of the keys, base64 or url, should be present in each dictionary for image and video data.
      * Consistency is required within a request, meaning each request should use either image_base64/video_base64 or image_url/video_url exclusively, not both.
@@ -320,7 +326,7 @@ export namespace Voyage {
         T extends Endpoints = "v1/contextualizedembeddings"
       > {
         inputs: T extends "v1/embeddings"
-          ? Embeddings.Input<Embeddings.Model>['inputs']
+          ? Embeddings.Input<Embeddings.Model>["inputs"]
           : T extends "v1/rerank"
             ? {}
             : Contextual.Input<"document">["inputs"];

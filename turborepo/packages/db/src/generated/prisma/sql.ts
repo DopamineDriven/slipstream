@@ -5,12 +5,22 @@
 // @ts-nocheck 
 export { type $DbEnums } from "./sql/$DbEnums"
 
-export * from "./sql/getProviderDocumentChunksByProviderStore"
+export * from "./sql/getMemoryChunksByConversation"
 
-export * from "./sql/insertDocumentChunk"
+export * from "./sql/insertLocalDoc"
+
+export * from "./sql/insertLocalDocChunk"
 
 export * from "./sql/insertMemoryChunk"
 
 export * from "./sql/searchConversationMemory"
 
-export * from "./sql/searchDocumentsChunks"
+export * from "./sql/searchLocalDocChunks"
+
+export * from "./sql/searchLocalDocChunksByStore"
+
+export * from "./sql/searchMemoryByConversation"
+
+export * from "./sql/updateLocalDocState"
+
+export * from "./sql/updateMemoryChunkState"

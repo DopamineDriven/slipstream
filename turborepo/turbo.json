@@ -16,6 +16,7 @@
     },
     "dev": {
       "cache": false,
+      "dependsOn": ["^build"],
       "persistent": true
     },
     "typecheck": {
@@ -124,6 +125,7 @@
     "X_AI_KEY",
     "X_AI_COLLECTION",
     "X_AI_MANAGEMENT_API_KEY",
+    "X_AI_MGMT_KEY",
     "X_AI_TEAM_ID"
   ]
 }

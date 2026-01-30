@@ -3,12 +3,12 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { prismaClient } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/site-url";
-import jsonData from "@/utils/__out__/random-name-gen.json" with { type: "json" };
+// import jsonData from "@/utils/__out__/random-name-gen.json" with { type: "json" };
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { lastLoginMethod } from "better-auth/plugins";
-import { anonymous } from "better-auth/plugins/anonymous";
+// import { anonymous } from "better-auth/plugins/anonymous";
 
 // openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
 
@@ -87,29 +87,29 @@ export const auth = betterAuth({
   // can handle onLinkAccount in `anonymous()` options
   plugins: [
     lastLoginMethod({ storeInDatabase: true }),
-    anonymous({
-      generateName: () => {
-        const { prefixes, suffixes } = jsonData;
-        const prefix =
-          prefixes.at(Math.floor(Math.random() * prefixes.length)) ?? "Random";
-        const suffix =
-          suffixes.at(Math.floor(Math.random() * suffixes.length)) ?? "User";
-        return `${prefix} ${suffix}`;
-      },
-      onLinkAccount: async ({ anonymousUser, newUser }) => {
-        const { emailVerified, ...userNew } = newUser.user;
+    // anonymous({
+    //   generateName: () => {
+    //     const { prefixes, suffixes } = jsonData;
+    //     const prefix =
+    //       prefixes.at(Math.floor(Math.random() * prefixes.length)) ?? "Random";
+    //     const suffix =
+    //       suffixes.at(Math.floor(Math.random() * suffixes.length)) ?? "User";
+    //     return `${prefix} ${suffix}`;
+    //   },
+    //   onLinkAccount: async ({ anonymousUser, newUser }) => {
+    //     const { emailVerified, ...userNew } = newUser.user;
 
-        await prismaClient.$transaction(async t => {
-          await t.user.update({
-            where: { id: anonymousUser.user.id },
-            data: {
-              emailVerified: emailVerified ? new Date(Date.now()) : null,
-              ...userNew
-            }
-          });
-        });
-      }
-    }),
+    //     await prismaClient.$transaction(async t => {
+    //       await t.user.update({
+    //         where: { id: anonymousUser.user.id },
+    //         data: {
+    //           emailVerified: emailVerified ? new Date(Date.now()) : null,
+    //           ...userNew
+    //         }
+    //       });
+    //     });
+    //   }
+    // }),
     nextCookies()
   ]
 } satisfies BetterAuthOptions);

@@ -1,6 +1,5 @@
 import { auth } from "@/utils/auth";
 import {
-  anonymousClient,
   inferAdditionalFields,
   lastLoginMethodClient
 } from "better-auth/client/plugins";
@@ -10,7 +9,7 @@ export const authClient = createAuthClient({
   baseURL: process.env.BETTER_AUTH_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
-    anonymousClient(),
+    // anonymousClient(),
     lastLoginMethodClient()
   ]
 });

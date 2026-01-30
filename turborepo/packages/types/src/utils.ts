@@ -2,6 +2,31 @@ export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
   : T;
 
+export type BigIntKeys<T> = {
+  [K in keyof T]: T[K] extends bigint ? K : never;
+}[keyof T];
+
+export type SerializeBigInt<T, Serialized extends boolean = boolean> = DX<{
+  [K in keyof T]: T[K] extends bigint | null
+    ? Serialized extends true
+      ? number | null
+      : bigint | null
+    : T[K];
+}>;
+
+// precision (field-level) targeting
+export type PrecisionSerializeBigIntField<
+  T,
+  Field extends keyof T = BigIntKeys<T>,
+  Serialized extends boolean = false
+> = DX<{
+  [K in keyof T]: K extends Field
+    ? Serialized extends true
+      ? number | null
+      : bigint | null
+    : T[K];
+}>;
+
 export type Rm<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };
@@ -12,7 +37,7 @@ export type Rm<T, P extends keyof T = keyof T> = {
  */
 export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 
-export type Include<T, U extends T> =  Exclude<T, Exclude<T, U>>;
+export type Include<T, U extends T> = Exclude<T, Exclude<T, U>>;
 
 /**
  * enforces mutual exclusivity of T | U
@@ -297,16 +322,15 @@ export type CommonDiscriminants =
 // type CommonDiscriminantObj<T extends CommonDiscriminants = CommonDiscriminants> = readonly [Include<CommonDiscriminants,T>,string];
 
 // const O =(props: CommonDiscriminantObj<"type">)=>({[props[0]]: props[1]})
-export type LiteralUnion<TKnown extends string> = TKnown | string
+export type LiteralUnion<TKnown extends string> = TKnown | string;
 
 export type DiscriminatedUnionToRecord<
   TUnion extends Record<TKey, string>,
-  TKey extends LiteralUnion<CommonDiscriminants> = LiteralUnion<CommonDiscriminants>
+  TKey extends LiteralUnion<CommonDiscriminants> =
+    LiteralUnion<CommonDiscriminants>
 > = TKey extends keyof TUnion
   ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
   : never;
-
-
 
 export type UnionToRecord<
   TUnion extends Record<"type", string>,
@@ -314,4 +338,3 @@ export type UnionToRecord<
 > = {
   [K in TDiscriminant]: Extract<TUnion, { type: K }>;
 };
-

@@ -282,6 +282,7 @@ export {
  */
 export type {
   ArrFieldReplacer,
+  BigIntKeys,
   CommonDiscriminants,
   CTR,
   DeepPartial,
@@ -301,9 +302,11 @@ export type {
   LiteralUnion,
   OnlyOptional,
   OnlyRequired,
+  PrecisionSerializeBigIntField,
   RTC,
   RequireNested,
   Rm,
+  SerializeBigInt,
   TCN,
   Unenumerate,
   UnionToRecord,
@@ -321,7 +324,11 @@ export type {
   AttachmentProviderSingleton,
   AssetReadyPayload,
   AttachmentSingleton,
+  AudioSingleton,
   BigIntOrNumber,
+  ConversationMemoryChunkSingleton,
+  ConversationMemoryContextSingleton,
+  ConversationMemoryStoreSingleton,
   ConversationSingleton,
   ConversationSingletonOneOff,
   ConvoSettingsSingleton,
@@ -330,7 +337,11 @@ export type {
   ImageGenJobSingleton,
   ImageGenOutputSingleton,
   ImageSingleton,
+  LocalVectorStoreDocChunkSingleton,
+  LocalVectorStoreDocSingleton,
+  LocalVectorStoreSingleton,
   MessageSingleton,
+  NormalizeAndInject,
   ProfileSingleton,
   ProviderStoreDocumentSingleton,
   ProviderStoreSingleton,
@@ -338,7 +349,8 @@ export type {
   SettingsSingleton,
   Signals,
   UserKeySingleton,
-  UserSingleton
+  UserSingleton,
+  VideoSingleton
 } from "@/types.ts";
 
 declare global {

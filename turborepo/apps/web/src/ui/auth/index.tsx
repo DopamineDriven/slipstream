@@ -54,7 +54,8 @@ export function AuthUI({
               </span>
             </Button>
           </div>
-          <div className="mt-8 grid grid-cols-1 gap-3">
+          {/**removed grid from classname until anonymous method is fully fixed*/}
+          <div className="mt-8 hidden grid-cols-1 gap-3">
             <Button
               variant="ghost"
               type="button"

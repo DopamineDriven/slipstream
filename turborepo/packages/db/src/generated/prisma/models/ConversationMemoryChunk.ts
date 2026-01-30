@@ -27,87 +27,117 @@ export type AggregateConversationMemoryChunk = {
 }
 
 export type ConversationMemoryChunkAvgAggregateOutputType = {
+  chunkIndex: number | null
+  chunkedMessagesCount: number | null
   tokenCount: number | null
+  chunkedAttachmentsCount: number | null
 }
 
 export type ConversationMemoryChunkSumAggregateOutputType = {
+  chunkIndex: number | null
+  chunkedMessagesCount: number | null
   tokenCount: number | null
+  chunkedAttachmentsCount: number | null
 }
 
 export type ConversationMemoryChunkMinAggregateOutputType = {
   id: string | null
-  conversationId: string | null
-  contextStateId: string | null
-  provider: $Enums.Provider | null
   provenanceId: string | null
+  contextId: string | null
+  storeId: string | null
+  conversationId: string | null
+  chunkIndex: number | null
   messageIdStart: string | null
   messageIdEnd: string | null
-  chunkingError: string | null
-  chunkingState: $Enums.ChunkingState | null
   messageTimestampStart: Date | null
   messageTimestampEnd: Date | null
-  transcriptMarkdown: string | null
-  tokenCount: number | null
-  modelProvidersInChunkRaw: string | null
   messageIdsRaw: string | null
-  attachmentIdsRaw: string | null
+  transcriptMarkdown: string | null
+  contentHash: string | null
+  chunkedMessagesCount: number | null
+  tokenCount: number | null
+  providerModelsRaw: string | null
+  hasAttachments: boolean | null
+  chunkedAttachmentsCount: number | null
+  attachmentProvenanceIdsRaw: string | null
   embeddingModel: string | null
+  schemaVersion: $Enums.MemorySchemaVersion | null
+  boundaryReason: $Enums.MemoryChunkBoundaryReason | null
+  chunkingState: $Enums.MemoryChunkingState | null
+  chunkingError: string | null
+  embeddedAt: Date | null
   summary: string | null
-  summaryModelProvider: string | null
+  summaryModel: string | null
+  summaryProvider: $Enums.Provider | null
   summaryGeneratedAt: Date | null
-  summaryUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ConversationMemoryChunkMaxAggregateOutputType = {
   id: string | null
-  conversationId: string | null
-  contextStateId: string | null
-  provider: $Enums.Provider | null
   provenanceId: string | null
+  contextId: string | null
+  storeId: string | null
+  conversationId: string | null
+  chunkIndex: number | null
   messageIdStart: string | null
   messageIdEnd: string | null
-  chunkingError: string | null
-  chunkingState: $Enums.ChunkingState | null
   messageTimestampStart: Date | null
   messageTimestampEnd: Date | null
-  transcriptMarkdown: string | null
-  tokenCount: number | null
-  modelProvidersInChunkRaw: string | null
   messageIdsRaw: string | null
-  attachmentIdsRaw: string | null
+  transcriptMarkdown: string | null
+  contentHash: string | null
+  chunkedMessagesCount: number | null
+  tokenCount: number | null
+  providerModelsRaw: string | null
+  hasAttachments: boolean | null
+  chunkedAttachmentsCount: number | null
+  attachmentProvenanceIdsRaw: string | null
   embeddingModel: string | null
+  schemaVersion: $Enums.MemorySchemaVersion | null
+  boundaryReason: $Enums.MemoryChunkBoundaryReason | null
+  chunkingState: $Enums.MemoryChunkingState | null
+  chunkingError: string | null
+  embeddedAt: Date | null
   summary: string | null
-  summaryModelProvider: string | null
+  summaryModel: string | null
+  summaryProvider: $Enums.Provider | null
   summaryGeneratedAt: Date | null
-  summaryUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ConversationMemoryChunkCountAggregateOutputType = {
   id: number
-  conversationId: number
-  contextStateId: number
-  provider: number
   provenanceId: number
+  contextId: number
+  storeId: number
+  conversationId: number
+  chunkIndex: number
   messageIdStart: number
   messageIdEnd: number
-  chunkingError: number
-  chunkingState: number
   messageTimestampStart: number
   messageTimestampEnd: number
-  transcriptMarkdown: number
-  tokenCount: number
-  modelProvidersInChunkRaw: number
   messageIdsRaw: number
-  attachmentIdsRaw: number
+  transcriptMarkdown: number
+  contentHash: number
+  chunkedMessagesCount: number
+  tokenCount: number
+  providerModelsRaw: number
+  hasAttachments: number
+  chunkedAttachmentsCount: number
+  attachmentProvenanceIdsRaw: number
   embeddingModel: number
+  schemaVersion: number
+  boundaryReason: number
+  chunkingState: number
+  chunkingError: number
+  embeddedAt: number
   summary: number
-  summaryModelProvider: number
+  summaryModel: number
+  summaryProvider: number
   summaryGeneratedAt: number
-  summaryUpdatedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -115,87 +145,117 @@ export type ConversationMemoryChunkCountAggregateOutputType = {
 
 
 export type ConversationMemoryChunkAvgAggregateInputType = {
+  chunkIndex?: true
+  chunkedMessagesCount?: true
   tokenCount?: true
+  chunkedAttachmentsCount?: true
 }
 
 export type ConversationMemoryChunkSumAggregateInputType = {
+  chunkIndex?: true
+  chunkedMessagesCount?: true
   tokenCount?: true
+  chunkedAttachmentsCount?: true
 }
 
 export type ConversationMemoryChunkMinAggregateInputType = {
   id?: true
-  conversationId?: true
-  contextStateId?: true
-  provider?: true
   provenanceId?: true
+  contextId?: true
+  storeId?: true
+  conversationId?: true
+  chunkIndex?: true
   messageIdStart?: true
   messageIdEnd?: true
-  chunkingError?: true
-  chunkingState?: true
   messageTimestampStart?: true
   messageTimestampEnd?: true
-  transcriptMarkdown?: true
-  tokenCount?: true
-  modelProvidersInChunkRaw?: true
   messageIdsRaw?: true
-  attachmentIdsRaw?: true
+  transcriptMarkdown?: true
+  contentHash?: true
+  chunkedMessagesCount?: true
+  tokenCount?: true
+  providerModelsRaw?: true
+  hasAttachments?: true
+  chunkedAttachmentsCount?: true
+  attachmentProvenanceIdsRaw?: true
   embeddingModel?: true
+  schemaVersion?: true
+  boundaryReason?: true
+  chunkingState?: true
+  chunkingError?: true
+  embeddedAt?: true
   summary?: true
-  summaryModelProvider?: true
+  summaryModel?: true
+  summaryProvider?: true
   summaryGeneratedAt?: true
-  summaryUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ConversationMemoryChunkMaxAggregateInputType = {
   id?: true
-  conversationId?: true
-  contextStateId?: true
-  provider?: true
   provenanceId?: true
+  contextId?: true
+  storeId?: true
+  conversationId?: true
+  chunkIndex?: true
   messageIdStart?: true
   messageIdEnd?: true
-  chunkingError?: true
-  chunkingState?: true
   messageTimestampStart?: true
   messageTimestampEnd?: true
-  transcriptMarkdown?: true
-  tokenCount?: true
-  modelProvidersInChunkRaw?: true
   messageIdsRaw?: true
-  attachmentIdsRaw?: true
+  transcriptMarkdown?: true
+  contentHash?: true
+  chunkedMessagesCount?: true
+  tokenCount?: true
+  providerModelsRaw?: true
+  hasAttachments?: true
+  chunkedAttachmentsCount?: true
+  attachmentProvenanceIdsRaw?: true
   embeddingModel?: true
+  schemaVersion?: true
+  boundaryReason?: true
+  chunkingState?: true
+  chunkingError?: true
+  embeddedAt?: true
   summary?: true
-  summaryModelProvider?: true
+  summaryModel?: true
+  summaryProvider?: true
   summaryGeneratedAt?: true
-  summaryUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ConversationMemoryChunkCountAggregateInputType = {
   id?: true
-  conversationId?: true
-  contextStateId?: true
-  provider?: true
   provenanceId?: true
+  contextId?: true
+  storeId?: true
+  conversationId?: true
+  chunkIndex?: true
   messageIdStart?: true
   messageIdEnd?: true
-  chunkingError?: true
-  chunkingState?: true
   messageTimestampStart?: true
   messageTimestampEnd?: true
-  transcriptMarkdown?: true
-  tokenCount?: true
-  modelProvidersInChunkRaw?: true
   messageIdsRaw?: true
-  attachmentIdsRaw?: true
+  transcriptMarkdown?: true
+  contentHash?: true
+  chunkedMessagesCount?: true
+  tokenCount?: true
+  providerModelsRaw?: true
+  hasAttachments?: true
+  chunkedAttachmentsCount?: true
+  attachmentProvenanceIdsRaw?: true
   embeddingModel?: true
+  schemaVersion?: true
+  boundaryReason?: true
+  chunkingState?: true
+  chunkingError?: true
+  embeddedAt?: true
   summary?: true
-  summaryModelProvider?: true
+  summaryModel?: true
+  summaryProvider?: true
   summaryGeneratedAt?: true
-  summaryUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -289,26 +349,34 @@ export type ConversationMemoryChunkGroupByArgs<ExtArgs extends runtime.Types.Ext
 
 export type ConversationMemoryChunkGroupByOutputType = {
   id: string
-  conversationId: string
-  contextStateId: string
-  provider: $Enums.Provider
   provenanceId: string
+  contextId: string
+  storeId: string
+  conversationId: string
+  chunkIndex: number
   messageIdStart: string
   messageIdEnd: string
-  chunkingError: string | null
-  chunkingState: $Enums.ChunkingState
   messageTimestampStart: Date
   messageTimestampEnd: Date
-  transcriptMarkdown: string
-  tokenCount: number
-  modelProvidersInChunkRaw: string
   messageIdsRaw: string
-  attachmentIdsRaw: string | null
+  transcriptMarkdown: string
+  contentHash: string
+  chunkedMessagesCount: number
+  tokenCount: number
+  providerModelsRaw: string
+  hasAttachments: boolean
+  chunkedAttachmentsCount: number | null
+  attachmentProvenanceIdsRaw: string | null
   embeddingModel: string
+  schemaVersion: $Enums.MemorySchemaVersion
+  boundaryReason: $Enums.MemoryChunkBoundaryReason | null
+  chunkingState: $Enums.MemoryChunkingState
+  chunkingError: string | null
+  embeddedAt: Date | null
   summary: string | null
-  summaryModelProvider: string | null
+  summaryModel: string | null
+  summaryProvider: $Enums.Provider | null
   summaryGeneratedAt: Date | null
-  summaryUpdatedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ConversationMemoryChunkCountAggregateOutputType | null
@@ -338,56 +406,74 @@ export type ConversationMemoryChunkWhereInput = {
   OR?: Prisma.ConversationMemoryChunkWhereInput[]
   NOT?: Prisma.ConversationMemoryChunkWhereInput | Prisma.ConversationMemoryChunkWhereInput[]
   id?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  conversationId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  contextStateId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  provider?: Prisma.EnumProviderFilter<"ConversationMemoryChunk"> | $Enums.Provider
   provenanceId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  contextId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  storeId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  conversationId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  chunkIndex?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   messageIdStart?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdEnd?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  chunkingState?: Prisma.EnumChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   messageTimestampEnd?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
-  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
-  modelProvidersInChunkRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  attachmentIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  contentHash?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  chunkedMessagesCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  providerModelsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  hasAttachments?: Prisma.BoolFilter<"ConversationMemoryChunk"> | boolean
+  chunkedAttachmentsCount?: Prisma.IntNullableFilter<"ConversationMemoryChunk"> | number | null
+  attachmentProvenanceIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   embeddingModel?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryChunk"> | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.EnumMemoryChunkBoundaryReasonNullableFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  embeddedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  summaryModelProvider?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
-  summaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
-  contextState?: Prisma.XOR<Prisma.ConversationContextStateScalarRelationFilter, Prisma.ConversationContextStateWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  context?: Prisma.XOR<Prisma.ConversationMemoryContextScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput>
 }
 
 export type ConversationMemoryChunkOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  contextStateId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
   provenanceId?: Prisma.SortOrder
+  contextId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
   messageIdStart?: Prisma.SortOrder
   messageIdEnd?: Prisma.SortOrder
-  chunkingError?: Prisma.SortOrderInput | Prisma.SortOrder
-  chunkingState?: Prisma.SortOrder
   messageTimestampStart?: Prisma.SortOrder
   messageTimestampEnd?: Prisma.SortOrder
-  transcriptMarkdown?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  modelProvidersInChunkRaw?: Prisma.SortOrder
   messageIdsRaw?: Prisma.SortOrder
-  attachmentIdsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  transcriptMarkdown?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  providerModelsRaw?: Prisma.SortOrder
+  hasAttachments?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentProvenanceIdsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingModel?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  boundaryReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  chunkingState?: Prisma.SortOrder
+  chunkingError?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryModelProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryGeneratedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  contextState?: Prisma.ConversationContextStateOrderByWithRelationInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  context?: Prisma.ConversationMemoryContextOrderByWithRelationInput
 }
 
 export type ConversationMemoryChunkWhereUniqueInput = Prisma.AtLeast<{
@@ -396,52 +482,69 @@ export type ConversationMemoryChunkWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ConversationMemoryChunkWhereInput | Prisma.ConversationMemoryChunkWhereInput[]
   OR?: Prisma.ConversationMemoryChunkWhereInput[]
   NOT?: Prisma.ConversationMemoryChunkWhereInput | Prisma.ConversationMemoryChunkWhereInput[]
+  contextId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  storeId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   conversationId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  contextStateId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  provider?: Prisma.EnumProviderFilter<"ConversationMemoryChunk"> | $Enums.Provider
+  chunkIndex?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   messageIdStart?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdEnd?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  chunkingState?: Prisma.EnumChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   messageTimestampEnd?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
-  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
-  modelProvidersInChunkRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  attachmentIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  contentHash?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  chunkedMessagesCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  providerModelsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  hasAttachments?: Prisma.BoolFilter<"ConversationMemoryChunk"> | boolean
+  chunkedAttachmentsCount?: Prisma.IntNullableFilter<"ConversationMemoryChunk"> | number | null
+  attachmentProvenanceIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   embeddingModel?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryChunk"> | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.EnumMemoryChunkBoundaryReasonNullableFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  embeddedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  summaryModelProvider?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
-  summaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
-  contextState?: Prisma.XOR<Prisma.ConversationContextStateScalarRelationFilter, Prisma.ConversationContextStateWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  context?: Prisma.XOR<Prisma.ConversationMemoryContextScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput>
 }, "id" | "provenanceId">
 
 export type ConversationMemoryChunkOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  contextStateId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
   provenanceId?: Prisma.SortOrder
+  contextId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
   messageIdStart?: Prisma.SortOrder
   messageIdEnd?: Prisma.SortOrder
-  chunkingError?: Prisma.SortOrderInput | Prisma.SortOrder
-  chunkingState?: Prisma.SortOrder
   messageTimestampStart?: Prisma.SortOrder
   messageTimestampEnd?: Prisma.SortOrder
-  transcriptMarkdown?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  modelProvidersInChunkRaw?: Prisma.SortOrder
   messageIdsRaw?: Prisma.SortOrder
-  attachmentIdsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
+  transcriptMarkdown?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  providerModelsRaw?: Prisma.SortOrder
+  hasAttachments?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentProvenanceIdsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingModel?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  boundaryReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  chunkingState?: Prisma.SortOrder
+  chunkingError?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryModelProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   summaryGeneratedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  summaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ConversationMemoryChunkCountOrderByAggregateInput
@@ -456,217 +559,173 @@ export type ConversationMemoryChunkScalarWhereWithAggregatesInput = {
   OR?: Prisma.ConversationMemoryChunkScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ConversationMemoryChunkScalarWhereWithAggregatesInput | Prisma.ConversationMemoryChunkScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  contextStateId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.Provider
   provenanceId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  contextId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  storeId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  chunkIndex?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
   messageIdStart?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
   messageIdEnd?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  chunkingError?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
-  chunkingState?: Prisma.EnumChunkingStateWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string
   messageTimestampEnd?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string
-  transcriptMarkdown?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  tokenCount?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
-  modelProvidersInChunkRaw?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
   messageIdsRaw?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
-  attachmentIdsRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  transcriptMarkdown?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  contentHash?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  chunkedMessagesCount?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
+  tokenCount?: Prisma.IntWithAggregatesFilter<"ConversationMemoryChunk"> | number
+  providerModelsRaw?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  hasAttachments?: Prisma.BoolWithAggregatesFilter<"ConversationMemoryChunk"> | boolean
+  chunkedAttachmentsCount?: Prisma.IntNullableWithAggregatesFilter<"ConversationMemoryChunk"> | number | null
+  attachmentProvenanceIdsRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
   embeddingModel?: Prisma.StringWithAggregatesFilter<"ConversationMemoryChunk"> | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.EnumMemoryChunkBoundaryReasonNullableWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  embeddedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string | null
   summary?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
-  summaryModelProvider?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  summaryModel?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryChunk"> | string | null
+  summaryProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string | null
-  summaryUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryChunk"> | Date | string
 }
 
 export type ConversationMemoryChunkUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  contextState?: Prisma.ConversationContextStateUpdateOneRequiredWithoutMemoryChunksNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationMemoryChunkNestedInput
+  context?: Prisma.ConversationMemoryContextUpdateOneRequiredWithoutMemoryChunksNestedInput
 }
 
 export type ConversationMemoryChunkUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  contextStateId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  contextId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationMemoryChunkNestedInput
 }
 
 export type ConversationMemoryChunkUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConversationMemoryChunkUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  contextStateId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  contextId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ConversationMemoryChunkCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  contextStateId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  messageIdStart?: Prisma.SortOrder
-  messageIdEnd?: Prisma.SortOrder
-  chunkingError?: Prisma.SortOrder
-  chunkingState?: Prisma.SortOrder
-  messageTimestampStart?: Prisma.SortOrder
-  messageTimestampEnd?: Prisma.SortOrder
-  transcriptMarkdown?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  modelProvidersInChunkRaw?: Prisma.SortOrder
-  messageIdsRaw?: Prisma.SortOrder
-  attachmentIdsRaw?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
-  summaryModelProvider?: Prisma.SortOrder
-  summaryGeneratedAt?: Prisma.SortOrder
-  summaryUpdatedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-}
-
-export type ConversationMemoryChunkAvgOrderByAggregateInput = {
-  tokenCount?: Prisma.SortOrder
-}
-
-export type ConversationMemoryChunkMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  contextStateId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  messageIdStart?: Prisma.SortOrder
-  messageIdEnd?: Prisma.SortOrder
-  chunkingError?: Prisma.SortOrder
-  chunkingState?: Prisma.SortOrder
-  messageTimestampStart?: Prisma.SortOrder
-  messageTimestampEnd?: Prisma.SortOrder
-  transcriptMarkdown?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  modelProvidersInChunkRaw?: Prisma.SortOrder
-  messageIdsRaw?: Prisma.SortOrder
-  attachmentIdsRaw?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
-  summaryModelProvider?: Prisma.SortOrder
-  summaryGeneratedAt?: Prisma.SortOrder
-  summaryUpdatedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-}
-
-export type ConversationMemoryChunkMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  contextStateId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  messageIdStart?: Prisma.SortOrder
-  messageIdEnd?: Prisma.SortOrder
-  chunkingError?: Prisma.SortOrder
-  chunkingState?: Prisma.SortOrder
-  messageTimestampStart?: Prisma.SortOrder
-  messageTimestampEnd?: Prisma.SortOrder
-  transcriptMarkdown?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  modelProvidersInChunkRaw?: Prisma.SortOrder
-  messageIdsRaw?: Prisma.SortOrder
-  attachmentIdsRaw?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  summary?: Prisma.SortOrder
-  summaryModelProvider?: Prisma.SortOrder
-  summaryGeneratedAt?: Prisma.SortOrder
-  summaryUpdatedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-}
-
-export type ConversationMemoryChunkSumOrderByAggregateInput = {
-  tokenCount?: Prisma.SortOrder
 }
 
 export type ConversationMemoryChunkListRelationFilter = {
@@ -679,46 +738,182 @@ export type ConversationMemoryChunkOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EnumChunkingStateFieldUpdateOperationsInput = {
-  set?: $Enums.ChunkingState
+export type ConversationMemoryChunkCountOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  contextId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  messageIdStart?: Prisma.SortOrder
+  messageIdEnd?: Prisma.SortOrder
+  messageTimestampStart?: Prisma.SortOrder
+  messageTimestampEnd?: Prisma.SortOrder
+  messageIdsRaw?: Prisma.SortOrder
+  transcriptMarkdown?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  providerModelsRaw?: Prisma.SortOrder
+  hasAttachments?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrder
+  attachmentProvenanceIdsRaw?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  boundaryReason?: Prisma.SortOrder
+  chunkingState?: Prisma.SortOrder
+  chunkingError?: Prisma.SortOrder
+  embeddedAt?: Prisma.SortOrder
+  summary?: Prisma.SortOrder
+  summaryModel?: Prisma.SortOrder
+  summaryProvider?: Prisma.SortOrder
+  summaryGeneratedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
-export type ConversationMemoryChunkCreateNestedManyWithoutContextStateInput = {
+export type ConversationMemoryChunkAvgOrderByAggregateInput = {
+  chunkIndex?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrder
+}
+
+export type ConversationMemoryChunkMaxOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  contextId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  messageIdStart?: Prisma.SortOrder
+  messageIdEnd?: Prisma.SortOrder
+  messageTimestampStart?: Prisma.SortOrder
+  messageTimestampEnd?: Prisma.SortOrder
+  messageIdsRaw?: Prisma.SortOrder
+  transcriptMarkdown?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  providerModelsRaw?: Prisma.SortOrder
+  hasAttachments?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrder
+  attachmentProvenanceIdsRaw?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  boundaryReason?: Prisma.SortOrder
+  chunkingState?: Prisma.SortOrder
+  chunkingError?: Prisma.SortOrder
+  embeddedAt?: Prisma.SortOrder
+  summary?: Prisma.SortOrder
+  summaryModel?: Prisma.SortOrder
+  summaryProvider?: Prisma.SortOrder
+  summaryGeneratedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+}
+
+export type ConversationMemoryChunkMinOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  contextId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  messageIdStart?: Prisma.SortOrder
+  messageIdEnd?: Prisma.SortOrder
+  messageTimestampStart?: Prisma.SortOrder
+  messageTimestampEnd?: Prisma.SortOrder
+  messageIdsRaw?: Prisma.SortOrder
+  transcriptMarkdown?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  providerModelsRaw?: Prisma.SortOrder
+  hasAttachments?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrder
+  attachmentProvenanceIdsRaw?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  boundaryReason?: Prisma.SortOrder
+  chunkingState?: Prisma.SortOrder
+  chunkingError?: Prisma.SortOrder
+  embeddedAt?: Prisma.SortOrder
+  summary?: Prisma.SortOrder
+  summaryModel?: Prisma.SortOrder
+  summaryProvider?: Prisma.SortOrder
+  summaryGeneratedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+}
+
+export type ConversationMemoryChunkSumOrderByAggregateInput = {
+  chunkIndex?: Prisma.SortOrder
+  chunkedMessagesCount?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  chunkedAttachmentsCount?: Prisma.SortOrder
+}
+
+export type ConversationMemoryChunkNullableScalarRelationFilter = {
+  is?: Prisma.ConversationMemoryChunkWhereInput | null
+  isNot?: Prisma.ConversationMemoryChunkWhereInput | null
+}
+
+export type ConversationMemoryChunkCreateNestedManyWithoutContextInput = {
   connect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
 }
 
-export type ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextStateInput = {
+export type ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput = {
   connect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
 }
 
-export type ConversationMemoryChunkUpdateManyWithoutContextStateNestedInput = {
+export type ConversationMemoryChunkUpdateManyWithoutContextNestedInput = {
   set?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   disconnect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   delete?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   connect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
-  update?: Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextStateInput | Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextStateInput[]
-  updateMany?: Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextStateInput | Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextStateInput[]
+  update?: Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextInput | Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextInput[]
+  updateMany?: Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextInput | Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextInput[]
   deleteMany?: Prisma.ConversationMemoryChunkScalarWhereInput | Prisma.ConversationMemoryChunkScalarWhereInput[]
 }
 
-export type ConversationMemoryChunkUncheckedUpdateManyWithoutContextStateNestedInput = {
+export type ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput = {
   set?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   disconnect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   delete?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
   connect?: Prisma.ConversationMemoryChunkWhereUniqueInput | Prisma.ConversationMemoryChunkWhereUniqueInput[]
-  update?: Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextStateInput | Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextStateInput[]
-  updateMany?: Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextStateInput | Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextStateInput[]
+  update?: Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextInput | Prisma.ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextInput[]
+  updateMany?: Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextInput | Prisma.ConversationMemoryChunkUpdateManyWithWhereWithoutContextInput[]
   deleteMany?: Prisma.ConversationMemoryChunkScalarWhereInput | Prisma.ConversationMemoryChunkScalarWhereInput[]
 }
 
-export type ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextStateInput = {
+export type NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput = {
+  set?: $Enums.MemoryChunkBoundaryReason | null
+}
+
+export type EnumMemoryChunkingStateFieldUpdateOperationsInput = {
+  set?: $Enums.MemoryChunkingState
+}
+
+export type ConversationMemoryChunkCreateNestedOneWithoutMessagesInput = {
+  connect?: Prisma.ConversationMemoryChunkWhereUniqueInput
+}
+
+export type ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput = {
+  disconnect?: Prisma.ConversationMemoryChunkWhereInput | boolean
+  delete?: Prisma.ConversationMemoryChunkWhereInput | boolean
+  connect?: Prisma.ConversationMemoryChunkWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryChunkUpdateToOneWithWhereWithoutMessagesInput, Prisma.ConversationMemoryChunkUpdateWithoutMessagesInput>, Prisma.ConversationMemoryChunkUncheckedUpdateWithoutMessagesInput>
+}
+
+export type ConversationMemoryChunkUpdateWithWhereUniqueWithoutContextInput = {
   where: Prisma.ConversationMemoryChunkWhereUniqueInput
-  data: Prisma.XOR<Prisma.ConversationMemoryChunkUpdateWithoutContextStateInput, Prisma.ConversationMemoryChunkUncheckedUpdateWithoutContextStateInput>
+  data: Prisma.XOR<Prisma.ConversationMemoryChunkUpdateWithoutContextInput, Prisma.ConversationMemoryChunkUncheckedUpdateWithoutContextInput>
 }
 
-export type ConversationMemoryChunkUpdateManyWithWhereWithoutContextStateInput = {
+export type ConversationMemoryChunkUpdateManyWithWhereWithoutContextInput = {
   where: Prisma.ConversationMemoryChunkScalarWhereInput
-  data: Prisma.XOR<Prisma.ConversationMemoryChunkUpdateManyMutationInput, Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextStateInput>
+  data: Prisma.XOR<Prisma.ConversationMemoryChunkUpdateManyMutationInput, Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextInput>
 }
 
 export type ConversationMemoryChunkScalarWhereInput = {
@@ -726,223 +921,396 @@ export type ConversationMemoryChunkScalarWhereInput = {
   OR?: Prisma.ConversationMemoryChunkScalarWhereInput[]
   NOT?: Prisma.ConversationMemoryChunkScalarWhereInput | Prisma.ConversationMemoryChunkScalarWhereInput[]
   id?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  conversationId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  contextStateId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  provider?: Prisma.EnumProviderFilter<"ConversationMemoryChunk"> | $Enums.Provider
   provenanceId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  contextId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  storeId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  conversationId?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  chunkIndex?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
   messageIdStart?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdEnd?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  chunkingState?: Prisma.EnumChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   messageTimestampEnd?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
-  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
-  modelProvidersInChunkRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
   messageIdsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
-  attachmentIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  transcriptMarkdown?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  contentHash?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  chunkedMessagesCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  tokenCount?: Prisma.IntFilter<"ConversationMemoryChunk"> | number
+  providerModelsRaw?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  hasAttachments?: Prisma.BoolFilter<"ConversationMemoryChunk"> | boolean
+  chunkedAttachmentsCount?: Prisma.IntNullableFilter<"ConversationMemoryChunk"> | number | null
+  attachmentProvenanceIdsRaw?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
   embeddingModel?: Prisma.StringFilter<"ConversationMemoryChunk"> | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryChunk"> | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.EnumMemoryChunkBoundaryReasonNullableFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFilter<"ConversationMemoryChunk"> | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  embeddedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   summary?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
-  summaryModelProvider?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryModel?: Prisma.StringNullableFilter<"ConversationMemoryChunk"> | string | null
+  summaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryChunk"> | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
-  summaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryChunk"> | Date | string
 }
 
-export type ConversationMemoryChunkUpdateWithoutContextStateInput = {
+export type ConversationMemoryChunkUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.ConversationMemoryChunkWhereInput
+  data: Prisma.XOR<Prisma.ConversationMemoryChunkUpdateWithoutMessagesInput, Prisma.ConversationMemoryChunkUncheckedUpdateWithoutMessagesInput>
+}
+
+export type ConversationMemoryChunkUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  context?: Prisma.ConversationMemoryContextUpdateOneRequiredWithoutMemoryChunksNestedInput
+}
+
+export type ConversationMemoryChunkUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  contextId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
+  messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
+  messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ConversationMemoryChunkUncheckedUpdateWithoutContextStateInput = {
+export type ConversationMemoryChunkUpdateWithoutContextInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
   provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
   messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
   messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
   messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
   summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUpdateManyWithoutConversationMemoryChunkNestedInput
+}
+
+export type ConversationMemoryChunkUncheckedUpdateWithoutContextInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
+  messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
+  messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationMemoryChunkNestedInput
+}
+
+export type ConversationMemoryChunkUncheckedUpdateManyWithoutContextInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
+  messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
+  messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkedMessagesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  providerModelsRaw?: Prisma.StringFieldUpdateOperationsInput | string
+  hasAttachments?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  chunkedAttachmentsCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  attachmentProvenanceIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  boundaryReason?: Prisma.NullableEnumMemoryChunkBoundaryReasonFieldUpdateOperationsInput | $Enums.MemoryChunkBoundaryReason | null
+  chunkingState?: Prisma.EnumMemoryChunkingStateFieldUpdateOperationsInput | $Enums.MemoryChunkingState
+  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ConversationMemoryChunkUncheckedUpdateManyWithoutContextStateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageIdStart?: Prisma.StringFieldUpdateOperationsInput | string
-  messageIdEnd?: Prisma.StringFieldUpdateOperationsInput | string
-  chunkingError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chunkingState?: Prisma.EnumChunkingStateFieldUpdateOperationsInput | $Enums.ChunkingState
-  messageTimestampStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  messageTimestampEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transcriptMarkdown?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  modelProvidersInChunkRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  messageIdsRaw?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentIdsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryModelProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  summaryGeneratedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  summaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+
+/**
+ * Count Type ConversationMemoryChunkCountOutputType
+ */
+
+export type ConversationMemoryChunkCountOutputType = {
+  messages: number
 }
 
+export type ConversationMemoryChunkCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messages?: boolean | ConversationMemoryChunkCountOutputTypeCountMessagesArgs
+}
+
+/**
+ * ConversationMemoryChunkCountOutputType without action
+ */
+export type ConversationMemoryChunkCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ConversationMemoryChunkCountOutputType
+   */
+  select?: Prisma.ConversationMemoryChunkCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ConversationMemoryChunkCountOutputType without action
+ */
+export type ConversationMemoryChunkCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
 
 
 export type ConversationMemoryChunkSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  conversationId?: boolean
-  contextStateId?: boolean
-  provider?: boolean
   provenanceId?: boolean
+  contextId?: boolean
+  storeId?: boolean
+  conversationId?: boolean
+  chunkIndex?: boolean
   messageIdStart?: boolean
   messageIdEnd?: boolean
-  chunkingError?: boolean
-  chunkingState?: boolean
   messageTimestampStart?: boolean
   messageTimestampEnd?: boolean
-  transcriptMarkdown?: boolean
-  tokenCount?: boolean
-  modelProvidersInChunkRaw?: boolean
   messageIdsRaw?: boolean
-  attachmentIdsRaw?: boolean
+  transcriptMarkdown?: boolean
+  contentHash?: boolean
+  chunkedMessagesCount?: boolean
+  tokenCount?: boolean
+  providerModelsRaw?: boolean
+  hasAttachments?: boolean
+  chunkedAttachmentsCount?: boolean
+  attachmentProvenanceIdsRaw?: boolean
   embeddingModel?: boolean
+  schemaVersion?: boolean
+  boundaryReason?: boolean
+  chunkingState?: boolean
+  chunkingError?: boolean
+  embeddedAt?: boolean
   summary?: boolean
-  summaryModelProvider?: boolean
+  summaryModel?: boolean
+  summaryProvider?: boolean
   summaryGeneratedAt?: boolean
-  summaryUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  contextState?: boolean | Prisma.ConversationContextStateDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.ConversationMemoryChunk$messagesArgs<ExtArgs>
+  context?: boolean | Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationMemoryChunkCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversationMemoryChunk"]>
 
 
 export type ConversationMemoryChunkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  conversationId?: boolean
-  contextStateId?: boolean
-  provider?: boolean
   provenanceId?: boolean
+  contextId?: boolean
+  storeId?: boolean
+  conversationId?: boolean
+  chunkIndex?: boolean
   messageIdStart?: boolean
   messageIdEnd?: boolean
-  chunkingError?: boolean
-  chunkingState?: boolean
   messageTimestampStart?: boolean
   messageTimestampEnd?: boolean
-  transcriptMarkdown?: boolean
-  tokenCount?: boolean
-  modelProvidersInChunkRaw?: boolean
   messageIdsRaw?: boolean
-  attachmentIdsRaw?: boolean
+  transcriptMarkdown?: boolean
+  contentHash?: boolean
+  chunkedMessagesCount?: boolean
+  tokenCount?: boolean
+  providerModelsRaw?: boolean
+  hasAttachments?: boolean
+  chunkedAttachmentsCount?: boolean
+  attachmentProvenanceIdsRaw?: boolean
   embeddingModel?: boolean
+  schemaVersion?: boolean
+  boundaryReason?: boolean
+  chunkingState?: boolean
+  chunkingError?: boolean
+  embeddedAt?: boolean
   summary?: boolean
-  summaryModelProvider?: boolean
+  summaryModel?: boolean
+  summaryProvider?: boolean
   summaryGeneratedAt?: boolean
-  summaryUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  contextState?: boolean | Prisma.ConversationContextStateDefaultArgs<ExtArgs>
+  context?: boolean | Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversationMemoryChunk"]>
 
 export type ConversationMemoryChunkSelectScalar = {
   id?: boolean
-  conversationId?: boolean
-  contextStateId?: boolean
-  provider?: boolean
   provenanceId?: boolean
+  contextId?: boolean
+  storeId?: boolean
+  conversationId?: boolean
+  chunkIndex?: boolean
   messageIdStart?: boolean
   messageIdEnd?: boolean
-  chunkingError?: boolean
-  chunkingState?: boolean
   messageTimestampStart?: boolean
   messageTimestampEnd?: boolean
-  transcriptMarkdown?: boolean
-  tokenCount?: boolean
-  modelProvidersInChunkRaw?: boolean
   messageIdsRaw?: boolean
-  attachmentIdsRaw?: boolean
+  transcriptMarkdown?: boolean
+  contentHash?: boolean
+  chunkedMessagesCount?: boolean
+  tokenCount?: boolean
+  providerModelsRaw?: boolean
+  hasAttachments?: boolean
+  chunkedAttachmentsCount?: boolean
+  attachmentProvenanceIdsRaw?: boolean
   embeddingModel?: boolean
+  schemaVersion?: boolean
+  boundaryReason?: boolean
+  chunkingState?: boolean
+  chunkingError?: boolean
+  embeddedAt?: boolean
   summary?: boolean
-  summaryModelProvider?: boolean
+  summaryModel?: boolean
+  summaryProvider?: boolean
   summaryGeneratedAt?: boolean
-  summaryUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ConversationMemoryChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "contextStateId" | "provider" | "provenanceId" | "messageIdStart" | "messageIdEnd" | "chunkingError" | "chunkingState" | "messageTimestampStart" | "messageTimestampEnd" | "transcriptMarkdown" | "tokenCount" | "modelProvidersInChunkRaw" | "messageIdsRaw" | "attachmentIdsRaw" | "embeddingModel" | "summary" | "summaryModelProvider" | "summaryGeneratedAt" | "summaryUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryChunk"]>
+export type ConversationMemoryChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "provenanceId" | "contextId" | "storeId" | "conversationId" | "chunkIndex" | "messageIdStart" | "messageIdEnd" | "messageTimestampStart" | "messageTimestampEnd" | "messageIdsRaw" | "transcriptMarkdown" | "contentHash" | "chunkedMessagesCount" | "tokenCount" | "providerModelsRaw" | "hasAttachments" | "chunkedAttachmentsCount" | "attachmentProvenanceIdsRaw" | "embeddingModel" | "schemaVersion" | "boundaryReason" | "chunkingState" | "chunkingError" | "embeddedAt" | "summary" | "summaryModel" | "summaryProvider" | "summaryGeneratedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryChunk"]>
 export type ConversationMemoryChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  contextState?: boolean | Prisma.ConversationContextStateDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.ConversationMemoryChunk$messagesArgs<ExtArgs>
+  context?: boolean | Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationMemoryChunkCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ConversationMemoryChunkIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  contextState?: boolean | Prisma.ConversationContextStateDefaultArgs<ExtArgs>
+  context?: boolean | Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>
 }
 
 export type $ConversationMemoryChunkPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ConversationMemoryChunk"
   objects: {
-    contextState: Prisma.$ConversationContextStatePayload<ExtArgs>
+    messages: Prisma.$MessagePayload<ExtArgs>[]
+    context: Prisma.$ConversationMemoryContextPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    conversationId: string
-    contextStateId: string
-    provider: $Enums.Provider
     provenanceId: string
+    contextId: string
+    storeId: string
+    conversationId: string
+    chunkIndex: number
     messageIdStart: string
     messageIdEnd: string
-    chunkingError: string | null
-    chunkingState: $Enums.ChunkingState
     messageTimestampStart: Date
     messageTimestampEnd: Date
-    transcriptMarkdown: string
-    tokenCount: number
-    modelProvidersInChunkRaw: string
     messageIdsRaw: string
-    attachmentIdsRaw: string | null
+    transcriptMarkdown: string
+    contentHash: string
+    chunkedMessagesCount: number
+    tokenCount: number
+    providerModelsRaw: string
+    hasAttachments: boolean
+    chunkedAttachmentsCount: number | null
+    attachmentProvenanceIdsRaw: string | null
     embeddingModel: string
+    schemaVersion: $Enums.MemorySchemaVersion
+    boundaryReason: $Enums.MemoryChunkBoundaryReason | null
+    chunkingState: $Enums.MemoryChunkingState
+    chunkingError: string | null
+    embeddedAt: Date | null
     summary: string | null
-    summaryModelProvider: string | null
+    summaryModel: string | null
+    summaryProvider: $Enums.Provider | null
     summaryGeneratedAt: Date | null
-    summaryUpdatedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["conversationMemoryChunk"]>
@@ -1268,7 +1636,8 @@ readonly fields: ConversationMemoryChunkFieldRefs;
  */
 export interface Prisma__ConversationMemoryChunkClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  contextState<T extends Prisma.ConversationContextStateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationContextStateDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationContextStateClient<runtime.Types.Result.GetResult<Prisma.$ConversationContextStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  messages<T extends Prisma.ConversationMemoryChunk$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationMemoryChunk$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  context<T extends Prisma.ConversationMemoryContextDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationMemoryContextDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationMemoryContextClient<runtime.Types.Result.GetResult<Prisma.$ConversationMemoryContextPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1299,26 +1668,34 @@ export interface Prisma__ConversationMemoryChunkClient<T, Null = never, ExtArgs 
  */
 export interface ConversationMemoryChunkFieldRefs {
   readonly id: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly conversationId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly contextStateId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly provider: Prisma.FieldRef<"ConversationMemoryChunk", 'Provider'>
   readonly provenanceId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly contextId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly storeId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly conversationId: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly chunkIndex: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
   readonly messageIdStart: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly messageIdEnd: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly chunkingError: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly chunkingState: Prisma.FieldRef<"ConversationMemoryChunk", 'ChunkingState'>
   readonly messageTimestampStart: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
   readonly messageTimestampEnd: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
-  readonly transcriptMarkdown: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly tokenCount: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
-  readonly modelProvidersInChunkRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly messageIdsRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly attachmentIdsRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly transcriptMarkdown: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly contentHash: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly chunkedMessagesCount: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
+  readonly tokenCount: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
+  readonly providerModelsRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly hasAttachments: Prisma.FieldRef<"ConversationMemoryChunk", 'Boolean'>
+  readonly chunkedAttachmentsCount: Prisma.FieldRef<"ConversationMemoryChunk", 'Int'>
+  readonly attachmentProvenanceIdsRaw: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
   readonly embeddingModel: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly schemaVersion: Prisma.FieldRef<"ConversationMemoryChunk", 'MemorySchemaVersion'>
+  readonly boundaryReason: Prisma.FieldRef<"ConversationMemoryChunk", 'MemoryChunkBoundaryReason'>
+  readonly chunkingState: Prisma.FieldRef<"ConversationMemoryChunk", 'MemoryChunkingState'>
+  readonly chunkingError: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly embeddedAt: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
   readonly summary: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
-  readonly summaryModelProvider: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly summaryModel: Prisma.FieldRef<"ConversationMemoryChunk", 'String'>
+  readonly summaryProvider: Prisma.FieldRef<"ConversationMemoryChunk", 'Provider'>
   readonly summaryGeneratedAt: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
-  readonly summaryUpdatedAt: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ConversationMemoryChunk", 'DateTime'>
 }
@@ -1628,6 +2005,30 @@ export type ConversationMemoryChunkDeleteManyArgs<ExtArgs extends runtime.Types.
    * Limit how many ConversationMemoryChunks to delete.
    */
   limit?: number
+}
+
+/**
+ * ConversationMemoryChunk.messages
+ */
+export type ConversationMemoryChunk$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
 }
 
 /**

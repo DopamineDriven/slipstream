@@ -1,5 +1,6 @@
 import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
+import type { AttachmentSingleton } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -12,18 +13,28 @@ async function getProdDb() {
 function devDb() {
   return process.env.DIRECT_URL;
 }
+function getInclude(assetType: "DOCUMENT" | "IMAGE" | "BOTH") {
+  return assetType === "DOCUMENT"
+    ? ({ imageGenOutput: true, document: true } as const)
+    : assetType === "IMAGE"
+      ? ({ imageGenOutput: true, image: true } as const)
+      : ({ imageGenOutput: true, document: true, image: true } as const);
+}
 
+function getWhere(assetType: "DOCUMENT" | "IMAGE" | "BOTH") {
+  const userId = "nrr6h4r4480f6kviycyo1zhf";
+  return assetType === "DOCUMENT"
+    ? ({ userId, assetType } as const)
+    : assetType === "IMAGE"
+      ? ({ userId, assetType } as const)
+      : ({ userId } as const);
+}
 const data = async (
   target: "dev" | "prod" = "dev",
   assetType: "DOCUMENT" | "IMAGE" | "BOTH" = "BOTH"
 ) => {
-  const userId = "nrr6h4r4480f6kviycyo1zhf";
-  const where =
-    assetType === "DOCUMENT"
-      ? ({ userId, assetType } as const)
-      : assetType === "IMAGE"
-        ? ({ userId, assetType } as const)
-        : ({ userId } as const);
+  const where = getWhere(assetType);
+  const include = getInclude(assetType);
 
   let datasourceUrl: string;
   const devString = devDb();
@@ -42,6 +53,7 @@ const data = async (
     const data = await prismaClient.attachment.findMany({
       where,
       take: 2500,
+      include,
       orderBy: { createdAt: "desc" }
     });
 
@@ -49,7 +61,7 @@ const data = async (
       const { size, ...attRest } = att;
       return { size: size ? Number(size) : null, ...attRest };
     });
-    return dataMap;
+    return dataMap satisfies AttachmentSingleton<true>[];
   } catch (err) {
     throw new Error(
       typeof err === "string"
@@ -79,7 +91,10 @@ if (process.argv[3] === "dev" || process.argv[3] === "prod") {
     const combinedUrls = urlArr.concat(urlCompatArr).filter(v => v.length > 1);
     const toJson = JSON.stringify(combinedUrls);
     const dir = assetType === "BOTH" ? "mixed" : `${assetType.toLowerCase()}s`;
-    const template = `export const ${s}PdfUrlArr=${toJson};`;
-    fs.withWs(`src/test/__out__/attachments/${s}/${dir}/urls.ts`, template);
+    const _template = `export const ${s}PdfUrlArr=${toJson};`;
+    fs.withWs(
+      `src/test/__out__/attachments/${s}/${dir}/bulk.json`,
+      JSON.stringify(v, null, 2)
+    );
   });
 }

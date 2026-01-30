@@ -6,25 +6,33 @@
 import * as $runtime from "@prisma/client/runtime/library"
 
 /**
- * @param contextStateId
+ * @param storeId
  * @param embedding
  * @param limit
  * @param threshold
  */
-export const searchConversationMemory = $runtime.makeTypedQueryFactory("\nSELECT\nid, \"provenanceId\", \"messageIdStart\", \"messageIdEnd\",\n\"messageTimestampStart\", \"messageTimestampEnd\",\n\"transcriptMarkdown\", \"modelProvidersInChunkRaw\", \"tokenCount\",\n1 - (embedding <=> $2::vector) as score\nFROM \"ConversationMemoryChunk\"\nWHERE (\"contextStateId\" = $1 OR \"provenanceId\" = $1)\nAND embedding IS NOT NULL\nAND 1 - (embedding <=> $2::vector) >= $4\nORDER BY embedding <=> $2::vector\nLIMIT $3;") as (contextStateId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchConversationMemory.Parameters, searchConversationMemory.Result>
+export const searchConversationMemory = $runtime.makeTypedQueryFactory("\nSELECT\nmc.id,\nmc.\"provenanceId\",\nmc.\"contextId\",\nmc.\"conversationId\",\nmc.\"chunkIndex\",\nmc.\"messageIdStart\",\nmc.\"messageIdEnd\",\nmc.\"messageTimestampStart\",\nmc.\"messageTimestampEnd\",\nmc.\"transcriptMarkdown\",\nmc.\"contentHash\",\nmc.\"tokenCount\",\nmc.\"chunkedMessagesCount\",\nmc.\"providerModelsRaw\",\nmc.\"hasAttachments\",\nmc.\"boundaryReason\"::\"text\" as \"boundaryReason\",\nmc.summary,\n1 - (mc.embedding <=> $2::vector) as score\nFROM \"ConversationMemoryChunk\" mc\nWHERE mc.\"storeId\" = $1\nAND mc.\"chunkingState\" = 'INDEXED'::\"MemoryChunkingState\"\nAND mc.embedding IS NOT NULL\nAND 1 - (mc.embedding <=> $2::vector) >= $4\nORDER BY mc.embedding <=> $2::vector\nLIMIT $3;") as (storeId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchConversationMemory.Parameters, searchConversationMemory.Result>
 
 export namespace searchConversationMemory {
-  export type Parameters = [contextStateId: string, embedding: string, limit: number, threshold: number]
+  export type Parameters = [storeId: string, embedding: string, limit: number, threshold: number]
   export type Result = {
     id: string
     provenanceId: string
+    contextId: string
+    conversationId: string
+    chunkIndex: number
     messageIdStart: string
     messageIdEnd: string
     messageTimestampStart: Date
     messageTimestampEnd: Date
     transcriptMarkdown: string
-    modelProvidersInChunkRaw: string
+    contentHash: string
     tokenCount: number
+    chunkedMessagesCount: number
+    providerModelsRaw: string
+    hasAttachments: boolean
+    boundaryReason: string | null
+    summary: string | null
     score: number | null
   }
 }

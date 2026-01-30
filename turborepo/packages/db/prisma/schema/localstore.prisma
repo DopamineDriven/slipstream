@@ -131,4 +131,6 @@ model LocalVectorStoreDocChunk {
   @@index([attachmentId])
   @@index([conversationId, messageId])
   @@index([contentHash])
+  @@index([embedding], map: "idx_local_doc_chunk_embedding_hnsw")
+  @@index([storeId], map: "idx_local_doc_chunk_store_active")
 }

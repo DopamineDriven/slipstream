@@ -1,6 +1,7 @@
 import { Fs } from "@d0paminedriven/fs";
 
 class SchemaService extends Fs {
+  private schemaPath="prisma/schema/schema.prisma" as const;
   private restoreMap = new Map<string, string>();
 
   private nodeRegex = /generator\s+client\s*\{[^}]*\}/gm;
@@ -17,7 +18,7 @@ class SchemaService extends Fs {
   }
 
   private schema() {
-    return this.fileToBuffer("prisma/schema.prisma").toString("utf-8");
+    return this.fileToBuffer(this.schemaPath).toString("utf-8");
   }
 
   private exeTarget<
@@ -40,7 +41,7 @@ class SchemaService extends Fs {
         this.withWs(this.targetsFile, targets);
       } finally {
         this.withWs(
-          "prisma/schema.prisma",
+          this.schemaPath,
           this.schema().replace(targets, targeted)
         );
       }
@@ -58,11 +59,11 @@ class SchemaService extends Fs {
       if (!targets) {
         const targets = this.fileToBuffer(this.targetsFile).toString("utf-8");
         const schemaOut = this.schema().replace(targeted, targets);
-        this.withWs("prisma/schema.prisma", schemaOut);
+        this.withWs(this.schemaPath, schemaOut);
         return;
       }
       const schemaOut = this.schema().replace(targeted, targets);
-      this.withWs("prisma/schema.prisma", schemaOut);
+      this.withWs(this.schemaPath, schemaOut);
     } else {
       console.warn(
         "you must provide a target flag and arg, eg: --restore from-edge | --restore from-node"

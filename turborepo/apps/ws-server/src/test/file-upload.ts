@@ -38,6 +38,112 @@ export const fileData = {
   last_indexed_at: null
 };
 
+const attToUpload = {
+  size: 110869,
+  id: "h12l20d6hxnwnmzeuph6ted7",
+  conversationId: "voxbi8kj9gm75mmiuxb7g4i9",
+  draftId: "nrr6h4r4480f6kviycyo1zhf~voxbi8kj9gm75mmiuxb7g4i9~batch_mh0dleex~0",
+  batchId: "batch_mh0dleex",
+  generationGroupId: null,
+  seriesId: null,
+  userId: "nrr6h4r4480f6kviycyo1zhf",
+  messageId: "ba7x7dogsafmazjfrjj8dte4",
+  s3ObjectId:
+    "s3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf#dnzrTH3bEGb6ioeeNqErRt2CW72GWtbb",
+  origin: "UPLOAD",
+  status: "READY",
+  uploadMethod: "PRESIGNED",
+  assetType: "DOCUMENT",
+  uploadDuration: 681,
+  cdnUrl:
+    "https://assets-dev.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf",
+  publicUrl:
+    "https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf",
+  sourceUrl:
+    "https://ws-server-assets-dev.s3.us-east-1.amazonaws.com/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3MSF7Z3NS5XCR5MM%2F20251021%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251021T094224Z&X-Amz-Expires=604800&X-Amz-Signature=31e55b203e2cb440f318c1e12e52ad9c323939a6479bdaf6a5cde3a06110dcf0&X-Amz-SignedHeaders=host&versionId=dnzrTH3bEGb6ioeeNqErRt2CW72GWtbb&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+  thumbnailKey: null,
+  compatMime: "application/pdf",
+  compatExt: "pdf",
+  compatVersionId: "dnzrTH3bEGb6ioeeNqErRt2CW72GWtbb",
+  compatKey:
+    "upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf",
+  compatS3ObjectId:
+    "s3://ws-server-assets-dev/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf#dnzrTH3bEGb6ioeeNqErRt2CW72GWtbb",
+  compatStatus: "ALIASED",
+  compatReadyAt: "2025-10-21T09:42:25.000Z",
+  compatCdnUrl:
+    "https://assets-dev.aicoalesce.com/upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf",
+  bucket: "ws-server-assets-dev",
+  key: "upload/nrr6h4r4480f6kviycyo1zhf/1761039743324-Deep_Analysis_of_The_Claudtullus_Chronicles_-_Chapters_5_through_10.pdf",
+  versionId: "dnzrTH3bEGb6ioeeNqErRt2CW72GWtbb",
+  region: "us-east-1",
+  cacheControl: null,
+  contentDisposition: null,
+  contentEncoding: null,
+  expiresAt: "2025-10-28T09:42:24.676Z",
+  filename:
+    "Deep Analysis of The Claudtullus Chronicles - Chapters 5 through 10.pdf",
+  ext: "pdf",
+  mime: "application/pdf",
+  etag: "eed44c91a83d5e416c064e4ce908607e",
+  checksumAlgo: "CRC64NVME",
+  checksumSha256: "xVhnmeAPAOU=",
+  storageClass: null,
+  sseAlgorithm: null,
+  sseKmsKeyId: null,
+  s3LastModified: "2025-10-21T09:42:25.000Z",
+  deletedAt: null,
+  createdAt: "2025-10-21T09:42:23.327Z",
+  updatedAt: "2025-10-21T09:42:50.336Z",
+  imageGenOutput: null,
+  document: {
+    attachmentId: "h12l20d6hxnwnmzeuph6ted7",
+    format: "pdf",
+    pageCount: 4,
+    wordCount: null,
+    language: null,
+    title: null,
+    author: null,
+    subject: null,
+    keywords: [""],
+    pdfVersion: "1.7",
+    isEncrypted: false,
+    isSearchable: false,
+    isLinearized: false,
+    encoding: null,
+    lineCount: null,
+    textPreview: null,
+    createdAt: "2025-10-21T09:42:25.028Z",
+    updatedAt: "2025-12-07T06:08:07.050Z"
+  }
+} as const;
+const {
+  createdAt,
+  updatedAt,
+  s3LastModified,
+  expiresAt,
+  compatReadyAt,
+  document: { createdAt: docCreatedAt, updatedAt: docUpdatedAt, ...doc },
+  ...rest
+} = attToUpload;
+
+const sDoc = {
+  ...rest,
+  expiresAt: new Date(expiresAt),
+  compatReadyAt: new Date(compatReadyAt),
+  s3LastModified: new Date(s3LastModified),
+  createdAt: new Date(createdAt),
+  updatedAt: new Date(updatedAt),
+  image: null,
+  imageGenOutput: null,
+  document: {
+    ...doc,
+    keywords: [""],
+    createdAt: new Date(docCreatedAt),
+    updatedAt: new Date(docUpdatedAt)
+  }
+} satisfies AttachmentSingleton<true>;
+
 class FileUpload extends Fs {
   constructor(
     protected xaiKey: string,

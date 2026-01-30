@@ -348,10 +348,6 @@ export type NullableEnumThemePreferenceFieldUpdateOperationsInput = {
   set?: $Enums.ThemePreference | null
 }
 
-export type NullableEnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider | null
-}
-
 export type SettingsCreateWithoutUserInput = {
   id?: string
   theme?: $Enums.ThemePreference | null

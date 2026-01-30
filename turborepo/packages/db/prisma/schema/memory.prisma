@@ -26,7 +26,7 @@ model ConversationMemoryStore {
   embeddingDim   Int    @default(1024)
 
   totalChunks        Int @default(0)
-  totalTokens        Int @default(0)
+  totalTokens        BigInt @default(0)
   totalConversations Int @default(0)
 
   schemaVersion MemorySchemaVersion @default(v1_0)
@@ -51,7 +51,8 @@ model ConversationMemoryContext {
   lastMessageAt  DateTime?
 
   rollingSummary          String?   @db.Text
-  rollingSummaryModel     String? // "claude-sonnet-4-5" - just the model that last updated it
+  rollingSummaryModel     String? // Model that last updated the rolling summary (e.g. "claude-sonnet-4-5")
+  rollingSummaryProvider  Provider? // Provider that last updated the rolling summary (enables model union narrowing)
   rollingSummaryTokens    Int       @default(0)
   rollingSummaryUpdatedAt DateTime?
 
@@ -65,8 +66,7 @@ model ConversationMemoryContext {
   chunkedTurns Int @default(0)
   totalTokens  Int @default(0)
 
-  modelsUsedRaw String? // "claude-opus-4-5::grok-4-1-fast::gemini-3-pro"
-  providersUsed String? // "ANTHROPIC::GROK::GEMINI"
+  contributingProviderModelsRaw String?  // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -101,16 +101,12 @@ model ConversationMemoryChunk {
   chunkedMessagesCount Int    @default(0)
   tokenCount           Int    @default(0)
 
-  modelsInChunkRaw    String // "claude-opus-4-5-20251101::grok-4-1-fast-reasoning::gemini-3-pro-preview::gpt-5.2"
-  providersInChunkRaw String // "ANTHROPIC::GROK::GEMINI"
+  providerModelsRaw String   // "ANTHROPIC:claude-opus-4-5-20251101::GROK:grok-4-1-fast-reasoning"
 
   hasAttachments          Boolean @default(false)
   chunkedAttachmentsCount Int?
 
   attachmentProvenanceIdsRaw String? // "convId-msgId-attId-hexEncodedFilename.ext::convId-msgId-attId-hexEncodedFilename.ext"
-
-  // aggregate thinking time from all models in chunk
-  totalThinkingDurationMs Int?
 
   embedding      Unsupported("vector(1024)")
   embeddingModel String                      @default("voyage-context-3")
@@ -142,4 +138,7 @@ model ConversationMemoryChunk {
   @@index([chunkingState])
   @@index([contentHash])
   @@index([embeddedAt])
+  @@index([embedding], map: "idx_memory_chunk_embedding_hnsw")
+  @@index([storeId], map: "idx_memory_chunk_store_indexed")
+  @@index([contextId], map: "idx_memory_chunk_context_indexed")
 }

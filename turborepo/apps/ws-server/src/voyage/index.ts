@@ -29,7 +29,7 @@ export class VoyageEmbeddingService {
     });
   }
   public async embedChunksText<
-    const T extends Voyage.Embeddings.Model = "voyage-3.5-large"
+    const T extends Voyage.Embeddings.Model = "voyage-4-large"
   >({
     input_type = "document",
     inputs,
@@ -92,7 +92,7 @@ export class VoyageEmbeddingService {
       }
     );
     if (res.status < 500) {
-        const resp = await res.json<Voyage.Contextual.Output<T>>();
+      const resp = await res.json<Voyage.Contextual.Output<T>>();
       if (this.isError(resp)) {
         throw new Error(
           `error in voyage contextual embedding post: [code]: ${res.status}; [text]: ${resp.detail}`
@@ -146,7 +146,7 @@ export class VoyageEmbeddingService {
 
   private isError(
     response:
-    | Voyage.Contextual.Output<Voyage.InputType>
+      | Voyage.Contextual.Output<Voyage.InputType>
       | Voyage.Embeddings.Output<Voyage.Embeddings.Model>
       | Voyage.Multimodal.Output
   ) {
@@ -250,7 +250,6 @@ tokenize_result = main()
   `;
   }
 }
-
 
 if (process.argv[3] === "exe") {
   const fs = new Fs(process.cwd());

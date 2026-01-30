@@ -8,25 +8,37 @@ import { type $DbEnums } from "./$DbEnums"
 
 /**
  * @param id
- * @param conversationId
- * @param contextStateId
- * @param provider
  * @param provenanceId
+ * @param contextId
+ * @param storeId
+ * @param conversationId
+ * @param chunkIndex
  * @param messageIdStart
  * @param messageIdEnd
  * @param messageTimestampStart
  * @param messageTimestampEnd
- * @param transcriptMarkdown
- * @param tokenCount
- * @param modelProvidersInChunkRaw
  * @param messageIdsRaw
- * @param attachmentIdsRaw
+ * @param transcriptMarkdown
+ * @param contentHash
+ * @param chunkedMessagesCount
+ * @param tokenCount
+ * @param providerModelsRaw
+ * @param hasAttachments
+ * @param chunkedAttachmentsCount
+ * @param attachmentProvenanceIdsRaw
  * @param embeddingModel
  * @param embedding
+ * @param embeddedAt
+ * @param boundaryReason
+ * @param schemaVersion
  */
-export const insertMemoryChunk = $runtime.makeTypedQueryFactory("\n\nINSERT INTO \"ConversationMemoryChunk\" (\nid,\n\"conversationId\",\n\"contextStateId\",\nprovider,\n\"provenanceId\",\n\"messageIdStart\",\n\"messageIdEnd\",\n\"chunkingState\",\n\"messageTimestampStart\",\n\"messageTimestampEnd\",\n\"transcriptMarkdown\",\n\"tokenCount\",\n\"modelProvidersInChunkRaw\",\n\"messageIdsRaw\",\n\"attachmentIdsRaw\",\n\"embeddingModel\",\nembedding,\n\"createdAt\",\n\"updatedAt\"\n) VALUES (\n$1, $2, $3, $4::\"Provider\", $5, $6, $7,\n'IDLE'::\"ChunkingState\",\n$8, $9, $10, $11, $12, $13,\nNULLIF($14, ''),\n$15,\n$16::vector,\nNOW(),\nNOW()\n)\nON CONFLICT (\"provenanceId\") DO UPDATE SET\n\"transcriptMarkdown\" = EXCLUDED.\"transcriptMarkdown\",\n\"tokenCount\" = EXCLUDED.\"tokenCount\",\n\"modelProvidersInChunkRaw\" = EXCLUDED.\"modelProvidersInChunkRaw\",\n\"messageIdsRaw\" = EXCLUDED.\"messageIdsRaw\",\n\"attachmentIdsRaw\" = EXCLUDED.\"attachmentIdsRaw\",\nembedding = EXCLUDED.embedding,\n\"chunkingState\" = 'COMPLETE'::\"ChunkingState\",\n\"updatedAt\" = NOW();") as (id: string, conversationId: string, contextStateId: string, provider: $DbEnums["Provider"], provenanceId: string, messageIdStart: string, messageIdEnd: string, messageTimestampStart: Date, messageTimestampEnd: Date, transcriptMarkdown: string, tokenCount: number, modelProvidersInChunkRaw: string, messageIdsRaw: string, attachmentIdsRaw: string, embeddingModel: string, embedding: string) => $runtime.TypedSql<insertMemoryChunk.Parameters, insertMemoryChunk.Result>
+export const insertMemoryChunk = $runtime.makeTypedQueryFactory("\nINSERT INTO \"ConversationMemoryChunk\" (\nid,\n\"provenanceId\",\n\"contextId\",\n\"storeId\",\n\"conversationId\",\n\"chunkIndex\",\n\"messageIdStart\",\n\"messageIdEnd\",\n\"messageTimestampStart\",\n\"messageTimestampEnd\",\n\"messageIdsRaw\",\n\"transcriptMarkdown\",\n\"contentHash\",\n\"chunkedMessagesCount\",\n\"tokenCount\",\n\"providerModelsRaw\",\n\"hasAttachments\",\n\"chunkedAttachmentsCount\",\n\"attachmentProvenanceIdsRaw\",\n\"embeddingModel\",\nembedding,\n\"embeddedAt\",\n\"boundaryReason\",\n\"schemaVersion\",\n\"chunkingState\",\n\"createdAt\",\n\"updatedAt\"\n) VALUES (\n$1, $2, $3, $4, $5, $6, $7, $8, $9, $10,\n$11, $12, $13, $14, $15, $16, $17,\n$18,\nNULLIF($19, ''),\n$20,\n$21::vector,\nCOALESCE($22, NOW()),\n$23::\"MemoryChunkBoundaryReason\",\nCOALESCE($24::\"MemorySchemaVersion\", 'v1_0'::\"MemorySchemaVersion\"),\n'EMBEDDING'::\"MemoryChunkingState\",\nNOW(),\nNOW()\n)\nON CONFLICT (\"provenanceId\") DO UPDATE SET\n\"transcriptMarkdown\"         = EXCLUDED.\"transcriptMarkdown\",\n\"contentHash\"                = EXCLUDED.\"contentHash\",\n\"tokenCount\"                 = EXCLUDED.\"tokenCount\",\n\"chunkedMessagesCount\"       = EXCLUDED.\"chunkedMessagesCount\",\n\"providerModelsRaw\"          = EXCLUDED.\"providerModelsRaw\",\n\"messageIdsRaw\"              = EXCLUDED.\"messageIdsRaw\",\n\"hasAttachments\"             = EXCLUDED.\"hasAttachments\",\n\"chunkedAttachmentsCount\"    = EXCLUDED.\"chunkedAttachmentsCount\",\n\"attachmentProvenanceIdsRaw\" = EXCLUDED.\"attachmentProvenanceIdsRaw\",\nembedding                    = EXCLUDED.embedding,\n\"embeddedAt\"                 = EXCLUDED.\"embeddedAt\",\n\"chunkingState\"              = 'INDEXED'::\"MemoryChunkingState\",\n\"updatedAt\"                  = NOW()\nRETURNING id, \"provenanceId\", \"chunkingState\"::\"text\" as \"chunkingState\";") as (id: string, provenanceId: string, contextId: string, storeId: string, conversationId: string, chunkIndex: number, messageIdStart: string, messageIdEnd: string, messageTimestampStart: Date, messageTimestampEnd: Date, messageIdsRaw: string, transcriptMarkdown: string, contentHash: string, chunkedMessagesCount: number, tokenCount: number, providerModelsRaw: string, hasAttachments: boolean, chunkedAttachmentsCount: number | null, attachmentProvenanceIdsRaw: string | null, embeddingModel: string, embedding: string, embeddedAt: Date | null, boundaryReason: $DbEnums["MemoryChunkBoundaryReason"] | null, schemaVersion: $DbEnums["MemorySchemaVersion"] | null) => $runtime.TypedSql<insertMemoryChunk.Parameters, insertMemoryChunk.Result>
 
 export namespace insertMemoryChunk {
-  export type Parameters = [id: string, conversationId: string, contextStateId: string, provider: $DbEnums["Provider"], provenanceId: string, messageIdStart: string, messageIdEnd: string, messageTimestampStart: Date, messageTimestampEnd: Date, transcriptMarkdown: string, tokenCount: number, modelProvidersInChunkRaw: string, messageIdsRaw: string, attachmentIdsRaw: string, embeddingModel: string, embedding: string]
-  export type Result = {}
+  export type Parameters = [id: string, provenanceId: string, contextId: string, storeId: string, conversationId: string, chunkIndex: number, messageIdStart: string, messageIdEnd: string, messageTimestampStart: Date, messageTimestampEnd: Date, messageIdsRaw: string, transcriptMarkdown: string, contentHash: string, chunkedMessagesCount: number, tokenCount: number, providerModelsRaw: string, hasAttachments: boolean, chunkedAttachmentsCount: number | null, attachmentProvenanceIdsRaw: string | null, embeddingModel: string, embedding: string, embeddedAt: Date | null, boundaryReason: $DbEnums["MemoryChunkBoundaryReason"] | null, schemaVersion: $DbEnums["MemorySchemaVersion"] | null]
+  export type Result = {
+    id: string
+    provenanceId: string
+    chunkingState: string | null
+  }
 }
