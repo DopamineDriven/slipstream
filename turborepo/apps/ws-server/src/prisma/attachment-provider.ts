@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import type { FssDoc, StoreDocDbRegistryProps } from "@/gemini/types.ts";
 import type {
   CreateGrokProviderStoreDocParams,
+  CreateManyGrokProviderStoreDocsProps,
   xAIDocDbRegistryProps
 } from "@/xai/types.ts";
 import { ExtractService } from "@/extract/index.ts";
@@ -245,42 +246,33 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
 
   public async createManyGrokProviderDocs({
     userId,
-    data: props,
-    aggsize
-  }: {
-    userId: string;
-    data: CreateGrokProviderStoreDocParams[];
-    aggsize: bigint;
-  }) {
-    const data = props.map(t => {
-      const { last_indexed_at, userId: _userId, storeRef: _s, ...rest } = t;
-      return {
-        ...rest,
-        indexedAt: last_indexed_at,
-        lastAccessed: last_indexed_at,
-        provider: "GROK"
-      } as const;
+    storeRef: _storeRef,
+    totalBytes,
+    data
+  }: CreateManyGrokProviderStoreDocsProps) {
+    return await this.prismaClient.$transaction(async prisma => {
+      const [newDocs, store] = await Promise.all([
+        prisma.providerStoreDocument.createManyAndReturn({
+          data
+        }),
+        prisma.providerStore.update({
+          where: { userId_provider: { userId, provider: "GROK" } },
+          data: {
+            totalBytes: { increment: totalBytes },
+            lastSyncedAt: new Date(Date.now()),
+            fileCount: { increment: data.length }
+          },
+          select: { storeRef: true }
+        })
+      ]);
+      return this.convertProviderStoreDocBigInt(newDocs).map(
+        newDoc =>
+          ({
+            ...newDoc,
+            storeRef: store.storeRef
+          }) satisfies xAIDocDbRegistryProps
+      );
     });
-    const dataOne =
-      await this.prismaClient.providerStoreDocument.createManyAndReturn({
-        data: data
-      });
-
-    const cleanedOne = dataOne.map(t => this.convertProviderStoreDocBigInt(t));
-    const dataTwo = await this.prismaClient.providerStore.update({
-      where: { userId_provider: { userId, provider: "GROK" } },
-      data: {
-        totalBytes: { increment: aggsize },
-        lastSyncedAt: new Date(Date.now()),
-        fileCount: { increment: data.length }
-      },
-      select: { storeRef: true }
-    });
-
-    const res = cleanedOne.map(t => {
-      return { ...t, storeRef: dataTwo.storeRef };
-    });
-    return res;
   }
 
   private async handleGrokDocCheck(
@@ -330,6 +322,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     userId,
     size
   }: CreateGrokProviderStoreDocParams) {
+    // absolute certainty
     const docExists = await this.handleGrokDocCheck(
       attachmentId,
       docRef,
@@ -337,7 +330,7 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       storeRef
     );
     return await this.prismaClient.$transaction(async prisma => {
-      if (docExists.exists === false) {
+      if (!docExists.exists) {
         const [doc, store] = await Promise.all([
           prisma.providerStoreDocument.create({
             data: {
@@ -866,10 +859,26 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
       ...rest
     } satisfies AttachmentProviderSingleton<true>;
   }
-
   private convertProviderStoreDocBigInt(
     obj: ProviderStoreDocumentSingleton<true | false>
+  ): ProviderStoreDocumentSingleton<true>;
+  private convertProviderStoreDocBigInt(
+    obj: ProviderStoreDocumentSingleton<true | false>[]
+  ): ProviderStoreDocumentSingleton<true>[];
+  private convertProviderStoreDocBigInt(
+    obj:
+      | ProviderStoreDocumentSingleton<true | false>
+      | ProviderStoreDocumentSingleton<true | false>[]
   ) {
+    if (Array.isArray(obj)) {
+      return obj.map(t => {
+        const { size, attachment: _att, store: _st, ...rest } = t;
+        return {
+          size: size ? Number(size) : null,
+          ...rest
+        };
+      }) satisfies ProviderStoreDocumentSingleton<true>[];
+    }
     const { size, attachment: _att, store: _st, ...rest } = obj;
     return {
       size: size ? Number(size) : null,
@@ -1170,6 +1179,19 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
     } else {
       throw new Error(`no conversationId or messageId set for ${att.id}`);
     }
+  }
+  public toVectorStoreDocChunkProvenanceId(a: string, chunk: number): string;
+  public toVectorStoreDocChunkProvenanceId(
+    a: AttachmentSingleton<true>,
+    chunk: number
+  ): string;
+  public toVectorStoreDocChunkProvenanceId(
+    a: AttachmentSingleton<true> | string,
+    chunk: number
+  ) {
+    if (typeof a === "string") return `${a}#${chunk}`;
+    const provenanceId = this.toVectorStoreFilename(a);
+    return `${provenanceId}#${chunk}`;
   }
   public canParseFilename(filename: string) {
     return /^(?:[a-z0-9]+-){3}[a-f0-9]+\.[a-z0-9]+$/.test(filename);

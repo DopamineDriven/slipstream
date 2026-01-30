@@ -12,6 +12,8 @@ export type Rm<T, P extends keyof T = keyof T> = {
  */
 export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
 
+export type Include<T, U extends T> =  Exclude<T, Exclude<T, U>>;
+
 /**
  * enforces mutual exclusivity of T | U
  */
@@ -58,6 +60,25 @@ export type IsExact<T, U> = [T] extends [U]
 export type TCN<T, X extends keyof T = keyof T> = Rm<T, X> & {
   [Q in X]?: XOR<T[Q], never>;
 };
+
+/**
+ * export type ArrFieldReplacer<
+  T extends unknown[] | readonly unknown[],
+  V extends keyof Unenumerate<T>,
+  Q extends boolean = false,
+  P = unknown
+> = T extends (infer U)[] | readonly (infer U)[]
+  ? V extends keyof U
+    ? Q extends true
+      ? P extends Record<infer Z, infer S>
+        ? [...[DX<{ [C in Z]: S } & Rm<U, V>>]][number][]
+        : (Rm<U, V> & P)[]
+      : Q extends false
+        ? Rm<U, V>[]
+        : U
+    : T
+  : T;
+ */
 
 export type ArrFieldReplacer<
   T extends unknown[] | readonly unknown[],
@@ -171,6 +192,8 @@ export type RequireNested<
     ? Rm<T, Path> & Record<Path, Required<T>[Path]>
     : T;
 
+export type FlexiCase<T extends string> = Lowercase<T> | Uppercase<T>;
+
 export function createDraftId(
   userId: string,
   conversationId: string,
@@ -204,6 +227,11 @@ export function parseDraftId(draftId: string) {
     o !== toArr.length - 1 ? v : Number.parseInt(v, 10)
   ) as [string, string, string, number];
 }
+
+export function instanceFunc<const Type>(c: new (...args: Type[]) => Type) {
+  return new c();
+}
+
 // export type IsNever<T> = [T] extends [never] ? true : false;
 
 // /**
@@ -266,26 +294,24 @@ export type CommonDiscriminants =
   | "tag"
   | "_tag"
   | "__typename";
+// type CommonDiscriminantObj<T extends CommonDiscriminants = CommonDiscriminants> = readonly [Include<CommonDiscriminants,T>,string];
 
-export type LiteralUnion<TKnown extends string> = TKnown | (string & {});
+// const O =(props: CommonDiscriminantObj<"type">)=>({[props[0]]: props[1]})
+export type LiteralUnion<TKnown extends string> = TKnown | string
 
 export type DiscriminatedUnionToRecord<
   TUnion extends Record<TKey, string>,
-  TKey extends LiteralUnion<CommonDiscriminants>
+  TKey extends LiteralUnion<CommonDiscriminants> = LiteralUnion<CommonDiscriminants>
 > = TKey extends keyof TUnion
   ? { [K in TUnion[TKey] & string]: Extract<TUnion, Record<TKey, K>> }
   : never;
 
+
+
 export type UnionToRecord<
-  TUnion extends { type: string },
+  TUnion extends Record<"type", string>,
   TDiscriminant extends string = TUnion["type"]
 > = {
   [K in TDiscriminant]: Extract<TUnion, { type: K }>;
 };
 
-export type SSEEventFromType<TUnion extends { type: string }> = {
-  [K in TUnion["type"]]: {
-    event: K;
-    data: Extract<TUnion, { type: K }>;
-  };
-}[TUnion["type"]];

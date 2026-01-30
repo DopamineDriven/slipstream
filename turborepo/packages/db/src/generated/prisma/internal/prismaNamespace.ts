@@ -396,6 +396,9 @@ export const ModelName = {
   Session: 'Session',
   ProviderStore: 'ProviderStore',
   ProviderStoreDocument: 'ProviderStoreDocument',
+  ProviderStoreDocumentChunk: 'ProviderStoreDocumentChunk',
+  ConversationMemoryChunk: 'ConversationMemoryChunk',
+  ConversationContextState: 'ConversationContextState',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -425,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "account" | "session" | "providerStore" | "providerStoreDocument" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
+    modelProps: "user" | "profile" | "account" | "session" | "providerStore" | "providerStoreDocument" | "providerStoreDocumentChunk" | "conversationMemoryChunk" | "conversationContextState" | "userKey" | "settings" | "conversation" | "conversationSettings" | "message" | "attachment" | "attachmentProvider" | "imageMetadata" | "videoMetadata" | "audioMetadata" | "documentMetadata" | "imageGenJob" | "imageGenOutput" | "verification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -870,6 +873,196 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProviderStoreDocumentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProviderStoreDocumentCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProviderStoreDocumentChunk: {
+      payload: Prisma.$ProviderStoreDocumentChunkPayload<ExtArgs>
+      fields: Prisma.ProviderStoreDocumentChunkFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProviderStoreDocumentChunkFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProviderStoreDocumentChunkFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>
+        }
+        findFirst: {
+          args: Prisma.ProviderStoreDocumentChunkFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProviderStoreDocumentChunkFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>
+        }
+        findMany: {
+          args: Prisma.ProviderStoreDocumentChunkFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>[]
+        }
+        delete: {
+          args: Prisma.ProviderStoreDocumentChunkDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>
+        }
+        update: {
+          args: Prisma.ProviderStoreDocumentChunkUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProviderStoreDocumentChunkDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProviderStoreDocumentChunkUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProviderStoreDocumentChunkUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProviderStoreDocumentChunkPayload>[]
+        }
+        aggregate: {
+          args: Prisma.ProviderStoreDocumentChunkAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProviderStoreDocumentChunk>
+        }
+        groupBy: {
+          args: Prisma.ProviderStoreDocumentChunkGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreDocumentChunkGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProviderStoreDocumentChunkCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProviderStoreDocumentChunkCountAggregateOutputType> | number
+        }
+      }
+    }
+    ConversationMemoryChunk: {
+      payload: Prisma.$ConversationMemoryChunkPayload<ExtArgs>
+      fields: Prisma.ConversationMemoryChunkFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConversationMemoryChunkFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConversationMemoryChunkFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
+        }
+        findFirst: {
+          args: Prisma.ConversationMemoryChunkFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConversationMemoryChunkFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
+        }
+        findMany: {
+          args: Prisma.ConversationMemoryChunkFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>[]
+        }
+        delete: {
+          args: Prisma.ConversationMemoryChunkDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
+        }
+        update: {
+          args: Prisma.ConversationMemoryChunkUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>
+        }
+        deleteMany: {
+          args: Prisma.ConversationMemoryChunkDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConversationMemoryChunkUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConversationMemoryChunkUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMemoryChunkPayload>[]
+        }
+        aggregate: {
+          args: Prisma.ConversationMemoryChunkAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConversationMemoryChunk>
+        }
+        groupBy: {
+          args: Prisma.ConversationMemoryChunkGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationMemoryChunkGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConversationMemoryChunkCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationMemoryChunkCountAggregateOutputType> | number
+        }
+      }
+    }
+    ConversationContextState: {
+      payload: Prisma.$ConversationContextStatePayload<ExtArgs>
+      fields: Prisma.ConversationContextStateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConversationContextStateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConversationContextStateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        findFirst: {
+          args: Prisma.ConversationContextStateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConversationContextStateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        findMany: {
+          args: Prisma.ConversationContextStateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>[]
+        }
+        create: {
+          args: Prisma.ConversationContextStateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        createMany: {
+          args: Prisma.ConversationContextStateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConversationContextStateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>[]
+        }
+        delete: {
+          args: Prisma.ConversationContextStateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        update: {
+          args: Prisma.ConversationContextStateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        deleteMany: {
+          args: Prisma.ConversationContextStateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConversationContextStateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConversationContextStateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>[]
+        }
+        upsert: {
+          args: Prisma.ConversationContextStateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationContextStatePayload>
+        }
+        aggregate: {
+          args: Prisma.ConversationContextStateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConversationContextState>
+        }
+        groupBy: {
+          args: Prisma.ConversationContextStateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationContextStateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConversationContextStateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationContextStateCountAggregateOutputType> | number
         }
       }
     }
@@ -2060,6 +2253,75 @@ export const ProviderStoreDocumentScalarFieldEnum = {
 export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
 
 
+export const ProviderStoreDocumentChunkScalarFieldEnum = {
+  id: 'id',
+  providerStoreDocId: 'providerStoreDocId',
+  attachmentId: 'attachmentId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  provider: 'provider',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreDocumentChunkScalarFieldEnum = (typeof ProviderStoreDocumentChunkScalarFieldEnum)[keyof typeof ProviderStoreDocumentChunkScalarFieldEnum]
+
+
+export const ConversationMemoryChunkScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  contextStateId: 'contextStateId',
+  provider: 'provider',
+  provenanceId: 'provenanceId',
+  messageIdStart: 'messageIdStart',
+  messageIdEnd: 'messageIdEnd',
+  chunkingError: 'chunkingError',
+  chunkingState: 'chunkingState',
+  messageTimestampStart: 'messageTimestampStart',
+  messageTimestampEnd: 'messageTimestampEnd',
+  transcriptMarkdown: 'transcriptMarkdown',
+  tokenCount: 'tokenCount',
+  modelProvidersInChunkRaw: 'modelProvidersInChunkRaw',
+  messageIdsRaw: 'messageIdsRaw',
+  attachmentIdsRaw: 'attachmentIdsRaw',
+  embeddingModel: 'embeddingModel',
+  summary: 'summary',
+  summaryModelProvider: 'summaryModelProvider',
+  summaryGeneratedAt: 'summaryGeneratedAt',
+  summaryUpdatedAt: 'summaryUpdatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMemoryChunkScalarFieldEnum = (typeof ConversationMemoryChunkScalarFieldEnum)[keyof typeof ConversationMemoryChunkScalarFieldEnum]
+
+
+export const ConversationContextStateScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  conversationId: 'conversationId',
+  provider: 'provider',
+  rollingSummary: 'rollingSummary',
+  rollingSummaryModels: 'rollingSummaryModels',
+  rollingSummaryTokens: 'rollingSummaryTokens',
+  rollingSummaryUpdatedAt: 'rollingSummaryUpdatedAt',
+  totalInputTokensCurrent: 'totalInputTokensCurrent',
+  lastChunkedMessageId: 'lastChunkedMessageId',
+  lastChunkedMessageIndex: 'lastChunkedMessageIndex',
+  totalModels: 'totalModels',
+  totalProviders: 'totalProviders',
+  totalTurns: 'totalTurns',
+  chunkedTurns: 'chunkedTurns',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationContextStateScalarFieldEnum = (typeof ConversationContextStateScalarFieldEnum)[keyof typeof ConversationContextStateScalarFieldEnum]
+
+
 export const UserKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2529,6 +2791,20 @@ export type ListEnumProviderDocStateFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'ChunkingState'
+ */
+export type EnumChunkingStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChunkingState'>
+    
+
+
+/**
+ * Reference to a field of type 'ChunkingState[]'
+ */
+export type ListEnumChunkingStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChunkingState[]'>
+    
+
+
+/**
  * Reference to a field of type 'ThemePreference'
  */
 export type EnumThemePreferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThemePreference'>
@@ -2858,6 +3134,9 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   providerStore?: Prisma.ProviderStoreOmit
   providerStoreDocument?: Prisma.ProviderStoreDocumentOmit
+  providerStoreDocumentChunk?: Prisma.ProviderStoreDocumentChunkOmit
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkOmit
+  conversationContextState?: Prisma.ConversationContextStateOmit
   userKey?: Prisma.UserKeyOmit
   settings?: Prisma.SettingsOmit
   conversation?: Prisma.ConversationOmit

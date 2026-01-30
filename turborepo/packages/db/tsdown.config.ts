@@ -12,7 +12,8 @@ export default defineConfig(
       | "cwd"
       | "clean"
       | "outDir"
-      | "tsconfig"
+      | "fixedExtension"
+      | "unbundle"
     >
   ) =>
     ({

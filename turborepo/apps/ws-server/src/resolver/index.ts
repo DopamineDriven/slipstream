@@ -561,7 +561,7 @@ export class Resolver {
     }
   }
 
-  public async postHandleConnectionEstablishedJob(userId: string) {
+  protected async postHandleConnectionEstablishedJob(userId: string) {
     const gemini = this.providers.getInstance("gemini");
     const anthropic = this.providers.getInstance("anthropic");
     const grok = this.providers.getInstance("grok");

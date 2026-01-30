@@ -1,0 +1,18 @@
+model Conversation {
+  id                         String                     @id @default(cuid(2))
+  userId                     String
+  userKeyId                  String?
+  user                       User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                      String?
+  createdAt                  DateTime                   @default(now())
+  updatedAt                  DateTime                   @updatedAt
+  messages                   Message[]
+  branchId                   String? // For branching conversations
+  parentId                   String? // For chat branching
+  attachments                Attachment[]
+  isShared                   Boolean                    @default(false)
+  conversationContextStateId String?
+  shareToken                 String?                    @unique
+  conversationSettings       ConversationSettings?
+  conversationContextState   ConversationMemoryContext?
+}

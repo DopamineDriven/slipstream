@@ -28,19 +28,7 @@ import type {
 } from "@slipstream/types";
 import { FileSearchStoreService } from "./fss.ts";
 
-/**
- The following models support File Search Tooling:
- ```json
-[
-  "deep-research-pro-preview-12-2025",
-  "gemini-3-flash-preview",
-  "gemini-3-pro-preview",
-  "gemini-2.5-pro",
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite"
-]
-```
- */
+
 
 export class GeminiWorkupService extends FileSearchStoreService {
   constructor(logger: LoggerService, prisma: PrismaService, apiKey: string) {
@@ -703,7 +691,19 @@ export class GeminiWorkupService extends FileSearchStoreService {
       retrievalConfig: { latLng: { latitude: lat, longitude: lng } }
     } satisfies ToolConfig;
   }
-
+/**
+ The following models support File Search Tooling:
+ ```json
+[
+  "deep-research-pro-preview-12-2025",
+  "gemini-3-flash-preview",
+  "gemini-3-pro-preview",
+  "gemini-2.5-pro",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite"
+]
+```
+ */
   private getTools(userId: string, model?: GeminiModelIdUnion) {
     const m = model ?? "gemini-2.5-pro";
 

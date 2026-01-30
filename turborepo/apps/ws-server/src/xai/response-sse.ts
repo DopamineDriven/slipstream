@@ -4,10 +4,9 @@ import type {
 } from "@/xai/responses-types.ts";
 
 export class ResponseSSEWorkupService {
-  // SSE chunk transformer
   protected xaiResponsesSSETransformer(
     chunk: string
-  ): XAIResponsesSSEEvent | null {
+  ) {
     let eventType: string | undefined = undefined;
     const dataLines = Array.of<string>();
 
@@ -36,7 +35,7 @@ export class ResponseSSEWorkupService {
     if (dataLines.length > 0 && eventType) {
       try {
         const jsonStr = dataLines.join("\n");
-        const parsedData = JSON.parse(jsonStr) as XAIResponsesEvent;
+        const parsedData = JSON.parse<XAIResponsesEvent>(jsonStr);
         // event and data.type are always identical from xAI API
         return {
           event: parsedData.type,
@@ -51,10 +50,6 @@ export class ResponseSSEWorkupService {
     return null;
   }
 }
-
-// ============================================================================
-// STREAM PARSER CLASS
-// ============================================================================
 
 export class ResponsesStreamParser
   extends ResponseSSEWorkupService
@@ -108,12 +103,7 @@ export class ResponsesStreamParser
   > {
     const reader = this.readable.getReader();
     try {
-      // const controller = new AbortController();
       while (true) {
-        // if (controller.signal.aborted) {
-        //   // ← Just check the signal
-        //   break;
-        // }
         const { done, value } = await reader.read();
         if (done) return;
         yield value;
@@ -122,10 +112,7 @@ export class ResponsesStreamParser
       reader.releaseLock();
     }
   }
-
-  public static createXAIResponsesParser(
-    response: Response
-  ): ResponsesStreamParser {
+  public static createXAIResponsesParser(response: Response) {
     if (!response.body) {
       throw new Error("Response body is not available for SSE parsing.");
     }

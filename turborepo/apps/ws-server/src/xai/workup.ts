@@ -3,7 +3,7 @@ import type {
   Collection,
   CollectionDocument,
   CreateCollectionRequest,
-  CreateGrokProviderStoreDocParams,
+  CreatManyGrokProviderStoreDocSingleton,
   DeleteXaiFileResponse,
   DocumentStatus,
   FieldDefinition,
@@ -197,34 +197,37 @@ export class GrokWorkupService {
   ) {
     if (this.storeDbDocRegistry.size !== this.docCache.size) {
       if (this.storeDbDocRegistry.size < this.docCache.size) {
-        const cachedDocsToSync = Array.of<CreateGrokProviderStoreDocParams>();
-        let aggsize = 0n;
+        let totalBytes = 0n;
+        const newDocArr = Array.of<CreatManyGrokProviderStoreDocSingleton>();
         for (const [cacheKey, doc] of Array.from(this.docCache.entries())) {
           if (!this.storeDbDocRegistry.has(cacheKey)) {
+            const indexedAt = doc.last_indexed_at
+              ? new Date(doc.last_indexed_at)
+              : new Date(doc.file_metadata.created_at);
             const size = BigInt(Number.parseInt(doc.file_metadata.size_bytes));
-            aggsize += size;
-            const s = {
+            const docUri = this.xaiURI(storeRef, doc.file_metadata.file_id);
+            const state = this.xaiToDbState[doc.status];
+            totalBytes += size;
+            newDocArr.push({
               attachmentId: doc.fields.attachmentId,
               docRef: doc.file_metadata.file_id,
-              docUri: this.xaiURI(storeRef, doc.file_metadata.file_id),
+              docUri,
               filename: doc.file_metadata.name,
-              last_indexed_at: doc.last_indexed_at
-                ? new Date(doc.last_indexed_at)
-                : new Date(doc.file_metadata.created_at),
+              indexedAt,
+              lastAccessed: indexedAt,
               mimeType: doc.file_metadata.content_type,
-              state: this.xaiToDbState[doc.status],
+              state,
               storeId: storeDbId,
-              storeRef,
-              userId,
+              provider: "GROK",
               size
-            } satisfies CreateGrokProviderStoreDocParams;
-            cachedDocsToSync.push(s);
+            } satisfies CreatManyGrokProviderStoreDocSingleton);
           }
         }
         const res = await this.prisma.createManyGrokProviderDocs({
-          data: cachedDocsToSync,
-          userId,
-          aggsize
+          data: newDocArr,
+          storeRef,
+          totalBytes,
+          userId
         });
         for (const dbDoc of res) {
           this.storeDbDocRegistry.set(dbDoc.attachmentId, dbDoc);

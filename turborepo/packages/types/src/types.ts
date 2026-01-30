@@ -1,10 +1,12 @@
-import type { Rm } from "@/utils.ts";
+import type { DX, Equal, FlexiCase, Rm } from "@/utils.ts";
 import type {
   $Enums,
   Account,
   Attachment,
   AttachmentProvider,
   Conversation,
+  ConversationContextState,
+  ConversationMemoryChunk,
   ConversationSettings,
   DocumentMetadata,
   ImageGenJob,
@@ -14,6 +16,7 @@ import type {
   Profile,
   ProviderStore,
   ProviderStoreDocument,
+  ProviderStoreDocumentChunk,
   Session,
   Settings,
   User,
@@ -24,124 +27,271 @@ export type BigIntOrNumber<T extends boolean = false> = T extends true
   ? number
   : bigint;
 
-export interface UserSingleton<T extends boolean = false> extends User {
-  conversations?: ConversationSingleton<T>[];
-  attachments?: AttachmentSingleton<T>[];
-  keys?: UserKeySingleton<T>[];
-  accounts?: AccountSingleton<T>[];
-  sessions?: SessionSingleton<T>[];
-  profile?: ProfileSingleton<T>;
-  providerStores?: ProviderStoreSingleton<T>[];
-  settings?: SettingsSingleton<T>;
+export interface UserSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends User {
+  conversations?: ConversationSingleton<T, ConvoChunk, DocChunk>[];
+  attachments?: AttachmentSingleton<T, ConvoChunk, DocChunk>[];
+  keys?: UserKeySingleton<T, ConvoChunk, DocChunk>[];
+  accounts?: AccountSingleton<T, ConvoChunk, DocChunk>[];
+  sessions?: SessionSingleton<T, ConvoChunk, DocChunk>[];
+  profile?: ProfileSingleton<T, ConvoChunk, DocChunk>;
+  providerStores?: ProviderStoreSingleton<T, ConvoChunk, DocChunk>[];
+  settings?: SettingsSingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface SessionSingleton<T extends boolean = false> extends Session {
-  user?: UserSingleton<T>;
+export interface SessionSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Session {
+  user?: UserSingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface AccountSingleton<T extends boolean = false> extends Account {
-  user?: UserSingleton<T>;
+export interface AccountSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Account {
+  user?: UserSingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface ProfileSingleton<T extends boolean = false> extends Profile {
-  user?: UserSingleton<T>;
+export interface ProfileSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Profile {
+  user?: UserSingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface SettingsSingleton<T extends boolean = false> extends Settings {
-  user?: UserSingleton<T>;
+export interface SettingsSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Settings {
+  user?: UserSingleton<T, ConvoChunk, DocChunk>;
 }
 
 export interface DocumentSingleton extends DocumentMetadata {}
 
 export interface AttachmentProviderSingleton<
-  T extends boolean = false
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
 > extends Rm<AttachmentProvider, "size"> {
   size: BigIntOrNumber<T> | null;
-  attachment?: AttachmentSingleton<T>;
-  userKey?: UserKeySingleton<T>;
+  attachment?: AttachmentSingleton<T, ConvoChunk, DocChunk>;
+  userKey?: UserKeySingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface ProviderStoreSingleton<T extends boolean = false> extends Rm<
-  ProviderStore,
-  "totalBytes"
-> {
+export namespace Chunk {
+  export type ConditionalObj = {
+    score: number;
+    embedding: number[];
+  };
+  export type ChunkObj = {
+    DocChunk: ProviderStoreDocumentChunk;
+    ConvoChunk: ConversationMemoryChunk;
+  };
+  export type AppendEmbeddingScores<
+    Z extends keyof ChunkObj,
+    W extends readonly [boolean, boolean] = readonly [false, false]
+  > = W extends readonly [false, false]
+    ? ChunkObj[Z]
+    : W extends readonly [true, false]
+      ? DX<ChunkObj[Z] & Rm<ConditionalObj, "score">>
+      : W extends readonly [false, true]
+        ? DX<ChunkObj[Z] & Rm<ConditionalObj, "embedding">>
+        : DX<ChunkObj[Z] & ConditionalObj>;
+
+  export namespace Fields {
+    export type All<T extends keyof ChunkObj> = AppendEmbeddingScores<
+      T,
+      readonly [true, true]
+    >;
+    export type Score<T extends keyof ChunkObj> = AppendEmbeddingScores<
+      T,
+      readonly [false, true]
+    >;
+    export type Embedding<T extends keyof ChunkObj> = AppendEmbeddingScores<
+      T,
+      readonly [true, false]
+    >;
+    export type None<T extends keyof ChunkObj> = AppendEmbeddingScores<
+      T,
+      readonly [false, false]
+    >;
+  }
+
+  export type Fields<T extends Opts.FieldUnion, K extends Opts.TargetUnion> = {
+    all: Fields.All<T>;
+    none: Fields.None<T>;
+    score: Fields.Score<T>;
+    embedding: Fields.Embedding<T>;
+  }[K];
+  export namespace Opts {
+    export type FieldUnion = "DocChunk" | "ConvoChunk";
+
+    export type TargetUnion = "all" | "score" | "embedding" | "none";
+  }
+  export type Opts<
+    T extends Opts.FieldUnion,
+    K extends Opts.TargetUnion = "none"
+  > = K extends "all"
+    ? Fields.All<T>
+    : K extends "score"
+      ? Fields.Score<T>
+      : K extends "embedding"
+        ? Fields.Embedding<T>
+        : Fields.None<T>;
+}
+
+export interface ProviderStoreSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Rm<ProviderStore, "totalBytes"> {
   totalBytes: BigIntOrNumber<T> | null;
-  docs?: ProviderStoreDocumentSingleton<T>[];
+  docs?: ProviderStoreDocumentSingleton<T, ConvoChunk, DocChunk>[];
+  conversationStates?: ConversationContextStateSingleton<
+    T,
+    ConvoChunk,
+    DocChunk
+  >[];
 }
 
 export interface ProviderStoreDocumentSingleton<
-  T extends boolean = false
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
 > extends Rm<ProviderStoreDocument, "size"> {
   size: BigIntOrNumber<T> | null;
-
-  store?: ProviderStoreSingleton<T>;
-  attachment?: AttachmentSingleton<T>;
+  providerStoreDocChunks?: ProviderStoreDocumentChunkSingleton<
+    T,
+    ConvoChunk,
+    DocChunk
+  >[];
+  store?: ProviderStoreSingleton<T, ConvoChunk, DocChunk>;
+  attachment?: AttachmentSingleton<T, ConvoChunk, DocChunk>;
 }
 
+export type ProviderStoreDocumentChunkSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> = Chunk.Opts<"DocChunk", DocChunk> & {
+  providerStoreDoc?: ProviderStoreDocumentSingleton<T, ConvoChunk, DocChunk>;
+};
 export interface ImageSingleton extends ImageMetadata {}
 
-export interface ConvoSettingsSingleton<
-  T extends boolean = false
-> extends ConversationSettings {
-  conversation?: ConversationSingleton<T>;
-}
-
 export interface ImageGenJobSingleton<
-  T extends boolean = false
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
 > extends ImageGenJob {
-  outputs?: ImageGenOutputSingleton<T>[];
-  userKey?: UserKeySingleton<T>;
-  requestMessage?: MessageSingleton<T>;
+  outputs?: ImageGenOutputSingleton<T, ConvoChunk, DocChunk>[];
+  userKey?: UserKeySingleton<T, ConvoChunk, DocChunk>;
+  requestMessage?: MessageSingleton<T, ConvoChunk, DocChunk>;
 }
 
 export interface ImageGenOutputSingleton<
-  T extends boolean = false
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
 > extends ImageGenOutput {
-  job?: ImageGenJobSingleton<T>;
+  job?: ImageGenJobSingleton<T, ConvoChunk, DocChunk>;
 }
 
-export interface AttachmentSingleton<T extends boolean = false> extends Rm<
-  Attachment,
-  "size"
-> {
+export interface AttachmentSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Rm<Attachment, "size"> {
   size: BigIntOrNumber<T> | null;
   providerLinks?: AttachmentProviderSingleton<T>[];
 
-  providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
+  providerStoreDocs?: ProviderStoreDocumentSingleton<T, ConvoChunk, DocChunk>[];
   image: ImageSingleton | null;
   document: DocumentSingleton | null;
-  imageGenOutput: ImageGenOutputSingleton<T> | null;
+  imageGenOutput: ImageGenOutputSingleton<T, ConvoChunk, DocChunk> | null;
 }
 
-export interface UserKeySingleton<T extends boolean = false> extends UserKey {
+export interface UserKeySingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends UserKey {
   user?: UserSingleton<T>;
-  messages?: MessageSingleton<T>[];
-  imageGenJobs?: ImageGenJobSingleton<T>[];
+  messages?: MessageSingleton<T, ConvoChunk, DocChunk>[];
+  imageGenJobs?: ImageGenJobSingleton<T, ConvoChunk, DocChunk>[];
   attachmentProviders?: AttachmentProviderSingleton<T>[];
 }
 
-export interface MessageSingleton<T extends boolean = false> extends Message {
-  imageGenJob?: ImageGenJobSingleton<T> | null;
-  userKey?: UserKeySingleton<T> | null;
-  attachments: AttachmentSingleton<T>[];
+export interface MessageSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends Message {
+  imageGenJob?: ImageGenJobSingleton<T, ConvoChunk, DocChunk> | null;
+  userKey?: UserKeySingleton<T, ConvoChunk, DocChunk> | null;
+  attachments: AttachmentSingleton<T, ConvoChunk, DocChunk>[];
+}
+
+export type ConversationMemoryChunkSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> = DX<
+  Chunk.Opts<"ConvoChunk", ConvoChunk> & {
+    contextState?: ConversationContextStateSingleton<T, ConvoChunk, DocChunk>;
+  }
+>;
+
+export interface ConvoSettingsSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends ConversationSettings {
+  conversation?: ConversationSingleton<T, ConvoChunk, DocChunk>;
 }
 
 export interface ConversationSingleton<
-  T extends boolean = false
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
 > extends Conversation {
-  conversationSettings: ConvoSettingsSingleton<T> | null;
-  messages: MessageSingleton<T>[];
-  attachments?: AttachmentSingleton<T>[];
+  conversationSettings: ConvoSettingsSingleton<T, ConvoChunk, DocChunk> | null;
+  messages: MessageSingleton<T, ConvoChunk, DocChunk>[];
+  attachments?: AttachmentSingleton<T, ConvoChunk, DocChunk>[];
   user?: UserSingleton<T>;
+  conversationStates?: ConversationContextStateSingleton<
+    T,
+    ConvoChunk,
+    DocChunk
+  >[];
 }
 
 export interface ConversationSingletonOneOff<
-  T extends boolean = false
-> extends ConversationSingleton<T> {
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends ConversationSingleton<T, ConvoChunk, DocChunk> {
   apiKey?: string | null;
 }
 
-export type FlexiProvider = $Enums.Provider | Lowercase<$Enums.Provider>;
+export interface ConversationContextStateSingleton<
+  T extends boolean = false,
+  ConvoChunk extends Chunk.Opts.TargetUnion = "none",
+  DocChunk extends Chunk.Opts.TargetUnion = "none"
+> extends ConversationContextState {
+  conversation?: ConversationSingleton<T, ConvoChunk, DocChunk>;
+  store?: ProviderStoreSingleton<T, ConvoChunk, DocChunk>;
+  memoryChunks?: ConversationMemoryChunkSingleton<T, ConvoChunk, DocChunk>[];
+}
+
+export type FlexiProvider = FlexiCase<$Enums.Provider>;
 
 export type Signals =
   | "SIGABRT"
@@ -222,3 +372,19 @@ export type AssetReadyPayload = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+type ALLTEST = DX<
+  ProviderStoreDocumentChunk & {
+    score: number;
+    embedding: number[];
+  }
+>;
+
+// true
+export type DOC_GAUGE = Equal<Chunk.Opts<"DocChunk", "all">, ALLTEST>;
+
+// true
+export type CONVO_GAUGE = Equal<
+  DX<Chunk.Opts<"ConvoChunk", "all">>,
+  DX<ConversationMemoryChunk & { score: number; embedding: number[] }>
+>;

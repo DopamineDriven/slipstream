@@ -8,7 +8,9 @@
         "$TURBO_DEFAULT$",
         "src/**/*.ts",
         "edge/**/*.ts",
-        "prisma/schema.prisma",
+        "prisma/schema/**/*.prisma",
+        "prisma/sql/**/*.sql",
+        "prisma.config.ts",
         "tsdown.config.ts"
       ]
     }

@@ -75,6 +75,21 @@ export type ProviderStore = Prisma.ProviderStoreModel
  */
 export type ProviderStoreDocument = Prisma.ProviderStoreDocumentModel
 /**
+ * Model ProviderStoreDocumentChunk
+ * 
+ */
+export type ProviderStoreDocumentChunk = Prisma.ProviderStoreDocumentChunkModel
+/**
+ * Model ConversationMemoryChunk
+ * 
+ */
+export type ConversationMemoryChunk = Prisma.ConversationMemoryChunkModel
+/**
+ * Model ConversationContextState
+ * 
+ */
+export type ConversationContextState = Prisma.ConversationContextStateModel
+/**
  * Model UserKey
  * 
  */

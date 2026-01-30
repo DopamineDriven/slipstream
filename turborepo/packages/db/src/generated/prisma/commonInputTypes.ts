@@ -290,6 +290,23 @@ export type EnumProviderDocStateWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
 }
 
+export type EnumChunkingStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChunkingState | Prisma.EnumChunkingStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel> | $Enums.ChunkingState
+}
+
+export type EnumChunkingStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChunkingState | Prisma.EnumChunkingStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChunkingStateWithAggregatesFilter<$PrismaModel> | $Enums.ChunkingState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel>
+}
+
 export type BoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -885,6 +902,23 @@ export type NestedEnumProviderDocStateWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProviderDocStateFilter<$PrismaModel>
+}
+
+export type NestedEnumChunkingStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChunkingState | Prisma.EnumChunkingStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel> | $Enums.ChunkingState
+}
+
+export type NestedEnumChunkingStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChunkingState | Prisma.EnumChunkingStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChunkingState[] | Prisma.ListEnumChunkingStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChunkingStateWithAggregatesFilter<$PrismaModel> | $Enums.ChunkingState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChunkingStateFilter<$PrismaModel>
 }
 
 export type NestedBoolFilter<$PrismaModel = never> = {

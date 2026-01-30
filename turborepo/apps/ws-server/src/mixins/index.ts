@@ -39,7 +39,7 @@ export type ProviderNarrowed<T extends keyof ProviderMap> = {
 
 export interface ProviderEntry<V extends Provider> {
   provider: V;
-  instance?: Partial<ProviderMap>[V];
+  instance?: ProviderMap[V];
   hasProviderApiKeySet: boolean;
   available: boolean;
   initialized: boolean;
@@ -47,7 +47,7 @@ export interface ProviderEntry<V extends Provider> {
   initTime?: number;
 }
 
-export type ServiceFromProvider<P extends Provider> = Partial<ProviderMap>[P];
+export type ServiceFromProvider<P extends Provider> = ProviderMap[P];
 
 export type Constructor<A extends any[] = any[], I = object> = new (
   ...args: A

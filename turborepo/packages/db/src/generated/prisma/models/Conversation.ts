@@ -226,6 +226,7 @@ export type ConversationWhereInput = {
   messages?: Prisma.MessageListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
   conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
+  conversationStates?: Prisma.ConversationContextStateListRelationFilter
 }
 
 export type ConversationOrderByWithRelationInput = {
@@ -243,6 +244,7 @@ export type ConversationOrderByWithRelationInput = {
   messages?: Prisma.MessageOrderByRelationAggregateInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
   conversationSettings?: Prisma.ConversationSettingsOrderByWithRelationInput
+  conversationStates?: Prisma.ConversationContextStateOrderByRelationAggregateInput
 }
 
 export type ConversationWhereUniqueInput = Prisma.AtLeast<{
@@ -263,6 +265,7 @@ export type ConversationWhereUniqueInput = Prisma.AtLeast<{
   messages?: Prisma.MessageListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
   conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
+  conversationStates?: Prisma.ConversationContextStateListRelationFilter
 }, "id" | "shareToken">
 
 export type ConversationOrderByWithAggregationInput = {
@@ -311,6 +314,7 @@ export type ConversationCreateInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateInput = {
@@ -327,6 +331,7 @@ export type ConversationUncheckedCreateInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUpdateInput = {
@@ -343,6 +348,7 @@ export type ConversationUpdateInput = {
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateInput = {
@@ -359,6 +365,7 @@ export type ConversationUncheckedUpdateInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateManyInput = {
@@ -409,6 +416,11 @@ export type ConversationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ConversationScalarRelationFilter = {
+  is?: Prisma.ConversationWhereInput
+  isNot?: Prisma.ConversationWhereInput
+}
+
 export type ConversationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -446,11 +458,6 @@ export type ConversationMinOrderByAggregateInput = {
   parentId?: Prisma.SortOrder
   isShared?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
-}
-
-export type ConversationScalarRelationFilter = {
-  is?: Prisma.ConversationWhereInput
-  isNot?: Prisma.ConversationWhereInput
 }
 
 export type ConversationNullableScalarRelationFilter = {
@@ -498,6 +505,20 @@ export type ConversationUncheckedUpdateManyWithoutUserNestedInput = {
   update?: Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput | Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.ConversationUpdateManyWithWhereWithoutUserInput | Prisma.ConversationUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
+}
+
+export type ConversationCreateNestedOneWithoutConversationStatesInput = {
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationStatesInput, Prisma.ConversationUncheckedCreateWithoutConversationStatesInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationStatesInput
+  connect?: Prisma.ConversationWhereUniqueInput
+}
+
+export type ConversationUpdateOneRequiredWithoutConversationStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationStatesInput, Prisma.ConversationUncheckedCreateWithoutConversationStatesInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationStatesInput
+  upsert?: Prisma.ConversationUpsertWithoutConversationStatesInput
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutConversationStatesInput, Prisma.ConversationUpdateWithoutConversationStatesInput>, Prisma.ConversationUncheckedUpdateWithoutConversationStatesInput>
 }
 
 export type ConversationCreateNestedOneWithoutConversationSettingsInput = {
@@ -557,6 +578,7 @@ export type ConversationCreateWithoutUserInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutUserInput = {
@@ -572,6 +594,7 @@ export type ConversationUncheckedCreateWithoutUserInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutUserInput = {
@@ -616,6 +639,86 @@ export type ConversationScalarWhereInput = {
   shareToken?: Prisma.StringNullableFilter<"Conversation"> | string | null
 }
 
+export type ConversationCreateWithoutConversationStatesInput = {
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  user: Prisma.UserCreateNestedOneWithoutConversationsInput
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+}
+
+export type ConversationUncheckedCreateWithoutConversationStatesInput = {
+  id?: string
+  userId: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+}
+
+export type ConversationCreateOrConnectWithoutConversationStatesInput = {
+  where: Prisma.ConversationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ConversationCreateWithoutConversationStatesInput, Prisma.ConversationUncheckedCreateWithoutConversationStatesInput>
+}
+
+export type ConversationUpsertWithoutConversationStatesInput = {
+  update: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationStatesInput, Prisma.ConversationUncheckedUpdateWithoutConversationStatesInput>
+  create: Prisma.XOR<Prisma.ConversationCreateWithoutConversationStatesInput, Prisma.ConversationUncheckedCreateWithoutConversationStatesInput>
+  where?: Prisma.ConversationWhereInput
+}
+
+export type ConversationUpdateToOneWithWhereWithoutConversationStatesInput = {
+  where?: Prisma.ConversationWhereInput
+  data: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationStatesInput, Prisma.ConversationUncheckedUpdateWithoutConversationStatesInput>
+}
+
+export type ConversationUpdateWithoutConversationStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+}
+
+export type ConversationUncheckedUpdateWithoutConversationStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+}
+
 export type ConversationCreateWithoutConversationSettingsInput = {
   id?: string
   userKeyId?: string | null
@@ -629,6 +732,7 @@ export type ConversationCreateWithoutConversationSettingsInput = {
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutConversationSettingsInput = {
@@ -644,6 +748,7 @@ export type ConversationUncheckedCreateWithoutConversationSettingsInput = {
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutConversationSettingsInput = {
@@ -675,6 +780,7 @@ export type ConversationUpdateWithoutConversationSettingsInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutConversationSettingsInput = {
@@ -690,6 +796,7 @@ export type ConversationUncheckedUpdateWithoutConversationSettingsInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutMessagesInput = {
@@ -705,6 +812,7 @@ export type ConversationCreateWithoutMessagesInput = {
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutMessagesInput = {
@@ -720,6 +828,7 @@ export type ConversationUncheckedCreateWithoutMessagesInput = {
   shareToken?: string | null
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutMessagesInput = {
@@ -751,6 +860,7 @@ export type ConversationUpdateWithoutMessagesInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutMessagesInput = {
@@ -766,6 +876,7 @@ export type ConversationUncheckedUpdateWithoutMessagesInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutAttachmentsInput = {
@@ -781,6 +892,7 @@ export type ConversationCreateWithoutAttachmentsInput = {
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutAttachmentsInput = {
@@ -796,6 +908,7 @@ export type ConversationUncheckedCreateWithoutAttachmentsInput = {
   shareToken?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutAttachmentsInput = {
@@ -827,6 +940,7 @@ export type ConversationUpdateWithoutAttachmentsInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutAttachmentsInput = {
@@ -842,6 +956,7 @@ export type ConversationUncheckedUpdateWithoutAttachmentsInput = {
   shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateManyUserInput = {
@@ -869,6 +984,7 @@ export type ConversationUpdateWithoutUserInput = {
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutUserInput = {
@@ -884,6 +1000,7 @@ export type ConversationUncheckedUpdateWithoutUserInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
   conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateManyWithoutUserInput = {
@@ -906,11 +1023,13 @@ export type ConversationUncheckedUpdateManyWithoutUserInput = {
 export type ConversationCountOutputType = {
   messages: number
   attachments: number
+  conversationStates: number
 }
 
 export type ConversationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   messages?: boolean | ConversationCountOutputTypeCountMessagesArgs
   attachments?: boolean | ConversationCountOutputTypeCountAttachmentsArgs
+  conversationStates?: boolean | ConversationCountOutputTypeCountConversationStatesArgs
 }
 
 /**
@@ -937,6 +1056,13 @@ export type ConversationCountOutputTypeCountAttachmentsArgs<ExtArgs extends runt
   where?: Prisma.AttachmentWhereInput
 }
 
+/**
+ * ConversationCountOutputType without action
+ */
+export type ConversationCountOutputTypeCountConversationStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationContextStateWhereInput
+}
+
 
 export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -953,6 +1079,7 @@ export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
   attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
   conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
+  conversationStates?: boolean | Prisma.Conversation$conversationStatesArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
 
@@ -1003,6 +1130,7 @@ export type ConversationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
   attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
   conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
+  conversationStates?: boolean | Prisma.Conversation$conversationStatesArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ConversationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1019,6 +1147,7 @@ export type $ConversationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     messages: Prisma.$MessagePayload<ExtArgs>[]
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
     conversationSettings: Prisma.$ConversationSettingsPayload<ExtArgs> | null
+    conversationStates: Prisma.$ConversationContextStatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1429,6 +1558,7 @@ export interface Prisma__ConversationClient<T, Null = never, ExtArgs extends run
   messages<T extends Prisma.Conversation$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachments<T extends Prisma.Conversation$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversationSettings<T extends Prisma.Conversation$conversationSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$conversationSettingsArgs<ExtArgs>>): Prisma.Prisma__ConversationSettingsClient<runtime.Types.Result.GetResult<Prisma.$ConversationSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  conversationStates<T extends Prisma.Conversation$conversationStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$conversationStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationContextStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1928,6 +2058,30 @@ export type Conversation$conversationSettingsArgs<ExtArgs extends runtime.Types.
    */
   include?: Prisma.ConversationSettingsInclude<ExtArgs> | null
   where?: Prisma.ConversationSettingsWhereInput
+}
+
+/**
+ * Conversation.conversationStates
+ */
+export type Conversation$conversationStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ConversationContextState
+   */
+  select?: Prisma.ConversationContextStateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ConversationContextState
+   */
+  omit?: Prisma.ConversationContextStateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationContextStateInclude<ExtArgs> | null
+  where?: Prisma.ConversationContextStateWhereInput
+  orderBy?: Prisma.ConversationContextStateOrderByWithRelationInput | Prisma.ConversationContextStateOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationContextStateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationContextStateScalarFieldEnum | Prisma.ConversationContextStateScalarFieldEnum[]
 }
 
 /**

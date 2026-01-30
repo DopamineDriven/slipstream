@@ -1,0 +1,93 @@
+enum ImageGenOutputKind {
+  PARTIAL
+  FINAL
+}
+
+enum ImageGenStage {
+  QUEUED
+  PROCESSING
+  PERSISTING
+  FINALIZING
+  COMPLETED
+  REFUSAL
+  FAILED
+  ABORTED
+}
+
+model ImageGenJob {
+  id               String   @id @default(cuid(2))
+  requestMessageId String   @unique
+  provider         Provider
+  model            String
+  userId           String
+  userKeyId        String? // BYOK used; store keyFingerprint here too if you wish
+  keyFingerprint   String? // useful for Google file/caches affinity
+
+  // Core request fields (provider-agnostic)
+  prompt         String
+  systemPrompt   String?
+  temperature    Float?
+  topP           Float?
+  nRequested     Int     @default(1)
+  nCompleted     Int     @default(0)
+  seed           Int?
+  negativePrompt String?
+
+  // Normalized output controls (shared across providers)
+  outputSize             String? // e.g. "1024x1024", "1:1"
+  outputQuality          String? // "low|medium|high|standard|hd|1K|2K"
+  outputFormat           String? // "png|jpeg|webp"
+  outputBackground       String? // "transparent|opaque|auto"
+  outputCompression      Int?
+  partialImagesRequested Int? // 0..3 for gpt-image-1 streaming
+  inputFidelity          String? // gpt-image-1 only -> "high" | "low" (default) | undefined
+  personGeneration       String? // imagen google gen models only -> "dont_allow" | "allow_adult" (default) | "allow_all" | undefined
+  moderation             String? // (gpt-image-1 & gpt-image-1-mini) only -> "auto" (default) | "low" | undefined
+
+  // Runtime status / progress
+  stage         ImageGenStage @default(QUEUED)
+  progress      Int           @default(0) // 0..100 (synthetic or signal-based)
+  etaSeconds    Int?
+  durationMs    Int? // filled on completion
+  usage         Int? // tokens/credits if provider reports
+  revisedPrompt String? // DALLE-3, grok-2-image-1212, Imagen.
+  error         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  requestMessage Message          @relation("ImageGenJobToMessage", fields: [requestMessageId], references: [id], onDelete: Cascade)
+  userKey        UserKey?         @relation("ImageGenJobToUserKey", fields: [userKeyId], references: [id], onDelete: SetNull)
+  outputs        ImageGenOutput[]
+
+  @@index([requestMessageId, createdAt])
+  @@index([provider, model, createdAt])
+  @@index([stage, createdAt])
+  @@index([userId, createdAt])
+  @@index([userKeyId])
+}
+
+model ImageGenOutput {
+  id            String             @id @default(cuid(2))
+  jobId         String
+  jobIndex      Int // 0..n-1 -- 0..0 (dall-e-3, n=1) -- 0..3 (all imagen- models, n <= 4) -- 0..9 (all other models, n <=10)
+  kind          ImageGenOutputKind @default(FINAL)
+  seriesIndex   Int
+  seriesId      String // mirror per-call lineage
+  isPartial     Boolean
+  attachmentId  String             @unique
+  width         Int?
+  height        Int?
+  mime          String?
+  ext           String?
+  revisedPrompt String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  job        ImageGenJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  attachment Attachment  @relation("ImageGenOutputToAttachment", fields: [attachmentId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, seriesId, kind, seriesIndex])
+  @@index([jobId, jobIndex, kind])
+}

@@ -270,6 +270,7 @@ export type ProviderStoreWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ProviderStore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   docs?: Prisma.ProviderStoreDocumentListRelationFilter
+  conversationStates?: Prisma.ConversationContextStateListRelationFilter
 }
 
 export type ProviderStoreOrderByWithRelationInput = {
@@ -286,11 +287,12 @@ export type ProviderStoreOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   docs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput
+  conversationStates?: Prisma.ConversationContextStateOrderByRelationAggregateInput
 }
 
 export type ProviderStoreWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_provider?: Prisma.ProviderStoreUserIdProviderCompoundUniqueInput
+  userId_provider?: Prisma.ProviderStoreUserId_providerCompoundUniqueInput
   AND?: Prisma.ProviderStoreWhereInput | Prisma.ProviderStoreWhereInput[]
   OR?: Prisma.ProviderStoreWhereInput[]
   NOT?: Prisma.ProviderStoreWhereInput | Prisma.ProviderStoreWhereInput[]
@@ -306,6 +308,7 @@ export type ProviderStoreWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"ProviderStore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   docs?: Prisma.ProviderStoreDocumentListRelationFilter
+  conversationStates?: Prisma.ConversationContextStateListRelationFilter
 }, "id" | "userId_provider">
 
 export type ProviderStoreOrderByWithAggregationInput = {
@@ -357,6 +360,7 @@ export type ProviderStoreCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
   docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateInput = {
@@ -372,6 +376,7 @@ export type ProviderStoreUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUpdateInput = {
@@ -387,6 +392,7 @@ export type ProviderStoreUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
   docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateInput = {
@@ -402,6 +408,7 @@ export type ProviderStoreUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreCreateManyInput = {
@@ -455,7 +462,7 @@ export type ProviderStoreOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ProviderStoreUserIdProviderCompoundUniqueInput = {
+export type ProviderStoreUserId_providerCompoundUniqueInput = {
   userId: string
   provider: $Enums.Provider
 }
@@ -593,6 +600,20 @@ export type ProviderStoreUpdateOneRequiredWithoutDocsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProviderStoreUpdateToOneWithWhereWithoutDocsInput, Prisma.ProviderStoreUpdateWithoutDocsInput>, Prisma.ProviderStoreUncheckedUpdateWithoutDocsInput>
 }
 
+export type ProviderStoreCreateNestedOneWithoutConversationStatesInput = {
+  create?: Prisma.XOR<Prisma.ProviderStoreCreateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedCreateWithoutConversationStatesInput>
+  connectOrCreate?: Prisma.ProviderStoreCreateOrConnectWithoutConversationStatesInput
+  connect?: Prisma.ProviderStoreWhereUniqueInput
+}
+
+export type ProviderStoreUpdateOneRequiredWithoutConversationStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProviderStoreCreateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedCreateWithoutConversationStatesInput>
+  connectOrCreate?: Prisma.ProviderStoreCreateOrConnectWithoutConversationStatesInput
+  upsert?: Prisma.ProviderStoreUpsertWithoutConversationStatesInput
+  connect?: Prisma.ProviderStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProviderStoreUpdateToOneWithWhereWithoutConversationStatesInput, Prisma.ProviderStoreUpdateWithoutConversationStatesInput>, Prisma.ProviderStoreUncheckedUpdateWithoutConversationStatesInput>
+}
+
 export type ProviderStoreCreateWithoutUserInput = {
   id?: string
   provider: $Enums.Provider
@@ -605,6 +626,7 @@ export type ProviderStoreCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateWithoutUserInput = {
@@ -619,6 +641,7 @@ export type ProviderStoreUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreCreateOrConnectWithoutUserInput = {
@@ -676,6 +699,7 @@ export type ProviderStoreCreateWithoutDocsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
+  conversationStates?: Prisma.ConversationContextStateCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreUncheckedCreateWithoutDocsInput = {
@@ -690,6 +714,7 @@ export type ProviderStoreUncheckedCreateWithoutDocsInput = {
   lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  conversationStates?: Prisma.ConversationContextStateUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type ProviderStoreCreateOrConnectWithoutDocsInput = {
@@ -720,6 +745,7 @@ export type ProviderStoreUpdateWithoutDocsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateWithoutDocsInput = {
@@ -734,6 +760,83 @@ export type ProviderStoreUncheckedUpdateWithoutDocsInput = {
   lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutStoreNestedInput
+}
+
+export type ProviderStoreCreateWithoutConversationStatesInput = {
+  id?: string
+  provider: $Enums.Provider
+  storeRef: string
+  storeName: string
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  providerStoreCreatedAt?: Date | string | null
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProviderStoresInput
+  docs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutStoreInput
+}
+
+export type ProviderStoreUncheckedCreateWithoutConversationStatesInput = {
+  id?: string
+  userId: string
+  provider: $Enums.Provider
+  storeRef: string
+  storeName: string
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  providerStoreCreatedAt?: Date | string | null
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  docs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput
+}
+
+export type ProviderStoreCreateOrConnectWithoutConversationStatesInput = {
+  where: Prisma.ProviderStoreWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProviderStoreCreateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedCreateWithoutConversationStatesInput>
+}
+
+export type ProviderStoreUpsertWithoutConversationStatesInput = {
+  update: Prisma.XOR<Prisma.ProviderStoreUpdateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedUpdateWithoutConversationStatesInput>
+  create: Prisma.XOR<Prisma.ProviderStoreCreateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedCreateWithoutConversationStatesInput>
+  where?: Prisma.ProviderStoreWhereInput
+}
+
+export type ProviderStoreUpdateToOneWithWhereWithoutConversationStatesInput = {
+  where?: Prisma.ProviderStoreWhereInput
+  data: Prisma.XOR<Prisma.ProviderStoreUpdateWithoutConversationStatesInput, Prisma.ProviderStoreUncheckedUpdateWithoutConversationStatesInput>
+}
+
+export type ProviderStoreUpdateWithoutConversationStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeRef?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  providerStoreCreatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProviderStoresNestedInput
+  docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
+}
+
+export type ProviderStoreUncheckedUpdateWithoutConversationStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeRef?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  providerStoreCreatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreCreateManyUserInput = {
@@ -761,6 +864,7 @@ export type ProviderStoreUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   docs?: Prisma.ProviderStoreDocumentUpdateManyWithoutStoreNestedInput
+  conversationStates?: Prisma.ConversationContextStateUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateWithoutUserInput = {
@@ -775,6 +879,7 @@ export type ProviderStoreUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   docs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput
+  conversationStates?: Prisma.ConversationContextStateUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type ProviderStoreUncheckedUpdateManyWithoutUserInput = {
@@ -797,10 +902,12 @@ export type ProviderStoreUncheckedUpdateManyWithoutUserInput = {
 
 export type ProviderStoreCountOutputType = {
   docs: number
+  conversationStates: number
 }
 
 export type ProviderStoreCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   docs?: boolean | ProviderStoreCountOutputTypeCountDocsArgs
+  conversationStates?: boolean | ProviderStoreCountOutputTypeCountConversationStatesArgs
 }
 
 /**
@@ -820,6 +927,13 @@ export type ProviderStoreCountOutputTypeCountDocsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ProviderStoreDocumentWhereInput
 }
 
+/**
+ * ProviderStoreCountOutputType without action
+ */
+export type ProviderStoreCountOutputTypeCountConversationStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationContextStateWhereInput
+}
+
 
 export type ProviderStoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -835,6 +949,7 @@ export type ProviderStoreSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   docs?: boolean | Prisma.ProviderStore$docsArgs<ExtArgs>
+  conversationStates?: boolean | Prisma.ProviderStore$conversationStatesArgs<ExtArgs>
   _count?: boolean | Prisma.ProviderStoreCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["providerStore"]>
 
@@ -886,6 +1001,7 @@ export type ProviderStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ProviderStoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   docs?: boolean | Prisma.ProviderStore$docsArgs<ExtArgs>
+  conversationStates?: boolean | Prisma.ProviderStore$conversationStatesArgs<ExtArgs>
   _count?: boolean | Prisma.ProviderStoreCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProviderStoreIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -900,6 +1016,7 @@ export type $ProviderStorePayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     docs: Prisma.$ProviderStoreDocumentPayload<ExtArgs>[]
+    conversationStates: Prisma.$ConversationContextStatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1309,6 +1426,7 @@ export interface Prisma__ProviderStoreClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   docs<T extends Prisma.ProviderStore$docsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderStore$docsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderStoreDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversationStates<T extends Prisma.ProviderStore$conversationStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderStore$conversationStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationContextStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1766,6 +1884,30 @@ export type ProviderStore$docsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+}
+
+/**
+ * ProviderStore.conversationStates
+ */
+export type ProviderStore$conversationStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ConversationContextState
+   */
+  select?: Prisma.ConversationContextStateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ConversationContextState
+   */
+  omit?: Prisma.ConversationContextStateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationContextStateInclude<ExtArgs> | null
+  where?: Prisma.ConversationContextStateWhereInput
+  orderBy?: Prisma.ConversationContextStateOrderByWithRelationInput | Prisma.ConversationContextStateOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationContextStateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationContextStateScalarFieldEnum | Prisma.ConversationContextStateScalarFieldEnum[]
 }
 
 /**

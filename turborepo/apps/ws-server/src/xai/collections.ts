@@ -1,16 +1,18 @@
+import type { xAIResponses } from "@/xai/event-types.ts";
 import type {
   CodeInterpreterTool,
   ContentBlockUnion,
   CreateResponseStreamProps,
   FileContentBlock,
   FileSearchTool,
+  HandleToolUsageParams,
   ImageContentBlock,
+  ResponsesApiInputWorkupParams,
   ResponsesComprehensive,
   ResponsesContentInputSingleton,
   ResponsesContentWorkup,
   ResponsesToolsParams,
   TextContentBlock,
-  ToolChoiceUnion,
   ToolUnion,
   WebSearchTool,
   XSearchTool
@@ -29,7 +31,6 @@ import type {
   GrokModelIdUnion,
   MessageSingleton
 } from "@slipstream/types";
-import type { xAIResponses } from "@/xai/event-types.ts";
 
 export class GrokCollectionsService extends GrokWorkupService {
   constructor(
@@ -230,7 +231,7 @@ export class GrokCollectionsService extends GrokWorkupService {
         const rec = await this.prisma.upsertGrokProviderDoc({
           attachmentId: att.id,
           docRef: xaiDocCache.file_metadata.file_id,
-          docUri: this.xaiURI(collection_id,xaiDocCache.file_metadata.file_id),
+          docUri: this.xaiURI(collection_id, xaiDocCache.file_metadata.file_id),
           filename: xaiDocCache.file_metadata.name,
           last_indexed_at: xaiDocCache.last_indexed_at
             ? new Date(xaiDocCache.last_indexed_at)
@@ -304,7 +305,7 @@ export class GrokCollectionsService extends GrokWorkupService {
   protected async ensureXaiAssetUploaded(
     attachment: AttachmentSingleton<true>,
     keyFingerprint = "server",
-    _keyId=keyFingerprint,
+    _keyId = keyFingerprint,
     xaiApiKey = this.xaiKey,
     mgmtKey = this.xaiManagementKey
   ) {
@@ -385,20 +386,20 @@ export class GrokCollectionsService extends GrokWorkupService {
       stream: streaming = stream,
       tools,
       user
-    } = await this.getResponsesApiInputWorkup(
+    } = await this.getResponsesApiInputWorkup({
       isNewChat,
-      (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion,
+      model: (m ?? "grok-4-1-fast-reasoning") as GrokModelIdUnion,
       userId,
       msgs,
-      keyId ?? "server",
+      keyFingerprint: keyId ?? "server",
       systemPrompt,
-      max_tokens,
-      tool_choice_input,
-      imgDetail,
-      keyId ?? undefined,
-      apiKey,
-      mgmtApiKey,
-      cId,
+      max_output_tokens: max_tokens,
+      tool_choice: tool_choice_input,
+      detail: imgDetail,
+      keyId: keyId ?? undefined,
+      apiKey: key,
+      managementKey: mgmtApiKey,
+      collectionId: cId,
       enableFileSearch,
       fileSearchMaxResults,
       enableCodeInterpreter,
@@ -407,9 +408,9 @@ export class GrokCollectionsService extends GrokWorkupService {
       web_enable_image_understanding,
       x_enable_image_understanding,
       x_enable_video_understanding,
-      parallel_tool_calling ?? undefined,
-      ["reasoning.encrypted_content"]
-    );
+      parallel_tool_calls: parallel_tool_calling ?? undefined,
+      include: ["reasoning.encrypted_content"]
+    });
 
     const requestBody = {
       model,
@@ -423,7 +424,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       logprobs,
       max_output_tokens,
       tools,
-      include: ["reasoning.encrypted_content"],
+      include: ["reasoning.encrypted_content"] as const,
       tool_choice,
       parallel_tool_calls
     } satisfies ResponsesContentWorkup;
@@ -769,17 +770,11 @@ export class GrokCollectionsService extends GrokWorkupService {
 
   /**
    * Model Compatibility
-   *
    * Supported Models: grok-4-0709, grok-4-fast-reasoning, grok-4-fast-non-reasoning, grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning
-   *
-   * Strongly Recommended: grok-4-1-fast-reasoning (specifically trained to excel at agentic tool calling)
-   *
-   *
-   *
    */
-  protected handleTooling(
-    model: GrokModelIdUnion,
-    collectionId?: string,
+  protected handleTooling({
+    model,
+    collectionId,
     enableFileSearch = true,
     fileSearchMaxResults = 10,
     enableCodeInterpreter = true,
@@ -788,7 +783,7 @@ export class GrokCollectionsService extends GrokWorkupService {
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true
-  ) {
+  }: HandleToolUsageParams) {
     if (this.canUseServerTools(model)) {
       return this.resolveResponsesTools({
         collectionId,
@@ -804,36 +799,36 @@ export class GrokCollectionsService extends GrokWorkupService {
     }
   }
 
-  private async getResponsesApiInputWorkup(
-    isNewChat: boolean,
-    model: GrokModelIdUnion,
-    userId: string,
-    msgs: MessageSingleton<true>[],
-    keyFingerprint: string,
-    systemPrompt?: string,
-    max_output_tokens?: number,
-    tool_choice: ToolChoiceUnion = "auto",
-    detail?: ImageContentBlock["detail"],
-    keyId?: string,
+  private async getResponsesApiInputWorkup({
+    isNewChat,
+    model = "grok-4-1-fast-reasoning",
+    userId,
+    msgs,
+    keyFingerprint = "server",
+    systemPrompt,
+    max_output_tokens,
+    tool_choice,
+    detail = "high",
+    keyId,
     apiKey = this.xaiKey,
     managementKey = this.xaiManagementKey,
-    collectionId?: string,
+    collectionId,
     enableFileSearch = true,
     fileSearchMaxResults = 5,
     enableCodeInterpreter = true,
     enableWebSearch = true,
-    enableXSearch = false,
+    enableXSearch = true,
     web_enable_image_understanding = true,
     x_enable_image_understanding = true,
     x_enable_video_understanding = true,
     parallel_tool_calls = true,
-    include = ["reasoning.encrypted_content" as const]
-  ) {
+    include = ["reasoning.encrypted_content"]
+  }: ResponsesApiInputWorkupParams) {
     const systemInstruction = this.formatSystemInstruction(
       isNewChat,
       systemPrompt
     );
-    const tooling = this.handleTooling(
+    const tooling = this.handleTooling({
       model,
       collectionId,
       enableFileSearch,
@@ -844,7 +839,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       web_enable_image_understanding,
       x_enable_image_understanding,
       x_enable_video_understanding
-    );
+    });
 
     const history = await this.formatxAIMsgHistory(
       msgs,

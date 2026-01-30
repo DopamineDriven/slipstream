@@ -282,18 +282,23 @@ export {
  */
 export type {
   ArrFieldReplacer,
+  CommonDiscriminants,
   CTR,
   DeepPartial,
   DeepPartialFields,
   DeepReplace,
+  DiscriminatedUnionToRecord,
   DX,
   Equal,
   Expect,
   Extends,
+  FlexiCase,
+  Include,
   InferGSPRT,
   InferGSPRTWorkup,
   IsExact,
   IsOptional,
+  LiteralUnion,
   OnlyOptional,
   OnlyRequired,
   RTC,
@@ -301,11 +306,12 @@ export type {
   Rm,
   TCN,
   Unenumerate,
+  UnionToRecord,
   Without,
   XOR
 } from "@/utils.ts";
 
-export { createDraftId, parseDraftId } from "@/utils.ts";
+export { createDraftId, instanceFunc, parseDraftId } from "@/utils.ts";
 
 /**
  * domain level types

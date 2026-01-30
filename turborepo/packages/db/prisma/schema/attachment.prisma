@@ -1,0 +1,133 @@
+enum AssetOrigin {
+  UPLOAD // local asset
+  REMOTE // external resource
+  GENERATED // created by generative AI
+  PASTED // pasted from clipboard
+  SCREENSHOT // specific type of capture
+  IMPORTED // migrated from another system
+  SCRAPED // extracted from web pages
+}
+
+enum AssetStatus {
+  REQUESTED
+  PLANNED
+  UPLOADING
+  STORED
+  SCANNING
+  READY
+  FAILED
+  QUARANTINED
+  ATTACHED
+  DELETED
+}
+
+
+enum CompatStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  ALIASED
+}
+
+
+enum AssetType {
+  DOCUMENT
+  IMAGE
+  VIDEO
+  AUDIO
+  UNKNOWN
+}
+
+enum ChecksumAlgo {
+  CRC32
+  CRC32C
+  SHA1
+  SHA256
+  CRC64NVME
+}
+
+enum UploadMethod {
+  FETCHED
+  PRESIGNED
+  SERVER
+  GENERATED
+}
+
+model Attachment {
+  id                String       @id @default(cuid(2))
+  conversationId    String?
+  draftId           String? // has the shape `${userId}~${conversationId}~${batchId}~${ordinal}` -> `${string}~${string}~${string}~${number}`
+  batchId           String?
+  generationGroupId String? // unique resp_id by provider -- eg, via openai -> resp_0769a1845e4ca883016900c9bfb9388193a9efbb12edd87b37
+  seriesId          String? // image_generation_call.id
+  userId            String
+  messageId         String?
+  s3ObjectId        String?      @unique // "s3://bucket/key#<versionId|nov>"
+  origin            AssetOrigin  @default(UPLOAD)
+  status            AssetStatus  @default(REQUESTED)
+  uploadMethod      UploadMethod @default(SERVER) // "server" | "presigned" | "generated" | "fetched"
+  assetType         AssetType    @default(UNKNOWN)
+
+  uploadDuration Int? // milliseconds
+  cdnUrl         String? // Cloudfront Url
+  publicUrl      String? // for backwards compat (DONT USE AS CDN URL)
+  sourceUrl      String? // uploadUrl
+  thumbnailKey   String? // image/video thumbnails
+
+  compatMime       String?
+  compatExt        String?
+  compatVersionId  String?
+  compatKey        String?
+  compatS3ObjectId String?
+  compatStatus     CompatStatus?
+  compatReadyAt    DateTime?
+  compatCdnUrl     String?
+
+  bucket    String
+  key       String
+  versionId String?
+  region    String  @default("us-east-1")
+
+  cacheControl       String?
+  contentDisposition String?
+  contentEncoding    String?
+  expiresAt          DateTime?
+
+  size           BigInt?
+  filename       String?
+  ext            String?
+  mime           String?
+  etag           String?
+  checksumAlgo   ChecksumAlgo @default(SHA256)
+  checksumSha256 String?
+
+  storageClass         String?
+  sseAlgorithm         String? // e.g., "aws:kms"
+  sseKmsKeyId          String?
+  s3LastModified       DateTime? // from HeadObject
+  deletedAt            DateTime? // soft deletes
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  localVectorStoreDocs LocalVectorStoreDoc[]
+  conversation         Conversation?           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message              Message?                @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  providerLinks        AttachmentProvider[]
+  providerStoreDocs    ProviderStoreDocument[]
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image                ImageMetadata?
+  video                VideoMetadata?
+  document             DocumentMetadata?
+  audio                AudioMetadata?
+  imageGenOutput       ImageGenOutput?         @relation("ImageGenOutputToAttachment")
+
+  @@index([checksumSha256])
+  @@index([assetType, createdAt])
+  @@index([conversationId, createdAt])
+  @@index([draftId])
+  @@index([assetType])
+  @@index([batchId, conversationId])
+  @@index([userId, createdAt])
+  @@index([generationGroupId, createdAt])
+  @@index([seriesId])
+  @@index([compatStatus])
+}

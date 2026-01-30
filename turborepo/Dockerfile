@@ -73,7 +73,7 @@ RUN groupadd --system --gid 1001 wsserver && \
 
 # install Python packages
 RUN python3.10 -m pip install --no-cache-dir --upgrade pip \
-    && python3.10 -m pip install --no-cache-dir xai-sdk==1.4.0  # Note: == not =
+    && python3.10 -m pip install --no-cache-dir xai-sdk==1.4.0 voyageai==0.3.7 # Note: == not =
 
 WORKDIR /app
 COPY --from=installer /app .

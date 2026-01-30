@@ -1,0 +1,40 @@
+enum ProviderAssetState {
+  PENDING
+  ACTIVE
+  EXPIRED
+  FAILED
+  DELETED
+}
+
+model AttachmentProvider {
+  id             String             @id @default(cuid(2))
+  attachmentId   String
+  provider       Provider
+  userKeyId      String?
+  keyFingerprint String             @db.VarChar(128) // "server" or real userKeyId if defined
+  state          ProviderAssetState @default(PENDING)
+
+  // provider-specific refs
+  providerUri      String?
+  providerRef      String?
+  mime             String?
+  size             BigInt?
+  readyAt          DateTime?
+  expiresAt        DateTime? // ~48h TTL minus safety margin for gemini
+  lastCheckedAt    DateTime?
+  errorCode        String?
+  errorMessage     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  // prisma doesn't allow optional lists.... :|
+  indexedStoreRefs String? // using | as delimiters at rest to separate storeRefs due to prisma's limitations with conditional lists...
+
+  attachment Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  userKey    UserKey?   @relation(fields: [userKeyId], references: [id], onDelete: SetNull)
+
+  @@unique([attachmentId, provider, keyFingerprint], name: "attachmentId_provider_keyFingerprint")
+  @@index([provider, keyFingerprint, expiresAt])
+  @@index([provider, providerRef])
+  @@index([attachmentId, provider])
+  @@index([provider, state, expiresAt])
+}

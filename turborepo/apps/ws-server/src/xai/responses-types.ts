@@ -1,6 +1,6 @@
 import type { GrokProviderChatRequestEntity } from "@/xai/types.ts";
 import { xAIResponses } from "@/xai/event-types.ts";
-import type { GrokModelIdUnion, XOR } from "@slipstream/types";
+import type { GrokModelIdUnion, MessageSingleton, XOR } from "@slipstream/types";
 
 export type ResponsesRole = "user" | "assistant" | "developer" | "system";
 
@@ -236,7 +236,7 @@ export interface GrokChatReqSubset extends GrokProviderChatRequestEntity {}
 
 export interface CreateResponseStreamProps extends GrokChatReqSubset {
   payload: CreateResponseStreamInputProps;
-};
+}
 
 export type SSEEvent<TUnion extends { type: string }> = TUnion extends {
   type: infer K extends string;
@@ -302,7 +302,7 @@ export type XAIResponsesEventMap<
   T extends XAIResponsesEventTypes = XAIResponsesEventTypes
 > = { [P in T]: MapIT[P] }[T];
 
-export type ResponsesToolsParams = {
+export interface ResponsesToolsParams {
   collectionId?: string;
   enableFileSearch?: boolean;
   enableWebSearch?: boolean;
@@ -312,4 +312,34 @@ export type ResponsesToolsParams = {
   web_enable_image_understanding?: boolean;
   x_enable_image_understanding?: boolean;
   x_enable_video_understanding?: boolean;
-};
+}
+
+export interface HandleToolUsageParams extends ResponsesToolsParams {
+  model: GrokModelIdUnion;
+}
+
+export interface ResponsesApiInputWorkupParams {
+  isNewChat: boolean;
+  model: GrokModelIdUnion;
+  userId: string;
+  msgs: MessageSingleton<true>[];
+  keyFingerprint: string;
+  include?: readonly ["reasoning.encrypted_content"]
+  systemPrompt?: string;
+  max_output_tokens?: number;
+  tool_choice?: ToolChoiceUnion;
+  detail?: ImageContentBlock["detail"];
+  keyId?: string;
+  apiKey?: string;
+  managementKey?: string;
+  collectionId?: string;
+  enableFileSearch?: boolean;
+  fileSearchMaxResults?: number;
+  enableCodeInterpreter?: boolean;
+  enableWebSearch?: boolean;
+  enableXSearch?: boolean;
+  web_enable_image_understanding?: boolean;
+  x_enable_image_understanding?: boolean;
+  x_enable_video_understanding?: boolean;
+  parallel_tool_calls?: boolean;
+}

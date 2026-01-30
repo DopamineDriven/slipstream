@@ -55,6 +55,9 @@ export const ModelName = {
   Session: 'Session',
   ProviderStore: 'ProviderStore',
   ProviderStoreDocument: 'ProviderStoreDocument',
+  ProviderStoreDocumentChunk: 'ProviderStoreDocumentChunk',
+  ConversationMemoryChunk: 'ConversationMemoryChunk',
+  ConversationContextState: 'ConversationContextState',
   UserKey: 'UserKey',
   Settings: 'Settings',
   Conversation: 'Conversation',
@@ -193,6 +196,75 @@ export const ProviderStoreDocumentScalarFieldEnum = {
 } as const
 
 export type ProviderStoreDocumentScalarFieldEnum = (typeof ProviderStoreDocumentScalarFieldEnum)[keyof typeof ProviderStoreDocumentScalarFieldEnum]
+
+
+export const ProviderStoreDocumentChunkScalarFieldEnum = {
+  id: 'id',
+  providerStoreDocId: 'providerStoreDocId',
+  attachmentId: 'attachmentId',
+  chunkIndex: 'chunkIndex',
+  content: 'content',
+  provider: 'provider',
+  tokenCount: 'tokenCount',
+  startOffset: 'startOffset',
+  endOffset: 'endOffset',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderStoreDocumentChunkScalarFieldEnum = (typeof ProviderStoreDocumentChunkScalarFieldEnum)[keyof typeof ProviderStoreDocumentChunkScalarFieldEnum]
+
+
+export const ConversationMemoryChunkScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  contextStateId: 'contextStateId',
+  provider: 'provider',
+  provenanceId: 'provenanceId',
+  messageIdStart: 'messageIdStart',
+  messageIdEnd: 'messageIdEnd',
+  chunkingError: 'chunkingError',
+  chunkingState: 'chunkingState',
+  messageTimestampStart: 'messageTimestampStart',
+  messageTimestampEnd: 'messageTimestampEnd',
+  transcriptMarkdown: 'transcriptMarkdown',
+  tokenCount: 'tokenCount',
+  modelProvidersInChunkRaw: 'modelProvidersInChunkRaw',
+  messageIdsRaw: 'messageIdsRaw',
+  attachmentIdsRaw: 'attachmentIdsRaw',
+  embeddingModel: 'embeddingModel',
+  summary: 'summary',
+  summaryModelProvider: 'summaryModelProvider',
+  summaryGeneratedAt: 'summaryGeneratedAt',
+  summaryUpdatedAt: 'summaryUpdatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMemoryChunkScalarFieldEnum = (typeof ConversationMemoryChunkScalarFieldEnum)[keyof typeof ConversationMemoryChunkScalarFieldEnum]
+
+
+export const ConversationContextStateScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  conversationId: 'conversationId',
+  provider: 'provider',
+  rollingSummary: 'rollingSummary',
+  rollingSummaryModels: 'rollingSummaryModels',
+  rollingSummaryTokens: 'rollingSummaryTokens',
+  rollingSummaryUpdatedAt: 'rollingSummaryUpdatedAt',
+  totalInputTokensCurrent: 'totalInputTokensCurrent',
+  lastChunkedMessageId: 'lastChunkedMessageId',
+  lastChunkedMessageIndex: 'lastChunkedMessageIndex',
+  totalModels: 'totalModels',
+  totalProviders: 'totalProviders',
+  totalTurns: 'totalTurns',
+  chunkedTurns: 'chunkedTurns',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationContextStateScalarFieldEnum = (typeof ConversationContextStateScalarFieldEnum)[keyof typeof ConversationContextStateScalarFieldEnum]
 
 
 export const UserKeyScalarFieldEnum = {

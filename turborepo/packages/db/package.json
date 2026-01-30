@@ -16,13 +16,13 @@
     "prebuild": "rm -rf dist/ && pnpm db:generate",
     "predev": "pnpm db:generate",
     "predb:generate:node": "tsx src/test/schema-manipulate.ts --target node",
-    "db:generate:node": "prisma generate",
+    "db:generate:node": "prisma generate --sql",
     "postdb:generate:node": "tsx src/test/schema-manipulate.ts --restore from-node",
     "predb:generate:edge": "tsx src/test/schema-manipulate.ts --target edge",
-    "db:generate:edge": "prisma generate",
+    "db:generate:edge": "prisma generate --sql",
     "postdb:generate:edge": "tsx src/test/schema-manipulate.ts --restore from-edge",
     "db:generate": "pnpm db:generate:node && pnpm db:generate:edge",
-    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
     "precp:binaries": "tsx src/test/scan-output.ts --scan output",
@@ -50,6 +50,11 @@
       "import": "./dist/models-node.js",
       "default": "./dist/models-node.js"
     },
+    "./sql-node": {
+      "types": "./dist/sql-node.d.ts",
+      "import": "./dist/sql-node.js",
+      "default": "./dist/sql-node.js"
+    },
     "./enums-node": {
       "types": "./dist/enums-node.d.ts",
       "import": "./dist/enums-node.js",
@@ -74,6 +79,16 @@
       "types": "./edge/client.ts",
       "import": "./edge/client.ts",
       "default": "./edge/client.ts"
+    },
+    "./edge-sql": {
+      "types": "./edge/sql.ts",
+      "import": "./edge/sql.ts",
+      "default": "./edge/sql.ts"
+    },
+    "./edge-generated-sql": {
+      "types": "./edge/generated/client/sql/*.d.ts",
+      "import": "./edge/generated/client/sql/*.mjs",
+      "default": "./edge/generated/client/sql/*.js"
     },
     "./edge-generated": {
       "types": "./edge/generated/client/*.d.ts",

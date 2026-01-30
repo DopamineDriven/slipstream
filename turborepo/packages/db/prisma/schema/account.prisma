@@ -1,0 +1,23 @@
+model Account {
+  id                    String    @id @default(cuid(2))
+  userId                String
+  type                  String?
+  provider              String // is providerId in better auth --ready to be backfilled one better auth is live and next auth is gone
+  providerAccountId     String // is accountId in better auth --ready to be backfilled one better auth is live and next auth is gone
+  refresh_token         String?
+  accessTokenExpiresAt  DateTime? // ready to be backfilled one better auth is live and next auth is gone
+  refreshTokenExpiresAt DateTime?
+  access_token          String?
+  expiresAt             DateTime?
+  expires_at            Int?
+  token_type            String?
+  scope                 String?
+  password              String?
+  id_token              String?
+  session_state         String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}

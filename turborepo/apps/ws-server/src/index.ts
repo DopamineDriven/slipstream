@@ -269,6 +269,27 @@ declare global {
   interface Response {
     json<T = unknown>(): Promise<T>;
   }
+  interface ObjectConstructor {
+    // PropertyKey -> string and number allowed, symbol disallowed (symbol can't be enumerable)
+    keys<T = object>(
+      o: T
+    ): (keyof T extends infer K
+      ? K extends string
+        ? K
+        : K extends number
+          ? `${K}`
+          : never
+      : never)[];
+    entries<T = object, V extends keyof T = keyof T>(
+      o: T
+    ): (V extends infer K
+      ? K extends string
+        ?  [K, T[V]]
+        : K extends number
+          ? [`${K}`, T[V]]
+          : never
+      : never)[];
+  }
 }
 
 declare module "pythonia" {

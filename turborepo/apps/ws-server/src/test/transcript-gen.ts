@@ -1,37 +1,36 @@
-import { Fs } from "@d0paminedriven/fs";
+import { Fs, UnwrapPromise } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
-import type { AssetType, MessageType } from "@slipstream/db/enums-node";
-import type { Provider } from "@slipstream/types";
+import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { AllModelsUnion } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
-type MapItRT =
-  | {
-      thinking: string | null;
-      thoughtFor: number | null;
-      msgNumber: number;
-      content: string;
-      timestamp: Date;
-      id: string;
-      provider: "openai" | "gemini" | "grok" | "anthropic" | "meta" | "vercel";
-      model: string;
-      sender: "USER" | "AI" | "SYSTEM";
-      assetUrl: {
-        cdnUrl: string;
-        ext: string;
-        msgId: string;
-        filename: string;
-        batchId: string;
-        assetType: AssetType;
-        size: number;
-        msgType: MessageType;
-      }[];
-    }[]
-  | undefined;
+type MapItRT = {
+  thinking: string | null;
+  thoughtFor: number | null;
+  msgNumber: number;
+  content: string;
+  timestamp: Date;
+  msgType: $Enums.MessageType;
+  id: string;
+  provider: Lowercase<$Enums.Provider>;
+  model: AllModelsUnion | (string & {});
+  sender: $Enums.SenderType;
+  asset: {
+    cdnUrl: string;
+    ext: string;
+    msgId: string;
+    filename: string;
+    batchId: string;
+    assetType: $Enums.AssetType;
+    size: number;
+    msgType: $Enums.MessageType;
+  }[];
+};
 
 class ScriptGen extends Fs {
-  constructor(public override cwd: string) {
-    super(process.cwd() ?? cwd);
+  constructor() {
+    super(process.cwd());
   }
 
   private safeErrMsg(err: unknown) {
@@ -48,15 +47,15 @@ class ScriptGen extends Fs {
     } else return String(err);
   }
 
-  private data = async (env: string, id: string) => {
+  private data = async (env: "dev" | "prod", id: string) => {
     const { PrismaClient } =
       await import("@slipstream/db/node/generated/client");
-    const prismaClient = new PrismaClient({ datasourceUrl: env });
+    const datasourceUrl = await this.resolveDbUrl(env);
+    const prismaClient = new PrismaClient({ datasourceUrl });
     try {
       prismaClient.$connect();
-      return await prismaClient.conversation.findUnique({
+      const data = await prismaClient.conversation.findUniqueOrThrow({
         where: { id: id },
-
         include: {
           messages: {
             orderBy: { createdAt: "asc" },
@@ -85,6 +84,24 @@ class ScriptGen extends Fs {
           }
         }
       });
+      const { messages, ...rest } = data;
+      const cleanS = messages.map(t => {
+        const { attachments, ...rest } = t;
+        const cleanAttachments = attachments.map(v => {
+          return { ...v, size: Number(v.size ?? 0) };
+        });
+        return { ...rest, attachments: cleanAttachments };
+      });
+      const cleanedData = { messages: cleanS, ...rest };
+
+      const slug = this.toSlug(cleanedData.title ?? "");
+
+      this.withWs(
+        `src/__out__/conversations/${slug}/${cleanedData.id}.json`,
+        JSON.stringify(cleanedData, null, 2)
+      );
+
+      return { messages: cleanS, ...rest };
     } catch (err) {
       console.error(this.safeErrMsg(err));
     } finally {
@@ -92,77 +109,44 @@ class ScriptGen extends Fs {
     }
   };
 
-  public async Prod(id = "gmj835g3xfgw9bft2ui0bblx") {
-    const { Credentials } = await import("@slipstream/credentials");
-    const cred = new Credentials();
-    const env = await cred.get("DIRECT_URL");
-    return await this.data(env, id).then(s => {
-      if (!s) return;
-      console.log(s.title);
-      const { messages, ...rest } = s;
-      const cleanS = messages.map(t => {
-        const { attachments, ...rest } = t;
-        const cleanAttachments = attachments.map(v => {
-          return { ...v, size: Number(v.size ?? 0) };
-        });
-        return { ...rest, attachments: cleanAttachments };
-      });
-      const sss = { messages: cleanS, ...rest };
-      this.withWs(
-        `src/__out__/conversations/${sss.title}/${sss.id}.json`,
-        JSON.stringify(sss, null, 2)
-      );
-      return s;
-    });
+  private async resolveDbUrl(target: "dev" | "prod") {
+    if (target === "dev" && process.env.DIRECT_URL) {
+      return process.env.DIRECT_URL;
+    } else {
+      const { Credentials } = await import("@slipstream/credentials");
+      const cred = new Credentials();
+      return await cred.get("DIRECT_URL");
+    }
   }
 
-  public async Dev(id = "tsc8ukfhxdddj4pykubzix1i") {
-    return await this.data(process.env.DIRECT_URL ?? "", id).then(s => {
-      if (!s) return;
-      console.log(s.title);
-      const { messages, ...rest } = s;
-      const cleanS = messages.map(t => {
-        const { attachments, ...rest } = t;
-        const cleanAttachments = attachments.map(v => {
-          return { ...v, size: Number(v.size ?? 0) };
-        });
-        return { ...rest, attachments: cleanAttachments };
-      });
-      const sss = { messages: cleanS, ...rest };
-      this.withWs(
-        `src/__out__/conversations/${sss.title && sss.title.length < 128 ? sss.title : "summoning-the-muse"}/${sss.id}.json`,
-        JSON.stringify(sss, null, 2)
-      );
-      return s;
-    });
+  private async envScopedData(
+    target: "dev" | "prod",
+    id = "pblzm3c6sxxlaooikmpzxkwd"
+  ) {
+    return await this.data(target, id);
   }
 
-  public async targeted(target: "dev" | "prod", id?: string) {
-    if (target === "dev") {
-      return await this.Dev(id);
-    } else return await this.Prod(id);
+  private toSlug(title: string) {
+    return title.length > 96
+      ? title
+          .replace(/ /gim, "-")
+          .replace(/:/gim, "--")
+          .replace(/'/gim, "")
+          .slice(0, 95)
+      : title.replace(/ /gim, "-").replace(/:/gim, "--").replace(/'/gim, "");
   }
 
-  private async mapIt(target: "dev" | "prod", id?: string) {
-    return (await this.targeted(target, id))?.messages.map((msg, i) => {
+  private mapIt(data: UnwrapPromise<ReturnType<typeof this.data>>) {
+    return data?.messages.map((msg, i) => {
       ++i;
-      const assetUrl = Array.of<{
-        cdnUrl: string;
-        ext: string;
-        msgId: string;
-        filename: string;
-        batchId: string;
-        assetType: AssetType;
-        size: number;
-        msgType: MessageType;
-      }>();
+      const asset = Array.of<MapItRT["asset"][number]>();
       const content = msg.content,
         timestamp = new Date(msg.createdAt),
         id = msg.id,
         thoughtFor = msg.senderType === "USER" ? null : msg.thinkingDuration,
-        provider = msg.provider.toLowerCase() as Provider,
+        provider = msg.provider.toLowerCase() as Lowercase<$Enums.Provider>,
         model = msg.model ?? "",
-        sender = msg.senderType as "USER" | "AI" | "SYSTEM",
+        sender = msg.senderType,
         thinking = msg.thinkingText ?? null;
       msg.attachments.length > 0
         ? msg.attachments.map(t => {
@@ -172,7 +156,7 @@ class ScriptGen extends Fs {
               filename: "",
               ext: "",
               size: 0,
-              assetType: "UNKNOWN" as AssetType,
+              assetType: "UNKNOWN" as $Enums.AssetType,
               batchOrSeriesId: "",
               msgType: msg.messageType
             };
@@ -226,7 +210,7 @@ class ScriptGen extends Fs {
               }
             }
             const { batchOrSeriesId, ...rest } = attObj;
-            assetUrl.push({ batchId: batchOrSeriesId, ...rest });
+            asset.push({ batchId: batchOrSeriesId, ...rest });
           })
         : null;
       return {
@@ -234,25 +218,37 @@ class ScriptGen extends Fs {
         msgNumber: i,
         content,
         thoughtFor,
+        msgType: msg.messageType,
         timestamp,
         id,
         provider,
         model,
         sender,
-        assetUrl
+        asset
       };
-    }) satisfies MapItRT;
+    });
   }
 
-  private async out(env: "dev" | "prod", id?: string, withThinking = "false") {
+  private assetsToMdFormat(target: MapItRT["asset"]) {
+    return target
+      .map(v => {
+        if (v.assetType === "IMAGE") {
+          return `![${v.filename}](${v.cdnUrl})`;
+        } else {
+          return `[${v.filename}](${v.cdnUrl})`;
+        }
+      })
+      .join("\n\n");
+  }
+
+  private transcriptFormat(
+    dataRaw: UnwrapPromise<ReturnType<typeof this.data>>,
+    withThinking: boolean | `${boolean}` = `${false}`
+  ) {
     const arr = Array.of<string>();
-    const data = await this.mapIt(env, id);
+    const data = this.mapIt(dataRaw) satisfies MapItRT[] | undefined;
     if (!data) return;
     for (const p of data) {
-      /**
-               ? p.provider === "anthropic"
-          ? `<model provider="${p.provider}" name="${p.model}">\n${p.content}\n</model>`
-       */
       const d = p.timestamp.toLocaleTimeString("ja-JP", {
         hour: "2-digit",
         minute: "2-digit",
@@ -262,107 +258,70 @@ class ScriptGen extends Fs {
         hour12: false,
         timeZone: decodeURIComponent("America/Chicago")
       });
-      if (p.assetUrl.length > 0) console.log(p.assetUrl);
       const handleProvider =
         p.provider === "grok"
           ? "xai"
           : p.provider === "gemini"
             ? "google"
             : p.provider;
-      const handleAssets = (
-        target: {
-          cdnUrl: string;
-          ext: string;
-          msgId: string;
-          filename: string;
-          batchId: string;
-          assetType: AssetType;
-          size: number;
-          msgType: MessageType;
-        }[]
-      ) => {
-        return target
-          .map(v => {
-            if (v.assetType === "IMAGE") {
-              return `![${v.filename}](${v.cdnUrl})`;
-            } else {
-              return `[${v.filename}](${v.cdnUrl})`;
-            }
-          })
-          .join("\n\n");
-      };
       const thinkingDur = p.thoughtFor
         ? `\n\n*thought for ${p.thoughtFor / 1000} seconds*\n\n`
         : `\n\n`;
-      const agg =
+      const includeThinking =
+        p.msgType === "IMAGE_GEN" && p.sender === "AI"
+          ? `${p.thinking ? p.thinking.concat("\n\n") : ``}`
+          : ``;
+      const transcriptMsg =
         p.sender === "AI"
           ? withThinking === "true"
             ? p.thinking
-              ? `${p.msgNumber}. ${p.model} (${handleProvider}) ${thinkingDur}${p.thinking}\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
-              : `${p.msgNumber}. ${p.model} (${handleProvider})${thinkingDur}${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
-            : `${p.msgNumber}. ${p.model}(${handleProvider}) ${thinkingDur}${p.content}\n\n${p.assetUrl.length > 0 ? handleAssets(p.assetUrl) : ""}\n\n${d}\n`
-          : p.assetUrl.length > 0
-            ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${handleAssets(p.assetUrl)}\n\n${d}\n`
+              ? `${p.msgNumber}. ${p.model} (${handleProvider})${thinkingDur}${p.thinking}\n\n${p.content}\n\n${this.assetsToMdFormat(p.asset)}\n\n${d}\n`
+              : `${p.msgNumber}. ${p.model} (${handleProvider})${thinkingDur}${p.content}\n\n${p.asset.length > 0 ? this.assetsToMdFormat(p.asset) : ""}\n\n${d}\n`
+            : `${p.msgNumber}. ${p.model} (${handleProvider})${thinkingDur}${includeThinking}${p.content}\n\n${p.asset.length > 0 ? this.assetsToMdFormat(p.asset) : ""}\n\n${d}\n`
+          : p.asset.length > 0
+            ? `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${this.assetsToMdFormat(p.asset)}\n\n${d}\n`
             : `${p.msgNumber}. andrew (user)\n\n${p.content}\n\n${d}\n`;
 
-      arr.push(agg);
+      arr.push(transcriptMsg);
     }
-
     return arr;
   }
-  // prettier-ignore
-  private withFrontmatter = (content: string, title: string) => {
-  // prettier-ignore
-    return`### ${title}\n\n${content}`};
 
   private toTranscript(data: string[], toSlug: string, title: string) {
+    const content = `### ${title}\n\n${data.join(`\n`)}`;
     return new Promise(res =>
-      res(
-        this.withWs(
-          `src/test/__out__/condensed/test/${toSlug}.md`,
-          this.withFrontmatter(data.join(`\n`), title)
-        )
-      )
+      res(this.withWs(`src/test/__out__/condensed/${toSlug}.md`, content))
     );
   }
 
   public async gen(
     target: "dev" | "prod",
     id?: string,
-    withThinking = "false"
+    withThinking: boolean | `${boolean}` = false
   ) {
-    const [data, raw] = await Promise.all([
-      this.out(target, id, withThinking),
-      this.targeted(target, id)
-    ]);
+    const dbData = await this.envScopedData(target, id);
+    const data = this.transcriptFormat(dbData, withThinking);
     if (!data) return;
-    if (!raw) return;
-    if (!raw.title) return;
-    const toSlug =
-      raw.title.length > 96
-        ? raw.title
-            .replace(/ /gim, "-")
-            .replace(/:/gim, "--")
-            .replace(/'/gim, "")
-            .slice(0, 95)
-        : raw.title
-            .replace(/ /gim, "-")
-            .replace(/:/gim, "--")
-            .replace(/'/gim, "");
+    if (!dbData) return;
+    if (!dbData.title) return;
+    const toSlug = this.toSlug(dbData.title);
     try {
-      await this.toTranscript(data, toSlug, raw.title);
+      await this.toTranscript(data, toSlug, dbData.title);
     } catch (err) {
       throw new Error("error in script-gen: ".concat(this.safeErrMsg(err)));
     }
   }
 }
 
-const scriptGen = new ScriptGen(process.cwd());
-
-(async () => {
-  return await scriptGen.gen(
-    (process.argv?.[3] as "dev" | "prod") ?? "dev",
-    process.argv[5],
-    process.argv[7]
-  );
-})();
+if (
+  (process.argv[3] === "dev" || process.argv[3] === "prod") &&
+  process.argv[5] &&
+  /^[a-z0-9]{24}$/.test(process.argv[5])
+) {
+  const scriptGen = new ScriptGen();
+  if (process.argv[7] && process.argv[7] === "true") {
+    scriptGen.gen(process.argv[3], process.argv[5], process.argv[7]);
+  } else {
+    scriptGen.gen(process.argv[3], process.argv[5]);
+  }
+}

@@ -251,3 +251,14 @@ export const AssetStatus = {
 } as const
 
 export type AssetStatus = (typeof AssetStatus)[keyof typeof AssetStatus]
+
+
+export const ChunkingState = {
+  IDLE: 'IDLE',
+  QUEUED: 'QUEUED',
+  CHUNKING: 'CHUNKING',
+  COMPLETE: 'COMPLETE',
+  ERROR: 'ERROR'
+} as const
+
+export type ChunkingState = (typeof ChunkingState)[keyof typeof ChunkingState]

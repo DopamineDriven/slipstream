@@ -67,7 +67,7 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
     const isDefault = Object.fromEntries(
       Object.entries(props.isDefault).map(([t, o]) => {
         return [
-          t as Lowercase<$Enums.Provider>,
+          t,
           o === 0 ? false : true
         ] as const;
       })

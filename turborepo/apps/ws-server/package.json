@@ -42,7 +42,7 @@
         "dist/meta/index.d.ts"
       ],
       "mixins": [
-        "src/mixins/index.d.ts"
+        "dist/mixins/index.d.ts"
       ],
       "models": [
         "dist/models/index.d.ts"
@@ -154,6 +154,7 @@
     "pythonia": "^1.2.6",
     "redis": "^5.10.0",
     "sharp": "^0.34.5",
+    "tiktoken": "^1.0.22",
     "tslib": "^2.8.1",
     "typescript": "catalog:ts6",
     "unpdf": "^1.4.0",

@@ -1,0 +1,14 @@
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+model Settings {
+  id              String           @id @default(cuid(2))
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme           ThemePreference? @default(SYSTEM)
+  defaultProvider Provider?
+  defaultModel    String?
+}
