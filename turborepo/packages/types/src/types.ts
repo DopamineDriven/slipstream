@@ -1,6 +1,5 @@
-import type { DX, FlexiCase, SerializeBigInt } from "@/utils.ts";
+import type { DX, SerializeBigInt } from "@/utils.ts";
 import type {
-  $Enums,
   Account,
   Attachment,
   AttachmentProvider,
@@ -28,13 +27,10 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 
-export type BigIntOrNumber<T extends boolean = false> = T extends true
-  ? number
-  : bigint;
-
 export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
   SerializeBigInt<V, P> & Q
 >;
+
 export type UserSingleton<T extends boolean = false> = NormalizeAndInject<
   User,
   {
@@ -139,7 +135,6 @@ export type ProviderStoreDocumentSingleton<T extends boolean = false> =
     },
     T
   >;
-
 export type ConversationMemoryStoreSingleton<T extends boolean = false> =
   NormalizeAndInject<
     ConversationMemoryStore,
@@ -255,85 +250,3 @@ export type ConversationSingletonOneOff<T extends boolean = false> =
     },
     T
   >;
-
-export type FlexiProvider = FlexiCase<$Enums.Provider>;
-
-export type Signals =
-  | "SIGABRT"
-  | "SIGALRM"
-  | "SIGBREAK"
-  | "SIGBUS"
-  | "SIGCHLD"
-  | "SIGCONT"
-  | "SIGFPE"
-  | "SIGHUP"
-  | "SIGILL"
-  | "SIGINFO"
-  | "SIGINT"
-  | "SIGIO"
-  | "SIGIOT"
-  | "SIGKILL"
-  | "SIGLOST"
-  | "SIGPIPE"
-  | "SIGPOLL"
-  | "SIGPROF"
-  | "SIGPWR"
-  | "SIGQUIT"
-  | "SIGSEGV"
-  | "SIGSTKFLT"
-  | "SIGSTOP"
-  | "SIGSYS"
-  | "SIGTERM"
-  | "SIGTRAP"
-  | "SIGTSTP"
-  | "SIGTTIN"
-  | "SIGTTOU"
-  | "SIGUNUSED"
-  | "SIGURG"
-  | "SIGUSR1"
-  | "SIGUSR2"
-  | "SIGVTALRM"
-  | "SIGWINCH"
-  | "SIGXCPU"
-  | "SIGXFSZ";
-
-export type AssetReadyPayload = {
-  publicUrl: string | null;
-  bucket: string;
-  cacheControl: string | null;
-  contentDisposition: string | null;
-  etag: string | null;
-  s3ObjectId: string | null;
-  key: string;
-  cdnUrl: string | null;
-  versionId: string | null;
-  size: bigint | null;
-  storageClass: string | null;
-  id: string;
-  conversationId: string | null;
-  draftId: string | null;
-  batchId: string | null;
-  userId: string;
-  messageId: string | null;
-  origin: $Enums.AssetOrigin;
-  status: $Enums.AssetStatus;
-  uploadMethod: $Enums.UploadMethod;
-  assetType: $Enums.AssetType;
-  uploadDuration: number | null;
-  sourceUrl: string | null;
-  thumbnailKey: string | null;
-  region: string;
-  contentEncoding: string | null;
-  expiresAt: Date | null;
-  filename: string | null;
-  ext: string | null;
-  mime: string | null;
-  checksumAlgo: $Enums.ChecksumAlgo;
-  checksumSha256: string | null;
-  sseAlgorithm: string | null;
-  sseKmsKeyId: string | null;
-  s3LastModified: Date | null;
-  deletedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};

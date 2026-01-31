@@ -1,3 +1,4 @@
+import type { $Enums } from "@slipstream/db/node/generated/client";
 export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
   : T;
@@ -7,10 +8,10 @@ export type BigIntKeys<T> = {
 }[keyof T];
 
 export type SerializeBigInt<T, Serialized extends boolean = boolean> = DX<{
-  [K in keyof T]: T[K] extends bigint | null
+  [K in keyof T]: T[K] extends bigint | null | undefined
     ? Serialized extends true
-      ? number | null
-      : bigint | null
+      ? Exclude<T[K], bigint> | number
+      : T[K]
     : T[K];
 }>;
 
@@ -338,3 +339,49 @@ export type UnionToRecord<
 > = {
   [K in TDiscriminant]: Extract<TUnion, { type: K }>;
 };
+export type Signals =
+  | "SIGABRT"
+  | "SIGALRM"
+  | "SIGBREAK"
+  | "SIGBUS"
+  | "SIGCHLD"
+  | "SIGCONT"
+  | "SIGFPE"
+  | "SIGHUP"
+  | "SIGILL"
+  | "SIGINFO"
+  | "SIGINT"
+  | "SIGIO"
+  | "SIGIOT"
+  | "SIGKILL"
+  | "SIGLOST"
+  | "SIGPIPE"
+  | "SIGPOLL"
+  | "SIGPROF"
+  | "SIGPWR"
+  | "SIGQUIT"
+  | "SIGSEGV"
+  | "SIGSTKFLT"
+  | "SIGSTOP"
+  | "SIGSYS"
+  | "SIGTERM"
+  | "SIGTRAP"
+  | "SIGTSTP"
+  | "SIGTTIN"
+  | "SIGTTOU"
+  | "SIGUNUSED"
+  | "SIGURG"
+  | "SIGUSR1"
+  | "SIGUSR2"
+  | "SIGVTALRM"
+  | "SIGWINCH"
+  | "SIGXCPU"
+  | "SIGXFSZ";
+
+export type FlexiProvider = FlexiCase<$Enums.Provider>;
+/**
+ * retained to support repos still using it
+ */
+export type BigIntOrNumber<T extends boolean = false> = T extends true
+  ? number
+  : bigint;

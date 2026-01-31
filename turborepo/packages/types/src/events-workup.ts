@@ -23,6 +23,47 @@ export type UploadMethod = $Enums.UploadMethod;
 export type AssetOrigin = $Enums.AssetOrigin;
 
 export type AssetUploadInstructionsMethod = "PUT" | "POST";
+export type AssetReadyPayload = {
+  publicUrl: string | null;
+  bucket: string;
+  cacheControl: string | null;
+  contentDisposition: string | null;
+  etag: string | null;
+  s3ObjectId: string | null;
+  key: string;
+  cdnUrl: string | null;
+  versionId: string | null;
+  size: bigint | null;
+  storageClass: string | null;
+  id: string;
+  conversationId: string | null;
+  draftId: string | null;
+  batchId: string | null;
+  userId: string;
+  messageId: string | null;
+  origin: $Enums.AssetOrigin;
+  status: $Enums.AssetStatus;
+  uploadMethod: $Enums.UploadMethod;
+  assetType: $Enums.AssetType;
+  uploadDuration: number | null;
+  sourceUrl: string | null;
+  thumbnailKey: string | null;
+  region: string;
+  contentEncoding: string | null;
+  expiresAt: Date | null;
+  filename: string | null;
+  ext: string | null;
+  mime: string | null;
+  checksumAlgo: $Enums.ChecksumAlgo;
+  checksumSha256: string | null;
+  sseAlgorithm: string | null;
+  sseKmsKeyId: string | null;
+  s3LastModified: Date | null;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 
 /**
  * Asset status lifecycle
