@@ -121,127 +121,127 @@ export type ImageMetadataCountAggregateOutputType = {
 
 
 export type ImageMetadataAvgAggregateInputType = {
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  frames?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  gpsLat?: true | runtime.Types.Skip
-  gpsLon?: true | runtime.Types.Skip
+  width?: true
+  height?: true
+  aspectRatio?: true
+  frames?: true
+  orientation?: true
+  gpsLat?: true
+  gpsLon?: true
 }
 
 export type ImageMetadataSumAggregateInputType = {
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  frames?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  gpsLat?: true | runtime.Types.Skip
-  gpsLon?: true | runtime.Types.Skip
+  width?: true
+  height?: true
+  aspectRatio?: true
+  frames?: true
+  orientation?: true
+  gpsLat?: true
+  gpsLon?: true
 }
 
 export type ImageMetadataMinAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  frames?: true | runtime.Types.Skip
-  hasAlpha?: true | runtime.Types.Skip
-  animated?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  colorSpace?: true | runtime.Types.Skip
-  colorModel?: true | runtime.Types.Skip
-  exifDateTimeOriginal?: true | runtime.Types.Skip
-  cameraMake?: true | runtime.Types.Skip
-  cameraModel?: true | runtime.Types.Skip
-  lensModel?: true | runtime.Types.Skip
-  gpsLat?: true | runtime.Types.Skip
-  gpsLon?: true | runtime.Types.Skip
-  dominantColorHex?: true | runtime.Types.Skip
-  iccProfile?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  frames?: true
+  hasAlpha?: true
+  animated?: true
+  orientation?: true
+  colorSpace?: true
+  colorModel?: true
+  exifDateTimeOriginal?: true
+  cameraMake?: true
+  cameraModel?: true
+  lensModel?: true
+  gpsLat?: true
+  gpsLon?: true
+  dominantColorHex?: true
+  iccProfile?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageMetadataMaxAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  frames?: true | runtime.Types.Skip
-  hasAlpha?: true | runtime.Types.Skip
-  animated?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  colorSpace?: true | runtime.Types.Skip
-  colorModel?: true | runtime.Types.Skip
-  exifDateTimeOriginal?: true | runtime.Types.Skip
-  cameraMake?: true | runtime.Types.Skip
-  cameraModel?: true | runtime.Types.Skip
-  lensModel?: true | runtime.Types.Skip
-  gpsLat?: true | runtime.Types.Skip
-  gpsLon?: true | runtime.Types.Skip
-  dominantColorHex?: true | runtime.Types.Skip
-  iccProfile?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  frames?: true
+  hasAlpha?: true
+  animated?: true
+  orientation?: true
+  colorSpace?: true
+  colorModel?: true
+  exifDateTimeOriginal?: true
+  cameraMake?: true
+  cameraModel?: true
+  lensModel?: true
+  gpsLat?: true
+  gpsLon?: true
+  dominantColorHex?: true
+  iccProfile?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageMetadataCountAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  frames?: true | runtime.Types.Skip
-  hasAlpha?: true | runtime.Types.Skip
-  animated?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  colorSpace?: true | runtime.Types.Skip
-  colorModel?: true | runtime.Types.Skip
-  exifDateTimeOriginal?: true | runtime.Types.Skip
-  cameraMake?: true | runtime.Types.Skip
-  cameraModel?: true | runtime.Types.Skip
-  lensModel?: true | runtime.Types.Skip
-  gpsLat?: true | runtime.Types.Skip
-  gpsLon?: true | runtime.Types.Skip
-  dominantColorHex?: true | runtime.Types.Skip
-  iccProfile?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  frames?: true
+  hasAlpha?: true
+  animated?: true
+  orientation?: true
+  colorSpace?: true
+  colorModel?: true
+  exifDateTimeOriginal?: true
+  cameraMake?: true
+  cameraModel?: true
+  lensModel?: true
+  gpsLat?: true
+  gpsLon?: true
+  dominantColorHex?: true
+  iccProfile?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type ImageMetadataAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ImageMetadata to aggregate.
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageMetadata to fetch.
    */
-  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -286,12 +286,12 @@ export type GetImageMetadataAggregateType<T extends ImageMetadataAggregateArgs> 
 
 
 export type ImageMetadataGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ImageMetadataOrderByWithAggregationInput | Prisma.ImageMetadataOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
+  orderBy?: Prisma.ImageMetadataOrderByWithAggregationInput | Prisma.ImageMetadataOrderByWithAggregationInput[]
   by: Prisma.ImageMetadataScalarFieldEnum[] | Prisma.ImageMetadataScalarFieldEnum
-  having?: Prisma.ImageMetadataScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ImageMetadataScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ImageMetadataCountAggregateInputType | true
   _avg?: ImageMetadataAvgAggregateInputType
   _sum?: ImageMetadataSumAggregateInputType
@@ -344,518 +344,518 @@ type GetImageMetadataGroupByPayload<T extends ImageMetadataGroupByArgs> = Prisma
 
 
 export type ImageMetadataWhereInput = {
-  AND?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ImageMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean | runtime.Types.Skip
-  orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  AND?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[]
+  OR?: Prisma.ImageMetadataWhereInput[]
+  NOT?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[]
+  attachmentId?: Prisma.StringFilter<"ImageMetadata"> | string
+  format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat
+  width?: Prisma.IntFilter<"ImageMetadata"> | number
+  height?: Prisma.IntFilter<"ImageMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  frames?: Prisma.IntFilter<"ImageMetadata"> | number
+  hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null
+  animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
+  orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null
+  colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null
+  cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
 
 export type ImageMetadataOrderByWithRelationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  animated?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lensModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  dominantColorHex?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  iccProfile?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder
+  animated?: Prisma.SortOrder
+  orientation?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  lensModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  gpsLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  gpsLon?: Prisma.SortOrderInput | Prisma.SortOrder
+  dominantColorHex?: Prisma.SortOrderInput | Prisma.SortOrder
+  iccProfile?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
 
 export type ImageMetadataWhereUniqueInput = Prisma.AtLeast<{
-  attachmentId?: string | runtime.Types.Skip
-  AND?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[] | runtime.Types.Skip
-  format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean | runtime.Types.Skip
-  orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  attachmentId?: string
+  AND?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[]
+  OR?: Prisma.ImageMetadataWhereInput[]
+  NOT?: Prisma.ImageMetadataWhereInput | Prisma.ImageMetadataWhereInput[]
+  format?: Prisma.EnumImageFormatFilter<"ImageMetadata"> | $Enums.ImageFormat
+  width?: Prisma.IntFilter<"ImageMetadata"> | number
+  height?: Prisma.IntFilter<"ImageMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  frames?: Prisma.IntFilter<"ImageMetadata"> | number
+  hasAlpha?: Prisma.BoolNullableFilter<"ImageMetadata"> | boolean | null
+  animated?: Prisma.BoolFilter<"ImageMetadata"> | boolean
+  orientation?: Prisma.IntNullableFilter<"ImageMetadata"> | number | null
+  colorSpace?: Prisma.EnumColorSpaceNullableFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableFilter<"ImageMetadata"> | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.DateTimeNullableFilter<"ImageMetadata"> | Date | string | null
+  cameraMake?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  cameraModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  lensModel?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  gpsLat?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableFilter<"ImageMetadata"> | number | null
+  dominantColorHex?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  iccProfile?: Prisma.StringNullableFilter<"ImageMetadata"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "attachmentId">
 
 export type ImageMetadataOrderByWithAggregationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  animated?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lensModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  dominantColorHex?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  iccProfile?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ImageMetadataCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.ImageMetadataAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ImageMetadataMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ImageMetadataMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.ImageMetadataSumOrderByAggregateInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  hasAlpha?: Prisma.SortOrderInput | Prisma.SortOrder
+  animated?: Prisma.SortOrder
+  orientation?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorSpace?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  exifDateTimeOriginal?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraMake?: Prisma.SortOrderInput | Prisma.SortOrder
+  cameraModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  lensModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  gpsLat?: Prisma.SortOrderInput | Prisma.SortOrder
+  gpsLon?: Prisma.SortOrderInput | Prisma.SortOrder
+  dominantColorHex?: Prisma.SortOrderInput | Prisma.SortOrder
+  iccProfile?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.ImageMetadataCountOrderByAggregateInput
+  _avg?: Prisma.ImageMetadataAvgOrderByAggregateInput
+  _max?: Prisma.ImageMetadataMaxOrderByAggregateInput
+  _min?: Prisma.ImageMetadataMinOrderByAggregateInput
+  _sum?: Prisma.ImageMetadataSumOrderByAggregateInput
 }
 
 export type ImageMetadataScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ImageMetadataScalarWhereWithAggregatesInput | Prisma.ImageMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageMetadataScalarWhereWithAggregatesInput | Prisma.ImageMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"ImageMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.EnumImageFormatWithAggregatesFilter<"ImageMetadata"> | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  frames?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number | runtime.Types.Skip
-  hasAlpha?: Prisma.BoolNullableWithAggregatesFilter<"ImageMetadata"> | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolWithAggregatesFilter<"ImageMetadata"> | boolean | runtime.Types.Skip
-  orientation?: Prisma.IntNullableWithAggregatesFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.EnumColorSpaceNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.EnumColorModelNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.DateTimeNullableWithAggregatesFilter<"ImageMetadata"> | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  lensModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageMetadata"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ImageMetadataScalarWhereWithAggregatesInput | Prisma.ImageMetadataScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ImageMetadataScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ImageMetadataScalarWhereWithAggregatesInput | Prisma.ImageMetadataScalarWhereWithAggregatesInput[]
+  attachmentId?: Prisma.StringWithAggregatesFilter<"ImageMetadata"> | string
+  format?: Prisma.EnumImageFormatWithAggregatesFilter<"ImageMetadata"> | $Enums.ImageFormat
+  width?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
+  height?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
+  frames?: Prisma.IntWithAggregatesFilter<"ImageMetadata"> | number
+  hasAlpha?: Prisma.BoolNullableWithAggregatesFilter<"ImageMetadata"> | boolean | null
+  animated?: Prisma.BoolWithAggregatesFilter<"ImageMetadata"> | boolean
+  orientation?: Prisma.IntNullableWithAggregatesFilter<"ImageMetadata"> | number | null
+  colorSpace?: Prisma.EnumColorSpaceNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorSpace | null
+  colorModel?: Prisma.EnumColorModelNullableWithAggregatesFilter<"ImageMetadata"> | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.DateTimeNullableWithAggregatesFilter<"ImageMetadata"> | Date | string | null
+  cameraMake?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
+  cameraModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
+  lensModel?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
+  gpsLat?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
+  gpsLon?: Prisma.FloatNullableWithAggregatesFilter<"ImageMetadata"> | number | null
+  dominantColorHex?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
+  iccProfile?: Prisma.StringNullableWithAggregatesFilter<"ImageMetadata"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageMetadata"> | Date | string
 }
 
 export type ImageMetadataCreateInput = {
-  format?: $Enums.ImageFormat | runtime.Types.Skip
+  format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
-  frames?: number | runtime.Types.Skip
-  hasAlpha?: boolean | null | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  colorSpace?: $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Date | string | null | runtime.Types.Skip
-  cameraMake?: string | null | runtime.Types.Skip
-  cameraModel?: string | null | runtime.Types.Skip
-  lensModel?: string | null | runtime.Types.Skip
-  gpsLat?: number | null | runtime.Types.Skip
-  gpsLon?: number | null | runtime.Types.Skip
-  dominantColorHex?: string | null | runtime.Types.Skip
-  iccProfile?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  aspectRatio?: number | null
+  frames?: number
+  hasAlpha?: boolean | null
+  animated?: boolean
+  orientation?: number | null
+  colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
+  exifDateTimeOriginal?: Date | string | null
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lensModel?: string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
+  dominantColorHex?: string | null
+  iccProfile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   attachment: Prisma.AttachmentCreateNestedOneWithoutImageInput
 }
 
 export type ImageMetadataUncheckedCreateInput = {
   attachmentId: string
-  format?: $Enums.ImageFormat | runtime.Types.Skip
+  format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
-  frames?: number | runtime.Types.Skip
-  hasAlpha?: boolean | null | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  colorSpace?: $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Date | string | null | runtime.Types.Skip
-  cameraMake?: string | null | runtime.Types.Skip
-  cameraModel?: string | null | runtime.Types.Skip
-  lensModel?: string | null | runtime.Types.Skip
-  gpsLat?: number | null | runtime.Types.Skip
-  gpsLon?: number | null | runtime.Types.Skip
-  dominantColorHex?: string | null | runtime.Types.Skip
-  iccProfile?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  aspectRatio?: number | null
+  frames?: number
+  hasAlpha?: boolean | null
+  animated?: boolean
+  orientation?: number | null
+  colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
+  exifDateTimeOriginal?: Date | string | null
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lensModel?: string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
+  dominantColorHex?: string | null
+  iccProfile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageMetadataUpdateInput = {
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageNestedInput | runtime.Types.Skip
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageNestedInput
 }
 
 export type ImageMetadataUncheckedUpdateInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageMetadataCreateManyInput = {
   attachmentId: string
-  format?: $Enums.ImageFormat | runtime.Types.Skip
+  format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
-  frames?: number | runtime.Types.Skip
-  hasAlpha?: boolean | null | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  colorSpace?: $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Date | string | null | runtime.Types.Skip
-  cameraMake?: string | null | runtime.Types.Skip
-  cameraModel?: string | null | runtime.Types.Skip
-  lensModel?: string | null | runtime.Types.Skip
-  gpsLat?: number | null | runtime.Types.Skip
-  gpsLon?: number | null | runtime.Types.Skip
-  dominantColorHex?: string | null | runtime.Types.Skip
-  iccProfile?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  aspectRatio?: number | null
+  frames?: number
+  hasAlpha?: boolean | null
+  animated?: boolean
+  orientation?: number | null
+  colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
+  exifDateTimeOriginal?: Date | string | null
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lensModel?: string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
+  dominantColorHex?: string | null
+  iccProfile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageMetadataUpdateManyMutationInput = {
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageMetadataUncheckedUpdateManyInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageMetadataNullableScalarRelationFilter = {
-  is?: Prisma.ImageMetadataWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.ImageMetadataWhereInput | null | runtime.Types.Skip
+  is?: Prisma.ImageMetadataWhereInput | null
+  isNot?: Prisma.ImageMetadataWhereInput | null
 }
 
 export type ImageMetadataCountOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  hasAlpha?: Prisma.SortOrder | runtime.Types.Skip
-  animated?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  colorSpace?: Prisma.SortOrder | runtime.Types.Skip
-  colorModel?: Prisma.SortOrder | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.SortOrder | runtime.Types.Skip
-  cameraMake?: Prisma.SortOrder | runtime.Types.Skip
-  cameraModel?: Prisma.SortOrder | runtime.Types.Skip
-  lensModel?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrder | runtime.Types.Skip
-  dominantColorHex?: Prisma.SortOrder | runtime.Types.Skip
-  iccProfile?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  hasAlpha?: Prisma.SortOrder
+  animated?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
+  exifDateTimeOriginal?: Prisma.SortOrder
+  cameraMake?: Prisma.SortOrder
+  cameraModel?: Prisma.SortOrder
+  lensModel?: Prisma.SortOrder
+  gpsLat?: Prisma.SortOrder
+  gpsLon?: Prisma.SortOrder
+  dominantColorHex?: Prisma.SortOrder
+  iccProfile?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageMetadataAvgOrderByAggregateInput = {
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrder | runtime.Types.Skip
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  gpsLat?: Prisma.SortOrder
+  gpsLon?: Prisma.SortOrder
 }
 
 export type ImageMetadataMaxOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  hasAlpha?: Prisma.SortOrder | runtime.Types.Skip
-  animated?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  colorSpace?: Prisma.SortOrder | runtime.Types.Skip
-  colorModel?: Prisma.SortOrder | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.SortOrder | runtime.Types.Skip
-  cameraMake?: Prisma.SortOrder | runtime.Types.Skip
-  cameraModel?: Prisma.SortOrder | runtime.Types.Skip
-  lensModel?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrder | runtime.Types.Skip
-  dominantColorHex?: Prisma.SortOrder | runtime.Types.Skip
-  iccProfile?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  hasAlpha?: Prisma.SortOrder
+  animated?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
+  exifDateTimeOriginal?: Prisma.SortOrder
+  cameraMake?: Prisma.SortOrder
+  cameraModel?: Prisma.SortOrder
+  lensModel?: Prisma.SortOrder
+  gpsLat?: Prisma.SortOrder
+  gpsLon?: Prisma.SortOrder
+  dominantColorHex?: Prisma.SortOrder
+  iccProfile?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageMetadataMinOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  hasAlpha?: Prisma.SortOrder | runtime.Types.Skip
-  animated?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  colorSpace?: Prisma.SortOrder | runtime.Types.Skip
-  colorModel?: Prisma.SortOrder | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.SortOrder | runtime.Types.Skip
-  cameraMake?: Prisma.SortOrder | runtime.Types.Skip
-  cameraModel?: Prisma.SortOrder | runtime.Types.Skip
-  lensModel?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrder | runtime.Types.Skip
-  dominantColorHex?: Prisma.SortOrder | runtime.Types.Skip
-  iccProfile?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  hasAlpha?: Prisma.SortOrder
+  animated?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  colorSpace?: Prisma.SortOrder
+  colorModel?: Prisma.SortOrder
+  exifDateTimeOriginal?: Prisma.SortOrder
+  cameraMake?: Prisma.SortOrder
+  cameraModel?: Prisma.SortOrder
+  lensModel?: Prisma.SortOrder
+  gpsLat?: Prisma.SortOrder
+  gpsLon?: Prisma.SortOrder
+  dominantColorHex?: Prisma.SortOrder
+  iccProfile?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageMetadataSumOrderByAggregateInput = {
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  frames?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLat?: Prisma.SortOrder | runtime.Types.Skip
-  gpsLon?: Prisma.SortOrder | runtime.Types.Skip
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  frames?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  gpsLat?: Prisma.SortOrder
+  gpsLon?: Prisma.SortOrder
 }
 
 export type ImageMetadataCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.ImageMetadataWhereUniqueInput
 }
 
 export type ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.ImageMetadataWhereUniqueInput
 }
 
 export type ImageMetadataUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.ImageMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageMetadataUpdateWithoutAttachmentInput>, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.ImageMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.ImageMetadataWhereInput | boolean
+  delete?: Prisma.ImageMetadataWhereInput | boolean
+  connect?: Prisma.ImageMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageMetadataUpdateWithoutAttachmentInput>, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.ImageMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageMetadataUpdateWithoutAttachmentInput>, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.ImageMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.ImageMetadataWhereInput | boolean
+  delete?: Prisma.ImageMetadataWhereInput | boolean
+  connect?: Prisma.ImageMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageMetadataUpdateWithoutAttachmentInput>, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type EnumImageFormatFieldUpdateOperationsInput = {
-  set?: $Enums.ImageFormat | runtime.Types.Skip
+  set?: $Enums.ImageFormat
 }
 
 export type IntFieldUpdateOperationsInput = {
-  set?: number | runtime.Types.Skip
-  increment?: number | runtime.Types.Skip
-  decrement?: number | runtime.Types.Skip
-  multiply?: number | runtime.Types.Skip
-  divide?: number | runtime.Types.Skip
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null | runtime.Types.Skip
-  increment?: number | runtime.Types.Skip
-  decrement?: number | runtime.Types.Skip
-  multiply?: number | runtime.Types.Skip
-  divide?: number | runtime.Types.Skip
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null | runtime.Types.Skip
+  set?: boolean | null
 }
 
 export type BoolFieldUpdateOperationsInput = {
-  set?: boolean | runtime.Types.Skip
+  set?: boolean
 }
 
 export type NullableEnumColorSpaceFieldUpdateOperationsInput = {
-  set?: $Enums.ColorSpace | null | runtime.Types.Skip
+  set?: $Enums.ColorSpace | null
 }
 
 export type NullableEnumColorModelFieldUpdateOperationsInput = {
-  set?: $Enums.ColorModel | null | runtime.Types.Skip
+  set?: $Enums.ColorModel | null
 }
 
 export type ImageMetadataCreateWithoutAttachmentInput = {
-  format?: $Enums.ImageFormat | runtime.Types.Skip
+  format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
-  frames?: number | runtime.Types.Skip
-  hasAlpha?: boolean | null | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  colorSpace?: $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Date | string | null | runtime.Types.Skip
-  cameraMake?: string | null | runtime.Types.Skip
-  cameraModel?: string | null | runtime.Types.Skip
-  lensModel?: string | null | runtime.Types.Skip
-  gpsLat?: number | null | runtime.Types.Skip
-  gpsLon?: number | null | runtime.Types.Skip
-  dominantColorHex?: string | null | runtime.Types.Skip
-  iccProfile?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  aspectRatio?: number | null
+  frames?: number
+  hasAlpha?: boolean | null
+  animated?: boolean
+  orientation?: number | null
+  colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
+  exifDateTimeOriginal?: Date | string | null
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lensModel?: string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
+  dominantColorHex?: string | null
+  iccProfile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageMetadataUncheckedCreateWithoutAttachmentInput = {
-  format?: $Enums.ImageFormat | runtime.Types.Skip
+  format?: $Enums.ImageFormat
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
-  frames?: number | runtime.Types.Skip
-  hasAlpha?: boolean | null | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  colorSpace?: $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Date | string | null | runtime.Types.Skip
-  cameraMake?: string | null | runtime.Types.Skip
-  cameraModel?: string | null | runtime.Types.Skip
-  lensModel?: string | null | runtime.Types.Skip
-  gpsLat?: number | null | runtime.Types.Skip
-  gpsLon?: number | null | runtime.Types.Skip
-  dominantColorHex?: string | null | runtime.Types.Skip
-  iccProfile?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  aspectRatio?: number | null
+  frames?: number
+  hasAlpha?: boolean | null
+  animated?: boolean
+  orientation?: number | null
+  colorSpace?: $Enums.ColorSpace | null
+  colorModel?: $Enums.ColorModel | null
+  exifDateTimeOriginal?: Date | string | null
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lensModel?: string | null
+  gpsLat?: number | null
+  gpsLon?: number | null
+  dominantColorHex?: string | null
+  iccProfile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageMetadataCreateOrConnectWithoutAttachmentInput = {
@@ -866,170 +866,170 @@ export type ImageMetadataCreateOrConnectWithoutAttachmentInput = {
 export type ImageMetadataUpsertWithoutAttachmentInput = {
   update: Prisma.XOR<Prisma.ImageMetadataUpdateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput>
   create: Prisma.XOR<Prisma.ImageMetadataCreateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedCreateWithoutAttachmentInput>
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
 }
 
 export type ImageMetadataUpdateToOneWithWhereWithoutAttachmentInput = {
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   data: Prisma.XOR<Prisma.ImageMetadataUpdateWithoutAttachmentInput, Prisma.ImageMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type ImageMetadataUpdateWithoutAttachmentInput = {
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageMetadataUncheckedUpdateWithoutAttachmentInput = {
-  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  frames?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null | runtime.Types.Skip
-  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null | runtime.Types.Skip
-  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.EnumImageFormatFieldUpdateOperationsInput | $Enums.ImageFormat
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  frames?: Prisma.IntFieldUpdateOperationsInput | number
+  hasAlpha?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  animated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  colorSpace?: Prisma.NullableEnumColorSpaceFieldUpdateOperationsInput | $Enums.ColorSpace | null
+  colorModel?: Prisma.NullableEnumColorModelFieldUpdateOperationsInput | $Enums.ColorModel | null
+  exifDateTimeOriginal?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cameraMake?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cameraModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lensModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gpsLat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  gpsLon?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  dominantColorHex?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iccProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type ImageMetadataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  frames?: boolean | runtime.Types.Skip
-  hasAlpha?: boolean | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  colorSpace?: boolean | runtime.Types.Skip
-  colorModel?: boolean | runtime.Types.Skip
-  exifDateTimeOriginal?: boolean | runtime.Types.Skip
-  cameraMake?: boolean | runtime.Types.Skip
-  cameraModel?: boolean | runtime.Types.Skip
-  lensModel?: boolean | runtime.Types.Skip
-  gpsLat?: boolean | runtime.Types.Skip
-  gpsLon?: boolean | runtime.Types.Skip
-  dominantColorHex?: boolean | runtime.Types.Skip
-  iccProfile?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  frames?: boolean
+  hasAlpha?: boolean
+  animated?: boolean
+  orientation?: boolean
+  colorSpace?: boolean
+  colorModel?: boolean
+  exifDateTimeOriginal?: boolean
+  cameraMake?: boolean
+  cameraModel?: boolean
+  lensModel?: boolean
+  gpsLat?: boolean
+  gpsLon?: boolean
+  dominantColorHex?: boolean
+  iccProfile?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageMetadata"]>
 
 export type ImageMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  frames?: boolean | runtime.Types.Skip
-  hasAlpha?: boolean | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  colorSpace?: boolean | runtime.Types.Skip
-  colorModel?: boolean | runtime.Types.Skip
-  exifDateTimeOriginal?: boolean | runtime.Types.Skip
-  cameraMake?: boolean | runtime.Types.Skip
-  cameraModel?: boolean | runtime.Types.Skip
-  lensModel?: boolean | runtime.Types.Skip
-  gpsLat?: boolean | runtime.Types.Skip
-  gpsLon?: boolean | runtime.Types.Skip
-  dominantColorHex?: boolean | runtime.Types.Skip
-  iccProfile?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  frames?: boolean
+  hasAlpha?: boolean
+  animated?: boolean
+  orientation?: boolean
+  colorSpace?: boolean
+  colorModel?: boolean
+  exifDateTimeOriginal?: boolean
+  cameraMake?: boolean
+  cameraModel?: boolean
+  lensModel?: boolean
+  gpsLat?: boolean
+  gpsLon?: boolean
+  dominantColorHex?: boolean
+  iccProfile?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageMetadata"]>
 
 export type ImageMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  frames?: boolean | runtime.Types.Skip
-  hasAlpha?: boolean | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  colorSpace?: boolean | runtime.Types.Skip
-  colorModel?: boolean | runtime.Types.Skip
-  exifDateTimeOriginal?: boolean | runtime.Types.Skip
-  cameraMake?: boolean | runtime.Types.Skip
-  cameraModel?: boolean | runtime.Types.Skip
-  lensModel?: boolean | runtime.Types.Skip
-  gpsLat?: boolean | runtime.Types.Skip
-  gpsLon?: boolean | runtime.Types.Skip
-  dominantColorHex?: boolean | runtime.Types.Skip
-  iccProfile?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  frames?: boolean
+  hasAlpha?: boolean
+  animated?: boolean
+  orientation?: boolean
+  colorSpace?: boolean
+  colorModel?: boolean
+  exifDateTimeOriginal?: boolean
+  cameraMake?: boolean
+  cameraModel?: boolean
+  lensModel?: boolean
+  gpsLat?: boolean
+  gpsLon?: boolean
+  dominantColorHex?: boolean
+  iccProfile?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageMetadata"]>
 
 export type ImageMetadataSelectScalar = {
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  frames?: boolean | runtime.Types.Skip
-  hasAlpha?: boolean | runtime.Types.Skip
-  animated?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  colorSpace?: boolean | runtime.Types.Skip
-  colorModel?: boolean | runtime.Types.Skip
-  exifDateTimeOriginal?: boolean | runtime.Types.Skip
-  cameraMake?: boolean | runtime.Types.Skip
-  cameraModel?: boolean | runtime.Types.Skip
-  lensModel?: boolean | runtime.Types.Skip
-  gpsLat?: boolean | runtime.Types.Skip
-  gpsLon?: boolean | runtime.Types.Skip
-  dominantColorHex?: boolean | runtime.Types.Skip
-  iccProfile?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  frames?: boolean
+  hasAlpha?: boolean
+  animated?: boolean
+  orientation?: boolean
+  colorSpace?: boolean
+  colorModel?: boolean
+  exifDateTimeOriginal?: boolean
+  cameraMake?: boolean
+  cameraModel?: boolean
+  lensModel?: boolean
+  gpsLat?: boolean
+  gpsLon?: boolean
+  dominantColorHex?: boolean
+  iccProfile?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ImageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "frames" | "hasAlpha" | "animated" | "orientation" | "colorSpace" | "colorModel" | "exifDateTimeOriginal" | "cameraMake" | "cameraModel" | "lensModel" | "gpsLat" | "gpsLon" | "dominantColorHex" | "iccProfile" | "createdAt" | "updatedAt", ExtArgs["result"]["imageMetadata"], runtime.Types.Skip>
+export type ImageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "frames" | "hasAlpha" | "animated" | "orientation" | "colorSpace" | "colorModel" | "exifDateTimeOriginal" | "cameraMake" | "cameraModel" | "lensModel" | "gpsLat" | "gpsLon" | "dominantColorHex" | "iccProfile" | "createdAt" | "updatedAt", ExtArgs["result"]["imageMetadata"]>
 export type ImageMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ImageMetadataIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ImageMetadataIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 
 export type $ImageMetadataPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1528,7 +1528,7 @@ export type ImageMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which ImageMetadata to fetch.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1551,7 +1551,7 @@ export type ImageMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which ImageMetadata to fetch.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1573,38 +1573,38 @@ export type ImageMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter, which ImageMetadata to fetch.
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageMetadata to fetch.
    */
-  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageMetadata.
    */
-  cursor?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageMetadata.
    */
-  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1626,38 +1626,38 @@ export type ImageMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter, which ImageMetadata to fetch.
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageMetadata to fetch.
    */
-  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageMetadata.
    */
-  cursor?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageMetadata.
    */
-  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1679,33 +1679,33 @@ export type ImageMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter, which ImageMetadata to fetch.
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageMetadata to fetch.
    */
-  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageMetadataOrderByWithRelationInput | Prisma.ImageMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ImageMetadata.
    */
-  cursor?: Prisma.ImageMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageMetadata.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ImageMetadataScalarFieldEnum | Prisma.ImageMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1728,7 +1728,7 @@ export type ImageMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a ImageMetadata.
    */
   data: Prisma.XOR<Prisma.ImageMetadataCreateInput, Prisma.ImageMetadataUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1739,7 +1739,7 @@ export type ImageMetadataCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many ImageMetadata.
    */
   data: Prisma.ImageMetadataCreateManyInput | Prisma.ImageMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1758,7 +1758,7 @@ export type ImageMetadataCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many ImageMetadata.
    */
   data: Prisma.ImageMetadataCreateManyInput | Prisma.ImageMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1789,7 +1789,7 @@ export type ImageMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which ImageMetadata to update.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1803,11 +1803,11 @@ export type ImageMetadataUpdateManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which ImageMetadata to update
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * Limit how many ImageMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1829,11 +1829,11 @@ export type ImageMetadataUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter which ImageMetadata to update
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * Limit how many ImageMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1868,7 +1868,7 @@ export type ImageMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the ImageMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ImageMetadataUpdateInput, Prisma.ImageMetadataUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1891,7 +1891,7 @@ export type ImageMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which ImageMetadata to delete.
    */
   where: Prisma.ImageMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1901,11 +1901,11 @@ export type ImageMetadataDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which ImageMetadata to delete
    */
-  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageMetadataWhereInput
   /**
    * Limit how many ImageMetadata to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

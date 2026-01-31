@@ -51,59 +51,59 @@ export type SettingsCountAggregateOutputType = {
 
 
 export type SettingsMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  theme?: true | runtime.Types.Skip
-  defaultProvider?: true | runtime.Types.Skip
-  defaultModel?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  theme?: true
+  defaultProvider?: true
+  defaultModel?: true
 }
 
 export type SettingsMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  theme?: true | runtime.Types.Skip
-  defaultProvider?: true | runtime.Types.Skip
-  defaultModel?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  theme?: true
+  defaultProvider?: true
+  defaultModel?: true
 }
 
 export type SettingsCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  theme?: true | runtime.Types.Skip
-  defaultProvider?: true | runtime.Types.Skip
-  defaultModel?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  theme?: true
+  defaultProvider?: true
+  defaultModel?: true
+  _all?: true
 }
 
 export type SettingsAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which Settings to aggregate.
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Settings to fetch.
    */
-  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.SettingsWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Settings from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Settings.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -136,12 +136,12 @@ export type GetSettingsAggregateType<T extends SettingsAggregateArgs> = {
 
 
 export type SettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.SettingsOrderByWithAggregationInput | Prisma.SettingsOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
+  orderBy?: Prisma.SettingsOrderByWithAggregationInput | Prisma.SettingsOrderByWithAggregationInput[]
   by: Prisma.SettingsScalarFieldEnum[] | Prisma.SettingsScalarFieldEnum
-  having?: Prisma.SettingsScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.SettingsScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: SettingsCountAggregateInputType | true
   _min?: SettingsMinAggregateInputType
   _max?: SettingsMaxAggregateInputType
@@ -174,192 +174,192 @@ type GetSettingsGroupByPayload<T extends SettingsGroupByArgs> = Prisma.PrismaPro
 
 
 export type SettingsWhereInput = {
-  AND?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"Settings"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"Settings"> | string | runtime.Types.Skip
-  theme?: Prisma.EnumThemePreferenceNullableFilter<"Settings"> | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.EnumProviderNullableFilter<"Settings"> | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.StringNullableFilter<"Settings"> | string | null | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
+  AND?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
+  OR?: Prisma.SettingsWhereInput[]
+  NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
+  id?: Prisma.StringFilter<"Settings"> | string
+  userId?: Prisma.StringFilter<"Settings"> | string
+  theme?: Prisma.EnumThemePreferenceNullableFilter<"Settings"> | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.EnumProviderNullableFilter<"Settings"> | $Enums.Provider | null
+  defaultModel?: Prisma.StringNullableFilter<"Settings"> | string | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type SettingsOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  theme?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  defaultProvider?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  defaultModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type SettingsWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  userId?: string | runtime.Types.Skip
-  AND?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[] | runtime.Types.Skip
-  theme?: Prisma.EnumThemePreferenceNullableFilter<"Settings"> | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.EnumProviderNullableFilter<"Settings"> | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.StringNullableFilter<"Settings"> | string | null | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
+  id?: string
+  userId?: string
+  AND?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
+  OR?: Prisma.SettingsWhereInput[]
+  NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
+  theme?: Prisma.EnumThemePreferenceNullableFilter<"Settings"> | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.EnumProviderNullableFilter<"Settings"> | $Enums.Provider | null
+  defaultModel?: Prisma.StringNullableFilter<"Settings"> | string | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
 export type SettingsOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  theme?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  defaultProvider?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  defaultModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.SettingsCountOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.SettingsMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.SettingsMinOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  _count?: Prisma.SettingsCountOrderByAggregateInput
+  _max?: Prisma.SettingsMaxOrderByAggregateInput
+  _min?: Prisma.SettingsMinOrderByAggregateInput
 }
 
 export type SettingsScalarWhereWithAggregatesInput = {
-  AND?: Prisma.SettingsScalarWhereWithAggregatesInput | Prisma.SettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.SettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.SettingsScalarWhereWithAggregatesInput | Prisma.SettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"Settings"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"Settings"> | string | runtime.Types.Skip
-  theme?: Prisma.EnumThemePreferenceNullableWithAggregatesFilter<"Settings"> | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"Settings"> | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null | runtime.Types.Skip
+  AND?: Prisma.SettingsScalarWhereWithAggregatesInput | Prisma.SettingsScalarWhereWithAggregatesInput[]
+  OR?: Prisma.SettingsScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.SettingsScalarWhereWithAggregatesInput | Prisma.SettingsScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"Settings"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"Settings"> | string
+  theme?: Prisma.EnumThemePreferenceNullableWithAggregatesFilter<"Settings"> | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"Settings"> | $Enums.Provider | null
+  defaultModel?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
 }
 
 export type SettingsCreateInput = {
-  id?: string | runtime.Types.Skip
-  theme?: $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: string | null | runtime.Types.Skip
+  id?: string
+  theme?: $Enums.ThemePreference | null
+  defaultProvider?: $Enums.Provider | null
+  defaultModel?: string | null
   user: Prisma.UserCreateNestedOneWithoutSettingsInput
 }
 
 export type SettingsUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  theme?: $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: string | null | runtime.Types.Skip
+  theme?: $Enums.ThemePreference | null
+  defaultProvider?: $Enums.Provider | null
+  defaultModel?: string | null
 }
 
 export type SettingsUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutSettingsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutSettingsNestedInput
 }
 
 export type SettingsUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SettingsCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  theme?: $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: string | null | runtime.Types.Skip
+  theme?: $Enums.ThemePreference | null
+  defaultProvider?: $Enums.Provider | null
+  defaultModel?: string | null
 }
 
 export type SettingsUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SettingsUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SettingsNullableScalarRelationFilter = {
-  is?: Prisma.SettingsWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.SettingsWhereInput | null | runtime.Types.Skip
+  is?: Prisma.SettingsWhereInput | null
+  isNot?: Prisma.SettingsWhereInput | null
 }
 
 export type SettingsCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  theme?: Prisma.SortOrder | runtime.Types.Skip
-  defaultProvider?: Prisma.SortOrder | runtime.Types.Skip
-  defaultModel?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  defaultProvider?: Prisma.SortOrder
+  defaultModel?: Prisma.SortOrder
 }
 
 export type SettingsMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  theme?: Prisma.SortOrder | runtime.Types.Skip
-  defaultProvider?: Prisma.SortOrder | runtime.Types.Skip
-  defaultModel?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  defaultProvider?: Prisma.SortOrder
+  defaultModel?: Prisma.SortOrder
 }
 
 export type SettingsMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  theme?: Prisma.SortOrder | runtime.Types.Skip
-  defaultProvider?: Prisma.SortOrder | runtime.Types.Skip
-  defaultModel?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  defaultProvider?: Prisma.SortOrder
+  defaultModel?: Prisma.SortOrder
 }
 
 export type SettingsCreateNestedOneWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  connect?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput
+  connect?: Prisma.SettingsWhereUniqueInput
 }
 
 export type SettingsUncheckedCreateNestedOneWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  connect?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput
+  connect?: Prisma.SettingsWhereUniqueInput
 }
 
 export type SettingsUpdateOneWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  upsert?: Prisma.SettingsUpsertWithoutUserInput | runtime.Types.Skip
-  disconnect?: Prisma.SettingsWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.SettingsWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutUserInput, Prisma.SettingsUpdateWithoutUserInput>, Prisma.SettingsUncheckedUpdateWithoutUserInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput
+  upsert?: Prisma.SettingsUpsertWithoutUserInput
+  disconnect?: Prisma.SettingsWhereInput | boolean
+  delete?: Prisma.SettingsWhereInput | boolean
+  connect?: Prisma.SettingsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutUserInput, Prisma.SettingsUpdateWithoutUserInput>, Prisma.SettingsUncheckedUpdateWithoutUserInput>
 }
 
 export type SettingsUncheckedUpdateOneWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  upsert?: Prisma.SettingsUpsertWithoutUserInput | runtime.Types.Skip
-  disconnect?: Prisma.SettingsWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.SettingsWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutUserInput, Prisma.SettingsUpdateWithoutUserInput>, Prisma.SettingsUncheckedUpdateWithoutUserInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutUserInput
+  upsert?: Prisma.SettingsUpsertWithoutUserInput
+  disconnect?: Prisma.SettingsWhereInput | boolean
+  delete?: Prisma.SettingsWhereInput | boolean
+  connect?: Prisma.SettingsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutUserInput, Prisma.SettingsUpdateWithoutUserInput>, Prisma.SettingsUncheckedUpdateWithoutUserInput>
 }
 
 export type NullableEnumThemePreferenceFieldUpdateOperationsInput = {
-  set?: $Enums.ThemePreference | null | runtime.Types.Skip
+  set?: $Enums.ThemePreference | null
 }
 
 export type SettingsCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  theme?: $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: string | null | runtime.Types.Skip
+  id?: string
+  theme?: $Enums.ThemePreference | null
+  defaultProvider?: $Enums.Provider | null
+  defaultModel?: string | null
 }
 
 export type SettingsUncheckedCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  theme?: $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: string | null | runtime.Types.Skip
+  id?: string
+  theme?: $Enums.ThemePreference | null
+  defaultProvider?: $Enums.Provider | null
+  defaultModel?: string | null
 }
 
 export type SettingsCreateOrConnectWithoutUserInput = {
@@ -370,74 +370,74 @@ export type SettingsCreateOrConnectWithoutUserInput = {
 export type SettingsUpsertWithoutUserInput = {
   update: Prisma.XOR<Prisma.SettingsUpdateWithoutUserInput, Prisma.SettingsUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.SettingsCreateWithoutUserInput, Prisma.SettingsUncheckedCreateWithoutUserInput>
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
 }
 
 export type SettingsUpdateToOneWithWhereWithoutUserInput = {
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   data: Prisma.XOR<Prisma.SettingsUpdateWithoutUserInput, Prisma.SettingsUncheckedUpdateWithoutUserInput>
 }
 
 export type SettingsUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SettingsUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null | runtime.Types.Skip
-  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
-  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  theme?: Prisma.NullableEnumThemePreferenceFieldUpdateOperationsInput | $Enums.ThemePreference | null
+  defaultProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
+  defaultModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
 
 export type SettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  theme?: boolean | runtime.Types.Skip
-  defaultProvider?: boolean | runtime.Types.Skip
-  defaultModel?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  theme?: boolean
+  defaultProvider?: boolean
+  defaultModel?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  theme?: boolean | runtime.Types.Skip
-  defaultProvider?: boolean | runtime.Types.Skip
-  defaultModel?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  theme?: boolean
+  defaultProvider?: boolean
+  defaultModel?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  theme?: boolean | runtime.Types.Skip
-  defaultProvider?: boolean | runtime.Types.Skip
-  defaultModel?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  theme?: boolean
+  defaultProvider?: boolean
+  defaultModel?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  theme?: boolean | runtime.Types.Skip
-  defaultProvider?: boolean | runtime.Types.Skip
-  defaultModel?: boolean | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  theme?: boolean
+  defaultProvider?: boolean
+  defaultModel?: boolean
 }
 
-export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "theme" | "defaultProvider" | "defaultModel", ExtArgs["result"]["settings"], runtime.Types.Skip>
+export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "theme" | "defaultProvider" | "defaultModel", ExtArgs["result"]["settings"]>
 export type SettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type SettingsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type SettingsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $SettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -904,7 +904,7 @@ export type SettingsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -927,7 +927,7 @@ export type SettingsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -949,38 +949,38 @@ export type SettingsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * Filter, which Settings to fetch.
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Settings to fetch.
    */
-  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Settings.
    */
-  cursor?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.SettingsWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Settings from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Settings.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Settings.
    */
-  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1002,38 +1002,38 @@ export type SettingsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
   /**
    * Filter, which Settings to fetch.
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Settings to fetch.
    */
-  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Settings.
    */
-  cursor?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.SettingsWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Settings from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Settings.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Settings.
    */
-  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1055,33 +1055,33 @@ export type SettingsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * Filter, which Settings to fetch.
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Settings to fetch.
    */
-  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.SettingsOrderByWithRelationInput | Prisma.SettingsOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Settings.
    */
-  cursor?: Prisma.SettingsWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.SettingsWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Settings from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Settings.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.SettingsScalarFieldEnum | Prisma.SettingsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1104,7 +1104,7 @@ export type SettingsCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a Settings.
    */
   data: Prisma.XOR<Prisma.SettingsCreateInput, Prisma.SettingsUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1115,7 +1115,7 @@ export type SettingsCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many Settings.
    */
   data: Prisma.SettingsCreateManyInput | Prisma.SettingsCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1134,7 +1134,7 @@ export type SettingsCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many Settings.
    */
   data: Prisma.SettingsCreateManyInput | Prisma.SettingsCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1165,7 +1165,7 @@ export type SettingsUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which Settings to update.
    */
   where: Prisma.SettingsWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1179,11 +1179,11 @@ export type SettingsUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * Filter which Settings to update
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * Limit how many Settings to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1205,11 +1205,11 @@ export type SettingsUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
   /**
    * Filter which Settings to update
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * Limit how many Settings to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1244,7 +1244,7 @@ export type SettingsUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the Settings was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.SettingsUpdateInput, Prisma.SettingsUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1267,7 +1267,7 @@ export type SettingsDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which Settings to delete.
    */
   where: Prisma.SettingsWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1277,11 +1277,11 @@ export type SettingsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * Filter which Settings to delete
    */
-  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.SettingsWhereInput
   /**
    * Limit how many Settings to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

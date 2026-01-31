@@ -91,97 +91,97 @@ export type ProviderStoreDocumentCountAggregateOutputType = {
 
 
 export type ProviderStoreDocumentAvgAggregateInputType = {
-  size?: true | runtime.Types.Skip
+  size?: true
 }
 
 export type ProviderStoreDocumentSumAggregateInputType = {
-  size?: true | runtime.Types.Skip
+  size?: true
 }
 
 export type ProviderStoreDocumentMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  docRef?: true | runtime.Types.Skip
-  docUri?: true | runtime.Types.Skip
-  filename?: true | runtime.Types.Skip
-  state?: true | runtime.Types.Skip
-  indexedAt?: true | runtime.Types.Skip
-  mimeType?: true | runtime.Types.Skip
-  errorMessage?: true | runtime.Types.Skip
-  lastAccessed?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  size?: true | runtime.Types.Skip
+  id?: true
+  storeId?: true
+  attachmentId?: true
+  provider?: true
+  docRef?: true
+  docUri?: true
+  filename?: true
+  state?: true
+  indexedAt?: true
+  mimeType?: true
+  errorMessage?: true
+  lastAccessed?: true
+  createdAt?: true
+  updatedAt?: true
+  size?: true
 }
 
 export type ProviderStoreDocumentMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  docRef?: true | runtime.Types.Skip
-  docUri?: true | runtime.Types.Skip
-  filename?: true | runtime.Types.Skip
-  state?: true | runtime.Types.Skip
-  indexedAt?: true | runtime.Types.Skip
-  mimeType?: true | runtime.Types.Skip
-  errorMessage?: true | runtime.Types.Skip
-  lastAccessed?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  size?: true | runtime.Types.Skip
+  id?: true
+  storeId?: true
+  attachmentId?: true
+  provider?: true
+  docRef?: true
+  docUri?: true
+  filename?: true
+  state?: true
+  indexedAt?: true
+  mimeType?: true
+  errorMessage?: true
+  lastAccessed?: true
+  createdAt?: true
+  updatedAt?: true
+  size?: true
 }
 
 export type ProviderStoreDocumentCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  docRef?: true | runtime.Types.Skip
-  docUri?: true | runtime.Types.Skip
-  filename?: true | runtime.Types.Skip
-  state?: true | runtime.Types.Skip
-  indexedAt?: true | runtime.Types.Skip
-  mimeType?: true | runtime.Types.Skip
-  errorMessage?: true | runtime.Types.Skip
-  lastAccessed?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  size?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  storeId?: true
+  attachmentId?: true
+  provider?: true
+  docRef?: true
+  docUri?: true
+  filename?: true
+  state?: true
+  indexedAt?: true
+  mimeType?: true
+  errorMessage?: true
+  lastAccessed?: true
+  createdAt?: true
+  updatedAt?: true
+  size?: true
+  _all?: true
 }
 
 export type ProviderStoreDocumentAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ProviderStoreDocument to aggregate.
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ProviderStoreDocuments to fetch.
    */
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ProviderStoreDocuments from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ProviderStoreDocuments.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -226,12 +226,12 @@ export type GetProviderStoreDocumentAggregateType<T extends ProviderStoreDocumen
 
 
 export type ProviderStoreDocumentGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithAggregationInput | Prisma.ProviderStoreDocumentOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithAggregationInput | Prisma.ProviderStoreDocumentOrderByWithAggregationInput[]
   by: Prisma.ProviderStoreDocumentScalarFieldEnum[] | Prisma.ProviderStoreDocumentScalarFieldEnum
-  having?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ProviderStoreDocumentCountAggregateInputType | true
   _avg?: ProviderStoreDocumentAvgAggregateInputType
   _sum?: ProviderStoreDocumentSumAggregateInputType
@@ -278,248 +278,248 @@ type GetProviderStoreDocumentGroupByPayload<T extends ProviderStoreDocumentGroup
 
 
 export type ProviderStoreDocumentWhereInput = {
-  AND?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null | runtime.Types.Skip
-  store?: Prisma.XOR<Prisma.ProviderStoreScalarRelationFilter, Prisma.ProviderStoreWhereInput> | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  AND?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[]
+  OR?: Prisma.ProviderStoreDocumentWhereInput[]
+  NOT?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[]
+  id?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider
+  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState
+  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null
+  store?: Prisma.XOR<Prisma.ProviderStoreScalarRelationFilter, Prisma.ProviderStoreWhereInput>
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
 
 export type ProviderStoreDocumentOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  docRef?: Prisma.SortOrder | runtime.Types.Skip
-  docUri?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  filename?: Prisma.SortOrder | runtime.Types.Skip
-  state?: Prisma.SortOrder | runtime.Types.Skip
-  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  mimeType?: Prisma.SortOrder | runtime.Types.Skip
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  store?: Prisma.ProviderStoreOrderByWithRelationInput | runtime.Types.Skip
-  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  docRef?: Prisma.SortOrder
+  docUri?: Prisma.SortOrderInput | Prisma.SortOrder
+  filename?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  store?: Prisma.ProviderStoreOrderByWithRelationInput
+  attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
 
 export type ProviderStoreDocumentWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  storeId_attachmentId?: Prisma.ProviderStoreDocumentStoreIdAttachmentIdCompoundUniqueInput | runtime.Types.Skip
-  AND?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[] | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null | runtime.Types.Skip
-  store?: Prisma.XOR<Prisma.ProviderStoreScalarRelationFilter, Prisma.ProviderStoreWhereInput> | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  id?: string
+  storeId_attachmentId?: Prisma.ProviderStoreDocumentStoreIdAttachmentIdCompoundUniqueInput
+  AND?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[]
+  OR?: Prisma.ProviderStoreDocumentWhereInput[]
+  NOT?: Prisma.ProviderStoreDocumentWhereInput | Prisma.ProviderStoreDocumentWhereInput[]
+  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider
+  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState
+  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null
+  store?: Prisma.XOR<Prisma.ProviderStoreScalarRelationFilter, Prisma.ProviderStoreWhereInput>
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "id" | "storeId_attachmentId">
 
 export type ProviderStoreDocumentOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  docRef?: Prisma.SortOrder | runtime.Types.Skip
-  docUri?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  filename?: Prisma.SortOrder | runtime.Types.Skip
-  state?: Prisma.SortOrder | runtime.Types.Skip
-  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  mimeType?: Prisma.SortOrder | runtime.Types.Skip
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ProviderStoreDocumentCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.ProviderStoreDocumentAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ProviderStoreDocumentMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ProviderStoreDocumentMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.ProviderStoreDocumentSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  docRef?: Prisma.SortOrder
+  docUri?: Prisma.SortOrderInput | Prisma.SortOrder
+  filename?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  _count?: Prisma.ProviderStoreDocumentCountOrderByAggregateInput
+  _avg?: Prisma.ProviderStoreDocumentAvgOrderByAggregateInput
+  _max?: Prisma.ProviderStoreDocumentMaxOrderByAggregateInput
+  _min?: Prisma.ProviderStoreDocumentMinOrderByAggregateInput
+  _sum?: Prisma.ProviderStoreDocumentSumOrderByAggregateInput
 }
 
 export type ProviderStoreDocumentScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput | Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput | Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"ProviderStoreDocument"> | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  docUri?: Prisma.StringNullableWithAggregatesFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  filename?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateWithAggregatesFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.DateTimeNullableWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  size?: Prisma.BigIntNullableWithAggregatesFilter<"ProviderStoreDocument"> | bigint | number | null | runtime.Types.Skip
+  AND?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput | Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput | Prisma.ProviderStoreDocumentScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  storeId?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  attachmentId?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"ProviderStoreDocument"> | $Enums.Provider
+  docRef?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  docUri?: Prisma.StringNullableWithAggregatesFilter<"ProviderStoreDocument"> | string | null
+  filename?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  state?: Prisma.EnumProviderDocStateWithAggregatesFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState
+  indexedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | null
+  mimeType?: Prisma.StringWithAggregatesFilter<"ProviderStoreDocument"> | string
+  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"ProviderStoreDocument"> | string | null
+  lastAccessed?: Prisma.DateTimeNullableWithAggregatesFilter<"ProviderStoreDocument"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProviderStoreDocument"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProviderStoreDocument"> | Date | string
+  size?: Prisma.BigIntNullableWithAggregatesFilter<"ProviderStoreDocument"> | bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
   store: Prisma.ProviderStoreCreateNestedOneWithoutDocsInput
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderStoreDocsInput
 }
 
 export type ProviderStoreDocumentUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   storeId: string
   attachmentId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  store?: Prisma.ProviderStoreUpdateOneRequiredWithoutDocsNestedInput | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  store?: Prisma.ProviderStoreUpdateOneRequiredWithoutDocsNestedInput
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput
 }
 
 export type ProviderStoreDocumentUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   storeId: string
   attachmentId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentListRelationFilter = {
-  every?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
-  some?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
-  none?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  every?: Prisma.ProviderStoreDocumentWhereInput
+  some?: Prisma.ProviderStoreDocumentWhereInput
+  none?: Prisma.ProviderStoreDocumentWhereInput
 }
 
 export type ProviderStoreDocumentOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentStoreIdAttachmentIdCompoundUniqueInput = {
@@ -528,187 +528,187 @@ export type ProviderStoreDocumentStoreIdAttachmentIdCompoundUniqueInput = {
 }
 
 export type ProviderStoreDocumentCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  docRef?: Prisma.SortOrder | runtime.Types.Skip
-  docUri?: Prisma.SortOrder | runtime.Types.Skip
-  filename?: Prisma.SortOrder | runtime.Types.Skip
-  state?: Prisma.SortOrder | runtime.Types.Skip
-  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
-  mimeType?: Prisma.SortOrder | runtime.Types.Skip
-  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
-  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  size?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  docRef?: Prisma.SortOrder
+  docUri?: Prisma.SortOrder
+  filename?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  indexedAt?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  lastAccessed?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  size?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentAvgOrderByAggregateInput = {
-  size?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  docRef?: Prisma.SortOrder | runtime.Types.Skip
-  docUri?: Prisma.SortOrder | runtime.Types.Skip
-  filename?: Prisma.SortOrder | runtime.Types.Skip
-  state?: Prisma.SortOrder | runtime.Types.Skip
-  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
-  mimeType?: Prisma.SortOrder | runtime.Types.Skip
-  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
-  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  size?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  docRef?: Prisma.SortOrder
+  docUri?: Prisma.SortOrder
+  filename?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  indexedAt?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  lastAccessed?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  size?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  docRef?: Prisma.SortOrder | runtime.Types.Skip
-  docUri?: Prisma.SortOrder | runtime.Types.Skip
-  filename?: Prisma.SortOrder | runtime.Types.Skip
-  state?: Prisma.SortOrder | runtime.Types.Skip
-  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
-  mimeType?: Prisma.SortOrder | runtime.Types.Skip
-  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
-  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  size?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  docRef?: Prisma.SortOrder
+  docUri?: Prisma.SortOrder
+  filename?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  indexedAt?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  lastAccessed?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  size?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentSumOrderByAggregateInput = {
-  size?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder
 }
 
 export type ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
 }
 
 export type ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
 }
 
 export type ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
-  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[]
+  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope
+  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput[]
+  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput[]
+  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
 }
 
 export type ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
-  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput> | Prisma.ProviderStoreDocumentCreateWithoutAttachmentInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput[]
+  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyAttachmentInputEnvelope
+  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutAttachmentInput[]
+  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput[]
+  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
 }
 
 export type ProviderStoreDocumentCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
 }
 
 export type ProviderStoreDocumentUncheckedCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
 }
 
 export type ProviderStoreDocumentUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
-  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[]
+  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope
+  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput[]
+  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput[]
+  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
 }
 
 export type ProviderStoreDocumentUncheckedUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
-  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
-  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ProviderStoreDocumentCreateWithoutStoreInput, Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput> | Prisma.ProviderStoreDocumentCreateWithoutStoreInput[] | Prisma.ProviderStoreDocumentUncheckedCreateWithoutStoreInput[]
+  connectOrCreate?: Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput | Prisma.ProviderStoreDocumentCreateOrConnectWithoutStoreInput[]
+  upsert?: Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput[]
+  createMany?: Prisma.ProviderStoreDocumentCreateManyStoreInputEnvelope
+  set?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  disconnect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  delete?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  connect?: Prisma.ProviderStoreDocumentWhereUniqueInput | Prisma.ProviderStoreDocumentWhereUniqueInput[]
+  update?: Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateWithWhereUniqueWithoutStoreInput[]
+  updateMany?: Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput | Prisma.ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput[]
+  deleteMany?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
 }
 
 export type EnumProviderDocStateFieldUpdateOperationsInput = {
-  set?: $Enums.ProviderDocState | runtime.Types.Skip
+  set?: $Enums.ProviderDocState
 }
 
 export type ProviderStoreDocumentCreateWithoutAttachmentInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
   store: Prisma.ProviderStoreCreateNestedOneWithoutDocsInput
 }
 
 export type ProviderStoreDocumentUncheckedCreateWithoutAttachmentInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   storeId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput = {
@@ -718,7 +718,7 @@ export type ProviderStoreDocumentCreateOrConnectWithoutAttachmentInput = {
 
 export type ProviderStoreDocumentCreateManyAttachmentInputEnvelope = {
   data: Prisma.ProviderStoreDocumentCreateManyAttachmentInput | Prisma.ProviderStoreDocumentCreateManyAttachmentInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type ProviderStoreDocumentUpsertWithWhereUniqueWithoutAttachmentInput = {
@@ -738,58 +738,58 @@ export type ProviderStoreDocumentUpdateManyWithWhereWithoutAttachmentInput = {
 }
 
 export type ProviderStoreDocumentScalarWhereInput = {
-  AND?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string | runtime.Types.Skip
-  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string | runtime.Types.Skip
-  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null | runtime.Types.Skip
+  AND?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
+  OR?: Prisma.ProviderStoreDocumentScalarWhereInput[]
+  NOT?: Prisma.ProviderStoreDocumentScalarWhereInput | Prisma.ProviderStoreDocumentScalarWhereInput[]
+  id?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  storeId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  attachmentId?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  provider?: Prisma.EnumProviderFilter<"ProviderStoreDocument"> | $Enums.Provider
+  docRef?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  docUri?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  filename?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  state?: Prisma.EnumProviderDocStateFilter<"ProviderStoreDocument"> | $Enums.ProviderDocState
+  indexedAt?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  mimeType?: Prisma.StringFilter<"ProviderStoreDocument"> | string
+  errorMessage?: Prisma.StringNullableFilter<"ProviderStoreDocument"> | string | null
+  lastAccessed?: Prisma.DateTimeNullableFilter<"ProviderStoreDocument"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ProviderStoreDocument"> | Date | string
+  size?: Prisma.BigIntNullableFilter<"ProviderStoreDocument"> | bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateWithoutStoreInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderStoreDocsInput
 }
 
 export type ProviderStoreDocumentUncheckedCreateWithoutStoreInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   attachmentId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateOrConnectWithoutStoreInput = {
@@ -799,7 +799,7 @@ export type ProviderStoreDocumentCreateOrConnectWithoutStoreInput = {
 
 export type ProviderStoreDocumentCreateManyStoreInputEnvelope = {
   data: Prisma.ProviderStoreDocumentCreateManyStoreInput | Prisma.ProviderStoreDocumentCreateManyStoreInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type ProviderStoreDocumentUpsertWithWhereUniqueWithoutStoreInput = {
@@ -819,233 +819,233 @@ export type ProviderStoreDocumentUpdateManyWithWhereWithoutStoreInput = {
 }
 
 export type ProviderStoreDocumentCreateManyAttachmentInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   storeId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  store?: Prisma.ProviderStoreUpdateOneRequiredWithoutDocsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  store?: Prisma.ProviderStoreUpdateOneRequiredWithoutDocsNestedInput
 }
 
 export type ProviderStoreDocumentUncheckedUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentCreateManyStoreInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   attachmentId: string
   provider: $Enums.Provider
   docRef: string
-  docUri?: string | null | runtime.Types.Skip
+  docUri?: string | null
   filename: string
-  state?: $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.ProviderDocState
+  indexedAt?: Date | string | null
   mimeType: string
-  errorMessage?: string | null | runtime.Types.Skip
-  lastAccessed?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  size?: bigint | number | null | runtime.Types.Skip
+  errorMessage?: string | null
+  lastAccessed?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  size?: bigint | number | null
 }
 
 export type ProviderStoreDocumentUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput
 }
 
 export type ProviderStoreDocumentUncheckedUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 export type ProviderStoreDocumentUncheckedUpdateManyWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  docRef?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState | runtime.Types.Skip
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  docRef?: Prisma.StringFieldUpdateOperationsInput | string
+  docUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumProviderDocStateFieldUpdateOperationsInput | $Enums.ProviderDocState
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
 }
 
 
 
 export type ProviderStoreDocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  docRef?: boolean | runtime.Types.Skip
-  docUri?: boolean | runtime.Types.Skip
-  filename?: boolean | runtime.Types.Skip
-  state?: boolean | runtime.Types.Skip
-  indexedAt?: boolean | runtime.Types.Skip
-  mimeType?: boolean | runtime.Types.Skip
-  errorMessage?: boolean | runtime.Types.Skip
-  lastAccessed?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  size?: boolean | runtime.Types.Skip
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  storeId?: boolean
+  attachmentId?: boolean
+  provider?: boolean
+  docRef?: boolean
+  docUri?: boolean
+  filename?: boolean
+  state?: boolean
+  indexedAt?: boolean
+  mimeType?: boolean
+  errorMessage?: boolean
+  lastAccessed?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  size?: boolean
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["providerStoreDocument"]>
 
 export type ProviderStoreDocumentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  docRef?: boolean | runtime.Types.Skip
-  docUri?: boolean | runtime.Types.Skip
-  filename?: boolean | runtime.Types.Skip
-  state?: boolean | runtime.Types.Skip
-  indexedAt?: boolean | runtime.Types.Skip
-  mimeType?: boolean | runtime.Types.Skip
-  errorMessage?: boolean | runtime.Types.Skip
-  lastAccessed?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  size?: boolean | runtime.Types.Skip
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  storeId?: boolean
+  attachmentId?: boolean
+  provider?: boolean
+  docRef?: boolean
+  docUri?: boolean
+  filename?: boolean
+  state?: boolean
+  indexedAt?: boolean
+  mimeType?: boolean
+  errorMessage?: boolean
+  lastAccessed?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  size?: boolean
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["providerStoreDocument"]>
 
 export type ProviderStoreDocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  docRef?: boolean | runtime.Types.Skip
-  docUri?: boolean | runtime.Types.Skip
-  filename?: boolean | runtime.Types.Skip
-  state?: boolean | runtime.Types.Skip
-  indexedAt?: boolean | runtime.Types.Skip
-  mimeType?: boolean | runtime.Types.Skip
-  errorMessage?: boolean | runtime.Types.Skip
-  lastAccessed?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  size?: boolean | runtime.Types.Skip
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  storeId?: boolean
+  attachmentId?: boolean
+  provider?: boolean
+  docRef?: boolean
+  docUri?: boolean
+  filename?: boolean
+  state?: boolean
+  indexedAt?: boolean
+  mimeType?: boolean
+  errorMessage?: boolean
+  lastAccessed?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  size?: boolean
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["providerStoreDocument"]>
 
 export type ProviderStoreDocumentSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  docRef?: boolean | runtime.Types.Skip
-  docUri?: boolean | runtime.Types.Skip
-  filename?: boolean | runtime.Types.Skip
-  state?: boolean | runtime.Types.Skip
-  indexedAt?: boolean | runtime.Types.Skip
-  mimeType?: boolean | runtime.Types.Skip
-  errorMessage?: boolean | runtime.Types.Skip
-  lastAccessed?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  size?: boolean | runtime.Types.Skip
+  id?: boolean
+  storeId?: boolean
+  attachmentId?: boolean
+  provider?: boolean
+  docRef?: boolean
+  docUri?: boolean
+  filename?: boolean
+  state?: boolean
+  indexedAt?: boolean
+  mimeType?: boolean
+  errorMessage?: boolean
+  lastAccessed?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  size?: boolean
 }
 
-export type ProviderStoreDocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "provider" | "docRef" | "docUri" | "filename" | "state" | "indexedAt" | "mimeType" | "errorMessage" | "lastAccessed" | "createdAt" | "updatedAt" | "size", ExtArgs["result"]["providerStoreDocument"], runtime.Types.Skip>
+export type ProviderStoreDocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "provider" | "docRef" | "docUri" | "filename" | "state" | "indexedAt" | "mimeType" | "errorMessage" | "lastAccessed" | "createdAt" | "updatedAt" | "size", ExtArgs["result"]["providerStoreDocument"]>
 export type ProviderStoreDocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ProviderStoreDocumentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ProviderStoreDocumentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  store?: boolean | Prisma.ProviderStoreDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 
 export type $ProviderStoreDocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1534,7 +1534,7 @@ export type ProviderStoreDocumentFindUniqueArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which ProviderStoreDocument to fetch.
    */
   where: Prisma.ProviderStoreDocumentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1557,7 +1557,7 @@ export type ProviderStoreDocumentFindUniqueOrThrowArgs<ExtArgs extends runtime.T
    * Filter, which ProviderStoreDocument to fetch.
    */
   where: Prisma.ProviderStoreDocumentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1579,38 +1579,38 @@ export type ProviderStoreDocumentFindFirstArgs<ExtArgs extends runtime.Types.Ext
   /**
    * Filter, which ProviderStoreDocument to fetch.
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ProviderStoreDocuments to fetch.
    */
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ProviderStoreDocuments.
    */
-  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ProviderStoreDocuments from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ProviderStoreDocuments.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ProviderStoreDocuments.
    */
-  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1632,38 +1632,38 @@ export type ProviderStoreDocumentFindFirstOrThrowArgs<ExtArgs extends runtime.Ty
   /**
    * Filter, which ProviderStoreDocument to fetch.
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ProviderStoreDocuments to fetch.
    */
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ProviderStoreDocuments.
    */
-  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ProviderStoreDocuments from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ProviderStoreDocuments.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ProviderStoreDocuments.
    */
-  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1685,33 +1685,33 @@ export type ProviderStoreDocumentFindManyArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter, which ProviderStoreDocuments to fetch.
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ProviderStoreDocuments to fetch.
    */
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ProviderStoreDocuments.
    */
-  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ProviderStoreDocuments from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ProviderStoreDocuments.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1734,7 +1734,7 @@ export type ProviderStoreDocumentCreateArgs<ExtArgs extends runtime.Types.Extens
    * The data needed to create a ProviderStoreDocument.
    */
   data: Prisma.XOR<Prisma.ProviderStoreDocumentCreateInput, Prisma.ProviderStoreDocumentUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1745,7 +1745,7 @@ export type ProviderStoreDocumentCreateManyArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many ProviderStoreDocuments.
    */
   data: Prisma.ProviderStoreDocumentCreateManyInput | Prisma.ProviderStoreDocumentCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1764,7 +1764,7 @@ export type ProviderStoreDocumentCreateManyAndReturnArgs<ExtArgs extends runtime
    * The data used to create many ProviderStoreDocuments.
    */
   data: Prisma.ProviderStoreDocumentCreateManyInput | Prisma.ProviderStoreDocumentCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1795,7 +1795,7 @@ export type ProviderStoreDocumentUpdateArgs<ExtArgs extends runtime.Types.Extens
    * Choose, which ProviderStoreDocument to update.
    */
   where: Prisma.ProviderStoreDocumentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1809,11 +1809,11 @@ export type ProviderStoreDocumentUpdateManyArgs<ExtArgs extends runtime.Types.Ex
   /**
    * Filter which ProviderStoreDocuments to update
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * Limit how many ProviderStoreDocuments to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1835,11 +1835,11 @@ export type ProviderStoreDocumentUpdateManyAndReturnArgs<ExtArgs extends runtime
   /**
    * Filter which ProviderStoreDocuments to update
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * Limit how many ProviderStoreDocuments to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1874,7 +1874,7 @@ export type ProviderStoreDocumentUpsertArgs<ExtArgs extends runtime.Types.Extens
    * In case the ProviderStoreDocument was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ProviderStoreDocumentUpdateInput, Prisma.ProviderStoreDocumentUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1897,7 +1897,7 @@ export type ProviderStoreDocumentDeleteArgs<ExtArgs extends runtime.Types.Extens
    * Filter which ProviderStoreDocument to delete.
    */
   where: Prisma.ProviderStoreDocumentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1907,11 +1907,11 @@ export type ProviderStoreDocumentDeleteManyArgs<ExtArgs extends runtime.Types.Ex
   /**
    * Filter which ProviderStoreDocuments to delete
    */
-  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  where?: Prisma.ProviderStoreDocumentWhereInput
   /**
    * Limit how many ProviderStoreDocuments to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

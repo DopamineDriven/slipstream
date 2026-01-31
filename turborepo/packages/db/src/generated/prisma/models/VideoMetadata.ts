@@ -113,119 +113,119 @@ export type VideoMetadataCountAggregateOutputType = {
 
 
 export type VideoMetadataAvgAggregateInputType = {
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  duration?: true | runtime.Types.Skip
-  frameRate?: true | runtime.Types.Skip
-  bitrate?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  rotation?: true | runtime.Types.Skip
-  thumbnailCount?: true | runtime.Types.Skip
-  keyframeTimes?: true | runtime.Types.Skip
+  width?: true
+  height?: true
+  aspectRatio?: true
+  duration?: true
+  frameRate?: true
+  bitrate?: true
+  orientation?: true
+  rotation?: true
+  thumbnailCount?: true
+  keyframeTimes?: true
 }
 
 export type VideoMetadataSumAggregateInputType = {
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  duration?: true | runtime.Types.Skip
-  frameRate?: true | runtime.Types.Skip
-  bitrate?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  rotation?: true | runtime.Types.Skip
-  thumbnailCount?: true | runtime.Types.Skip
-  keyframeTimes?: true | runtime.Types.Skip
+  width?: true
+  height?: true
+  aspectRatio?: true
+  duration?: true
+  frameRate?: true
+  bitrate?: true
+  orientation?: true
+  rotation?: true
+  thumbnailCount?: true
+  keyframeTimes?: true
 }
 
 export type VideoMetadataMinAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  duration?: true | runtime.Types.Skip
-  frameRate?: true | runtime.Types.Skip
-  bitrate?: true | runtime.Types.Skip
-  codec?: true | runtime.Types.Skip
-  hasAudio?: true | runtime.Types.Skip
-  resolution?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  rotation?: true | runtime.Types.Skip
-  thumbnailCount?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  duration?: true
+  frameRate?: true
+  bitrate?: true
+  codec?: true
+  hasAudio?: true
+  resolution?: true
+  orientation?: true
+  rotation?: true
+  thumbnailCount?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type VideoMetadataMaxAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  duration?: true | runtime.Types.Skip
-  frameRate?: true | runtime.Types.Skip
-  bitrate?: true | runtime.Types.Skip
-  codec?: true | runtime.Types.Skip
-  hasAudio?: true | runtime.Types.Skip
-  resolution?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  rotation?: true | runtime.Types.Skip
-  thumbnailCount?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  duration?: true
+  frameRate?: true
+  bitrate?: true
+  codec?: true
+  hasAudio?: true
+  resolution?: true
+  orientation?: true
+  rotation?: true
+  thumbnailCount?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type VideoMetadataCountAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  aspectRatio?: true | runtime.Types.Skip
-  duration?: true | runtime.Types.Skip
-  frameRate?: true | runtime.Types.Skip
-  bitrate?: true | runtime.Types.Skip
-  codec?: true | runtime.Types.Skip
-  hasAudio?: true | runtime.Types.Skip
-  resolution?: true | runtime.Types.Skip
-  orientation?: true | runtime.Types.Skip
-  rotation?: true | runtime.Types.Skip
-  thumbnailCount?: true | runtime.Types.Skip
-  keyframeTimes?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  width?: true
+  height?: true
+  aspectRatio?: true
+  duration?: true
+  frameRate?: true
+  bitrate?: true
+  codec?: true
+  hasAudio?: true
+  resolution?: true
+  orientation?: true
+  rotation?: true
+  thumbnailCount?: true
+  keyframeTimes?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type VideoMetadataAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which VideoMetadata to aggregate.
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of VideoMetadata to fetch.
    */
-  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.VideoMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` VideoMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` VideoMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -270,12 +270,12 @@ export type GetVideoMetadataAggregateType<T extends VideoMetadataAggregateArgs> 
 
 
 export type VideoMetadataGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.VideoMetadataOrderByWithAggregationInput | Prisma.VideoMetadataOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
+  orderBy?: Prisma.VideoMetadataOrderByWithAggregationInput | Prisma.VideoMetadataOrderByWithAggregationInput[]
   by: Prisma.VideoMetadataScalarFieldEnum[] | Prisma.VideoMetadataScalarFieldEnum
-  having?: Prisma.VideoMetadataScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.VideoMetadataScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: VideoMetadataCountAggregateInputType | true
   _avg?: VideoMetadataAvgAggregateInputType
   _sum?: VideoMetadataSumAggregateInputType
@@ -324,139 +324,139 @@ type GetVideoMetadataGroupByPayload<T extends VideoMetadataGroupByArgs> = Prisma
 
 
 export type VideoMetadataWhereInput = {
-  AND?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"VideoMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.StringFilter<"VideoMetadata"> | string | runtime.Types.Skip
-  width?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean | runtime.Types.Skip
-  resolution?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  orientation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  rotation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata"> | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  AND?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[]
+  OR?: Prisma.VideoMetadataWhereInput[]
+  NOT?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[]
+  attachmentId?: Prisma.StringFilter<"VideoMetadata"> | string
+  format?: Prisma.StringFilter<"VideoMetadata"> | string
+  width?: Prisma.IntFilter<"VideoMetadata"> | number
+  height?: Prisma.IntFilter<"VideoMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
+  duration?: Prisma.IntFilter<"VideoMetadata"> | number
+  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
+  bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
+  hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean
+  resolution?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
+  orientation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  rotation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  thumbnailCount?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata">
+  createdAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
 
 export type VideoMetadataOrderByWithRelationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  codec?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  hasAudio?: Prisma.SortOrder | runtime.Types.Skip
-  resolution?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keyframeTimes?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
+  codec?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasAudio?: Prisma.SortOrder
+  resolution?: Prisma.SortOrderInput | Prisma.SortOrder
+  orientation?: Prisma.SortOrderInput | Prisma.SortOrder
+  rotation?: Prisma.SortOrderInput | Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  keyframeTimes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
 
 export type VideoMetadataWhereUniqueInput = Prisma.AtLeast<{
-  attachmentId?: string | runtime.Types.Skip
-  AND?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[] | runtime.Types.Skip
-  format?: Prisma.StringFilter<"VideoMetadata"> | string | runtime.Types.Skip
-  width?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean | runtime.Types.Skip
-  resolution?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  orientation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  rotation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata"> | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  attachmentId?: string
+  AND?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[]
+  OR?: Prisma.VideoMetadataWhereInput[]
+  NOT?: Prisma.VideoMetadataWhereInput | Prisma.VideoMetadataWhereInput[]
+  format?: Prisma.StringFilter<"VideoMetadata"> | string
+  width?: Prisma.IntFilter<"VideoMetadata"> | number
+  height?: Prisma.IntFilter<"VideoMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
+  duration?: Prisma.IntFilter<"VideoMetadata"> | number
+  frameRate?: Prisma.FloatNullableFilter<"VideoMetadata"> | number | null
+  bitrate?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  codec?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
+  hasAudio?: Prisma.BoolFilter<"VideoMetadata"> | boolean
+  resolution?: Prisma.StringNullableFilter<"VideoMetadata"> | string | null
+  orientation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  rotation?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  thumbnailCount?: Prisma.IntNullableFilter<"VideoMetadata"> | number | null
+  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata">
+  createdAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"VideoMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "attachmentId">
 
 export type VideoMetadataOrderByWithAggregationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  codec?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  hasAudio?: Prisma.SortOrder | runtime.Types.Skip
-  resolution?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keyframeTimes?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.VideoMetadataCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.VideoMetadataAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.VideoMetadataMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.VideoMetadataMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.VideoMetadataSumOrderByAggregateInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrderInput | Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
+  codec?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasAudio?: Prisma.SortOrder
+  resolution?: Prisma.SortOrderInput | Prisma.SortOrder
+  orientation?: Prisma.SortOrderInput | Prisma.SortOrder
+  rotation?: Prisma.SortOrderInput | Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  keyframeTimes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.VideoMetadataCountOrderByAggregateInput
+  _avg?: Prisma.VideoMetadataAvgOrderByAggregateInput
+  _max?: Prisma.VideoMetadataMaxOrderByAggregateInput
+  _min?: Prisma.VideoMetadataMinOrderByAggregateInput
+  _sum?: Prisma.VideoMetadataSumOrderByAggregateInput
 }
 
 export type VideoMetadataScalarWhereWithAggregatesInput = {
-  AND?: Prisma.VideoMetadataScalarWhereWithAggregatesInput | Prisma.VideoMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.VideoMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.VideoMetadataScalarWhereWithAggregatesInput | Prisma.VideoMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"VideoMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.StringWithAggregatesFilter<"VideoMetadata"> | string | runtime.Types.Skip
-  width?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  height?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  duration?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number | runtime.Types.Skip
-  frameRate?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  bitrate?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  codec?: Prisma.StringNullableWithAggregatesFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolWithAggregatesFilter<"VideoMetadata"> | boolean | runtime.Types.Skip
-  resolution?: Prisma.StringNullableWithAggregatesFilter<"VideoMetadata"> | string | null | runtime.Types.Skip
-  orientation?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  rotation?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata"> | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"VideoMetadata"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.VideoMetadataScalarWhereWithAggregatesInput | Prisma.VideoMetadataScalarWhereWithAggregatesInput[]
+  OR?: Prisma.VideoMetadataScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.VideoMetadataScalarWhereWithAggregatesInput | Prisma.VideoMetadataScalarWhereWithAggregatesInput[]
+  attachmentId?: Prisma.StringWithAggregatesFilter<"VideoMetadata"> | string
+  format?: Prisma.StringWithAggregatesFilter<"VideoMetadata"> | string
+  width?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
+  height?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
+  aspectRatio?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  duration?: Prisma.IntWithAggregatesFilter<"VideoMetadata"> | number
+  frameRate?: Prisma.FloatNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  bitrate?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  codec?: Prisma.StringNullableWithAggregatesFilter<"VideoMetadata"> | string | null
+  hasAudio?: Prisma.BoolWithAggregatesFilter<"VideoMetadata"> | boolean
+  resolution?: Prisma.StringNullableWithAggregatesFilter<"VideoMetadata"> | string | null
+  orientation?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  rotation?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  thumbnailCount?: Prisma.IntNullableWithAggregatesFilter<"VideoMetadata"> | number | null
+  keyframeTimes?: Prisma.IntNullableListFilter<"VideoMetadata">
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"VideoMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"VideoMetadata"> | Date | string
 }
 
 export type VideoMetadataCreateInput = {
   format: string
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
+  aspectRatio?: number | null
   duration: number
-  frameRate?: number | null | runtime.Types.Skip
-  bitrate?: number | null | runtime.Types.Skip
-  codec?: string | null | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: string | null | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  rotation?: number | null | runtime.Types.Skip
-  thumbnailCount?: number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  frameRate?: number | null
+  bitrate?: number | null
+  codec?: string | null
+  hasAudio?: boolean
+  resolution?: string | null
+  orientation?: number | null
+  rotation?: number | null
+  thumbnailCount?: number | null
+  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
   attachment: Prisma.AttachmentCreateNestedOneWithoutVideoInput
 }
 
@@ -465,59 +465,59 @@ export type VideoMetadataUncheckedCreateInput = {
   format: string
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
+  aspectRatio?: number | null
   duration: number
-  frameRate?: number | null | runtime.Types.Skip
-  bitrate?: number | null | runtime.Types.Skip
-  codec?: string | null | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: string | null | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  rotation?: number | null | runtime.Types.Skip
-  thumbnailCount?: number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  frameRate?: number | null
+  bitrate?: number | null
+  codec?: string | null
+  hasAudio?: boolean
+  resolution?: string | null
+  orientation?: number | null
+  rotation?: number | null
+  thumbnailCount?: number | null
+  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type VideoMetadataUpdateInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutVideoNestedInput | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutVideoNestedInput
 }
 
 export type VideoMetadataUncheckedUpdateInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type VideoMetadataCreateManyInput = {
@@ -525,187 +525,187 @@ export type VideoMetadataCreateManyInput = {
   format: string
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
+  aspectRatio?: number | null
   duration: number
-  frameRate?: number | null | runtime.Types.Skip
-  bitrate?: number | null | runtime.Types.Skip
-  codec?: string | null | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: string | null | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  rotation?: number | null | runtime.Types.Skip
-  thumbnailCount?: number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  frameRate?: number | null
+  bitrate?: number | null
+  codec?: string | null
+  hasAudio?: boolean
+  resolution?: string | null
+  orientation?: number | null
+  rotation?: number | null
+  thumbnailCount?: number | null
+  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type VideoMetadataUpdateManyMutationInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type VideoMetadataUncheckedUpdateManyInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type VideoMetadataNullableScalarRelationFilter = {
-  is?: Prisma.VideoMetadataWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.VideoMetadataWhereInput | null | runtime.Types.Skip
+  is?: Prisma.VideoMetadataWhereInput | null
+  isNot?: Prisma.VideoMetadataWhereInput | null
 }
 
 export type IntNullableListFilter<$PrismaModel = never> = {
-  equals?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null | runtime.Types.Skip
-  has?: number | Prisma.IntFieldRefInput<$PrismaModel> | null | runtime.Types.Skip
-  hasEvery?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | runtime.Types.Skip
-  hasSome?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | runtime.Types.Skip
-  isEmpty?: boolean | runtime.Types.Skip
+  equals?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  has?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  hasEvery?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
+  hasSome?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type VideoMetadataCountOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrder | runtime.Types.Skip
-  codec?: Prisma.SortOrder | runtime.Types.Skip
-  hasAudio?: Prisma.SortOrder | runtime.Types.Skip
-  resolution?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrder | runtime.Types.Skip
-  keyframeTimes?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrder
+  bitrate?: Prisma.SortOrder
+  codec?: Prisma.SortOrder
+  hasAudio?: Prisma.SortOrder
+  resolution?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  rotation?: Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrder
+  keyframeTimes?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type VideoMetadataAvgOrderByAggregateInput = {
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrder | runtime.Types.Skip
-  keyframeTimes?: Prisma.SortOrder | runtime.Types.Skip
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrder
+  bitrate?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  rotation?: Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrder
+  keyframeTimes?: Prisma.SortOrder
 }
 
 export type VideoMetadataMaxOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrder | runtime.Types.Skip
-  codec?: Prisma.SortOrder | runtime.Types.Skip
-  hasAudio?: Prisma.SortOrder | runtime.Types.Skip
-  resolution?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrder
+  bitrate?: Prisma.SortOrder
+  codec?: Prisma.SortOrder
+  hasAudio?: Prisma.SortOrder
+  resolution?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  rotation?: Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type VideoMetadataMinOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrder | runtime.Types.Skip
-  codec?: Prisma.SortOrder | runtime.Types.Skip
-  hasAudio?: Prisma.SortOrder | runtime.Types.Skip
-  resolution?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrder
+  bitrate?: Prisma.SortOrder
+  codec?: Prisma.SortOrder
+  hasAudio?: Prisma.SortOrder
+  resolution?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  rotation?: Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type VideoMetadataSumOrderByAggregateInput = {
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  aspectRatio?: Prisma.SortOrder | runtime.Types.Skip
-  duration?: Prisma.SortOrder | runtime.Types.Skip
-  frameRate?: Prisma.SortOrder | runtime.Types.Skip
-  bitrate?: Prisma.SortOrder | runtime.Types.Skip
-  orientation?: Prisma.SortOrder | runtime.Types.Skip
-  rotation?: Prisma.SortOrder | runtime.Types.Skip
-  thumbnailCount?: Prisma.SortOrder | runtime.Types.Skip
-  keyframeTimes?: Prisma.SortOrder | runtime.Types.Skip
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  aspectRatio?: Prisma.SortOrder
+  duration?: Prisma.SortOrder
+  frameRate?: Prisma.SortOrder
+  bitrate?: Prisma.SortOrder
+  orientation?: Prisma.SortOrder
+  rotation?: Prisma.SortOrder
+  thumbnailCount?: Prisma.SortOrder
+  keyframeTimes?: Prisma.SortOrder
 }
 
 export type VideoMetadataCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.VideoMetadataWhereUniqueInput
 }
 
 export type VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.VideoMetadataWhereUniqueInput
 }
 
 export type VideoMetadataUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.VideoMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.VideoMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.VideoMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.VideoMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.VideoMetadataUpdateWithoutAttachmentInput>, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.VideoMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.VideoMetadataWhereInput | boolean
+  delete?: Prisma.VideoMetadataWhereInput | boolean
+  connect?: Prisma.VideoMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VideoMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.VideoMetadataUpdateWithoutAttachmentInput>, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.VideoMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.VideoMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.VideoMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.VideoMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.VideoMetadataUpdateWithoutAttachmentInput>, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.VideoMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.VideoMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.VideoMetadataWhereInput | boolean
+  delete?: Prisma.VideoMetadataWhereInput | boolean
+  connect?: Prisma.VideoMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VideoMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.VideoMetadataUpdateWithoutAttachmentInput>, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type VideoMetadataCreatekeyframeTimesInput = {
@@ -713,46 +713,46 @@ export type VideoMetadataCreatekeyframeTimesInput = {
 }
 
 export type VideoMetadataUpdatekeyframeTimesInput = {
-  set?: number[] | runtime.Types.Skip
-  push?: number | number[] | runtime.Types.Skip
+  set?: number[]
+  push?: number | number[]
 }
 
 export type VideoMetadataCreateWithoutAttachmentInput = {
   format: string
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
+  aspectRatio?: number | null
   duration: number
-  frameRate?: number | null | runtime.Types.Skip
-  bitrate?: number | null | runtime.Types.Skip
-  codec?: string | null | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: string | null | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  rotation?: number | null | runtime.Types.Skip
-  thumbnailCount?: number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  frameRate?: number | null
+  bitrate?: number | null
+  codec?: string | null
+  hasAudio?: boolean
+  resolution?: string | null
+  orientation?: number | null
+  rotation?: number | null
+  thumbnailCount?: number | null
+  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type VideoMetadataUncheckedCreateWithoutAttachmentInput = {
   format: string
   width: number
   height: number
-  aspectRatio?: number | null | runtime.Types.Skip
+  aspectRatio?: number | null
   duration: number
-  frameRate?: number | null | runtime.Types.Skip
-  bitrate?: number | null | runtime.Types.Skip
-  codec?: string | null | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: string | null | runtime.Types.Skip
-  orientation?: number | null | runtime.Types.Skip
-  rotation?: number | null | runtime.Types.Skip
-  thumbnailCount?: number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  frameRate?: number | null
+  bitrate?: number | null
+  codec?: string | null
+  hasAudio?: boolean
+  resolution?: string | null
+  orientation?: number | null
+  rotation?: number | null
+  thumbnailCount?: number | null
+  keyframeTimes?: Prisma.VideoMetadataCreatekeyframeTimesInput | number[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type VideoMetadataCreateOrConnectWithoutAttachmentInput = {
@@ -763,146 +763,146 @@ export type VideoMetadataCreateOrConnectWithoutAttachmentInput = {
 export type VideoMetadataUpsertWithoutAttachmentInput = {
   update: Prisma.XOR<Prisma.VideoMetadataUpdateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput>
   create: Prisma.XOR<Prisma.VideoMetadataCreateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedCreateWithoutAttachmentInput>
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
 }
 
 export type VideoMetadataUpdateToOneWithWhereWithoutAttachmentInput = {
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   data: Prisma.XOR<Prisma.VideoMetadataUpdateWithoutAttachmentInput, Prisma.VideoMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type VideoMetadataUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type VideoMetadataUncheckedUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  height?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[] | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  aspectRatio?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  frameRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hasAudio?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orientation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rotation?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  thumbnailCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  keyframeTimes?: Prisma.VideoMetadataUpdatekeyframeTimesInput | number[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type VideoMetadataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  duration?: boolean | runtime.Types.Skip
-  frameRate?: boolean | runtime.Types.Skip
-  bitrate?: boolean | runtime.Types.Skip
-  codec?: boolean | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  rotation?: boolean | runtime.Types.Skip
-  thumbnailCount?: boolean | runtime.Types.Skip
-  keyframeTimes?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  duration?: boolean
+  frameRate?: boolean
+  bitrate?: boolean
+  codec?: boolean
+  hasAudio?: boolean
+  resolution?: boolean
+  orientation?: boolean
+  rotation?: boolean
+  thumbnailCount?: boolean
+  keyframeTimes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["videoMetadata"]>
 
 export type VideoMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  duration?: boolean | runtime.Types.Skip
-  frameRate?: boolean | runtime.Types.Skip
-  bitrate?: boolean | runtime.Types.Skip
-  codec?: boolean | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  rotation?: boolean | runtime.Types.Skip
-  thumbnailCount?: boolean | runtime.Types.Skip
-  keyframeTimes?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  duration?: boolean
+  frameRate?: boolean
+  bitrate?: boolean
+  codec?: boolean
+  hasAudio?: boolean
+  resolution?: boolean
+  orientation?: boolean
+  rotation?: boolean
+  thumbnailCount?: boolean
+  keyframeTimes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["videoMetadata"]>
 
 export type VideoMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  duration?: boolean | runtime.Types.Skip
-  frameRate?: boolean | runtime.Types.Skip
-  bitrate?: boolean | runtime.Types.Skip
-  codec?: boolean | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  rotation?: boolean | runtime.Types.Skip
-  thumbnailCount?: boolean | runtime.Types.Skip
-  keyframeTimes?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  duration?: boolean
+  frameRate?: boolean
+  bitrate?: boolean
+  codec?: boolean
+  hasAudio?: boolean
+  resolution?: boolean
+  orientation?: boolean
+  rotation?: boolean
+  thumbnailCount?: boolean
+  keyframeTimes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["videoMetadata"]>
 
 export type VideoMetadataSelectScalar = {
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  aspectRatio?: boolean | runtime.Types.Skip
-  duration?: boolean | runtime.Types.Skip
-  frameRate?: boolean | runtime.Types.Skip
-  bitrate?: boolean | runtime.Types.Skip
-  codec?: boolean | runtime.Types.Skip
-  hasAudio?: boolean | runtime.Types.Skip
-  resolution?: boolean | runtime.Types.Skip
-  orientation?: boolean | runtime.Types.Skip
-  rotation?: boolean | runtime.Types.Skip
-  thumbnailCount?: boolean | runtime.Types.Skip
-  keyframeTimes?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  width?: boolean
+  height?: boolean
+  aspectRatio?: boolean
+  duration?: boolean
+  frameRate?: boolean
+  bitrate?: boolean
+  codec?: boolean
+  hasAudio?: boolean
+  resolution?: boolean
+  orientation?: boolean
+  rotation?: boolean
+  thumbnailCount?: boolean
+  keyframeTimes?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type VideoMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "duration" | "frameRate" | "bitrate" | "codec" | "hasAudio" | "resolution" | "orientation" | "rotation" | "thumbnailCount" | "keyframeTimes" | "createdAt" | "updatedAt", ExtArgs["result"]["videoMetadata"], runtime.Types.Skip>
+export type VideoMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "width" | "height" | "aspectRatio" | "duration" | "frameRate" | "bitrate" | "codec" | "hasAudio" | "resolution" | "orientation" | "rotation" | "thumbnailCount" | "keyframeTimes" | "createdAt" | "updatedAt", ExtArgs["result"]["videoMetadata"]>
 export type VideoMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type VideoMetadataIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type VideoMetadataIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 
 export type $VideoMetadataPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1393,7 +1393,7 @@ export type VideoMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which VideoMetadata to fetch.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1416,7 +1416,7 @@ export type VideoMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which VideoMetadata to fetch.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1438,38 +1438,38 @@ export type VideoMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter, which VideoMetadata to fetch.
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of VideoMetadata to fetch.
    */
-  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for VideoMetadata.
    */
-  cursor?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.VideoMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` VideoMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` VideoMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of VideoMetadata.
    */
-  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1491,38 +1491,38 @@ export type VideoMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter, which VideoMetadata to fetch.
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of VideoMetadata to fetch.
    */
-  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for VideoMetadata.
    */
-  cursor?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.VideoMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` VideoMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` VideoMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of VideoMetadata.
    */
-  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1544,33 +1544,33 @@ export type VideoMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter, which VideoMetadata to fetch.
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of VideoMetadata to fetch.
    */
-  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.VideoMetadataOrderByWithRelationInput | Prisma.VideoMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing VideoMetadata.
    */
-  cursor?: Prisma.VideoMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.VideoMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` VideoMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` VideoMetadata.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.VideoMetadataScalarFieldEnum | Prisma.VideoMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1593,7 +1593,7 @@ export type VideoMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a VideoMetadata.
    */
   data: Prisma.XOR<Prisma.VideoMetadataCreateInput, Prisma.VideoMetadataUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1604,7 +1604,7 @@ export type VideoMetadataCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many VideoMetadata.
    */
   data: Prisma.VideoMetadataCreateManyInput | Prisma.VideoMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1623,7 +1623,7 @@ export type VideoMetadataCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many VideoMetadata.
    */
   data: Prisma.VideoMetadataCreateManyInput | Prisma.VideoMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1654,7 +1654,7 @@ export type VideoMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which VideoMetadata to update.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1668,11 +1668,11 @@ export type VideoMetadataUpdateManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which VideoMetadata to update
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * Limit how many VideoMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1694,11 +1694,11 @@ export type VideoMetadataUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter which VideoMetadata to update
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * Limit how many VideoMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1733,7 +1733,7 @@ export type VideoMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the VideoMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.VideoMetadataUpdateInput, Prisma.VideoMetadataUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1756,7 +1756,7 @@ export type VideoMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which VideoMetadata to delete.
    */
   where: Prisma.VideoMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1766,11 +1766,11 @@ export type VideoMetadataDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which VideoMetadata to delete
    */
-  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.VideoMetadataWhereInput
   /**
    * Limit how many VideoMetadata to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

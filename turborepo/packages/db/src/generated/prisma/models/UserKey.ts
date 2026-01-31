@@ -66,74 +66,74 @@ export type UserKeyCountAggregateOutputType = {
 
 
 export type UserKeyMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  apiKey?: true | runtime.Types.Skip
-  iv?: true | runtime.Types.Skip
-  authTag?: true | runtime.Types.Skip
-  label?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  isDefault?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  apiKey?: true
+  iv?: true
+  authTag?: true
+  label?: true
+  createdAt?: true
+  updatedAt?: true
+  isDefault?: true
 }
 
 export type UserKeyMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  apiKey?: true | runtime.Types.Skip
-  iv?: true | runtime.Types.Skip
-  authTag?: true | runtime.Types.Skip
-  label?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  isDefault?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  apiKey?: true
+  iv?: true
+  authTag?: true
+  label?: true
+  createdAt?: true
+  updatedAt?: true
+  isDefault?: true
 }
 
 export type UserKeyCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  apiKey?: true | runtime.Types.Skip
-  iv?: true | runtime.Types.Skip
-  authTag?: true | runtime.Types.Skip
-  label?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  isDefault?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  apiKey?: true
+  iv?: true
+  authTag?: true
+  label?: true
+  createdAt?: true
+  updatedAt?: true
+  isDefault?: true
+  _all?: true
 }
 
 export type UserKeyAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which UserKey to aggregate.
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of UserKeys to fetch.
    */
-  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.UserKeyWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` UserKeys from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` UserKeys.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -166,12 +166,12 @@ export type GetUserKeyAggregateType<T extends UserKeyAggregateArgs> = {
 
 
 export type UserKeyGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.UserKeyOrderByWithAggregationInput | Prisma.UserKeyOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
+  orderBy?: Prisma.UserKeyOrderByWithAggregationInput | Prisma.UserKeyOrderByWithAggregationInput[]
   by: Prisma.UserKeyScalarFieldEnum[] | Prisma.UserKeyScalarFieldEnum
-  having?: Prisma.UserKeyScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.UserKeyScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: UserKeyCountAggregateInputType | true
   _min?: UserKeyMinAggregateInputType
   _max?: UserKeyMaxAggregateInputType
@@ -209,210 +209,210 @@ type GetUserKeyGroupByPayload<T extends UserKeyGroupByArgs> = Prisma.PrismaPromi
 
 
 export type UserKeyWhereInput = {
-  AND?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  iv?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  authTag?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  label?: Prisma.StringNullableFilter<"UserKey"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  messages?: Prisma.MessageListRelationFilter | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobListRelationFilter | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter | runtime.Types.Skip
+  AND?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
+  OR?: Prisma.UserKeyWhereInput[]
+  NOT?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
+  id?: Prisma.StringFilter<"UserKey"> | string
+  userId?: Prisma.StringFilter<"UserKey"> | string
+  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
+  apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
+  label?: Prisma.StringNullableFilter<"UserKey"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  imageGenJobs?: Prisma.ImageGenJobListRelationFilter
+  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }
 
 export type UserKeyOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  apiKey?: Prisma.SortOrder | runtime.Types.Skip
-  iv?: Prisma.SortOrder | runtime.Types.Skip
-  authTag?: Prisma.SortOrder | runtime.Types.Skip
-  label?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  isDefault?: Prisma.SortOrder | runtime.Types.Skip
-  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
-  messages?: Prisma.MessageOrderByRelationAggregateInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobOrderByRelationAggregateInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderOrderByRelationAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
+  label?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  imageGenJobs?: Prisma.ImageGenJobOrderByRelationAggregateInput
+  attachmentProviders?: Prisma.AttachmentProviderOrderByRelationAggregateInput
 }
 
 export type UserKeyWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  userId_provider?: Prisma.UserKeyUserId_providerCompoundUniqueInput | runtime.Types.Skip
-  AND?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[] | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  iv?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  authTag?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  label?: Prisma.StringNullableFilter<"UserKey"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  messages?: Prisma.MessageListRelationFilter | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobListRelationFilter | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter | runtime.Types.Skip
+  id?: string
+  userId_provider?: Prisma.UserKeyUserId_providerCompoundUniqueInput
+  AND?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
+  OR?: Prisma.UserKeyWhereInput[]
+  NOT?: Prisma.UserKeyWhereInput | Prisma.UserKeyWhereInput[]
+  userId?: Prisma.StringFilter<"UserKey"> | string
+  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
+  apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
+  label?: Prisma.StringNullableFilter<"UserKey"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  imageGenJobs?: Prisma.ImageGenJobListRelationFilter
+  attachmentProviders?: Prisma.AttachmentProviderListRelationFilter
 }, "id" | "userId_provider">
 
 export type UserKeyOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  apiKey?: Prisma.SortOrder | runtime.Types.Skip
-  iv?: Prisma.SortOrder | runtime.Types.Skip
-  authTag?: Prisma.SortOrder | runtime.Types.Skip
-  label?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  isDefault?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.UserKeyCountOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.UserKeyMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.UserKeyMinOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
+  label?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
+  _count?: Prisma.UserKeyCountOrderByAggregateInput
+  _max?: Prisma.UserKeyMaxOrderByAggregateInput
+  _min?: Prisma.UserKeyMinOrderByAggregateInput
 }
 
 export type UserKeyScalarWhereWithAggregatesInput = {
-  AND?: Prisma.UserKeyScalarWhereWithAggregatesInput | Prisma.UserKeyScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.UserKeyScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.UserKeyScalarWhereWithAggregatesInput | Prisma.UserKeyScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"UserKey"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"UserKey"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"UserKey"> | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringWithAggregatesFilter<"UserKey"> | string | runtime.Types.Skip
-  iv?: Prisma.StringWithAggregatesFilter<"UserKey"> | string | runtime.Types.Skip
-  authTag?: Prisma.StringWithAggregatesFilter<"UserKey"> | string | runtime.Types.Skip
-  label?: Prisma.StringNullableWithAggregatesFilter<"UserKey"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolWithAggregatesFilter<"UserKey"> | boolean | runtime.Types.Skip
+  AND?: Prisma.UserKeyScalarWhereWithAggregatesInput | Prisma.UserKeyScalarWhereWithAggregatesInput[]
+  OR?: Prisma.UserKeyScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.UserKeyScalarWhereWithAggregatesInput | Prisma.UserKeyScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"UserKey"> | $Enums.Provider
+  apiKey?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  iv?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  authTag?: Prisma.StringWithAggregatesFilter<"UserKey"> | string
+  label?: Prisma.StringNullableWithAggregatesFilter<"UserKey"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolWithAggregatesFilter<"UserKey"> | boolean
 }
 
 export type UserKeyCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
 }
 
 export type UserKeyUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserKeyUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserKeyNullableScalarRelationFilter = {
-  is?: Prisma.UserKeyWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.UserKeyWhereInput | null | runtime.Types.Skip
+  is?: Prisma.UserKeyWhereInput | null
+  isNot?: Prisma.UserKeyWhereInput | null
 }
 
 export type UserKeyListRelationFilter = {
-  every?: Prisma.UserKeyWhereInput | runtime.Types.Skip
-  some?: Prisma.UserKeyWhereInput | runtime.Types.Skip
-  none?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  every?: Prisma.UserKeyWhereInput
+  some?: Prisma.UserKeyWhereInput
+  none?: Prisma.UserKeyWhereInput
 }
 
 export type UserKeyOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type UserKeyUserId_providerCompoundUniqueInput = {
@@ -421,162 +421,162 @@ export type UserKeyUserId_providerCompoundUniqueInput = {
 }
 
 export type UserKeyCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  apiKey?: Prisma.SortOrder | runtime.Types.Skip
-  iv?: Prisma.SortOrder | runtime.Types.Skip
-  authTag?: Prisma.SortOrder | runtime.Types.Skip
-  label?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  isDefault?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
+  label?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  apiKey?: Prisma.SortOrder | runtime.Types.Skip
-  iv?: Prisma.SortOrder | runtime.Types.Skip
-  authTag?: Prisma.SortOrder | runtime.Types.Skip
-  label?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  isDefault?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
+  label?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  apiKey?: Prisma.SortOrder | runtime.Types.Skip
-  iv?: Prisma.SortOrder | runtime.Types.Skip
-  authTag?: Prisma.SortOrder | runtime.Types.Skip
-  label?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  isDefault?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  apiKey?: Prisma.SortOrder
+  iv?: Prisma.SortOrder
+  authTag?: Prisma.SortOrder
+  label?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
 }
 
 export type UserKeyCreateNestedOneWithoutImageGenJobsInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  connect?: Prisma.UserKeyWhereUniqueInput
 }
 
 export type UserKeyUpdateOneWithoutImageGenJobsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput | runtime.Types.Skip
-  upsert?: Prisma.UserKeyUpsertWithoutImageGenJobsInput | runtime.Types.Skip
-  disconnect?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput, Prisma.UserKeyUpdateWithoutImageGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutImageGenJobsInput
+  upsert?: Prisma.UserKeyUpsertWithoutImageGenJobsInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput, Prisma.UserKeyUpdateWithoutImageGenJobsInput>, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
 }
 
 export type UserKeyCreateNestedOneWithoutMessagesInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.UserKeyWhereUniqueInput
 }
 
 export type UserKeyUpdateOneWithoutMessagesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput | runtime.Types.Skip
-  upsert?: Prisma.UserKeyUpsertWithoutMessagesInput | runtime.Types.Skip
-  disconnect?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserKeyUpdateWithoutMessagesInput>, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.UserKeyUpsertWithoutMessagesInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserKeyUpdateWithoutMessagesInput>, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
 }
 
 export type UserKeyCreateNestedOneWithoutAttachmentProvidersInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  connect?: Prisma.UserKeyWhereUniqueInput
 }
 
 export type UserKeyUpdateOneWithoutAttachmentProvidersNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput | runtime.Types.Skip
-  upsert?: Prisma.UserKeyUpsertWithoutAttachmentProvidersInput | runtime.Types.Skip
-  disconnect?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.UserKeyWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutAttachmentProvidersInput
+  upsert?: Prisma.UserKeyUpsertWithoutAttachmentProvidersInput
+  disconnect?: Prisma.UserKeyWhereInput | boolean
+  delete?: Prisma.UserKeyWhereInput | boolean
+  connect?: Prisma.UserKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput, Prisma.UserKeyUpdateWithoutAttachmentProvidersInput>, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
 }
 
 export type UserKeyCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope
+  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
 }
 
 export type UserKeyUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope
+  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
 }
 
 export type UserKeyUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.UserKeyUpdateManyWithWhereWithoutUserInput | Prisma.UserKeyUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope
+  set?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  disconnect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  delete?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  update?: Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UserKeyUpdateManyWithWhereWithoutUserInput | Prisma.UserKeyUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
 }
 
 export type UserKeyUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.UserKeyUpdateManyWithWhereWithoutUserInput | Prisma.UserKeyUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.UserKeyCreateWithoutUserInput, Prisma.UserKeyUncheckedCreateWithoutUserInput> | Prisma.UserKeyCreateWithoutUserInput[] | Prisma.UserKeyUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserKeyCreateOrConnectWithoutUserInput | Prisma.UserKeyCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UserKeyCreateManyUserInputEnvelope
+  set?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  disconnect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  delete?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  connect?: Prisma.UserKeyWhereUniqueInput | Prisma.UserKeyWhereUniqueInput[]
+  update?: Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput | Prisma.UserKeyUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UserKeyUpdateManyWithWhereWithoutUserInput | Prisma.UserKeyUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
 }
 
 export type UserKeyCreateWithoutImageGenJobsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutImageGenJobsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutImageGenJobsInput = {
@@ -587,72 +587,72 @@ export type UserKeyCreateOrConnectWithoutImageGenJobsInput = {
 export type UserKeyUpsertWithoutImageGenJobsInput = {
   update: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
   create: Prisma.XOR<Prisma.UserKeyCreateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedCreateWithoutImageGenJobsInput>
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
 }
 
 export type UserKeyUpdateToOneWithWhereWithoutImageGenJobsInput = {
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   data: Prisma.XOR<Prisma.UserKeyUpdateWithoutImageGenJobsInput, Prisma.UserKeyUncheckedUpdateWithoutImageGenJobsInput>
 }
 
 export type UserKeyUpdateWithoutImageGenJobsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutImageGenJobsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateWithoutMessagesInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
-  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutMessagesInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutMessagesInput = {
@@ -663,72 +663,72 @@ export type UserKeyCreateOrConnectWithoutMessagesInput = {
 export type UserKeyUpsertWithoutMessagesInput = {
   update: Prisma.XOR<Prisma.UserKeyUpdateWithoutMessagesInput, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
   create: Prisma.XOR<Prisma.UserKeyCreateWithoutMessagesInput, Prisma.UserKeyUncheckedCreateWithoutMessagesInput>
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
 }
 
 export type UserKeyUpdateToOneWithWhereWithoutMessagesInput = {
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   data: Prisma.XOR<Prisma.UserKeyUpdateWithoutMessagesInput, Prisma.UserKeyUncheckedUpdateWithoutMessagesInput>
 }
 
 export type UserKeyUpdateWithoutMessagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutMessagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateWithoutAttachmentProvidersInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
   user: Prisma.UserCreateNestedOneWithoutKeysInput
-  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutAttachmentProvidersInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutAttachmentProvidersInput = {
@@ -739,72 +739,72 @@ export type UserKeyCreateOrConnectWithoutAttachmentProvidersInput = {
 export type UserKeyUpsertWithoutAttachmentProvidersInput = {
   update: Prisma.XOR<Prisma.UserKeyUpdateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
   create: Prisma.XOR<Prisma.UserKeyCreateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedCreateWithoutAttachmentProvidersInput>
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
 }
 
 export type UserKeyUpdateToOneWithWhereWithoutAttachmentProvidersInput = {
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   data: Prisma.XOR<Prisma.UserKeyUpdateWithoutAttachmentProvidersInput, Prisma.UserKeyUncheckedUpdateWithoutAttachmentProvidersInput>
 }
 
 export type UserKeyUpdateWithoutAttachmentProvidersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutKeysNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutAttachmentProvidersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyUncheckedCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutUserKeyInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput
 }
 
 export type UserKeyCreateOrConnectWithoutUserInput = {
@@ -814,7 +814,7 @@ export type UserKeyCreateOrConnectWithoutUserInput = {
 
 export type UserKeyCreateManyUserInputEnvelope = {
   data: Prisma.UserKeyCreateManyUserInput | Prisma.UserKeyCreateManyUserInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type UserKeyUpsertWithWhereUniqueWithoutUserInput = {
@@ -834,73 +834,73 @@ export type UserKeyUpdateManyWithWhereWithoutUserInput = {
 }
 
 export type UserKeyScalarWhereInput = {
-  AND?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.UserKeyScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  iv?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  authTag?: Prisma.StringFilter<"UserKey"> | string | runtime.Types.Skip
-  label?: Prisma.StringNullableFilter<"UserKey"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean | runtime.Types.Skip
+  AND?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
+  OR?: Prisma.UserKeyScalarWhereInput[]
+  NOT?: Prisma.UserKeyScalarWhereInput | Prisma.UserKeyScalarWhereInput[]
+  id?: Prisma.StringFilter<"UserKey"> | string
+  userId?: Prisma.StringFilter<"UserKey"> | string
+  provider?: Prisma.EnumProviderFilter<"UserKey"> | $Enums.Provider
+  apiKey?: Prisma.StringFilter<"UserKey"> | string
+  iv?: Prisma.StringFilter<"UserKey"> | string
+  authTag?: Prisma.StringFilter<"UserKey"> | string
+  label?: Prisma.StringNullableFilter<"UserKey"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"UserKey"> | Date | string
+  isDefault?: Prisma.BoolFilter<"UserKey"> | boolean
 }
 
 export type UserKeyCreateManyUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   apiKey: string
   iv: string
   authTag: string
-  label?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  label?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDefault?: boolean
 }
 
 export type UserKeyUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
-  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutUserKeyNestedInput
+  imageGenJobs?: Prisma.ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput
+  attachmentProviders?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput
 }
 
 export type UserKeyUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  apiKey?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  iv?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  authTag?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  apiKey?: Prisma.StringFieldUpdateOperationsInput | string
+  iv?: Prisma.StringFieldUpdateOperationsInput | string
+  authTag?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -934,96 +934,96 @@ export type UserKeyCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  * UserKeyCountOutputType without action
  */
 export type UserKeyCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.MessageWhereInput | runtime.Types.Skip
+  where?: Prisma.MessageWhereInput
 }
 
 /**
  * UserKeyCountOutputType without action
  */
 export type UserKeyCountOutputTypeCountImageGenJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
 }
 
 /**
  * UserKeyCountOutputType without action
  */
 export type UserKeyCountOutputTypeCountAttachmentProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
+  where?: Prisma.AttachmentProviderWhereInput
 }
 
 
 export type UserKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  apiKey?: boolean | runtime.Types.Skip
-  iv?: boolean | runtime.Types.Skip
-  authTag?: boolean | runtime.Types.Skip
-  label?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs> | runtime.Types.Skip
-  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs> | runtime.Types.Skip
-  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
+  label?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  isDefault?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
+  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
+  _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
 export type UserKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  apiKey?: boolean | runtime.Types.Skip
-  iv?: boolean | runtime.Types.Skip
-  authTag?: boolean | runtime.Types.Skip
-  label?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
+  label?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  isDefault?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
 export type UserKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  apiKey?: boolean | runtime.Types.Skip
-  iv?: boolean | runtime.Types.Skip
-  authTag?: boolean | runtime.Types.Skip
-  label?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
+  label?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  isDefault?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userKey"]>
 
 export type UserKeySelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  apiKey?: boolean | runtime.Types.Skip
-  iv?: boolean | runtime.Types.Skip
-  authTag?: boolean | runtime.Types.Skip
-  label?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  isDefault?: boolean | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  apiKey?: boolean
+  iv?: boolean
+  authTag?: boolean
+  label?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  isDefault?: boolean
 }
 
-export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "apiKey" | "iv" | "authTag" | "label" | "createdAt" | "updatedAt" | "isDefault", ExtArgs["result"]["userKey"], runtime.Types.Skip>
+export type UserKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "apiKey" | "iv" | "authTag" | "label" | "createdAt" | "updatedAt" | "isDefault", ExtArgs["result"]["userKey"]>
 export type UserKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs> | runtime.Types.Skip
-  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs> | runtime.Types.Skip
-  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.UserKey$messagesArgs<ExtArgs>
+  imageGenJobs?: boolean | Prisma.UserKey$imageGenJobsArgs<ExtArgs>
+  attachmentProviders?: boolean | Prisma.UserKey$attachmentProvidersArgs<ExtArgs>
+  _count?: boolean | Prisma.UserKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserKeyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type UserKeyIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $UserKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1506,7 +1506,7 @@ export type UserKeyFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which UserKey to fetch.
    */
   where: Prisma.UserKeyWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1529,7 +1529,7 @@ export type UserKeyFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which UserKey to fetch.
    */
   where: Prisma.UserKeyWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1551,38 +1551,38 @@ export type UserKeyFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * Filter, which UserKey to fetch.
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of UserKeys to fetch.
    */
-  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for UserKeys.
    */
-  cursor?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.UserKeyWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` UserKeys from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` UserKeys.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of UserKeys.
    */
-  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1604,38 +1604,38 @@ export type UserKeyFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter, which UserKey to fetch.
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of UserKeys to fetch.
    */
-  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for UserKeys.
    */
-  cursor?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.UserKeyWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` UserKeys from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` UserKeys.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of UserKeys.
    */
-  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1657,33 +1657,33 @@ export type UserKeyFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * Filter, which UserKeys to fetch.
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of UserKeys to fetch.
    */
-  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing UserKeys.
    */
-  cursor?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.UserKeyWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` UserKeys from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` UserKeys.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1706,7 +1706,7 @@ export type UserKeyCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a UserKey.
    */
   data: Prisma.XOR<Prisma.UserKeyCreateInput, Prisma.UserKeyUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1717,7 +1717,7 @@ export type UserKeyCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many UserKeys.
    */
   data: Prisma.UserKeyCreateManyInput | Prisma.UserKeyCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1736,7 +1736,7 @@ export type UserKeyCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many UserKeys.
    */
   data: Prisma.UserKeyCreateManyInput | Prisma.UserKeyCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1767,7 +1767,7 @@ export type UserKeyUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which UserKey to update.
    */
   where: Prisma.UserKeyWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1781,11 +1781,11 @@ export type UserKeyUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * Filter which UserKeys to update
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * Limit how many UserKeys to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1807,11 +1807,11 @@ export type UserKeyUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which UserKeys to update
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * Limit how many UserKeys to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1846,7 +1846,7 @@ export type UserKeyUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the UserKey was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.UserKeyUpdateInput, Prisma.UserKeyUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1869,7 +1869,7 @@ export type UserKeyDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which UserKey to delete.
    */
   where: Prisma.UserKeyWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1879,11 +1879,11 @@ export type UserKeyDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * Filter which UserKeys to delete
    */
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
   /**
    * Limit how many UserKeys to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1902,12 +1902,12 @@ export type UserKey$messagesArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.MessageInclude<ExtArgs> | null
-  where?: Prisma.MessageWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
 }
 
 /**
@@ -1926,12 +1926,12 @@ export type UserKey$imageGenJobsArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ImageGenJobInclude<ExtArgs> | null
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
 }
 
 /**
@@ -1950,12 +1950,12 @@ export type UserKey$attachmentProvidersArgs<ExtArgs extends runtime.Types.Extens
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AttachmentProviderInclude<ExtArgs> | null
-  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.AttachmentProviderWhereInput
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
 }
 
 /**

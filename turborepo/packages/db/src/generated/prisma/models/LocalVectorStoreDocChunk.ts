@@ -106,112 +106,112 @@ export type LocalVectorStoreDocChunkCountAggregateOutputType = {
 
 
 export type LocalVectorStoreDocChunkAvgAggregateInputType = {
-  chunkIndex?: true | runtime.Types.Skip
-  tokenCount?: true | runtime.Types.Skip
-  startOffset?: true | runtime.Types.Skip
-  endOffset?: true | runtime.Types.Skip
+  chunkIndex?: true
+  tokenCount?: true
+  startOffset?: true
+  endOffset?: true
 }
 
 export type LocalVectorStoreDocChunkSumAggregateInputType = {
-  chunkIndex?: true | runtime.Types.Skip
-  tokenCount?: true | runtime.Types.Skip
-  startOffset?: true | runtime.Types.Skip
-  endOffset?: true | runtime.Types.Skip
+  chunkIndex?: true
+  tokenCount?: true
+  startOffset?: true
+  endOffset?: true
 }
 
 export type LocalVectorStoreDocChunkMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  docId?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  chunkProvenanceId?: true | runtime.Types.Skip
-  provenanceId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  conversationId?: true | runtime.Types.Skip
-  messageId?: true | runtime.Types.Skip
-  chunkIndex?: true | runtime.Types.Skip
-  content?: true | runtime.Types.Skip
-  contentHash?: true | runtime.Types.Skip
-  tokenCount?: true | runtime.Types.Skip
-  startOffset?: true | runtime.Types.Skip
-  endOffset?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  deletedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  docId?: true
+  storeId?: true
+  chunkProvenanceId?: true
+  provenanceId?: true
+  attachmentId?: true
+  conversationId?: true
+  messageId?: true
+  chunkIndex?: true
+  content?: true
+  contentHash?: true
+  tokenCount?: true
+  startOffset?: true
+  endOffset?: true
+  schemaVersion?: true
+  deletedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type LocalVectorStoreDocChunkMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  docId?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  chunkProvenanceId?: true | runtime.Types.Skip
-  provenanceId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  conversationId?: true | runtime.Types.Skip
-  messageId?: true | runtime.Types.Skip
-  chunkIndex?: true | runtime.Types.Skip
-  content?: true | runtime.Types.Skip
-  contentHash?: true | runtime.Types.Skip
-  tokenCount?: true | runtime.Types.Skip
-  startOffset?: true | runtime.Types.Skip
-  endOffset?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  deletedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  docId?: true
+  storeId?: true
+  chunkProvenanceId?: true
+  provenanceId?: true
+  attachmentId?: true
+  conversationId?: true
+  messageId?: true
+  chunkIndex?: true
+  content?: true
+  contentHash?: true
+  tokenCount?: true
+  startOffset?: true
+  endOffset?: true
+  schemaVersion?: true
+  deletedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type LocalVectorStoreDocChunkCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  docId?: true | runtime.Types.Skip
-  storeId?: true | runtime.Types.Skip
-  chunkProvenanceId?: true | runtime.Types.Skip
-  provenanceId?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  conversationId?: true | runtime.Types.Skip
-  messageId?: true | runtime.Types.Skip
-  chunkIndex?: true | runtime.Types.Skip
-  content?: true | runtime.Types.Skip
-  contentHash?: true | runtime.Types.Skip
-  tokenCount?: true | runtime.Types.Skip
-  startOffset?: true | runtime.Types.Skip
-  endOffset?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  deletedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  docId?: true
+  storeId?: true
+  chunkProvenanceId?: true
+  provenanceId?: true
+  attachmentId?: true
+  conversationId?: true
+  messageId?: true
+  chunkIndex?: true
+  content?: true
+  contentHash?: true
+  tokenCount?: true
+  startOffset?: true
+  endOffset?: true
+  schemaVersion?: true
+  deletedAt?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type LocalVectorStoreDocChunkAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which LocalVectorStoreDocChunk to aggregate.
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocChunks to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocChunks from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocChunks.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -256,12 +256,12 @@ export type GetLocalVectorStoreDocChunkAggregateType<T extends LocalVectorStoreD
 
 
 export type LocalVectorStoreDocChunkGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithAggregationInput | Prisma.LocalVectorStoreDocChunkOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithAggregationInput | Prisma.LocalVectorStoreDocChunkOrderByWithAggregationInput[]
   by: Prisma.LocalVectorStoreDocChunkScalarFieldEnum[] | Prisma.LocalVectorStoreDocChunkScalarFieldEnum
-  having?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: LocalVectorStoreDocChunkCountAggregateInputType | true
   _avg?: LocalVectorStoreDocChunkAvgAggregateInputType
   _sum?: LocalVectorStoreDocChunkSumAggregateInputType
@@ -311,219 +311,219 @@ type GetLocalVectorStoreDocChunkGroupByPayload<T extends LocalVectorStoreDocChun
 
 
 export type LocalVectorStoreDocChunkWhereInput = {
-  AND?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  doc?: Prisma.XOR<Prisma.LocalVectorStoreDocScalarRelationFilter, Prisma.LocalVectorStoreDocWhereInput> | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[]
+  OR?: Prisma.LocalVectorStoreDocChunkWhereInput[]
+  NOT?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[]
+  id?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+  doc?: Prisma.XOR<Prisma.LocalVectorStoreDocScalarRelationFilter, Prisma.LocalVectorStoreDocWhereInput>
 }
 
 export type LocalVectorStoreDocChunkOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  docId?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  conversationId?: Prisma.SortOrder | runtime.Types.Skip
-  messageId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  content?: Prisma.SortOrder | runtime.Types.Skip
-  contentHash?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  doc?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  docId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  chunkProvenanceId?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  endOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  doc?: Prisma.LocalVectorStoreDocOrderByWithRelationInput
 }
 
 export type LocalVectorStoreDocChunkWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  docId_chunkIndex_schemaVersion?: Prisma.LocalVectorStoreDocChunkDocIdChunkIndexSchemaVersionCompoundUniqueInput | runtime.Types.Skip
-  AND?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[] | runtime.Types.Skip
-  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  doc?: Prisma.XOR<Prisma.LocalVectorStoreDocScalarRelationFilter, Prisma.LocalVectorStoreDocWhereInput> | runtime.Types.Skip
+  id?: string
+  docId_chunkIndex_schemaVersion?: Prisma.LocalVectorStoreDocChunkDocIdChunkIndexSchemaVersionCompoundUniqueInput
+  AND?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[]
+  OR?: Prisma.LocalVectorStoreDocChunkWhereInput[]
+  NOT?: Prisma.LocalVectorStoreDocChunkWhereInput | Prisma.LocalVectorStoreDocChunkWhereInput[]
+  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+  doc?: Prisma.XOR<Prisma.LocalVectorStoreDocScalarRelationFilter, Prisma.LocalVectorStoreDocWhereInput>
 }, "id" | "docId_chunkIndex_schemaVersion">
 
 export type LocalVectorStoreDocChunkOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  docId?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  conversationId?: Prisma.SortOrder | runtime.Types.Skip
-  messageId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  content?: Prisma.SortOrder | runtime.Types.Skip
-  contentHash?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.LocalVectorStoreDocChunkCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.LocalVectorStoreDocChunkAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.LocalVectorStoreDocChunkMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.LocalVectorStoreDocChunkMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.LocalVectorStoreDocChunkSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  docId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  chunkProvenanceId?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  endOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.LocalVectorStoreDocChunkCountOrderByAggregateInput
+  _avg?: Prisma.LocalVectorStoreDocChunkAvgOrderByAggregateInput
+  _max?: Prisma.LocalVectorStoreDocChunkMaxOrderByAggregateInput
+  _min?: Prisma.LocalVectorStoreDocChunkMinOrderByAggregateInput
+  _sum?: Prisma.LocalVectorStoreDocChunkSumOrderByAggregateInput
 }
 
 export type LocalVectorStoreDocChunkScalarWhereWithAggregatesInput = {
-  AND?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  docId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  conversationId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  messageId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  content?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  contentHash?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  startOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  endOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[]
+  OR?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocChunkScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  docId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  storeId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  chunkProvenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  provenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  attachmentId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  conversationId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  messageId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  chunkIndex?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number
+  content?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  contentHash?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string
+  tokenCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number
+  startOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null
+  endOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  doc?: Prisma.LocalVectorStoreDocUpdateOneRequiredWithoutChunksNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  doc?: Prisma.LocalVectorStoreDocUpdateOneRequiredWithoutChunksNestedInput
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  docId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  docId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  docId?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreDocChunkListRelationFilter = {
-  every?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
-  some?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
-  none?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  every?: Prisma.LocalVectorStoreDocChunkWhereInput
+  some?: Prisma.LocalVectorStoreDocChunkWhereInput
+  none?: Prisma.LocalVectorStoreDocChunkWhereInput
 }
 
 export type LocalVectorStoreDocChunkOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkDocIdChunkIndexSchemaVersionCompoundUniqueInput = {
@@ -533,108 +533,108 @@ export type LocalVectorStoreDocChunkDocIdChunkIndexSchemaVersionCompoundUniqueIn
 }
 
 export type LocalVectorStoreDocChunkCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  docId?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  conversationId?: Prisma.SortOrder | runtime.Types.Skip
-  messageId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  content?: Prisma.SortOrder | runtime.Types.Skip
-  contentHash?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  docId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  chunkProvenanceId?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrder
+  endOffset?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkAvgOrderByAggregateInput = {
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrder | runtime.Types.Skip
+  chunkIndex?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrder
+  endOffset?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  docId?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  conversationId?: Prisma.SortOrder | runtime.Types.Skip
-  messageId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  content?: Prisma.SortOrder | runtime.Types.Skip
-  contentHash?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  docId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  chunkProvenanceId?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrder
+  endOffset?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  docId?: Prisma.SortOrder | runtime.Types.Skip
-  storeId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  conversationId?: Prisma.SortOrder | runtime.Types.Skip
-  messageId?: Prisma.SortOrder | runtime.Types.Skip
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  content?: Prisma.SortOrder | runtime.Types.Skip
-  contentHash?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  docId?: Prisma.SortOrder
+  storeId?: Prisma.SortOrder
+  chunkProvenanceId?: Prisma.SortOrder
+  provenanceId?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  conversationId?: Prisma.SortOrder
+  messageId?: Prisma.SortOrder
+  chunkIndex?: Prisma.SortOrder
+  content?: Prisma.SortOrder
+  contentHash?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrder
+  endOffset?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkSumOrderByAggregateInput = {
-  chunkIndex?: Prisma.SortOrder | runtime.Types.Skip
-  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
-  startOffset?: Prisma.SortOrder | runtime.Types.Skip
-  endOffset?: Prisma.SortOrder | runtime.Types.Skip
+  chunkIndex?: Prisma.SortOrder
+  tokenCount?: Prisma.SortOrder
+  startOffset?: Prisma.SortOrder
+  endOffset?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput = {
-  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
 }
 
 export type LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput = {
-  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
 }
 
 export type LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput = {
-  set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput[] | runtime.Types.Skip
-  updateMany?: Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[] | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  update?: Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput[]
+  updateMany?: Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput[]
+  deleteMany?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput = {
-  set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput[] | runtime.Types.Skip
-  updateMany?: Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[] | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
+  update?: Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput[]
+  updateMany?: Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput[]
+  deleteMany?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
 }
 
 export type LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput = {
@@ -648,163 +648,163 @@ export type LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput = {
 }
 
 export type LocalVectorStoreDocChunkScalarWhereInput = {
-  AND?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreDocChunkScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number | runtime.Types.Skip
-  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
+  OR?: Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
+  NOT?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
+  id?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  docId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkProvenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  chunkIndex?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  content?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  contentHash?: Prisma.StringFilter<"LocalVectorStoreDocChunk"> | string
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
+  startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateWithoutDocInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateWithoutDocInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  contentHash?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkProvenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type LocalVectorStoreDocChunkSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  docId?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  chunkProvenanceId?: boolean | runtime.Types.Skip
-  provenanceId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  conversationId?: boolean | runtime.Types.Skip
-  messageId?: boolean | runtime.Types.Skip
-  chunkIndex?: boolean | runtime.Types.Skip
-  content?: boolean | runtime.Types.Skip
-  contentHash?: boolean | runtime.Types.Skip
-  tokenCount?: boolean | runtime.Types.Skip
-  startOffset?: boolean | runtime.Types.Skip
-  endOffset?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  deletedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  docId?: boolean
+  storeId?: boolean
+  chunkProvenanceId?: boolean
+  provenanceId?: boolean
+  attachmentId?: boolean
+  conversationId?: boolean
+  messageId?: boolean
+  chunkIndex?: boolean
+  content?: boolean
+  contentHash?: boolean
+  tokenCount?: boolean
+  startOffset?: boolean
+  endOffset?: boolean
+  schemaVersion?: boolean
+  deletedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStoreDocChunk"]>
 
 
 export type LocalVectorStoreDocChunkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  docId?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  chunkProvenanceId?: boolean | runtime.Types.Skip
-  provenanceId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  conversationId?: boolean | runtime.Types.Skip
-  messageId?: boolean | runtime.Types.Skip
-  chunkIndex?: boolean | runtime.Types.Skip
-  content?: boolean | runtime.Types.Skip
-  contentHash?: boolean | runtime.Types.Skip
-  tokenCount?: boolean | runtime.Types.Skip
-  startOffset?: boolean | runtime.Types.Skip
-  endOffset?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  deletedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  docId?: boolean
+  storeId?: boolean
+  chunkProvenanceId?: boolean
+  provenanceId?: boolean
+  attachmentId?: boolean
+  conversationId?: boolean
+  messageId?: boolean
+  chunkIndex?: boolean
+  content?: boolean
+  contentHash?: boolean
+  tokenCount?: boolean
+  startOffset?: boolean
+  endOffset?: boolean
+  schemaVersion?: boolean
+  deletedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStoreDocChunk"]>
 
 export type LocalVectorStoreDocChunkSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  docId?: boolean | runtime.Types.Skip
-  storeId?: boolean | runtime.Types.Skip
-  chunkProvenanceId?: boolean | runtime.Types.Skip
-  provenanceId?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  conversationId?: boolean | runtime.Types.Skip
-  messageId?: boolean | runtime.Types.Skip
-  chunkIndex?: boolean | runtime.Types.Skip
-  content?: boolean | runtime.Types.Skip
-  contentHash?: boolean | runtime.Types.Skip
-  tokenCount?: boolean | runtime.Types.Skip
-  startOffset?: boolean | runtime.Types.Skip
-  endOffset?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  deletedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  id?: boolean
+  docId?: boolean
+  storeId?: boolean
+  chunkProvenanceId?: boolean
+  provenanceId?: boolean
+  attachmentId?: boolean
+  conversationId?: boolean
+  messageId?: boolean
+  chunkIndex?: boolean
+  content?: boolean
+  contentHash?: boolean
+  tokenCount?: boolean
+  startOffset?: boolean
+  endOffset?: boolean
+  schemaVersion?: boolean
+  deletedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type LocalVectorStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDocChunk"], runtime.Types.Skip>
+export type LocalVectorStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDocChunk"]>
 export type LocalVectorStoreDocChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs> | runtime.Types.Skip
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }
 export type LocalVectorStoreDocChunkIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs> | runtime.Types.Skip
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }
 
 export type $LocalVectorStoreDocChunkPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1226,7 +1226,7 @@ export type LocalVectorStoreDocChunkFindUniqueArgs<ExtArgs extends runtime.Types
    * Filter, which LocalVectorStoreDocChunk to fetch.
    */
   where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1249,7 +1249,7 @@ export type LocalVectorStoreDocChunkFindUniqueOrThrowArgs<ExtArgs extends runtim
    * Filter, which LocalVectorStoreDocChunk to fetch.
    */
   where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1271,38 +1271,38 @@ export type LocalVectorStoreDocChunkFindFirstArgs<ExtArgs extends runtime.Types.
   /**
    * Filter, which LocalVectorStoreDocChunk to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocChunks to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStoreDocChunks.
    */
-  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocChunks from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocChunks.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStoreDocChunks.
    */
-  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1324,38 +1324,38 @@ export type LocalVectorStoreDocChunkFindFirstOrThrowArgs<ExtArgs extends runtime
   /**
    * Filter, which LocalVectorStoreDocChunk to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocChunks to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStoreDocChunks.
    */
-  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocChunks from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocChunks.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStoreDocChunks.
    */
-  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1377,33 +1377,33 @@ export type LocalVectorStoreDocChunkFindManyArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter, which LocalVectorStoreDocChunks to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocChunks to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing LocalVectorStoreDocChunks.
    */
-  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocChunks from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocChunks.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1430,7 +1430,7 @@ export type LocalVectorStoreDocChunkUpdateArgs<ExtArgs extends runtime.Types.Ext
    * Choose, which LocalVectorStoreDocChunk to update.
    */
   where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1444,11 +1444,11 @@ export type LocalVectorStoreDocChunkUpdateManyArgs<ExtArgs extends runtime.Types
   /**
    * Filter which LocalVectorStoreDocChunks to update
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * Limit how many LocalVectorStoreDocChunks to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1470,11 +1470,11 @@ export type LocalVectorStoreDocChunkUpdateManyAndReturnArgs<ExtArgs extends runt
   /**
    * Filter which LocalVectorStoreDocChunks to update
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * Limit how many LocalVectorStoreDocChunks to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1501,7 +1501,7 @@ export type LocalVectorStoreDocChunkDeleteArgs<ExtArgs extends runtime.Types.Ext
    * Filter which LocalVectorStoreDocChunk to delete.
    */
   where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1511,11 +1511,11 @@ export type LocalVectorStoreDocChunkDeleteManyArgs<ExtArgs extends runtime.Types
   /**
    * Filter which LocalVectorStoreDocChunks to delete
    */
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput
   /**
    * Limit how many LocalVectorStoreDocChunks to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

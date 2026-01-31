@@ -66,74 +66,74 @@ export type ConversationCountAggregateOutputType = {
 
 
 export type ConversationMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  branchId?: true | runtime.Types.Skip
-  parentId?: true | runtime.Types.Skip
-  isShared?: true | runtime.Types.Skip
-  shareToken?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  userKeyId?: true
+  title?: true
+  createdAt?: true
+  updatedAt?: true
+  branchId?: true
+  parentId?: true
+  isShared?: true
+  shareToken?: true
 }
 
 export type ConversationMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  branchId?: true | runtime.Types.Skip
-  parentId?: true | runtime.Types.Skip
-  isShared?: true | runtime.Types.Skip
-  shareToken?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  userKeyId?: true
+  title?: true
+  createdAt?: true
+  updatedAt?: true
+  branchId?: true
+  parentId?: true
+  isShared?: true
+  shareToken?: true
 }
 
 export type ConversationCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  branchId?: true | runtime.Types.Skip
-  parentId?: true | runtime.Types.Skip
-  isShared?: true | runtime.Types.Skip
-  shareToken?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  userKeyId?: true
+  title?: true
+  createdAt?: true
+  updatedAt?: true
+  branchId?: true
+  parentId?: true
+  isShared?: true
+  shareToken?: true
+  _all?: true
 }
 
 export type ConversationAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which Conversation to aggregate.
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Conversations to fetch.
    */
-  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Conversations from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Conversations.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -166,12 +166,12 @@ export type GetConversationAggregateType<T extends ConversationAggregateArgs> = 
 
 
 export type ConversationGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ConversationOrderByWithAggregationInput | Prisma.ConversationOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithAggregationInput | Prisma.ConversationOrderByWithAggregationInput[]
   by: Prisma.ConversationScalarFieldEnum[] | Prisma.ConversationScalarFieldEnum
-  having?: Prisma.ConversationScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ConversationScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ConversationCountAggregateInputType | true
   _min?: ConversationMinAggregateInputType
   _max?: ConversationMaxAggregateInputType
@@ -209,392 +209,392 @@ type GetConversationGroupByPayload<T extends ConversationGroupByArgs> = Prisma.P
 
 
 export type ConversationWhereInput = {
-  AND?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"Conversation"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"Conversation"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFilter<"Conversation"> | boolean | runtime.Types.Skip
-  shareToken?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  messages?: Prisma.MessageListRelationFilter | runtime.Types.Skip
-  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
-  conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null | runtime.Types.Skip
-  conversationContextState?: Prisma.XOR<Prisma.ConversationMemoryContextNullableScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput> | null | runtime.Types.Skip
+  AND?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[]
+  OR?: Prisma.ConversationWhereInput[]
+  NOT?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[]
+  id?: Prisma.StringFilter<"Conversation"> | string
+  userId?: Prisma.StringFilter<"Conversation"> | string
+  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  title?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  isShared?: Prisma.BoolFilter<"Conversation"> | boolean
+  shareToken?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
+  conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
+  conversationContextState?: Prisma.XOR<Prisma.ConversationMemoryContextNullableScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput> | null
 }
 
 export type ConversationOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  branchId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  parentId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  isShared?: Prisma.SortOrder | runtime.Types.Skip
-  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
-  messages?: Prisma.MessageOrderByRelationAggregateInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentOrderByRelationAggregateInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsOrderByWithRelationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextOrderByWithRelationInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isShared?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
+  conversationSettings?: Prisma.ConversationSettingsOrderByWithRelationInput
+  conversationContextState?: Prisma.ConversationMemoryContextOrderByWithRelationInput
 }
 
 export type ConversationWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  shareToken?: string | runtime.Types.Skip
-  AND?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[] | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"Conversation"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFilter<"Conversation"> | boolean | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  messages?: Prisma.MessageListRelationFilter | runtime.Types.Skip
-  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
-  conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null | runtime.Types.Skip
-  conversationContextState?: Prisma.XOR<Prisma.ConversationMemoryContextNullableScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput> | null | runtime.Types.Skip
+  id?: string
+  shareToken?: string
+  AND?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[]
+  OR?: Prisma.ConversationWhereInput[]
+  NOT?: Prisma.ConversationWhereInput | Prisma.ConversationWhereInput[]
+  userId?: Prisma.StringFilter<"Conversation"> | string
+  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  title?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  isShared?: Prisma.BoolFilter<"Conversation"> | boolean
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
+  conversationSettings?: Prisma.XOR<Prisma.ConversationSettingsNullableScalarRelationFilter, Prisma.ConversationSettingsWhereInput> | null
+  conversationContextState?: Prisma.XOR<Prisma.ConversationMemoryContextNullableScalarRelationFilter, Prisma.ConversationMemoryContextWhereInput> | null
 }, "id" | "shareToken">
 
 export type ConversationOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  branchId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  parentId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  isShared?: Prisma.SortOrder | runtime.Types.Skip
-  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ConversationCountOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ConversationMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ConversationMinOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  branchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isShared?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  _count?: Prisma.ConversationCountOrderByAggregateInput
+  _max?: Prisma.ConversationMaxOrderByAggregateInput
+  _min?: Prisma.ConversationMinOrderByAggregateInput
 }
 
 export type ConversationScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ConversationScalarWhereWithAggregatesInput | Prisma.ConversationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationScalarWhereWithAggregatesInput | Prisma.ConversationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"Conversation"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"Conversation"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  branchId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null | runtime.Types.Skip
-  parentId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolWithAggregatesFilter<"Conversation"> | boolean | runtime.Types.Skip
-  shareToken?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null | runtime.Types.Skip
+  AND?: Prisma.ConversationScalarWhereWithAggregatesInput | Prisma.ConversationScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ConversationScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ConversationScalarWhereWithAggregatesInput | Prisma.ConversationScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"Conversation"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"Conversation"> | string
+  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null
+  title?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Conversation"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Conversation"> | Date | string
+  branchId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null
+  parentId?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null
+  isShared?: Prisma.BoolWithAggregatesFilter<"Conversation"> | boolean
+  shareToken?: Prisma.StringNullableWithAggregatesFilter<"Conversation"> | string | null
 }
 
 export type ConversationCreateInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
 }
 
 export type ConversationUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ConversationUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ConversationNullableScalarRelationFilter = {
-  is?: Prisma.ConversationWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.ConversationWhereInput | null | runtime.Types.Skip
+  is?: Prisma.ConversationWhereInput | null
+  isNot?: Prisma.ConversationWhereInput | null
 }
 
 export type ConversationCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  branchId?: Prisma.SortOrder | runtime.Types.Skip
-  parentId?: Prisma.SortOrder | runtime.Types.Skip
-  isShared?: Prisma.SortOrder | runtime.Types.Skip
-  shareToken?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
+  isShared?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
 }
 
 export type ConversationMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  branchId?: Prisma.SortOrder | runtime.Types.Skip
-  parentId?: Prisma.SortOrder | runtime.Types.Skip
-  isShared?: Prisma.SortOrder | runtime.Types.Skip
-  shareToken?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
+  isShared?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
 }
 
 export type ConversationMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  branchId?: Prisma.SortOrder | runtime.Types.Skip
-  parentId?: Prisma.SortOrder | runtime.Types.Skip
-  isShared?: Prisma.SortOrder | runtime.Types.Skip
-  shareToken?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  branchId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
+  isShared?: Prisma.SortOrder
+  shareToken?: Prisma.SortOrder
 }
 
 export type ConversationScalarRelationFilter = {
-  is?: Prisma.ConversationWhereInput | runtime.Types.Skip
-  isNot?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  is?: Prisma.ConversationWhereInput
+  isNot?: Prisma.ConversationWhereInput
 }
 
 export type ConversationListRelationFilter = {
-  every?: Prisma.ConversationWhereInput | runtime.Types.Skip
-  some?: Prisma.ConversationWhereInput | runtime.Types.Skip
-  none?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  every?: Prisma.ConversationWhereInput
+  some?: Prisma.ConversationWhereInput
+  none?: Prisma.ConversationWhereInput
 }
 
 export type ConversationOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type ConversationCreateNestedOneWithoutAttachmentsInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutAttachmentsInput
+  connect?: Prisma.ConversationWhereUniqueInput
 }
 
 export type ConversationUpdateOneWithoutAttachmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithoutAttachmentsInput | runtime.Types.Skip
-  disconnect?: Prisma.ConversationWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ConversationWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ConversationUpdateWithoutAttachmentsInput>, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutAttachmentsInput
+  upsert?: Prisma.ConversationUpsertWithoutAttachmentsInput
+  disconnect?: Prisma.ConversationWhereInput | boolean
+  delete?: Prisma.ConversationWhereInput | boolean
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.ConversationUpdateWithoutAttachmentsInput>, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput>
 }
 
 export type ConversationCreateNestedOneWithoutConversationSettingsInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationSettingsInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationSettingsInput
+  connect?: Prisma.ConversationWhereUniqueInput
 }
 
 export type ConversationUpdateOneRequiredWithoutConversationSettingsNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationSettingsInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithoutConversationSettingsInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutConversationSettingsInput, Prisma.ConversationUpdateWithoutConversationSettingsInput>, Prisma.ConversationUncheckedUpdateWithoutConversationSettingsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationSettingsInput
+  upsert?: Prisma.ConversationUpsertWithoutConversationSettingsInput
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutConversationSettingsInput, Prisma.ConversationUpdateWithoutConversationSettingsInput>, Prisma.ConversationUncheckedUpdateWithoutConversationSettingsInput>
 }
 
 export type ConversationCreateNestedOneWithoutConversationContextStateInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationContextStateInput, Prisma.ConversationUncheckedCreateWithoutConversationContextStateInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationContextStateInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationContextStateInput, Prisma.ConversationUncheckedCreateWithoutConversationContextStateInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationContextStateInput
+  connect?: Prisma.ConversationWhereUniqueInput
 }
 
 export type ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationContextStateInput, Prisma.ConversationUncheckedCreateWithoutConversationContextStateInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationContextStateInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithoutConversationContextStateInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutConversationContextStateInput, Prisma.ConversationUpdateWithoutConversationContextStateInput>, Prisma.ConversationUncheckedUpdateWithoutConversationContextStateInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutConversationContextStateInput, Prisma.ConversationUncheckedCreateWithoutConversationContextStateInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutConversationContextStateInput
+  upsert?: Prisma.ConversationUpsertWithoutConversationContextStateInput
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutConversationContextStateInput, Prisma.ConversationUpdateWithoutConversationContextStateInput>, Prisma.ConversationUncheckedUpdateWithoutConversationContextStateInput>
 }
 
 export type ConversationCreateNestedOneWithoutMessagesInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMessagesInput, Prisma.ConversationUncheckedCreateWithoutMessagesInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMessagesInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMessagesInput, Prisma.ConversationUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.ConversationWhereUniqueInput
 }
 
 export type ConversationUpdateOneRequiredWithoutMessagesNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMessagesInput, Prisma.ConversationUncheckedCreateWithoutMessagesInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMessagesInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithoutMessagesInput | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutMessagesInput, Prisma.ConversationUpdateWithoutMessagesInput>, Prisma.ConversationUncheckedUpdateWithoutMessagesInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMessagesInput, Prisma.ConversationUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.ConversationUpsertWithoutMessagesInput
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutMessagesInput, Prisma.ConversationUpdateWithoutMessagesInput>, Prisma.ConversationUncheckedUpdateWithoutMessagesInput>
 }
 
 export type ConversationCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.ConversationCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ConversationCreateManyUserInputEnvelope
+  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
 }
 
 export type ConversationUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.ConversationCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ConversationCreateManyUserInputEnvelope
+  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
 }
 
 export type ConversationUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput | Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.ConversationCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput | Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ConversationUpdateManyWithWhereWithoutUserInput | Prisma.ConversationUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput | Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ConversationCreateManyUserInputEnvelope
+  set?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  disconnect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  delete?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  update?: Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput | Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ConversationUpdateManyWithWhereWithoutUserInput | Prisma.ConversationUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
 }
 
 export type ConversationUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput | Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.ConversationCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput | Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ConversationUpdateManyWithWhereWithoutUserInput | Prisma.ConversationUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutUserInput, Prisma.ConversationUncheckedCreateWithoutUserInput> | Prisma.ConversationCreateWithoutUserInput[] | Prisma.ConversationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutUserInput | Prisma.ConversationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput | Prisma.ConversationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ConversationCreateManyUserInputEnvelope
+  set?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  disconnect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  delete?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  connect?: Prisma.ConversationWhereUniqueInput | Prisma.ConversationWhereUniqueInput[]
+  update?: Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput | Prisma.ConversationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ConversationUpdateManyWithWhereWithoutUserInput | Prisma.ConversationUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
 }
 
 export type ConversationCreateWithoutAttachmentsInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutAttachmentsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutAttachmentsInput = {
@@ -605,76 +605,76 @@ export type ConversationCreateOrConnectWithoutAttachmentsInput = {
 export type ConversationUpsertWithoutAttachmentsInput = {
   update: Prisma.XOR<Prisma.ConversationUpdateWithoutAttachmentsInput, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput>
   create: Prisma.XOR<Prisma.ConversationCreateWithoutAttachmentsInput, Prisma.ConversationUncheckedCreateWithoutAttachmentsInput>
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
 }
 
 export type ConversationUpdateToOneWithWhereWithoutAttachmentsInput = {
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   data: Prisma.XOR<Prisma.ConversationUpdateWithoutAttachmentsInput, Prisma.ConversationUncheckedUpdateWithoutAttachmentsInput>
 }
 
 export type ConversationUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutConversationSettingsInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutConversationSettingsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutConversationSettingsInput = {
@@ -685,76 +685,76 @@ export type ConversationCreateOrConnectWithoutConversationSettingsInput = {
 export type ConversationUpsertWithoutConversationSettingsInput = {
   update: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationSettingsInput, Prisma.ConversationUncheckedUpdateWithoutConversationSettingsInput>
   create: Prisma.XOR<Prisma.ConversationCreateWithoutConversationSettingsInput, Prisma.ConversationUncheckedCreateWithoutConversationSettingsInput>
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
 }
 
 export type ConversationUpdateToOneWithWhereWithoutConversationSettingsInput = {
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   data: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationSettingsInput, Prisma.ConversationUncheckedUpdateWithoutConversationSettingsInput>
 }
 
 export type ConversationUpdateWithoutConversationSettingsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutConversationSettingsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutConversationContextStateInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutConversationContextStateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutConversationContextStateInput = {
@@ -765,76 +765,76 @@ export type ConversationCreateOrConnectWithoutConversationContextStateInput = {
 export type ConversationUpsertWithoutConversationContextStateInput = {
   update: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationContextStateInput, Prisma.ConversationUncheckedUpdateWithoutConversationContextStateInput>
   create: Prisma.XOR<Prisma.ConversationCreateWithoutConversationContextStateInput, Prisma.ConversationUncheckedCreateWithoutConversationContextStateInput>
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
 }
 
 export type ConversationUpdateToOneWithWhereWithoutConversationContextStateInput = {
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   data: Prisma.XOR<Prisma.ConversationUpdateWithoutConversationContextStateInput, Prisma.ConversationUncheckedUpdateWithoutConversationContextStateInput>
 }
 
 export type ConversationUpdateWithoutConversationContextStateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutConversationContextStateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutMessagesInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
   user: Prisma.UserCreateNestedOneWithoutConversationsInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutMessagesInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutMessagesInput = {
@@ -845,76 +845,76 @@ export type ConversationCreateOrConnectWithoutMessagesInput = {
 export type ConversationUpsertWithoutMessagesInput = {
   update: Prisma.XOR<Prisma.ConversationUpdateWithoutMessagesInput, Prisma.ConversationUncheckedUpdateWithoutMessagesInput>
   create: Prisma.XOR<Prisma.ConversationCreateWithoutMessagesInput, Prisma.ConversationUncheckedCreateWithoutMessagesInput>
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
 }
 
 export type ConversationUpdateToOneWithWhereWithoutMessagesInput = {
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   data: Prisma.XOR<Prisma.ConversationUpdateWithoutMessagesInput, Prisma.ConversationUncheckedUpdateWithoutMessagesInput>
 }
 
 export type ConversationUpdateWithoutMessagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationsNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutMessagesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutConversationInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutUserInput = {
@@ -924,7 +924,7 @@ export type ConversationCreateOrConnectWithoutUserInput = {
 
 export type ConversationCreateManyUserInputEnvelope = {
   data: Prisma.ConversationCreateManyUserInput | Prisma.ConversationCreateManyUserInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type ConversationUpsertWithWhereUniqueWithoutUserInput = {
@@ -944,75 +944,75 @@ export type ConversationUpdateManyWithWhereWithoutUserInput = {
 }
 
 export type ConversationScalarWhereInput = {
-  AND?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"Conversation"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"Conversation"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string | runtime.Types.Skip
-  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFilter<"Conversation"> | boolean | runtime.Types.Skip
-  shareToken?: Prisma.StringNullableFilter<"Conversation"> | string | null | runtime.Types.Skip
+  AND?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
+  OR?: Prisma.ConversationScalarWhereInput[]
+  NOT?: Prisma.ConversationScalarWhereInput | Prisma.ConversationScalarWhereInput[]
+  id?: Prisma.StringFilter<"Conversation"> | string
+  userId?: Prisma.StringFilter<"Conversation"> | string
+  userKeyId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  title?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Conversation"> | Date | string
+  branchId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  parentId?: Prisma.StringNullableFilter<"Conversation"> | string | null
+  isShared?: Prisma.BoolFilter<"Conversation"> | boolean
+  shareToken?: Prisma.StringNullableFilter<"Conversation"> | string | null
 }
 
 export type ConversationCreateManyUserInput = {
-  id?: string | runtime.Types.Skip
-  userKeyId?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  branchId?: string | null | runtime.Types.Skip
-  parentId?: string | null | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: string | null | runtime.Types.Skip
+  id?: string
+  userKeyId?: string | null
+  title?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchId?: string | null
+  parentId?: string | null
+  isShared?: boolean
+  shareToken?: string | null
 }
 
 export type ConversationUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput | runtime.Types.Skip
-  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
-  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutConversationNestedInput
+  conversationSettings?: Prisma.ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput
+  conversationContextState?: Prisma.ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isShared?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shareToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1044,91 +1044,91 @@ export type ConversationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
  * ConversationCountOutputType without action
  */
 export type ConversationCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.MessageWhereInput | runtime.Types.Skip
+  where?: Prisma.MessageWhereInput
 }
 
 /**
  * ConversationCountOutputType without action
  */
 export type ConversationCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  where?: Prisma.AttachmentWhereInput
 }
 
 
 export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  branchId?: boolean | runtime.Types.Skip
-  parentId?: boolean | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs> | runtime.Types.Skip
-  attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs> | runtime.Types.Skip
-  conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs> | runtime.Types.Skip
-  conversationContextState?: boolean | Prisma.Conversation$conversationContextStateArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  title?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  branchId?: boolean
+  parentId?: boolean
+  isShared?: boolean
+  shareToken?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
+  attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
+  conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
+  conversationContextState?: boolean | Prisma.Conversation$conversationContextStateArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
 
 export type ConversationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  branchId?: boolean | runtime.Types.Skip
-  parentId?: boolean | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  title?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  branchId?: boolean
+  parentId?: boolean
+  isShared?: boolean
+  shareToken?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
 
 export type ConversationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  branchId?: boolean | runtime.Types.Skip
-  parentId?: boolean | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  title?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  branchId?: boolean
+  parentId?: boolean
+  isShared?: boolean
+  shareToken?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
 
 export type ConversationSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  branchId?: boolean | runtime.Types.Skip
-  parentId?: boolean | runtime.Types.Skip
-  isShared?: boolean | runtime.Types.Skip
-  shareToken?: boolean | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  title?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  branchId?: boolean
+  parentId?: boolean
+  isShared?: boolean
+  shareToken?: boolean
 }
 
-export type ConversationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "userKeyId" | "title" | "createdAt" | "updatedAt" | "branchId" | "parentId" | "isShared" | "shareToken", ExtArgs["result"]["conversation"], runtime.Types.Skip>
+export type ConversationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "userKeyId" | "title" | "createdAt" | "updatedAt" | "branchId" | "parentId" | "isShared" | "shareToken", ExtArgs["result"]["conversation"]>
 export type ConversationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs> | runtime.Types.Skip
-  attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs> | runtime.Types.Skip
-  conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs> | runtime.Types.Skip
-  conversationContextState?: boolean | Prisma.Conversation$conversationContextStateArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
+  attachments?: boolean | Prisma.Conversation$attachmentsArgs<ExtArgs>
+  conversationSettings?: boolean | Prisma.Conversation$conversationSettingsArgs<ExtArgs>
+  conversationContextState?: boolean | Prisma.Conversation$conversationContextStateArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ConversationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ConversationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ConversationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1613,7 +1613,7 @@ export type ConversationFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Conversation to fetch.
    */
   where: Prisma.ConversationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1636,7 +1636,7 @@ export type ConversationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which Conversation to fetch.
    */
   where: Prisma.ConversationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1658,38 +1658,38 @@ export type ConversationFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter, which Conversation to fetch.
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Conversations to fetch.
    */
-  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Conversations.
    */
-  cursor?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Conversations from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Conversations.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Conversations.
    */
-  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1711,38 +1711,38 @@ export type ConversationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter, which Conversation to fetch.
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Conversations to fetch.
    */
-  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Conversations.
    */
-  cursor?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Conversations from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Conversations.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Conversations.
    */
-  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1764,33 +1764,33 @@ export type ConversationFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter, which Conversations to fetch.
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Conversations to fetch.
    */
-  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Conversations.
    */
-  cursor?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Conversations from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Conversations.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1813,7 +1813,7 @@ export type ConversationCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data needed to create a Conversation.
    */
   data: Prisma.XOR<Prisma.ConversationCreateInput, Prisma.ConversationUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1824,7 +1824,7 @@ export type ConversationCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many Conversations.
    */
   data: Prisma.ConversationCreateManyInput | Prisma.ConversationCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1843,7 +1843,7 @@ export type ConversationCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many Conversations.
    */
   data: Prisma.ConversationCreateManyInput | Prisma.ConversationCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1874,7 +1874,7 @@ export type ConversationUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which Conversation to update.
    */
   where: Prisma.ConversationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1888,11 +1888,11 @@ export type ConversationUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter which Conversations to update
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * Limit how many Conversations to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1914,11 +1914,11 @@ export type ConversationUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
   /**
    * Filter which Conversations to update
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * Limit how many Conversations to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1953,7 +1953,7 @@ export type ConversationUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * In case the Conversation was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ConversationUpdateInput, Prisma.ConversationUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1976,7 +1976,7 @@ export type ConversationDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter which Conversation to delete.
    */
   where: Prisma.ConversationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1986,11 +1986,11 @@ export type ConversationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter which Conversations to delete
    */
-  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationWhereInput
   /**
    * Limit how many Conversations to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -2009,12 +2009,12 @@ export type Conversation$messagesArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.MessageInclude<ExtArgs> | null
-  where?: Prisma.MessageWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
 }
 
 /**
@@ -2033,12 +2033,12 @@ export type Conversation$attachmentsArgs<ExtArgs extends runtime.Types.Extension
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AttachmentInclude<ExtArgs> | null
-  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.AttachmentWhereInput
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
 }
 
 /**
@@ -2057,7 +2057,7 @@ export type Conversation$conversationSettingsArgs<ExtArgs extends runtime.Types.
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationSettingsInclude<ExtArgs> | null
-  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationSettingsWhereInput
 }
 
 /**
@@ -2076,7 +2076,7 @@ export type Conversation$conversationContextStateArgs<ExtArgs extends runtime.Ty
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationMemoryContextInclude<ExtArgs> | null
-  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryContextWhereInput
 }
 
 /**

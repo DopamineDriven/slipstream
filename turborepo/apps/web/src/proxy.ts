@@ -3,7 +3,7 @@ import { NextResponse, userAgent } from "next/server";
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image|auth/(?:login|signup)).*)"
+    "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image).*)"
   ]
 };
 // type CookieCacheProps = {
@@ -128,17 +128,5 @@ function detectDeviceAndSetCookies(
 }
 
 export default async function proxy(req: NextRequest) {
-
-  // if (!session && !req.nextUrl.pathname.includes("/auth")) {
-  //   return detectDeviceAndSetCookies(
-  //     req,
-  //     NextResponse.redirect(new URL("/auth/login", req.url))
-  //   );
-  // }
-  if (req.nextUrl.pathname === "/") {
-    return detectDeviceAndSetCookies(
-      req,
-      NextResponse.rewrite(new URL("/chat/home", req.url))
-    );
-  } else return detectDeviceAndSetCookies(req, NextResponse.next());
+  return detectDeviceAndSetCookies(req, NextResponse.next());
 }

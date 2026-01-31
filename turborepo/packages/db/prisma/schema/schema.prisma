@@ -10,7 +10,7 @@ generator client {
   runtime                = "nodejs"
   moduleFormat           = "esm"
   compilerBuild          = "fast"
-  previewFeatures        = ["typedSql", "postgresqlExtensions", "relationJoins", "strictUndefinedChecks"]
+  previewFeatures        = ["typedSql", "postgresqlExtensions", "relationJoins"]
 }
 
 

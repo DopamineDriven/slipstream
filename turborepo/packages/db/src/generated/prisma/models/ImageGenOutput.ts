@@ -97,103 +97,103 @@ export type ImageGenOutputCountAggregateOutputType = {
 
 
 export type ImageGenOutputAvgAggregateInputType = {
-  jobIndex?: true | runtime.Types.Skip
-  seriesIndex?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
+  jobIndex?: true
+  seriesIndex?: true
+  width?: true
+  height?: true
 }
 
 export type ImageGenOutputSumAggregateInputType = {
-  jobIndex?: true | runtime.Types.Skip
-  seriesIndex?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
+  jobIndex?: true
+  seriesIndex?: true
+  width?: true
+  height?: true
 }
 
 export type ImageGenOutputMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  jobId?: true | runtime.Types.Skip
-  jobIndex?: true | runtime.Types.Skip
-  kind?: true | runtime.Types.Skip
-  seriesIndex?: true | runtime.Types.Skip
-  seriesId?: true | runtime.Types.Skip
-  isPartial?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  mime?: true | runtime.Types.Skip
-  ext?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  jobId?: true
+  jobIndex?: true
+  kind?: true
+  seriesIndex?: true
+  seriesId?: true
+  isPartial?: true
+  attachmentId?: true
+  width?: true
+  height?: true
+  mime?: true
+  ext?: true
+  revisedPrompt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageGenOutputMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  jobId?: true | runtime.Types.Skip
-  jobIndex?: true | runtime.Types.Skip
-  kind?: true | runtime.Types.Skip
-  seriesIndex?: true | runtime.Types.Skip
-  seriesId?: true | runtime.Types.Skip
-  isPartial?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  mime?: true | runtime.Types.Skip
-  ext?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  jobId?: true
+  jobIndex?: true
+  kind?: true
+  seriesIndex?: true
+  seriesId?: true
+  isPartial?: true
+  attachmentId?: true
+  width?: true
+  height?: true
+  mime?: true
+  ext?: true
+  revisedPrompt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageGenOutputCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  jobId?: true | runtime.Types.Skip
-  jobIndex?: true | runtime.Types.Skip
-  kind?: true | runtime.Types.Skip
-  seriesIndex?: true | runtime.Types.Skip
-  seriesId?: true | runtime.Types.Skip
-  isPartial?: true | runtime.Types.Skip
-  attachmentId?: true | runtime.Types.Skip
-  width?: true | runtime.Types.Skip
-  height?: true | runtime.Types.Skip
-  mime?: true | runtime.Types.Skip
-  ext?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  jobId?: true
+  jobIndex?: true
+  kind?: true
+  seriesIndex?: true
+  seriesId?: true
+  isPartial?: true
+  attachmentId?: true
+  width?: true
+  height?: true
+  mime?: true
+  ext?: true
+  revisedPrompt?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type ImageGenOutputAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ImageGenOutput to aggregate.
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenOutputs to fetch.
    */
-  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenOutputWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenOutputs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenOutputs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -238,12 +238,12 @@ export type GetImageGenOutputAggregateType<T extends ImageGenOutputAggregateArgs
 
 
 export type ImageGenOutputGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ImageGenOutputOrderByWithAggregationInput | Prisma.ImageGenOutputOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
+  orderBy?: Prisma.ImageGenOutputOrderByWithAggregationInput | Prisma.ImageGenOutputOrderByWithAggregationInput[]
   by: Prisma.ImageGenOutputScalarFieldEnum[] | Prisma.ImageGenOutputScalarFieldEnum
-  having?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ImageGenOutputCountAggregateInputType | true
   _avg?: ImageGenOutputAvgAggregateInputType
   _sum?: ImageGenOutputSumAggregateInputType
@@ -290,253 +290,253 @@ type GetImageGenOutputGroupByPayload<T extends ImageGenOutputGroupByArgs> = Pris
 
 
 export type ImageGenOutputWhereInput = {
-  AND?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  job?: Prisma.XOR<Prisma.ImageGenJobScalarRelationFilter, Prisma.ImageGenJobWhereInput> | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  AND?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[]
+  OR?: Prisma.ImageGenOutputWhereInput[]
+  NOT?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[]
+  id?: Prisma.StringFilter<"ImageGenOutput"> | string
+  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean
+  attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
+  job?: Prisma.XOR<Prisma.ImageGenJobScalarRelationFilter, Prisma.ImageGenJobWhereInput>
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
 
 export type ImageGenOutputOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  jobId?: Prisma.SortOrder | runtime.Types.Skip
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  kind?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesId?: Prisma.SortOrder | runtime.Types.Skip
-  isPartial?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  ext?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  job?: Prisma.ImageGenJobOrderByWithRelationInput | runtime.Types.Skip
-  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
+  jobIndex?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  seriesId?: Prisma.SortOrder
+  isPartial?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder
+  ext?: Prisma.SortOrderInput | Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  job?: Prisma.ImageGenJobOrderByWithRelationInput
+  attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
 
 export type ImageGenOutputWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  attachmentId?: string | runtime.Types.Skip
-  jobId_seriesId_kind_seriesIndex?: Prisma.ImageGenOutputJobIdSeriesIdKindSeriesIndexCompoundUniqueInput | runtime.Types.Skip
-  AND?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[] | runtime.Types.Skip
-  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean | runtime.Types.Skip
-  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  job?: Prisma.XOR<Prisma.ImageGenJobScalarRelationFilter, Prisma.ImageGenJobWhereInput> | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  id?: string
+  attachmentId?: string
+  jobId_seriesId_kind_seriesIndex?: Prisma.ImageGenOutputJobIdSeriesIdKindSeriesIndexCompoundUniqueInput
+  AND?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[]
+  OR?: Prisma.ImageGenOutputWhereInput[]
+  NOT?: Prisma.ImageGenOutputWhereInput | Prisma.ImageGenOutputWhereInput[]
+  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean
+  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
+  job?: Prisma.XOR<Prisma.ImageGenJobScalarRelationFilter, Prisma.ImageGenJobWhereInput>
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "id" | "attachmentId" | "jobId_seriesId_kind_seriesIndex">
 
 export type ImageGenOutputOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  jobId?: Prisma.SortOrder | runtime.Types.Skip
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  kind?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesId?: Prisma.SortOrder | runtime.Types.Skip
-  isPartial?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  ext?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ImageGenOutputCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.ImageGenOutputAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ImageGenOutputMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ImageGenOutputMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.ImageGenOutputSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
+  jobIndex?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  seriesId?: Prisma.SortOrder
+  isPartial?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder
+  ext?: Prisma.SortOrderInput | Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.ImageGenOutputCountOrderByAggregateInput
+  _avg?: Prisma.ImageGenOutputAvgOrderByAggregateInput
+  _max?: Prisma.ImageGenOutputMaxOrderByAggregateInput
+  _min?: Prisma.ImageGenOutputMinOrderByAggregateInput
+  _sum?: Prisma.ImageGenOutputSumOrderByAggregateInput
 }
 
 export type ImageGenOutputScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput | Prisma.ImageGenOutputScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput | Prisma.ImageGenOutputScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntWithAggregatesFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindWithAggregatesFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntWithAggregatesFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  seriesId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolWithAggregatesFilter<"ImageGenOutput"> | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  width?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  height?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  mime?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  ext?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput | Prisma.ImageGenOutputScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ImageGenOutputScalarWhereWithAggregatesInput | Prisma.ImageGenOutputScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string
+  jobId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string
+  jobIndex?: Prisma.IntWithAggregatesFilter<"ImageGenOutput"> | number
+  kind?: Prisma.EnumImageGenOutputKindWithAggregatesFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntWithAggregatesFilter<"ImageGenOutput"> | number
+  seriesId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string
+  isPartial?: Prisma.BoolWithAggregatesFilter<"ImageGenOutput"> | boolean
+  attachmentId?: Prisma.StringWithAggregatesFilter<"ImageGenOutput"> | string
+  width?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null
+  height?: Prisma.IntNullableWithAggregatesFilter<"ImageGenOutput"> | number | null
+  mime?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
+  ext?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
+  revisedPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenOutput"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenOutput"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenOutput"> | Date | string
 }
 
 export type ImageGenOutputCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   job: Prisma.ImageGenJobCreateNestedOneWithoutOutputsInput
   attachment: Prisma.AttachmentCreateNestedOneWithoutImageGenOutputInput
 }
 
 export type ImageGenOutputUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobId: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
   attachmentId: string
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenOutputUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  job?: Prisma.ImageGenJobUpdateOneRequiredWithoutOutputsNestedInput | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ImageGenJobUpdateOneRequiredWithoutOutputsNestedInput
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput
 }
 
 export type ImageGenOutputUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenOutputCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobId: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
   attachmentId: string
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenOutputUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenOutputUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenOutputNullableScalarRelationFilter = {
-  is?: Prisma.ImageGenOutputWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.ImageGenOutputWhereInput | null | runtime.Types.Skip
+  is?: Prisma.ImageGenOutputWhereInput | null
+  isNot?: Prisma.ImageGenOutputWhereInput | null
 }
 
 export type ImageGenOutputListRelationFilter = {
-  every?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
-  some?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
-  none?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  every?: Prisma.ImageGenOutputWhereInput
+  some?: Prisma.ImageGenOutputWhereInput
+  none?: Prisma.ImageGenOutputWhereInput
 }
 
 export type ImageGenOutputOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type ImageGenOutputJobIdSeriesIdKindSeriesIndexCompoundUniqueInput = {
@@ -547,183 +547,183 @@ export type ImageGenOutputJobIdSeriesIdKindSeriesIndexCompoundUniqueInput = {
 }
 
 export type ImageGenOutputCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  jobId?: Prisma.SortOrder | runtime.Types.Skip
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  kind?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesId?: Prisma.SortOrder | runtime.Types.Skip
-  isPartial?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  mime?: Prisma.SortOrder | runtime.Types.Skip
-  ext?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
+  jobIndex?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  seriesId?: Prisma.SortOrder
+  isPartial?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  ext?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenOutputAvgOrderByAggregateInput = {
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
+  jobIndex?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
 }
 
 export type ImageGenOutputMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  jobId?: Prisma.SortOrder | runtime.Types.Skip
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  kind?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesId?: Prisma.SortOrder | runtime.Types.Skip
-  isPartial?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  mime?: Prisma.SortOrder | runtime.Types.Skip
-  ext?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
+  jobIndex?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  seriesId?: Prisma.SortOrder
+  isPartial?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  ext?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenOutputMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  jobId?: Prisma.SortOrder | runtime.Types.Skip
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  kind?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesId?: Prisma.SortOrder | runtime.Types.Skip
-  isPartial?: Prisma.SortOrder | runtime.Types.Skip
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
-  mime?: Prisma.SortOrder | runtime.Types.Skip
-  ext?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
+  jobIndex?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  seriesId?: Prisma.SortOrder
+  isPartial?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
+  mime?: Prisma.SortOrder
+  ext?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenOutputSumOrderByAggregateInput = {
-  jobIndex?: Prisma.SortOrder | runtime.Types.Skip
-  seriesIndex?: Prisma.SortOrder | runtime.Types.Skip
-  width?: Prisma.SortOrder | runtime.Types.Skip
-  height?: Prisma.SortOrder | runtime.Types.Skip
+  jobIndex?: Prisma.SortOrder
+  seriesIndex?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
 }
 
 export type ImageGenOutputCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.ImageGenOutputWhereUniqueInput
 }
 
 export type ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.ImageGenOutputWhereUniqueInput
 }
 
 export type ImageGenOutputUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.ImageGenOutputUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenOutputWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageGenOutputWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenOutputUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageGenOutputUpdateWithoutAttachmentInput>, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.ImageGenOutputUpsertWithoutAttachmentInput
+  disconnect?: Prisma.ImageGenOutputWhereInput | boolean
+  delete?: Prisma.ImageGenOutputWhereInput | boolean
+  connect?: Prisma.ImageGenOutputWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenOutputUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageGenOutputUpdateWithoutAttachmentInput>, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.ImageGenOutputUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenOutputWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageGenOutputWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenOutputUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageGenOutputUpdateWithoutAttachmentInput>, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.ImageGenOutputUpsertWithoutAttachmentInput
+  disconnect?: Prisma.ImageGenOutputWhereInput | boolean
+  delete?: Prisma.ImageGenOutputWhereInput | boolean
+  connect?: Prisma.ImageGenOutputWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenOutputUpdateToOneWithWhereWithoutAttachmentInput, Prisma.ImageGenOutputUpdateWithoutAttachmentInput>, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type ImageGenOutputCreateNestedManyWithoutJobInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope
+  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
 }
 
 export type ImageGenOutputUncheckedCreateNestedManyWithoutJobInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[]
+  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope
+  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
 }
 
 export type ImageGenOutputUpdateManyWithoutJobNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[] | runtime.Types.Skip
-  upsert?: Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput | Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope
+  set?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  disconnect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  delete?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  update?: Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput | Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[]
 }
 
 export type ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[] | runtime.Types.Skip
-  upsert?: Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput | Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutJobInput, Prisma.ImageGenOutputUncheckedCreateWithoutJobInput> | Prisma.ImageGenOutputCreateWithoutJobInput[] | Prisma.ImageGenOutputUncheckedCreateWithoutJobInput[]
+  connectOrCreate?: Prisma.ImageGenOutputCreateOrConnectWithoutJobInput | Prisma.ImageGenOutputCreateOrConnectWithoutJobInput[]
+  upsert?: Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpsertWithWhereUniqueWithoutJobInput[]
+  createMany?: Prisma.ImageGenOutputCreateManyJobInputEnvelope
+  set?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  disconnect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  delete?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  connect?: Prisma.ImageGenOutputWhereUniqueInput | Prisma.ImageGenOutputWhereUniqueInput[]
+  update?: Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput | Prisma.ImageGenOutputUpdateWithWhereUniqueWithoutJobInput[]
+  updateMany?: Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput | Prisma.ImageGenOutputUpdateManyWithWhereWithoutJobInput[]
+  deleteMany?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[]
 }
 
 export type EnumImageGenOutputKindFieldUpdateOperationsInput = {
-  set?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  set?: $Enums.ImageGenOutputKind
 }
 
 export type ImageGenOutputCreateWithoutAttachmentInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   job: Prisma.ImageGenJobCreateNestedOneWithoutOutputsInput
 }
 
 export type ImageGenOutputUncheckedCreateWithoutAttachmentInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobId: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenOutputCreateOrConnectWithoutAttachmentInput = {
@@ -734,80 +734,80 @@ export type ImageGenOutputCreateOrConnectWithoutAttachmentInput = {
 export type ImageGenOutputUpsertWithoutAttachmentInput = {
   update: Prisma.XOR<Prisma.ImageGenOutputUpdateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput>
   create: Prisma.XOR<Prisma.ImageGenOutputCreateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedCreateWithoutAttachmentInput>
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
 }
 
 export type ImageGenOutputUpdateToOneWithWhereWithoutAttachmentInput = {
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   data: Prisma.XOR<Prisma.ImageGenOutputUpdateWithoutAttachmentInput, Prisma.ImageGenOutputUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type ImageGenOutputUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  job?: Prisma.ImageGenJobUpdateOneRequiredWithoutOutputsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.ImageGenJobUpdateOneRequiredWithoutOutputsNestedInput
 }
 
 export type ImageGenOutputUncheckedUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenOutputCreateWithoutJobInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   attachment: Prisma.AttachmentCreateNestedOneWithoutImageGenOutputInput
 }
 
 export type ImageGenOutputUncheckedCreateWithoutJobInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
   attachmentId: string
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenOutputCreateOrConnectWithoutJobInput = {
@@ -817,7 +817,7 @@ export type ImageGenOutputCreateOrConnectWithoutJobInput = {
 
 export type ImageGenOutputCreateManyJobInputEnvelope = {
   data: Prisma.ImageGenOutputCreateManyJobInput | Prisma.ImageGenOutputCreateManyJobInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type ImageGenOutputUpsertWithWhereUniqueWithoutJobInput = {
@@ -837,186 +837,186 @@ export type ImageGenOutputUpdateManyWithWhereWithoutJobInput = {
 }
 
 export type ImageGenOutputScalarWhereInput = {
-  AND?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenOutputScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string | runtime.Types.Skip
-  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null | runtime.Types.Skip
-  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[]
+  OR?: Prisma.ImageGenOutputScalarWhereInput[]
+  NOT?: Prisma.ImageGenOutputScalarWhereInput | Prisma.ImageGenOutputScalarWhereInput[]
+  id?: Prisma.StringFilter<"ImageGenOutput"> | string
+  jobId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  jobIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  kind?: Prisma.EnumImageGenOutputKindFilter<"ImageGenOutput"> | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFilter<"ImageGenOutput"> | number
+  seriesId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  isPartial?: Prisma.BoolFilter<"ImageGenOutput"> | boolean
+  attachmentId?: Prisma.StringFilter<"ImageGenOutput"> | string
+  width?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  height?: Prisma.IntNullableFilter<"ImageGenOutput"> | number | null
+  mime?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  ext?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenOutput"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenOutput"> | Date | string
 }
 
 export type ImageGenOutputCreateManyJobInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   jobIndex: number
-  kind?: $Enums.ImageGenOutputKind | runtime.Types.Skip
+  kind?: $Enums.ImageGenOutputKind
   seriesIndex: number
   seriesId: string
   isPartial: boolean
   attachmentId: string
-  width?: number | null | runtime.Types.Skip
-  height?: number | null | runtime.Types.Skip
-  mime?: string | null | runtime.Types.Skip
-  ext?: string | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  width?: number | null
+  height?: number | null
+  mime?: string | null
+  ext?: string | null
+  revisedPrompt?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenOutputUpdateWithoutJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput
 }
 
 export type ImageGenOutputUncheckedUpdateWithoutJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenOutputUncheckedUpdateManyWithoutJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind | runtime.Types.Skip
-  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seriesId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jobIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  kind?: Prisma.EnumImageGenOutputKindFieldUpdateOperationsInput | $Enums.ImageGenOutputKind
+  seriesIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  seriesId?: Prisma.StringFieldUpdateOperationsInput | string
+  isPartial?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type ImageGenOutputSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  jobId?: boolean | runtime.Types.Skip
-  jobIndex?: boolean | runtime.Types.Skip
-  kind?: boolean | runtime.Types.Skip
-  seriesIndex?: boolean | runtime.Types.Skip
-  seriesId?: boolean | runtime.Types.Skip
-  isPartial?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  mime?: boolean | runtime.Types.Skip
-  ext?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  jobId?: boolean
+  jobIndex?: boolean
+  kind?: boolean
+  seriesIndex?: boolean
+  seriesId?: boolean
+  isPartial?: boolean
+  attachmentId?: boolean
+  width?: boolean
+  height?: boolean
+  mime?: boolean
+  ext?: boolean
+  revisedPrompt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenOutput"]>
 
 export type ImageGenOutputSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  jobId?: boolean | runtime.Types.Skip
-  jobIndex?: boolean | runtime.Types.Skip
-  kind?: boolean | runtime.Types.Skip
-  seriesIndex?: boolean | runtime.Types.Skip
-  seriesId?: boolean | runtime.Types.Skip
-  isPartial?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  mime?: boolean | runtime.Types.Skip
-  ext?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  jobId?: boolean
+  jobIndex?: boolean
+  kind?: boolean
+  seriesIndex?: boolean
+  seriesId?: boolean
+  isPartial?: boolean
+  attachmentId?: boolean
+  width?: boolean
+  height?: boolean
+  mime?: boolean
+  ext?: boolean
+  revisedPrompt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenOutput"]>
 
 export type ImageGenOutputSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  jobId?: boolean | runtime.Types.Skip
-  jobIndex?: boolean | runtime.Types.Skip
-  kind?: boolean | runtime.Types.Skip
-  seriesIndex?: boolean | runtime.Types.Skip
-  seriesId?: boolean | runtime.Types.Skip
-  isPartial?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  mime?: boolean | runtime.Types.Skip
-  ext?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  jobId?: boolean
+  jobIndex?: boolean
+  kind?: boolean
+  seriesIndex?: boolean
+  seriesId?: boolean
+  isPartial?: boolean
+  attachmentId?: boolean
+  width?: boolean
+  height?: boolean
+  mime?: boolean
+  ext?: boolean
+  revisedPrompt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenOutput"]>
 
 export type ImageGenOutputSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  jobId?: boolean | runtime.Types.Skip
-  jobIndex?: boolean | runtime.Types.Skip
-  kind?: boolean | runtime.Types.Skip
-  seriesIndex?: boolean | runtime.Types.Skip
-  seriesId?: boolean | runtime.Types.Skip
-  isPartial?: boolean | runtime.Types.Skip
-  attachmentId?: boolean | runtime.Types.Skip
-  width?: boolean | runtime.Types.Skip
-  height?: boolean | runtime.Types.Skip
-  mime?: boolean | runtime.Types.Skip
-  ext?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  id?: boolean
+  jobId?: boolean
+  jobIndex?: boolean
+  kind?: boolean
+  seriesIndex?: boolean
+  seriesId?: boolean
+  isPartial?: boolean
+  attachmentId?: boolean
+  width?: boolean
+  height?: boolean
+  mime?: boolean
+  ext?: boolean
+  revisedPrompt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ImageGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "jobIndex" | "kind" | "seriesIndex" | "seriesId" | "isPartial" | "attachmentId" | "width" | "height" | "mime" | "ext" | "revisedPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenOutput"], runtime.Types.Skip>
+export type ImageGenOutputOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "jobIndex" | "kind" | "seriesIndex" | "seriesId" | "isPartial" | "attachmentId" | "width" | "height" | "mime" | "ext" | "revisedPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenOutput"]>
 export type ImageGenOutputInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ImageGenOutputIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type ImageGenOutputIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs> | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  job?: boolean | Prisma.ImageGenJobDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 
 export type $ImageGenOutputPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1505,7 +1505,7 @@ export type ImageGenOutputFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which ImageGenOutput to fetch.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1528,7 +1528,7 @@ export type ImageGenOutputFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which ImageGenOutput to fetch.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1550,38 +1550,38 @@ export type ImageGenOutputFindFirstArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter, which ImageGenOutput to fetch.
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenOutputs to fetch.
    */
-  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageGenOutputs.
    */
-  cursor?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenOutputWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenOutputs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenOutputs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageGenOutputs.
    */
-  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1603,38 +1603,38 @@ export type ImageGenOutputFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
   /**
    * Filter, which ImageGenOutput to fetch.
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenOutputs to fetch.
    */
-  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageGenOutputs.
    */
-  cursor?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenOutputWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenOutputs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenOutputs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageGenOutputs.
    */
-  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1656,33 +1656,33 @@ export type ImageGenOutputFindManyArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter, which ImageGenOutputs to fetch.
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenOutputs to fetch.
    */
-  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ImageGenOutputs.
    */
-  cursor?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenOutputWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenOutputs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenOutputs.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1705,7 +1705,7 @@ export type ImageGenOutputCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a ImageGenOutput.
    */
   data: Prisma.XOR<Prisma.ImageGenOutputCreateInput, Prisma.ImageGenOutputUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1716,7 +1716,7 @@ export type ImageGenOutputCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many ImageGenOutputs.
    */
   data: Prisma.ImageGenOutputCreateManyInput | Prisma.ImageGenOutputCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1735,7 +1735,7 @@ export type ImageGenOutputCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * The data used to create many ImageGenOutputs.
    */
   data: Prisma.ImageGenOutputCreateManyInput | Prisma.ImageGenOutputCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1766,7 +1766,7 @@ export type ImageGenOutputUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which ImageGenOutput to update.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1780,11 +1780,11 @@ export type ImageGenOutputUpdateManyArgs<ExtArgs extends runtime.Types.Extension
   /**
    * Filter which ImageGenOutputs to update
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * Limit how many ImageGenOutputs to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1806,11 +1806,11 @@ export type ImageGenOutputUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
   /**
    * Filter which ImageGenOutputs to update
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * Limit how many ImageGenOutputs to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1845,7 +1845,7 @@ export type ImageGenOutputUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the ImageGenOutput was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ImageGenOutputUpdateInput, Prisma.ImageGenOutputUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1868,7 +1868,7 @@ export type ImageGenOutputDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which ImageGenOutput to delete.
    */
   where: Prisma.ImageGenOutputWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1878,11 +1878,11 @@ export type ImageGenOutputDeleteManyArgs<ExtArgs extends runtime.Types.Extension
   /**
    * Filter which ImageGenOutputs to delete
    */
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
   /**
    * Limit how many ImageGenOutputs to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

@@ -102,108 +102,108 @@ export type DocumentMetadataCountAggregateOutputType = {
 
 
 export type DocumentMetadataAvgAggregateInputType = {
-  pageCount?: true | runtime.Types.Skip
-  wordCount?: true | runtime.Types.Skip
-  lineCount?: true | runtime.Types.Skip
+  pageCount?: true
+  wordCount?: true
+  lineCount?: true
 }
 
 export type DocumentMetadataSumAggregateInputType = {
-  pageCount?: true | runtime.Types.Skip
-  wordCount?: true | runtime.Types.Skip
-  lineCount?: true | runtime.Types.Skip
+  pageCount?: true
+  wordCount?: true
+  lineCount?: true
 }
 
 export type DocumentMetadataMinAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  pageCount?: true | runtime.Types.Skip
-  wordCount?: true | runtime.Types.Skip
-  language?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  author?: true | runtime.Types.Skip
-  subject?: true | runtime.Types.Skip
-  pdfVersion?: true | runtime.Types.Skip
-  isEncrypted?: true | runtime.Types.Skip
-  isSearchable?: true | runtime.Types.Skip
-  isLinearized?: true | runtime.Types.Skip
-  encoding?: true | runtime.Types.Skip
-  lineCount?: true | runtime.Types.Skip
-  textPreview?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  pageCount?: true
+  wordCount?: true
+  language?: true
+  title?: true
+  author?: true
+  subject?: true
+  pdfVersion?: true
+  isEncrypted?: true
+  isSearchable?: true
+  isLinearized?: true
+  encoding?: true
+  lineCount?: true
+  textPreview?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type DocumentMetadataMaxAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  pageCount?: true | runtime.Types.Skip
-  wordCount?: true | runtime.Types.Skip
-  language?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  author?: true | runtime.Types.Skip
-  subject?: true | runtime.Types.Skip
-  pdfVersion?: true | runtime.Types.Skip
-  isEncrypted?: true | runtime.Types.Skip
-  isSearchable?: true | runtime.Types.Skip
-  isLinearized?: true | runtime.Types.Skip
-  encoding?: true | runtime.Types.Skip
-  lineCount?: true | runtime.Types.Skip
-  textPreview?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  pageCount?: true
+  wordCount?: true
+  language?: true
+  title?: true
+  author?: true
+  subject?: true
+  pdfVersion?: true
+  isEncrypted?: true
+  isSearchable?: true
+  isLinearized?: true
+  encoding?: true
+  lineCount?: true
+  textPreview?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type DocumentMetadataCountAggregateInputType = {
-  attachmentId?: true | runtime.Types.Skip
-  format?: true | runtime.Types.Skip
-  pageCount?: true | runtime.Types.Skip
-  wordCount?: true | runtime.Types.Skip
-  language?: true | runtime.Types.Skip
-  title?: true | runtime.Types.Skip
-  author?: true | runtime.Types.Skip
-  subject?: true | runtime.Types.Skip
-  keywords?: true | runtime.Types.Skip
-  pdfVersion?: true | runtime.Types.Skip
-  isEncrypted?: true | runtime.Types.Skip
-  isSearchable?: true | runtime.Types.Skip
-  isLinearized?: true | runtime.Types.Skip
-  encoding?: true | runtime.Types.Skip
-  lineCount?: true | runtime.Types.Skip
-  textPreview?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  attachmentId?: true
+  format?: true
+  pageCount?: true
+  wordCount?: true
+  language?: true
+  title?: true
+  author?: true
+  subject?: true
+  keywords?: true
+  pdfVersion?: true
+  isEncrypted?: true
+  isSearchable?: true
+  isLinearized?: true
+  encoding?: true
+  lineCount?: true
+  textPreview?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type DocumentMetadataAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which DocumentMetadata to aggregate.
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of DocumentMetadata to fetch.
    */
-  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.DocumentMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` DocumentMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` DocumentMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -248,12 +248,12 @@ export type GetDocumentMetadataAggregateType<T extends DocumentMetadataAggregate
 
 
 export type DocumentMetadataGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.DocumentMetadataOrderByWithAggregationInput | Prisma.DocumentMetadataOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
+  orderBy?: Prisma.DocumentMetadataOrderByWithAggregationInput | Prisma.DocumentMetadataOrderByWithAggregationInput[]
   by: Prisma.DocumentMetadataScalarFieldEnum[] | Prisma.DocumentMetadataScalarFieldEnum
-  having?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: DocumentMetadataCountAggregateInputType | true
   _avg?: DocumentMetadataAvgAggregateInputType
   _sum?: DocumentMetadataSumAggregateInputType
@@ -303,389 +303,389 @@ type GetDocumentMetadataGroupByPayload<T extends DocumentMetadataGroupByArgs> = 
 
 
 export type DocumentMetadataWhereInput = {
-  AND?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringFilter<"DocumentMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.StringFilter<"DocumentMetadata"> | string | runtime.Types.Skip
-  pageCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  wordCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  language?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  author?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  subject?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata"> | runtime.Types.Skip
-  pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  AND?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[]
+  OR?: Prisma.DocumentMetadataWhereInput[]
+  NOT?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[]
+  attachmentId?: Prisma.StringFilter<"DocumentMetadata"> | string
+  format?: Prisma.StringFilter<"DocumentMetadata"> | string
+  pageCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  wordCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  language?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  title?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  author?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  subject?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata">
+  pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null
+  encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }
 
 export type DocumentMetadataOrderByWithRelationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  language?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  author?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  subject?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keywords?: Prisma.SortOrder | runtime.Types.Skip
-  pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  isEncrypted?: Prisma.SortOrder | runtime.Types.Skip
-  isSearchable?: Prisma.SortOrder | runtime.Types.Skip
-  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  encoding?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  textPreview?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  language?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  author?: Prisma.SortOrderInput | Prisma.SortOrder
+  subject?: Prisma.SortOrderInput | Prisma.SortOrder
+  keywords?: Prisma.SortOrder
+  pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  isEncrypted?: Prisma.SortOrder
+  isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder
+  encoding?: Prisma.SortOrderInput | Prisma.SortOrder
+  lineCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  textPreview?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  attachment?: Prisma.AttachmentOrderByWithRelationInput
 }
 
 export type DocumentMetadataWhereUniqueInput = Prisma.AtLeast<{
-  attachmentId?: string | runtime.Types.Skip
-  AND?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[] | runtime.Types.Skip
-  format?: Prisma.StringFilter<"DocumentMetadata"> | string | runtime.Types.Skip
-  pageCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  wordCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  language?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  author?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  subject?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata"> | runtime.Types.Skip
-  pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  attachmentId?: string
+  AND?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[]
+  OR?: Prisma.DocumentMetadataWhereInput[]
+  NOT?: Prisma.DocumentMetadataWhereInput | Prisma.DocumentMetadataWhereInput[]
+  format?: Prisma.StringFilter<"DocumentMetadata"> | string
+  pageCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  wordCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  language?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  title?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  author?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  subject?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata">
+  pdfVersion?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  isEncrypted?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isSearchable?: Prisma.BoolFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableFilter<"DocumentMetadata"> | boolean | null
+  encoding?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  lineCount?: Prisma.IntNullableFilter<"DocumentMetadata"> | number | null
+  textPreview?: Prisma.StringNullableFilter<"DocumentMetadata"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"DocumentMetadata"> | Date | string
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
 }, "attachmentId">
 
 export type DocumentMetadataOrderByWithAggregationInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  language?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  author?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  subject?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keywords?: Prisma.SortOrder | runtime.Types.Skip
-  pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  isEncrypted?: Prisma.SortOrder | runtime.Types.Skip
-  isSearchable?: Prisma.SortOrder | runtime.Types.Skip
-  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  encoding?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  textPreview?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.DocumentMetadataCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.DocumentMetadataAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.DocumentMetadataMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.DocumentMetadataMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.DocumentMetadataSumOrderByAggregateInput | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  wordCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  language?: Prisma.SortOrderInput | Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  author?: Prisma.SortOrderInput | Prisma.SortOrder
+  subject?: Prisma.SortOrderInput | Prisma.SortOrder
+  keywords?: Prisma.SortOrder
+  pdfVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  isEncrypted?: Prisma.SortOrder
+  isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrderInput | Prisma.SortOrder
+  encoding?: Prisma.SortOrderInput | Prisma.SortOrder
+  lineCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  textPreview?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.DocumentMetadataCountOrderByAggregateInput
+  _avg?: Prisma.DocumentMetadataAvgOrderByAggregateInput
+  _max?: Prisma.DocumentMetadataMaxOrderByAggregateInput
+  _min?: Prisma.DocumentMetadataMinOrderByAggregateInput
+  _sum?: Prisma.DocumentMetadataSumOrderByAggregateInput
 }
 
 export type DocumentMetadataScalarWhereWithAggregatesInput = {
-  AND?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput | Prisma.DocumentMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput | Prisma.DocumentMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  attachmentId?: Prisma.StringWithAggregatesFilter<"DocumentMetadata"> | string | runtime.Types.Skip
-  format?: Prisma.StringWithAggregatesFilter<"DocumentMetadata"> | string | runtime.Types.Skip
-  pageCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  wordCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  language?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  title?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  author?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  subject?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata"> | runtime.Types.Skip
-  pdfVersion?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.BoolNullableWithAggregatesFilter<"DocumentMetadata"> | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  lineCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null | runtime.Types.Skip
-  textPreview?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DocumentMetadata"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput | Prisma.DocumentMetadataScalarWhereWithAggregatesInput[]
+  OR?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.DocumentMetadataScalarWhereWithAggregatesInput | Prisma.DocumentMetadataScalarWhereWithAggregatesInput[]
+  attachmentId?: Prisma.StringWithAggregatesFilter<"DocumentMetadata"> | string
+  format?: Prisma.StringWithAggregatesFilter<"DocumentMetadata"> | string
+  pageCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null
+  wordCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null
+  language?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  title?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  author?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  subject?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"DocumentMetadata">
+  pdfVersion?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  isEncrypted?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean
+  isSearchable?: Prisma.BoolWithAggregatesFilter<"DocumentMetadata"> | boolean
+  isLinearized?: Prisma.BoolNullableWithAggregatesFilter<"DocumentMetadata"> | boolean | null
+  encoding?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  lineCount?: Prisma.IntNullableWithAggregatesFilter<"DocumentMetadata"> | number | null
+  textPreview?: Prisma.StringNullableWithAggregatesFilter<"DocumentMetadata"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"DocumentMetadata"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DocumentMetadata"> | Date | string
 }
 
 export type DocumentMetadataCreateInput = {
   format: string
-  pageCount?: number | null | runtime.Types.Skip
-  wordCount?: number | null | runtime.Types.Skip
-  language?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  author?: string | null | runtime.Types.Skip
-  subject?: string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: string | null | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | null | runtime.Types.Skip
-  encoding?: string | null | runtime.Types.Skip
-  lineCount?: number | null | runtime.Types.Skip
-  textPreview?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  pageCount?: number | null
+  wordCount?: number | null
+  language?: string | null
+  title?: string | null
+  author?: string | null
+  subject?: string | null
+  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[]
+  pdfVersion?: string | null
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean | null
+  encoding?: string | null
+  lineCount?: number | null
+  textPreview?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   attachment: Prisma.AttachmentCreateNestedOneWithoutDocumentInput
 }
 
 export type DocumentMetadataUncheckedCreateInput = {
   attachmentId: string
   format: string
-  pageCount?: number | null | runtime.Types.Skip
-  wordCount?: number | null | runtime.Types.Skip
-  language?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  author?: string | null | runtime.Types.Skip
-  subject?: string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: string | null | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | null | runtime.Types.Skip
-  encoding?: string | null | runtime.Types.Skip
-  lineCount?: number | null | runtime.Types.Skip
-  textPreview?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  pageCount?: number | null
+  wordCount?: number | null
+  language?: string | null
+  title?: string | null
+  author?: string | null
+  subject?: string | null
+  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[]
+  pdfVersion?: string | null
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean | null
+  encoding?: string | null
+  lineCount?: number | null
+  textPreview?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type DocumentMetadataUpdateInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutDocumentNestedInput | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutDocumentNestedInput
 }
 
 export type DocumentMetadataUncheckedUpdateInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DocumentMetadataCreateManyInput = {
   attachmentId: string
   format: string
-  pageCount?: number | null | runtime.Types.Skip
-  wordCount?: number | null | runtime.Types.Skip
-  language?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  author?: string | null | runtime.Types.Skip
-  subject?: string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: string | null | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | null | runtime.Types.Skip
-  encoding?: string | null | runtime.Types.Skip
-  lineCount?: number | null | runtime.Types.Skip
-  textPreview?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  pageCount?: number | null
+  wordCount?: number | null
+  language?: string | null
+  title?: string | null
+  author?: string | null
+  subject?: string | null
+  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[]
+  pdfVersion?: string | null
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean | null
+  encoding?: string | null
+  lineCount?: number | null
+  textPreview?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type DocumentMetadataUpdateManyMutationInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DocumentMetadataUncheckedUpdateManyInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DocumentMetadataNullableScalarRelationFilter = {
-  is?: Prisma.DocumentMetadataWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.DocumentMetadataWhereInput | null | runtime.Types.Skip
+  is?: Prisma.DocumentMetadataWhereInput | null
+  isNot?: Prisma.DocumentMetadataWhereInput | null
 }
 
 export type StringNullableListFilter<$PrismaModel = never> = {
-  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null | runtime.Types.Skip
-  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null | runtime.Types.Skip
-  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | runtime.Types.Skip
-  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | runtime.Types.Skip
-  isEmpty?: boolean | runtime.Types.Skip
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type DocumentMetadataCountOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  pageCount?: Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrder | runtime.Types.Skip
-  language?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  author?: Prisma.SortOrder | runtime.Types.Skip
-  subject?: Prisma.SortOrder | runtime.Types.Skip
-  keywords?: Prisma.SortOrder | runtime.Types.Skip
-  pdfVersion?: Prisma.SortOrder | runtime.Types.Skip
-  isEncrypted?: Prisma.SortOrder | runtime.Types.Skip
-  isSearchable?: Prisma.SortOrder | runtime.Types.Skip
-  isLinearized?: Prisma.SortOrder | runtime.Types.Skip
-  encoding?: Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrder | runtime.Types.Skip
-  textPreview?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  pageCount?: Prisma.SortOrder
+  wordCount?: Prisma.SortOrder
+  language?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  author?: Prisma.SortOrder
+  subject?: Prisma.SortOrder
+  keywords?: Prisma.SortOrder
+  pdfVersion?: Prisma.SortOrder
+  isEncrypted?: Prisma.SortOrder
+  isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
+  encoding?: Prisma.SortOrder
+  lineCount?: Prisma.SortOrder
+  textPreview?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type DocumentMetadataAvgOrderByAggregateInput = {
-  pageCount?: Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder
+  wordCount?: Prisma.SortOrder
+  lineCount?: Prisma.SortOrder
 }
 
 export type DocumentMetadataMaxOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  pageCount?: Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrder | runtime.Types.Skip
-  language?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  author?: Prisma.SortOrder | runtime.Types.Skip
-  subject?: Prisma.SortOrder | runtime.Types.Skip
-  pdfVersion?: Prisma.SortOrder | runtime.Types.Skip
-  isEncrypted?: Prisma.SortOrder | runtime.Types.Skip
-  isSearchable?: Prisma.SortOrder | runtime.Types.Skip
-  isLinearized?: Prisma.SortOrder | runtime.Types.Skip
-  encoding?: Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrder | runtime.Types.Skip
-  textPreview?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  pageCount?: Prisma.SortOrder
+  wordCount?: Prisma.SortOrder
+  language?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  author?: Prisma.SortOrder
+  subject?: Prisma.SortOrder
+  pdfVersion?: Prisma.SortOrder
+  isEncrypted?: Prisma.SortOrder
+  isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
+  encoding?: Prisma.SortOrder
+  lineCount?: Prisma.SortOrder
+  textPreview?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type DocumentMetadataMinOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
-  format?: Prisma.SortOrder | runtime.Types.Skip
-  pageCount?: Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrder | runtime.Types.Skip
-  language?: Prisma.SortOrder | runtime.Types.Skip
-  title?: Prisma.SortOrder | runtime.Types.Skip
-  author?: Prisma.SortOrder | runtime.Types.Skip
-  subject?: Prisma.SortOrder | runtime.Types.Skip
-  pdfVersion?: Prisma.SortOrder | runtime.Types.Skip
-  isEncrypted?: Prisma.SortOrder | runtime.Types.Skip
-  isSearchable?: Prisma.SortOrder | runtime.Types.Skip
-  isLinearized?: Prisma.SortOrder | runtime.Types.Skip
-  encoding?: Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrder | runtime.Types.Skip
-  textPreview?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder
+  format?: Prisma.SortOrder
+  pageCount?: Prisma.SortOrder
+  wordCount?: Prisma.SortOrder
+  language?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  author?: Prisma.SortOrder
+  subject?: Prisma.SortOrder
+  pdfVersion?: Prisma.SortOrder
+  isEncrypted?: Prisma.SortOrder
+  isSearchable?: Prisma.SortOrder
+  isLinearized?: Prisma.SortOrder
+  encoding?: Prisma.SortOrder
+  lineCount?: Prisma.SortOrder
+  textPreview?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type DocumentMetadataSumOrderByAggregateInput = {
-  pageCount?: Prisma.SortOrder | runtime.Types.Skip
-  wordCount?: Prisma.SortOrder | runtime.Types.Skip
-  lineCount?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder
+  wordCount?: Prisma.SortOrder
+  lineCount?: Prisma.SortOrder
 }
 
 export type DocumentMetadataCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.DocumentMetadataWhereUniqueInput
 }
 
 export type DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  connect?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput
+  connect?: Prisma.DocumentMetadataWhereUniqueInput
 }
 
 export type DocumentMetadataUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.DocumentMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.DocumentMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.DocumentMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.DocumentMetadataUpdateWithoutAttachmentInput>, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.DocumentMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.DocumentMetadataWhereInput | boolean
+  delete?: Prisma.DocumentMetadataWhereInput | boolean
+  connect?: Prisma.DocumentMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.DocumentMetadataUpdateWithoutAttachmentInput>, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
-  upsert?: Prisma.DocumentMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
-  disconnect?: Prisma.DocumentMetadataWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.DocumentMetadataWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.DocumentMetadataUpdateWithoutAttachmentInput>, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput>
+  connectOrCreate?: Prisma.DocumentMetadataCreateOrConnectWithoutAttachmentInput
+  upsert?: Prisma.DocumentMetadataUpsertWithoutAttachmentInput
+  disconnect?: Prisma.DocumentMetadataWhereInput | boolean
+  delete?: Prisma.DocumentMetadataWhereInput | boolean
+  connect?: Prisma.DocumentMetadataWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.DocumentMetadataUpdateWithoutAttachmentInput>, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type DocumentMetadataCreatekeywordsInput = {
@@ -693,48 +693,48 @@ export type DocumentMetadataCreatekeywordsInput = {
 }
 
 export type DocumentMetadataUpdatekeywordsInput = {
-  set?: string[] | runtime.Types.Skip
-  push?: string | string[] | runtime.Types.Skip
+  set?: string[]
+  push?: string | string[]
 }
 
 export type DocumentMetadataCreateWithoutAttachmentInput = {
   format: string
-  pageCount?: number | null | runtime.Types.Skip
-  wordCount?: number | null | runtime.Types.Skip
-  language?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  author?: string | null | runtime.Types.Skip
-  subject?: string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: string | null | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | null | runtime.Types.Skip
-  encoding?: string | null | runtime.Types.Skip
-  lineCount?: number | null | runtime.Types.Skip
-  textPreview?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  pageCount?: number | null
+  wordCount?: number | null
+  language?: string | null
+  title?: string | null
+  author?: string | null
+  subject?: string | null
+  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[]
+  pdfVersion?: string | null
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean | null
+  encoding?: string | null
+  lineCount?: number | null
+  textPreview?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type DocumentMetadataUncheckedCreateWithoutAttachmentInput = {
   format: string
-  pageCount?: number | null | runtime.Types.Skip
-  wordCount?: number | null | runtime.Types.Skip
-  language?: string | null | runtime.Types.Skip
-  title?: string | null | runtime.Types.Skip
-  author?: string | null | runtime.Types.Skip
-  subject?: string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: string | null | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | null | runtime.Types.Skip
-  encoding?: string | null | runtime.Types.Skip
-  lineCount?: number | null | runtime.Types.Skip
-  textPreview?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  pageCount?: number | null
+  wordCount?: number | null
+  language?: string | null
+  title?: string | null
+  author?: string | null
+  subject?: string | null
+  keywords?: Prisma.DocumentMetadataCreatekeywordsInput | string[]
+  pdfVersion?: string | null
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean | null
+  encoding?: string | null
+  lineCount?: number | null
+  textPreview?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type DocumentMetadataCreateOrConnectWithoutAttachmentInput = {
@@ -745,152 +745,152 @@ export type DocumentMetadataCreateOrConnectWithoutAttachmentInput = {
 export type DocumentMetadataUpsertWithoutAttachmentInput = {
   update: Prisma.XOR<Prisma.DocumentMetadataUpdateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput>
   create: Prisma.XOR<Prisma.DocumentMetadataCreateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedCreateWithoutAttachmentInput>
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
 }
 
 export type DocumentMetadataUpdateToOneWithWhereWithoutAttachmentInput = {
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   data: Prisma.XOR<Prisma.DocumentMetadataUpdateWithoutAttachmentInput, Prisma.DocumentMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type DocumentMetadataUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DocumentMetadataUncheckedUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[] | runtime.Types.Skip
-  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
-  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
-  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wordCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  language?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.DocumentMetadataUpdatekeywordsInput | string[]
+  pdfVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isEncrypted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSearchable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLinearized?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  encoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lineCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  textPreview?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type DocumentMetadataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  pageCount?: boolean | runtime.Types.Skip
-  wordCount?: boolean | runtime.Types.Skip
-  language?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  author?: boolean | runtime.Types.Skip
-  subject?: boolean | runtime.Types.Skip
-  keywords?: boolean | runtime.Types.Skip
-  pdfVersion?: boolean | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | runtime.Types.Skip
-  encoding?: boolean | runtime.Types.Skip
-  lineCount?: boolean | runtime.Types.Skip
-  textPreview?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  pageCount?: boolean
+  wordCount?: boolean
+  language?: boolean
+  title?: boolean
+  author?: boolean
+  subject?: boolean
+  keywords?: boolean
+  pdfVersion?: boolean
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean
+  encoding?: boolean
+  lineCount?: boolean
+  textPreview?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["documentMetadata"]>
 
 export type DocumentMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  pageCount?: boolean | runtime.Types.Skip
-  wordCount?: boolean | runtime.Types.Skip
-  language?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  author?: boolean | runtime.Types.Skip
-  subject?: boolean | runtime.Types.Skip
-  keywords?: boolean | runtime.Types.Skip
-  pdfVersion?: boolean | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | runtime.Types.Skip
-  encoding?: boolean | runtime.Types.Skip
-  lineCount?: boolean | runtime.Types.Skip
-  textPreview?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  pageCount?: boolean
+  wordCount?: boolean
+  language?: boolean
+  title?: boolean
+  author?: boolean
+  subject?: boolean
+  keywords?: boolean
+  pdfVersion?: boolean
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean
+  encoding?: boolean
+  lineCount?: boolean
+  textPreview?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["documentMetadata"]>
 
 export type DocumentMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  pageCount?: boolean | runtime.Types.Skip
-  wordCount?: boolean | runtime.Types.Skip
-  language?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  author?: boolean | runtime.Types.Skip
-  subject?: boolean | runtime.Types.Skip
-  keywords?: boolean | runtime.Types.Skip
-  pdfVersion?: boolean | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | runtime.Types.Skip
-  encoding?: boolean | runtime.Types.Skip
-  lineCount?: boolean | runtime.Types.Skip
-  textPreview?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  pageCount?: boolean
+  wordCount?: boolean
+  language?: boolean
+  title?: boolean
+  author?: boolean
+  subject?: boolean
+  keywords?: boolean
+  pdfVersion?: boolean
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean
+  encoding?: boolean
+  lineCount?: boolean
+  textPreview?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["documentMetadata"]>
 
 export type DocumentMetadataSelectScalar = {
-  attachmentId?: boolean | runtime.Types.Skip
-  format?: boolean | runtime.Types.Skip
-  pageCount?: boolean | runtime.Types.Skip
-  wordCount?: boolean | runtime.Types.Skip
-  language?: boolean | runtime.Types.Skip
-  title?: boolean | runtime.Types.Skip
-  author?: boolean | runtime.Types.Skip
-  subject?: boolean | runtime.Types.Skip
-  keywords?: boolean | runtime.Types.Skip
-  pdfVersion?: boolean | runtime.Types.Skip
-  isEncrypted?: boolean | runtime.Types.Skip
-  isSearchable?: boolean | runtime.Types.Skip
-  isLinearized?: boolean | runtime.Types.Skip
-  encoding?: boolean | runtime.Types.Skip
-  lineCount?: boolean | runtime.Types.Skip
-  textPreview?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  attachmentId?: boolean
+  format?: boolean
+  pageCount?: boolean
+  wordCount?: boolean
+  language?: boolean
+  title?: boolean
+  author?: boolean
+  subject?: boolean
+  keywords?: boolean
+  pdfVersion?: boolean
+  isEncrypted?: boolean
+  isSearchable?: boolean
+  isLinearized?: boolean
+  encoding?: boolean
+  lineCount?: boolean
+  textPreview?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type DocumentMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "pageCount" | "wordCount" | "language" | "title" | "author" | "subject" | "keywords" | "pdfVersion" | "isEncrypted" | "isSearchable" | "isLinearized" | "encoding" | "lineCount" | "textPreview" | "createdAt" | "updatedAt", ExtArgs["result"]["documentMetadata"], runtime.Types.Skip>
+export type DocumentMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "pageCount" | "wordCount" | "language" | "title" | "author" | "subject" | "keywords" | "pdfVersion" | "isEncrypted" | "isSearchable" | "isLinearized" | "encoding" | "lineCount" | "textPreview" | "createdAt" | "updatedAt", ExtArgs["result"]["documentMetadata"]>
 export type DocumentMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type DocumentMetadataIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 export type DocumentMetadataIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
 }
 
 export type $DocumentMetadataPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1383,7 +1383,7 @@ export type DocumentMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which DocumentMetadata to fetch.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1406,7 +1406,7 @@ export type DocumentMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which DocumentMetadata to fetch.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1428,38 +1428,38 @@ export type DocumentMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensio
   /**
    * Filter, which DocumentMetadata to fetch.
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of DocumentMetadata to fetch.
    */
-  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for DocumentMetadata.
    */
-  cursor?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.DocumentMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` DocumentMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` DocumentMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of DocumentMetadata.
    */
-  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1481,38 +1481,38 @@ export type DocumentMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter, which DocumentMetadata to fetch.
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of DocumentMetadata to fetch.
    */
-  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for DocumentMetadata.
    */
-  cursor?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.DocumentMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` DocumentMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` DocumentMetadata.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of DocumentMetadata.
    */
-  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1534,33 +1534,33 @@ export type DocumentMetadataFindManyArgs<ExtArgs extends runtime.Types.Extension
   /**
    * Filter, which DocumentMetadata to fetch.
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of DocumentMetadata to fetch.
    */
-  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.DocumentMetadataOrderByWithRelationInput | Prisma.DocumentMetadataOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing DocumentMetadata.
    */
-  cursor?: Prisma.DocumentMetadataWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.DocumentMetadataWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` DocumentMetadata from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` DocumentMetadata.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.DocumentMetadataScalarFieldEnum | Prisma.DocumentMetadataScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1583,7 +1583,7 @@ export type DocumentMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a DocumentMetadata.
    */
   data: Prisma.XOR<Prisma.DocumentMetadataCreateInput, Prisma.DocumentMetadataUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1594,7 +1594,7 @@ export type DocumentMetadataCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many DocumentMetadata.
    */
   data: Prisma.DocumentMetadataCreateManyInput | Prisma.DocumentMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1613,7 +1613,7 @@ export type DocumentMetadataCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    * The data used to create many DocumentMetadata.
    */
   data: Prisma.DocumentMetadataCreateManyInput | Prisma.DocumentMetadataCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1644,7 +1644,7 @@ export type DocumentMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which DocumentMetadata to update.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1658,11 +1658,11 @@ export type DocumentMetadataUpdateManyArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which DocumentMetadata to update
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * Limit how many DocumentMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1684,11 +1684,11 @@ export type DocumentMetadataUpdateManyAndReturnArgs<ExtArgs extends runtime.Type
   /**
    * Filter which DocumentMetadata to update
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * Limit how many DocumentMetadata to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1723,7 +1723,7 @@ export type DocumentMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the DocumentMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.DocumentMetadataUpdateInput, Prisma.DocumentMetadataUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1746,7 +1746,7 @@ export type DocumentMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which DocumentMetadata to delete.
    */
   where: Prisma.DocumentMetadataWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1756,11 +1756,11 @@ export type DocumentMetadataDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which DocumentMetadata to delete
    */
-  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
+  where?: Prisma.DocumentMetadataWhereInput
   /**
    * Limit how many DocumentMetadata to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**

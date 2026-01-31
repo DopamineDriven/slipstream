@@ -85,91 +85,91 @@ export type ConversationMemoryStoreCountAggregateOutputType = {
 
 
 export type ConversationMemoryStoreAvgAggregateInputType = {
-  embeddingDim?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  totalTokens?: true | runtime.Types.Skip
-  totalConversations?: true | runtime.Types.Skip
+  embeddingDim?: true
+  totalChunks?: true
+  totalTokens?: true
+  totalConversations?: true
 }
 
 export type ConversationMemoryStoreSumAggregateInputType = {
-  embeddingDim?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  totalTokens?: true | runtime.Types.Skip
-  totalConversations?: true | runtime.Types.Skip
+  embeddingDim?: true
+  totalChunks?: true
+  totalTokens?: true
+  totalConversations?: true
 }
 
 export type ConversationMemoryStoreMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  embeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  totalTokens?: true | runtime.Types.Skip
-  totalConversations?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  embeddingModel?: true
+  embeddingDim?: true
+  totalChunks?: true
+  totalTokens?: true
+  totalConversations?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ConversationMemoryStoreMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  embeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  totalTokens?: true | runtime.Types.Skip
-  totalConversations?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  embeddingModel?: true
+  embeddingDim?: true
+  totalChunks?: true
+  totalTokens?: true
+  totalConversations?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ConversationMemoryStoreCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  embeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  totalTokens?: true | runtime.Types.Skip
-  totalConversations?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  embeddingModel?: true
+  embeddingDim?: true
+  totalChunks?: true
+  totalTokens?: true
+  totalConversations?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type ConversationMemoryStoreAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ConversationMemoryStore to aggregate.
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryStores to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -214,12 +214,12 @@ export type GetConversationMemoryStoreAggregateType<T extends ConversationMemory
 
 
 export type ConversationMemoryStoreGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ConversationMemoryStoreOrderByWithAggregationInput | Prisma.ConversationMemoryStoreOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
+  orderBy?: Prisma.ConversationMemoryStoreOrderByWithAggregationInput | Prisma.ConversationMemoryStoreOrderByWithAggregationInput[]
   by: Prisma.ConversationMemoryStoreScalarFieldEnum[] | Prisma.ConversationMemoryStoreScalarFieldEnum
-  having?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ConversationMemoryStoreCountAggregateInputType | true
   _avg?: ConversationMemoryStoreAvgAggregateInputType
   _sum?: ConversationMemoryStoreSumAggregateInputType
@@ -262,346 +262,346 @@ type GetConversationMemoryStoreGroupByPayload<T extends ConversationMemoryStoreG
 
 
 export type ConversationMemoryStoreWhereInput = {
-  AND?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFilter<"ConversationMemoryStore"> | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextListRelationFilter | runtime.Types.Skip
+  AND?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[]
+  OR?: Prisma.ConversationMemoryStoreWhereInput[]
+  NOT?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[]
+  id?: Prisma.StringFilter<"ConversationMemoryStore"> | string
+  userId?: Prisma.StringFilter<"ConversationMemoryStore"> | string
+  embeddingModel?: Prisma.StringFilter<"ConversationMemoryStore"> | string
+  embeddingDim?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  totalChunks?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  totalTokens?: Prisma.BigIntFilter<"ConversationMemoryStore"> | bigint | number
+  totalConversations?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  contexts?: Prisma.ConversationMemoryContextListRelationFilter
 }
 
 export type ConversationMemoryStoreOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextOrderByRelationAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
+  contexts?: Prisma.ConversationMemoryContextOrderByRelationAggregateInput
 }
 
 export type ConversationMemoryStoreWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  userId?: string | runtime.Types.Skip
-  AND?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[] | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFilter<"ConversationMemoryStore"> | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextListRelationFilter | runtime.Types.Skip
+  id?: string
+  userId?: string
+  AND?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[]
+  OR?: Prisma.ConversationMemoryStoreWhereInput[]
+  NOT?: Prisma.ConversationMemoryStoreWhereInput | Prisma.ConversationMemoryStoreWhereInput[]
+  embeddingModel?: Prisma.StringFilter<"ConversationMemoryStore"> | string
+  embeddingDim?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  totalChunks?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  totalTokens?: Prisma.BigIntFilter<"ConversationMemoryStore"> | bigint | number
+  totalConversations?: Prisma.IntFilter<"ConversationMemoryStore"> | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryStore"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  contexts?: Prisma.ConversationMemoryContextListRelationFilter
 }, "id" | "userId">
 
 export type ConversationMemoryStoreOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ConversationMemoryStoreCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.ConversationMemoryStoreAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ConversationMemoryStoreMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ConversationMemoryStoreMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.ConversationMemoryStoreSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.ConversationMemoryStoreCountOrderByAggregateInput
+  _avg?: Prisma.ConversationMemoryStoreAvgOrderByAggregateInput
+  _max?: Prisma.ConversationMemoryStoreMaxOrderByAggregateInput
+  _min?: Prisma.ConversationMemoryStoreMinOrderByAggregateInput
+  _sum?: Prisma.ConversationMemoryStoreSumOrderByAggregateInput
 }
 
 export type ConversationMemoryStoreScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput | Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput | Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntWithAggregatesFilter<"ConversationMemoryStore"> | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionWithAggregatesFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryStore"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput | Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput | Prisma.ConversationMemoryStoreScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string
+  embeddingModel?: Prisma.StringWithAggregatesFilter<"ConversationMemoryStore"> | string
+  embeddingDim?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number
+  totalChunks?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number
+  totalTokens?: Prisma.BigIntWithAggregatesFilter<"ConversationMemoryStore"> | bigint | number
+  totalConversations?: Prisma.IntWithAggregatesFilter<"ConversationMemoryStore"> | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionWithAggregatesFilter<"ConversationMemoryStore"> | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryStore"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryStore"> | Date | string
 }
 
 export type ConversationMemoryStoreCreateInput = {
-  id?: string | runtime.Types.Skip
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  id?: string
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutConversationMemoryStoreInput
-  contexts?: Prisma.ConversationMemoryContextCreateNestedManyWithoutMemoryStoreInput | runtime.Types.Skip
+  contexts?: Prisma.ConversationMemoryContextCreateNestedManyWithoutMemoryStoreInput
 }
 
 export type ConversationMemoryStoreUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUncheckedCreateNestedManyWithoutMemoryStoreInput | runtime.Types.Skip
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contexts?: Prisma.ConversationMemoryContextUncheckedCreateNestedManyWithoutMemoryStoreInput
 }
 
 export type ConversationMemoryStoreUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationMemoryStoreNestedInput | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUpdateManyWithoutMemoryStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationMemoryStoreNestedInput
+  contexts?: Prisma.ConversationMemoryContextUpdateManyWithoutMemoryStoreNestedInput
 }
 
 export type ConversationMemoryStoreUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contexts?: Prisma.ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNestedInput
 }
 
 export type ConversationMemoryStoreCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ConversationMemoryStoreUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConversationMemoryStoreUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConversationMemoryStoreCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ConversationMemoryStoreAvgOrderByAggregateInput = {
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
 }
 
 export type ConversationMemoryStoreMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ConversationMemoryStoreMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ConversationMemoryStoreSumOrderByAggregateInput = {
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
-  totalConversations?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  totalTokens?: Prisma.SortOrder
+  totalConversations?: Prisma.SortOrder
 }
 
 export type ConversationMemoryStoreScalarRelationFilter = {
-  is?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
-  isNot?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  is?: Prisma.ConversationMemoryStoreWhereInput
+  isNot?: Prisma.ConversationMemoryStoreWhereInput
 }
 
 export type ConversationMemoryStoreNullableScalarRelationFilter = {
-  is?: Prisma.ConversationMemoryStoreWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.ConversationMemoryStoreWhereInput | null | runtime.Types.Skip
+  is?: Prisma.ConversationMemoryStoreWhereInput | null
+  isNot?: Prisma.ConversationMemoryStoreWhereInput | null
 }
 
 export type BigIntFieldUpdateOperationsInput = {
-  set?: bigint | number | runtime.Types.Skip
-  increment?: bigint | number | runtime.Types.Skip
-  decrement?: bigint | number | runtime.Types.Skip
-  multiply?: bigint | number | runtime.Types.Skip
-  divide?: bigint | number | runtime.Types.Skip
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type EnumMemorySchemaVersionFieldUpdateOperationsInput = {
-  set?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  set?: $Enums.MemorySchemaVersion
 }
 
 export type ConversationMemoryStoreCreateNestedOneWithoutContextsInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutContextsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutContextsInput | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutContextsInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutContextsInput
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
 }
 
 export type ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutContextsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutContextsInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutContextsInput | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutContextsInput, Prisma.ConversationMemoryStoreUpdateWithoutContextsInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutContextsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutContextsInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutContextsInput
+  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutContextsInput
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutContextsInput, Prisma.ConversationMemoryStoreUpdateWithoutContextsInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutContextsInput>
 }
 
 export type ConversationMemoryStoreCreateNestedOneWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
 }
 
 export type ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
 }
 
 export type ConversationMemoryStoreUpdateOneWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutUserInput | runtime.Types.Skip
-  disconnect?: Prisma.ConversationMemoryStoreWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ConversationMemoryStoreWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutUserInput, Prisma.ConversationMemoryStoreUpdateWithoutUserInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput
+  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutUserInput
+  disconnect?: Prisma.ConversationMemoryStoreWhereInput | boolean
+  delete?: Prisma.ConversationMemoryStoreWhereInput | boolean
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutUserInput, Prisma.ConversationMemoryStoreUpdateWithoutUserInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput>
 }
 
 export type ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput | runtime.Types.Skip
-  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutUserInput | runtime.Types.Skip
-  disconnect?: Prisma.ConversationMemoryStoreWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ConversationMemoryStoreWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutUserInput, Prisma.ConversationMemoryStoreUpdateWithoutUserInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ConversationMemoryStoreCreateOrConnectWithoutUserInput
+  upsert?: Prisma.ConversationMemoryStoreUpsertWithoutUserInput
+  disconnect?: Prisma.ConversationMemoryStoreWhereInput | boolean
+  delete?: Prisma.ConversationMemoryStoreWhereInput | boolean
+  connect?: Prisma.ConversationMemoryStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryStoreUpdateToOneWithWhereWithoutUserInput, Prisma.ConversationMemoryStoreUpdateWithoutUserInput>, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput>
 }
 
 export type ConversationMemoryStoreCreateWithoutContextsInput = {
-  id?: string | runtime.Types.Skip
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  id?: string
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutConversationMemoryStoreInput
 }
 
 export type ConversationMemoryStoreUncheckedCreateWithoutContextsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ConversationMemoryStoreCreateOrConnectWithoutContextsInput = {
@@ -612,68 +612,68 @@ export type ConversationMemoryStoreCreateOrConnectWithoutContextsInput = {
 export type ConversationMemoryStoreUpsertWithoutContextsInput = {
   update: Prisma.XOR<Prisma.ConversationMemoryStoreUpdateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutContextsInput>
   create: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutContextsInput>
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
 }
 
 export type ConversationMemoryStoreUpdateToOneWithWhereWithoutContextsInput = {
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   data: Prisma.XOR<Prisma.ConversationMemoryStoreUpdateWithoutContextsInput, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutContextsInput>
 }
 
 export type ConversationMemoryStoreUpdateWithoutContextsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutConversationMemoryStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutConversationMemoryStoreNestedInput
 }
 
 export type ConversationMemoryStoreUncheckedUpdateWithoutContextsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ConversationMemoryStoreCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextCreateNestedManyWithoutMemoryStoreInput | runtime.Types.Skip
+  id?: string
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contexts?: Prisma.ConversationMemoryContextCreateNestedManyWithoutMemoryStoreInput
 }
 
 export type ConversationMemoryStoreUncheckedCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
-  embeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  totalTokens?: bigint | number | runtime.Types.Skip
-  totalConversations?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUncheckedCreateNestedManyWithoutMemoryStoreInput | runtime.Types.Skip
+  id?: string
+  embeddingModel?: string
+  embeddingDim?: number
+  totalChunks?: number
+  totalTokens?: bigint | number
+  totalConversations?: number
+  schemaVersion?: $Enums.MemorySchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contexts?: Prisma.ConversationMemoryContextUncheckedCreateNestedManyWithoutMemoryStoreInput
 }
 
 export type ConversationMemoryStoreCreateOrConnectWithoutUserInput = {
@@ -684,40 +684,40 @@ export type ConversationMemoryStoreCreateOrConnectWithoutUserInput = {
 export type ConversationMemoryStoreUpsertWithoutUserInput = {
   update: Prisma.XOR<Prisma.ConversationMemoryStoreUpdateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.ConversationMemoryStoreCreateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedCreateWithoutUserInput>
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
 }
 
 export type ConversationMemoryStoreUpdateToOneWithWhereWithoutUserInput = {
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   data: Prisma.XOR<Prisma.ConversationMemoryStoreUpdateWithoutUserInput, Prisma.ConversationMemoryStoreUncheckedUpdateWithoutUserInput>
 }
 
 export type ConversationMemoryStoreUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUpdateManyWithoutMemoryStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contexts?: Prisma.ConversationMemoryContextUpdateManyWithoutMemoryStoreNestedInput
 }
 
 export type ConversationMemoryStoreUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number | runtime.Types.Skip
-  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  contexts?: Prisma.ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  totalTokens?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalConversations?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contexts?: Prisma.ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNestedInput
 }
 
 
@@ -747,82 +747,82 @@ export type ConversationMemoryStoreCountOutputTypeDefaultArgs<ExtArgs extends ru
  * ConversationMemoryStoreCountOutputType without action
  */
 export type ConversationMemoryStoreCountOutputTypeCountContextsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryContextWhereInput
 }
 
 
 export type ConversationMemoryStoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  embeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  totalTokens?: boolean | runtime.Types.Skip
-  totalConversations?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  contexts?: boolean | Prisma.ConversationMemoryStore$contextsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ConversationMemoryStoreCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  embeddingModel?: boolean
+  embeddingDim?: boolean
+  totalChunks?: boolean
+  totalTokens?: boolean
+  totalConversations?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  contexts?: boolean | Prisma.ConversationMemoryStore$contextsArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationMemoryStoreCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversationMemoryStore"]>
 
 export type ConversationMemoryStoreSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  embeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  totalTokens?: boolean | runtime.Types.Skip
-  totalConversations?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  embeddingModel?: boolean
+  embeddingDim?: boolean
+  totalChunks?: boolean
+  totalTokens?: boolean
+  totalConversations?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversationMemoryStore"]>
 
 export type ConversationMemoryStoreSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  embeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  totalTokens?: boolean | runtime.Types.Skip
-  totalConversations?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  embeddingModel?: boolean
+  embeddingDim?: boolean
+  totalChunks?: boolean
+  totalTokens?: boolean
+  totalConversations?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversationMemoryStore"]>
 
 export type ConversationMemoryStoreSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  embeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  totalTokens?: boolean | runtime.Types.Skip
-  totalConversations?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  embeddingModel?: boolean
+  embeddingDim?: boolean
+  totalChunks?: boolean
+  totalTokens?: boolean
+  totalConversations?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ConversationMemoryStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "embeddingModel" | "embeddingDim" | "totalChunks" | "totalTokens" | "totalConversations" | "schemaVersion" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryStore"], runtime.Types.Skip>
+export type ConversationMemoryStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "embeddingModel" | "embeddingDim" | "totalChunks" | "totalTokens" | "totalConversations" | "schemaVersion" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationMemoryStore"]>
 export type ConversationMemoryStoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  contexts?: boolean | Prisma.ConversationMemoryStore$contextsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ConversationMemoryStoreCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  contexts?: boolean | Prisma.ConversationMemoryStore$contextsArgs<ExtArgs>
+  _count?: boolean | Prisma.ConversationMemoryStoreCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ConversationMemoryStoreIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ConversationMemoryStoreIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ConversationMemoryStorePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1303,7 +1303,7 @@ export type ConversationMemoryStoreFindUniqueArgs<ExtArgs extends runtime.Types.
    * Filter, which ConversationMemoryStore to fetch.
    */
   where: Prisma.ConversationMemoryStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1326,7 +1326,7 @@ export type ConversationMemoryStoreFindUniqueOrThrowArgs<ExtArgs extends runtime
    * Filter, which ConversationMemoryStore to fetch.
    */
   where: Prisma.ConversationMemoryStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1348,38 +1348,38 @@ export type ConversationMemoryStoreFindFirstArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter, which ConversationMemoryStore to fetch.
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryStores to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationMemoryStores.
    */
-  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationMemoryStores.
    */
-  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1401,38 +1401,38 @@ export type ConversationMemoryStoreFindFirstOrThrowArgs<ExtArgs extends runtime.
   /**
    * Filter, which ConversationMemoryStore to fetch.
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryStores to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationMemoryStores.
    */
-  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationMemoryStores.
    */
-  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1454,33 +1454,33 @@ export type ConversationMemoryStoreFindManyArgs<ExtArgs extends runtime.Types.Ex
   /**
    * Filter, which ConversationMemoryStores to fetch.
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryStores to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | Prisma.ConversationMemoryStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ConversationMemoryStores.
    */
-  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ConversationMemoryStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryStores.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ConversationMemoryStoreScalarFieldEnum | Prisma.ConversationMemoryStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1503,7 +1503,7 @@ export type ConversationMemoryStoreCreateArgs<ExtArgs extends runtime.Types.Exte
    * The data needed to create a ConversationMemoryStore.
    */
   data: Prisma.XOR<Prisma.ConversationMemoryStoreCreateInput, Prisma.ConversationMemoryStoreUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1514,7 +1514,7 @@ export type ConversationMemoryStoreCreateManyArgs<ExtArgs extends runtime.Types.
    * The data used to create many ConversationMemoryStores.
    */
   data: Prisma.ConversationMemoryStoreCreateManyInput | Prisma.ConversationMemoryStoreCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1533,7 +1533,7 @@ export type ConversationMemoryStoreCreateManyAndReturnArgs<ExtArgs extends runti
    * The data used to create many ConversationMemoryStores.
    */
   data: Prisma.ConversationMemoryStoreCreateManyInput | Prisma.ConversationMemoryStoreCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1564,7 +1564,7 @@ export type ConversationMemoryStoreUpdateArgs<ExtArgs extends runtime.Types.Exte
    * Choose, which ConversationMemoryStore to update.
    */
   where: Prisma.ConversationMemoryStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1578,11 +1578,11 @@ export type ConversationMemoryStoreUpdateManyArgs<ExtArgs extends runtime.Types.
   /**
    * Filter which ConversationMemoryStores to update
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * Limit how many ConversationMemoryStores to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1604,11 +1604,11 @@ export type ConversationMemoryStoreUpdateManyAndReturnArgs<ExtArgs extends runti
   /**
    * Filter which ConversationMemoryStores to update
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * Limit how many ConversationMemoryStores to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1643,7 +1643,7 @@ export type ConversationMemoryStoreUpsertArgs<ExtArgs extends runtime.Types.Exte
    * In case the ConversationMemoryStore was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ConversationMemoryStoreUpdateInput, Prisma.ConversationMemoryStoreUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1666,7 +1666,7 @@ export type ConversationMemoryStoreDeleteArgs<ExtArgs extends runtime.Types.Exte
    * Filter which ConversationMemoryStore to delete.
    */
   where: Prisma.ConversationMemoryStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1676,11 +1676,11 @@ export type ConversationMemoryStoreDeleteManyArgs<ExtArgs extends runtime.Types.
   /**
    * Filter which ConversationMemoryStores to delete
    */
-  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryStoreWhereInput
   /**
    * Limit how many ConversationMemoryStores to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1699,12 +1699,12 @@ export type ConversationMemoryStore$contextsArgs<ExtArgs extends runtime.Types.E
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationMemoryContextInclude<ExtArgs> | null
-  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.ConversationMemoryContextWhereInput
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[]
 }
 
 /**

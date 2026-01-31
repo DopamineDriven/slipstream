@@ -165,171 +165,171 @@ export type ImageGenJobCountAggregateOutputType = {
 
 
 export type ImageGenJobAvgAggregateInputType = {
-  temperature?: true | runtime.Types.Skip
-  topP?: true | runtime.Types.Skip
-  nRequested?: true | runtime.Types.Skip
-  nCompleted?: true | runtime.Types.Skip
-  seed?: true | runtime.Types.Skip
-  outputCompression?: true | runtime.Types.Skip
-  partialImagesRequested?: true | runtime.Types.Skip
-  progress?: true | runtime.Types.Skip
-  etaSeconds?: true | runtime.Types.Skip
-  durationMs?: true | runtime.Types.Skip
-  usage?: true | runtime.Types.Skip
+  temperature?: true
+  topP?: true
+  nRequested?: true
+  nCompleted?: true
+  seed?: true
+  outputCompression?: true
+  partialImagesRequested?: true
+  progress?: true
+  etaSeconds?: true
+  durationMs?: true
+  usage?: true
 }
 
 export type ImageGenJobSumAggregateInputType = {
-  temperature?: true | runtime.Types.Skip
-  topP?: true | runtime.Types.Skip
-  nRequested?: true | runtime.Types.Skip
-  nCompleted?: true | runtime.Types.Skip
-  seed?: true | runtime.Types.Skip
-  outputCompression?: true | runtime.Types.Skip
-  partialImagesRequested?: true | runtime.Types.Skip
-  progress?: true | runtime.Types.Skip
-  etaSeconds?: true | runtime.Types.Skip
-  durationMs?: true | runtime.Types.Skip
-  usage?: true | runtime.Types.Skip
+  temperature?: true
+  topP?: true
+  nRequested?: true
+  nCompleted?: true
+  seed?: true
+  outputCompression?: true
+  partialImagesRequested?: true
+  progress?: true
+  etaSeconds?: true
+  durationMs?: true
+  usage?: true
 }
 
 export type ImageGenJobMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  requestMessageId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  model?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  keyFingerprint?: true | runtime.Types.Skip
-  prompt?: true | runtime.Types.Skip
-  systemPrompt?: true | runtime.Types.Skip
-  temperature?: true | runtime.Types.Skip
-  topP?: true | runtime.Types.Skip
-  nRequested?: true | runtime.Types.Skip
-  nCompleted?: true | runtime.Types.Skip
-  seed?: true | runtime.Types.Skip
-  negativePrompt?: true | runtime.Types.Skip
-  outputSize?: true | runtime.Types.Skip
-  outputQuality?: true | runtime.Types.Skip
-  outputFormat?: true | runtime.Types.Skip
-  outputBackground?: true | runtime.Types.Skip
-  outputCompression?: true | runtime.Types.Skip
-  partialImagesRequested?: true | runtime.Types.Skip
-  inputFidelity?: true | runtime.Types.Skip
-  personGeneration?: true | runtime.Types.Skip
-  moderation?: true | runtime.Types.Skip
-  stage?: true | runtime.Types.Skip
-  progress?: true | runtime.Types.Skip
-  etaSeconds?: true | runtime.Types.Skip
-  durationMs?: true | runtime.Types.Skip
-  usage?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  error?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  requestMessageId?: true
+  provider?: true
+  model?: true
+  userId?: true
+  userKeyId?: true
+  keyFingerprint?: true
+  prompt?: true
+  systemPrompt?: true
+  temperature?: true
+  topP?: true
+  nRequested?: true
+  nCompleted?: true
+  seed?: true
+  negativePrompt?: true
+  outputSize?: true
+  outputQuality?: true
+  outputFormat?: true
+  outputBackground?: true
+  outputCompression?: true
+  partialImagesRequested?: true
+  inputFidelity?: true
+  personGeneration?: true
+  moderation?: true
+  stage?: true
+  progress?: true
+  etaSeconds?: true
+  durationMs?: true
+  usage?: true
+  revisedPrompt?: true
+  error?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageGenJobMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  requestMessageId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  model?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  keyFingerprint?: true | runtime.Types.Skip
-  prompt?: true | runtime.Types.Skip
-  systemPrompt?: true | runtime.Types.Skip
-  temperature?: true | runtime.Types.Skip
-  topP?: true | runtime.Types.Skip
-  nRequested?: true | runtime.Types.Skip
-  nCompleted?: true | runtime.Types.Skip
-  seed?: true | runtime.Types.Skip
-  negativePrompt?: true | runtime.Types.Skip
-  outputSize?: true | runtime.Types.Skip
-  outputQuality?: true | runtime.Types.Skip
-  outputFormat?: true | runtime.Types.Skip
-  outputBackground?: true | runtime.Types.Skip
-  outputCompression?: true | runtime.Types.Skip
-  partialImagesRequested?: true | runtime.Types.Skip
-  inputFidelity?: true | runtime.Types.Skip
-  personGeneration?: true | runtime.Types.Skip
-  moderation?: true | runtime.Types.Skip
-  stage?: true | runtime.Types.Skip
-  progress?: true | runtime.Types.Skip
-  etaSeconds?: true | runtime.Types.Skip
-  durationMs?: true | runtime.Types.Skip
-  usage?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  error?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  requestMessageId?: true
+  provider?: true
+  model?: true
+  userId?: true
+  userKeyId?: true
+  keyFingerprint?: true
+  prompt?: true
+  systemPrompt?: true
+  temperature?: true
+  topP?: true
+  nRequested?: true
+  nCompleted?: true
+  seed?: true
+  negativePrompt?: true
+  outputSize?: true
+  outputQuality?: true
+  outputFormat?: true
+  outputBackground?: true
+  outputCompression?: true
+  partialImagesRequested?: true
+  inputFidelity?: true
+  personGeneration?: true
+  moderation?: true
+  stage?: true
+  progress?: true
+  etaSeconds?: true
+  durationMs?: true
+  usage?: true
+  revisedPrompt?: true
+  error?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ImageGenJobCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  requestMessageId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  model?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  userKeyId?: true | runtime.Types.Skip
-  keyFingerprint?: true | runtime.Types.Skip
-  prompt?: true | runtime.Types.Skip
-  systemPrompt?: true | runtime.Types.Skip
-  temperature?: true | runtime.Types.Skip
-  topP?: true | runtime.Types.Skip
-  nRequested?: true | runtime.Types.Skip
-  nCompleted?: true | runtime.Types.Skip
-  seed?: true | runtime.Types.Skip
-  negativePrompt?: true | runtime.Types.Skip
-  outputSize?: true | runtime.Types.Skip
-  outputQuality?: true | runtime.Types.Skip
-  outputFormat?: true | runtime.Types.Skip
-  outputBackground?: true | runtime.Types.Skip
-  outputCompression?: true | runtime.Types.Skip
-  partialImagesRequested?: true | runtime.Types.Skip
-  inputFidelity?: true | runtime.Types.Skip
-  personGeneration?: true | runtime.Types.Skip
-  moderation?: true | runtime.Types.Skip
-  stage?: true | runtime.Types.Skip
-  progress?: true | runtime.Types.Skip
-  etaSeconds?: true | runtime.Types.Skip
-  durationMs?: true | runtime.Types.Skip
-  usage?: true | runtime.Types.Skip
-  revisedPrompt?: true | runtime.Types.Skip
-  error?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  requestMessageId?: true
+  provider?: true
+  model?: true
+  userId?: true
+  userKeyId?: true
+  keyFingerprint?: true
+  prompt?: true
+  systemPrompt?: true
+  temperature?: true
+  topP?: true
+  nRequested?: true
+  nCompleted?: true
+  seed?: true
+  negativePrompt?: true
+  outputSize?: true
+  outputQuality?: true
+  outputFormat?: true
+  outputBackground?: true
+  outputCompression?: true
+  partialImagesRequested?: true
+  inputFidelity?: true
+  personGeneration?: true
+  moderation?: true
+  stage?: true
+  progress?: true
+  etaSeconds?: true
+  durationMs?: true
+  usage?: true
+  revisedPrompt?: true
+  error?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type ImageGenJobAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ImageGenJob to aggregate.
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenJobs to fetch.
    */
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenJobs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenJobs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -374,12 +374,12 @@ export type GetImageGenJobAggregateType<T extends ImageGenJobAggregateArgs> = {
 
 
 export type ImageGenJobGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ImageGenJobOrderByWithAggregationInput | Prisma.ImageGenJobOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
+  orderBy?: Prisma.ImageGenJobOrderByWithAggregationInput | Prisma.ImageGenJobOrderByWithAggregationInput[]
   by: Prisma.ImageGenJobScalarFieldEnum[] | Prisma.ImageGenJobScalarFieldEnum
-  having?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.ImageGenJobScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: ImageGenJobCountAggregateInputType | true
   _avg?: ImageGenJobAvgAggregateInputType
   _sum?: ImageGenJobSumAggregateInputType
@@ -444,784 +444,784 @@ type GetImageGenJobGroupByPayload<T extends ImageGenJobGroupByArgs> = Prisma.Pri
 
 
 export type ImageGenJobWhereInput = {
-  AND?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput> | runtime.Types.Skip
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputListRelationFilter | runtime.Types.Skip
+  AND?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
+  OR?: Prisma.ImageGenJobWhereInput[]
+  NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
+  id?: Prisma.StringFilter<"ImageGenJob"> | string
+  requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string
+  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
+  model?: Prisma.StringFilter<"ImageGenJob"> | string
+  userId?: Prisma.StringFilter<"ImageGenJob"> | string
+  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  prompt?: Prisma.StringFilter<"ImageGenJob"> | string
+  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number
+  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number
+  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
+  progress?: Prisma.IntFilter<"ImageGenJob"> | number
+  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
+  requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
+  outputs?: Prisma.ImageGenOutputListRelationFilter
 }
 
 export type ImageGenJobOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessageId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  model?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keyFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  prompt?: Prisma.SortOrder | runtime.Types.Skip
-  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  temperature?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  negativePrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputSize?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputQuality?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputFormat?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputBackground?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  moderation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  stage?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  error?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessage?: Prisma.MessageOrderByWithRelationInput | runtime.Types.Skip
-  userKey?: Prisma.UserKeyOrderByWithRelationInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputOrderByRelationAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  requestMessageId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  model?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  keyFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  prompt?: Prisma.SortOrder
+  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  temperature?: Prisma.SortOrderInput | Prisma.SortOrder
+  topP?: Prisma.SortOrderInput | Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrderInput | Prisma.SortOrder
+  negativePrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputQuality?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputFormat?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputBackground?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder
+  inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder
+  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder
+  moderation?: Prisma.SortOrderInput | Prisma.SortOrder
+  stage?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrderInput | Prisma.SortOrder
+  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder
+  usage?: Prisma.SortOrderInput | Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  error?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  requestMessage?: Prisma.MessageOrderByWithRelationInput
+  userKey?: Prisma.UserKeyOrderByWithRelationInput
+  outputs?: Prisma.ImageGenOutputOrderByRelationAggregateInput
 }
 
 export type ImageGenJobWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  requestMessageId?: string | runtime.Types.Skip
-  AND?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[] | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput> | runtime.Types.Skip
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputListRelationFilter | runtime.Types.Skip
+  id?: string
+  requestMessageId?: string
+  AND?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
+  OR?: Prisma.ImageGenJobWhereInput[]
+  NOT?: Prisma.ImageGenJobWhereInput | Prisma.ImageGenJobWhereInput[]
+  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
+  model?: Prisma.StringFilter<"ImageGenJob"> | string
+  userId?: Prisma.StringFilter<"ImageGenJob"> | string
+  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  prompt?: Prisma.StringFilter<"ImageGenJob"> | string
+  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number
+  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number
+  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
+  progress?: Prisma.IntFilter<"ImageGenJob"> | number
+  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
+  requestMessage?: Prisma.XOR<Prisma.MessageScalarRelationFilter, Prisma.MessageWhereInput>
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
+  outputs?: Prisma.ImageGenOutputListRelationFilter
 }, "id" | "requestMessageId">
 
 export type ImageGenJobOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessageId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  model?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  keyFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  prompt?: Prisma.SortOrder | runtime.Types.Skip
-  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  temperature?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  negativePrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputSize?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputQuality?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputFormat?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputBackground?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  moderation?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  stage?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  error?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.ImageGenJobCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.ImageGenJobAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.ImageGenJobMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.ImageGenJobMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.ImageGenJobSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  requestMessageId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  model?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  keyFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  prompt?: Prisma.SortOrder
+  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  temperature?: Prisma.SortOrderInput | Prisma.SortOrder
+  topP?: Prisma.SortOrderInput | Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrderInput | Prisma.SortOrder
+  negativePrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputQuality?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputFormat?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputBackground?: Prisma.SortOrderInput | Prisma.SortOrder
+  outputCompression?: Prisma.SortOrderInput | Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrderInput | Prisma.SortOrder
+  inputFidelity?: Prisma.SortOrderInput | Prisma.SortOrder
+  personGeneration?: Prisma.SortOrderInput | Prisma.SortOrder
+  moderation?: Prisma.SortOrderInput | Prisma.SortOrder
+  stage?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrderInput | Prisma.SortOrder
+  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder
+  usage?: Prisma.SortOrderInput | Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  error?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.ImageGenJobCountOrderByAggregateInput
+  _avg?: Prisma.ImageGenJobAvgOrderByAggregateInput
+  _max?: Prisma.ImageGenJobMaxOrderByAggregateInput
+  _min?: Prisma.ImageGenJobMinOrderByAggregateInput
+  _sum?: Prisma.ImageGenJobSumOrderByAggregateInput
 }
 
 export type ImageGenJobScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | Prisma.ImageGenJobScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenJobScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | Prisma.ImageGenJobScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"ImageGenJob"> | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  systemPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  temperature?: Prisma.FloatNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  topP?: Prisma.FloatNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  seed?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputSize?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  moderation?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageWithAggregatesFilter<"ImageGenJob"> | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  etaSeconds?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  durationMs?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  usage?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  error?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | Prisma.ImageGenJobScalarWhereWithAggregatesInput[]
+  OR?: Prisma.ImageGenJobScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.ImageGenJobScalarWhereWithAggregatesInput | Prisma.ImageGenJobScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
+  requestMessageId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"ImageGenJob"> | $Enums.Provider
+  model?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
+  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  keyFingerprint?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  prompt?: Prisma.StringWithAggregatesFilter<"ImageGenJob"> | string
+  systemPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  temperature?: Prisma.FloatNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  topP?: Prisma.FloatNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  nRequested?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number
+  nCompleted?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number
+  seed?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  negativePrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  outputSize?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  outputQuality?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  outputFormat?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  outputBackground?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  outputCompression?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  partialImagesRequested?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  inputFidelity?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  moderation?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  stage?: Prisma.EnumImageGenStageWithAggregatesFilter<"ImageGenJob"> | $Enums.ImageGenStage
+  progress?: Prisma.IntWithAggregatesFilter<"ImageGenJob"> | number
+  etaSeconds?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  durationMs?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  usage?: Prisma.IntNullableWithAggregatesFilter<"ImageGenJob"> | number | null
+  revisedPrompt?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  error?: Prisma.StringNullableWithAggregatesFilter<"ImageGenJob"> | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenJob"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ImageGenJob"> | Date | string
 }
 
 export type ImageGenJobCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
+  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  keyFingerprint?: string | null | runtime.Types.Skip
+  userKeyId?: string | null
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput | runtime.Types.Skip
-  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
+  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
+  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  keyFingerprint?: string | null | runtime.Types.Skip
+  userKeyId?: string | null
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenJobUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenJobUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenJobCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessageId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  model?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
-  prompt?: Prisma.SortOrder | runtime.Types.Skip
-  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  temperature?: Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrder | runtime.Types.Skip
-  negativePrompt?: Prisma.SortOrder | runtime.Types.Skip
-  outputSize?: Prisma.SortOrder | runtime.Types.Skip
-  outputQuality?: Prisma.SortOrder | runtime.Types.Skip
-  outputFormat?: Prisma.SortOrder | runtime.Types.Skip
-  outputBackground?: Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrder | runtime.Types.Skip
-  inputFidelity?: Prisma.SortOrder | runtime.Types.Skip
-  personGeneration?: Prisma.SortOrder | runtime.Types.Skip
-  moderation?: Prisma.SortOrder | runtime.Types.Skip
-  stage?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  error?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  requestMessageId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  model?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  keyFingerprint?: Prisma.SortOrder
+  prompt?: Prisma.SortOrder
+  systemPrompt?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  topP?: Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrder
+  negativePrompt?: Prisma.SortOrder
+  outputSize?: Prisma.SortOrder
+  outputQuality?: Prisma.SortOrder
+  outputFormat?: Prisma.SortOrder
+  outputBackground?: Prisma.SortOrder
+  outputCompression?: Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrder
+  inputFidelity?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
+  moderation?: Prisma.SortOrder
+  stage?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  usage?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  error?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenJobAvgOrderByAggregateInput = {
-  temperature?: Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder
+  topP?: Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrder
+  outputCompression?: Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  usage?: Prisma.SortOrder
 }
 
 export type ImageGenJobMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessageId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  model?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
-  prompt?: Prisma.SortOrder | runtime.Types.Skip
-  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  temperature?: Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrder | runtime.Types.Skip
-  negativePrompt?: Prisma.SortOrder | runtime.Types.Skip
-  outputSize?: Prisma.SortOrder | runtime.Types.Skip
-  outputQuality?: Prisma.SortOrder | runtime.Types.Skip
-  outputFormat?: Prisma.SortOrder | runtime.Types.Skip
-  outputBackground?: Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrder | runtime.Types.Skip
-  inputFidelity?: Prisma.SortOrder | runtime.Types.Skip
-  personGeneration?: Prisma.SortOrder | runtime.Types.Skip
-  moderation?: Prisma.SortOrder | runtime.Types.Skip
-  stage?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  error?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  requestMessageId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  model?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  keyFingerprint?: Prisma.SortOrder
+  prompt?: Prisma.SortOrder
+  systemPrompt?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  topP?: Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrder
+  negativePrompt?: Prisma.SortOrder
+  outputSize?: Prisma.SortOrder
+  outputQuality?: Prisma.SortOrder
+  outputFormat?: Prisma.SortOrder
+  outputBackground?: Prisma.SortOrder
+  outputCompression?: Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrder
+  inputFidelity?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
+  moderation?: Prisma.SortOrder
+  stage?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  usage?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  error?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenJobMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  requestMessageId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  model?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
-  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
-  prompt?: Prisma.SortOrder | runtime.Types.Skip
-  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  temperature?: Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrder | runtime.Types.Skip
-  negativePrompt?: Prisma.SortOrder | runtime.Types.Skip
-  outputSize?: Prisma.SortOrder | runtime.Types.Skip
-  outputQuality?: Prisma.SortOrder | runtime.Types.Skip
-  outputFormat?: Prisma.SortOrder | runtime.Types.Skip
-  outputBackground?: Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrder | runtime.Types.Skip
-  inputFidelity?: Prisma.SortOrder | runtime.Types.Skip
-  personGeneration?: Prisma.SortOrder | runtime.Types.Skip
-  moderation?: Prisma.SortOrder | runtime.Types.Skip
-  stage?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrder | runtime.Types.Skip
-  revisedPrompt?: Prisma.SortOrder | runtime.Types.Skip
-  error?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  requestMessageId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  model?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  userKeyId?: Prisma.SortOrder
+  keyFingerprint?: Prisma.SortOrder
+  prompt?: Prisma.SortOrder
+  systemPrompt?: Prisma.SortOrder
+  temperature?: Prisma.SortOrder
+  topP?: Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrder
+  negativePrompt?: Prisma.SortOrder
+  outputSize?: Prisma.SortOrder
+  outputQuality?: Prisma.SortOrder
+  outputFormat?: Prisma.SortOrder
+  outputBackground?: Prisma.SortOrder
+  outputCompression?: Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrder
+  inputFidelity?: Prisma.SortOrder
+  personGeneration?: Prisma.SortOrder
+  moderation?: Prisma.SortOrder
+  stage?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  usage?: Prisma.SortOrder
+  revisedPrompt?: Prisma.SortOrder
+  error?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ImageGenJobSumOrderByAggregateInput = {
-  temperature?: Prisma.SortOrder | runtime.Types.Skip
-  topP?: Prisma.SortOrder | runtime.Types.Skip
-  nRequested?: Prisma.SortOrder | runtime.Types.Skip
-  nCompleted?: Prisma.SortOrder | runtime.Types.Skip
-  seed?: Prisma.SortOrder | runtime.Types.Skip
-  outputCompression?: Prisma.SortOrder | runtime.Types.Skip
-  partialImagesRequested?: Prisma.SortOrder | runtime.Types.Skip
-  progress?: Prisma.SortOrder | runtime.Types.Skip
-  etaSeconds?: Prisma.SortOrder | runtime.Types.Skip
-  durationMs?: Prisma.SortOrder | runtime.Types.Skip
-  usage?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder
+  topP?: Prisma.SortOrder
+  nRequested?: Prisma.SortOrder
+  nCompleted?: Prisma.SortOrder
+  seed?: Prisma.SortOrder
+  outputCompression?: Prisma.SortOrder
+  partialImagesRequested?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+  etaSeconds?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  usage?: Prisma.SortOrder
 }
 
 export type ImageGenJobScalarRelationFilter = {
-  is?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
-  isNot?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  is?: Prisma.ImageGenJobWhereInput
+  isNot?: Prisma.ImageGenJobWhereInput
 }
 
 export type ImageGenJobNullableScalarRelationFilter = {
-  is?: Prisma.ImageGenJobWhereInput | null | runtime.Types.Skip
-  isNot?: Prisma.ImageGenJobWhereInput | null | runtime.Types.Skip
+  is?: Prisma.ImageGenJobWhereInput | null
+  isNot?: Prisma.ImageGenJobWhereInput | null
 }
 
 export type ImageGenJobListRelationFilter = {
-  every?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
-  some?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
-  none?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  every?: Prisma.ImageGenJobWhereInput
+  some?: Prisma.ImageGenJobWhereInput
+  none?: Prisma.ImageGenJobWhereInput
 }
 
 export type ImageGenJobOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type EnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider | runtime.Types.Skip
+  set?: $Enums.Provider
 }
 
 export type EnumImageGenStageFieldUpdateOperationsInput = {
-  set?: $Enums.ImageGenStage | runtime.Types.Skip
+  set?: $Enums.ImageGenStage
 }
 
 export type ImageGenJobCreateNestedOneWithoutOutputsInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutOutputsInput, Prisma.ImageGenJobUncheckedCreateWithoutOutputsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutOutputsInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutOutputsInput, Prisma.ImageGenJobUncheckedCreateWithoutOutputsInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutOutputsInput
+  connect?: Prisma.ImageGenJobWhereUniqueInput
 }
 
 export type ImageGenJobUpdateOneRequiredWithoutOutputsNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutOutputsInput, Prisma.ImageGenJobUncheckedCreateWithoutOutputsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutOutputsInput | runtime.Types.Skip
-  upsert?: Prisma.ImageGenJobUpsertWithoutOutputsInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutOutputsInput, Prisma.ImageGenJobUpdateWithoutOutputsInput>, Prisma.ImageGenJobUncheckedUpdateWithoutOutputsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutOutputsInput, Prisma.ImageGenJobUncheckedCreateWithoutOutputsInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutOutputsInput
+  upsert?: Prisma.ImageGenJobUpsertWithoutOutputsInput
+  connect?: Prisma.ImageGenJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutOutputsInput, Prisma.ImageGenJobUpdateWithoutOutputsInput>, Prisma.ImageGenJobUncheckedUpdateWithoutOutputsInput>
 }
 
 export type ImageGenJobCreateNestedOneWithoutRequestMessageInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput
+  connect?: Prisma.ImageGenJobWhereUniqueInput
 }
 
 export type ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput
+  connect?: Prisma.ImageGenJobWhereUniqueInput
 }
 
 export type ImageGenJobUpdateOneWithoutRequestMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput | runtime.Types.Skip
-  upsert?: Prisma.ImageGenJobUpsertWithoutRequestMessageInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenJobWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageGenJobWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutRequestMessageInput, Prisma.ImageGenJobUpdateWithoutRequestMessageInput>, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput
+  upsert?: Prisma.ImageGenJobUpsertWithoutRequestMessageInput
+  disconnect?: Prisma.ImageGenJobWhereInput | boolean
+  delete?: Prisma.ImageGenJobWhereInput | boolean
+  connect?: Prisma.ImageGenJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutRequestMessageInput, Prisma.ImageGenJobUpdateWithoutRequestMessageInput>, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput>
 }
 
 export type ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput | runtime.Types.Skip
-  upsert?: Prisma.ImageGenJobUpsertWithoutRequestMessageInput | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenJobWhereInput | boolean | runtime.Types.Skip
-  delete?: Prisma.ImageGenJobWhereInput | boolean | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutRequestMessageInput, Prisma.ImageGenJobUpdateWithoutRequestMessageInput>, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput>
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutRequestMessageInput
+  upsert?: Prisma.ImageGenJobUpsertWithoutRequestMessageInput
+  disconnect?: Prisma.ImageGenJobWhereInput | boolean
+  delete?: Prisma.ImageGenJobWhereInput | boolean
+  connect?: Prisma.ImageGenJobWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ImageGenJobUpdateToOneWithWhereWithoutRequestMessageInput, Prisma.ImageGenJobUpdateWithoutRequestMessageInput>, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput>
 }
 
 export type ImageGenJobCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[]
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[]
+  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope
+  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
 }
 
 export type ImageGenJobUncheckedCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[]
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[]
+  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope
+  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
 }
 
 export type ImageGenJobUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
-  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[]
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[]
+  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput[]
+  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope
+  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput[]
+  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput[]
+  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
 }
 
 export type ImageGenJobUncheckedUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
-  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
-  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope | runtime.Types.Skip
-  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
-  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.ImageGenJobCreateWithoutUserKeyInput, Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput> | Prisma.ImageGenJobCreateWithoutUserKeyInput[] | Prisma.ImageGenJobUncheckedCreateWithoutUserKeyInput[]
+  connectOrCreate?: Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput | Prisma.ImageGenJobCreateOrConnectWithoutUserKeyInput[]
+  upsert?: Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput[]
+  createMany?: Prisma.ImageGenJobCreateManyUserKeyInputEnvelope
+  set?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  disconnect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  delete?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  connect?: Prisma.ImageGenJobWhereUniqueInput | Prisma.ImageGenJobWhereUniqueInput[]
+  update?: Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.ImageGenJobUpdateWithWhereUniqueWithoutUserKeyInput[]
+  updateMany?: Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput | Prisma.ImageGenJobUpdateManyWithWhereWithoutUserKeyInput[]
+  deleteMany?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
 }
 
 export type ImageGenJobCreateWithoutOutputsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutOutputsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  keyFingerprint?: string | null | runtime.Types.Skip
+  userKeyId?: string | null
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenJobCreateOrConnectWithoutOutputsInput = {
@@ -1232,156 +1232,156 @@ export type ImageGenJobCreateOrConnectWithoutOutputsInput = {
 export type ImageGenJobUpsertWithoutOutputsInput = {
   update: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutOutputsInput, Prisma.ImageGenJobUncheckedUpdateWithoutOutputsInput>
   create: Prisma.XOR<Prisma.ImageGenJobCreateWithoutOutputsInput, Prisma.ImageGenJobUncheckedCreateWithoutOutputsInput>
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
 }
 
 export type ImageGenJobUpdateToOneWithWhereWithoutOutputsInput = {
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   data: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutOutputsInput, Prisma.ImageGenJobUncheckedUpdateWithoutOutputsInput>
 }
 
 export type ImageGenJobUpdateWithoutOutputsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput | runtime.Types.Skip
-  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
+  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutOutputsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ImageGenJobCreateWithoutRequestMessageInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutImageGenJobsInput
+  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutRequestMessageInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   model: string
   userId: string
-  userKeyId?: string | null | runtime.Types.Skip
-  keyFingerprint?: string | null | runtime.Types.Skip
+  userKeyId?: string | null
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobCreateOrConnectWithoutRequestMessageInput = {
@@ -1392,156 +1392,156 @@ export type ImageGenJobCreateOrConnectWithoutRequestMessageInput = {
 export type ImageGenJobUpsertWithoutRequestMessageInput = {
   update: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput>
   create: Prisma.XOR<Prisma.ImageGenJobCreateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedCreateWithoutRequestMessageInput>
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
 }
 
 export type ImageGenJobUpdateToOneWithWhereWithoutRequestMessageInput = {
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   data: Prisma.XOR<Prisma.ImageGenJobUpdateWithoutRequestMessageInput, Prisma.ImageGenJobUncheckedUpdateWithoutRequestMessageInput>
 }
 
 export type ImageGenJobUpdateWithoutRequestMessageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userKey?: Prisma.UserKeyUpdateOneWithoutImageGenJobsNestedInput
+  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutRequestMessageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobCreateWithoutUserKeyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   requestMessage: Prisma.MessageCreateNestedOneWithoutImageGenJobInput
-  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  outputs?: Prisma.ImageGenOutputCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobUncheckedCreateWithoutUserKeyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedCreateNestedManyWithoutJobInput
 }
 
 export type ImageGenJobCreateOrConnectWithoutUserKeyInput = {
@@ -1551,7 +1551,7 @@ export type ImageGenJobCreateOrConnectWithoutUserKeyInput = {
 
 export type ImageGenJobCreateManyUserKeyInputEnvelope = {
   data: Prisma.ImageGenJobCreateManyUserKeyInput | Prisma.ImageGenJobCreateManyUserKeyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type ImageGenJobUpsertWithWhereUniqueWithoutUserKeyInput = {
@@ -1571,184 +1571,184 @@ export type ImageGenJobUpdateManyWithWhereWithoutUserKeyInput = {
 }
 
 export type ImageGenJobScalarWhereInput = {
-  AND?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.ImageGenJobScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFilter<"ImageGenJob"> | string | runtime.Types.Skip
-  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFilter<"ImageGenJob"> | number | runtime.Types.Skip
-  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
+  OR?: Prisma.ImageGenJobScalarWhereInput[]
+  NOT?: Prisma.ImageGenJobScalarWhereInput | Prisma.ImageGenJobScalarWhereInput[]
+  id?: Prisma.StringFilter<"ImageGenJob"> | string
+  requestMessageId?: Prisma.StringFilter<"ImageGenJob"> | string
+  provider?: Prisma.EnumProviderFilter<"ImageGenJob"> | $Enums.Provider
+  model?: Prisma.StringFilter<"ImageGenJob"> | string
+  userId?: Prisma.StringFilter<"ImageGenJob"> | string
+  userKeyId?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  keyFingerprint?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  prompt?: Prisma.StringFilter<"ImageGenJob"> | string
+  systemPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  temperature?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  topP?: Prisma.FloatNullableFilter<"ImageGenJob"> | number | null
+  nRequested?: Prisma.IntFilter<"ImageGenJob"> | number
+  nCompleted?: Prisma.IntFilter<"ImageGenJob"> | number
+  seed?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  negativePrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputSize?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputQuality?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputFormat?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputBackground?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  outputCompression?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  partialImagesRequested?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  inputFidelity?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  personGeneration?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  moderation?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  stage?: Prisma.EnumImageGenStageFilter<"ImageGenJob"> | $Enums.ImageGenStage
+  progress?: Prisma.IntFilter<"ImageGenJob"> | number
+  etaSeconds?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  durationMs?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  usage?: Prisma.IntNullableFilter<"ImageGenJob"> | number | null
+  revisedPrompt?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  error?: Prisma.StringNullableFilter<"ImageGenJob"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ImageGenJob"> | Date | string
 }
 
 export type ImageGenJobCreateManyUserKeyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   requestMessageId: string
   provider: $Enums.Provider
   model: string
   userId: string
-  keyFingerprint?: string | null | runtime.Types.Skip
+  keyFingerprint?: string | null
   prompt: string
-  systemPrompt?: string | null | runtime.Types.Skip
-  temperature?: number | null | runtime.Types.Skip
-  topP?: number | null | runtime.Types.Skip
-  nRequested?: number | runtime.Types.Skip
-  nCompleted?: number | runtime.Types.Skip
-  seed?: number | null | runtime.Types.Skip
-  negativePrompt?: string | null | runtime.Types.Skip
-  outputSize?: string | null | runtime.Types.Skip
-  outputQuality?: string | null | runtime.Types.Skip
-  outputFormat?: string | null | runtime.Types.Skip
-  outputBackground?: string | null | runtime.Types.Skip
-  outputCompression?: number | null | runtime.Types.Skip
-  partialImagesRequested?: number | null | runtime.Types.Skip
-  inputFidelity?: string | null | runtime.Types.Skip
-  personGeneration?: string | null | runtime.Types.Skip
-  moderation?: string | null | runtime.Types.Skip
-  stage?: $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: number | runtime.Types.Skip
-  etaSeconds?: number | null | runtime.Types.Skip
-  durationMs?: number | null | runtime.Types.Skip
-  usage?: number | null | runtime.Types.Skip
-  revisedPrompt?: string | null | runtime.Types.Skip
-  error?: string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  systemPrompt?: string | null
+  temperature?: number | null
+  topP?: number | null
+  nRequested?: number
+  nCompleted?: number
+  seed?: number | null
+  negativePrompt?: string | null
+  outputSize?: string | null
+  outputQuality?: string | null
+  outputFormat?: string | null
+  outputBackground?: string | null
+  outputCompression?: number | null
+  partialImagesRequested?: number | null
+  inputFidelity?: string | null
+  personGeneration?: string | null
+  moderation?: string | null
+  stage?: $Enums.ImageGenStage
+  progress?: number
+  etaSeconds?: number | null
+  durationMs?: number | null
+  usage?: number | null
+  revisedPrompt?: string | null
+  error?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ImageGenJobUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestMessage?: Prisma.MessageUpdateOneRequiredWithoutImageGenJobNestedInput
+  outputs?: Prisma.ImageGenOutputUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  outputs?: Prisma.ImageGenOutputUncheckedUpdateManyWithoutJobNestedInput
 }
 
 export type ImageGenJobUncheckedUpdateManyWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  model?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  prompt?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  nRequested?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage | runtime.Types.Skip
-  progress?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
-  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestMessageId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  keyFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  nRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  nCompleted?: Prisma.IntFieldUpdateOperationsInput | number
+  seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  negativePrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputQuality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputFormat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputBackground?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  outputCompression?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  partialImagesRequested?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inputFidelity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personGeneration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  moderation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stage?: Prisma.EnumImageGenStageFieldUpdateOperationsInput | $Enums.ImageGenStage
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
+  etaSeconds?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  usage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  revisedPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  error?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1778,176 +1778,176 @@ export type ImageGenJobCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
  * ImageGenJobCountOutputType without action
  */
 export type ImageGenJobCountOutputTypeCountOutputsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
 }
 
 
 export type ImageGenJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  requestMessageId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  model?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  keyFingerprint?: boolean | runtime.Types.Skip
-  prompt?: boolean | runtime.Types.Skip
-  systemPrompt?: boolean | runtime.Types.Skip
-  temperature?: boolean | runtime.Types.Skip
-  topP?: boolean | runtime.Types.Skip
-  nRequested?: boolean | runtime.Types.Skip
-  nCompleted?: boolean | runtime.Types.Skip
-  seed?: boolean | runtime.Types.Skip
-  negativePrompt?: boolean | runtime.Types.Skip
-  outputSize?: boolean | runtime.Types.Skip
-  outputQuality?: boolean | runtime.Types.Skip
-  outputFormat?: boolean | runtime.Types.Skip
-  outputBackground?: boolean | runtime.Types.Skip
-  outputCompression?: boolean | runtime.Types.Skip
-  partialImagesRequested?: boolean | runtime.Types.Skip
-  inputFidelity?: boolean | runtime.Types.Skip
-  personGeneration?: boolean | runtime.Types.Skip
-  moderation?: boolean | runtime.Types.Skip
-  stage?: boolean | runtime.Types.Skip
-  progress?: boolean | runtime.Types.Skip
-  etaSeconds?: boolean | runtime.Types.Skip
-  durationMs?: boolean | runtime.Types.Skip
-  usage?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  error?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
-  outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  requestMessageId?: boolean
+  provider?: boolean
+  model?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  keyFingerprint?: boolean
+  prompt?: boolean
+  systemPrompt?: boolean
+  temperature?: boolean
+  topP?: boolean
+  nRequested?: boolean
+  nCompleted?: boolean
+  seed?: boolean
+  negativePrompt?: boolean
+  outputSize?: boolean
+  outputQuality?: boolean
+  outputFormat?: boolean
+  outputBackground?: boolean
+  outputCompression?: boolean
+  partialImagesRequested?: boolean
+  inputFidelity?: boolean
+  personGeneration?: boolean
+  moderation?: boolean
+  stage?: boolean
+  progress?: boolean
+  etaSeconds?: boolean
+  durationMs?: boolean
+  usage?: boolean
+  revisedPrompt?: boolean
+  error?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
+  outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs>
+  _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenJob"]>
 
 export type ImageGenJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  requestMessageId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  model?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  keyFingerprint?: boolean | runtime.Types.Skip
-  prompt?: boolean | runtime.Types.Skip
-  systemPrompt?: boolean | runtime.Types.Skip
-  temperature?: boolean | runtime.Types.Skip
-  topP?: boolean | runtime.Types.Skip
-  nRequested?: boolean | runtime.Types.Skip
-  nCompleted?: boolean | runtime.Types.Skip
-  seed?: boolean | runtime.Types.Skip
-  negativePrompt?: boolean | runtime.Types.Skip
-  outputSize?: boolean | runtime.Types.Skip
-  outputQuality?: boolean | runtime.Types.Skip
-  outputFormat?: boolean | runtime.Types.Skip
-  outputBackground?: boolean | runtime.Types.Skip
-  outputCompression?: boolean | runtime.Types.Skip
-  partialImagesRequested?: boolean | runtime.Types.Skip
-  inputFidelity?: boolean | runtime.Types.Skip
-  personGeneration?: boolean | runtime.Types.Skip
-  moderation?: boolean | runtime.Types.Skip
-  stage?: boolean | runtime.Types.Skip
-  progress?: boolean | runtime.Types.Skip
-  etaSeconds?: boolean | runtime.Types.Skip
-  durationMs?: boolean | runtime.Types.Skip
-  usage?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  error?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  requestMessageId?: boolean
+  provider?: boolean
+  model?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  keyFingerprint?: boolean
+  prompt?: boolean
+  systemPrompt?: boolean
+  temperature?: boolean
+  topP?: boolean
+  nRequested?: boolean
+  nCompleted?: boolean
+  seed?: boolean
+  negativePrompt?: boolean
+  outputSize?: boolean
+  outputQuality?: boolean
+  outputFormat?: boolean
+  outputBackground?: boolean
+  outputCompression?: boolean
+  partialImagesRequested?: boolean
+  inputFidelity?: boolean
+  personGeneration?: boolean
+  moderation?: boolean
+  stage?: boolean
+  progress?: boolean
+  etaSeconds?: boolean
+  durationMs?: boolean
+  usage?: boolean
+  revisedPrompt?: boolean
+  error?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenJob"]>
 
 export type ImageGenJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  requestMessageId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  model?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  keyFingerprint?: boolean | runtime.Types.Skip
-  prompt?: boolean | runtime.Types.Skip
-  systemPrompt?: boolean | runtime.Types.Skip
-  temperature?: boolean | runtime.Types.Skip
-  topP?: boolean | runtime.Types.Skip
-  nRequested?: boolean | runtime.Types.Skip
-  nCompleted?: boolean | runtime.Types.Skip
-  seed?: boolean | runtime.Types.Skip
-  negativePrompt?: boolean | runtime.Types.Skip
-  outputSize?: boolean | runtime.Types.Skip
-  outputQuality?: boolean | runtime.Types.Skip
-  outputFormat?: boolean | runtime.Types.Skip
-  outputBackground?: boolean | runtime.Types.Skip
-  outputCompression?: boolean | runtime.Types.Skip
-  partialImagesRequested?: boolean | runtime.Types.Skip
-  inputFidelity?: boolean | runtime.Types.Skip
-  personGeneration?: boolean | runtime.Types.Skip
-  moderation?: boolean | runtime.Types.Skip
-  stage?: boolean | runtime.Types.Skip
-  progress?: boolean | runtime.Types.Skip
-  etaSeconds?: boolean | runtime.Types.Skip
-  durationMs?: boolean | runtime.Types.Skip
-  usage?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  error?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  requestMessageId?: boolean
+  provider?: boolean
+  model?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  keyFingerprint?: boolean
+  prompt?: boolean
+  systemPrompt?: boolean
+  temperature?: boolean
+  topP?: boolean
+  nRequested?: boolean
+  nCompleted?: boolean
+  seed?: boolean
+  negativePrompt?: boolean
+  outputSize?: boolean
+  outputQuality?: boolean
+  outputFormat?: boolean
+  outputBackground?: boolean
+  outputCompression?: boolean
+  partialImagesRequested?: boolean
+  inputFidelity?: boolean
+  personGeneration?: boolean
+  moderation?: boolean
+  stage?: boolean
+  progress?: boolean
+  etaSeconds?: boolean
+  durationMs?: boolean
+  usage?: boolean
+  revisedPrompt?: boolean
+  error?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }, ExtArgs["result"]["imageGenJob"]>
 
 export type ImageGenJobSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  requestMessageId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  model?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  userKeyId?: boolean | runtime.Types.Skip
-  keyFingerprint?: boolean | runtime.Types.Skip
-  prompt?: boolean | runtime.Types.Skip
-  systemPrompt?: boolean | runtime.Types.Skip
-  temperature?: boolean | runtime.Types.Skip
-  topP?: boolean | runtime.Types.Skip
-  nRequested?: boolean | runtime.Types.Skip
-  nCompleted?: boolean | runtime.Types.Skip
-  seed?: boolean | runtime.Types.Skip
-  negativePrompt?: boolean | runtime.Types.Skip
-  outputSize?: boolean | runtime.Types.Skip
-  outputQuality?: boolean | runtime.Types.Skip
-  outputFormat?: boolean | runtime.Types.Skip
-  outputBackground?: boolean | runtime.Types.Skip
-  outputCompression?: boolean | runtime.Types.Skip
-  partialImagesRequested?: boolean | runtime.Types.Skip
-  inputFidelity?: boolean | runtime.Types.Skip
-  personGeneration?: boolean | runtime.Types.Skip
-  moderation?: boolean | runtime.Types.Skip
-  stage?: boolean | runtime.Types.Skip
-  progress?: boolean | runtime.Types.Skip
-  etaSeconds?: boolean | runtime.Types.Skip
-  durationMs?: boolean | runtime.Types.Skip
-  usage?: boolean | runtime.Types.Skip
-  revisedPrompt?: boolean | runtime.Types.Skip
-  error?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  id?: boolean
+  requestMessageId?: boolean
+  provider?: boolean
+  model?: boolean
+  userId?: boolean
+  userKeyId?: boolean
+  keyFingerprint?: boolean
+  prompt?: boolean
+  systemPrompt?: boolean
+  temperature?: boolean
+  topP?: boolean
+  nRequested?: boolean
+  nCompleted?: boolean
+  seed?: boolean
+  negativePrompt?: boolean
+  outputSize?: boolean
+  outputQuality?: boolean
+  outputFormat?: boolean
+  outputBackground?: boolean
+  outputCompression?: boolean
+  partialImagesRequested?: boolean
+  inputFidelity?: boolean
+  personGeneration?: boolean
+  moderation?: boolean
+  stage?: boolean
+  progress?: boolean
+  etaSeconds?: boolean
+  durationMs?: boolean
+  usage?: boolean
+  revisedPrompt?: boolean
+  error?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ImageGenJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestMessageId" | "provider" | "model" | "userId" | "userKeyId" | "keyFingerprint" | "prompt" | "systemPrompt" | "temperature" | "topP" | "nRequested" | "nCompleted" | "seed" | "negativePrompt" | "outputSize" | "outputQuality" | "outputFormat" | "outputBackground" | "outputCompression" | "partialImagesRequested" | "inputFidelity" | "personGeneration" | "moderation" | "stage" | "progress" | "etaSeconds" | "durationMs" | "usage" | "revisedPrompt" | "error" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenJob"], runtime.Types.Skip>
+export type ImageGenJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requestMessageId" | "provider" | "model" | "userId" | "userKeyId" | "keyFingerprint" | "prompt" | "systemPrompt" | "temperature" | "topP" | "nRequested" | "nCompleted" | "seed" | "negativePrompt" | "outputSize" | "outputQuality" | "outputFormat" | "outputBackground" | "outputCompression" | "partialImagesRequested" | "inputFidelity" | "personGeneration" | "moderation" | "stage" | "progress" | "etaSeconds" | "durationMs" | "usage" | "revisedPrompt" | "error" | "createdAt" | "updatedAt", ExtArgs["result"]["imageGenJob"]>
 export type ImageGenJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
-  outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
+  outputs?: boolean | Prisma.ImageGenJob$outputsArgs<ExtArgs>
+  _count?: boolean | Prisma.ImageGenJobCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ImageGenJobIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }
 export type ImageGenJobIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs> | runtime.Types.Skip
-  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  requestMessage?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.ImageGenJob$userKeyArgs<ExtArgs>
 }
 
 export type $ImageGenJobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2474,7 +2474,7 @@ export type ImageGenJobFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which ImageGenJob to fetch.
    */
   where: Prisma.ImageGenJobWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2497,7 +2497,7 @@ export type ImageGenJobFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exten
    * Filter, which ImageGenJob to fetch.
    */
   where: Prisma.ImageGenJobWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2519,38 +2519,38 @@ export type ImageGenJobFindFirstArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter, which ImageGenJob to fetch.
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenJobs to fetch.
    */
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageGenJobs.
    */
-  cursor?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenJobs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenJobs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageGenJobs.
    */
-  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2572,38 +2572,38 @@ export type ImageGenJobFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extens
   /**
    * Filter, which ImageGenJob to fetch.
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenJobs to fetch.
    */
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ImageGenJobs.
    */
-  cursor?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenJobs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenJobs.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ImageGenJobs.
    */
-  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2625,33 +2625,33 @@ export type ImageGenJobFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * Filter, which ImageGenJobs to fetch.
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ImageGenJobs to fetch.
    */
-  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.ImageGenJobOrderByWithRelationInput | Prisma.ImageGenJobOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ImageGenJobs.
    */
-  cursor?: Prisma.ImageGenJobWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.ImageGenJobWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ImageGenJobs from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ImageGenJobs.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.ImageGenJobScalarFieldEnum | Prisma.ImageGenJobScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2674,7 +2674,7 @@ export type ImageGenJobCreateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data needed to create a ImageGenJob.
    */
   data: Prisma.XOR<Prisma.ImageGenJobCreateInput, Prisma.ImageGenJobUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2685,7 +2685,7 @@ export type ImageGenJobCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many ImageGenJobs.
    */
   data: Prisma.ImageGenJobCreateManyInput | Prisma.ImageGenJobCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2704,7 +2704,7 @@ export type ImageGenJobCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many ImageGenJobs.
    */
   data: Prisma.ImageGenJobCreateManyInput | Prisma.ImageGenJobCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2735,7 +2735,7 @@ export type ImageGenJobUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Choose, which ImageGenJob to update.
    */
   where: Prisma.ImageGenJobWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2749,11 +2749,11 @@ export type ImageGenJobUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter which ImageGenJobs to update
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * Limit how many ImageGenJobs to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -2775,11 +2775,11 @@ export type ImageGenJobUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
   /**
    * Filter which ImageGenJobs to update
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * Limit how many ImageGenJobs to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2814,7 +2814,7 @@ export type ImageGenJobUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * In case the ImageGenJob was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ImageGenJobUpdateInput, Prisma.ImageGenJobUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2837,7 +2837,7 @@ export type ImageGenJobDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter which ImageGenJob to delete.
    */
   where: Prisma.ImageGenJobWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2847,11 +2847,11 @@ export type ImageGenJobDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter which ImageGenJobs to delete
    */
-  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
+  where?: Prisma.ImageGenJobWhereInput
   /**
    * Limit how many ImageGenJobs to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -2870,7 +2870,7 @@ export type ImageGenJob$userKeyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.UserKeyInclude<ExtArgs> | null
-  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  where?: Prisma.UserKeyWhereInput
 }
 
 /**
@@ -2889,12 +2889,12 @@ export type ImageGenJob$outputsArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ImageGenOutputInclude<ExtArgs> | null
-  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.ImageGenOutputWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.ImageGenOutputWhereInput
+  orderBy?: Prisma.ImageGenOutputOrderByWithRelationInput | Prisma.ImageGenOutputOrderByWithRelationInput[]
+  cursor?: Prisma.ImageGenOutputWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImageGenOutputScalarFieldEnum | Prisma.ImageGenOutputScalarFieldEnum[]
 }
 
 /**

@@ -91,97 +91,97 @@ export type LocalVectorStoreCountAggregateOutputType = {
 
 
 export type LocalVectorStoreAvgAggregateInputType = {
-  embeddingDim?: true | runtime.Types.Skip
-  fileCount?: true | runtime.Types.Skip
-  totalBytes?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
+  embeddingDim?: true
+  fileCount?: true
+  totalBytes?: true
+  totalChunks?: true
 }
 
 export type LocalVectorStoreSumAggregateInputType = {
-  embeddingDim?: true | runtime.Types.Skip
-  fileCount?: true | runtime.Types.Skip
-  totalBytes?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
+  embeddingDim?: true
+  fileCount?: true
+  totalBytes?: true
+  totalChunks?: true
 }
 
 export type LocalVectorStoreMinAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  storeName?: true | runtime.Types.Skip
-  defaultEmbeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  fileCount?: true | runtime.Types.Skip
-  totalBytes?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  storeName?: true
+  defaultEmbeddingModel?: true
+  embeddingDim?: true
+  fileCount?: true
+  totalBytes?: true
+  totalChunks?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type LocalVectorStoreMaxAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  storeName?: true | runtime.Types.Skip
-  defaultEmbeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  fileCount?: true | runtime.Types.Skip
-  totalBytes?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  storeName?: true
+  defaultEmbeddingModel?: true
+  embeddingDim?: true
+  fileCount?: true
+  totalBytes?: true
+  totalChunks?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type LocalVectorStoreCountAggregateInputType = {
-  id?: true | runtime.Types.Skip
-  userId?: true | runtime.Types.Skip
-  provider?: true | runtime.Types.Skip
-  storeName?: true | runtime.Types.Skip
-  defaultEmbeddingModel?: true | runtime.Types.Skip
-  embeddingDim?: true | runtime.Types.Skip
-  fileCount?: true | runtime.Types.Skip
-  totalBytes?: true | runtime.Types.Skip
-  totalChunks?: true | runtime.Types.Skip
-  schemaVersion?: true | runtime.Types.Skip
-  lastSyncedAt?: true | runtime.Types.Skip
-  createdAt?: true | runtime.Types.Skip
-  updatedAt?: true | runtime.Types.Skip
-  _all?: true | runtime.Types.Skip
+  id?: true
+  userId?: true
+  provider?: true
+  storeName?: true
+  defaultEmbeddingModel?: true
+  embeddingDim?: true
+  fileCount?: true
+  totalBytes?: true
+  totalChunks?: true
+  schemaVersion?: true
+  lastSyncedAt?: true
+  createdAt?: true
+  updatedAt?: true
+  _all?: true
 }
 
 export type LocalVectorStoreAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which LocalVectorStore to aggregate.
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStores to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -226,12 +226,12 @@ export type GetLocalVectorStoreAggregateType<T extends LocalVectorStoreAggregate
 
 
 export type LocalVectorStoreGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.LocalVectorStoreOrderByWithAggregationInput | Prisma.LocalVectorStoreOrderByWithAggregationInput[] | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
+  orderBy?: Prisma.LocalVectorStoreOrderByWithAggregationInput | Prisma.LocalVectorStoreOrderByWithAggregationInput[]
   by: Prisma.LocalVectorStoreScalarFieldEnum[] | Prisma.LocalVectorStoreScalarFieldEnum
-  having?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
+  having?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput
+  take?: number
+  skip?: number
   _count?: LocalVectorStoreCountAggregateInputType | true
   _avg?: LocalVectorStoreAvgAggregateInputType
   _sum?: LocalVectorStoreSumAggregateInputType
@@ -276,219 +276,219 @@ type GetLocalVectorStoreGroupByPayload<T extends LocalVectorStoreGroupByArgs> = 
 
 
 export type LocalVectorStoreWhereInput = {
-  AND?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocListRelationFilter | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[]
+  OR?: Prisma.LocalVectorStoreWhereInput[]
+  NOT?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[]
+  id?: Prisma.StringFilter<"LocalVectorStore"> | string
+  userId?: Prisma.StringFilter<"LocalVectorStore"> | string
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider
+  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string
+  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number
+  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number
+  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null
+  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  docs?: Prisma.LocalVectorStoreDocListRelationFilter
 }
 
 export type LocalVectorStoreOrderByWithRelationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  storeName?: Prisma.SortOrder | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  storeName?: Prisma.SortOrder
+  defaultEmbeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
+  docs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput
 }
 
 export type LocalVectorStoreWhereUniqueInput = Prisma.AtLeast<{
-  id?: string | runtime.Types.Skip
-  userId_provider_local?: Prisma.LocalVectorStoreUserId_provider_localCompoundUniqueInput | runtime.Types.Skip
-  AND?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[] | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocListRelationFilter | runtime.Types.Skip
+  id?: string
+  userId_provider_local?: Prisma.LocalVectorStoreUserId_provider_localCompoundUniqueInput
+  AND?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[]
+  OR?: Prisma.LocalVectorStoreWhereInput[]
+  NOT?: Prisma.LocalVectorStoreWhereInput | Prisma.LocalVectorStoreWhereInput[]
+  userId?: Prisma.StringFilter<"LocalVectorStore"> | string
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider
+  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string
+  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number
+  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number
+  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null
+  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  docs?: Prisma.LocalVectorStoreDocListRelationFilter
 }, "id" | "userId_provider_local">
 
 export type LocalVectorStoreOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  storeName?: Prisma.SortOrder | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
-  _count?: Prisma.LocalVectorStoreCountOrderByAggregateInput | runtime.Types.Skip
-  _avg?: Prisma.LocalVectorStoreAvgOrderByAggregateInput | runtime.Types.Skip
-  _max?: Prisma.LocalVectorStoreMaxOrderByAggregateInput | runtime.Types.Skip
-  _min?: Prisma.LocalVectorStoreMinOrderByAggregateInput | runtime.Types.Skip
-  _sum?: Prisma.LocalVectorStoreSumOrderByAggregateInput | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  storeName?: Prisma.SortOrder
+  defaultEmbeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  _count?: Prisma.LocalVectorStoreCountOrderByAggregateInput
+  _avg?: Prisma.LocalVectorStoreAvgOrderByAggregateInput
+  _max?: Prisma.LocalVectorStoreMaxOrderByAggregateInput
+  _min?: Prisma.LocalVectorStoreMinOrderByAggregateInput
+  _sum?: Prisma.LocalVectorStoreSumOrderByAggregateInput
 }
 
 export type LocalVectorStoreScalarWhereWithAggregatesInput = {
-  AND?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[] | runtime.Types.Skip
-  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  userId?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"LocalVectorStore"> | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  fileCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  totalBytes?: Prisma.BigIntNullableWithAggregatesFilter<"LocalVectorStore"> | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[]
+  OR?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.LocalVectorStoreScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"LocalVectorStore"> | $Enums.Provider
+  storeName?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string
+  defaultEmbeddingModel?: Prisma.StringWithAggregatesFilter<"LocalVectorStore"> | string
+  embeddingDim?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number
+  fileCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number
+  totalBytes?: Prisma.BigIntNullableWithAggregatesFilter<"LocalVectorStore"> | bigint | number | null
+  totalChunks?: Prisma.IntWithAggregatesFilter<"LocalVectorStore"> | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStore"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStore"> | Date | string
 }
 
 export type LocalVectorStoreCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLocalVectorStoresInput
-  docs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutStoreInput | runtime.Types.Skip
+  docs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutStoreInput
 }
 
 export type LocalVectorStoreUncheckedCreateInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutStoreInput | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  docs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type LocalVectorStoreUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUpdateManyWithoutStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput
+  docs?: Prisma.LocalVectorStoreDocUpdateManyWithoutStoreNestedInput
 }
 
 export type LocalVectorStoreUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  docs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type LocalVectorStoreCreateManyInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreUserId_provider_localCompoundUniqueInput = {
@@ -497,172 +497,172 @@ export type LocalVectorStoreUserId_provider_localCompoundUniqueInput = {
 }
 
 export type LocalVectorStoreCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  storeName?: Prisma.SortOrder | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  storeName?: Prisma.SortOrder
+  defaultEmbeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreAvgOrderByAggregateInput = {
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  storeName?: Prisma.SortOrder | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  storeName?: Prisma.SortOrder
+  defaultEmbeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder | runtime.Types.Skip
-  userId?: Prisma.SortOrder | runtime.Types.Skip
-  provider?: Prisma.SortOrder | runtime.Types.Skip
-  storeName?: Prisma.SortOrder | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.SortOrder | runtime.Types.Skip
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
-  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
-  lastSyncedAt?: Prisma.SortOrder | runtime.Types.Skip
-  createdAt?: Prisma.SortOrder | runtime.Types.Skip
-  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
+  storeName?: Prisma.SortOrder
+  defaultEmbeddingModel?: Prisma.SortOrder
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
+  schemaVersion?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreSumOrderByAggregateInput = {
-  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
-  fileCount?: Prisma.SortOrder | runtime.Types.Skip
-  totalBytes?: Prisma.SortOrder | runtime.Types.Skip
-  totalChunks?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder
+  fileCount?: Prisma.SortOrder
+  totalBytes?: Prisma.SortOrder
+  totalChunks?: Prisma.SortOrder
 }
 
 export type LocalVectorStoreScalarRelationFilter = {
-  is?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
-  isNot?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  is?: Prisma.LocalVectorStoreWhereInput
+  isNot?: Prisma.LocalVectorStoreWhereInput
 }
 
 export type LocalVectorStoreListRelationFilter = {
-  every?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
-  some?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
-  none?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  every?: Prisma.LocalVectorStoreWhereInput
+  some?: Prisma.LocalVectorStoreWhereInput
+  none?: Prisma.LocalVectorStoreWhereInput
 }
 
 export type LocalVectorStoreOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.SortOrder
 }
 
 export type EnumLocalStoreSchemaVersionFieldUpdateOperationsInput = {
-  set?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  set?: $Enums.LocalStoreSchemaVersion
 }
 
 export type LocalVectorStoreCreateNestedOneWithoutDocsInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedCreateWithoutDocsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutDocsInput | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedCreateWithoutDocsInput>
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutDocsInput
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput
 }
 
 export type LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedCreateWithoutDocsInput> | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutDocsInput | runtime.Types.Skip
-  upsert?: Prisma.LocalVectorStoreUpsertWithoutDocsInput | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LocalVectorStoreUpdateToOneWithWhereWithoutDocsInput, Prisma.LocalVectorStoreUpdateWithoutDocsInput>, Prisma.LocalVectorStoreUncheckedUpdateWithoutDocsInput> | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedCreateWithoutDocsInput>
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutDocsInput
+  upsert?: Prisma.LocalVectorStoreUpsertWithoutDocsInput
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LocalVectorStoreUpdateToOneWithWhereWithoutDocsInput, Prisma.LocalVectorStoreUpdateWithoutDocsInput>, Prisma.LocalVectorStoreUncheckedUpdateWithoutDocsInput>
 }
 
 export type LocalVectorStoreCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
 }
 
 export type LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
 }
 
 export type LocalVectorStoreUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput | Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope
+  set?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  disconnect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  delete?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  update?: Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput | Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[]
 }
 
 export type LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
-  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
-  upsert?: Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope | runtime.Types.Skip
-  set?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  disconnect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  delete?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[] | runtime.Types.Skip
-  update?: Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
-  updateMany?: Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput | Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
-  deleteMany?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[] | runtime.Types.Skip
+  create?: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutUserInput, Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput> | Prisma.LocalVectorStoreCreateWithoutUserInput[] | Prisma.LocalVectorStoreUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput | Prisma.LocalVectorStoreCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.LocalVectorStoreCreateManyUserInputEnvelope
+  set?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  disconnect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  delete?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  connect?: Prisma.LocalVectorStoreWhereUniqueInput | Prisma.LocalVectorStoreWhereUniqueInput[]
+  update?: Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput | Prisma.LocalVectorStoreUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput | Prisma.LocalVectorStoreUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[]
 }
 
 export type LocalVectorStoreCreateWithoutDocsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLocalVectorStoresInput
 }
 
 export type LocalVectorStoreUncheckedCreateWithoutDocsInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   userId: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreCreateOrConnectWithoutDocsInput = {
@@ -673,76 +673,76 @@ export type LocalVectorStoreCreateOrConnectWithoutDocsInput = {
 export type LocalVectorStoreUpsertWithoutDocsInput = {
   update: Prisma.XOR<Prisma.LocalVectorStoreUpdateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedUpdateWithoutDocsInput>
   create: Prisma.XOR<Prisma.LocalVectorStoreCreateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedCreateWithoutDocsInput>
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
 }
 
 export type LocalVectorStoreUpdateToOneWithWhereWithoutDocsInput = {
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   data: Prisma.XOR<Prisma.LocalVectorStoreUpdateWithoutDocsInput, Prisma.LocalVectorStoreUncheckedUpdateWithoutDocsInput>
 }
 
 export type LocalVectorStoreUpdateWithoutDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  user?: Prisma.UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput
 }
 
 export type LocalVectorStoreUncheckedUpdateWithoutDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LocalVectorStoreCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutStoreInput | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  docs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutStoreInput
 }
 
 export type LocalVectorStoreUncheckedCreateWithoutUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutStoreInput | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  docs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutStoreInput
 }
 
 export type LocalVectorStoreCreateOrConnectWithoutUserInput = {
@@ -752,7 +752,7 @@ export type LocalVectorStoreCreateOrConnectWithoutUserInput = {
 
 export type LocalVectorStoreCreateManyUserInputEnvelope = {
   data: Prisma.LocalVectorStoreCreateManyUserInput | Prisma.LocalVectorStoreCreateManyUserInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 export type LocalVectorStoreUpsertWithWhereUniqueWithoutUserInput = {
@@ -772,84 +772,84 @@ export type LocalVectorStoreUpdateManyWithWhereWithoutUserInput = {
 }
 
 export type LocalVectorStoreScalarWhereInput = {
-  AND?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[] | runtime.Types.Skip
-  OR?: Prisma.LocalVectorStoreScalarWhereInput[] | runtime.Types.Skip
-  NOT?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[] | runtime.Types.Skip
-  id?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  userId?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[]
+  OR?: Prisma.LocalVectorStoreScalarWhereInput[]
+  NOT?: Prisma.LocalVectorStoreScalarWhereInput | Prisma.LocalVectorStoreScalarWhereInput[]
+  id?: Prisma.StringFilter<"LocalVectorStore"> | string
+  userId?: Prisma.StringFilter<"LocalVectorStore"> | string
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStore"> | $Enums.Provider
+  storeName?: Prisma.StringFilter<"LocalVectorStore"> | string
+  defaultEmbeddingModel?: Prisma.StringFilter<"LocalVectorStore"> | string
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStore"> | number
+  fileCount?: Prisma.IntFilter<"LocalVectorStore"> | number
+  totalBytes?: Prisma.BigIntNullableFilter<"LocalVectorStore"> | bigint | number | null
+  totalChunks?: Prisma.IntFilter<"LocalVectorStore"> | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStore"> | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStore"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStore"> | Date | string
 }
 
 export type LocalVectorStoreCreateManyUserInput = {
-  id?: string | runtime.Types.Skip
+  id?: string
   provider: $Enums.Provider
   storeName: string
-  defaultEmbeddingModel?: string | runtime.Types.Skip
-  embeddingDim?: number | runtime.Types.Skip
-  fileCount?: number | runtime.Types.Skip
-  totalBytes?: bigint | number | null | runtime.Types.Skip
-  totalChunks?: number | runtime.Types.Skip
-  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Date | string | null | runtime.Types.Skip
-  createdAt?: Date | string | runtime.Types.Skip
-  updatedAt?: Date | string | runtime.Types.Skip
+  defaultEmbeddingModel?: string
+  embeddingDim?: number
+  fileCount?: number
+  totalBytes?: bigint | number | null
+  totalChunks?: number
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUpdateManyWithoutStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  docs?: Prisma.LocalVectorStoreDocUpdateManyWithoutStoreNestedInput
 }
 
 export type LocalVectorStoreUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  docs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutStoreNestedInput | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  docs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutStoreNestedInput
 }
 
 export type LocalVectorStoreUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
-  storeName?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  fileCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
-  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
-  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultEmbeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
+  fileCount?: Prisma.IntFieldUpdateOperationsInput | number
+  totalBytes?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  totalChunks?: Prisma.IntFieldUpdateOperationsInput | number
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -879,90 +879,90 @@ export type LocalVectorStoreCountOutputTypeDefaultArgs<ExtArgs extends runtime.T
  * LocalVectorStoreCountOutputType without action
  */
 export type LocalVectorStoreCountOutputTypeCountDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocWhereInput
 }
 
 
 export type LocalVectorStoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  storeName?: boolean | runtime.Types.Skip
-  defaultEmbeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  fileCount?: boolean | runtime.Types.Skip
-  totalBytes?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  docs?: boolean | Prisma.LocalVectorStore$docsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.LocalVectorStoreCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  storeName?: boolean
+  defaultEmbeddingModel?: boolean
+  embeddingDim?: boolean
+  fileCount?: boolean
+  totalBytes?: boolean
+  totalChunks?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  docs?: boolean | Prisma.LocalVectorStore$docsArgs<ExtArgs>
+  _count?: boolean | Prisma.LocalVectorStoreCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStore"]>
 
 export type LocalVectorStoreSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  storeName?: boolean | runtime.Types.Skip
-  defaultEmbeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  fileCount?: boolean | runtime.Types.Skip
-  totalBytes?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  storeName?: boolean
+  defaultEmbeddingModel?: boolean
+  embeddingDim?: boolean
+  fileCount?: boolean
+  totalBytes?: boolean
+  totalChunks?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStore"]>
 
 export type LocalVectorStoreSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  storeName?: boolean | runtime.Types.Skip
-  defaultEmbeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  fileCount?: boolean | runtime.Types.Skip
-  totalBytes?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  storeName?: boolean
+  defaultEmbeddingModel?: boolean
+  embeddingDim?: boolean
+  fileCount?: boolean
+  totalBytes?: boolean
+  totalChunks?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStore"]>
 
 export type LocalVectorStoreSelectScalar = {
-  id?: boolean | runtime.Types.Skip
-  userId?: boolean | runtime.Types.Skip
-  provider?: boolean | runtime.Types.Skip
-  storeName?: boolean | runtime.Types.Skip
-  defaultEmbeddingModel?: boolean | runtime.Types.Skip
-  embeddingDim?: boolean | runtime.Types.Skip
-  fileCount?: boolean | runtime.Types.Skip
-  totalBytes?: boolean | runtime.Types.Skip
-  totalChunks?: boolean | runtime.Types.Skip
-  schemaVersion?: boolean | runtime.Types.Skip
-  lastSyncedAt?: boolean | runtime.Types.Skip
-  createdAt?: boolean | runtime.Types.Skip
-  updatedAt?: boolean | runtime.Types.Skip
+  id?: boolean
+  userId?: boolean
+  provider?: boolean
+  storeName?: boolean
+  defaultEmbeddingModel?: boolean
+  embeddingDim?: boolean
+  fileCount?: boolean
+  totalBytes?: boolean
+  totalChunks?: boolean
+  schemaVersion?: boolean
+  lastSyncedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type LocalVectorStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "storeName" | "defaultEmbeddingModel" | "embeddingDim" | "fileCount" | "totalBytes" | "totalChunks" | "schemaVersion" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStore"], runtime.Types.Skip>
+export type LocalVectorStoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "storeName" | "defaultEmbeddingModel" | "embeddingDim" | "fileCount" | "totalBytes" | "totalChunks" | "schemaVersion" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStore"]>
 export type LocalVectorStoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
-  docs?: boolean | Prisma.LocalVectorStore$docsArgs<ExtArgs> | runtime.Types.Skip
-  _count?: boolean | Prisma.LocalVectorStoreCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  docs?: boolean | Prisma.LocalVectorStore$docsArgs<ExtArgs>
+  _count?: boolean | Prisma.LocalVectorStoreCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LocalVectorStoreIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type LocalVectorStoreIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $LocalVectorStorePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1447,7 +1447,7 @@ export type LocalVectorStoreFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which LocalVectorStore to fetch.
    */
   where: Prisma.LocalVectorStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1470,7 +1470,7 @@ export type LocalVectorStoreFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which LocalVectorStore to fetch.
    */
   where: Prisma.LocalVectorStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1492,38 +1492,38 @@ export type LocalVectorStoreFindFirstArgs<ExtArgs extends runtime.Types.Extensio
   /**
    * Filter, which LocalVectorStore to fetch.
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStores to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStores.
    */
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStores.
    */
-  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1545,38 +1545,38 @@ export type LocalVectorStoreFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter, which LocalVectorStore to fetch.
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStores to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStores.
    */
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStores.
    */
-  skip?: number | runtime.Types.Skip
+  skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStores.
    */
-  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1598,33 +1598,33 @@ export type LocalVectorStoreFindManyArgs<ExtArgs extends runtime.Types.Extension
   /**
    * Filter, which LocalVectorStores to fetch.
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStores to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing LocalVectorStores.
    */
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStores from the position of the cursor.
    */
-  take?: number | runtime.Types.Skip
+  take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStores.
    */
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[] | runtime.Types.Skip
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  skip?: number
+  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1647,7 +1647,7 @@ export type LocalVectorStoreCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a LocalVectorStore.
    */
   data: Prisma.XOR<Prisma.LocalVectorStoreCreateInput, Prisma.LocalVectorStoreUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1658,7 +1658,7 @@ export type LocalVectorStoreCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many LocalVectorStores.
    */
   data: Prisma.LocalVectorStoreCreateManyInput | Prisma.LocalVectorStoreCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1677,7 +1677,7 @@ export type LocalVectorStoreCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    * The data used to create many LocalVectorStores.
    */
   data: Prisma.LocalVectorStoreCreateManyInput | Prisma.LocalVectorStoreCreateManyInput[]
-  skipDuplicates?: boolean | runtime.Types.Skip
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1708,7 +1708,7 @@ export type LocalVectorStoreUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which LocalVectorStore to update.
    */
   where: Prisma.LocalVectorStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1722,11 +1722,11 @@ export type LocalVectorStoreUpdateManyArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which LocalVectorStores to update
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * Limit how many LocalVectorStores to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1748,11 +1748,11 @@ export type LocalVectorStoreUpdateManyAndReturnArgs<ExtArgs extends runtime.Type
   /**
    * Filter which LocalVectorStores to update
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * Limit how many LocalVectorStores to update.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1787,7 +1787,7 @@ export type LocalVectorStoreUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the LocalVectorStore was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.LocalVectorStoreUpdateInput, Prisma.LocalVectorStoreUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1810,7 +1810,7 @@ export type LocalVectorStoreDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which LocalVectorStore to delete.
    */
   where: Prisma.LocalVectorStoreWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1820,11 +1820,11 @@ export type LocalVectorStoreDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which LocalVectorStores to delete
    */
-  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreWhereInput
   /**
    * Limit how many LocalVectorStores to delete.
    */
-  limit?: number | runtime.Types.Skip
+  limit?: number
 }
 
 /**
@@ -1843,12 +1843,12 @@ export type LocalVectorStore$docsArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.LocalVectorStoreDocInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
-  take?: number | runtime.Types.Skip
-  skip?: number | runtime.Types.Skip
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[] | runtime.Types.Skip
+  where?: Prisma.LocalVectorStoreDocWhereInput
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
 }
 
 /**
