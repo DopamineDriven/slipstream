@@ -1,14 +1,13 @@
-import type { PrismaConfig } from "prisma/config";
-import { defineConfig } from "prisma/config";
 import "dotenv/config";
-import { relative } from "node:path";
+import type { PrismaConfig } from "prisma/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: relative(process.cwd(), "prisma/schema"),
-  typedSql: {
-    path: relative(process.cwd(), "prisma/sql")
-  },
+  schema: "prisma/schema",
+  typedSql: { path: "prisma/sql" },
+  experimental: { extensions: true },
+  datasource: { url: env("DATABASE_URL") },
   migrations: {
-    path: relative(process.cwd(), "prisma/migrations")
+    path: "prisma/migrations"
   }
 } satisfies PrismaConfig);

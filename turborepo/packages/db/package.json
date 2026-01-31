@@ -12,16 +12,9 @@
     "lint": "eslint",
     "format": "prisma format",
     "clean": "git clean -xdf .turbo dist node_modules",
-    "postbuild": "pnpm cp:binaries",
     "prebuild": "rm -rf dist/ && pnpm db:generate",
     "predev": "pnpm db:generate",
-    "predb:generate:node": "tsx src/test/schema-manipulate.ts --target node",
-    "db:generate:node": "prisma generate --sql",
-    "postdb:generate:node": "tsx src/test/schema-manipulate.ts --restore from-node",
-    "predb:generate:edge": "tsx src/test/schema-manipulate.ts --target edge",
-    "db:generate:edge": "prisma generate --sql",
-    "postdb:generate:edge": "tsx src/test/schema-manipulate.ts --restore from-edge",
-    "db:generate": "pnpm db:generate:node && pnpm db:generate:edge",
+    "db:generate": "prisma generate --sql",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio --browser none --port 7777",
@@ -30,15 +23,24 @@
   },
   "files": [
     "dist/**",
-    "edge/**",
     "prisma/**",
     "package.json"
   ],
   "exports": {
+    "./factory": {
+      "types": "./dist/factory.d.ts",
+      "import": "./dist/factory.js",
+      "default": "./dist/factory.js"
+    },
     "./node": {
       "types": "./dist/db.d.ts",
       "import": "./dist/db.js",
       "default": "./dist/db.js"
+    },
+    "./db-accelerate": {
+      "types": "./dist/db-accelerate.d.ts",
+      "import": "./dist/db-accelerate.js",
+      "default": "./dist/db-accelerate.js"
     },
     "./node/generated/client": {
       "types": "./dist/client-node.d.ts",
@@ -59,55 +61,14 @@
       "types": "./dist/enums-node.d.ts",
       "import": "./dist/enums-node.js",
       "default": "./dist/enums-node.js"
-    },
-    "./edge": {
-      "types": "./edge/db-edge.ts",
-      "import": "./edge/db-edge.ts",
-      "default": "./edge/db-edge.ts"
-    },
-    "./wasm": {
-      "types": "./edge/wasm.ts",
-      "import": "./edge/wasm.ts",
-      "default": "./edge/wasm.ts"
-    },
-    "./edge-client-edge": {
-      "types": "./edge/client-edge.ts",
-      "import": "./edge/client-edge.ts",
-      "default": "./edge/client-edge.ts"
-    },
-    "./edge-client": {
-      "types": "./edge/client.ts",
-      "import": "./edge/client.ts",
-      "default": "./edge/client.ts"
-    },
-    "./edge-sql": {
-      "types": "./edge/sql.ts",
-      "import": "./edge/sql.ts",
-      "default": "./edge/sql.ts"
-    },
-    "./edge-generated-sql": {
-      "types": "./edge/generated/client/sql/*.d.ts",
-      "import": "./edge/generated/client/sql/*.mjs",
-      "default": "./edge/generated/client/sql/*.js"
-    },
-    "./edge-generated": {
-      "types": "./edge/generated/client/*.d.ts",
-      "import": "./edge/generated/client/*.mjs",
-      "default": "./edge/generated/client/*.js"
-    },
-    "./edge-generated-runtime": {
-      "types": "./edge/generated/client/runtime/*.d.ts",
-      "import": "./edge/generated/client/runtime/*.js",
-      "default": "./edge/generated/client/runtime/*.js"
     }
   },
   "dependencies": {
     "@prisma/adapter-pg": "catalog:prisma",
     "@prisma/client": "catalog:prisma",
+    "@prisma/client-runtime-utils": "catalog:prisma",
     "@prisma/extension-accelerate": "catalog:prisma",
-    "@prisma/extension-optimize": "catalog:prisma",
-    "@prisma/instrumentation": "catalog:prisma",
-    "jiti": "catalog:jiti"
+    "dotenv": "catalog:dotenv"
   },
   "devDependencies": {
     "@d0paminedriven/fs": "catalog:dd",
@@ -115,15 +76,17 @@
     "@slipstream/prettier-config": "workspace:*",
     "@slipstream/tsconfig": "workspace:*",
     "@types/node": "catalog:node",
-    "@typescript/native-preview": "catalog:tsgo",
     "@types/pg": "catalog:pg",
+    "@typescript/native-preview": "catalog:tsgo",
     "dotenv": "catalog:dotenv",
     "eslint": "catalog:eslint",
+    "jiti": "catalog:jiti",
     "pg": "catalog:pg",
     "prettier": "catalog:prettier",
     "prisma": "catalog:prisma",
     "rolldown": "catalog:rolldown",
     "rolldown-plugin-dts": "catalog:rolldown",
+    "rolldown-plugin-wasm": "catalog:rolldown",
     "tsdown": "catalog:tsdown",
     "tslib": "catalog:tslib",
     "tsx": "catalog:tsx",

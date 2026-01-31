@@ -1,1 +1,1 @@
-export * from "./generated/prisma/sql";
+export * from "./generated/prisma/sql.ts";

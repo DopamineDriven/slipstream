@@ -15,10 +15,10 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 import type { CTR, Rm, RTC, XOR } from "@slipstream/types";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaAttachmentService extends PrismaAttachmentProviderService {
-  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+  constructor(prisma: PrismaDbService, extractor: ExtractService, isProd: boolean) {
     super(prisma, extractor, isProd);
   }
 

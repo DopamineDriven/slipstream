@@ -16,7 +16,7 @@ import type {
   ProviderStoreSingleton,
   XOR
 } from "@slipstream/types";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
 
 export interface AttachmentSingletonWithProvider<
   T extends $Enums.Provider
@@ -28,7 +28,7 @@ export type AttachmentSingletonProviderWorkup<T extends $Enums.Provider> =
   AttachmentSingleton<true> & { provider: T };
 export class PrismaAttachmentProviderService extends PrismaUtilsService {
   public extractor: ExtractService;
-  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+  constructor(prisma: PrismaDbService, extractor: ExtractService, isProd: boolean) {
     super(prisma, isProd);
     this.extractor = extractor;
   }

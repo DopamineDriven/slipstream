@@ -52,12 +52,11 @@ catalogs:
   prettier:
     prettier: ^3.8.1
   prisma:
-    prisma: ^6.19.1
-    "@prisma/adapter-pg": ^6.19.1
-    "@prisma/client": ^6.19.1
-    "@prisma/extension-accelerate": ^2.0.2
-    "@prisma/extension-optimize": ^2.0.1
-    "@prisma/instrumentation": ^6.19.1
+    prisma: ^7.3.0
+    "@prisma/adapter-pg": ^7.3.0
+    "@prisma/client": ^7.3.0
+    "@prisma/client-runtime-utils": ^7.3.0
+    "@prisma/extension-accelerate": ^3.0.1
   react:
     react: ^19.2.4
     react-dom: ^19.2.4
@@ -69,6 +68,7 @@ catalogs:
   rolldown:
     rolldown: ^1.0.0-rc.2
     rolldown-plugin-dts: ^0.21.8
+    rolldown-plugin-wasm: ^0.2.1
   sharp:
     sharp: ^0.34.5
   shiki:

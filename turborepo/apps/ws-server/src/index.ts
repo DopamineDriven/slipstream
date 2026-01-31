@@ -67,9 +67,13 @@ async function exe() {
     );
     const connectionString = process.env.DATABASE_URL ?? cfg.DATABASE_URL;
 
-    const { DbService } = await import("@slipstream/db/node");
+    const { PrismaDbService } = await import("@slipstream/db/factory");
 
-    const db = new DbService(connectionString);
+    const db = new PrismaDbService({
+      connectionString,
+      poolMax: 100,
+      idleTimeoutMs: 30000
+    });
 
     const { PrismaService } = await import("@/prisma/index.ts");
 
@@ -280,7 +284,6 @@ declare global {
           ? `${K}`
           : never
       : never)[];
-
   }
 }
 

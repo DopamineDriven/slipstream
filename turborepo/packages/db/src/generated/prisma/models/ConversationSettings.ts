@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ConversationSettings
@@ -95,101 +95,101 @@ export type ConversationSettingsCountAggregateOutputType = {
 
 
 export type ConversationSettingsAvgAggregateInputType = {
-  maxTokens?: true
-  temperature?: true
-  topP?: true
+  maxTokens?: true | runtime.Types.Skip
+  temperature?: true | runtime.Types.Skip
+  topP?: true | runtime.Types.Skip
 }
 
 export type ConversationSettingsSumAggregateInputType = {
-  maxTokens?: true
-  temperature?: true
-  topP?: true
+  maxTokens?: true | runtime.Types.Skip
+  temperature?: true | runtime.Types.Skip
+  topP?: true | runtime.Types.Skip
 }
 
 export type ConversationSettingsMinAggregateInputType = {
-  id?: true
-  conversationId?: true
-  systemPrompt?: true
-  enableThinking?: true
-  trackUsage?: true
-  enableWebSearch?: true
-  enableAssetGen?: true
-  reasoningEffort?: true
-  outputVerbosity?: true
-  maxTokens?: true
-  usageAlerts?: true
-  temperature?: true
-  topP?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  systemPrompt?: true | runtime.Types.Skip
+  enableThinking?: true | runtime.Types.Skip
+  trackUsage?: true | runtime.Types.Skip
+  enableWebSearch?: true | runtime.Types.Skip
+  enableAssetGen?: true | runtime.Types.Skip
+  reasoningEffort?: true | runtime.Types.Skip
+  outputVerbosity?: true | runtime.Types.Skip
+  maxTokens?: true | runtime.Types.Skip
+  usageAlerts?: true | runtime.Types.Skip
+  temperature?: true | runtime.Types.Skip
+  topP?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type ConversationSettingsMaxAggregateInputType = {
-  id?: true
-  conversationId?: true
-  systemPrompt?: true
-  enableThinking?: true
-  trackUsage?: true
-  enableWebSearch?: true
-  enableAssetGen?: true
-  reasoningEffort?: true
-  outputVerbosity?: true
-  maxTokens?: true
-  usageAlerts?: true
-  temperature?: true
-  topP?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  systemPrompt?: true | runtime.Types.Skip
+  enableThinking?: true | runtime.Types.Skip
+  trackUsage?: true | runtime.Types.Skip
+  enableWebSearch?: true | runtime.Types.Skip
+  enableAssetGen?: true | runtime.Types.Skip
+  reasoningEffort?: true | runtime.Types.Skip
+  outputVerbosity?: true | runtime.Types.Skip
+  maxTokens?: true | runtime.Types.Skip
+  usageAlerts?: true | runtime.Types.Skip
+  temperature?: true | runtime.Types.Skip
+  topP?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type ConversationSettingsCountAggregateInputType = {
-  id?: true
-  conversationId?: true
-  systemPrompt?: true
-  enableThinking?: true
-  trackUsage?: true
-  enableWebSearch?: true
-  enableAssetGen?: true
-  reasoningEffort?: true
-  outputVerbosity?: true
-  maxTokens?: true
-  usageAlerts?: true
-  temperature?: true
-  topP?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  systemPrompt?: true | runtime.Types.Skip
+  enableThinking?: true | runtime.Types.Skip
+  trackUsage?: true | runtime.Types.Skip
+  enableWebSearch?: true | runtime.Types.Skip
+  enableAssetGen?: true | runtime.Types.Skip
+  reasoningEffort?: true | runtime.Types.Skip
+  outputVerbosity?: true | runtime.Types.Skip
+  maxTokens?: true | runtime.Types.Skip
+  usageAlerts?: true | runtime.Types.Skip
+  temperature?: true | runtime.Types.Skip
+  topP?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type ConversationSettingsAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ConversationSettings to aggregate.
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationSettings to fetch.
    */
-  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ConversationSettingsWhereUniqueInput
+  cursor?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationSettings from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationSettings.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -234,12 +234,12 @@ export type GetConversationSettingsAggregateType<T extends ConversationSettingsA
 
 
 export type ConversationSettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationSettingsWhereInput
-  orderBy?: Prisma.ConversationSettingsOrderByWithAggregationInput | Prisma.ConversationSettingsOrderByWithAggregationInput[]
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ConversationSettingsOrderByWithAggregationInput | Prisma.ConversationSettingsOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.ConversationSettingsScalarFieldEnum[] | Prisma.ConversationSettingsScalarFieldEnum
-  having?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: ConversationSettingsCountAggregateInputType | true
   _avg?: ConversationSettingsAvgAggregateInputType
   _sum?: ConversationSettingsSumAggregateInputType
@@ -286,380 +286,380 @@ type GetConversationSettingsGroupByPayload<T extends ConversationSettingsGroupBy
 
 
 export type ConversationSettingsWhereInput = {
-  AND?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[]
-  OR?: Prisma.ConversationSettingsWhereInput[]
-  NOT?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[]
-  id?: Prisma.StringFilter<"ConversationSettings"> | string
-  conversationId?: Prisma.StringFilter<"ConversationSettings"> | string
-  systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null
-  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
-  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
-  topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
-  createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  AND?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"ConversationSettings"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"ConversationSettings"> | string | runtime.Types.Skip
+  systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
 }
 
 export type ConversationSettingsOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder
-  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
-  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder
-  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder
-  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
-  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
-  temperature?: Prisma.SortOrderInput | Prisma.SortOrder
-  topP?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  conversation?: Prisma.ConversationOrderByWithRelationInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  conversation?: Prisma.ConversationOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  conversationId?: string
-  AND?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[]
-  OR?: Prisma.ConversationSettingsWhereInput[]
-  NOT?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[]
-  systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null
-  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null
-  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null
-  temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
-  topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null
-  createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  id?: string | runtime.Types.Skip
+  conversationId?: string | runtime.Types.Skip
+  AND?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationSettingsWhereInput | Prisma.ConversationSettingsWhereInput[] | runtime.Types.Skip
+  systemPrompt?: Prisma.StringNullableFilter<"ConversationSettings"> | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.IntNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.BoolNullableFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  topP?: Prisma.FloatNullableFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
 }, "id" | "conversationId">
 
 export type ConversationSettingsOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder
-  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder
-  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder
-  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder
-  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder
-  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder
-  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder
-  temperature?: Prisma.SortOrderInput | Prisma.SortOrder
-  topP?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.ConversationSettingsCountOrderByAggregateInput
-  _avg?: Prisma.ConversationSettingsAvgOrderByAggregateInput
-  _max?: Prisma.ConversationSettingsMaxOrderByAggregateInput
-  _min?: Prisma.ConversationSettingsMinOrderByAggregateInput
-  _sum?: Prisma.ConversationSettingsSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  systemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableThinking?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  trackUsage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableWebSearch?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  enableAssetGen?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  reasoningEffort?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  outputVerbosity?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  maxTokens?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  usageAlerts?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.ConversationSettingsCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.ConversationSettingsAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.ConversationSettingsMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.ConversationSettingsMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.ConversationSettingsSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput | Prisma.ConversationSettingsScalarWhereWithAggregatesInput[]
-  OR?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput | Prisma.ConversationSettingsScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string
-  systemPrompt?: Prisma.StringNullableWithAggregatesFilter<"ConversationSettings"> | string | null
-  enableThinking?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
-  trackUsage?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
-  enableWebSearch?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
-  enableAssetGen?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
-  reasoningEffort?: Prisma.EnumReasoningEffortNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.EnumOutputVerbosityNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.IntNullableWithAggregatesFilter<"ConversationSettings"> | number | null
-  usageAlerts?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null
-  temperature?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null
-  topP?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationSettings"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationSettings"> | Date | string
+  AND?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput | Prisma.ConversationSettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationSettingsScalarWhereWithAggregatesInput | Prisma.ConversationSettingsScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationSettings"> | string | runtime.Types.Skip
+  systemPrompt?: Prisma.StringNullableWithAggregatesFilter<"ConversationSettings"> | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.EnumReasoningEffortNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.EnumOutputVerbosityNullableWithAggregatesFilter<"ConversationSettings"> | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.IntNullableWithAggregatesFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.BoolNullableWithAggregatesFilter<"ConversationSettings"> | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  topP?: Prisma.FloatNullableWithAggregatesFilter<"ConversationSettings"> | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationSettings"> | Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsCreateInput = {
-  id?: string
-  systemPrompt?: string | null
-  enableThinking?: boolean | null
-  trackUsage?: boolean | null
-  enableWebSearch?: boolean | null
-  enableAssetGen?: boolean | null
-  reasoningEffort?: $Enums.ReasoningEffort | null
-  outputVerbosity?: $Enums.OutputVerbosity | null
-  maxTokens?: number | null
-  usageAlerts?: boolean | null
-  temperature?: number | null
-  topP?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  id?: string | runtime.Types.Skip
+  systemPrompt?: string | null | runtime.Types.Skip
+  enableThinking?: boolean | null | runtime.Types.Skip
+  trackUsage?: boolean | null | runtime.Types.Skip
+  enableWebSearch?: boolean | null | runtime.Types.Skip
+  enableAssetGen?: boolean | null | runtime.Types.Skip
+  reasoningEffort?: $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: number | null | runtime.Types.Skip
+  usageAlerts?: boolean | null | runtime.Types.Skip
+  temperature?: number | null | runtime.Types.Skip
+  topP?: number | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutConversationSettingsInput
 }
 
 export type ConversationSettingsUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  systemPrompt?: string | null
-  enableThinking?: boolean | null
-  trackUsage?: boolean | null
-  enableWebSearch?: boolean | null
-  enableAssetGen?: boolean | null
-  reasoningEffort?: $Enums.ReasoningEffort | null
-  outputVerbosity?: $Enums.OutputVerbosity | null
-  maxTokens?: number | null
-  usageAlerts?: boolean | null
-  temperature?: number | null
-  topP?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  systemPrompt?: string | null | runtime.Types.Skip
+  enableThinking?: boolean | null | runtime.Types.Skip
+  trackUsage?: boolean | null | runtime.Types.Skip
+  enableWebSearch?: boolean | null | runtime.Types.Skip
+  enableAssetGen?: boolean | null | runtime.Types.Skip
+  reasoningEffort?: $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: number | null | runtime.Types.Skip
+  usageAlerts?: boolean | null | runtime.Types.Skip
+  temperature?: number | null | runtime.Types.Skip
+  topP?: number | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationSettingsNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationSettingsNestedInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  systemPrompt?: string | null
-  enableThinking?: boolean | null
-  trackUsage?: boolean | null
-  enableWebSearch?: boolean | null
-  enableAssetGen?: boolean | null
-  reasoningEffort?: $Enums.ReasoningEffort | null
-  outputVerbosity?: $Enums.OutputVerbosity | null
-  maxTokens?: number | null
-  usageAlerts?: boolean | null
-  temperature?: number | null
-  topP?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  systemPrompt?: string | null | runtime.Types.Skip
+  enableThinking?: boolean | null | runtime.Types.Skip
+  trackUsage?: boolean | null | runtime.Types.Skip
+  enableWebSearch?: boolean | null | runtime.Types.Skip
+  enableAssetGen?: boolean | null | runtime.Types.Skip
+  reasoningEffort?: $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: number | null | runtime.Types.Skip
+  usageAlerts?: boolean | null | runtime.Types.Skip
+  temperature?: number | null | runtime.Types.Skip
+  topP?: number | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsNullableScalarRelationFilter = {
-  is?: Prisma.ConversationSettingsWhereInput | null
-  isNot?: Prisma.ConversationSettingsWhereInput | null
+  is?: Prisma.ConversationSettingsWhereInput | null | runtime.Types.Skip
+  isNot?: Prisma.ConversationSettingsWhereInput | null | runtime.Types.Skip
 }
 
 export type ConversationSettingsCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  systemPrompt?: Prisma.SortOrder
-  enableThinking?: Prisma.SortOrder
-  trackUsage?: Prisma.SortOrder
-  enableWebSearch?: Prisma.SortOrder
-  enableAssetGen?: Prisma.SortOrder
-  reasoningEffort?: Prisma.SortOrder
-  outputVerbosity?: Prisma.SortOrder
-  maxTokens?: Prisma.SortOrder
-  usageAlerts?: Prisma.SortOrder
-  temperature?: Prisma.SortOrder
-  topP?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
+  enableThinking?: Prisma.SortOrder | runtime.Types.Skip
+  trackUsage?: Prisma.SortOrder | runtime.Types.Skip
+  enableWebSearch?: Prisma.SortOrder | runtime.Types.Skip
+  enableAssetGen?: Prisma.SortOrder | runtime.Types.Skip
+  reasoningEffort?: Prisma.SortOrder | runtime.Types.Skip
+  outputVerbosity?: Prisma.SortOrder | runtime.Types.Skip
+  maxTokens?: Prisma.SortOrder | runtime.Types.Skip
+  usageAlerts?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationSettingsAvgOrderByAggregateInput = {
-  maxTokens?: Prisma.SortOrder
-  temperature?: Prisma.SortOrder
-  topP?: Prisma.SortOrder
+  maxTokens?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationSettingsMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  systemPrompt?: Prisma.SortOrder
-  enableThinking?: Prisma.SortOrder
-  trackUsage?: Prisma.SortOrder
-  enableWebSearch?: Prisma.SortOrder
-  enableAssetGen?: Prisma.SortOrder
-  reasoningEffort?: Prisma.SortOrder
-  outputVerbosity?: Prisma.SortOrder
-  maxTokens?: Prisma.SortOrder
-  usageAlerts?: Prisma.SortOrder
-  temperature?: Prisma.SortOrder
-  topP?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
+  enableThinking?: Prisma.SortOrder | runtime.Types.Skip
+  trackUsage?: Prisma.SortOrder | runtime.Types.Skip
+  enableWebSearch?: Prisma.SortOrder | runtime.Types.Skip
+  enableAssetGen?: Prisma.SortOrder | runtime.Types.Skip
+  reasoningEffort?: Prisma.SortOrder | runtime.Types.Skip
+  outputVerbosity?: Prisma.SortOrder | runtime.Types.Skip
+  maxTokens?: Prisma.SortOrder | runtime.Types.Skip
+  usageAlerts?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationSettingsMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  systemPrompt?: Prisma.SortOrder
-  enableThinking?: Prisma.SortOrder
-  trackUsage?: Prisma.SortOrder
-  enableWebSearch?: Prisma.SortOrder
-  enableAssetGen?: Prisma.SortOrder
-  reasoningEffort?: Prisma.SortOrder
-  outputVerbosity?: Prisma.SortOrder
-  maxTokens?: Prisma.SortOrder
-  usageAlerts?: Prisma.SortOrder
-  temperature?: Prisma.SortOrder
-  topP?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  systemPrompt?: Prisma.SortOrder | runtime.Types.Skip
+  enableThinking?: Prisma.SortOrder | runtime.Types.Skip
+  trackUsage?: Prisma.SortOrder | runtime.Types.Skip
+  enableWebSearch?: Prisma.SortOrder | runtime.Types.Skip
+  enableAssetGen?: Prisma.SortOrder | runtime.Types.Skip
+  reasoningEffort?: Prisma.SortOrder | runtime.Types.Skip
+  outputVerbosity?: Prisma.SortOrder | runtime.Types.Skip
+  maxTokens?: Prisma.SortOrder | runtime.Types.Skip
+  usageAlerts?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationSettingsSumOrderByAggregateInput = {
-  maxTokens?: Prisma.SortOrder
-  temperature?: Prisma.SortOrder
-  topP?: Prisma.SortOrder
+  maxTokens?: Prisma.SortOrder | runtime.Types.Skip
+  temperature?: Prisma.SortOrder | runtime.Types.Skip
+  topP?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationSettingsCreateNestedOneWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput
-  connect?: Prisma.ConversationSettingsWhereUniqueInput
+  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  connect?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedCreateNestedOneWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput
-  connect?: Prisma.ConversationSettingsWhereUniqueInput
+  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  connect?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsUpdateOneWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput
-  upsert?: Prisma.ConversationSettingsUpsertWithoutConversationInput
-  disconnect?: Prisma.ConversationSettingsWhereInput | boolean
-  delete?: Prisma.ConversationSettingsWhereInput | boolean
-  connect?: Prisma.ConversationSettingsWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
+  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  upsert?: Prisma.ConversationSettingsUpsertWithoutConversationInput | runtime.Types.Skip
+  disconnect?: Prisma.ConversationSettingsWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.ConversationSettingsWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput> | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedUpdateOneWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput
-  upsert?: Prisma.ConversationSettingsUpsertWithoutConversationInput
-  disconnect?: Prisma.ConversationSettingsWhereInput | boolean
-  delete?: Prisma.ConversationSettingsWhereInput | boolean
-  connect?: Prisma.ConversationSettingsWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
+  create?: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationSettingsCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  upsert?: Prisma.ConversationSettingsUpsertWithoutConversationInput | runtime.Types.Skip
+  disconnect?: Prisma.ConversationSettingsWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.ConversationSettingsWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationSettingsUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationSettingsUpdateWithoutConversationInput>, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput> | runtime.Types.Skip
 }
 
 export type NullableEnumReasoningEffortFieldUpdateOperationsInput = {
-  set?: $Enums.ReasoningEffort | null
+  set?: $Enums.ReasoningEffort | null | runtime.Types.Skip
 }
 
 export type NullableEnumOutputVerbosityFieldUpdateOperationsInput = {
-  set?: $Enums.OutputVerbosity | null
+  set?: $Enums.OutputVerbosity | null | runtime.Types.Skip
 }
 
 export type ConversationSettingsCreateWithoutConversationInput = {
-  id?: string
-  systemPrompt?: string | null
-  enableThinking?: boolean | null
-  trackUsage?: boolean | null
-  enableWebSearch?: boolean | null
-  enableAssetGen?: boolean | null
-  reasoningEffort?: $Enums.ReasoningEffort | null
-  outputVerbosity?: $Enums.OutputVerbosity | null
-  maxTokens?: number | null
-  usageAlerts?: boolean | null
-  temperature?: number | null
-  topP?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  id?: string | runtime.Types.Skip
+  systemPrompt?: string | null | runtime.Types.Skip
+  enableThinking?: boolean | null | runtime.Types.Skip
+  trackUsage?: boolean | null | runtime.Types.Skip
+  enableWebSearch?: boolean | null | runtime.Types.Skip
+  enableAssetGen?: boolean | null | runtime.Types.Skip
+  reasoningEffort?: $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: number | null | runtime.Types.Skip
+  usageAlerts?: boolean | null | runtime.Types.Skip
+  temperature?: number | null | runtime.Types.Skip
+  topP?: number | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedCreateWithoutConversationInput = {
-  id?: string
-  systemPrompt?: string | null
-  enableThinking?: boolean | null
-  trackUsage?: boolean | null
-  enableWebSearch?: boolean | null
-  enableAssetGen?: boolean | null
-  reasoningEffort?: $Enums.ReasoningEffort | null
-  outputVerbosity?: $Enums.OutputVerbosity | null
-  maxTokens?: number | null
-  usageAlerts?: boolean | null
-  temperature?: number | null
-  topP?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  id?: string | runtime.Types.Skip
+  systemPrompt?: string | null | runtime.Types.Skip
+  enableThinking?: boolean | null | runtime.Types.Skip
+  trackUsage?: boolean | null | runtime.Types.Skip
+  enableWebSearch?: boolean | null | runtime.Types.Skip
+  enableAssetGen?: boolean | null | runtime.Types.Skip
+  reasoningEffort?: $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: number | null | runtime.Types.Skip
+  usageAlerts?: boolean | null | runtime.Types.Skip
+  temperature?: number | null | runtime.Types.Skip
+  topP?: number | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsCreateOrConnectWithoutConversationInput = {
@@ -670,134 +670,134 @@ export type ConversationSettingsCreateOrConnectWithoutConversationInput = {
 export type ConversationSettingsUpsertWithoutConversationInput = {
   update: Prisma.XOR<Prisma.ConversationSettingsUpdateWithoutConversationInput, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
   create: Prisma.XOR<Prisma.ConversationSettingsCreateWithoutConversationInput, Prisma.ConversationSettingsUncheckedCreateWithoutConversationInput>
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
 }
 
 export type ConversationSettingsUpdateToOneWithWhereWithoutConversationInput = {
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.ConversationSettingsUpdateWithoutConversationInput, Prisma.ConversationSettingsUncheckedUpdateWithoutConversationInput>
 }
 
 export type ConversationSettingsUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type ConversationSettingsUncheckedUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null
-  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null
-  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  systemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  enableThinking?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  trackUsage?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableWebSearch?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  enableAssetGen?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  reasoningEffort?: Prisma.NullableEnumReasoningEffortFieldUpdateOperationsInput | $Enums.ReasoningEffort | null | runtime.Types.Skip
+  outputVerbosity?: Prisma.NullableEnumOutputVerbosityFieldUpdateOperationsInput | $Enums.OutputVerbosity | null | runtime.Types.Skip
+  maxTokens?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  usageAlerts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  temperature?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  topP?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 
 
 export type ConversationSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  systemPrompt?: boolean
-  enableThinking?: boolean
-  trackUsage?: boolean
-  enableWebSearch?: boolean
-  enableAssetGen?: boolean
-  reasoningEffort?: boolean
-  outputVerbosity?: boolean
-  maxTokens?: boolean
-  usageAlerts?: boolean
-  temperature?: boolean
-  topP?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  systemPrompt?: boolean | runtime.Types.Skip
+  enableThinking?: boolean | runtime.Types.Skip
+  trackUsage?: boolean | runtime.Types.Skip
+  enableWebSearch?: boolean | runtime.Types.Skip
+  enableAssetGen?: boolean | runtime.Types.Skip
+  reasoningEffort?: boolean | runtime.Types.Skip
+  outputVerbosity?: boolean | runtime.Types.Skip
+  maxTokens?: boolean | runtime.Types.Skip
+  usageAlerts?: boolean | runtime.Types.Skip
+  temperature?: boolean | runtime.Types.Skip
+  topP?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationSettings"]>
 
 export type ConversationSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  systemPrompt?: boolean
-  enableThinking?: boolean
-  trackUsage?: boolean
-  enableWebSearch?: boolean
-  enableAssetGen?: boolean
-  reasoningEffort?: boolean
-  outputVerbosity?: boolean
-  maxTokens?: boolean
-  usageAlerts?: boolean
-  temperature?: boolean
-  topP?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  systemPrompt?: boolean | runtime.Types.Skip
+  enableThinking?: boolean | runtime.Types.Skip
+  trackUsage?: boolean | runtime.Types.Skip
+  enableWebSearch?: boolean | runtime.Types.Skip
+  enableAssetGen?: boolean | runtime.Types.Skip
+  reasoningEffort?: boolean | runtime.Types.Skip
+  outputVerbosity?: boolean | runtime.Types.Skip
+  maxTokens?: boolean | runtime.Types.Skip
+  usageAlerts?: boolean | runtime.Types.Skip
+  temperature?: boolean | runtime.Types.Skip
+  topP?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationSettings"]>
 
 export type ConversationSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  systemPrompt?: boolean
-  enableThinking?: boolean
-  trackUsage?: boolean
-  enableWebSearch?: boolean
-  enableAssetGen?: boolean
-  reasoningEffort?: boolean
-  outputVerbosity?: boolean
-  maxTokens?: boolean
-  usageAlerts?: boolean
-  temperature?: boolean
-  topP?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  systemPrompt?: boolean | runtime.Types.Skip
+  enableThinking?: boolean | runtime.Types.Skip
+  trackUsage?: boolean | runtime.Types.Skip
+  enableWebSearch?: boolean | runtime.Types.Skip
+  enableAssetGen?: boolean | runtime.Types.Skip
+  reasoningEffort?: boolean | runtime.Types.Skip
+  outputVerbosity?: boolean | runtime.Types.Skip
+  maxTokens?: boolean | runtime.Types.Skip
+  usageAlerts?: boolean | runtime.Types.Skip
+  temperature?: boolean | runtime.Types.Skip
+  topP?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationSettings"]>
 
 export type ConversationSettingsSelectScalar = {
-  id?: boolean
-  conversationId?: boolean
-  systemPrompt?: boolean
-  enableThinking?: boolean
-  trackUsage?: boolean
-  enableWebSearch?: boolean
-  enableAssetGen?: boolean
-  reasoningEffort?: boolean
-  outputVerbosity?: boolean
-  maxTokens?: boolean
-  usageAlerts?: boolean
-  temperature?: boolean
-  topP?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  systemPrompt?: boolean | runtime.Types.Skip
+  enableThinking?: boolean | runtime.Types.Skip
+  trackUsage?: boolean | runtime.Types.Skip
+  enableWebSearch?: boolean | runtime.Types.Skip
+  enableAssetGen?: boolean | runtime.Types.Skip
+  reasoningEffort?: boolean | runtime.Types.Skip
+  outputVerbosity?: boolean | runtime.Types.Skip
+  maxTokens?: boolean | runtime.Types.Skip
+  usageAlerts?: boolean | runtime.Types.Skip
+  temperature?: boolean | runtime.Types.Skip
+  topP?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "enableThinking" | "trackUsage" | "enableWebSearch" | "enableAssetGen" | "reasoningEffort" | "outputVerbosity" | "maxTokens" | "usageAlerts" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"]>
+export type ConversationSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "systemPrompt" | "enableThinking" | "trackUsage" | "enableWebSearch" | "enableAssetGen" | "reasoningEffort" | "outputVerbosity" | "maxTokens" | "usageAlerts" | "temperature" | "topP" | "createdAt" | "updatedAt", ExtArgs["result"]["conversationSettings"], runtime.Types.Skip>
 export type ConversationSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type ConversationSettingsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type ConversationSettingsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $ConversationSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -828,7 +828,7 @@ export type $ConversationSettingsPayload<ExtArgs extends runtime.Types.Extension
 export type ConversationSettingsGetPayload<S extends boolean | null | undefined | ConversationSettingsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ConversationSettingsPayload, S>
 
 export type ConversationSettingsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ConversationSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ConversationSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ConversationSettingsCountAggregateInputType | true
   }
 
@@ -1284,6 +1284,7 @@ export type ConversationSettingsFindUniqueArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which ConversationSettings to fetch.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1306,6 +1307,7 @@ export type ConversationSettingsFindUniqueOrThrowArgs<ExtArgs extends runtime.Ty
    * Filter, which ConversationSettings to fetch.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1327,37 +1329,38 @@ export type ConversationSettingsFindFirstArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter, which ConversationSettings to fetch.
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationSettings to fetch.
    */
-  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationSettings.
    */
-  cursor?: Prisma.ConversationSettingsWhereUniqueInput
+  cursor?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationSettings from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationSettings.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationSettings.
    */
-  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1379,37 +1382,38 @@ export type ConversationSettingsFindFirstOrThrowArgs<ExtArgs extends runtime.Typ
   /**
    * Filter, which ConversationSettings to fetch.
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationSettings to fetch.
    */
-  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationSettings.
    */
-  cursor?: Prisma.ConversationSettingsWhereUniqueInput
+  cursor?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationSettings from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationSettings.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationSettings.
    */
-  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1431,32 +1435,33 @@ export type ConversationSettingsFindManyArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter, which ConversationSettings to fetch.
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationSettings to fetch.
    */
-  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationSettingsOrderByWithRelationInput | Prisma.ConversationSettingsOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ConversationSettings.
    */
-  cursor?: Prisma.ConversationSettingsWhereUniqueInput
+  cursor?: Prisma.ConversationSettingsWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationSettings from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationSettings.
    */
-  skip?: number
-  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ConversationSettingsScalarFieldEnum | Prisma.ConversationSettingsScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1479,6 +1484,7 @@ export type ConversationSettingsCreateArgs<ExtArgs extends runtime.Types.Extensi
    * The data needed to create a ConversationSettings.
    */
   data: Prisma.XOR<Prisma.ConversationSettingsCreateInput, Prisma.ConversationSettingsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1489,7 +1495,7 @@ export type ConversationSettingsCreateManyArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many ConversationSettings.
    */
   data: Prisma.ConversationSettingsCreateManyInput | Prisma.ConversationSettingsCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -1508,7 +1514,7 @@ export type ConversationSettingsCreateManyAndReturnArgs<ExtArgs extends runtime.
    * The data used to create many ConversationSettings.
    */
   data: Prisma.ConversationSettingsCreateManyInput | Prisma.ConversationSettingsCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1539,6 +1545,7 @@ export type ConversationSettingsUpdateArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which ConversationSettings to update.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1552,11 +1559,11 @@ export type ConversationSettingsUpdateManyArgs<ExtArgs extends runtime.Types.Ext
   /**
    * Filter which ConversationSettings to update
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationSettings to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -1578,11 +1585,11 @@ export type ConversationSettingsUpdateManyAndReturnArgs<ExtArgs extends runtime.
   /**
    * Filter which ConversationSettings to update
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationSettings to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1617,6 +1624,7 @@ export type ConversationSettingsUpsertArgs<ExtArgs extends runtime.Types.Extensi
    * In case the ConversationSettings was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ConversationSettingsUpdateInput, Prisma.ConversationSettingsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1639,6 +1647,7 @@ export type ConversationSettingsDeleteArgs<ExtArgs extends runtime.Types.Extensi
    * Filter which ConversationSettings to delete.
    */
   where: Prisma.ConversationSettingsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1648,11 +1657,11 @@ export type ConversationSettingsDeleteManyArgs<ExtArgs extends runtime.Types.Ext
   /**
    * Filter which ConversationSettings to delete
    */
-  where?: Prisma.ConversationSettingsWhereInput
+  where?: Prisma.ConversationSettingsWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationSettings to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**

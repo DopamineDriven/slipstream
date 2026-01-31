@@ -3,7 +3,7 @@
 /* eslint-disable */
 // biome-ignore-all lint: generated file
 // @ts-nocheck 
-import * as $runtime from "@prisma/client/runtime/library"
+import * as $runtime from "@prisma/client/runtime/client"
 
 /**
  * @param docId

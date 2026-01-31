@@ -1,23 +1,24 @@
 import type { BigIntToCompatProps } from "@/types/index.ts";
 import { ModelService } from "@/models/index.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-
-import { DbService, PrismaClient } from "@slipstream/db/node";
+import { PrismaClient, PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaUtilsService extends ModelService {
   protected readonly prismaClient: PrismaClient;
 
-  constructor(prisma: DbService,     public isProd: boolean) {
+  constructor(
+    prisma: PrismaDbService,
+    public isProd: boolean
+  ) {
     super();
-    this.prismaClient = prisma.prismaClient;
+    this.prismaClient = prisma.p(false);
   }
-
 
   public getEnv() {
     return this.isProd === true ? ("prod" as const) : ("dev" as const);
   }
 
-  public vectorStoreDisplayName(userId: string){
+  public vectorStoreDisplayName(userId: string) {
     const env = this.getEnv();
     return `${env}-${userId}`;
   }

@@ -1,23 +1,18 @@
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  directUrl  = env("DIRECT_URL")
-  extensions = [pgvector(map: "vector")]
+  provider = "postgresql"
 }
 
 generator client {
-  provider        = "prisma-client"
-  previewFeatures = ["typedSql", "postgresqlExtensions"]
-  output          = "../../src/generated/prisma"
-  runtime         = "nodejs"
+  provider               = "prisma-client"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+  output                 = "../../src/generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  compilerBuild          = "fast"
+  previewFeatures        = ["typedSql", "postgresqlExtensions", "relationJoins", "strictUndefinedChecks"]
 }
 
-generator edge {
-  provider        = "prisma-client-js"
-  output          = "../../edge/generated/client"
-  runtime         = "vercel-edge"
-  previewFeatures = ["typedSql", "postgresqlExtensions"]
-}
 
 enum Provider {
   OPENAI

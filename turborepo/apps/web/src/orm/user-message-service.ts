@@ -1,9 +1,9 @@
-import type { PrismaClientWithAccelerate } from "@/lib/prisma";
+import type { PrismaClientBase } from "@/lib/prisma";
 import type { ChatInterfaceProps } from "@/types/ui";
 import { redirect } from "next/navigation";
 import { ErrorHelperService } from "@/orm/err-helper";
 import { getSession } from "@/utils/auth";
-import type { $Enums } from "@slipstream/db/edge-client";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AttachmentSingleton,
   ConversationSingleton,
@@ -12,7 +12,7 @@ import type {
 } from "@slipstream/types";
 
 export class PrismaUserMessageService extends ErrorHelperService {
-  constructor(public prismaClient: PrismaClientWithAccelerate) {
+  constructor(public prismaClient: PrismaClientBase) {
     super();
   }
 

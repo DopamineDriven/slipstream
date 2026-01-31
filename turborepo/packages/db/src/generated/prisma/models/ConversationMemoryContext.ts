@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ConversationMemoryContext
@@ -123,129 +123,129 @@ export type ConversationMemoryContextCountAggregateOutputType = {
 
 
 export type ConversationMemoryContextAvgAggregateInputType = {
-  rollingSummaryTokens?: true
-  lastChunkedMessageIndex?: true
-  totalTurns?: true
-  chunkedTurns?: true
-  totalTokens?: true
+  rollingSummaryTokens?: true | runtime.Types.Skip
+  lastChunkedMessageIndex?: true | runtime.Types.Skip
+  totalTurns?: true | runtime.Types.Skip
+  chunkedTurns?: true | runtime.Types.Skip
+  totalTokens?: true | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextSumAggregateInputType = {
-  rollingSummaryTokens?: true
-  lastChunkedMessageIndex?: true
-  totalTurns?: true
-  chunkedTurns?: true
-  totalTokens?: true
+  rollingSummaryTokens?: true | runtime.Types.Skip
+  lastChunkedMessageIndex?: true | runtime.Types.Skip
+  totalTurns?: true | runtime.Types.Skip
+  chunkedTurns?: true | runtime.Types.Skip
+  totalTokens?: true | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextMinAggregateInputType = {
-  id?: true
-  storeId?: true
-  conversationId?: true
-  schemaVersion?: true
-  conversationTitle?: true
-  firstMessageAt?: true
-  lastMessageAt?: true
-  rollingSummary?: true
-  rollingSummaryModel?: true
-  rollingSummaryProvider?: true
-  rollingSummaryTokens?: true
-  rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
-  lastChunkedAt?: true
-  totalTurns?: true
-  chunkedTurns?: true
-  totalTokens?: true
-  contributingProviderModelsRaw?: true
-  createdAt?: true
-  updatedAt?: true
-  hasMultipleProviders?: true
-  hasMultipleModels?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  conversationTitle?: true | runtime.Types.Skip
+  firstMessageAt?: true | runtime.Types.Skip
+  lastMessageAt?: true | runtime.Types.Skip
+  rollingSummary?: true | runtime.Types.Skip
+  rollingSummaryModel?: true | runtime.Types.Skip
+  rollingSummaryProvider?: true | runtime.Types.Skip
+  rollingSummaryTokens?: true | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: true | runtime.Types.Skip
+  lastChunkedMessageId?: true | runtime.Types.Skip
+  lastChunkedMessageIndex?: true | runtime.Types.Skip
+  lastChunkedAt?: true | runtime.Types.Skip
+  totalTurns?: true | runtime.Types.Skip
+  chunkedTurns?: true | runtime.Types.Skip
+  totalTokens?: true | runtime.Types.Skip
+  contributingProviderModelsRaw?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  hasMultipleProviders?: true | runtime.Types.Skip
+  hasMultipleModels?: true | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextMaxAggregateInputType = {
-  id?: true
-  storeId?: true
-  conversationId?: true
-  schemaVersion?: true
-  conversationTitle?: true
-  firstMessageAt?: true
-  lastMessageAt?: true
-  rollingSummary?: true
-  rollingSummaryModel?: true
-  rollingSummaryProvider?: true
-  rollingSummaryTokens?: true
-  rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
-  lastChunkedAt?: true
-  totalTurns?: true
-  chunkedTurns?: true
-  totalTokens?: true
-  contributingProviderModelsRaw?: true
-  createdAt?: true
-  updatedAt?: true
-  hasMultipleProviders?: true
-  hasMultipleModels?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  conversationTitle?: true | runtime.Types.Skip
+  firstMessageAt?: true | runtime.Types.Skip
+  lastMessageAt?: true | runtime.Types.Skip
+  rollingSummary?: true | runtime.Types.Skip
+  rollingSummaryModel?: true | runtime.Types.Skip
+  rollingSummaryProvider?: true | runtime.Types.Skip
+  rollingSummaryTokens?: true | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: true | runtime.Types.Skip
+  lastChunkedMessageId?: true | runtime.Types.Skip
+  lastChunkedMessageIndex?: true | runtime.Types.Skip
+  lastChunkedAt?: true | runtime.Types.Skip
+  totalTurns?: true | runtime.Types.Skip
+  chunkedTurns?: true | runtime.Types.Skip
+  totalTokens?: true | runtime.Types.Skip
+  contributingProviderModelsRaw?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  hasMultipleProviders?: true | runtime.Types.Skip
+  hasMultipleModels?: true | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCountAggregateInputType = {
-  id?: true
-  storeId?: true
-  conversationId?: true
-  schemaVersion?: true
-  conversationTitle?: true
-  firstMessageAt?: true
-  lastMessageAt?: true
-  rollingSummary?: true
-  rollingSummaryModel?: true
-  rollingSummaryProvider?: true
-  rollingSummaryTokens?: true
-  rollingSummaryUpdatedAt?: true
-  lastChunkedMessageId?: true
-  lastChunkedMessageIndex?: true
-  lastChunkedAt?: true
-  totalTurns?: true
-  chunkedTurns?: true
-  totalTokens?: true
-  contributingProviderModelsRaw?: true
-  createdAt?: true
-  updatedAt?: true
-  hasMultipleProviders?: true
-  hasMultipleModels?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  conversationTitle?: true | runtime.Types.Skip
+  firstMessageAt?: true | runtime.Types.Skip
+  lastMessageAt?: true | runtime.Types.Skip
+  rollingSummary?: true | runtime.Types.Skip
+  rollingSummaryModel?: true | runtime.Types.Skip
+  rollingSummaryProvider?: true | runtime.Types.Skip
+  rollingSummaryTokens?: true | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: true | runtime.Types.Skip
+  lastChunkedMessageId?: true | runtime.Types.Skip
+  lastChunkedMessageIndex?: true | runtime.Types.Skip
+  lastChunkedAt?: true | runtime.Types.Skip
+  totalTurns?: true | runtime.Types.Skip
+  chunkedTurns?: true | runtime.Types.Skip
+  totalTokens?: true | runtime.Types.Skip
+  contributingProviderModelsRaw?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  hasMultipleProviders?: true | runtime.Types.Skip
+  hasMultipleModels?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which ConversationMemoryContext to aggregate.
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryContexts to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput
+  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryContexts from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryContexts.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -290,12 +290,12 @@ export type GetConversationMemoryContextAggregateType<T extends ConversationMemo
 
 
 export type ConversationMemoryContextGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationMemoryContextWhereInput
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithAggregationInput | Prisma.ConversationMemoryContextOrderByWithAggregationInput[]
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithAggregationInput | Prisma.ConversationMemoryContextOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.ConversationMemoryContextScalarFieldEnum[] | Prisma.ConversationMemoryContextScalarFieldEnum
-  having?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: ConversationMemoryContextCountAggregateInputType | true
   _avg?: ConversationMemoryContextAvgAggregateInputType
   _sum?: ConversationMemoryContextSumAggregateInputType
@@ -350,592 +350,592 @@ type GetConversationMemoryContextGroupByPayload<T extends ConversationMemoryCont
 
 
 export type ConversationMemoryContextWhereInput = {
-  AND?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[]
-  OR?: Prisma.ConversationMemoryContextWhereInput[]
-  NOT?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[]
-  id?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  conversationId?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
-  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
-  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
-  memoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput>
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
-  memoryChunks?: Prisma.ConversationMemoryChunkListRelationFilter
+  AND?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  memoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkListRelationFilter | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  conversationTitle?: Prisma.SortOrderInput | Prisma.SortOrder
-  firstMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummary?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryTokens?: Prisma.SortOrder
-  rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
-  contributingProviderModelsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  hasMultipleProviders?: Prisma.SortOrder
-  hasMultipleModels?: Prisma.SortOrder
-  memoryStore?: Prisma.ConversationMemoryStoreOrderByWithRelationInput
-  conversation?: Prisma.ConversationOrderByWithRelationInput
-  memoryChunks?: Prisma.ConversationMemoryChunkOrderByRelationAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  conversationTitle?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  firstMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummary?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleModels?: Prisma.SortOrder | runtime.Types.Skip
+  memoryStore?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationOrderByWithRelationInput | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkOrderByRelationAggregateInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  conversationId?: string
-  AND?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[]
-  OR?: Prisma.ConversationMemoryContextWhereInput[]
-  NOT?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[]
-  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
-  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
-  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
-  memoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput>
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
-  memoryChunks?: Prisma.ConversationMemoryChunkListRelationFilter
+  id?: string | runtime.Types.Skip
+  conversationId?: string | runtime.Types.Skip
+  AND?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationMemoryContextWhereInput | Prisma.ConversationMemoryContextWhereInput[] | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  memoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkListRelationFilter | runtime.Types.Skip
 }, "id" | "conversationId">
 
 export type ConversationMemoryContextOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  conversationTitle?: Prisma.SortOrderInput | Prisma.SortOrder
-  firstMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummary?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryModel?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder
-  rollingSummaryTokens?: Prisma.SortOrder
-  rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
-  contributingProviderModelsRaw?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  hasMultipleProviders?: Prisma.SortOrder
-  hasMultipleModels?: Prisma.SortOrder
-  _count?: Prisma.ConversationMemoryContextCountOrderByAggregateInput
-  _avg?: Prisma.ConversationMemoryContextAvgOrderByAggregateInput
-  _max?: Prisma.ConversationMemoryContextMaxOrderByAggregateInput
-  _min?: Prisma.ConversationMemoryContextMinOrderByAggregateInput
-  _sum?: Prisma.ConversationMemoryContextSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  conversationTitle?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  firstMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastMessageAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummary?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleModels?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.ConversationMemoryContextCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.ConversationMemoryContextAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.ConversationMemoryContextMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.ConversationMemoryContextMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.ConversationMemoryContextSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextScalarWhereWithAggregatesInput = {
-  AND?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput | Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[]
-  OR?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput | Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string
-  storeId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  firstMessageAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
-  lastMessageAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
-  rollingSummary?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryModel?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
-  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableWithAggregatesFilter<"ConversationMemoryContext"> | number | null
-  lastChunkedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null
-  totalTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
-  chunkedTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
-  totalTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number
-  contributingProviderModelsRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryContext"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryContext"> | Date | string
-  hasMultipleProviders?: Prisma.BoolWithAggregatesFilter<"ConversationMemoryContext"> | boolean
-  hasMultipleModels?: Prisma.BoolWithAggregatesFilter<"ConversationMemoryContext"> | boolean
+  AND?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput | Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput | Prisma.ConversationMemoryContextScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringWithAggregatesFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.EnumProviderNullableWithAggregatesFilter<"ConversationMemoryContext"> | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.IntNullableWithAggregatesFilter<"ConversationMemoryContext"> | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntWithAggregatesFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.StringNullableWithAggregatesFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolWithAggregatesFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolWithAggregatesFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateInput = {
-  id?: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  id?: string | runtime.Types.Skip
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
   memoryStore: Prisma.ConversationMemoryStoreCreateNestedOneWithoutContextsInput
   conversation: Prisma.ConversationCreateNestedOneWithoutConversationContextStateInput
-  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput
+  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   conversationId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput
-  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   conversationId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextNullableScalarRelationFilter = {
-  is?: Prisma.ConversationMemoryContextWhereInput | null
-  isNot?: Prisma.ConversationMemoryContextWhereInput | null
+  is?: Prisma.ConversationMemoryContextWhereInput | null | runtime.Types.Skip
+  isNot?: Prisma.ConversationMemoryContextWhereInput | null | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextListRelationFilter = {
-  every?: Prisma.ConversationMemoryContextWhereInput
-  some?: Prisma.ConversationMemoryContextWhereInput
-  none?: Prisma.ConversationMemoryContextWhereInput
+  every?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  some?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  none?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+  _count?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  conversationTitle?: Prisma.SortOrder
-  firstMessageAt?: Prisma.SortOrder
-  lastMessageAt?: Prisma.SortOrder
-  rollingSummary?: Prisma.SortOrder
-  rollingSummaryModel?: Prisma.SortOrder
-  rollingSummaryProvider?: Prisma.SortOrder
-  rollingSummaryTokens?: Prisma.SortOrder
-  rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
-  lastChunkedAt?: Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
-  contributingProviderModelsRaw?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  hasMultipleProviders?: Prisma.SortOrder
-  hasMultipleModels?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  conversationTitle?: Prisma.SortOrder | runtime.Types.Skip
+  firstMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummary?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedAt?: Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleModels?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextAvgOrderByAggregateInput = {
-  rollingSummaryTokens?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  conversationTitle?: Prisma.SortOrder
-  firstMessageAt?: Prisma.SortOrder
-  lastMessageAt?: Prisma.SortOrder
-  rollingSummary?: Prisma.SortOrder
-  rollingSummaryModel?: Prisma.SortOrder
-  rollingSummaryProvider?: Prisma.SortOrder
-  rollingSummaryTokens?: Prisma.SortOrder
-  rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
-  lastChunkedAt?: Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
-  contributingProviderModelsRaw?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  hasMultipleProviders?: Prisma.SortOrder
-  hasMultipleModels?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  conversationTitle?: Prisma.SortOrder | runtime.Types.Skip
+  firstMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummary?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedAt?: Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleModels?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  conversationTitle?: Prisma.SortOrder
-  firstMessageAt?: Prisma.SortOrder
-  lastMessageAt?: Prisma.SortOrder
-  rollingSummary?: Prisma.SortOrder
-  rollingSummaryModel?: Prisma.SortOrder
-  rollingSummaryProvider?: Prisma.SortOrder
-  rollingSummaryTokens?: Prisma.SortOrder
-  rollingSummaryUpdatedAt?: Prisma.SortOrder
-  lastChunkedMessageId?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
-  lastChunkedAt?: Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
-  contributingProviderModelsRaw?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  hasMultipleProviders?: Prisma.SortOrder
-  hasMultipleModels?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  conversationTitle?: Prisma.SortOrder | runtime.Types.Skip
+  firstMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastMessageAt?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummary?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedAt?: Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.SortOrder | runtime.Types.Skip
+  hasMultipleModels?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextSumOrderByAggregateInput = {
-  rollingSummaryTokens?: Prisma.SortOrder
-  lastChunkedMessageIndex?: Prisma.SortOrder
-  totalTurns?: Prisma.SortOrder
-  chunkedTurns?: Prisma.SortOrder
-  totalTokens?: Prisma.SortOrder
+  rollingSummaryTokens?: Prisma.SortOrder | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.SortOrder | runtime.Types.Skip
+  totalTurns?: Prisma.SortOrder | runtime.Types.Skip
+  chunkedTurns?: Prisma.SortOrder | runtime.Types.Skip
+  totalTokens?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextScalarRelationFilter = {
-  is?: Prisma.ConversationMemoryContextWhereInput
-  isNot?: Prisma.ConversationMemoryContextWhereInput
+  is?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
+  isNot?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateNestedOneWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedCreateNestedOneWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateOneWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput
-  upsert?: Prisma.ConversationMemoryContextUpsertWithoutConversationInput
-  disconnect?: Prisma.ConversationMemoryContextWhereInput | boolean
-  delete?: Prisma.ConversationMemoryContextWhereInput | boolean
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationMemoryContextUpdateWithoutConversationInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput>
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  upsert?: Prisma.ConversationMemoryContextUpsertWithoutConversationInput | runtime.Types.Skip
+  disconnect?: Prisma.ConversationMemoryContextWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.ConversationMemoryContextWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationMemoryContextUpdateWithoutConversationInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput> | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateOneWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput>
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput
-  upsert?: Prisma.ConversationMemoryContextUpsertWithoutConversationInput
-  disconnect?: Prisma.ConversationMemoryContextWhereInput | boolean
-  delete?: Prisma.ConversationMemoryContextWhereInput | boolean
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationMemoryContextUpdateWithoutConversationInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput>
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutConversationInput | runtime.Types.Skip
+  upsert?: Prisma.ConversationMemoryContextUpsertWithoutConversationInput | runtime.Types.Skip
+  disconnect?: Prisma.ConversationMemoryContextWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.ConversationMemoryContextWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutConversationInput, Prisma.ConversationMemoryContextUpdateWithoutConversationInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput> | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateNestedManyWithoutMemoryStoreInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[]
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[]
-  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedCreateNestedManyWithoutMemoryStoreInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[]
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[]
-  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateManyWithoutMemoryStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[]
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[]
-  upsert?: Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput[]
-  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope
-  set?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  disconnect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  delete?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  update?: Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput[]
-  updateMany?: Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput[]
-  deleteMany?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[] | runtime.Types.Skip
+  upsert?: Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope | runtime.Types.Skip
+  set?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput[] | runtime.Types.Skip
+  updateMany?: Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[]
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[]
-  upsert?: Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput[]
-  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope
-  set?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  disconnect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  delete?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[]
-  update?: Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput[]
-  updateMany?: Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput[]
-  deleteMany?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput> | Prisma.ConversationMemoryContextCreateWithoutMemoryStoreInput[] | Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput | Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput[] | runtime.Types.Skip
+  upsert?: Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.ConversationMemoryContextCreateManyMemoryStoreInputEnvelope | runtime.Types.Skip
+  set?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | Prisma.ConversationMemoryContextWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateWithWhereUniqueWithoutMemoryStoreInput[] | runtime.Types.Skip
+  updateMany?: Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput | Prisma.ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type NullableEnumProviderFieldUpdateOperationsInput = {
-  set?: $Enums.Provider | null
+  set?: $Enums.Provider | null | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateOneRequiredWithoutMemoryChunksNestedInput = {
-  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput>
-  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput
-  upsert?: Prisma.ConversationMemoryContextUpsertWithoutMemoryChunksInput
-  connect?: Prisma.ConversationMemoryContextWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUpdateWithoutMemoryChunksInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput>
+  create?: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput | runtime.Types.Skip
+  upsert?: Prisma.ConversationMemoryContextUpsertWithoutMemoryChunksInput | runtime.Types.Skip
+  connect?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationMemoryContextUpdateToOneWithWhereWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUpdateWithoutMemoryChunksInput>, Prisma.ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput> | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateWithoutConversationInput = {
-  id?: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  id?: string | runtime.Types.Skip
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
   memoryStore: Prisma.ConversationMemoryStoreCreateNestedOneWithoutContextsInput
-  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput
+  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedCreateWithoutConversationInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateOrConnectWithoutConversationInput = {
@@ -946,116 +946,116 @@ export type ConversationMemoryContextCreateOrConnectWithoutConversationInput = {
 export type ConversationMemoryContextUpsertWithoutConversationInput = {
   update: Prisma.XOR<Prisma.ConversationMemoryContextUpdateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput>
   create: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutConversationInput>
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateToOneWithWhereWithoutConversationInput = {
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.ConversationMemoryContextUpdateWithoutConversationInput, Prisma.ConversationMemoryContextUncheckedUpdateWithoutConversationInput>
 }
 
 export type ConversationMemoryContextUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput
-  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateWithoutMemoryStoreInput = {
-  id?: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  id?: string | runtime.Types.Skip
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutConversationContextStateInput
-  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput
+  memoryChunks?: Prisma.ConversationMemoryChunkCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedCreateWithoutMemoryStoreInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedCreateNestedManyWithoutContextInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput = {
@@ -1065,7 +1065,7 @@ export type ConversationMemoryContextCreateOrConnectWithoutMemoryStoreInput = {
 
 export type ConversationMemoryContextCreateManyMemoryStoreInputEnvelope = {
   data: Prisma.ConversationMemoryContextCreateManyMemoryStoreInput | Prisma.ConversationMemoryContextCreateManyMemoryStoreInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpsertWithWhereUniqueWithoutMemoryStoreInput = {
@@ -1085,84 +1085,84 @@ export type ConversationMemoryContextUpdateManyWithWhereWithoutMemoryStoreInput 
 }
 
 export type ConversationMemoryContextScalarWhereInput = {
-  AND?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[]
-  OR?: Prisma.ConversationMemoryContextScalarWhereInput[]
-  NOT?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[]
-  id?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  conversationId?: Prisma.StringFilter<"ConversationMemoryContext"> | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null
-  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null
-  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number
-  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string
-  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
-  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean
+  AND?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.ConversationMemoryContextScalarWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.ConversationMemoryContextScalarWhereInput | Prisma.ConversationMemoryContextScalarWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"ConversationMemoryContext"> | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFilter<"ConversationMemoryContext"> | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.EnumProviderNullableFilter<"ConversationMemoryContext"> | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.IntNullableFilter<"ConversationMemoryContext"> | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.DateTimeNullableFilter<"ConversationMemoryContext"> | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFilter<"ConversationMemoryContext"> | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.StringNullableFilter<"ConversationMemoryContext"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"ConversationMemoryContext"> | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFilter<"ConversationMemoryContext"> | boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateWithoutMemoryChunksInput = {
-  id?: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  id?: string | runtime.Types.Skip
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
   memoryStore: Prisma.ConversationMemoryStoreCreateNestedOneWithoutContextsInput
   conversation: Prisma.ConversationCreateNestedOneWithoutConversationContextStateInput
 }
 
 export type ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   conversationId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput = {
@@ -1173,166 +1173,166 @@ export type ConversationMemoryContextCreateOrConnectWithoutMemoryChunksInput = {
 export type ConversationMemoryContextUpsertWithoutMemoryChunksInput = {
   update: Prisma.XOR<Prisma.ConversationMemoryContextUpdateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput>
   create: Prisma.XOR<Prisma.ConversationMemoryContextCreateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedCreateWithoutMemoryChunksInput>
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateToOneWithWhereWithoutMemoryChunksInput = {
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.ConversationMemoryContextUpdateWithoutMemoryChunksInput, Prisma.ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput>
 }
 
 export type ConversationMemoryContextUpdateWithoutMemoryChunksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryStore?: Prisma.ConversationMemoryStoreUpdateOneRequiredWithoutContextsNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateWithoutMemoryChunksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextCreateManyMemoryStoreInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  schemaVersion?: $Enums.MemorySchemaVersion
-  conversationTitle?: string | null
-  firstMessageAt?: Date | string | null
-  lastMessageAt?: Date | string | null
-  rollingSummary?: string | null
-  rollingSummaryModel?: string | null
-  rollingSummaryProvider?: $Enums.Provider | null
-  rollingSummaryTokens?: number
-  rollingSummaryUpdatedAt?: Date | string | null
-  lastChunkedMessageId?: string | null
-  lastChunkedMessageIndex?: number | null
-  lastChunkedAt?: Date | string | null
-  totalTurns?: number
-  chunkedTurns?: number
-  totalTokens?: number
-  contributingProviderModelsRaw?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  schemaVersion?: $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: string | null | runtime.Types.Skip
+  firstMessageAt?: Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Date | string | null | runtime.Types.Skip
+  rollingSummary?: string | null | runtime.Types.Skip
+  rollingSummaryModel?: string | null | runtime.Types.Skip
+  rollingSummaryProvider?: $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: number | null | runtime.Types.Skip
+  lastChunkedAt?: Date | string | null | runtime.Types.Skip
+  totalTurns?: number | runtime.Types.Skip
+  chunkedTurns?: number | runtime.Types.Skip
+  totalTokens?: number | runtime.Types.Skip
+  contributingProviderModelsRaw?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUpdateWithoutMemoryStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput
-  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutConversationContextStateNestedInput | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateWithoutMemoryStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  memoryChunks?: Prisma.ConversationMemoryChunkUncheckedUpdateManyWithoutContextNestedInput | runtime.Types.Skip
 }
 
 export type ConversationMemoryContextUncheckedUpdateManyWithoutMemoryStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion
-  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null
-  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number
-  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number
-  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumMemorySchemaVersionFieldUpdateOperationsInput | $Enums.MemorySchemaVersion | runtime.Types.Skip
+  conversationTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  firstMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  rollingSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  rollingSummaryProvider?: Prisma.NullableEnumProviderFieldUpdateOperationsInput | $Enums.Provider | null | runtime.Types.Skip
+  rollingSummaryTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastChunkedMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastChunkedMessageIndex?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  lastChunkedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  totalTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  chunkedTurns?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  totalTokens?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  contributingProviderModelsRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  hasMultipleProviders?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  hasMultipleModels?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
 }
 
 
@@ -1362,136 +1362,136 @@ export type ConversationMemoryContextCountOutputTypeDefaultArgs<ExtArgs extends 
  * ConversationMemoryContextCountOutputType without action
  */
 export type ConversationMemoryContextCountOutputTypeCountMemoryChunksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationMemoryChunkWhereInput
+  where?: Prisma.ConversationMemoryChunkWhereInput | runtime.Types.Skip
 }
 
 
 export type ConversationMemoryContextSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  conversationId?: boolean
-  schemaVersion?: boolean
-  conversationTitle?: boolean
-  firstMessageAt?: boolean
-  lastMessageAt?: boolean
-  rollingSummary?: boolean
-  rollingSummaryModel?: boolean
-  rollingSummaryProvider?: boolean
-  rollingSummaryTokens?: boolean
-  rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
-  lastChunkedAt?: boolean
-  totalTurns?: boolean
-  chunkedTurns?: boolean
-  totalTokens?: boolean
-  contributingProviderModelsRaw?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  memoryChunks?: boolean | Prisma.ConversationMemoryContext$memoryChunksArgs<ExtArgs>
-  _count?: boolean | Prisma.ConversationMemoryContextCountOutputTypeDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  conversationTitle?: boolean | runtime.Types.Skip
+  firstMessageAt?: boolean | runtime.Types.Skip
+  lastMessageAt?: boolean | runtime.Types.Skip
+  rollingSummary?: boolean | runtime.Types.Skip
+  rollingSummaryModel?: boolean | runtime.Types.Skip
+  rollingSummaryProvider?: boolean | runtime.Types.Skip
+  rollingSummaryTokens?: boolean | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: boolean | runtime.Types.Skip
+  lastChunkedMessageId?: boolean | runtime.Types.Skip
+  lastChunkedMessageIndex?: boolean | runtime.Types.Skip
+  lastChunkedAt?: boolean | runtime.Types.Skip
+  totalTurns?: boolean | runtime.Types.Skip
+  chunkedTurns?: boolean | runtime.Types.Skip
+  totalTokens?: boolean | runtime.Types.Skip
+  contributingProviderModelsRaw?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  memoryChunks?: boolean | Prisma.ConversationMemoryContext$memoryChunksArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.ConversationMemoryContextCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationMemoryContext"]>
 
 export type ConversationMemoryContextSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  conversationId?: boolean
-  schemaVersion?: boolean
-  conversationTitle?: boolean
-  firstMessageAt?: boolean
-  lastMessageAt?: boolean
-  rollingSummary?: boolean
-  rollingSummaryModel?: boolean
-  rollingSummaryProvider?: boolean
-  rollingSummaryTokens?: boolean
-  rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
-  lastChunkedAt?: boolean
-  totalTurns?: boolean
-  chunkedTurns?: boolean
-  totalTokens?: boolean
-  contributingProviderModelsRaw?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  conversationTitle?: boolean | runtime.Types.Skip
+  firstMessageAt?: boolean | runtime.Types.Skip
+  lastMessageAt?: boolean | runtime.Types.Skip
+  rollingSummary?: boolean | runtime.Types.Skip
+  rollingSummaryModel?: boolean | runtime.Types.Skip
+  rollingSummaryProvider?: boolean | runtime.Types.Skip
+  rollingSummaryTokens?: boolean | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: boolean | runtime.Types.Skip
+  lastChunkedMessageId?: boolean | runtime.Types.Skip
+  lastChunkedMessageIndex?: boolean | runtime.Types.Skip
+  lastChunkedAt?: boolean | runtime.Types.Skip
+  totalTurns?: boolean | runtime.Types.Skip
+  chunkedTurns?: boolean | runtime.Types.Skip
+  totalTokens?: boolean | runtime.Types.Skip
+  contributingProviderModelsRaw?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationMemoryContext"]>
 
 export type ConversationMemoryContextSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  conversationId?: boolean
-  schemaVersion?: boolean
-  conversationTitle?: boolean
-  firstMessageAt?: boolean
-  lastMessageAt?: boolean
-  rollingSummary?: boolean
-  rollingSummaryModel?: boolean
-  rollingSummaryProvider?: boolean
-  rollingSummaryTokens?: boolean
-  rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
-  lastChunkedAt?: boolean
-  totalTurns?: boolean
-  chunkedTurns?: boolean
-  totalTokens?: boolean
-  contributingProviderModelsRaw?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  conversationTitle?: boolean | runtime.Types.Skip
+  firstMessageAt?: boolean | runtime.Types.Skip
+  lastMessageAt?: boolean | runtime.Types.Skip
+  rollingSummary?: boolean | runtime.Types.Skip
+  rollingSummaryModel?: boolean | runtime.Types.Skip
+  rollingSummaryProvider?: boolean | runtime.Types.Skip
+  rollingSummaryTokens?: boolean | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: boolean | runtime.Types.Skip
+  lastChunkedMessageId?: boolean | runtime.Types.Skip
+  lastChunkedMessageIndex?: boolean | runtime.Types.Skip
+  lastChunkedAt?: boolean | runtime.Types.Skip
+  totalTurns?: boolean | runtime.Types.Skip
+  chunkedTurns?: boolean | runtime.Types.Skip
+  totalTokens?: boolean | runtime.Types.Skip
+  contributingProviderModelsRaw?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["conversationMemoryContext"]>
 
 export type ConversationMemoryContextSelectScalar = {
-  id?: boolean
-  storeId?: boolean
-  conversationId?: boolean
-  schemaVersion?: boolean
-  conversationTitle?: boolean
-  firstMessageAt?: boolean
-  lastMessageAt?: boolean
-  rollingSummary?: boolean
-  rollingSummaryModel?: boolean
-  rollingSummaryProvider?: boolean
-  rollingSummaryTokens?: boolean
-  rollingSummaryUpdatedAt?: boolean
-  lastChunkedMessageId?: boolean
-  lastChunkedMessageIndex?: boolean
-  lastChunkedAt?: boolean
-  totalTurns?: boolean
-  chunkedTurns?: boolean
-  totalTokens?: boolean
-  contributingProviderModelsRaw?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  hasMultipleProviders?: boolean
-  hasMultipleModels?: boolean
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  conversationTitle?: boolean | runtime.Types.Skip
+  firstMessageAt?: boolean | runtime.Types.Skip
+  lastMessageAt?: boolean | runtime.Types.Skip
+  rollingSummary?: boolean | runtime.Types.Skip
+  rollingSummaryModel?: boolean | runtime.Types.Skip
+  rollingSummaryProvider?: boolean | runtime.Types.Skip
+  rollingSummaryTokens?: boolean | runtime.Types.Skip
+  rollingSummaryUpdatedAt?: boolean | runtime.Types.Skip
+  lastChunkedMessageId?: boolean | runtime.Types.Skip
+  lastChunkedMessageIndex?: boolean | runtime.Types.Skip
+  lastChunkedAt?: boolean | runtime.Types.Skip
+  totalTurns?: boolean | runtime.Types.Skip
+  chunkedTurns?: boolean | runtime.Types.Skip
+  totalTokens?: boolean | runtime.Types.Skip
+  contributingProviderModelsRaw?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  hasMultipleProviders?: boolean | runtime.Types.Skip
+  hasMultipleModels?: boolean | runtime.Types.Skip
 }
 
-export type ConversationMemoryContextOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "conversationId" | "schemaVersion" | "conversationTitle" | "firstMessageAt" | "lastMessageAt" | "rollingSummary" | "rollingSummaryModel" | "rollingSummaryProvider" | "rollingSummaryTokens" | "rollingSummaryUpdatedAt" | "lastChunkedMessageId" | "lastChunkedMessageIndex" | "lastChunkedAt" | "totalTurns" | "chunkedTurns" | "totalTokens" | "contributingProviderModelsRaw" | "createdAt" | "updatedAt" | "hasMultipleProviders" | "hasMultipleModels", ExtArgs["result"]["conversationMemoryContext"]>
+export type ConversationMemoryContextOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "conversationId" | "schemaVersion" | "conversationTitle" | "firstMessageAt" | "lastMessageAt" | "rollingSummary" | "rollingSummaryModel" | "rollingSummaryProvider" | "rollingSummaryTokens" | "rollingSummaryUpdatedAt" | "lastChunkedMessageId" | "lastChunkedMessageIndex" | "lastChunkedAt" | "totalTurns" | "chunkedTurns" | "totalTokens" | "contributingProviderModelsRaw" | "createdAt" | "updatedAt" | "hasMultipleProviders" | "hasMultipleModels", ExtArgs["result"]["conversationMemoryContext"], runtime.Types.Skip>
 export type ConversationMemoryContextInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  memoryChunks?: boolean | Prisma.ConversationMemoryContext$memoryChunksArgs<ExtArgs>
-  _count?: boolean | Prisma.ConversationMemoryContextCountOutputTypeDefaultArgs<ExtArgs>
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  memoryChunks?: boolean | Prisma.ConversationMemoryContext$memoryChunksArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.ConversationMemoryContextCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type ConversationMemoryContextIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type ConversationMemoryContextIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  memoryStore?: boolean | Prisma.ConversationMemoryStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $ConversationMemoryContextPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1532,7 +1532,7 @@ export type $ConversationMemoryContextPayload<ExtArgs extends runtime.Types.Exte
 export type ConversationMemoryContextGetPayload<S extends boolean | null | undefined | ConversationMemoryContextDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ConversationMemoryContextPayload, S>
 
 export type ConversationMemoryContextCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ConversationMemoryContextFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ConversationMemoryContextFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ConversationMemoryContextCountAggregateInputType | true
   }
 
@@ -1998,6 +1998,7 @@ export type ConversationMemoryContextFindUniqueArgs<ExtArgs extends runtime.Type
    * Filter, which ConversationMemoryContext to fetch.
    */
   where: Prisma.ConversationMemoryContextWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2020,6 +2021,7 @@ export type ConversationMemoryContextFindUniqueOrThrowArgs<ExtArgs extends runti
    * Filter, which ConversationMemoryContext to fetch.
    */
   where: Prisma.ConversationMemoryContextWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2041,37 +2043,38 @@ export type ConversationMemoryContextFindFirstArgs<ExtArgs extends runtime.Types
   /**
    * Filter, which ConversationMemoryContext to fetch.
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryContexts to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationMemoryContexts.
    */
-  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput
+  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryContexts from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryContexts.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationMemoryContexts.
    */
-  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[]
+  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2093,37 +2096,38 @@ export type ConversationMemoryContextFindFirstOrThrowArgs<ExtArgs extends runtim
   /**
    * Filter, which ConversationMemoryContext to fetch.
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryContexts to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for ConversationMemoryContexts.
    */
-  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput
+  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryContexts from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryContexts.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of ConversationMemoryContexts.
    */
-  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[]
+  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2145,32 +2149,33 @@ export type ConversationMemoryContextFindManyArgs<ExtArgs extends runtime.Types.
   /**
    * Filter, which ConversationMemoryContexts to fetch.
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of ConversationMemoryContexts to fetch.
    */
-  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[]
+  orderBy?: Prisma.ConversationMemoryContextOrderByWithRelationInput | Prisma.ConversationMemoryContextOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing ConversationMemoryContexts.
    */
-  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput
+  cursor?: Prisma.ConversationMemoryContextWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` ConversationMemoryContexts from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` ConversationMemoryContexts.
    */
-  skip?: number
-  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ConversationMemoryContextScalarFieldEnum | Prisma.ConversationMemoryContextScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2193,6 +2198,7 @@ export type ConversationMemoryContextCreateArgs<ExtArgs extends runtime.Types.Ex
    * The data needed to create a ConversationMemoryContext.
    */
   data: Prisma.XOR<Prisma.ConversationMemoryContextCreateInput, Prisma.ConversationMemoryContextUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2203,7 +2209,7 @@ export type ConversationMemoryContextCreateManyArgs<ExtArgs extends runtime.Type
    * The data used to create many ConversationMemoryContexts.
    */
   data: Prisma.ConversationMemoryContextCreateManyInput | Prisma.ConversationMemoryContextCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -2222,7 +2228,7 @@ export type ConversationMemoryContextCreateManyAndReturnArgs<ExtArgs extends run
    * The data used to create many ConversationMemoryContexts.
    */
   data: Prisma.ConversationMemoryContextCreateManyInput | Prisma.ConversationMemoryContextCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2253,6 +2259,7 @@ export type ConversationMemoryContextUpdateArgs<ExtArgs extends runtime.Types.Ex
    * Choose, which ConversationMemoryContext to update.
    */
   where: Prisma.ConversationMemoryContextWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2266,11 +2273,11 @@ export type ConversationMemoryContextUpdateManyArgs<ExtArgs extends runtime.Type
   /**
    * Filter which ConversationMemoryContexts to update
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationMemoryContexts to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2292,11 +2299,11 @@ export type ConversationMemoryContextUpdateManyAndReturnArgs<ExtArgs extends run
   /**
    * Filter which ConversationMemoryContexts to update
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationMemoryContexts to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2331,6 +2338,7 @@ export type ConversationMemoryContextUpsertArgs<ExtArgs extends runtime.Types.Ex
    * In case the ConversationMemoryContext was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ConversationMemoryContextUpdateInput, Prisma.ConversationMemoryContextUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2353,6 +2361,7 @@ export type ConversationMemoryContextDeleteArgs<ExtArgs extends runtime.Types.Ex
    * Filter which ConversationMemoryContext to delete.
    */
   where: Prisma.ConversationMemoryContextWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2362,11 +2371,11 @@ export type ConversationMemoryContextDeleteManyArgs<ExtArgs extends runtime.Type
   /**
    * Filter which ConversationMemoryContexts to delete
    */
-  where?: Prisma.ConversationMemoryContextWhereInput
+  where?: Prisma.ConversationMemoryContextWhereInput | runtime.Types.Skip
   /**
    * Limit how many ConversationMemoryContexts to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2385,12 +2394,12 @@ export type ConversationMemoryContext$memoryChunksArgs<ExtArgs extends runtime.T
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationMemoryChunkInclude<ExtArgs> | null
-  where?: Prisma.ConversationMemoryChunkWhereInput
-  orderBy?: Prisma.ConversationMemoryChunkOrderByWithRelationInput | Prisma.ConversationMemoryChunkOrderByWithRelationInput[]
-  cursor?: Prisma.ConversationMemoryChunkWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ConversationMemoryChunkScalarFieldEnum | Prisma.ConversationMemoryChunkScalarFieldEnum[]
+  where?: Prisma.ConversationMemoryChunkWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ConversationMemoryChunkOrderByWithRelationInput | Prisma.ConversationMemoryChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.ConversationMemoryChunkWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ConversationMemoryChunkScalarFieldEnum | Prisma.ConversationMemoryChunkScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**

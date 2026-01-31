@@ -44,10 +44,10 @@ const data = async (
     datasourceUrl = await getProdDb();
   }
 
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({
-    datasourceUrl
-  });
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const prismaClient = new PrismaDbService({
+    connectionString: datasourceUrl
+  }).p(false);
   prismaClient.$connect();
   try {
     const data = await prismaClient.attachment.findMany({

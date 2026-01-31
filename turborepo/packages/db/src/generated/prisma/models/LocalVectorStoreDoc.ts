@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model LocalVectorStoreDoc
@@ -145,151 +145,151 @@ export type LocalVectorStoreDocCountAggregateOutputType = {
 
 
 export type LocalVectorStoreDocAvgAggregateInputType = {
-  size?: true
-  embeddingDim?: true
-  pageCount?: true
-  extractedTextLength?: true
-  imageCount?: true
-  chunkCount?: true
-  tokenCount?: true
+  size?: true | runtime.Types.Skip
+  embeddingDim?: true | runtime.Types.Skip
+  pageCount?: true | runtime.Types.Skip
+  extractedTextLength?: true | runtime.Types.Skip
+  imageCount?: true | runtime.Types.Skip
+  chunkCount?: true | runtime.Types.Skip
+  tokenCount?: true | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocSumAggregateInputType = {
-  size?: true
-  embeddingDim?: true
-  pageCount?: true
-  extractedTextLength?: true
-  imageCount?: true
-  chunkCount?: true
-  tokenCount?: true
+  size?: true | runtime.Types.Skip
+  embeddingDim?: true | runtime.Types.Skip
+  pageCount?: true | runtime.Types.Skip
+  extractedTextLength?: true | runtime.Types.Skip
+  imageCount?: true | runtime.Types.Skip
+  chunkCount?: true | runtime.Types.Skip
+  tokenCount?: true | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocMinAggregateInputType = {
-  id?: true
-  storeId?: true
-  attachmentId?: true
-  conversationId?: true
-  messageId?: true
-  provider?: true
-  provenanceId?: true
-  filename?: true
-  mimeType?: true
-  ext?: true
-  size?: true
-  schemaVersion?: true
-  embeddingModel?: true
-  embeddingDim?: true
-  hasVisualMedia?: true
-  visualMediaHint?: true
-  pageCount?: true
-  extractedTextLength?: true
-  imageCount?: true
-  modelSelectionReason?: true
-  indexedAt?: true
-  errorMessage?: true
-  lastAccessed?: true
-  state?: true
-  chunkCount?: true
-  tokenCount?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  provenanceId?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  mimeType?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  embeddingModel?: true | runtime.Types.Skip
+  embeddingDim?: true | runtime.Types.Skip
+  hasVisualMedia?: true | runtime.Types.Skip
+  visualMediaHint?: true | runtime.Types.Skip
+  pageCount?: true | runtime.Types.Skip
+  extractedTextLength?: true | runtime.Types.Skip
+  imageCount?: true | runtime.Types.Skip
+  modelSelectionReason?: true | runtime.Types.Skip
+  indexedAt?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  lastAccessed?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  chunkCount?: true | runtime.Types.Skip
+  tokenCount?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocMaxAggregateInputType = {
-  id?: true
-  storeId?: true
-  attachmentId?: true
-  conversationId?: true
-  messageId?: true
-  provider?: true
-  provenanceId?: true
-  filename?: true
-  mimeType?: true
-  ext?: true
-  size?: true
-  schemaVersion?: true
-  embeddingModel?: true
-  embeddingDim?: true
-  hasVisualMedia?: true
-  visualMediaHint?: true
-  pageCount?: true
-  extractedTextLength?: true
-  imageCount?: true
-  modelSelectionReason?: true
-  indexedAt?: true
-  errorMessage?: true
-  lastAccessed?: true
-  state?: true
-  chunkCount?: true
-  tokenCount?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  provenanceId?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  mimeType?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  embeddingModel?: true | runtime.Types.Skip
+  embeddingDim?: true | runtime.Types.Skip
+  hasVisualMedia?: true | runtime.Types.Skip
+  visualMediaHint?: true | runtime.Types.Skip
+  pageCount?: true | runtime.Types.Skip
+  extractedTextLength?: true | runtime.Types.Skip
+  imageCount?: true | runtime.Types.Skip
+  modelSelectionReason?: true | runtime.Types.Skip
+  indexedAt?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  lastAccessed?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  chunkCount?: true | runtime.Types.Skip
+  tokenCount?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCountAggregateInputType = {
-  id?: true
-  storeId?: true
-  attachmentId?: true
-  conversationId?: true
-  messageId?: true
-  provider?: true
-  provenanceId?: true
-  filename?: true
-  mimeType?: true
-  ext?: true
-  size?: true
-  schemaVersion?: true
-  embeddingModel?: true
-  embeddingDim?: true
-  hasVisualMedia?: true
-  visualMediaHint?: true
-  pageCount?: true
-  extractedTextLength?: true
-  imageCount?: true
-  modelSelectionReason?: true
-  indexedAt?: true
-  errorMessage?: true
-  lastAccessed?: true
-  state?: true
-  chunkCount?: true
-  tokenCount?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  storeId?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  provenanceId?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  mimeType?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  schemaVersion?: true | runtime.Types.Skip
+  embeddingModel?: true | runtime.Types.Skip
+  embeddingDim?: true | runtime.Types.Skip
+  hasVisualMedia?: true | runtime.Types.Skip
+  visualMediaHint?: true | runtime.Types.Skip
+  pageCount?: true | runtime.Types.Skip
+  extractedTextLength?: true | runtime.Types.Skip
+  imageCount?: true | runtime.Types.Skip
+  modelSelectionReason?: true | runtime.Types.Skip
+  indexedAt?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  lastAccessed?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  chunkCount?: true | runtime.Types.Skip
+  tokenCount?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which LocalVectorStoreDoc to aggregate.
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocs to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocs from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocs.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -334,12 +334,12 @@ export type GetLocalVectorStoreDocAggregateType<T extends LocalVectorStoreDocAgg
 
 
 export type LocalVectorStoreDocGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocWhereInput
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithAggregationInput | Prisma.LocalVectorStoreDocOrderByWithAggregationInput[]
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithAggregationInput | Prisma.LocalVectorStoreDocOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.LocalVectorStoreDocScalarFieldEnum[] | Prisma.LocalVectorStoreDocScalarFieldEnum
-  having?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: LocalVectorStoreDocCountAggregateInputType | true
   _avg?: LocalVectorStoreDocAvgAggregateInputType
   _sum?: LocalVectorStoreDocSumAggregateInputType
@@ -400,191 +400,191 @@ type GetLocalVectorStoreDocGroupByPayload<T extends LocalVectorStoreDocGroupByAr
 
 
 export type LocalVectorStoreDocWhereInput = {
-  AND?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[]
-  OR?: Prisma.LocalVectorStoreDocWhereInput[]
-  NOT?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[]
-  id?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean
-  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
-  store?: Prisma.XOR<Prisma.LocalVectorStoreScalarRelationFilter, Prisma.LocalVectorStoreWhereInput>
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
-  chunks?: Prisma.LocalVectorStoreDocChunkListRelationFilter
+  AND?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  store?: Prisma.XOR<Prisma.LocalVectorStoreScalarRelationFilter, Prisma.LocalVectorStoreWhereInput> | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkListRelationFilter | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  mimeType?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  hasVisualMedia?: Prisma.SortOrder
-  visualMediaHint?: Prisma.SortOrderInput | Prisma.SortOrder
-  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder
-  imageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
-  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder
-  state?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  store?: Prisma.LocalVectorStoreOrderByWithRelationInput
-  attachment?: Prisma.AttachmentOrderByWithRelationInput
-  chunks?: Prisma.LocalVectorStoreDocChunkOrderByRelationAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  mimeType?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  hasVisualMedia?: Prisma.SortOrder | runtime.Types.Skip
+  visualMediaHint?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  store?: Prisma.LocalVectorStoreOrderByWithRelationInput | runtime.Types.Skip
+  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkOrderByRelationAggregateInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  storeId_provenanceId?: Prisma.LocalVectorStoreDocStoreIdProvenanceIdCompoundUniqueInput
-  AND?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[]
-  OR?: Prisma.LocalVectorStoreDocWhereInput[]
-  NOT?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[]
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean
-  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
-  store?: Prisma.XOR<Prisma.LocalVectorStoreScalarRelationFilter, Prisma.LocalVectorStoreWhereInput>
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
-  chunks?: Prisma.LocalVectorStoreDocChunkListRelationFilter
+  id?: string | runtime.Types.Skip
+  storeId_provenanceId?: Prisma.LocalVectorStoreDocStoreIdProvenanceIdCompoundUniqueInput | runtime.Types.Skip
+  AND?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.LocalVectorStoreDocWhereInput | Prisma.LocalVectorStoreDocWhereInput[] | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  store?: Prisma.XOR<Prisma.LocalVectorStoreScalarRelationFilter, Prisma.LocalVectorStoreWhereInput> | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkListRelationFilter | runtime.Types.Skip
 }, "id" | "storeId_provenanceId">
 
 export type LocalVectorStoreDocOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  mimeType?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  hasVisualMedia?: Prisma.SortOrder
-  visualMediaHint?: Prisma.SortOrderInput | Prisma.SortOrder
-  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder
-  imageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
-  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder
-  state?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.LocalVectorStoreDocCountOrderByAggregateInput
-  _avg?: Prisma.LocalVectorStoreDocAvgOrderByAggregateInput
-  _max?: Prisma.LocalVectorStoreDocMaxOrderByAggregateInput
-  _min?: Prisma.LocalVectorStoreDocMinOrderByAggregateInput
-  _sum?: Prisma.LocalVectorStoreDocSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  mimeType?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  hasVisualMedia?: Prisma.SortOrder | runtime.Types.Skip
+  visualMediaHint?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastAccessed?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.LocalVectorStoreDocCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.LocalVectorStoreDocAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.LocalVectorStoreDocMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.LocalVectorStoreDocMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.LocalVectorStoreDocSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocScalarWhereWithAggregatesInput = {
-  AND?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[]
-  OR?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  storeId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  attachmentId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  messageId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.Provider
-  provenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  filename?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  mimeType?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  ext?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  size?: Prisma.BigIntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string
-  embeddingDim?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number
-  hasVisualMedia?: Prisma.BoolWithAggregatesFilter<"LocalVectorStoreDoc"> | boolean
-  visualMediaHint?: Prisma.EnumVisualMediaHintNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
-  extractedTextLength?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
-  imageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
-  modelSelectionReason?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
-  indexedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null
-  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
-  lastAccessed?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number
-  tokenCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string
+  AND?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput | Prisma.LocalVectorStoreDocScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  filename?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  mimeType?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  ext?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  size?: Prisma.BigIntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringWithAggregatesFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolWithAggregatesFilter<"LocalVectorStoreDoc"> | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.EnumVisualMediaHintNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  imageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateWithAggregatesFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
   messageId: string
   provider: $Enums.Provider
@@ -592,32 +592,32 @@ export type LocalVectorStoreDocCreateInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   store: Prisma.LocalVectorStoreCreateNestedOneWithoutDocsInput
   attachment: Prisma.AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput
-  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput
+  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   attachmentId: string
   conversationId: string
@@ -627,96 +627,96 @@ export type LocalVectorStoreDocUncheckedCreateInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput
-  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   attachmentId: string
   conversationId: string
@@ -726,97 +726,97 @@ export type LocalVectorStoreDocCreateManyInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocListRelationFilter = {
-  every?: Prisma.LocalVectorStoreDocWhereInput
-  some?: Prisma.LocalVectorStoreDocWhereInput
-  none?: Prisma.LocalVectorStoreDocWhereInput
+  every?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  some?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  none?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+  _count?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocStoreIdProvenanceIdCompoundUniqueInput = {
@@ -825,228 +825,228 @@ export type LocalVectorStoreDocStoreIdProvenanceIdCompoundUniqueInput = {
 }
 
 export type LocalVectorStoreDocCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  mimeType?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  hasVisualMedia?: Prisma.SortOrder
-  visualMediaHint?: Prisma.SortOrder
-  pageCount?: Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrder
-  imageCount?: Prisma.SortOrder
-  modelSelectionReason?: Prisma.SortOrder
-  indexedAt?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  lastAccessed?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  mimeType?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  hasVisualMedia?: Prisma.SortOrder | runtime.Types.Skip
+  visualMediaHint?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrder | runtime.Types.Skip
+  modelSelectionReason?: Prisma.SortOrder | runtime.Types.Skip
+  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocAvgOrderByAggregateInput = {
-  size?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  pageCount?: Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrder
-  imageCount?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  mimeType?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  hasVisualMedia?: Prisma.SortOrder
-  visualMediaHint?: Prisma.SortOrder
-  pageCount?: Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrder
-  imageCount?: Prisma.SortOrder
-  modelSelectionReason?: Prisma.SortOrder
-  indexedAt?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  lastAccessed?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  mimeType?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  hasVisualMedia?: Prisma.SortOrder | runtime.Types.Skip
+  visualMediaHint?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrder | runtime.Types.Skip
+  modelSelectionReason?: Prisma.SortOrder | runtime.Types.Skip
+  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  storeId?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  provenanceId?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  mimeType?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  schemaVersion?: Prisma.SortOrder
-  embeddingModel?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  hasVisualMedia?: Prisma.SortOrder
-  visualMediaHint?: Prisma.SortOrder
-  pageCount?: Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrder
-  imageCount?: Prisma.SortOrder
-  modelSelectionReason?: Prisma.SortOrder
-  indexedAt?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  lastAccessed?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  storeId?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  provenanceId?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  mimeType?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  schemaVersion?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingModel?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  hasVisualMedia?: Prisma.SortOrder | runtime.Types.Skip
+  visualMediaHint?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrder | runtime.Types.Skip
+  modelSelectionReason?: Prisma.SortOrder | runtime.Types.Skip
+  indexedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  lastAccessed?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocSumOrderByAggregateInput = {
-  size?: Prisma.SortOrder
-  embeddingDim?: Prisma.SortOrder
-  pageCount?: Prisma.SortOrder
-  extractedTextLength?: Prisma.SortOrder
-  imageCount?: Prisma.SortOrder
-  chunkCount?: Prisma.SortOrder
-  tokenCount?: Prisma.SortOrder
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  embeddingDim?: Prisma.SortOrder | runtime.Types.Skip
+  pageCount?: Prisma.SortOrder | runtime.Types.Skip
+  extractedTextLength?: Prisma.SortOrder | runtime.Types.Skip
+  imageCount?: Prisma.SortOrder | runtime.Types.Skip
+  chunkCount?: Prisma.SortOrder | runtime.Types.Skip
+  tokenCount?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocScalarRelationFilter = {
-  is?: Prisma.LocalVectorStoreDocWhereInput
-  isNot?: Prisma.LocalVectorStoreDocWhereInput
+  is?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  isNot?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[]
-  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope
-  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput[]
-  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput[]
-  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[]
-  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope
-  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput[]
-  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput[]
-  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput> | Prisma.LocalVectorStoreDocCreateWithoutAttachmentInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedCreateNestedManyWithoutStoreInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[]
-  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope
-  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput[]
-  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput[]
-  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
+  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
+  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateManyWithoutStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[]
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[]
-  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput[]
-  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope
-  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[]
-  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput[]
-  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput[]
-  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutStoreInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput> | Prisma.LocalVectorStoreDocCreateWithoutStoreInput[] | Prisma.LocalVectorStoreDocUncheckedCreateWithoutStoreInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput | Prisma.LocalVectorStoreDocCreateOrConnectWithoutStoreInput[] | runtime.Types.Skip
+  upsert?: Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
+  createMany?: Prisma.LocalVectorStoreDocCreateManyStoreInputEnvelope | runtime.Types.Skip
+  set?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | Prisma.LocalVectorStoreDocWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateWithWhereUniqueWithoutStoreInput[] | runtime.Types.Skip
+  updateMany?: Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput | Prisma.LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type NullableEnumVisualMediaHintFieldUpdateOperationsInput = {
-  set?: $Enums.VisualMediaHint | null
+  set?: $Enums.VisualMediaHint | null | runtime.Types.Skip
 }
 
 export type EnumLocalStoreDocStateFieldUpdateOperationsInput = {
-  set?: $Enums.LocalStoreDocState
+  set?: $Enums.LocalStoreDocState | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateOneRequiredWithoutChunksNestedInput = {
-  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutChunksInput>
-  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutChunksInput
-  upsert?: Prisma.LocalVectorStoreDocUpsertWithoutChunksInput
-  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.LocalVectorStoreDocUpdateToOneWithWhereWithoutChunksInput, Prisma.LocalVectorStoreDocUpdateWithoutChunksInput>, Prisma.LocalVectorStoreDocUncheckedUpdateWithoutChunksInput>
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutChunksInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutChunksInput | runtime.Types.Skip
+  upsert?: Prisma.LocalVectorStoreDocUpsertWithoutChunksInput | runtime.Types.Skip
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LocalVectorStoreDocUpdateToOneWithWhereWithoutChunksInput, Prisma.LocalVectorStoreDocUpdateWithoutChunksInput>, Prisma.LocalVectorStoreDocUncheckedUpdateWithoutChunksInput> | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateWithoutAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
   messageId: string
   provider: $Enums.Provider
@@ -1054,31 +1054,31 @@ export type LocalVectorStoreDocCreateWithoutAttachmentInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   store: Prisma.LocalVectorStoreCreateNestedOneWithoutDocsInput
-  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput
+  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   conversationId: string
   messageId: string
@@ -1087,26 +1087,26 @@ export type LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput = {
@@ -1116,7 +1116,7 @@ export type LocalVectorStoreDocCreateOrConnectWithoutAttachmentInput = {
 
 export type LocalVectorStoreDocCreateManyAttachmentInputEnvelope = {
   data: Prisma.LocalVectorStoreDocCreateManyAttachmentInput | Prisma.LocalVectorStoreDocCreateManyAttachmentInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpsertWithWhereUniqueWithoutAttachmentInput = {
@@ -1136,42 +1136,42 @@ export type LocalVectorStoreDocUpdateManyWithWhereWithoutAttachmentInput = {
 }
 
 export type LocalVectorStoreDocScalarWhereInput = {
-  AND?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
-  OR?: Prisma.LocalVectorStoreDocScalarWhereInput[]
-  NOT?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[]
-  id?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider
-  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string
-  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean
-  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
-  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
-  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number
-  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string
+  AND?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.LocalVectorStoreDocScalarWhereInput | Prisma.LocalVectorStoreDocScalarWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  storeId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"LocalVectorStoreDoc"> | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  filename?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  ext?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"LocalVectorStoreDoc"> | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFilter<"LocalVectorStoreDoc"> | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFilter<"LocalVectorStoreDoc"> | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.EnumVisualMediaHintNullableFilter<"LocalVectorStoreDoc"> | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFilter<"LocalVectorStoreDoc"> | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFilter<"LocalVectorStoreDoc"> | number | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDoc"> | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateWithoutStoreInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
   messageId: string
   provider: $Enums.Provider
@@ -1179,31 +1179,31 @@ export type LocalVectorStoreDocCreateWithoutStoreInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   attachment: Prisma.AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput
-  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput
+  chunks?: Prisma.LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedCreateWithoutStoreInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   conversationId: string
   messageId: string
@@ -1212,26 +1212,26 @@ export type LocalVectorStoreDocUncheckedCreateWithoutStoreInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateOrConnectWithoutStoreInput = {
@@ -1241,7 +1241,7 @@ export type LocalVectorStoreDocCreateOrConnectWithoutStoreInput = {
 
 export type LocalVectorStoreDocCreateManyStoreInputEnvelope = {
   data: Prisma.LocalVectorStoreDocCreateManyStoreInput | Prisma.LocalVectorStoreDocCreateManyStoreInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpsertWithWhereUniqueWithoutStoreInput = {
@@ -1261,7 +1261,7 @@ export type LocalVectorStoreDocUpdateManyWithWhereWithoutStoreInput = {
 }
 
 export type LocalVectorStoreDocCreateWithoutChunksInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
   messageId: string
   provider: $Enums.Provider
@@ -1269,31 +1269,31 @@ export type LocalVectorStoreDocCreateWithoutChunksInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   store: Prisma.LocalVectorStoreCreateNestedOneWithoutDocsInput
   attachment: Prisma.AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput
 }
 
 export type LocalVectorStoreDocUncheckedCreateWithoutChunksInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   attachmentId: string
   conversationId: string
@@ -1303,25 +1303,25 @@ export type LocalVectorStoreDocUncheckedCreateWithoutChunksInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateOrConnectWithoutChunksInput = {
@@ -1332,80 +1332,80 @@ export type LocalVectorStoreDocCreateOrConnectWithoutChunksInput = {
 export type LocalVectorStoreDocUpsertWithoutChunksInput = {
   update: Prisma.XOR<Prisma.LocalVectorStoreDocUpdateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedUpdateWithoutChunksInput>
   create: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutChunksInput>
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateToOneWithWhereWithoutChunksInput = {
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.LocalVectorStoreDocUpdateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedUpdateWithoutChunksInput>
 }
 
 export type LocalVectorStoreDocUpdateWithoutChunksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateWithoutChunksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateManyAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   storeId: string
   conversationId: string
   messageId: string
@@ -1414,124 +1414,124 @@ export type LocalVectorStoreDocCreateManyAttachmentInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput
-  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  store?: Prisma.LocalVectorStoreUpdateOneRequiredWithoutDocsNestedInput | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  storeId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  storeId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocCreateManyStoreInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   conversationId: string
   messageId: string
@@ -1540,120 +1540,120 @@ export type LocalVectorStoreDocCreateManyStoreInput = {
   filename: string
   mimeType: string
   ext: string
-  size?: bigint | number | null
-  schemaVersion?: $Enums.LocalStoreSchemaVersion
-  embeddingModel?: string
-  embeddingDim?: number
-  hasVisualMedia?: boolean
-  visualMediaHint?: $Enums.VisualMediaHint | null
-  pageCount?: number | null
-  extractedTextLength?: number | null
-  imageCount?: number | null
-  modelSelectionReason?: string | null
-  indexedAt?: Date | string | null
-  errorMessage?: string | null
-  lastAccessed?: Date | string | null
-  state?: $Enums.LocalStoreDocState
-  chunkCount?: number
-  tokenCount?: number
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  size?: bigint | number | null | runtime.Types.Skip
+  schemaVersion?: $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: string | runtime.Types.Skip
+  embeddingDim?: number | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: number | null | runtime.Types.Skip
+  extractedTextLength?: number | null | runtime.Types.Skip
+  imageCount?: number | null | runtime.Types.Skip
+  modelSelectionReason?: string | null | runtime.Types.Skip
+  indexedAt?: Date | string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  lastAccessed?: Date | string | null | runtime.Types.Skip
+  state?: $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: number | runtime.Types.Skip
+  tokenCount?: number | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput
-  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  chunks?: Prisma.LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput | runtime.Types.Skip
 }
 
 export type LocalVectorStoreDocUncheckedUpdateManyWithoutStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string
-  filename?: Prisma.StringFieldUpdateOperationsInput | string
-  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  ext?: Prisma.StringFieldUpdateOperationsInput | string
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
-  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string
-  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number
-  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null
-  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState
-  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number
-  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  provenanceId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  filename?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  ext?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion | runtime.Types.Skip
+  embeddingModel?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  embeddingDim?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  hasVisualMedia?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  visualMediaHint?: Prisma.NullableEnumVisualMediaHintFieldUpdateOperationsInput | $Enums.VisualMediaHint | null | runtime.Types.Skip
+  pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  lastAccessed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  state?: Prisma.EnumLocalStoreDocStateFieldUpdateOperationsInput | $Enums.LocalStoreDocState | runtime.Types.Skip
+  chunkCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  tokenCount?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 
@@ -1683,160 +1683,160 @@ export type LocalVectorStoreDocCountOutputTypeDefaultArgs<ExtArgs extends runtim
  * LocalVectorStoreDocCountOutputType without action
  */
 export type LocalVectorStoreDocCountOutputTypeCountChunksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
 }
 
 
 export type LocalVectorStoreDocSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  attachmentId?: boolean
-  conversationId?: boolean
-  messageId?: boolean
-  provider?: boolean
-  provenanceId?: boolean
-  filename?: boolean
-  mimeType?: boolean
-  ext?: boolean
-  size?: boolean
-  schemaVersion?: boolean
-  embeddingModel?: boolean
-  embeddingDim?: boolean
-  hasVisualMedia?: boolean
-  visualMediaHint?: boolean
-  pageCount?: boolean
-  extractedTextLength?: boolean
-  imageCount?: boolean
-  modelSelectionReason?: boolean
-  indexedAt?: boolean
-  errorMessage?: boolean
-  lastAccessed?: boolean
-  state?: boolean
-  chunkCount?: boolean
-  tokenCount?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  chunks?: boolean | Prisma.LocalVectorStoreDoc$chunksArgs<ExtArgs>
-  _count?: boolean | Prisma.LocalVectorStoreDocCountOutputTypeDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  provenanceId?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  mimeType?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  embeddingModel?: boolean | runtime.Types.Skip
+  embeddingDim?: boolean | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: boolean | runtime.Types.Skip
+  pageCount?: boolean | runtime.Types.Skip
+  extractedTextLength?: boolean | runtime.Types.Skip
+  imageCount?: boolean | runtime.Types.Skip
+  modelSelectionReason?: boolean | runtime.Types.Skip
+  indexedAt?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  lastAccessed?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  chunkCount?: boolean | runtime.Types.Skip
+  tokenCount?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  chunks?: boolean | Prisma.LocalVectorStoreDoc$chunksArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.LocalVectorStoreDocCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["localVectorStoreDoc"]>
 
 export type LocalVectorStoreDocSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  attachmentId?: boolean
-  conversationId?: boolean
-  messageId?: boolean
-  provider?: boolean
-  provenanceId?: boolean
-  filename?: boolean
-  mimeType?: boolean
-  ext?: boolean
-  size?: boolean
-  schemaVersion?: boolean
-  embeddingModel?: boolean
-  embeddingDim?: boolean
-  hasVisualMedia?: boolean
-  visualMediaHint?: boolean
-  pageCount?: boolean
-  extractedTextLength?: boolean
-  imageCount?: boolean
-  modelSelectionReason?: boolean
-  indexedAt?: boolean
-  errorMessage?: boolean
-  lastAccessed?: boolean
-  state?: boolean
-  chunkCount?: boolean
-  tokenCount?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  provenanceId?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  mimeType?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  embeddingModel?: boolean | runtime.Types.Skip
+  embeddingDim?: boolean | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: boolean | runtime.Types.Skip
+  pageCount?: boolean | runtime.Types.Skip
+  extractedTextLength?: boolean | runtime.Types.Skip
+  imageCount?: boolean | runtime.Types.Skip
+  modelSelectionReason?: boolean | runtime.Types.Skip
+  indexedAt?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  lastAccessed?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  chunkCount?: boolean | runtime.Types.Skip
+  tokenCount?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["localVectorStoreDoc"]>
 
 export type LocalVectorStoreDocSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  storeId?: boolean
-  attachmentId?: boolean
-  conversationId?: boolean
-  messageId?: boolean
-  provider?: boolean
-  provenanceId?: boolean
-  filename?: boolean
-  mimeType?: boolean
-  ext?: boolean
-  size?: boolean
-  schemaVersion?: boolean
-  embeddingModel?: boolean
-  embeddingDim?: boolean
-  hasVisualMedia?: boolean
-  visualMediaHint?: boolean
-  pageCount?: boolean
-  extractedTextLength?: boolean
-  imageCount?: boolean
-  modelSelectionReason?: boolean
-  indexedAt?: boolean
-  errorMessage?: boolean
-  lastAccessed?: boolean
-  state?: boolean
-  chunkCount?: boolean
-  tokenCount?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  provenanceId?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  mimeType?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  embeddingModel?: boolean | runtime.Types.Skip
+  embeddingDim?: boolean | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: boolean | runtime.Types.Skip
+  pageCount?: boolean | runtime.Types.Skip
+  extractedTextLength?: boolean | runtime.Types.Skip
+  imageCount?: boolean | runtime.Types.Skip
+  modelSelectionReason?: boolean | runtime.Types.Skip
+  indexedAt?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  lastAccessed?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  chunkCount?: boolean | runtime.Types.Skip
+  tokenCount?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["localVectorStoreDoc"]>
 
 export type LocalVectorStoreDocSelectScalar = {
-  id?: boolean
-  storeId?: boolean
-  attachmentId?: boolean
-  conversationId?: boolean
-  messageId?: boolean
-  provider?: boolean
-  provenanceId?: boolean
-  filename?: boolean
-  mimeType?: boolean
-  ext?: boolean
-  size?: boolean
-  schemaVersion?: boolean
-  embeddingModel?: boolean
-  embeddingDim?: boolean
-  hasVisualMedia?: boolean
-  visualMediaHint?: boolean
-  pageCount?: boolean
-  extractedTextLength?: boolean
-  imageCount?: boolean
-  modelSelectionReason?: boolean
-  indexedAt?: boolean
-  errorMessage?: boolean
-  lastAccessed?: boolean
-  state?: boolean
-  chunkCount?: boolean
-  tokenCount?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  storeId?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  provenanceId?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  mimeType?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  schemaVersion?: boolean | runtime.Types.Skip
+  embeddingModel?: boolean | runtime.Types.Skip
+  embeddingDim?: boolean | runtime.Types.Skip
+  hasVisualMedia?: boolean | runtime.Types.Skip
+  visualMediaHint?: boolean | runtime.Types.Skip
+  pageCount?: boolean | runtime.Types.Skip
+  extractedTextLength?: boolean | runtime.Types.Skip
+  imageCount?: boolean | runtime.Types.Skip
+  modelSelectionReason?: boolean | runtime.Types.Skip
+  indexedAt?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  lastAccessed?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  chunkCount?: boolean | runtime.Types.Skip
+  tokenCount?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type LocalVectorStoreDocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "conversationId" | "messageId" | "provider" | "provenanceId" | "filename" | "mimeType" | "ext" | "size" | "schemaVersion" | "embeddingModel" | "embeddingDim" | "hasVisualMedia" | "visualMediaHint" | "pageCount" | "extractedTextLength" | "imageCount" | "modelSelectionReason" | "indexedAt" | "errorMessage" | "lastAccessed" | "state" | "chunkCount" | "tokenCount" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDoc"]>
+export type LocalVectorStoreDocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "conversationId" | "messageId" | "provider" | "provenanceId" | "filename" | "mimeType" | "ext" | "size" | "schemaVersion" | "embeddingModel" | "embeddingDim" | "hasVisualMedia" | "visualMediaHint" | "pageCount" | "extractedTextLength" | "imageCount" | "modelSelectionReason" | "indexedAt" | "errorMessage" | "lastAccessed" | "state" | "chunkCount" | "tokenCount" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDoc"], runtime.Types.Skip>
 export type LocalVectorStoreDocInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  chunks?: boolean | Prisma.LocalVectorStoreDoc$chunksArgs<ExtArgs>
-  _count?: boolean | Prisma.LocalVectorStoreDocCountOutputTypeDefaultArgs<ExtArgs>
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  chunks?: boolean | Prisma.LocalVectorStoreDoc$chunksArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.LocalVectorStoreDocCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type LocalVectorStoreDocIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type LocalVectorStoreDocIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs> | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $LocalVectorStoreDocPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1883,7 +1883,7 @@ export type $LocalVectorStoreDocPayload<ExtArgs extends runtime.Types.Extensions
 export type LocalVectorStoreDocGetPayload<S extends boolean | null | undefined | LocalVectorStoreDocDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocPayload, S>
 
 export type LocalVectorStoreDocCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<LocalVectorStoreDocFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<LocalVectorStoreDocFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: LocalVectorStoreDocCountAggregateInputType | true
   }
 
@@ -2355,6 +2355,7 @@ export type LocalVectorStoreDocFindUniqueArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which LocalVectorStoreDoc to fetch.
    */
   where: Prisma.LocalVectorStoreDocWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2377,6 +2378,7 @@ export type LocalVectorStoreDocFindUniqueOrThrowArgs<ExtArgs extends runtime.Typ
    * Filter, which LocalVectorStoreDoc to fetch.
    */
   where: Prisma.LocalVectorStoreDocWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2398,37 +2400,38 @@ export type LocalVectorStoreDocFindFirstArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter, which LocalVectorStoreDoc to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocs to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStoreDocs.
    */
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocs from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocs.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStoreDocs.
    */
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2450,37 +2453,38 @@ export type LocalVectorStoreDocFindFirstOrThrowArgs<ExtArgs extends runtime.Type
   /**
    * Filter, which LocalVectorStoreDoc to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocs to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for LocalVectorStoreDocs.
    */
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocs from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocs.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of LocalVectorStoreDocs.
    */
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2502,32 +2506,33 @@ export type LocalVectorStoreDocFindManyArgs<ExtArgs extends runtime.Types.Extens
   /**
    * Filter, which LocalVectorStoreDocs to fetch.
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of LocalVectorStoreDocs to fetch.
    */
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing LocalVectorStoreDocs.
    */
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` LocalVectorStoreDocs from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` LocalVectorStoreDocs.
    */
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2550,6 +2555,7 @@ export type LocalVectorStoreDocCreateArgs<ExtArgs extends runtime.Types.Extensio
    * The data needed to create a LocalVectorStoreDoc.
    */
   data: Prisma.XOR<Prisma.LocalVectorStoreDocCreateInput, Prisma.LocalVectorStoreDocUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2560,7 +2566,7 @@ export type LocalVectorStoreDocCreateManyArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many LocalVectorStoreDocs.
    */
   data: Prisma.LocalVectorStoreDocCreateManyInput | Prisma.LocalVectorStoreDocCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -2579,7 +2585,7 @@ export type LocalVectorStoreDocCreateManyAndReturnArgs<ExtArgs extends runtime.T
    * The data used to create many LocalVectorStoreDocs.
    */
   data: Prisma.LocalVectorStoreDocCreateManyInput | Prisma.LocalVectorStoreDocCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2610,6 +2616,7 @@ export type LocalVectorStoreDocUpdateArgs<ExtArgs extends runtime.Types.Extensio
    * Choose, which LocalVectorStoreDoc to update.
    */
   where: Prisma.LocalVectorStoreDocWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2623,11 +2630,11 @@ export type LocalVectorStoreDocUpdateManyArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter which LocalVectorStoreDocs to update
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * Limit how many LocalVectorStoreDocs to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2649,11 +2656,11 @@ export type LocalVectorStoreDocUpdateManyAndReturnArgs<ExtArgs extends runtime.T
   /**
    * Filter which LocalVectorStoreDocs to update
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * Limit how many LocalVectorStoreDocs to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2688,6 +2695,7 @@ export type LocalVectorStoreDocUpsertArgs<ExtArgs extends runtime.Types.Extensio
    * In case the LocalVectorStoreDoc was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.LocalVectorStoreDocUpdateInput, Prisma.LocalVectorStoreDocUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2710,6 +2718,7 @@ export type LocalVectorStoreDocDeleteArgs<ExtArgs extends runtime.Types.Extensio
    * Filter which LocalVectorStoreDoc to delete.
    */
   where: Prisma.LocalVectorStoreDocWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2719,11 +2728,11 @@ export type LocalVectorStoreDocDeleteManyArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter which LocalVectorStoreDocs to delete
    */
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
   /**
    * Limit how many LocalVectorStoreDocs to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2742,12 +2751,12 @@ export type LocalVectorStoreDoc$chunksArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.LocalVectorStoreDocChunkInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreDocChunkWhereInput
-  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[]
-  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[]
+  where?: Prisma.LocalVectorStoreDocChunkWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput | Prisma.LocalVectorStoreDocChunkOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreDocChunkScalarFieldEnum | Prisma.LocalVectorStoreDocChunkScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**

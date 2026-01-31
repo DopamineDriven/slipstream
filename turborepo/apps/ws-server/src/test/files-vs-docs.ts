@@ -9,11 +9,11 @@ const fs = new Fs(process.cwd());
 const pl = async (provider: $Enums.Provider, userId: string) => {
   const { Credentials } = await import("@slipstream/credentials");
   const p = new Credentials();
-  const datasourceUrl = await p.get("DIRECT_URL");
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({
-    datasourceUrl
-  });
+  const connectionString = await p.get("DIRECT_URL");
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const prismaClient = new PrismaDbService({
+    connectionString
+  }).p(false);
   prismaClient.$connect();
 
   try {
@@ -251,6 +251,9 @@ const pl = async (provider: $Enums.Provider, userId: string) => {
 })().then(v => {
   console.log(v.length);
   const toJson = JSON.stringify(v, null, 2);
-  fs.withWs("src/test/__out__/xai/inspect/cross-compare/new-prod-recs.json", toJson);
+  fs.withWs(
+    "src/test/__out__/xai/inspect/cross-compare/new-prod-recs.json",
+    toJson
+  );
   return v;
 });

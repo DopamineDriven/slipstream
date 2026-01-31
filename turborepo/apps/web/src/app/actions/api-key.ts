@@ -1,7 +1,7 @@
 "use server";
 
 import { updateTag, refresh } from "next/cache";
-import { prismaClient } from "@/lib/prisma";
+import { prismaClient, prismaClientAccelerate } from "@/lib/prisma";
 import { getSession } from "@/utils/auth";
 import type { Providers } from "@slipstream/types";
 import { EncryptionService } from "@slipstream/encryption";
@@ -58,7 +58,7 @@ export async function upsertApiKey(formdata: FormData) {
         }
       }
     });
-    await prismaClient.$accelerate.invalidate({
+    await prismaClientAccelerate.$accelerate.invalidate({
       tags: [`user_api_keys_${userId}`]
     });
     updateTag(`user_api_keys_${userId}`);
@@ -90,7 +90,7 @@ export async function getDecryptedApiKeyOnEdit(
     decryptMapper.clear();
     throw new Error("unauthorized");
   }
-  const rec = await prismaClient.userKey.findUnique({
+  const rec = await prismaClientAccelerate.userKey.findUnique({
     where: { userId_provider: { userId, provider: toPrismaFormat(provider) } },
     select: { authTag: true, apiKey: true, iv: true }
   });

@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Attachment
@@ -192,198 +192,198 @@ export type AttachmentCountAggregateOutputType = {
 
 
 export type AttachmentAvgAggregateInputType = {
-  uploadDuration?: true
-  size?: true
+  uploadDuration?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
 }
 
 export type AttachmentSumAggregateInputType = {
-  uploadDuration?: true
-  size?: true
+  uploadDuration?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
 }
 
 export type AttachmentMinAggregateInputType = {
-  id?: true
-  conversationId?: true
-  draftId?: true
-  batchId?: true
-  generationGroupId?: true
-  seriesId?: true
-  userId?: true
-  messageId?: true
-  s3ObjectId?: true
-  origin?: true
-  status?: true
-  uploadMethod?: true
-  assetType?: true
-  uploadDuration?: true
-  cdnUrl?: true
-  publicUrl?: true
-  sourceUrl?: true
-  thumbnailKey?: true
-  compatMime?: true
-  compatExt?: true
-  compatVersionId?: true
-  compatKey?: true
-  compatS3ObjectId?: true
-  compatStatus?: true
-  compatReadyAt?: true
-  compatCdnUrl?: true
-  bucket?: true
-  key?: true
-  versionId?: true
-  region?: true
-  cacheControl?: true
-  contentDisposition?: true
-  contentEncoding?: true
-  expiresAt?: true
-  size?: true
-  filename?: true
-  ext?: true
-  mime?: true
-  etag?: true
-  checksumAlgo?: true
-  checksumSha256?: true
-  storageClass?: true
-  sseAlgorithm?: true
-  sseKmsKeyId?: true
-  s3LastModified?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  draftId?: true | runtime.Types.Skip
+  batchId?: true | runtime.Types.Skip
+  generationGroupId?: true | runtime.Types.Skip
+  seriesId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  s3ObjectId?: true | runtime.Types.Skip
+  origin?: true | runtime.Types.Skip
+  status?: true | runtime.Types.Skip
+  uploadMethod?: true | runtime.Types.Skip
+  assetType?: true | runtime.Types.Skip
+  uploadDuration?: true | runtime.Types.Skip
+  cdnUrl?: true | runtime.Types.Skip
+  publicUrl?: true | runtime.Types.Skip
+  sourceUrl?: true | runtime.Types.Skip
+  thumbnailKey?: true | runtime.Types.Skip
+  compatMime?: true | runtime.Types.Skip
+  compatExt?: true | runtime.Types.Skip
+  compatVersionId?: true | runtime.Types.Skip
+  compatKey?: true | runtime.Types.Skip
+  compatS3ObjectId?: true | runtime.Types.Skip
+  compatStatus?: true | runtime.Types.Skip
+  compatReadyAt?: true | runtime.Types.Skip
+  compatCdnUrl?: true | runtime.Types.Skip
+  bucket?: true | runtime.Types.Skip
+  key?: true | runtime.Types.Skip
+  versionId?: true | runtime.Types.Skip
+  region?: true | runtime.Types.Skip
+  cacheControl?: true | runtime.Types.Skip
+  contentDisposition?: true | runtime.Types.Skip
+  contentEncoding?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  etag?: true | runtime.Types.Skip
+  checksumAlgo?: true | runtime.Types.Skip
+  checksumSha256?: true | runtime.Types.Skip
+  storageClass?: true | runtime.Types.Skip
+  sseAlgorithm?: true | runtime.Types.Skip
+  sseKmsKeyId?: true | runtime.Types.Skip
+  s3LastModified?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type AttachmentMaxAggregateInputType = {
-  id?: true
-  conversationId?: true
-  draftId?: true
-  batchId?: true
-  generationGroupId?: true
-  seriesId?: true
-  userId?: true
-  messageId?: true
-  s3ObjectId?: true
-  origin?: true
-  status?: true
-  uploadMethod?: true
-  assetType?: true
-  uploadDuration?: true
-  cdnUrl?: true
-  publicUrl?: true
-  sourceUrl?: true
-  thumbnailKey?: true
-  compatMime?: true
-  compatExt?: true
-  compatVersionId?: true
-  compatKey?: true
-  compatS3ObjectId?: true
-  compatStatus?: true
-  compatReadyAt?: true
-  compatCdnUrl?: true
-  bucket?: true
-  key?: true
-  versionId?: true
-  region?: true
-  cacheControl?: true
-  contentDisposition?: true
-  contentEncoding?: true
-  expiresAt?: true
-  size?: true
-  filename?: true
-  ext?: true
-  mime?: true
-  etag?: true
-  checksumAlgo?: true
-  checksumSha256?: true
-  storageClass?: true
-  sseAlgorithm?: true
-  sseKmsKeyId?: true
-  s3LastModified?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  draftId?: true | runtime.Types.Skip
+  batchId?: true | runtime.Types.Skip
+  generationGroupId?: true | runtime.Types.Skip
+  seriesId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  s3ObjectId?: true | runtime.Types.Skip
+  origin?: true | runtime.Types.Skip
+  status?: true | runtime.Types.Skip
+  uploadMethod?: true | runtime.Types.Skip
+  assetType?: true | runtime.Types.Skip
+  uploadDuration?: true | runtime.Types.Skip
+  cdnUrl?: true | runtime.Types.Skip
+  publicUrl?: true | runtime.Types.Skip
+  sourceUrl?: true | runtime.Types.Skip
+  thumbnailKey?: true | runtime.Types.Skip
+  compatMime?: true | runtime.Types.Skip
+  compatExt?: true | runtime.Types.Skip
+  compatVersionId?: true | runtime.Types.Skip
+  compatKey?: true | runtime.Types.Skip
+  compatS3ObjectId?: true | runtime.Types.Skip
+  compatStatus?: true | runtime.Types.Skip
+  compatReadyAt?: true | runtime.Types.Skip
+  compatCdnUrl?: true | runtime.Types.Skip
+  bucket?: true | runtime.Types.Skip
+  key?: true | runtime.Types.Skip
+  versionId?: true | runtime.Types.Skip
+  region?: true | runtime.Types.Skip
+  cacheControl?: true | runtime.Types.Skip
+  contentDisposition?: true | runtime.Types.Skip
+  contentEncoding?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  etag?: true | runtime.Types.Skip
+  checksumAlgo?: true | runtime.Types.Skip
+  checksumSha256?: true | runtime.Types.Skip
+  storageClass?: true | runtime.Types.Skip
+  sseAlgorithm?: true | runtime.Types.Skip
+  sseKmsKeyId?: true | runtime.Types.Skip
+  s3LastModified?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type AttachmentCountAggregateInputType = {
-  id?: true
-  conversationId?: true
-  draftId?: true
-  batchId?: true
-  generationGroupId?: true
-  seriesId?: true
-  userId?: true
-  messageId?: true
-  s3ObjectId?: true
-  origin?: true
-  status?: true
-  uploadMethod?: true
-  assetType?: true
-  uploadDuration?: true
-  cdnUrl?: true
-  publicUrl?: true
-  sourceUrl?: true
-  thumbnailKey?: true
-  compatMime?: true
-  compatExt?: true
-  compatVersionId?: true
-  compatKey?: true
-  compatS3ObjectId?: true
-  compatStatus?: true
-  compatReadyAt?: true
-  compatCdnUrl?: true
-  bucket?: true
-  key?: true
-  versionId?: true
-  region?: true
-  cacheControl?: true
-  contentDisposition?: true
-  contentEncoding?: true
-  expiresAt?: true
-  size?: true
-  filename?: true
-  ext?: true
-  mime?: true
-  etag?: true
-  checksumAlgo?: true
-  checksumSha256?: true
-  storageClass?: true
-  sseAlgorithm?: true
-  sseKmsKeyId?: true
-  s3LastModified?: true
-  deletedAt?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  draftId?: true | runtime.Types.Skip
+  batchId?: true | runtime.Types.Skip
+  generationGroupId?: true | runtime.Types.Skip
+  seriesId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  messageId?: true | runtime.Types.Skip
+  s3ObjectId?: true | runtime.Types.Skip
+  origin?: true | runtime.Types.Skip
+  status?: true | runtime.Types.Skip
+  uploadMethod?: true | runtime.Types.Skip
+  assetType?: true | runtime.Types.Skip
+  uploadDuration?: true | runtime.Types.Skip
+  cdnUrl?: true | runtime.Types.Skip
+  publicUrl?: true | runtime.Types.Skip
+  sourceUrl?: true | runtime.Types.Skip
+  thumbnailKey?: true | runtime.Types.Skip
+  compatMime?: true | runtime.Types.Skip
+  compatExt?: true | runtime.Types.Skip
+  compatVersionId?: true | runtime.Types.Skip
+  compatKey?: true | runtime.Types.Skip
+  compatS3ObjectId?: true | runtime.Types.Skip
+  compatStatus?: true | runtime.Types.Skip
+  compatReadyAt?: true | runtime.Types.Skip
+  compatCdnUrl?: true | runtime.Types.Skip
+  bucket?: true | runtime.Types.Skip
+  key?: true | runtime.Types.Skip
+  versionId?: true | runtime.Types.Skip
+  region?: true | runtime.Types.Skip
+  cacheControl?: true | runtime.Types.Skip
+  contentDisposition?: true | runtime.Types.Skip
+  contentEncoding?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  filename?: true | runtime.Types.Skip
+  ext?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  etag?: true | runtime.Types.Skip
+  checksumAlgo?: true | runtime.Types.Skip
+  checksumSha256?: true | runtime.Types.Skip
+  storageClass?: true | runtime.Types.Skip
+  sseAlgorithm?: true | runtime.Types.Skip
+  sseKmsKeyId?: true | runtime.Types.Skip
+  s3LastModified?: true | runtime.Types.Skip
+  deletedAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type AttachmentAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which Attachment to aggregate.
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Attachments to fetch.
    */
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.AttachmentWhereUniqueInput
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Attachments from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Attachments.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -428,12 +428,12 @@ export type GetAttachmentAggregateType<T extends AttachmentAggregateArgs> = {
 
 
 export type AttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentWhereInput
-  orderBy?: Prisma.AttachmentOrderByWithAggregationInput | Prisma.AttachmentOrderByWithAggregationInput[]
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AttachmentOrderByWithAggregationInput | Prisma.AttachmentOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.AttachmentScalarFieldEnum[] | Prisma.AttachmentScalarFieldEnum
-  having?: Prisma.AttachmentScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.AttachmentScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: AttachmentCountAggregateInputType | true
   _avg?: AttachmentAvgAggregateInputType
   _sum?: AttachmentSumAggregateInputType
@@ -513,1255 +513,1255 @@ type GetAttachmentGroupByPayload<T extends AttachmentGroupByArgs> = Prisma.Prism
 
 
 export type AttachmentWhereInput = {
-  AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  OR?: Prisma.AttachmentWhereInput[]
-  NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  id?: Prisma.StringFilter<"Attachment"> | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  userId?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
-  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
-  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  bucket?: Prisma.StringFilter<"Attachment"> | string
-  key?: Prisma.StringFilter<"Attachment"> | string
-  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  region?: Prisma.StringFilter<"Attachment"> | string
-  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
-  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
-  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
-  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
-  providerLinks?: Prisma.AttachmentProviderListRelationFilter
-  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
-  video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
-  document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null
-  audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null
-  imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null
+  AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  key?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  region?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null | runtime.Types.Skip
+  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderListRelationFilter | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter | runtime.Types.Skip
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
+  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null | runtime.Types.Skip
+  video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null | runtime.Types.Skip
+  document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null | runtime.Types.Skip
+  audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null | runtime.Types.Skip
+  imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null | runtime.Types.Skip
 }
 
 export type AttachmentOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
-  draftId?: Prisma.SortOrderInput | Prisma.SortOrder
-  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
-  generationGroupId?: Prisma.SortOrderInput | Prisma.SortOrder
-  seriesId?: Prisma.SortOrderInput | Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
-  origin?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  uploadMethod?: Prisma.SortOrder
-  assetType?: Prisma.SortOrder
-  uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder
-  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  bucket?: Prisma.SortOrder
-  key?: Prisma.SortOrder
-  versionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  region?: Prisma.SortOrder
-  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
-  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
-  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  filename?: Prisma.SortOrderInput | Prisma.SortOrder
-  ext?: Prisma.SortOrderInput | Prisma.SortOrder
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder
-  etag?: Prisma.SortOrderInput | Prisma.SortOrder
-  checksumAlgo?: Prisma.SortOrder
-  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
-  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder
-  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder
-  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput
-  conversation?: Prisma.ConversationOrderByWithRelationInput
-  message?: Prisma.MessageOrderByWithRelationInput
-  providerLinks?: Prisma.AttachmentProviderOrderByRelationAggregateInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput
-  user?: Prisma.UserOrderByWithRelationInput
-  image?: Prisma.ImageMetadataOrderByWithRelationInput
-  video?: Prisma.VideoMetadataOrderByWithRelationInput
-  document?: Prisma.DocumentMetadataOrderByWithRelationInput
-  audio?: Prisma.AudioMetadataOrderByWithRelationInput
-  imageGenOutput?: Prisma.ImageGenOutputOrderByWithRelationInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  draftId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  generationGroupId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  seriesId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  origin?: Prisma.SortOrder | runtime.Types.Skip
+  status?: Prisma.SortOrder | runtime.Types.Skip
+  uploadMethod?: Prisma.SortOrder | runtime.Types.Skip
+  assetType?: Prisma.SortOrder | runtime.Types.Skip
+  uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  bucket?: Prisma.SortOrder | runtime.Types.Skip
+  key?: Prisma.SortOrder | runtime.Types.Skip
+  versionId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  region?: Prisma.SortOrder | runtime.Types.Skip
+  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  checksumAlgo?: Prisma.SortOrder | runtime.Types.Skip
+  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocOrderByRelationAggregateInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationOrderByWithRelationInput | runtime.Types.Skip
+  message?: Prisma.MessageOrderByWithRelationInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderOrderByRelationAggregateInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentOrderByRelationAggregateInput | runtime.Types.Skip
+  user?: Prisma.UserOrderByWithRelationInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataOrderByWithRelationInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataOrderByWithRelationInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataOrderByWithRelationInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataOrderByWithRelationInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  s3ObjectId?: string
-  AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  OR?: Prisma.AttachmentWhereInput[]
-  NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  userId?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
-  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
-  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  bucket?: Prisma.StringFilter<"Attachment"> | string
-  key?: Prisma.StringFilter<"Attachment"> | string
-  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  region?: Prisma.StringFilter<"Attachment"> | string
-  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
-  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter
-  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null
-  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
-  providerLinks?: Prisma.AttachmentProviderListRelationFilter
-  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null
-  video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null
-  document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null
-  audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null
-  imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null
+  id?: string | runtime.Types.Skip
+  s3ObjectId?: string | runtime.Types.Skip
+  AND?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[] | runtime.Types.Skip
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  key?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  region?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocListRelationFilter | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationNullableScalarRelationFilter, Prisma.ConversationWhereInput> | null | runtime.Types.Skip
+  message?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderListRelationFilter | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentListRelationFilter | runtime.Types.Skip
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput> | runtime.Types.Skip
+  image?: Prisma.XOR<Prisma.ImageMetadataNullableScalarRelationFilter, Prisma.ImageMetadataWhereInput> | null | runtime.Types.Skip
+  video?: Prisma.XOR<Prisma.VideoMetadataNullableScalarRelationFilter, Prisma.VideoMetadataWhereInput> | null | runtime.Types.Skip
+  document?: Prisma.XOR<Prisma.DocumentMetadataNullableScalarRelationFilter, Prisma.DocumentMetadataWhereInput> | null | runtime.Types.Skip
+  audio?: Prisma.XOR<Prisma.AudioMetadataNullableScalarRelationFilter, Prisma.AudioMetadataWhereInput> | null | runtime.Types.Skip
+  imageGenOutput?: Prisma.XOR<Prisma.ImageGenOutputNullableScalarRelationFilter, Prisma.ImageGenOutputWhereInput> | null | runtime.Types.Skip
 }, "id" | "s3ObjectId">
 
 export type AttachmentOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder
-  draftId?: Prisma.SortOrderInput | Prisma.SortOrder
-  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
-  generationGroupId?: Prisma.SortOrderInput | Prisma.SortOrder
-  seriesId?: Prisma.SortOrderInput | Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
-  origin?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  uploadMethod?: Prisma.SortOrder
-  assetType?: Prisma.SortOrder
-  uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder
-  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  bucket?: Prisma.SortOrder
-  key?: Prisma.SortOrder
-  versionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  region?: Prisma.SortOrder
-  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder
-  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder
-  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  filename?: Prisma.SortOrderInput | Prisma.SortOrder
-  ext?: Prisma.SortOrderInput | Prisma.SortOrder
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder
-  etag?: Prisma.SortOrderInput | Prisma.SortOrder
-  checksumAlgo?: Prisma.SortOrder
-  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder
-  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder
-  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder
-  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.AttachmentCountOrderByAggregateInput
-  _avg?: Prisma.AttachmentAvgOrderByAggregateInput
-  _max?: Prisma.AttachmentMaxOrderByAggregateInput
-  _min?: Prisma.AttachmentMinOrderByAggregateInput
-  _sum?: Prisma.AttachmentSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  draftId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  generationGroupId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  seriesId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  s3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  origin?: Prisma.SortOrder | runtime.Types.Skip
+  status?: Prisma.SortOrder | runtime.Types.Skip
+  uploadMethod?: Prisma.SortOrder | runtime.Types.Skip
+  assetType?: Prisma.SortOrder | runtime.Types.Skip
+  uploadDuration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  cdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  publicUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sourceUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thumbnailKey?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatMime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatExt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatVersionId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatKey?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatStatus?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatReadyAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  compatCdnUrl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  bucket?: Prisma.SortOrder | runtime.Types.Skip
+  key?: Prisma.SortOrder | runtime.Types.Skip
+  versionId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  region?: Prisma.SortOrder | runtime.Types.Skip
+  cacheControl?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  contentDisposition?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  contentEncoding?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  checksumAlgo?: Prisma.SortOrder | runtime.Types.Skip
+  checksumSha256?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  storageClass?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sseAlgorithm?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  s3LastModified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.AttachmentCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.AttachmentAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.AttachmentMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.AttachmentMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.AttachmentSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type AttachmentScalarWhereWithAggregatesInput = {
-  AND?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[]
-  OR?: Prisma.AttachmentScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  conversationId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  draftId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  batchId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  generationGroupId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  seriesId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  origin?: Prisma.EnumAssetOriginWithAggregatesFilter<"Attachment"> | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusWithAggregatesFilter<"Attachment"> | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodWithAggregatesFilter<"Attachment"> | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeWithAggregatesFilter<"Attachment"> | $Enums.AssetType
-  uploadDuration?: Prisma.IntNullableWithAggregatesFilter<"Attachment"> | number | null
-  cdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  publicUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  thumbnailKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatMime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatExt?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatVersionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatS3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  compatStatus?: Prisma.EnumCompatStatusNullableWithAggregatesFilter<"Attachment"> | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
-  compatCdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  versionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  region?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
-  cacheControl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  contentDisposition?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  contentEncoding?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
-  size?: Prisma.BigIntNullableWithAggregatesFilter<"Attachment"> | bigint | number | null
-  filename?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  ext?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  mime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  etag?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoWithAggregatesFilter<"Attachment"> | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  storageClass?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  sseAlgorithm?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  sseKmsKeyId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null
-  s3LastModified?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
+  AND?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"Attachment"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  draftId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  batchId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  seriesId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  userId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginWithAggregatesFilter<"Attachment"> | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusWithAggregatesFilter<"Attachment"> | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodWithAggregatesFilter<"Attachment"> | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeWithAggregatesFilter<"Attachment"> | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.IntNullableWithAggregatesFilter<"Attachment"> | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatMime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatExt?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatKey?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.EnumCompatStatusNullableWithAggregatesFilter<"Attachment"> | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringWithAggregatesFilter<"Attachment"> | string | runtime.Types.Skip
+  key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string | runtime.Types.Skip
+  versionId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  region?: Prisma.StringWithAggregatesFilter<"Attachment"> | string | runtime.Types.Skip
+  cacheControl?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableWithAggregatesFilter<"Attachment"> | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  ext?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  etag?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoWithAggregatesFilter<"Attachment"> | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  storageClass?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.StringNullableWithAggregatesFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentCreateInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateManyInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AttachmentUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  draftId?: Prisma.SortOrder
-  batchId?: Prisma.SortOrder
-  generationGroupId?: Prisma.SortOrder
-  seriesId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrder
-  origin?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  uploadMethod?: Prisma.SortOrder
-  assetType?: Prisma.SortOrder
-  uploadDuration?: Prisma.SortOrder
-  cdnUrl?: Prisma.SortOrder
-  publicUrl?: Prisma.SortOrder
-  sourceUrl?: Prisma.SortOrder
-  thumbnailKey?: Prisma.SortOrder
-  compatMime?: Prisma.SortOrder
-  compatExt?: Prisma.SortOrder
-  compatVersionId?: Prisma.SortOrder
-  compatKey?: Prisma.SortOrder
-  compatS3ObjectId?: Prisma.SortOrder
-  compatStatus?: Prisma.SortOrder
-  compatReadyAt?: Prisma.SortOrder
-  compatCdnUrl?: Prisma.SortOrder
-  bucket?: Prisma.SortOrder
-  key?: Prisma.SortOrder
-  versionId?: Prisma.SortOrder
-  region?: Prisma.SortOrder
-  cacheControl?: Prisma.SortOrder
-  contentDisposition?: Prisma.SortOrder
-  contentEncoding?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  etag?: Prisma.SortOrder
-  checksumAlgo?: Prisma.SortOrder
-  checksumSha256?: Prisma.SortOrder
-  storageClass?: Prisma.SortOrder
-  sseAlgorithm?: Prisma.SortOrder
-  sseKmsKeyId?: Prisma.SortOrder
-  s3LastModified?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  draftId?: Prisma.SortOrder | runtime.Types.Skip
+  batchId?: Prisma.SortOrder | runtime.Types.Skip
+  generationGroupId?: Prisma.SortOrder | runtime.Types.Skip
+  seriesId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  s3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  origin?: Prisma.SortOrder | runtime.Types.Skip
+  status?: Prisma.SortOrder | runtime.Types.Skip
+  uploadMethod?: Prisma.SortOrder | runtime.Types.Skip
+  assetType?: Prisma.SortOrder | runtime.Types.Skip
+  uploadDuration?: Prisma.SortOrder | runtime.Types.Skip
+  cdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  publicUrl?: Prisma.SortOrder | runtime.Types.Skip
+  sourceUrl?: Prisma.SortOrder | runtime.Types.Skip
+  thumbnailKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatMime?: Prisma.SortOrder | runtime.Types.Skip
+  compatExt?: Prisma.SortOrder | runtime.Types.Skip
+  compatVersionId?: Prisma.SortOrder | runtime.Types.Skip
+  compatKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  compatStatus?: Prisma.SortOrder | runtime.Types.Skip
+  compatReadyAt?: Prisma.SortOrder | runtime.Types.Skip
+  compatCdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  bucket?: Prisma.SortOrder | runtime.Types.Skip
+  key?: Prisma.SortOrder | runtime.Types.Skip
+  versionId?: Prisma.SortOrder | runtime.Types.Skip
+  region?: Prisma.SortOrder | runtime.Types.Skip
+  cacheControl?: Prisma.SortOrder | runtime.Types.Skip
+  contentDisposition?: Prisma.SortOrder | runtime.Types.Skip
+  contentEncoding?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  etag?: Prisma.SortOrder | runtime.Types.Skip
+  checksumAlgo?: Prisma.SortOrder | runtime.Types.Skip
+  checksumSha256?: Prisma.SortOrder | runtime.Types.Skip
+  storageClass?: Prisma.SortOrder | runtime.Types.Skip
+  sseAlgorithm?: Prisma.SortOrder | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  s3LastModified?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentAvgOrderByAggregateInput = {
-  uploadDuration?: Prisma.SortOrder
-  size?: Prisma.SortOrder
+  uploadDuration?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  draftId?: Prisma.SortOrder
-  batchId?: Prisma.SortOrder
-  generationGroupId?: Prisma.SortOrder
-  seriesId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrder
-  origin?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  uploadMethod?: Prisma.SortOrder
-  assetType?: Prisma.SortOrder
-  uploadDuration?: Prisma.SortOrder
-  cdnUrl?: Prisma.SortOrder
-  publicUrl?: Prisma.SortOrder
-  sourceUrl?: Prisma.SortOrder
-  thumbnailKey?: Prisma.SortOrder
-  compatMime?: Prisma.SortOrder
-  compatExt?: Prisma.SortOrder
-  compatVersionId?: Prisma.SortOrder
-  compatKey?: Prisma.SortOrder
-  compatS3ObjectId?: Prisma.SortOrder
-  compatStatus?: Prisma.SortOrder
-  compatReadyAt?: Prisma.SortOrder
-  compatCdnUrl?: Prisma.SortOrder
-  bucket?: Prisma.SortOrder
-  key?: Prisma.SortOrder
-  versionId?: Prisma.SortOrder
-  region?: Prisma.SortOrder
-  cacheControl?: Prisma.SortOrder
-  contentDisposition?: Prisma.SortOrder
-  contentEncoding?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  etag?: Prisma.SortOrder
-  checksumAlgo?: Prisma.SortOrder
-  checksumSha256?: Prisma.SortOrder
-  storageClass?: Prisma.SortOrder
-  sseAlgorithm?: Prisma.SortOrder
-  sseKmsKeyId?: Prisma.SortOrder
-  s3LastModified?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  draftId?: Prisma.SortOrder | runtime.Types.Skip
+  batchId?: Prisma.SortOrder | runtime.Types.Skip
+  generationGroupId?: Prisma.SortOrder | runtime.Types.Skip
+  seriesId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  s3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  origin?: Prisma.SortOrder | runtime.Types.Skip
+  status?: Prisma.SortOrder | runtime.Types.Skip
+  uploadMethod?: Prisma.SortOrder | runtime.Types.Skip
+  assetType?: Prisma.SortOrder | runtime.Types.Skip
+  uploadDuration?: Prisma.SortOrder | runtime.Types.Skip
+  cdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  publicUrl?: Prisma.SortOrder | runtime.Types.Skip
+  sourceUrl?: Prisma.SortOrder | runtime.Types.Skip
+  thumbnailKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatMime?: Prisma.SortOrder | runtime.Types.Skip
+  compatExt?: Prisma.SortOrder | runtime.Types.Skip
+  compatVersionId?: Prisma.SortOrder | runtime.Types.Skip
+  compatKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  compatStatus?: Prisma.SortOrder | runtime.Types.Skip
+  compatReadyAt?: Prisma.SortOrder | runtime.Types.Skip
+  compatCdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  bucket?: Prisma.SortOrder | runtime.Types.Skip
+  key?: Prisma.SortOrder | runtime.Types.Skip
+  versionId?: Prisma.SortOrder | runtime.Types.Skip
+  region?: Prisma.SortOrder | runtime.Types.Skip
+  cacheControl?: Prisma.SortOrder | runtime.Types.Skip
+  contentDisposition?: Prisma.SortOrder | runtime.Types.Skip
+  contentEncoding?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  etag?: Prisma.SortOrder | runtime.Types.Skip
+  checksumAlgo?: Prisma.SortOrder | runtime.Types.Skip
+  checksumSha256?: Prisma.SortOrder | runtime.Types.Skip
+  storageClass?: Prisma.SortOrder | runtime.Types.Skip
+  sseAlgorithm?: Prisma.SortOrder | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  s3LastModified?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  draftId?: Prisma.SortOrder
-  batchId?: Prisma.SortOrder
-  generationGroupId?: Prisma.SortOrder
-  seriesId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  messageId?: Prisma.SortOrder
-  s3ObjectId?: Prisma.SortOrder
-  origin?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  uploadMethod?: Prisma.SortOrder
-  assetType?: Prisma.SortOrder
-  uploadDuration?: Prisma.SortOrder
-  cdnUrl?: Prisma.SortOrder
-  publicUrl?: Prisma.SortOrder
-  sourceUrl?: Prisma.SortOrder
-  thumbnailKey?: Prisma.SortOrder
-  compatMime?: Prisma.SortOrder
-  compatExt?: Prisma.SortOrder
-  compatVersionId?: Prisma.SortOrder
-  compatKey?: Prisma.SortOrder
-  compatS3ObjectId?: Prisma.SortOrder
-  compatStatus?: Prisma.SortOrder
-  compatReadyAt?: Prisma.SortOrder
-  compatCdnUrl?: Prisma.SortOrder
-  bucket?: Prisma.SortOrder
-  key?: Prisma.SortOrder
-  versionId?: Prisma.SortOrder
-  region?: Prisma.SortOrder
-  cacheControl?: Prisma.SortOrder
-  contentDisposition?: Prisma.SortOrder
-  contentEncoding?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  filename?: Prisma.SortOrder
-  ext?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  etag?: Prisma.SortOrder
-  checksumAlgo?: Prisma.SortOrder
-  checksumSha256?: Prisma.SortOrder
-  storageClass?: Prisma.SortOrder
-  sseAlgorithm?: Prisma.SortOrder
-  sseKmsKeyId?: Prisma.SortOrder
-  s3LastModified?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  draftId?: Prisma.SortOrder | runtime.Types.Skip
+  batchId?: Prisma.SortOrder | runtime.Types.Skip
+  generationGroupId?: Prisma.SortOrder | runtime.Types.Skip
+  seriesId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  messageId?: Prisma.SortOrder | runtime.Types.Skip
+  s3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  origin?: Prisma.SortOrder | runtime.Types.Skip
+  status?: Prisma.SortOrder | runtime.Types.Skip
+  uploadMethod?: Prisma.SortOrder | runtime.Types.Skip
+  assetType?: Prisma.SortOrder | runtime.Types.Skip
+  uploadDuration?: Prisma.SortOrder | runtime.Types.Skip
+  cdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  publicUrl?: Prisma.SortOrder | runtime.Types.Skip
+  sourceUrl?: Prisma.SortOrder | runtime.Types.Skip
+  thumbnailKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatMime?: Prisma.SortOrder | runtime.Types.Skip
+  compatExt?: Prisma.SortOrder | runtime.Types.Skip
+  compatVersionId?: Prisma.SortOrder | runtime.Types.Skip
+  compatKey?: Prisma.SortOrder | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.SortOrder | runtime.Types.Skip
+  compatStatus?: Prisma.SortOrder | runtime.Types.Skip
+  compatReadyAt?: Prisma.SortOrder | runtime.Types.Skip
+  compatCdnUrl?: Prisma.SortOrder | runtime.Types.Skip
+  bucket?: Prisma.SortOrder | runtime.Types.Skip
+  key?: Prisma.SortOrder | runtime.Types.Skip
+  versionId?: Prisma.SortOrder | runtime.Types.Skip
+  region?: Prisma.SortOrder | runtime.Types.Skip
+  cacheControl?: Prisma.SortOrder | runtime.Types.Skip
+  contentDisposition?: Prisma.SortOrder | runtime.Types.Skip
+  contentEncoding?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  filename?: Prisma.SortOrder | runtime.Types.Skip
+  ext?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  etag?: Prisma.SortOrder | runtime.Types.Skip
+  checksumAlgo?: Prisma.SortOrder | runtime.Types.Skip
+  checksumSha256?: Prisma.SortOrder | runtime.Types.Skip
+  storageClass?: Prisma.SortOrder | runtime.Types.Skip
+  sseAlgorithm?: Prisma.SortOrder | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  s3LastModified?: Prisma.SortOrder | runtime.Types.Skip
+  deletedAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentSumOrderByAggregateInput = {
-  uploadDuration?: Prisma.SortOrder
-  size?: Prisma.SortOrder
+  uploadDuration?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentScalarRelationFilter = {
-  is?: Prisma.AttachmentWhereInput
-  isNot?: Prisma.AttachmentWhereInput
+  is?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  isNot?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentListRelationFilter = {
-  every?: Prisma.AttachmentWhereInput
-  some?: Prisma.AttachmentWhereInput
-  none?: Prisma.AttachmentWhereInput
+  every?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  some?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  none?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+  _count?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type EnumAssetOriginFieldUpdateOperationsInput = {
-  set?: $Enums.AssetOrigin
+  set?: $Enums.AssetOrigin | runtime.Types.Skip
 }
 
 export type EnumAssetStatusFieldUpdateOperationsInput = {
-  set?: $Enums.AssetStatus
+  set?: $Enums.AssetStatus | runtime.Types.Skip
 }
 
 export type EnumUploadMethodFieldUpdateOperationsInput = {
-  set?: $Enums.UploadMethod
+  set?: $Enums.UploadMethod | runtime.Types.Skip
 }
 
 export type EnumAssetTypeFieldUpdateOperationsInput = {
-  set?: $Enums.AssetType
+  set?: $Enums.AssetType | runtime.Types.Skip
 }
 
 export type NullableEnumCompatStatusFieldUpdateOperationsInput = {
-  set?: $Enums.CompatStatus | null
+  set?: $Enums.CompatStatus | null | runtime.Types.Skip
 }
 
 export type NullableBigIntFieldUpdateOperationsInput = {
-  set?: bigint | number | null
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
+  set?: bigint | number | null | runtime.Types.Skip
+  increment?: bigint | number | runtime.Types.Skip
+  decrement?: bigint | number | runtime.Types.Skip
+  multiply?: bigint | number | runtime.Types.Skip
+  divide?: bigint | number | runtime.Types.Skip
 }
 
 export type EnumChecksumAlgoFieldUpdateOperationsInput = {
-  set?: $Enums.ChecksumAlgo
+  set?: $Enums.ChecksumAlgo | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutImageInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutImageNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput
-  upsert?: Prisma.AttachmentUpsertWithoutImageInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageInput, Prisma.AttachmentUpdateWithoutImageInput>, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutImageInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageInput, Prisma.AttachmentUpdateWithoutImageInput>, Prisma.AttachmentUncheckedUpdateWithoutImageInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutVideoInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutVideoInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutVideoInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutVideoNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutVideoInput
-  upsert?: Prisma.AttachmentUpsertWithoutVideoInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutVideoInput, Prisma.AttachmentUpdateWithoutVideoInput>, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutVideoInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutVideoInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutVideoInput, Prisma.AttachmentUpdateWithoutVideoInput>, Prisma.AttachmentUncheckedUpdateWithoutVideoInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutAudioInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutAudioNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioInput
-  upsert?: Prisma.AttachmentUpsertWithoutAudioInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutAudioInput, Prisma.AttachmentUpdateWithoutAudioInput>, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutAudioInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutAudioInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutAudioInput, Prisma.AttachmentUpdateWithoutAudioInput>, Prisma.AttachmentUncheckedUpdateWithoutAudioInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutDocumentInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutDocumentInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutDocumentInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutDocumentNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutDocumentInput
-  upsert?: Prisma.AttachmentUpsertWithoutDocumentInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutDocumentInput, Prisma.AttachmentUpdateWithoutDocumentInput>, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutDocumentInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutDocumentInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutDocumentInput, Prisma.AttachmentUpdateWithoutDocumentInput>, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutConversationInput, Prisma.AttachmentUncheckedCreateWithoutConversationInput> | Prisma.AttachmentCreateWithoutConversationInput[] | Prisma.AttachmentUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutConversationInput | Prisma.AttachmentCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyConversationInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput | Prisma.AttachmentUpdateManyWithWhereWithoutConversationInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutImageGenOutputInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageGenOutputInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageGenOutputInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutImageGenOutputNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageGenOutputInput
-  upsert?: Prisma.AttachmentUpsertWithoutImageGenOutputInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput, Prisma.AttachmentUpdateWithoutImageGenOutputInput>, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutImageGenOutputInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutImageGenOutputInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput, Prisma.AttachmentUpdateWithoutImageGenOutputInput>, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutLocalVectorStoreDocsInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutLocalVectorStoreDocsNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput
-  upsert?: Prisma.AttachmentUpsertWithoutLocalVectorStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutLocalVectorStoreDocsInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedManyWithoutMessageInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateNestedManyWithoutMessageInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUpdateManyWithoutMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutMessageNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[]
-  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutMessageInput, Prisma.AttachmentUncheckedCreateWithoutMessageInput> | Prisma.AttachmentCreateWithoutMessageInput[] | Prisma.AttachmentUncheckedCreateWithoutMessageInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutMessageInput | Prisma.AttachmentCreateOrConnectWithoutMessageInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutMessageInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyMessageInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutMessageInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput | Prisma.AttachmentUpdateManyWithWhereWithoutMessageInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutProviderLinksInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput
-  upsert?: Prisma.AttachmentUpsertWithoutProviderLinksInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderLinksInput, Prisma.AttachmentUpdateWithoutProviderLinksInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderLinksInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutProviderLinksInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderLinksInput, Prisma.AttachmentUpdateWithoutProviderLinksInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedOneWithoutProviderStoreDocsInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateOneRequiredWithoutProviderStoreDocsNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput
-  upsert?: Prisma.AttachmentUpsertWithoutProviderStoreDocsInput
-  connect?: Prisma.AttachmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput, Prisma.AttachmentUpdateWithoutProviderStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutProviderStoreDocsInput | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithoutProviderStoreDocsInput | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput, Prisma.AttachmentUpdateWithoutProviderStoreDocsInput>, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput> | runtime.Types.Skip
 }
 
 export type AttachmentCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope
-  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[]
-  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentCreateWithoutUserInput, Prisma.AttachmentUncheckedCreateWithoutUserInput> | Prisma.AttachmentCreateWithoutUserInput[] | Prisma.AttachmentUncheckedCreateWithoutUserInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentCreateOrConnectWithoutUserInput | Prisma.AttachmentCreateOrConnectWithoutUserInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpsertWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentCreateManyUserInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentWhereUniqueInput | Prisma.AttachmentWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput | Prisma.AttachmentUpdateWithWhereUniqueWithoutUserInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentUpdateManyWithWhereWithoutUserInput | Prisma.AttachmentUpdateManyWithWhereWithoutUserInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutImageInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutImageInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutImageInput = {
@@ -1772,244 +1772,244 @@ export type AttachmentCreateOrConnectWithoutImageInput = {
 export type AttachmentUpsertWithoutImageInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageInput, Prisma.AttachmentUncheckedCreateWithoutImageInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutImageInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageInput, Prisma.AttachmentUncheckedUpdateWithoutImageInput>
 }
 
 export type AttachmentUpdateWithoutImageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutImageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutVideoInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutVideoInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutVideoInput = {
@@ -2020,244 +2020,244 @@ export type AttachmentCreateOrConnectWithoutVideoInput = {
 export type AttachmentUpsertWithoutVideoInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutVideoInput, Prisma.AttachmentUncheckedCreateWithoutVideoInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutVideoInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutVideoInput, Prisma.AttachmentUncheckedUpdateWithoutVideoInput>
 }
 
 export type AttachmentUpdateWithoutVideoInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutVideoInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutAudioInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutAudioInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutAudioInput = {
@@ -2268,244 +2268,244 @@ export type AttachmentCreateOrConnectWithoutAudioInput = {
 export type AttachmentUpsertWithoutAudioInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutAudioInput, Prisma.AttachmentUncheckedCreateWithoutAudioInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutAudioInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutAudioInput, Prisma.AttachmentUncheckedUpdateWithoutAudioInput>
 }
 
 export type AttachmentUpdateWithoutAudioInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutAudioInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutDocumentInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutDocumentInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutDocumentInput = {
@@ -2516,244 +2516,244 @@ export type AttachmentCreateOrConnectWithoutDocumentInput = {
 export type AttachmentUpsertWithoutDocumentInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutDocumentInput, Prisma.AttachmentUncheckedCreateWithoutDocumentInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutDocumentInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutDocumentInput, Prisma.AttachmentUncheckedUpdateWithoutDocumentInput>
 }
 
 export type AttachmentUpdateWithoutDocumentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutDocumentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutConversationInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutConversationInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutConversationInput = {
@@ -2763,7 +2763,7 @@ export type AttachmentCreateOrConnectWithoutConversationInput = {
 
 export type AttachmentCreateManyConversationInputEnvelope = {
   data: Prisma.AttachmentCreateManyConversationInput | Prisma.AttachmentCreateManyConversationInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type AttachmentUpsertWithWhereUniqueWithoutConversationInput = {
@@ -2783,173 +2783,173 @@ export type AttachmentUpdateManyWithWhereWithoutConversationInput = {
 }
 
 export type AttachmentScalarWhereInput = {
-  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  OR?: Prisma.AttachmentScalarWhereInput[]
-  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
-  id?: Prisma.StringFilter<"Attachment"> | string
-  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  userId?: Prisma.StringFilter<"Attachment"> | string
-  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType
-  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null
-  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  bucket?: Prisma.StringFilter<"Attachment"> | string
-  key?: Prisma.StringFilter<"Attachment"> | string
-  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  region?: Prisma.StringFilter<"Attachment"> | string
-  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null
-  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null
-  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
+  AND?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  draftId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  batchId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  seriesId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  messageId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFilter<"Attachment"> | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFilter<"Attachment"> | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFilter<"Attachment"> | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFilter<"Attachment"> | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.IntNullableFilter<"Attachment"> | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatMime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatExt?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatKey?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.EnumCompatStatusNullableFilter<"Attachment"> | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  key?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  versionId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  region?: Prisma.StringFilter<"Attachment"> | string | runtime.Types.Skip
+  cacheControl?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"Attachment"> | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  ext?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  etag?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFilter<"Attachment"> | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  storageClass?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.StringNullableFilter<"Attachment"> | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.DateTimeNullableFilter<"Attachment"> | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutImageGenOutputInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutImageGenOutputInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutImageGenOutputInput = {
@@ -2960,244 +2960,244 @@ export type AttachmentCreateOrConnectWithoutImageGenOutputInput = {
 export type AttachmentUpsertWithoutImageGenOutputInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedCreateWithoutImageGenOutputInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutImageGenOutputInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutImageGenOutputInput, Prisma.AttachmentUncheckedUpdateWithoutImageGenOutputInput>
 }
 
 export type AttachmentUpdateWithoutImageGenOutputInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutImageGenOutputInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutLocalVectorStoreDocsInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput = {
@@ -3208,244 +3208,244 @@ export type AttachmentCreateOrConnectWithoutLocalVectorStoreDocsInput = {
 export type AttachmentUpsertWithoutLocalVectorStoreDocsInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutLocalVectorStoreDocsInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutLocalVectorStoreDocsInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutLocalVectorStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput>
 }
 
 export type AttachmentUpdateWithoutLocalVectorStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutLocalVectorStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutMessageInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutMessageInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutMessageInput = {
@@ -3455,7 +3455,7 @@ export type AttachmentCreateOrConnectWithoutMessageInput = {
 
 export type AttachmentCreateManyMessageInputEnvelope = {
   data: Prisma.AttachmentCreateManyMessageInput | Prisma.AttachmentCreateManyMessageInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type AttachmentUpsertWithWhereUniqueWithoutMessageInput = {
@@ -3475,119 +3475,119 @@ export type AttachmentUpdateManyWithWhereWithoutMessageInput = {
 }
 
 export type AttachmentCreateWithoutProviderLinksInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutProviderLinksInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutProviderLinksInput = {
@@ -3598,244 +3598,244 @@ export type AttachmentCreateOrConnectWithoutProviderLinksInput = {
 export type AttachmentUpsertWithoutProviderLinksInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderLinksInput, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderLinksInput, Prisma.AttachmentUncheckedCreateWithoutProviderLinksInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutProviderLinksInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderLinksInput, Prisma.AttachmentUncheckedUpdateWithoutProviderLinksInput>
 }
 
 export type AttachmentUpdateWithoutProviderLinksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutProviderLinksInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutProviderStoreDocsInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
   user: Prisma.UserCreateNestedOneWithoutAttachmentsInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutProviderStoreDocsInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
@@ -3846,244 +3846,244 @@ export type AttachmentCreateOrConnectWithoutProviderStoreDocsInput = {
 export type AttachmentUpsertWithoutProviderStoreDocsInput = {
   update: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
   create: Prisma.XOR<Prisma.AttachmentCreateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedCreateWithoutProviderStoreDocsInput>
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentUpdateToOneWithWhereWithoutProviderStoreDocsInput = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AttachmentUpdateWithoutProviderStoreDocsInput, Prisma.AttachmentUncheckedUpdateWithoutProviderStoreDocsInput>
 }
 
 export type AttachmentUpdateWithoutProviderStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutProviderStoreDocsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateWithoutUserInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput
-  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput
-  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput
-  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  message?: Prisma.MessageCreateNestedOneWithoutAttachmentsInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedCreateWithoutUserInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput
-  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedCreateNestedManyWithoutAttachmentInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedCreateNestedOneWithoutAttachmentInput | runtime.Types.Skip
 }
 
 export type AttachmentCreateOrConnectWithoutUserInput = {
@@ -4093,7 +4093,7 @@ export type AttachmentCreateOrConnectWithoutUserInput = {
 
 export type AttachmentCreateManyUserInputEnvelope = {
   data: Prisma.AttachmentCreateManyUserInput | Prisma.AttachmentCreateManyUserInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type AttachmentUpsertWithWhereUniqueWithoutUserInput = {
@@ -4113,651 +4113,651 @@ export type AttachmentUpdateManyWithWhereWithoutUserInput = {
 }
 
 export type AttachmentCreateManyConversationInput = {
-  id?: string
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AttachmentUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentCreateManyMessageInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
   userId: string
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AttachmentUpdateWithoutMessageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  user?: Prisma.UserUpdateOneRequiredWithoutAttachmentsNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutMessageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutMessageInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AttachmentCreateManyUserInput = {
-  id?: string
-  conversationId?: string | null
-  draftId?: string | null
-  batchId?: string | null
-  generationGroupId?: string | null
-  seriesId?: string | null
-  messageId?: string | null
-  s3ObjectId?: string | null
-  origin?: $Enums.AssetOrigin
-  status?: $Enums.AssetStatus
-  uploadMethod?: $Enums.UploadMethod
-  assetType?: $Enums.AssetType
-  uploadDuration?: number | null
-  cdnUrl?: string | null
-  publicUrl?: string | null
-  sourceUrl?: string | null
-  thumbnailKey?: string | null
-  compatMime?: string | null
-  compatExt?: string | null
-  compatVersionId?: string | null
-  compatKey?: string | null
-  compatS3ObjectId?: string | null
-  compatStatus?: $Enums.CompatStatus | null
-  compatReadyAt?: Date | string | null
-  compatCdnUrl?: string | null
+  id?: string | runtime.Types.Skip
+  conversationId?: string | null | runtime.Types.Skip
+  draftId?: string | null | runtime.Types.Skip
+  batchId?: string | null | runtime.Types.Skip
+  generationGroupId?: string | null | runtime.Types.Skip
+  seriesId?: string | null | runtime.Types.Skip
+  messageId?: string | null | runtime.Types.Skip
+  s3ObjectId?: string | null | runtime.Types.Skip
+  origin?: $Enums.AssetOrigin | runtime.Types.Skip
+  status?: $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: number | null | runtime.Types.Skip
+  cdnUrl?: string | null | runtime.Types.Skip
+  publicUrl?: string | null | runtime.Types.Skip
+  sourceUrl?: string | null | runtime.Types.Skip
+  thumbnailKey?: string | null | runtime.Types.Skip
+  compatMime?: string | null | runtime.Types.Skip
+  compatExt?: string | null | runtime.Types.Skip
+  compatVersionId?: string | null | runtime.Types.Skip
+  compatKey?: string | null | runtime.Types.Skip
+  compatS3ObjectId?: string | null | runtime.Types.Skip
+  compatStatus?: $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: string | null | runtime.Types.Skip
   bucket: string
   key: string
-  versionId?: string | null
-  region?: string
-  cacheControl?: string | null
-  contentDisposition?: string | null
-  contentEncoding?: string | null
-  expiresAt?: Date | string | null
-  size?: bigint | number | null
-  filename?: string | null
-  ext?: string | null
-  mime?: string | null
-  etag?: string | null
-  checksumAlgo?: $Enums.ChecksumAlgo
-  checksumSha256?: string | null
-  storageClass?: string | null
-  sseAlgorithm?: string | null
-  sseKmsKeyId?: string | null
-  s3LastModified?: Date | string | null
-  deletedAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  versionId?: string | null | runtime.Types.Skip
+  region?: string | runtime.Types.Skip
+  cacheControl?: string | null | runtime.Types.Skip
+  contentDisposition?: string | null | runtime.Types.Skip
+  contentEncoding?: string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  filename?: string | null | runtime.Types.Skip
+  ext?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  etag?: string | null | runtime.Types.Skip
+  checksumAlgo?: $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: string | null | runtime.Types.Skip
+  storageClass?: string | null | runtime.Types.Skip
+  sseAlgorithm?: string | null | runtime.Types.Skip
+  sseKmsKeyId?: string | null | runtime.Types.Skip
+  s3LastModified?: Date | string | null | runtime.Types.Skip
+  deletedAt?: Date | string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AttachmentUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput
-  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput
-  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput
-  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  message?: Prisma.MessageUpdateOneWithoutAttachmentsNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput
-  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput
-  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput
-  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  localVectorStoreDocs?: Prisma.LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerLinks?: Prisma.AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  providerStoreDocs?: Prisma.ProviderStoreDocumentUncheckedUpdateManyWithoutAttachmentNestedInput | runtime.Types.Skip
+  image?: Prisma.ImageMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  video?: Prisma.VideoMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  document?: Prisma.DocumentMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  audio?: Prisma.AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
+  imageGenOutput?: Prisma.ImageGenOutputUncheckedUpdateOneWithoutAttachmentNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin
-  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus
-  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod
-  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType
-  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null
-  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  bucket?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
-  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  region?: Prisma.StringFieldUpdateOperationsInput | string
-  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo
-  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  draftId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  generationGroupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  seriesId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  messageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  origin?: Prisma.EnumAssetOriginFieldUpdateOperationsInput | $Enums.AssetOrigin | runtime.Types.Skip
+  status?: Prisma.EnumAssetStatusFieldUpdateOperationsInput | $Enums.AssetStatus | runtime.Types.Skip
+  uploadMethod?: Prisma.EnumUploadMethodFieldUpdateOperationsInput | $Enums.UploadMethod | runtime.Types.Skip
+  assetType?: Prisma.EnumAssetTypeFieldUpdateOperationsInput | $Enums.AssetType | runtime.Types.Skip
+  uploadDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  cdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  publicUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatExt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatVersionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatS3ObjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  compatStatus?: Prisma.NullableEnumCompatStatusFieldUpdateOperationsInput | $Enums.CompatStatus | null | runtime.Types.Skip
+  compatReadyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  compatCdnUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  bucket?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  key?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  versionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  region?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  cacheControl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentDisposition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  contentEncoding?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  filename?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  ext?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  checksumAlgo?: Prisma.EnumChecksumAlgoFieldUpdateOperationsInput | $Enums.ChecksumAlgo | runtime.Types.Skip
+  checksumSha256?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  storageClass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseAlgorithm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  sseKmsKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  s3LastModified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 
@@ -4791,270 +4791,270 @@ export type AttachmentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  * AttachmentCountOutputType without action
  */
 export type AttachmentCountOutputTypeCountLocalVectorStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreDocWhereInput
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
 }
 
 /**
  * AttachmentCountOutputType without action
  */
 export type AttachmentCountOutputTypeCountProviderLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
 }
 
 /**
  * AttachmentCountOutputType without action
  */
 export type AttachmentCountOutputTypeCountProviderStoreDocsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ProviderStoreDocumentWhereInput
+  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
 }
 
 
 export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  draftId?: boolean
-  batchId?: boolean
-  generationGroupId?: boolean
-  seriesId?: boolean
-  userId?: boolean
-  messageId?: boolean
-  s3ObjectId?: boolean
-  origin?: boolean
-  status?: boolean
-  uploadMethod?: boolean
-  assetType?: boolean
-  uploadDuration?: boolean
-  cdnUrl?: boolean
-  publicUrl?: boolean
-  sourceUrl?: boolean
-  thumbnailKey?: boolean
-  compatMime?: boolean
-  compatExt?: boolean
-  compatVersionId?: boolean
-  compatKey?: boolean
-  compatS3ObjectId?: boolean
-  compatStatus?: boolean
-  compatReadyAt?: boolean
-  compatCdnUrl?: boolean
-  bucket?: boolean
-  key?: boolean
-  versionId?: boolean
-  region?: boolean
-  cacheControl?: boolean
-  contentDisposition?: boolean
-  contentEncoding?: boolean
-  expiresAt?: boolean
-  size?: boolean
-  filename?: boolean
-  ext?: boolean
-  mime?: boolean
-  etag?: boolean
-  checksumAlgo?: boolean
-  checksumSha256?: boolean
-  storageClass?: boolean
-  sseAlgorithm?: boolean
-  sseKmsKeyId?: boolean
-  s3LastModified?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
-  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
-  video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
-  document?: boolean | Prisma.Attachment$documentArgs<ExtArgs>
-  audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs>
-  imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs>
-  _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  draftId?: boolean | runtime.Types.Skip
+  batchId?: boolean | runtime.Types.Skip
+  generationGroupId?: boolean | runtime.Types.Skip
+  seriesId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  s3ObjectId?: boolean | runtime.Types.Skip
+  origin?: boolean | runtime.Types.Skip
+  status?: boolean | runtime.Types.Skip
+  uploadMethod?: boolean | runtime.Types.Skip
+  assetType?: boolean | runtime.Types.Skip
+  uploadDuration?: boolean | runtime.Types.Skip
+  cdnUrl?: boolean | runtime.Types.Skip
+  publicUrl?: boolean | runtime.Types.Skip
+  sourceUrl?: boolean | runtime.Types.Skip
+  thumbnailKey?: boolean | runtime.Types.Skip
+  compatMime?: boolean | runtime.Types.Skip
+  compatExt?: boolean | runtime.Types.Skip
+  compatVersionId?: boolean | runtime.Types.Skip
+  compatKey?: boolean | runtime.Types.Skip
+  compatS3ObjectId?: boolean | runtime.Types.Skip
+  compatStatus?: boolean | runtime.Types.Skip
+  compatReadyAt?: boolean | runtime.Types.Skip
+  compatCdnUrl?: boolean | runtime.Types.Skip
+  bucket?: boolean | runtime.Types.Skip
+  key?: boolean | runtime.Types.Skip
+  versionId?: boolean | runtime.Types.Skip
+  region?: boolean | runtime.Types.Skip
+  cacheControl?: boolean | runtime.Types.Skip
+  contentDisposition?: boolean | runtime.Types.Skip
+  contentEncoding?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  etag?: boolean | runtime.Types.Skip
+  checksumAlgo?: boolean | runtime.Types.Skip
+  checksumSha256?: boolean | runtime.Types.Skip
+  storageClass?: boolean | runtime.Types.Skip
+  sseAlgorithm?: boolean | runtime.Types.Skip
+  sseKmsKeyId?: boolean | runtime.Types.Skip
+  s3LastModified?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs> | runtime.Types.Skip
+  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs> | runtime.Types.Skip
+  video?: boolean | Prisma.Attachment$videoArgs<ExtArgs> | runtime.Types.Skip
+  document?: boolean | Prisma.Attachment$documentArgs<ExtArgs> | runtime.Types.Skip
+  audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs> | runtime.Types.Skip
+  imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  draftId?: boolean
-  batchId?: boolean
-  generationGroupId?: boolean
-  seriesId?: boolean
-  userId?: boolean
-  messageId?: boolean
-  s3ObjectId?: boolean
-  origin?: boolean
-  status?: boolean
-  uploadMethod?: boolean
-  assetType?: boolean
-  uploadDuration?: boolean
-  cdnUrl?: boolean
-  publicUrl?: boolean
-  sourceUrl?: boolean
-  thumbnailKey?: boolean
-  compatMime?: boolean
-  compatExt?: boolean
-  compatVersionId?: boolean
-  compatKey?: boolean
-  compatS3ObjectId?: boolean
-  compatStatus?: boolean
-  compatReadyAt?: boolean
-  compatCdnUrl?: boolean
-  bucket?: boolean
-  key?: boolean
-  versionId?: boolean
-  region?: boolean
-  cacheControl?: boolean
-  contentDisposition?: boolean
-  contentEncoding?: boolean
-  expiresAt?: boolean
-  size?: boolean
-  filename?: boolean
-  ext?: boolean
-  mime?: boolean
-  etag?: boolean
-  checksumAlgo?: boolean
-  checksumSha256?: boolean
-  storageClass?: boolean
-  sseAlgorithm?: boolean
-  sseKmsKeyId?: boolean
-  s3LastModified?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  draftId?: boolean | runtime.Types.Skip
+  batchId?: boolean | runtime.Types.Skip
+  generationGroupId?: boolean | runtime.Types.Skip
+  seriesId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  s3ObjectId?: boolean | runtime.Types.Skip
+  origin?: boolean | runtime.Types.Skip
+  status?: boolean | runtime.Types.Skip
+  uploadMethod?: boolean | runtime.Types.Skip
+  assetType?: boolean | runtime.Types.Skip
+  uploadDuration?: boolean | runtime.Types.Skip
+  cdnUrl?: boolean | runtime.Types.Skip
+  publicUrl?: boolean | runtime.Types.Skip
+  sourceUrl?: boolean | runtime.Types.Skip
+  thumbnailKey?: boolean | runtime.Types.Skip
+  compatMime?: boolean | runtime.Types.Skip
+  compatExt?: boolean | runtime.Types.Skip
+  compatVersionId?: boolean | runtime.Types.Skip
+  compatKey?: boolean | runtime.Types.Skip
+  compatS3ObjectId?: boolean | runtime.Types.Skip
+  compatStatus?: boolean | runtime.Types.Skip
+  compatReadyAt?: boolean | runtime.Types.Skip
+  compatCdnUrl?: boolean | runtime.Types.Skip
+  bucket?: boolean | runtime.Types.Skip
+  key?: boolean | runtime.Types.Skip
+  versionId?: boolean | runtime.Types.Skip
+  region?: boolean | runtime.Types.Skip
+  cacheControl?: boolean | runtime.Types.Skip
+  contentDisposition?: boolean | runtime.Types.Skip
+  contentEncoding?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  etag?: boolean | runtime.Types.Skip
+  checksumAlgo?: boolean | runtime.Types.Skip
+  checksumSha256?: boolean | runtime.Types.Skip
+  storageClass?: boolean | runtime.Types.Skip
+  sseAlgorithm?: boolean | runtime.Types.Skip
+  sseKmsKeyId?: boolean | runtime.Types.Skip
+  s3LastModified?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  draftId?: boolean
-  batchId?: boolean
-  generationGroupId?: boolean
-  seriesId?: boolean
-  userId?: boolean
-  messageId?: boolean
-  s3ObjectId?: boolean
-  origin?: boolean
-  status?: boolean
-  uploadMethod?: boolean
-  assetType?: boolean
-  uploadDuration?: boolean
-  cdnUrl?: boolean
-  publicUrl?: boolean
-  sourceUrl?: boolean
-  thumbnailKey?: boolean
-  compatMime?: boolean
-  compatExt?: boolean
-  compatVersionId?: boolean
-  compatKey?: boolean
-  compatS3ObjectId?: boolean
-  compatStatus?: boolean
-  compatReadyAt?: boolean
-  compatCdnUrl?: boolean
-  bucket?: boolean
-  key?: boolean
-  versionId?: boolean
-  region?: boolean
-  cacheControl?: boolean
-  contentDisposition?: boolean
-  contentEncoding?: boolean
-  expiresAt?: boolean
-  size?: boolean
-  filename?: boolean
-  ext?: boolean
-  mime?: boolean
-  etag?: boolean
-  checksumAlgo?: boolean
-  checksumSha256?: boolean
-  storageClass?: boolean
-  sseAlgorithm?: boolean
-  sseKmsKeyId?: boolean
-  s3LastModified?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  draftId?: boolean | runtime.Types.Skip
+  batchId?: boolean | runtime.Types.Skip
+  generationGroupId?: boolean | runtime.Types.Skip
+  seriesId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  s3ObjectId?: boolean | runtime.Types.Skip
+  origin?: boolean | runtime.Types.Skip
+  status?: boolean | runtime.Types.Skip
+  uploadMethod?: boolean | runtime.Types.Skip
+  assetType?: boolean | runtime.Types.Skip
+  uploadDuration?: boolean | runtime.Types.Skip
+  cdnUrl?: boolean | runtime.Types.Skip
+  publicUrl?: boolean | runtime.Types.Skip
+  sourceUrl?: boolean | runtime.Types.Skip
+  thumbnailKey?: boolean | runtime.Types.Skip
+  compatMime?: boolean | runtime.Types.Skip
+  compatExt?: boolean | runtime.Types.Skip
+  compatVersionId?: boolean | runtime.Types.Skip
+  compatKey?: boolean | runtime.Types.Skip
+  compatS3ObjectId?: boolean | runtime.Types.Skip
+  compatStatus?: boolean | runtime.Types.Skip
+  compatReadyAt?: boolean | runtime.Types.Skip
+  compatCdnUrl?: boolean | runtime.Types.Skip
+  bucket?: boolean | runtime.Types.Skip
+  key?: boolean | runtime.Types.Skip
+  versionId?: boolean | runtime.Types.Skip
+  region?: boolean | runtime.Types.Skip
+  cacheControl?: boolean | runtime.Types.Skip
+  contentDisposition?: boolean | runtime.Types.Skip
+  contentEncoding?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  etag?: boolean | runtime.Types.Skip
+  checksumAlgo?: boolean | runtime.Types.Skip
+  checksumSha256?: boolean | runtime.Types.Skip
+  storageClass?: boolean | runtime.Types.Skip
+  sseAlgorithm?: boolean | runtime.Types.Skip
+  sseKmsKeyId?: boolean | runtime.Types.Skip
+  s3LastModified?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachment"]>
 
 export type AttachmentSelectScalar = {
-  id?: boolean
-  conversationId?: boolean
-  draftId?: boolean
-  batchId?: boolean
-  generationGroupId?: boolean
-  seriesId?: boolean
-  userId?: boolean
-  messageId?: boolean
-  s3ObjectId?: boolean
-  origin?: boolean
-  status?: boolean
-  uploadMethod?: boolean
-  assetType?: boolean
-  uploadDuration?: boolean
-  cdnUrl?: boolean
-  publicUrl?: boolean
-  sourceUrl?: boolean
-  thumbnailKey?: boolean
-  compatMime?: boolean
-  compatExt?: boolean
-  compatVersionId?: boolean
-  compatKey?: boolean
-  compatS3ObjectId?: boolean
-  compatStatus?: boolean
-  compatReadyAt?: boolean
-  compatCdnUrl?: boolean
-  bucket?: boolean
-  key?: boolean
-  versionId?: boolean
-  region?: boolean
-  cacheControl?: boolean
-  contentDisposition?: boolean
-  contentEncoding?: boolean
-  expiresAt?: boolean
-  size?: boolean
-  filename?: boolean
-  ext?: boolean
-  mime?: boolean
-  etag?: boolean
-  checksumAlgo?: boolean
-  checksumSha256?: boolean
-  storageClass?: boolean
-  sseAlgorithm?: boolean
-  sseKmsKeyId?: boolean
-  s3LastModified?: boolean
-  deletedAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  draftId?: boolean | runtime.Types.Skip
+  batchId?: boolean | runtime.Types.Skip
+  generationGroupId?: boolean | runtime.Types.Skip
+  seriesId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  messageId?: boolean | runtime.Types.Skip
+  s3ObjectId?: boolean | runtime.Types.Skip
+  origin?: boolean | runtime.Types.Skip
+  status?: boolean | runtime.Types.Skip
+  uploadMethod?: boolean | runtime.Types.Skip
+  assetType?: boolean | runtime.Types.Skip
+  uploadDuration?: boolean | runtime.Types.Skip
+  cdnUrl?: boolean | runtime.Types.Skip
+  publicUrl?: boolean | runtime.Types.Skip
+  sourceUrl?: boolean | runtime.Types.Skip
+  thumbnailKey?: boolean | runtime.Types.Skip
+  compatMime?: boolean | runtime.Types.Skip
+  compatExt?: boolean | runtime.Types.Skip
+  compatVersionId?: boolean | runtime.Types.Skip
+  compatKey?: boolean | runtime.Types.Skip
+  compatS3ObjectId?: boolean | runtime.Types.Skip
+  compatStatus?: boolean | runtime.Types.Skip
+  compatReadyAt?: boolean | runtime.Types.Skip
+  compatCdnUrl?: boolean | runtime.Types.Skip
+  bucket?: boolean | runtime.Types.Skip
+  key?: boolean | runtime.Types.Skip
+  versionId?: boolean | runtime.Types.Skip
+  region?: boolean | runtime.Types.Skip
+  cacheControl?: boolean | runtime.Types.Skip
+  contentDisposition?: boolean | runtime.Types.Skip
+  contentEncoding?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  filename?: boolean | runtime.Types.Skip
+  ext?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  etag?: boolean | runtime.Types.Skip
+  checksumAlgo?: boolean | runtime.Types.Skip
+  checksumSha256?: boolean | runtime.Types.Skip
+  storageClass?: boolean | runtime.Types.Skip
+  sseAlgorithm?: boolean | runtime.Types.Skip
+  sseKmsKeyId?: boolean | runtime.Types.Skip
+  s3LastModified?: boolean | runtime.Types.Skip
+  deletedAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "generationGroupId" | "seriesId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "compatMime" | "compatExt" | "compatVersionId" | "compatKey" | "compatS3ObjectId" | "compatStatus" | "compatReadyAt" | "compatCdnUrl" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "draftId" | "batchId" | "generationGroupId" | "seriesId" | "userId" | "messageId" | "s3ObjectId" | "origin" | "status" | "uploadMethod" | "assetType" | "uploadDuration" | "cdnUrl" | "publicUrl" | "sourceUrl" | "thumbnailKey" | "compatMime" | "compatExt" | "compatVersionId" | "compatKey" | "compatS3ObjectId" | "compatStatus" | "compatReadyAt" | "compatCdnUrl" | "bucket" | "key" | "versionId" | "region" | "cacheControl" | "contentDisposition" | "contentEncoding" | "expiresAt" | "size" | "filename" | "ext" | "mime" | "etag" | "checksumAlgo" | "checksumSha256" | "storageClass" | "sseAlgorithm" | "sseKmsKeyId" | "s3LastModified" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attachment"], runtime.Types.Skip>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs>
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs>
-  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs>
-  video?: boolean | Prisma.Attachment$videoArgs<ExtArgs>
-  document?: boolean | Prisma.Attachment$documentArgs<ExtArgs>
-  audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs>
-  imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs>
-  _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs>
+  localVectorStoreDocs?: boolean | Prisma.Attachment$localVectorStoreDocsArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  providerLinks?: boolean | Prisma.Attachment$providerLinksArgs<ExtArgs> | runtime.Types.Skip
+  providerStoreDocs?: boolean | Prisma.Attachment$providerStoreDocsArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
+  image?: boolean | Prisma.Attachment$imageArgs<ExtArgs> | runtime.Types.Skip
+  video?: boolean | Prisma.Attachment$videoArgs<ExtArgs> | runtime.Types.Skip
+  document?: boolean | Prisma.Attachment$documentArgs<ExtArgs> | runtime.Types.Skip
+  audio?: boolean | Prisma.Attachment$audioArgs<ExtArgs> | runtime.Types.Skip
+  imageGenOutput?: boolean | Prisma.Attachment$imageGenOutputArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.AttachmentCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AttachmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AttachmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs>
-  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  conversation?: boolean | Prisma.Attachment$conversationArgs<ExtArgs> | runtime.Types.Skip
+  message?: boolean | Prisma.Attachment$messageArgs<ExtArgs> | runtime.Types.Skip
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5128,7 +5128,7 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type AttachmentGetPayload<S extends boolean | null | undefined | AttachmentDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AttachmentPayload, S>
 
 export type AttachmentCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AttachmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AttachmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AttachmentCountAggregateInputType | true
   }
 
@@ -5627,6 +5627,7 @@ export type AttachmentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which Attachment to fetch.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5649,6 +5650,7 @@ export type AttachmentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which Attachment to fetch.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5670,37 +5672,38 @@ export type AttachmentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * Filter, which Attachment to fetch.
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Attachments to fetch.
    */
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Attachments.
    */
-  cursor?: Prisma.AttachmentWhereUniqueInput
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Attachments from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Attachments.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Attachments.
    */
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5722,37 +5725,38 @@ export type AttachmentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter, which Attachment to fetch.
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Attachments to fetch.
    */
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Attachments.
    */
-  cursor?: Prisma.AttachmentWhereUniqueInput
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Attachments from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Attachments.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Attachments.
    */
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5774,32 +5778,33 @@ export type AttachmentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * Filter, which Attachments to fetch.
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Attachments to fetch.
    */
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Attachments.
    */
-  cursor?: Prisma.AttachmentWhereUniqueInput
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Attachments from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Attachments.
    */
-  skip?: number
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5822,6 +5827,7 @@ export type AttachmentCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a Attachment.
    */
   data: Prisma.XOR<Prisma.AttachmentCreateInput, Prisma.AttachmentUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5832,7 +5838,7 @@ export type AttachmentCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many Attachments.
    */
   data: Prisma.AttachmentCreateManyInput | Prisma.AttachmentCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -5851,7 +5857,7 @@ export type AttachmentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many Attachments.
    */
   data: Prisma.AttachmentCreateManyInput | Prisma.AttachmentCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -5882,6 +5888,7 @@ export type AttachmentUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which Attachment to update.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5895,11 +5902,11 @@ export type AttachmentUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter which Attachments to update
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * Limit how many Attachments to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -5921,11 +5928,11 @@ export type AttachmentUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter which Attachments to update
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * Limit how many Attachments to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -5960,6 +5967,7 @@ export type AttachmentUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the Attachment was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AttachmentUpdateInput, Prisma.AttachmentUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5982,6 +5990,7 @@ export type AttachmentDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which Attachment to delete.
    */
   where: Prisma.AttachmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -5991,11 +6000,11 @@ export type AttachmentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter which Attachments to delete
    */
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
   /**
    * Limit how many Attachments to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -6014,12 +6023,12 @@ export type Attachment$localVectorStoreDocsArgs<ExtArgs extends runtime.Types.Ex
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.LocalVectorStoreDocInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreDocWhereInput
-  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[]
-  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[]
+  where?: Prisma.LocalVectorStoreDocWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreDocOrderByWithRelationInput | Prisma.LocalVectorStoreDocOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreDocWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreDocScalarFieldEnum | Prisma.LocalVectorStoreDocScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -6038,7 +6047,7 @@ export type Attachment$conversationArgs<ExtArgs extends runtime.Types.Extensions
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationInclude<ExtArgs> | null
-  where?: Prisma.ConversationWhereInput
+  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6057,7 +6066,7 @@ export type Attachment$messageArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.MessageInclude<ExtArgs> | null
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6076,12 +6085,12 @@ export type Attachment$providerLinksArgs<ExtArgs extends runtime.Types.Extension
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AttachmentProviderInclude<ExtArgs> | null
-  where?: Prisma.AttachmentProviderWhereInput
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -6100,12 +6109,12 @@ export type Attachment$providerStoreDocsArgs<ExtArgs extends runtime.Types.Exten
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ProviderStoreDocumentInclude<ExtArgs> | null
-  where?: Prisma.ProviderStoreDocumentWhereInput
-  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[]
-  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[]
+  where?: Prisma.ProviderStoreDocumentWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreDocumentOrderByWithRelationInput | Prisma.ProviderStoreDocumentOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreDocumentWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ProviderStoreDocumentScalarFieldEnum | Prisma.ProviderStoreDocumentScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -6124,7 +6133,7 @@ export type Attachment$imageArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ImageMetadataInclude<ExtArgs> | null
-  where?: Prisma.ImageMetadataWhereInput
+  where?: Prisma.ImageMetadataWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6143,7 +6152,7 @@ export type Attachment$videoArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.VideoMetadataInclude<ExtArgs> | null
-  where?: Prisma.VideoMetadataWhereInput
+  where?: Prisma.VideoMetadataWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6162,7 +6171,7 @@ export type Attachment$documentArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.DocumentMetadataInclude<ExtArgs> | null
-  where?: Prisma.DocumentMetadataWhereInput
+  where?: Prisma.DocumentMetadataWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6181,7 +6190,7 @@ export type Attachment$audioArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AudioMetadataInclude<ExtArgs> | null
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -6200,7 +6209,7 @@ export type Attachment$imageGenOutputArgs<ExtArgs extends runtime.Types.Extensio
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ImageGenOutputInclude<ExtArgs> | null
-  where?: Prisma.ImageGenOutputWhereInput
+  where?: Prisma.ImageGenOutputWhereInput | runtime.Types.Skip
 }
 
 /**

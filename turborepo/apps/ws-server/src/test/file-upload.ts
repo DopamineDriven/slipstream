@@ -127,7 +127,7 @@ const {
   ...rest
 } = attToUpload;
 
-const sDoc = {
+const _sDoc = {
   ...rest,
   expiresAt: new Date(expiresAt),
   compatReadyAt: new Date(compatReadyAt),

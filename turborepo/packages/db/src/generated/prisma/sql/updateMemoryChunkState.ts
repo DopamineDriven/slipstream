@@ -3,8 +3,8 @@
 /* eslint-disable */
 // biome-ignore-all lint: generated file
 // @ts-nocheck 
-import * as $runtime from "@prisma/client/runtime/library"
-import { type $DbEnums } from "./$DbEnums"
+import * as $runtime from "@prisma/client/runtime/client"
+import { type $DbEnums } from "./$DbEnums.ts"
 
 /**
  * @param chunkId

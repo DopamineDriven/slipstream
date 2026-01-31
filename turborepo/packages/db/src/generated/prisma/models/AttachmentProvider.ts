@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model AttachmentProvider
@@ -100,106 +100,106 @@ export type AttachmentProviderCountAggregateOutputType = {
 
 
 export type AttachmentProviderAvgAggregateInputType = {
-  size?: true
+  size?: true | runtime.Types.Skip
 }
 
 export type AttachmentProviderSumAggregateInputType = {
-  size?: true
+  size?: true | runtime.Types.Skip
 }
 
 export type AttachmentProviderMinAggregateInputType = {
-  id?: true
-  attachmentId?: true
-  provider?: true
-  userKeyId?: true
-  keyFingerprint?: true
-  state?: true
-  providerUri?: true
-  providerRef?: true
-  mime?: true
-  size?: true
-  readyAt?: true
-  expiresAt?: true
-  lastCheckedAt?: true
-  errorCode?: true
-  errorMessage?: true
-  createdAt?: true
-  updatedAt?: true
-  indexedStoreRefs?: true
+  id?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  keyFingerprint?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  providerUri?: true | runtime.Types.Skip
+  providerRef?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  readyAt?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  lastCheckedAt?: true | runtime.Types.Skip
+  errorCode?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  indexedStoreRefs?: true | runtime.Types.Skip
 }
 
 export type AttachmentProviderMaxAggregateInputType = {
-  id?: true
-  attachmentId?: true
-  provider?: true
-  userKeyId?: true
-  keyFingerprint?: true
-  state?: true
-  providerUri?: true
-  providerRef?: true
-  mime?: true
-  size?: true
-  readyAt?: true
-  expiresAt?: true
-  lastCheckedAt?: true
-  errorCode?: true
-  errorMessage?: true
-  createdAt?: true
-  updatedAt?: true
-  indexedStoreRefs?: true
+  id?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  keyFingerprint?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  providerUri?: true | runtime.Types.Skip
+  providerRef?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  readyAt?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  lastCheckedAt?: true | runtime.Types.Skip
+  errorCode?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  indexedStoreRefs?: true | runtime.Types.Skip
 }
 
 export type AttachmentProviderCountAggregateInputType = {
-  id?: true
-  attachmentId?: true
-  provider?: true
-  userKeyId?: true
-  keyFingerprint?: true
-  state?: true
-  providerUri?: true
-  providerRef?: true
-  mime?: true
-  size?: true
-  readyAt?: true
-  expiresAt?: true
-  lastCheckedAt?: true
-  errorCode?: true
-  errorMessage?: true
-  createdAt?: true
-  updatedAt?: true
-  indexedStoreRefs?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  attachmentId?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  keyFingerprint?: true | runtime.Types.Skip
+  state?: true | runtime.Types.Skip
+  providerUri?: true | runtime.Types.Skip
+  providerRef?: true | runtime.Types.Skip
+  mime?: true | runtime.Types.Skip
+  size?: true | runtime.Types.Skip
+  readyAt?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  lastCheckedAt?: true | runtime.Types.Skip
+  errorCode?: true | runtime.Types.Skip
+  errorMessage?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  indexedStoreRefs?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type AttachmentProviderAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which AttachmentProvider to aggregate.
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AttachmentProviders to fetch.
    */
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AttachmentProviders from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AttachmentProviders.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -244,12 +244,12 @@ export type GetAttachmentProviderAggregateType<T extends AttachmentProviderAggre
 
 
 export type AttachmentProviderGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentProviderWhereInput
-  orderBy?: Prisma.AttachmentProviderOrderByWithAggregationInput | Prisma.AttachmentProviderOrderByWithAggregationInput[]
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AttachmentProviderOrderByWithAggregationInput | Prisma.AttachmentProviderOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.AttachmentProviderScalarFieldEnum[] | Prisma.AttachmentProviderScalarFieldEnum
-  having?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: AttachmentProviderCountAggregateInputType | true
   _avg?: AttachmentProviderAvgAggregateInputType
   _sum?: AttachmentProviderSumAggregateInputType
@@ -299,284 +299,284 @@ type GetAttachmentProviderGroupByPayload<T extends AttachmentProviderGroupByArgs
 
 
 export type AttachmentProviderWhereInput = {
-  AND?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[]
-  OR?: Prisma.AttachmentProviderWhereInput[]
-  NOT?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[]
-  id?: Prisma.StringFilter<"AttachmentProvider"> | string
-  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string
-  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider
-  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
-  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
-  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null
-  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
+  AND?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  keyFingerprint?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  providerUri?: Prisma.SortOrderInput | Prisma.SortOrder
-  providerRef?: Prisma.SortOrderInput | Prisma.SortOrder
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  readyAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder
-  attachment?: Prisma.AttachmentOrderByWithRelationInput
-  userKey?: Prisma.UserKeyOrderByWithRelationInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  providerUri?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  providerRef?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  readyAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
+  userKey?: Prisma.UserKeyOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  attachmentId_provider_keyFingerprint?: Prisma.AttachmentProviderAttachmentId_provider_keyFingerprintCompoundUniqueInput
-  AND?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[]
-  OR?: Prisma.AttachmentProviderWhereInput[]
-  NOT?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[]
-  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string
-  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider
-  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
-  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
-  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null
-  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
+  id?: string | runtime.Types.Skip
+  attachmentId_provider_keyFingerprint?: Prisma.AttachmentProviderAttachmentId_provider_keyFingerprintCompoundUniqueInput | runtime.Types.Skip
+  AND?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentProviderWhereInput | Prisma.AttachmentProviderWhereInput[] | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
 }, "id" | "attachmentId_provider_keyFingerprint">
 
 export type AttachmentProviderOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  keyFingerprint?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  providerUri?: Prisma.SortOrderInput | Prisma.SortOrder
-  providerRef?: Prisma.SortOrderInput | Prisma.SortOrder
-  mime?: Prisma.SortOrderInput | Prisma.SortOrder
-  size?: Prisma.SortOrderInput | Prisma.SortOrder
-  readyAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder
-  _count?: Prisma.AttachmentProviderCountOrderByAggregateInput
-  _avg?: Prisma.AttachmentProviderAvgOrderByAggregateInput
-  _max?: Prisma.AttachmentProviderMaxOrderByAggregateInput
-  _min?: Prisma.AttachmentProviderMinOrderByAggregateInput
-  _sum?: Prisma.AttachmentProviderSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  providerUri?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  providerRef?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  readyAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastCheckedAt?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorCode?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.AttachmentProviderCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.AttachmentProviderAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.AttachmentProviderMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.AttachmentProviderMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.AttachmentProviderSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderScalarWhereWithAggregatesInput = {
-  AND?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput | Prisma.AttachmentProviderScalarWhereWithAggregatesInput[]
-  OR?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput | Prisma.AttachmentProviderScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string
-  attachmentId?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"AttachmentProvider"> | $Enums.Provider
-  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  keyFingerprint?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string
-  state?: Prisma.EnumProviderAssetStateWithAggregatesFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
-  providerUri?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  providerRef?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  mime?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  size?: Prisma.BigIntNullableWithAggregatesFilter<"AttachmentProvider"> | bigint | number | null
-  readyAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null
-  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null
-  lastCheckedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null
-  errorCode?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string
-  indexedStoreRefs?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null
+  AND?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput | Prisma.AttachmentProviderScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentProviderScalarWhereWithAggregatesInput | Prisma.AttachmentProviderScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"AttachmentProvider"> | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringWithAggregatesFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateWithAggregatesFilter<"AttachmentProvider"> | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  providerRef?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableWithAggregatesFilter<"AttachmentProvider"> | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.StringNullableWithAggregatesFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   provider: $Enums.Provider
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderLinksInput
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   provider: $Enums.Provider
-  userKeyId?: string | null
+  userKeyId?: string | null | runtime.Types.Skip
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput
-  userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   provider: $Enums.Provider
-  userKeyId?: string | null
+  userKeyId?: string | null | runtime.Types.Skip
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderListRelationFilter = {
-  every?: Prisma.AttachmentProviderWhereInput
-  some?: Prisma.AttachmentProviderWhereInput
-  none?: Prisma.AttachmentProviderWhereInput
+  every?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
+  some?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
+  none?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+  _count?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderAttachmentId_provider_keyFingerprintCompoundUniqueInput = {
@@ -586,202 +586,202 @@ export type AttachmentProviderAttachmentId_provider_keyFingerprintCompoundUnique
 }
 
 export type AttachmentProviderCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  keyFingerprint?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  providerUri?: Prisma.SortOrder
-  providerRef?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  readyAt?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  lastCheckedAt?: Prisma.SortOrder
-  errorCode?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  indexedStoreRefs?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  providerUri?: Prisma.SortOrder | runtime.Types.Skip
+  providerRef?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  readyAt?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastCheckedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorCode?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderAvgOrderByAggregateInput = {
-  size?: Prisma.SortOrder
+  size?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  keyFingerprint?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  providerUri?: Prisma.SortOrder
-  providerRef?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  readyAt?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  lastCheckedAt?: Prisma.SortOrder
-  errorCode?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  indexedStoreRefs?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  providerUri?: Prisma.SortOrder | runtime.Types.Skip
+  providerRef?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  readyAt?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastCheckedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorCode?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  attachmentId?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  keyFingerprint?: Prisma.SortOrder
-  state?: Prisma.SortOrder
-  providerUri?: Prisma.SortOrder
-  providerRef?: Prisma.SortOrder
-  mime?: Prisma.SortOrder
-  size?: Prisma.SortOrder
-  readyAt?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  lastCheckedAt?: Prisma.SortOrder
-  errorCode?: Prisma.SortOrder
-  errorMessage?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  indexedStoreRefs?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  keyFingerprint?: Prisma.SortOrder | runtime.Types.Skip
+  state?: Prisma.SortOrder | runtime.Types.Skip
+  providerUri?: Prisma.SortOrder | runtime.Types.Skip
+  providerRef?: Prisma.SortOrder | runtime.Types.Skip
+  mime?: Prisma.SortOrder | runtime.Types.Skip
+  size?: Prisma.SortOrder | runtime.Types.Skip
+  readyAt?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  lastCheckedAt?: Prisma.SortOrder | runtime.Types.Skip
+  errorCode?: Prisma.SortOrder | runtime.Types.Skip
+  errorMessage?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderSumOrderByAggregateInput = {
-  size?: Prisma.SortOrder
+  size?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedCreateNestedManyWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutAttachmentInput, Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput> | Prisma.AttachmentProviderCreateWithoutAttachmentInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutAttachmentInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput | Prisma.AttachmentProviderCreateOrConnectWithoutAttachmentInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyAttachmentInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutAttachmentInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type EnumProviderAssetStateFieldUpdateOperationsInput = {
-  set?: $Enums.ProviderAssetState
+  set?: $Enums.ProviderAssetState | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[]
-  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput[]
-  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope
-  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[]
-  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput[]
-  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput[]
-  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.AttachmentProviderCreateWithoutUserKeyInput, Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput> | Prisma.AttachmentProviderCreateWithoutUserKeyInput[] | Prisma.AttachmentProviderUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput | Prisma.AttachmentProviderCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  upsert?: Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.AttachmentProviderCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  set?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.AttachmentProviderWhereUniqueInput | Prisma.AttachmentProviderWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.AttachmentProviderUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  updateMany?: Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput | Prisma.AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateWithoutAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   provider: $Enums.Provider
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutAttachmentProvidersInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedCreateWithoutAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   provider: $Enums.Provider
-  userKeyId?: string | null
+  userKeyId?: string | null | runtime.Types.Skip
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateOrConnectWithoutAttachmentInput = {
@@ -791,7 +791,7 @@ export type AttachmentProviderCreateOrConnectWithoutAttachmentInput = {
 
 export type AttachmentProviderCreateManyAttachmentInputEnvelope = {
   data: Prisma.AttachmentProviderCreateManyAttachmentInput | Prisma.AttachmentProviderCreateManyAttachmentInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpsertWithWhereUniqueWithoutAttachmentInput = {
@@ -811,67 +811,67 @@ export type AttachmentProviderUpdateManyWithWhereWithoutAttachmentInput = {
 }
 
 export type AttachmentProviderScalarWhereInput = {
-  AND?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
-  OR?: Prisma.AttachmentProviderScalarWhereInput[]
-  NOT?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[]
-  id?: Prisma.StringFilter<"AttachmentProvider"> | string
-  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string
-  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider
-  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string
-  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState
-  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null
-  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null
-  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string
-  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null
+  AND?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AttachmentProviderScalarWhereInput | Prisma.AttachmentProviderScalarWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"AttachmentProvider"> | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFilter<"AttachmentProvider"> | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFilter<"AttachmentProvider"> | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  providerRef?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  mime?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  size?: Prisma.BigIntNullableFilter<"AttachmentProvider"> | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.DateTimeNullableFilter<"AttachmentProvider"> | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"AttachmentProvider"> | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.StringNullableFilter<"AttachmentProvider"> | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateWithoutUserKeyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   provider: $Enums.Provider
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
   attachment: Prisma.AttachmentCreateNestedOneWithoutProviderLinksInput
 }
 
 export type AttachmentProviderUncheckedCreateWithoutUserKeyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   provider: $Enums.Provider
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateOrConnectWithoutUserKeyInput = {
@@ -881,7 +881,7 @@ export type AttachmentProviderCreateOrConnectWithoutUserKeyInput = {
 
 export type AttachmentProviderCreateManyUserKeyInputEnvelope = {
   data: Prisma.AttachmentProviderCreateManyUserKeyInput | Prisma.AttachmentProviderCreateManyUserKeyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpsertWithWhereUniqueWithoutUserKeyInput = {
@@ -901,269 +901,269 @@ export type AttachmentProviderUpdateManyWithWhereWithoutUserKeyInput = {
 }
 
 export type AttachmentProviderCreateManyAttachmentInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   provider: $Enums.Provider
-  userKeyId?: string | null
+  userKeyId?: string | null | runtime.Types.Skip
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutAttachmentProvidersNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutAttachmentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderCreateManyUserKeyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   attachmentId: string
   provider: $Enums.Provider
   keyFingerprint: string
-  state?: $Enums.ProviderAssetState
-  providerUri?: string | null
-  providerRef?: string | null
-  mime?: string | null
-  size?: bigint | number | null
-  readyAt?: Date | string | null
-  expiresAt?: Date | string | null
-  lastCheckedAt?: Date | string | null
-  errorCode?: string | null
-  errorMessage?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  indexedStoreRefs?: string | null
+  state?: $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: string | null | runtime.Types.Skip
+  providerRef?: string | null | runtime.Types.Skip
+  mime?: string | null | runtime.Types.Skip
+  size?: bigint | number | null | runtime.Types.Skip
+  readyAt?: Date | string | null | runtime.Types.Skip
+  expiresAt?: Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Date | string | null | runtime.Types.Skip
+  errorCode?: string | null | runtime.Types.Skip
+  errorMessage?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  indexedStoreRefs?: string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutProviderLinksNestedInput | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 export type AttachmentProviderUncheckedUpdateManyWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState
-  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  keyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  state?: Prisma.EnumProviderAssetStateFieldUpdateOperationsInput | $Enums.ProviderAssetState | runtime.Types.Skip
+  providerUri?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  providerRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  mime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  size?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null | runtime.Types.Skip
+  readyAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  lastCheckedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  errorCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  indexedStoreRefs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
 }
 
 
 
 export type AttachmentProviderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  attachmentId?: boolean
-  provider?: boolean
-  userKeyId?: boolean
-  keyFingerprint?: boolean
-  state?: boolean
-  providerUri?: boolean
-  providerRef?: boolean
-  mime?: boolean
-  size?: boolean
-  readyAt?: boolean
-  expiresAt?: boolean
-  lastCheckedAt?: boolean
-  errorCode?: boolean
-  errorMessage?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  indexedStoreRefs?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  keyFingerprint?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  providerUri?: boolean | runtime.Types.Skip
+  providerRef?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  readyAt?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  lastCheckedAt?: boolean | runtime.Types.Skip
+  errorCode?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  indexedStoreRefs?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  attachmentId?: boolean
-  provider?: boolean
-  userKeyId?: boolean
-  keyFingerprint?: boolean
-  state?: boolean
-  providerUri?: boolean
-  providerRef?: boolean
-  mime?: boolean
-  size?: boolean
-  readyAt?: boolean
-  expiresAt?: boolean
-  lastCheckedAt?: boolean
-  errorCode?: boolean
-  errorMessage?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  indexedStoreRefs?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  keyFingerprint?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  providerUri?: boolean | runtime.Types.Skip
+  providerRef?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  readyAt?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  lastCheckedAt?: boolean | runtime.Types.Skip
+  errorCode?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  indexedStoreRefs?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  attachmentId?: boolean
-  provider?: boolean
-  userKeyId?: boolean
-  keyFingerprint?: boolean
-  state?: boolean
-  providerUri?: boolean
-  providerRef?: boolean
-  mime?: boolean
-  size?: boolean
-  readyAt?: boolean
-  expiresAt?: boolean
-  lastCheckedAt?: boolean
-  errorCode?: boolean
-  errorMessage?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  indexedStoreRefs?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  keyFingerprint?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  providerUri?: boolean | runtime.Types.Skip
+  providerRef?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  readyAt?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  lastCheckedAt?: boolean | runtime.Types.Skip
+  errorCode?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  indexedStoreRefs?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["attachmentProvider"]>
 
 export type AttachmentProviderSelectScalar = {
-  id?: boolean
-  attachmentId?: boolean
-  provider?: boolean
-  userKeyId?: boolean
-  keyFingerprint?: boolean
-  state?: boolean
-  providerUri?: boolean
-  providerRef?: boolean
-  mime?: boolean
-  size?: boolean
-  readyAt?: boolean
-  expiresAt?: boolean
-  lastCheckedAt?: boolean
-  errorCode?: boolean
-  errorMessage?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  indexedStoreRefs?: boolean
+  id?: boolean | runtime.Types.Skip
+  attachmentId?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  keyFingerprint?: boolean | runtime.Types.Skip
+  state?: boolean | runtime.Types.Skip
+  providerUri?: boolean | runtime.Types.Skip
+  providerRef?: boolean | runtime.Types.Skip
+  mime?: boolean | runtime.Types.Skip
+  size?: boolean | runtime.Types.Skip
+  readyAt?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  lastCheckedAt?: boolean | runtime.Types.Skip
+  errorCode?: boolean | runtime.Types.Skip
+  errorMessage?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  indexedStoreRefs?: boolean | runtime.Types.Skip
 }
 
-export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "createdAt" | "updatedAt" | "indexedStoreRefs", ExtArgs["result"]["attachmentProvider"]>
+export type AttachmentProviderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attachmentId" | "provider" | "userKeyId" | "keyFingerprint" | "state" | "providerUri" | "providerRef" | "mime" | "size" | "readyAt" | "expiresAt" | "lastCheckedAt" | "errorCode" | "errorMessage" | "createdAt" | "updatedAt" | "indexedStoreRefs", ExtArgs["result"]["attachmentProvider"], runtime.Types.Skip>
 export type AttachmentProviderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AttachmentProviderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AttachmentProviderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
-  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
+  userKey?: boolean | Prisma.AttachmentProvider$userKeyArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1198,7 +1198,7 @@ export type $AttachmentProviderPayload<ExtArgs extends runtime.Types.Extensions.
 export type AttachmentProviderGetPayload<S extends boolean | null | undefined | AttachmentProviderDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AttachmentProviderPayload, S>
 
 export type AttachmentProviderCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AttachmentProviderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AttachmentProviderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AttachmentProviderCountAggregateInputType | true
   }
 
@@ -1658,6 +1658,7 @@ export type AttachmentProviderFindUniqueArgs<ExtArgs extends runtime.Types.Exten
    * Filter, which AttachmentProvider to fetch.
    */
   where: Prisma.AttachmentProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1680,6 +1681,7 @@ export type AttachmentProviderFindUniqueOrThrowArgs<ExtArgs extends runtime.Type
    * Filter, which AttachmentProvider to fetch.
    */
   where: Prisma.AttachmentProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1701,37 +1703,38 @@ export type AttachmentProviderFindFirstArgs<ExtArgs extends runtime.Types.Extens
   /**
    * Filter, which AttachmentProvider to fetch.
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AttachmentProviders to fetch.
    */
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for AttachmentProviders.
    */
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AttachmentProviders from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AttachmentProviders.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of AttachmentProviders.
    */
-  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1753,37 +1756,38 @@ export type AttachmentProviderFindFirstOrThrowArgs<ExtArgs extends runtime.Types
   /**
    * Filter, which AttachmentProvider to fetch.
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AttachmentProviders to fetch.
    */
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for AttachmentProviders.
    */
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AttachmentProviders from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AttachmentProviders.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of AttachmentProviders.
    */
-  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1805,32 +1809,33 @@ export type AttachmentProviderFindManyArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter, which AttachmentProviders to fetch.
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AttachmentProviders to fetch.
    */
-  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[]
+  orderBy?: Prisma.AttachmentProviderOrderByWithRelationInput | Prisma.AttachmentProviderOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing AttachmentProviders.
    */
-  cursor?: Prisma.AttachmentProviderWhereUniqueInput
+  cursor?: Prisma.AttachmentProviderWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AttachmentProviders from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AttachmentProviders.
    */
-  skip?: number
-  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AttachmentProviderScalarFieldEnum | Prisma.AttachmentProviderScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1853,6 +1858,7 @@ export type AttachmentProviderCreateArgs<ExtArgs extends runtime.Types.Extension
    * The data needed to create a AttachmentProvider.
    */
   data: Prisma.XOR<Prisma.AttachmentProviderCreateInput, Prisma.AttachmentProviderUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1863,7 +1869,7 @@ export type AttachmentProviderCreateManyArgs<ExtArgs extends runtime.Types.Exten
    * The data used to create many AttachmentProviders.
    */
   data: Prisma.AttachmentProviderCreateManyInput | Prisma.AttachmentProviderCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -1882,7 +1888,7 @@ export type AttachmentProviderCreateManyAndReturnArgs<ExtArgs extends runtime.Ty
    * The data used to create many AttachmentProviders.
    */
   data: Prisma.AttachmentProviderCreateManyInput | Prisma.AttachmentProviderCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1913,6 +1919,7 @@ export type AttachmentProviderUpdateArgs<ExtArgs extends runtime.Types.Extension
    * Choose, which AttachmentProvider to update.
    */
   where: Prisma.AttachmentProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1926,11 +1933,11 @@ export type AttachmentProviderUpdateManyArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter which AttachmentProviders to update
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * Limit how many AttachmentProviders to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -1952,11 +1959,11 @@ export type AttachmentProviderUpdateManyAndReturnArgs<ExtArgs extends runtime.Ty
   /**
    * Filter which AttachmentProviders to update
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * Limit how many AttachmentProviders to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1991,6 +1998,7 @@ export type AttachmentProviderUpsertArgs<ExtArgs extends runtime.Types.Extension
    * In case the AttachmentProvider was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AttachmentProviderUpdateInput, Prisma.AttachmentProviderUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2013,6 +2021,7 @@ export type AttachmentProviderDeleteArgs<ExtArgs extends runtime.Types.Extension
    * Filter which AttachmentProvider to delete.
    */
   where: Prisma.AttachmentProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2022,11 +2031,11 @@ export type AttachmentProviderDeleteManyArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter which AttachmentProviders to delete
    */
-  where?: Prisma.AttachmentProviderWhereInput
+  where?: Prisma.AttachmentProviderWhereInput | runtime.Types.Skip
   /**
    * Limit how many AttachmentProviders to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2045,7 +2054,7 @@ export type AttachmentProvider$userKeyArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.UserKeyInclude<ExtArgs> | null
-  where?: Prisma.UserKeyWhereInput
+  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
 }
 
 /**

@@ -1,5 +1,5 @@
-import type { AttachmentSingleton, DocumentSingleton } from "@slipstream/types";
 import * as dotenv from "dotenv";
+import type { AttachmentSingleton, DocumentSingleton } from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -79,16 +79,16 @@ type AssetRT =
 
 const _asset = () =>
   (async () => {
-    const { PrismaClient } = await import(
-      "@slipstream/db/node/generated/client"
-    );
+    const { PrismaDbService } = await import("@slipstream/db/factory");
     const { Credentials } = await import("@slipstream/credentials");
     const cfg = new Credentials();
     const [datasourceUrl, _direct] = await Promise.all([
       cfg.get("DATABASE_URL"),
       cfg.get("DIRECT_URL")
     ]);
-    const prisma = new PrismaClient({ datasourceUrl });
+    const prisma = new PrismaDbService({ connectionString: datasourceUrl }).p(
+      false
+    );
     let asset: AssetRT = null;
     try {
       prisma.$connect();
@@ -107,28 +107,27 @@ const _asset = () =>
     return t;
   });
 
-
-  // Using your DeepReplace utility
+// Using your DeepReplace utility
 export type DeepBigIntToNumber<T> = DeepReplace<T, bigint, number>;
 
 // But let's make DeepReplace even more robust without any
 export type DeepReplace<T, From, To> = T extends From
   ? To
   : T extends readonly (infer U)[]
-  ? readonly DeepReplace<U, From, To>[]
-  : T extends (infer U)[]
-  ? DeepReplace<U, From, To>[]
-  : T extends Map<infer K, infer V>
-  ? Map<K, DeepReplace<V, From, To>>
-  : T extends Set<infer U>
-  ? Set<DeepReplace<U, From, To>>
-  : T extends Promise<infer U>
-  ? Promise<DeepReplace<U, From, To>>
-  : T extends (...args: infer Args) => infer R
-  ? (...args: Args) => DeepReplace<R, From, To>
-  : T extends object
-  ? { [K in keyof T]: DeepReplace<T[K], From, To> }
-  : T;
+    ? readonly DeepReplace<U, From, To>[]
+    : T extends (infer U)[]
+      ? DeepReplace<U, From, To>[]
+      : T extends Map<infer K, infer V>
+        ? Map<K, DeepReplace<V, From, To>>
+        : T extends Set<infer U>
+          ? Set<DeepReplace<U, From, To>>
+          : T extends Promise<infer U>
+            ? Promise<DeepReplace<U, From, To>>
+            : T extends (...args: infer Args) => infer R
+              ? (...args: Args) => DeepReplace<R, From, To>
+              : T extends object
+                ? { [K in keyof T]: DeepReplace<T[K], From, To> }
+                : T;
 
 // Generic deep transformer without any
 export function deepTransform<T, TResult = T>(
@@ -138,7 +137,7 @@ export function deepTransform<T, TResult = T>(
   visited = new WeakSet<object>()
 ): TResult {
   // Handle primitives and null/undefined
-  if (value === null || value === undefined || typeof value !== 'object') {
+  if (value === null || value === undefined || typeof value !== "object") {
     return transformer(value, path) as TResult;
   }
 
@@ -184,7 +183,7 @@ export function deepTransform<T, TResult = T>(
   }
 
   // Plain objects
-        // eslint-disable-next-line
+  // eslint-disable-next-line
   const proto = Object.getPrototypeOf(value);
   if (proto === Object.prototype || proto === null) {
     const result: Record<string, unknown> = {};
@@ -205,8 +204,7 @@ export function deepTransform<T, TResult = T>(
 
 // Specific bigint converter using the generic transformer
 export function deepConvertBigIntToNumber<T>(value: T): DeepBigIntToNumber<T> {
-  return deepTransform<T, DeepBigIntToNumber<T>>(
-    value,
-    (val) => typeof val === 'bigint' ? Number(val) : val
+  return deepTransform<T, DeepBigIntToNumber<T>>(value, val =>
+    typeof val === "bigint" ? Number(val) : val
   );
 }

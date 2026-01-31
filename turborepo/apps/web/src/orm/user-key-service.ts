@@ -1,6 +1,6 @@
-import type { PrismaClientWithAccelerate } from "@/lib/prisma";
+import type { PrismaClientBase } from "@/lib/prisma";
 import { ErrorHelperService } from "@/orm/err-helper";
-import type { $Enums, UserKey } from "@slipstream/db/edge-client";
+import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
 import type {
   ClientContextWorkupProps,
   Provider,
@@ -8,7 +8,7 @@ import type {
 } from "@slipstream/types";
 
 export class PrismaUserKeyService extends ErrorHelperService {
-  constructor(public prismaClient: PrismaClientWithAccelerate) {
+  constructor(public prismaClient: PrismaClientBase) {
     super();
   }
   public formatProps(props: RecordCountsProps) {
@@ -58,12 +58,7 @@ export class PrismaUserKeyService extends ErrorHelperService {
 
   public async getClientApiKeys(userId: string) {
     const data = await this.prismaClient.userKey.findMany({
-      where: { userId },
-      cacheStrategy: {
-        ttl: 60,
-        swr: 300,
-        tags: this.apiKeysCacheTag(userId)
-      }
+      where: { userId }
     });
     return this.handleExistingKeysForClient(data);
   }

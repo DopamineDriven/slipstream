@@ -11,12 +11,12 @@ const data = async (env: "dev" | "prod") => {
   const p = new Credentials();
   const datasourceUrlProd = await p.get("DIRECT_URL");
   const datasourceUrlDev = process.env.DIRECT_URL;
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const datasourceUrl =
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const connectionString =
     env === "dev" && datasourceUrlDev ? datasourceUrlDev : datasourceUrlProd;
-  const prismaClient = new PrismaClient({
-    datasourceUrl
-  });
+  const prismaClient = new PrismaDbService({
+    connectionString
+  }).p(false);
   prismaClient.$connect();
   try {
     const getMany = await prismaClient.providerStoreDocument.findMany({

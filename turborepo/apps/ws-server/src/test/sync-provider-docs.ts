@@ -459,10 +459,10 @@ for (const d of data) {
 const collectionId = "collection_1a143a9a-f734-41cb-9cd4-693bf00be9dc";
 const _userId = "nrr6h4r4480f6kviycyo1zhf";
 async function handlePrisma(d: typeof data) {
-  const { PrismaClient } = await import("@slipstream/db/node/generated/client");
-  const prismaClient = new PrismaClient({
-    datasourceUrl: process.env.DIRECT_URL ?? ""
-  });
+  const { PrismaDbService } = await import("@slipstream/db/factory");
+  const prismaClient = new PrismaDbService({
+    connectionString: process.env.DIRECT_URL ?? ""
+  }).p(false);
   const provider = "GROK";
   prismaClient.$connect();
   try {

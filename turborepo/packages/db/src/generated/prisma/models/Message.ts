@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Message
@@ -103,109 +103,109 @@ export type MessageCountAggregateOutputType = {
 
 
 export type MessageAvgAggregateInputType = {
-  thinkingDuration?: true
+  thinkingDuration?: true | runtime.Types.Skip
 }
 
 export type MessageSumAggregateInputType = {
-  thinkingDuration?: true
+  thinkingDuration?: true | runtime.Types.Skip
 }
 
 export type MessageMinAggregateInputType = {
-  id?: true
-  conversationId?: true
-  userId?: true
-  senderType?: true
-  provider?: true
-  model?: true
-  userKeyId?: true
-  content?: true
-  conversationMemoryChunkId?: true
-  thinkingText?: true
-  thinkingDuration?: true
-  responseOutput?: true
-  isImageGen?: true
-  messageType?: true
-  liked?: true
-  disliked?: true
-  tryAgain?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  senderType?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  model?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  content?: true | runtime.Types.Skip
+  conversationMemoryChunkId?: true | runtime.Types.Skip
+  thinkingText?: true | runtime.Types.Skip
+  thinkingDuration?: true | runtime.Types.Skip
+  responseOutput?: true | runtime.Types.Skip
+  isImageGen?: true | runtime.Types.Skip
+  messageType?: true | runtime.Types.Skip
+  liked?: true | runtime.Types.Skip
+  disliked?: true | runtime.Types.Skip
+  tryAgain?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type MessageMaxAggregateInputType = {
-  id?: true
-  conversationId?: true
-  userId?: true
-  senderType?: true
-  provider?: true
-  model?: true
-  userKeyId?: true
-  content?: true
-  conversationMemoryChunkId?: true
-  thinkingText?: true
-  thinkingDuration?: true
-  responseOutput?: true
-  isImageGen?: true
-  messageType?: true
-  liked?: true
-  disliked?: true
-  tryAgain?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  senderType?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  model?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  content?: true | runtime.Types.Skip
+  conversationMemoryChunkId?: true | runtime.Types.Skip
+  thinkingText?: true | runtime.Types.Skip
+  thinkingDuration?: true | runtime.Types.Skip
+  responseOutput?: true | runtime.Types.Skip
+  isImageGen?: true | runtime.Types.Skip
+  messageType?: true | runtime.Types.Skip
+  liked?: true | runtime.Types.Skip
+  disliked?: true | runtime.Types.Skip
+  tryAgain?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type MessageCountAggregateInputType = {
-  id?: true
-  conversationId?: true
-  userId?: true
-  senderType?: true
-  provider?: true
-  model?: true
-  userKeyId?: true
-  content?: true
-  conversationMemoryChunkId?: true
-  thinkingText?: true
-  thinkingDuration?: true
-  responseOutput?: true
-  isImageGen?: true
-  messageType?: true
-  liked?: true
-  disliked?: true
-  tryAgain?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  conversationId?: true | runtime.Types.Skip
+  userId?: true | runtime.Types.Skip
+  senderType?: true | runtime.Types.Skip
+  provider?: true | runtime.Types.Skip
+  model?: true | runtime.Types.Skip
+  userKeyId?: true | runtime.Types.Skip
+  content?: true | runtime.Types.Skip
+  conversationMemoryChunkId?: true | runtime.Types.Skip
+  thinkingText?: true | runtime.Types.Skip
+  thinkingDuration?: true | runtime.Types.Skip
+  responseOutput?: true | runtime.Types.Skip
+  isImageGen?: true | runtime.Types.Skip
+  messageType?: true | runtime.Types.Skip
+  liked?: true | runtime.Types.Skip
+  disliked?: true | runtime.Types.Skip
+  tryAgain?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type MessageAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which Message to aggregate.
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Messages to fetch.
    */
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.MessageWhereUniqueInput
+  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Messages from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Messages.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -250,12 +250,12 @@ export type GetMessageAggregateType<T extends MessageAggregateArgs> = {
 
 
 export type MessageGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.MessageWhereInput
-  orderBy?: Prisma.MessageOrderByWithAggregationInput | Prisma.MessageOrderByWithAggregationInput[]
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.MessageOrderByWithAggregationInput | Prisma.MessageOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.MessageScalarFieldEnum[] | Prisma.MessageScalarFieldEnum
-  having?: Prisma.MessageScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.MessageScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: MessageCountAggregateInputType | true
   _avg?: MessageAvgAggregateInputType
   _sum?: MessageSumAggregateInputType
@@ -306,591 +306,591 @@ type GetMessageGroupByPayload<T extends MessageGroupByArgs> = Prisma.PrismaPromi
 
 
 export type MessageWhereInput = {
-  AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
-  OR?: Prisma.MessageWhereInput[]
-  NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
-  id?: Prisma.StringFilter<"Message"> | string
-  conversationId?: Prisma.StringFilter<"Message"> | string
-  userId?: Prisma.StringNullableFilter<"Message"> | string | null
-  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
-  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider
-  model?: Prisma.StringNullableFilter<"Message"> | string | null
-  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
-  content?: Prisma.StringFilter<"Message"> | string
-  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
-  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null
-  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
-  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
-  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
-  attachments?: Prisma.AttachmentListRelationFilter
-  imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
-  conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null
+  AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.MessageWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  userId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  content?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
+  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
+  imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null | runtime.Types.Skip
 }
 
 export type MessageOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  senderType?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  model?: Prisma.SortOrderInput | Prisma.SortOrder
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  content?: Prisma.SortOrder
-  conversationMemoryChunkId?: Prisma.SortOrderInput | Prisma.SortOrder
-  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
-  thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder
-  responseOutput?: Prisma.SortOrderInput | Prisma.SortOrder
-  isImageGen?: Prisma.SortOrder
-  messageType?: Prisma.SortOrder
-  liked?: Prisma.SortOrderInput | Prisma.SortOrder
-  disliked?: Prisma.SortOrderInput | Prisma.SortOrder
-  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  userKey?: Prisma.UserKeyOrderByWithRelationInput
-  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
-  imageGenJob?: Prisma.ImageGenJobOrderByWithRelationInput
-  conversation?: Prisma.ConversationOrderByWithRelationInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkOrderByWithRelationInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  senderType?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  model?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  content?: Prisma.SortOrder | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  responseOutput?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  isImageGen?: Prisma.SortOrder | runtime.Types.Skip
+  messageType?: Prisma.SortOrder | runtime.Types.Skip
+  liked?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  disliked?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  userKey?: Prisma.UserKeyOrderByWithRelationInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobOrderByWithRelationInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationOrderByWithRelationInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type MessageWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
-  OR?: Prisma.MessageWhereInput[]
-  NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
-  conversationId?: Prisma.StringFilter<"Message"> | string
-  userId?: Prisma.StringNullableFilter<"Message"> | string | null
-  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
-  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider
-  model?: Prisma.StringNullableFilter<"Message"> | string | null
-  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
-  content?: Prisma.StringFilter<"Message"> | string
-  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
-  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null
-  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
-  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
-  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
-  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null
-  attachments?: Prisma.AttachmentListRelationFilter
-  imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null
-  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
-  conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null
+  id?: string | runtime.Types.Skip
+  AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.MessageWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[] | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  userId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  content?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
+  userKey?: Prisma.XOR<Prisma.UserKeyNullableScalarRelationFilter, Prisma.UserKeyWhereInput> | null | runtime.Types.Skip
+  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
+  imageGenJob?: Prisma.XOR<Prisma.ImageGenJobNullableScalarRelationFilter, Prisma.ImageGenJobWhereInput> | null | runtime.Types.Skip
+  conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput> | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.XOR<Prisma.ConversationMemoryChunkNullableScalarRelationFilter, Prisma.ConversationMemoryChunkWhereInput> | null | runtime.Types.Skip
 }, "id">
 
 export type MessageOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  senderType?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  model?: Prisma.SortOrderInput | Prisma.SortOrder
-  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
-  content?: Prisma.SortOrder
-  conversationMemoryChunkId?: Prisma.SortOrderInput | Prisma.SortOrder
-  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder
-  thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder
-  responseOutput?: Prisma.SortOrderInput | Prisma.SortOrder
-  isImageGen?: Prisma.SortOrder
-  messageType?: Prisma.SortOrder
-  liked?: Prisma.SortOrderInput | Prisma.SortOrder
-  disliked?: Prisma.SortOrderInput | Prisma.SortOrder
-  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.MessageCountOrderByAggregateInput
-  _avg?: Prisma.MessageAvgOrderByAggregateInput
-  _max?: Prisma.MessageMaxOrderByAggregateInput
-  _min?: Prisma.MessageMinOrderByAggregateInput
-  _sum?: Prisma.MessageSumOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  senderType?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  model?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  content?: Prisma.SortOrder | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thinkingText?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  thinkingDuration?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  responseOutput?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  isImageGen?: Prisma.SortOrder | runtime.Types.Skip
+  messageType?: Prisma.SortOrder | runtime.Types.Skip
+  liked?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  disliked?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  tryAgain?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.MessageCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.MessageAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.MessageMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.MessageMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.MessageSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type MessageScalarWhereWithAggregatesInput = {
-  AND?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
-  OR?: Prisma.MessageScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  conversationId?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  userId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  senderType?: Prisma.EnumSenderTypeWithAggregatesFilter<"Message"> | $Enums.SenderType
-  provider?: Prisma.EnumProviderWithAggregatesFilter<"Message"> | $Enums.Provider
-  model?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  content?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  conversationMemoryChunkId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  thinkingText?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  thinkingDuration?: Prisma.IntNullableWithAggregatesFilter<"Message"> | number | null
-  responseOutput?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
-  isImageGen?: Prisma.BoolWithAggregatesFilter<"Message"> | boolean
-  messageType?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
-  liked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
-  disliked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
-  tryAgain?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
+  AND?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.MessageScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"Message"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringWithAggregatesFilter<"Message"> | string | runtime.Types.Skip
+  userId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeWithAggregatesFilter<"Message"> | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderWithAggregatesFilter<"Message"> | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  content?: Prisma.StringWithAggregatesFilter<"Message"> | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.IntNullableWithAggregatesFilter<"Message"> | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolWithAggregatesFilter<"Message"> | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.BoolNullableWithAggregatesFilter<"Message"> | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string | runtime.Types.Skip
 }
 
 export type MessageCreateInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
 }
 
 export type MessageUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type MessageUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type MessageNullableScalarRelationFilter = {
-  is?: Prisma.MessageWhereInput | null
-  isNot?: Prisma.MessageWhereInput | null
+  is?: Prisma.MessageWhereInput | null | runtime.Types.Skip
+  isNot?: Prisma.MessageWhereInput | null | runtime.Types.Skip
 }
 
 export type MessageListRelationFilter = {
-  every?: Prisma.MessageWhereInput
-  some?: Prisma.MessageWhereInput
-  none?: Prisma.MessageWhereInput
+  every?: Prisma.MessageWhereInput | runtime.Types.Skip
+  some?: Prisma.MessageWhereInput | runtime.Types.Skip
+  none?: Prisma.MessageWhereInput | runtime.Types.Skip
 }
 
 export type MessageOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+  _count?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageScalarRelationFilter = {
-  is?: Prisma.MessageWhereInput
-  isNot?: Prisma.MessageWhereInput
+  is?: Prisma.MessageWhereInput | runtime.Types.Skip
+  isNot?: Prisma.MessageWhereInput | runtime.Types.Skip
 }
 
 export type MessageCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  senderType?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  model?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  conversationMemoryChunkId?: Prisma.SortOrder
-  thinkingText?: Prisma.SortOrder
-  thinkingDuration?: Prisma.SortOrder
-  responseOutput?: Prisma.SortOrder
-  isImageGen?: Prisma.SortOrder
-  messageType?: Prisma.SortOrder
-  liked?: Prisma.SortOrder
-  disliked?: Prisma.SortOrder
-  tryAgain?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  senderType?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  model?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  content?: Prisma.SortOrder | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingText?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingDuration?: Prisma.SortOrder | runtime.Types.Skip
+  responseOutput?: Prisma.SortOrder | runtime.Types.Skip
+  isImageGen?: Prisma.SortOrder | runtime.Types.Skip
+  messageType?: Prisma.SortOrder | runtime.Types.Skip
+  liked?: Prisma.SortOrder | runtime.Types.Skip
+  disliked?: Prisma.SortOrder | runtime.Types.Skip
+  tryAgain?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageAvgOrderByAggregateInput = {
-  thinkingDuration?: Prisma.SortOrder
+  thinkingDuration?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  senderType?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  model?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  conversationMemoryChunkId?: Prisma.SortOrder
-  thinkingText?: Prisma.SortOrder
-  thinkingDuration?: Prisma.SortOrder
-  responseOutput?: Prisma.SortOrder
-  isImageGen?: Prisma.SortOrder
-  messageType?: Prisma.SortOrder
-  liked?: Prisma.SortOrder
-  disliked?: Prisma.SortOrder
-  tryAgain?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  senderType?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  model?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  content?: Prisma.SortOrder | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingText?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingDuration?: Prisma.SortOrder | runtime.Types.Skip
+  responseOutput?: Prisma.SortOrder | runtime.Types.Skip
+  isImageGen?: Prisma.SortOrder | runtime.Types.Skip
+  messageType?: Prisma.SortOrder | runtime.Types.Skip
+  liked?: Prisma.SortOrder | runtime.Types.Skip
+  disliked?: Prisma.SortOrder | runtime.Types.Skip
+  tryAgain?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  conversationId?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  senderType?: Prisma.SortOrder
-  provider?: Prisma.SortOrder
-  model?: Prisma.SortOrder
-  userKeyId?: Prisma.SortOrder
-  content?: Prisma.SortOrder
-  conversationMemoryChunkId?: Prisma.SortOrder
-  thinkingText?: Prisma.SortOrder
-  thinkingDuration?: Prisma.SortOrder
-  responseOutput?: Prisma.SortOrder
-  isImageGen?: Prisma.SortOrder
-  messageType?: Prisma.SortOrder
-  liked?: Prisma.SortOrder
-  disliked?: Prisma.SortOrder
-  tryAgain?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  conversationId?: Prisma.SortOrder | runtime.Types.Skip
+  userId?: Prisma.SortOrder | runtime.Types.Skip
+  senderType?: Prisma.SortOrder | runtime.Types.Skip
+  provider?: Prisma.SortOrder | runtime.Types.Skip
+  model?: Prisma.SortOrder | runtime.Types.Skip
+  userKeyId?: Prisma.SortOrder | runtime.Types.Skip
+  content?: Prisma.SortOrder | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingText?: Prisma.SortOrder | runtime.Types.Skip
+  thinkingDuration?: Prisma.SortOrder | runtime.Types.Skip
+  responseOutput?: Prisma.SortOrder | runtime.Types.Skip
+  isImageGen?: Prisma.SortOrder | runtime.Types.Skip
+  messageType?: Prisma.SortOrder | runtime.Types.Skip
+  liked?: Prisma.SortOrder | runtime.Types.Skip
+  disliked?: Prisma.SortOrder | runtime.Types.Skip
+  tryAgain?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageSumOrderByAggregateInput = {
-  thinkingDuration?: Prisma.SortOrder
+  thinkingDuration?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type MessageCreateNestedOneWithoutAttachmentsInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAttachmentsInput
-  connect?: Prisma.MessageWhereUniqueInput
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
 }
 
 export type MessageUpdateOneWithoutAttachmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAttachmentsInput
-  upsert?: Prisma.MessageUpsertWithoutAttachmentsInput
-  disconnect?: Prisma.MessageWhereInput | boolean
-  delete?: Prisma.MessageWhereInput | boolean
-  connect?: Prisma.MessageWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.MessageUpdateWithoutAttachmentsInput>, Prisma.MessageUncheckedUpdateWithoutAttachmentsInput>
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithoutAttachmentsInput | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.MessageWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.MessageUpdateWithoutAttachmentsInput>, Prisma.MessageUncheckedUpdateWithoutAttachmentsInput> | runtime.Types.Skip
 }
 
 export type MessageCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.MessageCreateManyConversationInputEnvelope
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateNestedManyWithoutConversationInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[]
-  createMany?: Prisma.MessageCreateManyConversationInputEnvelope
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type MessageUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.MessageCreateManyConversationInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationInput | Prisma.MessageUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationInput | Prisma.MessageUpdateManyWithWhereWithoutConversationInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput[]
-  createMany?: Prisma.MessageCreateManyConversationInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationInput | Prisma.MessageUpdateManyWithWhereWithoutConversationInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationInput, Prisma.MessageUncheckedCreateWithoutConversationInput> | Prisma.MessageCreateWithoutConversationInput[] | Prisma.MessageUncheckedCreateWithoutConversationInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationInput | Prisma.MessageCreateOrConnectWithoutConversationInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationInput | Prisma.MessageUpdateManyWithWhereWithoutConversationInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type MessageCreateNestedOneWithoutImageGenJobInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutImageGenJobInput, Prisma.MessageUncheckedCreateWithoutImageGenJobInput>
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutImageGenJobInput
-  connect?: Prisma.MessageWhereUniqueInput
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutImageGenJobInput, Prisma.MessageUncheckedCreateWithoutImageGenJobInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutImageGenJobInput | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
 }
 
 export type MessageUpdateOneRequiredWithoutImageGenJobNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutImageGenJobInput, Prisma.MessageUncheckedCreateWithoutImageGenJobInput>
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutImageGenJobInput
-  upsert?: Prisma.MessageUpsertWithoutImageGenJobInput
-  connect?: Prisma.MessageWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutImageGenJobInput, Prisma.MessageUpdateWithoutImageGenJobInput>, Prisma.MessageUncheckedUpdateWithoutImageGenJobInput>
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutImageGenJobInput, Prisma.MessageUncheckedCreateWithoutImageGenJobInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutImageGenJobInput | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithoutImageGenJobInput | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutImageGenJobInput, Prisma.MessageUpdateWithoutImageGenJobInput>, Prisma.MessageUncheckedUpdateWithoutImageGenJobInput> | runtime.Types.Skip
 }
 
 export type MessageUpdateManyWithoutConversationMemoryChunkNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput[]
-  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput | Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput | Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput[]
-  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput | Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationMemoryChunkInput, Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput> | Prisma.MessageCreateWithoutConversationMemoryChunkInput[] | Prisma.MessageUncheckedCreateWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput | Prisma.MessageCreateOrConnectWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyConversationMemoryChunkInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput | Prisma.MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput | Prisma.MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type EnumSenderTypeFieldUpdateOperationsInput = {
-  set?: $Enums.SenderType
+  set?: $Enums.SenderType | runtime.Types.Skip
 }
 
 export type EnumMessageTypeFieldUpdateOperationsInput = {
-  set?: $Enums.MessageType
+  set?: $Enums.MessageType | runtime.Types.Skip
 }
 
 export type MessageCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[]
-  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateNestedManyWithoutUserKeyInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[]
-  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
 }
 
 export type MessageUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput[]
-  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput | Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput | Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutUserKeyNestedInput = {
-  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[]
-  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[]
-  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput[]
-  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope
-  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
-  update?: Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput[]
-  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput | Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput[]
-  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutUserKeyInput, Prisma.MessageUncheckedCreateWithoutUserKeyInput> | Prisma.MessageCreateWithoutUserKeyInput[] | Prisma.MessageUncheckedCreateWithoutUserKeyInput[] | runtime.Types.Skip
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutUserKeyInput | Prisma.MessageCreateOrConnectWithoutUserKeyInput[] | runtime.Types.Skip
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpsertWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  createMany?: Prisma.MessageCreateManyUserKeyInputEnvelope | runtime.Types.Skip
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[] | runtime.Types.Skip
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput | Prisma.MessageUpdateWithWhereUniqueWithoutUserKeyInput[] | runtime.Types.Skip
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput | Prisma.MessageUpdateManyWithWhereWithoutUserKeyInput[] | runtime.Types.Skip
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
 }
 
 export type MessageCreateWithoutAttachmentsInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateWithoutAttachmentsInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
 }
 
 export type MessageCreateOrConnectWithoutAttachmentsInput = {
@@ -901,104 +901,104 @@ export type MessageCreateOrConnectWithoutAttachmentsInput = {
 export type MessageUpsertWithoutAttachmentsInput = {
   update: Prisma.XOR<Prisma.MessageUpdateWithoutAttachmentsInput, Prisma.MessageUncheckedUpdateWithoutAttachmentsInput>
   create: Prisma.XOR<Prisma.MessageCreateWithoutAttachmentsInput, Prisma.MessageUncheckedCreateWithoutAttachmentsInput>
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
 }
 
 export type MessageUpdateToOneWithWhereWithoutAttachmentsInput = {
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.MessageUpdateWithoutAttachmentsInput, Prisma.MessageUncheckedUpdateWithoutAttachmentsInput>
 }
 
 export type MessageUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageCreateWithoutConversationInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateWithoutConversationInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
 }
 
 export type MessageCreateOrConnectWithoutConversationInput = {
@@ -1008,7 +1008,7 @@ export type MessageCreateOrConnectWithoutConversationInput = {
 
 export type MessageCreateManyConversationInputEnvelope = {
   data: Prisma.MessageCreateManyConversationInput | Prisma.MessageCreateManyConversationInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type MessageUpsertWithWhereUniqueWithoutConversationInput = {
@@ -1028,74 +1028,74 @@ export type MessageUpdateManyWithWhereWithoutConversationInput = {
 }
 
 export type MessageScalarWhereInput = {
-  AND?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
-  OR?: Prisma.MessageScalarWhereInput[]
-  NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
-  id?: Prisma.StringFilter<"Message"> | string
-  conversationId?: Prisma.StringFilter<"Message"> | string
-  userId?: Prisma.StringNullableFilter<"Message"> | string | null
-  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType
-  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider
-  model?: Prisma.StringNullableFilter<"Message"> | string | null
-  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null
-  content?: Prisma.StringFilter<"Message"> | string
-  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null
-  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null
-  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null
-  isImageGen?: Prisma.BoolFilter<"Message"> | boolean
-  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
-  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null
-  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  AND?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  userId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFilter<"Message"> | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFilter<"Message"> | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  content?: Prisma.StringFilter<"Message"> | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.IntNullableFilter<"Message"> | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.StringNullableFilter<"Message"> | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFilter<"Message"> | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.BoolNullableFilter<"Message"> | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string | runtime.Types.Skip
 }
 
 export type MessageCreateWithoutImageGenJobInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateWithoutImageGenJobInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput | runtime.Types.Skip
 }
 
 export type MessageCreateOrConnectWithoutImageGenJobInput = {
@@ -1106,104 +1106,104 @@ export type MessageCreateOrConnectWithoutImageGenJobInput = {
 export type MessageUpsertWithoutImageGenJobInput = {
   update: Prisma.XOR<Prisma.MessageUpdateWithoutImageGenJobInput, Prisma.MessageUncheckedUpdateWithoutImageGenJobInput>
   create: Prisma.XOR<Prisma.MessageCreateWithoutImageGenJobInput, Prisma.MessageUncheckedCreateWithoutImageGenJobInput>
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
 }
 
 export type MessageUpdateToOneWithWhereWithoutImageGenJobInput = {
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.MessageUpdateWithoutImageGenJobInput, Prisma.MessageUncheckedUpdateWithoutImageGenJobInput>
 }
 
 export type MessageUpdateWithoutImageGenJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateWithoutImageGenJobInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageCreateWithoutConversationMemoryChunkInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
 }
 
 export type MessageUncheckedCreateWithoutConversationMemoryChunkInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
 }
 
 export type MessageCreateOrConnectWithoutConversationMemoryChunkInput = {
@@ -1219,7 +1219,7 @@ export type MessageUpsertWithWhereUniqueWithoutConversationMemoryChunkInput = {
 
 export type MessageCreateManyConversationMemoryChunkInputEnvelope = {
   data: Prisma.MessageCreateManyConversationMemoryChunkInput | Prisma.MessageCreateManyConversationMemoryChunkInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type MessageUpdateWithWhereUniqueWithoutConversationMemoryChunkInput = {
@@ -1233,49 +1233,49 @@ export type MessageUpdateManyWithWhereWithoutConversationMemoryChunkInput = {
 }
 
 export type MessageCreateWithoutUserKeyInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
   conversation: Prisma.ConversationCreateNestedOneWithoutMessagesInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkCreateNestedOneWithoutMessagesInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedCreateWithoutUserKeyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutMessageInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedCreateNestedOneWithoutRequestMessageInput | runtime.Types.Skip
 }
 
 export type MessageCreateOrConnectWithoutUserKeyInput = {
@@ -1285,7 +1285,7 @@ export type MessageCreateOrConnectWithoutUserKeyInput = {
 
 export type MessageCreateManyUserKeyInputEnvelope = {
   data: Prisma.MessageCreateManyUserKeyInput | Prisma.MessageCreateManyUserKeyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 export type MessageUpsertWithWhereUniqueWithoutUserKeyInput = {
@@ -1305,267 +1305,267 @@ export type MessageUpdateManyWithWhereWithoutUserKeyInput = {
 }
 
 export type MessageCreateManyConversationInput = {
-  id?: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  id?: string | runtime.Types.Skip
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type MessageUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type MessageUpdateWithoutConversationMemoryChunkInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  userKey?: Prisma.UserKeyUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateWithoutConversationMemoryChunkInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageCreateManyConversationMemoryChunkInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
-  userKeyId?: string | null
+  model?: string | null | runtime.Types.Skip
+  userKeyId?: string | null | runtime.Types.Skip
   content: string
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutConversationMemoryChunkInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  userKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type MessageCreateManyUserKeyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   conversationId: string
-  userId?: string | null
-  senderType?: $Enums.SenderType
+  userId?: string | null | runtime.Types.Skip
+  senderType?: $Enums.SenderType | runtime.Types.Skip
   provider: $Enums.Provider
-  model?: string | null
+  model?: string | null | runtime.Types.Skip
   content: string
-  conversationMemoryChunkId?: string | null
-  thinkingText?: string | null
-  thinkingDuration?: number | null
-  responseOutput?: string | null
-  isImageGen?: boolean
-  messageType?: $Enums.MessageType
-  liked?: boolean | null
-  disliked?: boolean | null
-  tryAgain?: boolean | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  conversationMemoryChunkId?: string | null | runtime.Types.Skip
+  thinkingText?: string | null | runtime.Types.Skip
+  thinkingDuration?: number | null | runtime.Types.Skip
+  responseOutput?: string | null | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: $Enums.MessageType | runtime.Types.Skip
+  liked?: boolean | null | runtime.Types.Skip
+  disliked?: boolean | null | runtime.Types.Skip
+  tryAgain?: boolean | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type MessageUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput
-  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput
-  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessagesNestedInput | runtime.Types.Skip
+  conversationMemoryChunk?: Prisma.ConversationMemoryChunkUpdateOneWithoutMessagesNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput
-  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutMessageNestedInput | runtime.Types.Skip
+  imageGenJob?: Prisma.ImageGenJobUncheckedUpdateOneWithoutRequestMessageNestedInput | runtime.Types.Skip
 }
 
 export type MessageUncheckedUpdateManyWithoutUserKeyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider
-  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  content?: Prisma.StringFieldUpdateOperationsInput | string
-  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
-  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType | runtime.Types.Skip
+  provider?: Prisma.EnumProviderFieldUpdateOperationsInput | $Enums.Provider | runtime.Types.Skip
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  content?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  conversationMemoryChunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  thinkingDuration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  responseOutput?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isImageGen?: Prisma.BoolFieldUpdateOperationsInput | boolean | runtime.Types.Skip
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType | runtime.Types.Skip
+  liked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  disliked?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  tryAgain?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 
@@ -1595,128 +1595,128 @@ export type MessageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  * MessageCountOutputType without action
  */
 export type MessageCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 
 export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  userId?: boolean
-  senderType?: boolean
-  provider?: boolean
-  model?: boolean
-  userKeyId?: boolean
-  content?: boolean
-  conversationMemoryChunkId?: boolean
-  thinkingText?: boolean
-  thinkingDuration?: boolean
-  responseOutput?: boolean
-  isImageGen?: boolean
-  messageType?: boolean
-  liked?: boolean
-  disliked?: boolean
-  tryAgain?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
-  imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
-  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  senderType?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  model?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  content?: boolean | runtime.Types.Skip
+  conversationMemoryChunkId?: boolean | runtime.Types.Skip
+  thinkingText?: boolean | runtime.Types.Skip
+  thinkingDuration?: boolean | runtime.Types.Skip
+  responseOutput?: boolean | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: boolean | runtime.Types.Skip
+  liked?: boolean | runtime.Types.Skip
+  disliked?: boolean | runtime.Types.Skip
+  tryAgain?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs> | runtime.Types.Skip
+  imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  userId?: boolean
-  senderType?: boolean
-  provider?: boolean
-  model?: boolean
-  userKeyId?: boolean
-  content?: boolean
-  conversationMemoryChunkId?: boolean
-  thinkingText?: boolean
-  thinkingDuration?: boolean
-  responseOutput?: boolean
-  isImageGen?: boolean
-  messageType?: boolean
-  liked?: boolean
-  disliked?: boolean
-  tryAgain?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  senderType?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  model?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  content?: boolean | runtime.Types.Skip
+  conversationMemoryChunkId?: boolean | runtime.Types.Skip
+  thinkingText?: boolean | runtime.Types.Skip
+  thinkingDuration?: boolean | runtime.Types.Skip
+  responseOutput?: boolean | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: boolean | runtime.Types.Skip
+  liked?: boolean | runtime.Types.Skip
+  disliked?: boolean | runtime.Types.Skip
+  tryAgain?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  conversationId?: boolean
-  userId?: boolean
-  senderType?: boolean
-  provider?: boolean
-  model?: boolean
-  userKeyId?: boolean
-  content?: boolean
-  conversationMemoryChunkId?: boolean
-  thinkingText?: boolean
-  thinkingDuration?: boolean
-  responseOutput?: boolean
-  isImageGen?: boolean
-  messageType?: boolean
-  liked?: boolean
-  disliked?: boolean
-  tryAgain?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  senderType?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  model?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  content?: boolean | runtime.Types.Skip
+  conversationMemoryChunkId?: boolean | runtime.Types.Skip
+  thinkingText?: boolean | runtime.Types.Skip
+  thinkingDuration?: boolean | runtime.Types.Skip
+  responseOutput?: boolean | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: boolean | runtime.Types.Skip
+  liked?: boolean | runtime.Types.Skip
+  disliked?: boolean | runtime.Types.Skip
+  tryAgain?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectScalar = {
-  id?: boolean
-  conversationId?: boolean
-  userId?: boolean
-  senderType?: boolean
-  provider?: boolean
-  model?: boolean
-  userKeyId?: boolean
-  content?: boolean
-  conversationMemoryChunkId?: boolean
-  thinkingText?: boolean
-  thinkingDuration?: boolean
-  responseOutput?: boolean
-  isImageGen?: boolean
-  messageType?: boolean
-  liked?: boolean
-  disliked?: boolean
-  tryAgain?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  conversationId?: boolean | runtime.Types.Skip
+  userId?: boolean | runtime.Types.Skip
+  senderType?: boolean | runtime.Types.Skip
+  provider?: boolean | runtime.Types.Skip
+  model?: boolean | runtime.Types.Skip
+  userKeyId?: boolean | runtime.Types.Skip
+  content?: boolean | runtime.Types.Skip
+  conversationMemoryChunkId?: boolean | runtime.Types.Skip
+  thinkingText?: boolean | runtime.Types.Skip
+  thinkingDuration?: boolean | runtime.Types.Skip
+  responseOutput?: boolean | runtime.Types.Skip
+  isImageGen?: boolean | runtime.Types.Skip
+  messageType?: boolean | runtime.Types.Skip
+  liked?: boolean | runtime.Types.Skip
+  disliked?: boolean | runtime.Types.Skip
+  tryAgain?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "conversationMemoryChunkId" | "thinkingText" | "thinkingDuration" | "responseOutput" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "userId" | "senderType" | "provider" | "model" | "userKeyId" | "content" | "conversationMemoryChunkId" | "thinkingText" | "thinkingDuration" | "responseOutput" | "isImageGen" | "messageType" | "liked" | "disliked" | "tryAgain" | "createdAt" | "updatedAt", ExtArgs["result"]["message"], runtime.Types.Skip>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs>
-  imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
-  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  attachments?: boolean | Prisma.Message$attachmentsArgs<ExtArgs> | runtime.Types.Skip
+  imageGenJob?: boolean | Prisma.Message$imageGenJobArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type MessageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
 }
 export type MessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs>
-  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
-  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs>
+  userKey?: boolean | Prisma.Message$userKeyArgs<ExtArgs> | runtime.Types.Skip
+  conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryChunk?: boolean | Prisma.Message$conversationMemoryChunkArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1755,7 +1755,7 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type MessageGetPayload<S extends boolean | null | undefined | MessageDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$MessagePayload, S>
 
 export type MessageCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<MessageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<MessageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: MessageCountAggregateInputType | true
   }
 
@@ -2219,6 +2219,7 @@ export type MessageFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which Message to fetch.
    */
   where: Prisma.MessageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2241,6 +2242,7 @@ export type MessageFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which Message to fetch.
    */
   where: Prisma.MessageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2262,37 +2264,38 @@ export type MessageFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * Filter, which Message to fetch.
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Messages to fetch.
    */
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Messages.
    */
-  cursor?: Prisma.MessageWhereUniqueInput
+  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Messages from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Messages.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Messages.
    */
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2314,37 +2317,38 @@ export type MessageFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter, which Message to fetch.
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Messages to fetch.
    */
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Messages.
    */
-  cursor?: Prisma.MessageWhereUniqueInput
+  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Messages from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Messages.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Messages.
    */
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2366,32 +2370,33 @@ export type MessageFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * Filter, which Messages to fetch.
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Messages to fetch.
    */
-  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Messages.
    */
-  cursor?: Prisma.MessageWhereUniqueInput
+  cursor?: Prisma.MessageWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Messages from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Messages.
    */
-  skip?: number
-  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2414,6 +2419,7 @@ export type MessageCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a Message.
    */
   data: Prisma.XOR<Prisma.MessageCreateInput, Prisma.MessageUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2424,7 +2430,7 @@ export type MessageCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Messages.
    */
   data: Prisma.MessageCreateManyInput | Prisma.MessageCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -2443,7 +2449,7 @@ export type MessageCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Messages.
    */
   data: Prisma.MessageCreateManyInput | Prisma.MessageCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2474,6 +2480,7 @@ export type MessageUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which Message to update.
    */
   where: Prisma.MessageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2487,11 +2494,11 @@ export type MessageUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * Filter which Messages to update
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * Limit how many Messages to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2513,11 +2520,11 @@ export type MessageUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * Filter which Messages to update
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * Limit how many Messages to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -2552,6 +2559,7 @@ export type MessageUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the Message was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.MessageUpdateInput, Prisma.MessageUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2574,6 +2582,7 @@ export type MessageDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which Message to delete.
    */
   where: Prisma.MessageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2583,11 +2592,11 @@ export type MessageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * Filter which Messages to delete
    */
-  where?: Prisma.MessageWhereInput
+  where?: Prisma.MessageWhereInput | runtime.Types.Skip
   /**
    * Limit how many Messages to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2606,7 +2615,7 @@ export type Message$userKeyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.UserKeyInclude<ExtArgs> | null
-  where?: Prisma.UserKeyWhereInput
+  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -2625,12 +2634,12 @@ export type Message$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AttachmentInclude<ExtArgs> | null
-  where?: Prisma.AttachmentWhereInput
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
-  cursor?: Prisma.AttachmentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2649,7 +2658,7 @@ export type Message$imageGenJobArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ImageGenJobInclude<ExtArgs> | null
-  where?: Prisma.ImageGenJobWhereInput
+  where?: Prisma.ImageGenJobWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -2668,7 +2677,7 @@ export type Message$conversationMemoryChunkArgs<ExtArgs extends runtime.Types.Ex
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationMemoryChunkInclude<ExtArgs> | null
-  where?: Prisma.ConversationMemoryChunkWhereInput
+  where?: Prisma.ConversationMemoryChunkWhereInput | runtime.Types.Skip
 }
 
 /**

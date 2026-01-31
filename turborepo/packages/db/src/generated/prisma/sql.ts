@@ -3,24 +3,24 @@
 /* eslint-disable */
 // biome-ignore-all lint: generated file
 // @ts-nocheck 
-export { type $DbEnums } from "./sql/$DbEnums"
+export { type $DbEnums } from "./sql/$DbEnums.ts"
 
-export * from "./sql/getMemoryChunksByConversation"
+export * from "./sql/getMemoryChunksByConversation.ts"
 
-export * from "./sql/insertLocalDoc"
+export * from "./sql/insertLocalDoc.ts"
 
-export * from "./sql/insertLocalDocChunk"
+export * from "./sql/insertLocalDocChunk.ts"
 
-export * from "./sql/insertMemoryChunk"
+export * from "./sql/insertMemoryChunk.ts"
 
-export * from "./sql/searchConversationMemory"
+export * from "./sql/searchConversationMemory.ts"
 
-export * from "./sql/searchLocalDocChunks"
+export * from "./sql/searchLocalDocChunks.ts"
 
-export * from "./sql/searchLocalDocChunksByStore"
+export * from "./sql/searchLocalDocChunksByStore.ts"
 
-export * from "./sql/searchMemoryByConversation"
+export * from "./sql/searchMemoryByConversation.ts"
 
-export * from "./sql/updateLocalDocState"
+export * from "./sql/updateLocalDocState.ts"
 
-export * from "./sql/updateMemoryChunkState"
+export * from "./sql/updateMemoryChunkState.ts"

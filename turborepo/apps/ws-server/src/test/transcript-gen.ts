@@ -48,10 +48,11 @@ class ScriptGen extends Fs {
   }
 
   private data = async (env: "dev" | "prod", id: string) => {
-    const { PrismaClient } =
-      await import("@slipstream/db/node/generated/client");
+    const { PrismaDbService } = await import("@slipstream/db/factory");
     const datasourceUrl = await this.resolveDbUrl(env);
-    const prismaClient = new PrismaClient({ datasourceUrl });
+    const prismaClient = new PrismaDbService({
+      connectionString: datasourceUrl
+    }).p(false);
     try {
       prismaClient.$connect();
       const data = await prismaClient.conversation.findUniqueOrThrow({

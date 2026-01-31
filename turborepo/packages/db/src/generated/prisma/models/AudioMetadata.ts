@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model AudioMetadata
@@ -99,105 +99,105 @@ export type AudioMetadataCountAggregateOutputType = {
 
 
 export type AudioMetadataAvgAggregateInputType = {
-  duration?: true
-  bitrate?: true
-  sampleRate?: true
-  channels?: true
-  year?: true
-  waveformPeaks?: true
+  duration?: true | runtime.Types.Skip
+  bitrate?: true | runtime.Types.Skip
+  sampleRate?: true | runtime.Types.Skip
+  channels?: true | runtime.Types.Skip
+  year?: true | runtime.Types.Skip
+  waveformPeaks?: true | runtime.Types.Skip
 }
 
 export type AudioMetadataSumAggregateInputType = {
-  duration?: true
-  bitrate?: true
-  sampleRate?: true
-  channels?: true
-  year?: true
-  waveformPeaks?: true
+  duration?: true | runtime.Types.Skip
+  bitrate?: true | runtime.Types.Skip
+  sampleRate?: true | runtime.Types.Skip
+  channels?: true | runtime.Types.Skip
+  year?: true | runtime.Types.Skip
+  waveformPeaks?: true | runtime.Types.Skip
 }
 
 export type AudioMetadataMinAggregateInputType = {
-  attachmentId?: true
-  format?: true
-  duration?: true
-  bitrate?: true
-  sampleRate?: true
-  channels?: true
-  codec?: true
-  title?: true
-  artist?: true
-  album?: true
-  year?: true
-  genre?: true
-  createdAt?: true
-  updatedAt?: true
+  attachmentId?: true | runtime.Types.Skip
+  format?: true | runtime.Types.Skip
+  duration?: true | runtime.Types.Skip
+  bitrate?: true | runtime.Types.Skip
+  sampleRate?: true | runtime.Types.Skip
+  channels?: true | runtime.Types.Skip
+  codec?: true | runtime.Types.Skip
+  title?: true | runtime.Types.Skip
+  artist?: true | runtime.Types.Skip
+  album?: true | runtime.Types.Skip
+  year?: true | runtime.Types.Skip
+  genre?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type AudioMetadataMaxAggregateInputType = {
-  attachmentId?: true
-  format?: true
-  duration?: true
-  bitrate?: true
-  sampleRate?: true
-  channels?: true
-  codec?: true
-  title?: true
-  artist?: true
-  album?: true
-  year?: true
-  genre?: true
-  createdAt?: true
-  updatedAt?: true
+  attachmentId?: true | runtime.Types.Skip
+  format?: true | runtime.Types.Skip
+  duration?: true | runtime.Types.Skip
+  bitrate?: true | runtime.Types.Skip
+  sampleRate?: true | runtime.Types.Skip
+  channels?: true | runtime.Types.Skip
+  codec?: true | runtime.Types.Skip
+  title?: true | runtime.Types.Skip
+  artist?: true | runtime.Types.Skip
+  album?: true | runtime.Types.Skip
+  year?: true | runtime.Types.Skip
+  genre?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type AudioMetadataCountAggregateInputType = {
-  attachmentId?: true
-  format?: true
-  duration?: true
-  bitrate?: true
-  sampleRate?: true
-  channels?: true
-  codec?: true
-  title?: true
-  artist?: true
-  album?: true
-  year?: true
-  genre?: true
-  waveformPeaks?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  attachmentId?: true | runtime.Types.Skip
+  format?: true | runtime.Types.Skip
+  duration?: true | runtime.Types.Skip
+  bitrate?: true | runtime.Types.Skip
+  sampleRate?: true | runtime.Types.Skip
+  channels?: true | runtime.Types.Skip
+  codec?: true | runtime.Types.Skip
+  title?: true | runtime.Types.Skip
+  artist?: true | runtime.Types.Skip
+  album?: true | runtime.Types.Skip
+  year?: true | runtime.Types.Skip
+  genre?: true | runtime.Types.Skip
+  waveformPeaks?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type AudioMetadataAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which AudioMetadata to aggregate.
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AudioMetadata to fetch.
    */
-  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[]
+  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.AudioMetadataWhereUniqueInput
+  cursor?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AudioMetadata from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AudioMetadata.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -242,12 +242,12 @@ export type GetAudioMetadataAggregateType<T extends AudioMetadataAggregateArgs> 
 
 
 export type AudioMetadataGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AudioMetadataWhereInput
-  orderBy?: Prisma.AudioMetadataOrderByWithAggregationInput | Prisma.AudioMetadataOrderByWithAggregationInput[]
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AudioMetadataOrderByWithAggregationInput | Prisma.AudioMetadataOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.AudioMetadataScalarFieldEnum[] | Prisma.AudioMetadataScalarFieldEnum
-  having?: Prisma.AudioMetadataScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.AudioMetadataScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: AudioMetadataCountAggregateInputType | true
   _avg?: AudioMetadataAvgAggregateInputType
   _sum?: AudioMetadataSumAggregateInputType
@@ -294,127 +294,127 @@ type GetAudioMetadataGroupByPayload<T extends AudioMetadataGroupByArgs> = Prisma
 
 
 export type AudioMetadataWhereInput = {
-  AND?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[]
-  OR?: Prisma.AudioMetadataWhereInput[]
-  NOT?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[]
-  attachmentId?: Prisma.StringFilter<"AudioMetadata"> | string
-  format?: Prisma.StringFilter<"AudioMetadata"> | string
-  duration?: Prisma.IntFilter<"AudioMetadata"> | number
-  bitrate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  sampleRate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  channels?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  codec?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  title?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  artist?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  album?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  year?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  genre?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata">
-  createdAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
+  AND?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  attachmentId?: Prisma.StringFilter<"AudioMetadata"> | string | runtime.Types.Skip
+  format?: Prisma.StringFilter<"AudioMetadata"> | string | runtime.Types.Skip
+  duration?: Prisma.IntFilter<"AudioMetadata"> | number | runtime.Types.Skip
+  bitrate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  channels?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  codec?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  title?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  artist?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  album?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  year?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  genre?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata"> | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
 }
 
 export type AudioMetadataOrderByWithRelationInput = {
-  attachmentId?: Prisma.SortOrder
-  format?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
-  sampleRate?: Prisma.SortOrderInput | Prisma.SortOrder
-  channels?: Prisma.SortOrderInput | Prisma.SortOrder
-  codec?: Prisma.SortOrderInput | Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
-  artist?: Prisma.SortOrderInput | Prisma.SortOrder
-  album?: Prisma.SortOrderInput | Prisma.SortOrder
-  year?: Prisma.SortOrderInput | Prisma.SortOrder
-  genre?: Prisma.SortOrderInput | Prisma.SortOrder
-  waveformPeaks?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  attachment?: Prisma.AttachmentOrderByWithRelationInput
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  format?: Prisma.SortOrder | runtime.Types.Skip
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  codec?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  artist?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  album?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  genre?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  waveformPeaks?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  attachment?: Prisma.AttachmentOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type AudioMetadataWhereUniqueInput = Prisma.AtLeast<{
-  attachmentId?: string
-  AND?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[]
-  OR?: Prisma.AudioMetadataWhereInput[]
-  NOT?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[]
-  format?: Prisma.StringFilter<"AudioMetadata"> | string
-  duration?: Prisma.IntFilter<"AudioMetadata"> | number
-  bitrate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  sampleRate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  channels?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  codec?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  title?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  artist?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  album?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  year?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null
-  genre?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null
-  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata">
-  createdAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string
-  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput>
+  attachmentId?: string | runtime.Types.Skip
+  AND?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.AudioMetadataWhereInput | Prisma.AudioMetadataWhereInput[] | runtime.Types.Skip
+  format?: Prisma.StringFilter<"AudioMetadata"> | string | runtime.Types.Skip
+  duration?: Prisma.IntFilter<"AudioMetadata"> | number | runtime.Types.Skip
+  bitrate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  channels?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  codec?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  title?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  artist?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  album?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  year?: Prisma.IntNullableFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  genre?: Prisma.StringNullableFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata"> | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
+  attachment?: Prisma.XOR<Prisma.AttachmentScalarRelationFilter, Prisma.AttachmentWhereInput> | runtime.Types.Skip
 }, "attachmentId">
 
 export type AudioMetadataOrderByWithAggregationInput = {
-  attachmentId?: Prisma.SortOrder
-  format?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder
-  sampleRate?: Prisma.SortOrderInput | Prisma.SortOrder
-  channels?: Prisma.SortOrderInput | Prisma.SortOrder
-  codec?: Prisma.SortOrderInput | Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
-  artist?: Prisma.SortOrderInput | Prisma.SortOrder
-  album?: Prisma.SortOrderInput | Prisma.SortOrder
-  year?: Prisma.SortOrderInput | Prisma.SortOrder
-  genre?: Prisma.SortOrderInput | Prisma.SortOrder
-  waveformPeaks?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.AudioMetadataCountOrderByAggregateInput
-  _avg?: Prisma.AudioMetadataAvgOrderByAggregateInput
-  _max?: Prisma.AudioMetadataMaxOrderByAggregateInput
-  _min?: Prisma.AudioMetadataMinOrderByAggregateInput
-  _sum?: Prisma.AudioMetadataSumOrderByAggregateInput
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  format?: Prisma.SortOrder | runtime.Types.Skip
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  codec?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  title?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  artist?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  album?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  genre?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  waveformPeaks?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.AudioMetadataCountOrderByAggregateInput | runtime.Types.Skip
+  _avg?: Prisma.AudioMetadataAvgOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.AudioMetadataMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.AudioMetadataMinOrderByAggregateInput | runtime.Types.Skip
+  _sum?: Prisma.AudioMetadataSumOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type AudioMetadataScalarWhereWithAggregatesInput = {
-  AND?: Prisma.AudioMetadataScalarWhereWithAggregatesInput | Prisma.AudioMetadataScalarWhereWithAggregatesInput[]
-  OR?: Prisma.AudioMetadataScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.AudioMetadataScalarWhereWithAggregatesInput | Prisma.AudioMetadataScalarWhereWithAggregatesInput[]
-  attachmentId?: Prisma.StringWithAggregatesFilter<"AudioMetadata"> | string
-  format?: Prisma.StringWithAggregatesFilter<"AudioMetadata"> | string
-  duration?: Prisma.IntWithAggregatesFilter<"AudioMetadata"> | number
-  bitrate?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null
-  sampleRate?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null
-  channels?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null
-  codec?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null
-  title?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null
-  artist?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null
-  album?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null
-  year?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null
-  genre?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null
-  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata">
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"AudioMetadata"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AudioMetadata"> | Date | string
+  AND?: Prisma.AudioMetadataScalarWhereWithAggregatesInput | Prisma.AudioMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.AudioMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.AudioMetadataScalarWhereWithAggregatesInput | Prisma.AudioMetadataScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  attachmentId?: Prisma.StringWithAggregatesFilter<"AudioMetadata"> | string | runtime.Types.Skip
+  format?: Prisma.StringWithAggregatesFilter<"AudioMetadata"> | string | runtime.Types.Skip
+  duration?: Prisma.IntWithAggregatesFilter<"AudioMetadata"> | number | runtime.Types.Skip
+  bitrate?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  channels?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  codec?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  title?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  artist?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  album?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  year?: Prisma.IntNullableWithAggregatesFilter<"AudioMetadata"> | number | null | runtime.Types.Skip
+  genre?: Prisma.StringNullableWithAggregatesFilter<"AudioMetadata"> | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.IntNullableListFilter<"AudioMetadata"> | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AudioMetadata"> | Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataCreateInput = {
   format: string
   duration: number
-  bitrate?: number | null
-  sampleRate?: number | null
-  channels?: number | null
-  codec?: string | null
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  year?: number | null
-  genre?: string | null
-  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  bitrate?: number | null | runtime.Types.Skip
+  sampleRate?: number | null | runtime.Types.Skip
+  channels?: number | null | runtime.Types.Skip
+  codec?: string | null | runtime.Types.Skip
+  title?: string | null | runtime.Types.Skip
+  artist?: string | null | runtime.Types.Skip
+  album?: string | null | runtime.Types.Skip
+  year?: number | null | runtime.Types.Skip
+  genre?: string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
   attachment: Prisma.AttachmentCreateNestedOneWithoutAudioInput
 }
 
@@ -422,214 +422,214 @@ export type AudioMetadataUncheckedCreateInput = {
   attachmentId: string
   format: string
   duration: number
-  bitrate?: number | null
-  sampleRate?: number | null
-  channels?: number | null
-  codec?: string | null
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  year?: number | null
-  genre?: string | null
-  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  bitrate?: number | null | runtime.Types.Skip
+  sampleRate?: number | null | runtime.Types.Skip
+  channels?: number | null | runtime.Types.Skip
+  codec?: string | null | runtime.Types.Skip
+  title?: string | null | runtime.Types.Skip
+  artist?: string | null | runtime.Types.Skip
+  album?: string | null | runtime.Types.Skip
+  year?: number | null | runtime.Types.Skip
+  genre?: string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataUpdateInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutAudioNestedInput
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  attachment?: Prisma.AttachmentUpdateOneRequiredWithoutAudioNestedInput | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedUpdateInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataCreateManyInput = {
   attachmentId: string
   format: string
   duration: number
-  bitrate?: number | null
-  sampleRate?: number | null
-  channels?: number | null
-  codec?: string | null
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  year?: number | null
-  genre?: string | null
-  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  bitrate?: number | null | runtime.Types.Skip
+  sampleRate?: number | null | runtime.Types.Skip
+  channels?: number | null | runtime.Types.Skip
+  codec?: string | null | runtime.Types.Skip
+  title?: string | null | runtime.Types.Skip
+  artist?: string | null | runtime.Types.Skip
+  album?: string | null | runtime.Types.Skip
+  year?: number | null | runtime.Types.Skip
+  genre?: string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataUpdateManyMutationInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedUpdateManyInput = {
-  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachmentId?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataNullableScalarRelationFilter = {
-  is?: Prisma.AudioMetadataWhereInput | null
-  isNot?: Prisma.AudioMetadataWhereInput | null
+  is?: Prisma.AudioMetadataWhereInput | null | runtime.Types.Skip
+  isNot?: Prisma.AudioMetadataWhereInput | null | runtime.Types.Skip
 }
 
 export type AudioMetadataCountOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder
-  format?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrder
-  sampleRate?: Prisma.SortOrder
-  channels?: Prisma.SortOrder
-  codec?: Prisma.SortOrder
-  title?: Prisma.SortOrder
-  artist?: Prisma.SortOrder
-  album?: Prisma.SortOrder
-  year?: Prisma.SortOrder
-  genre?: Prisma.SortOrder
-  waveformPeaks?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  format?: Prisma.SortOrder | runtime.Types.Skip
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrder | runtime.Types.Skip
+  codec?: Prisma.SortOrder | runtime.Types.Skip
+  title?: Prisma.SortOrder | runtime.Types.Skip
+  artist?: Prisma.SortOrder | runtime.Types.Skip
+  album?: Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrder | runtime.Types.Skip
+  genre?: Prisma.SortOrder | runtime.Types.Skip
+  waveformPeaks?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AudioMetadataAvgOrderByAggregateInput = {
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrder
-  sampleRate?: Prisma.SortOrder
-  channels?: Prisma.SortOrder
-  year?: Prisma.SortOrder
-  waveformPeaks?: Prisma.SortOrder
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrder | runtime.Types.Skip
+  waveformPeaks?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AudioMetadataMaxOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder
-  format?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrder
-  sampleRate?: Prisma.SortOrder
-  channels?: Prisma.SortOrder
-  codec?: Prisma.SortOrder
-  title?: Prisma.SortOrder
-  artist?: Prisma.SortOrder
-  album?: Prisma.SortOrder
-  year?: Prisma.SortOrder
-  genre?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  format?: Prisma.SortOrder | runtime.Types.Skip
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrder | runtime.Types.Skip
+  codec?: Prisma.SortOrder | runtime.Types.Skip
+  title?: Prisma.SortOrder | runtime.Types.Skip
+  artist?: Prisma.SortOrder | runtime.Types.Skip
+  album?: Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrder | runtime.Types.Skip
+  genre?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AudioMetadataMinOrderByAggregateInput = {
-  attachmentId?: Prisma.SortOrder
-  format?: Prisma.SortOrder
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrder
-  sampleRate?: Prisma.SortOrder
-  channels?: Prisma.SortOrder
-  codec?: Prisma.SortOrder
-  title?: Prisma.SortOrder
-  artist?: Prisma.SortOrder
-  album?: Prisma.SortOrder
-  year?: Prisma.SortOrder
-  genre?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  attachmentId?: Prisma.SortOrder | runtime.Types.Skip
+  format?: Prisma.SortOrder | runtime.Types.Skip
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrder | runtime.Types.Skip
+  codec?: Prisma.SortOrder | runtime.Types.Skip
+  title?: Prisma.SortOrder | runtime.Types.Skip
+  artist?: Prisma.SortOrder | runtime.Types.Skip
+  album?: Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrder | runtime.Types.Skip
+  genre?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AudioMetadataSumOrderByAggregateInput = {
-  duration?: Prisma.SortOrder
-  bitrate?: Prisma.SortOrder
-  sampleRate?: Prisma.SortOrder
-  channels?: Prisma.SortOrder
-  year?: Prisma.SortOrder
-  waveformPeaks?: Prisma.SortOrder
+  duration?: Prisma.SortOrder | runtime.Types.Skip
+  bitrate?: Prisma.SortOrder | runtime.Types.Skip
+  sampleRate?: Prisma.SortOrder | runtime.Types.Skip
+  channels?: Prisma.SortOrder | runtime.Types.Skip
+  year?: Prisma.SortOrder | runtime.Types.Skip
+  waveformPeaks?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type AudioMetadataCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput>
-  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput
-  connect?: Prisma.AudioMetadataWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
+  connect?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedCreateNestedOneWithoutAttachmentInput = {
-  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput>
-  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput
-  connect?: Prisma.AudioMetadataWhereUniqueInput
+  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
+  connect?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
 }
 
 export type AudioMetadataUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput>
-  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput
-  upsert?: Prisma.AudioMetadataUpsertWithoutAttachmentInput
-  disconnect?: Prisma.AudioMetadataWhereInput | boolean
-  delete?: Prisma.AudioMetadataWhereInput | boolean
-  connect?: Prisma.AudioMetadataWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AudioMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.AudioMetadataUpdateWithoutAttachmentInput>, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput>
+  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
+  upsert?: Prisma.AudioMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
+  disconnect?: Prisma.AudioMetadataWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.AudioMetadataWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AudioMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.AudioMetadataUpdateWithoutAttachmentInput>, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedUpdateOneWithoutAttachmentNestedInput = {
-  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput>
-  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput
-  upsert?: Prisma.AudioMetadataUpsertWithoutAttachmentInput
-  disconnect?: Prisma.AudioMetadataWhereInput | boolean
-  delete?: Prisma.AudioMetadataWhereInput | boolean
-  connect?: Prisma.AudioMetadataWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AudioMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.AudioMetadataUpdateWithoutAttachmentInput>, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput>
+  create?: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.AudioMetadataCreateOrConnectWithoutAttachmentInput | runtime.Types.Skip
+  upsert?: Prisma.AudioMetadataUpsertWithoutAttachmentInput | runtime.Types.Skip
+  disconnect?: Prisma.AudioMetadataWhereInput | boolean | runtime.Types.Skip
+  delete?: Prisma.AudioMetadataWhereInput | boolean | runtime.Types.Skip
+  connect?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AudioMetadataUpdateToOneWithWhereWithoutAttachmentInput, Prisma.AudioMetadataUpdateWithoutAttachmentInput>, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput> | runtime.Types.Skip
 }
 
 export type AudioMetadataCreatewaveformPeaksInput = {
@@ -637,42 +637,42 @@ export type AudioMetadataCreatewaveformPeaksInput = {
 }
 
 export type AudioMetadataUpdatewaveformPeaksInput = {
-  set?: number[]
-  push?: number | number[]
+  set?: number[] | runtime.Types.Skip
+  push?: number | number[] | runtime.Types.Skip
 }
 
 export type AudioMetadataCreateWithoutAttachmentInput = {
   format: string
   duration: number
-  bitrate?: number | null
-  sampleRate?: number | null
-  channels?: number | null
-  codec?: string | null
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  year?: number | null
-  genre?: string | null
-  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  bitrate?: number | null | runtime.Types.Skip
+  sampleRate?: number | null | runtime.Types.Skip
+  channels?: number | null | runtime.Types.Skip
+  codec?: string | null | runtime.Types.Skip
+  title?: string | null | runtime.Types.Skip
+  artist?: string | null | runtime.Types.Skip
+  album?: string | null | runtime.Types.Skip
+  year?: number | null | runtime.Types.Skip
+  genre?: string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedCreateWithoutAttachmentInput = {
   format: string
   duration: number
-  bitrate?: number | null
-  sampleRate?: number | null
-  channels?: number | null
-  codec?: string | null
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  year?: number | null
-  genre?: string | null
-  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  bitrate?: number | null | runtime.Types.Skip
+  sampleRate?: number | null | runtime.Types.Skip
+  channels?: number | null | runtime.Types.Skip
+  codec?: string | null | runtime.Types.Skip
+  title?: string | null | runtime.Types.Skip
+  artist?: string | null | runtime.Types.Skip
+  album?: string | null | runtime.Types.Skip
+  year?: number | null | runtime.Types.Skip
+  genre?: string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataCreatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataCreateOrConnectWithoutAttachmentInput = {
@@ -683,134 +683,134 @@ export type AudioMetadataCreateOrConnectWithoutAttachmentInput = {
 export type AudioMetadataUpsertWithoutAttachmentInput = {
   update: Prisma.XOR<Prisma.AudioMetadataUpdateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput>
   create: Prisma.XOR<Prisma.AudioMetadataCreateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedCreateWithoutAttachmentInput>
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
 }
 
 export type AudioMetadataUpdateToOneWithWhereWithoutAttachmentInput = {
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.AudioMetadataUpdateWithoutAttachmentInput, Prisma.AudioMetadataUncheckedUpdateWithoutAttachmentInput>
 }
 
 export type AudioMetadataUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type AudioMetadataUncheckedUpdateWithoutAttachmentInput = {
-  format?: Prisma.StringFieldUpdateOperationsInput | string
-  duration?: Prisma.IntFieldUpdateOperationsInput | number
-  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  format?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  duration?: Prisma.IntFieldUpdateOperationsInput | number | runtime.Types.Skip
+  bitrate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  sampleRate?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  channels?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  codec?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  artist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  album?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null | runtime.Types.Skip
+  genre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  waveformPeaks?: Prisma.AudioMetadataUpdatewaveformPeaksInput | number[] | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 
 
 export type AudioMetadataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean
-  format?: boolean
-  duration?: boolean
-  bitrate?: boolean
-  sampleRate?: boolean
-  channels?: boolean
-  codec?: boolean
-  title?: boolean
-  artist?: boolean
-  album?: boolean
-  year?: boolean
-  genre?: boolean
-  waveformPeaks?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachmentId?: boolean | runtime.Types.Skip
+  format?: boolean | runtime.Types.Skip
+  duration?: boolean | runtime.Types.Skip
+  bitrate?: boolean | runtime.Types.Skip
+  sampleRate?: boolean | runtime.Types.Skip
+  channels?: boolean | runtime.Types.Skip
+  codec?: boolean | runtime.Types.Skip
+  title?: boolean | runtime.Types.Skip
+  artist?: boolean | runtime.Types.Skip
+  album?: boolean | runtime.Types.Skip
+  year?: boolean | runtime.Types.Skip
+  genre?: boolean | runtime.Types.Skip
+  waveformPeaks?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["audioMetadata"]>
 
 export type AudioMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean
-  format?: boolean
-  duration?: boolean
-  bitrate?: boolean
-  sampleRate?: boolean
-  channels?: boolean
-  codec?: boolean
-  title?: boolean
-  artist?: boolean
-  album?: boolean
-  year?: boolean
-  genre?: boolean
-  waveformPeaks?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachmentId?: boolean | runtime.Types.Skip
+  format?: boolean | runtime.Types.Skip
+  duration?: boolean | runtime.Types.Skip
+  bitrate?: boolean | runtime.Types.Skip
+  sampleRate?: boolean | runtime.Types.Skip
+  channels?: boolean | runtime.Types.Skip
+  codec?: boolean | runtime.Types.Skip
+  title?: boolean | runtime.Types.Skip
+  artist?: boolean | runtime.Types.Skip
+  album?: boolean | runtime.Types.Skip
+  year?: boolean | runtime.Types.Skip
+  genre?: boolean | runtime.Types.Skip
+  waveformPeaks?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["audioMetadata"]>
 
 export type AudioMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  attachmentId?: boolean
-  format?: boolean
-  duration?: boolean
-  bitrate?: boolean
-  sampleRate?: boolean
-  channels?: boolean
-  codec?: boolean
-  title?: boolean
-  artist?: boolean
-  album?: boolean
-  year?: boolean
-  genre?: boolean
-  waveformPeaks?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachmentId?: boolean | runtime.Types.Skip
+  format?: boolean | runtime.Types.Skip
+  duration?: boolean | runtime.Types.Skip
+  bitrate?: boolean | runtime.Types.Skip
+  sampleRate?: boolean | runtime.Types.Skip
+  channels?: boolean | runtime.Types.Skip
+  codec?: boolean | runtime.Types.Skip
+  title?: boolean | runtime.Types.Skip
+  artist?: boolean | runtime.Types.Skip
+  album?: boolean | runtime.Types.Skip
+  year?: boolean | runtime.Types.Skip
+  genre?: boolean | runtime.Types.Skip
+  waveformPeaks?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["audioMetadata"]>
 
 export type AudioMetadataSelectScalar = {
-  attachmentId?: boolean
-  format?: boolean
-  duration?: boolean
-  bitrate?: boolean
-  sampleRate?: boolean
-  channels?: boolean
-  codec?: boolean
-  title?: boolean
-  artist?: boolean
-  album?: boolean
-  year?: boolean
-  genre?: boolean
-  waveformPeaks?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  attachmentId?: boolean | runtime.Types.Skip
+  format?: boolean | runtime.Types.Skip
+  duration?: boolean | runtime.Types.Skip
+  bitrate?: boolean | runtime.Types.Skip
+  sampleRate?: boolean | runtime.Types.Skip
+  channels?: boolean | runtime.Types.Skip
+  codec?: boolean | runtime.Types.Skip
+  title?: boolean | runtime.Types.Skip
+  artist?: boolean | runtime.Types.Skip
+  album?: boolean | runtime.Types.Skip
+  year?: boolean | runtime.Types.Skip
+  genre?: boolean | runtime.Types.Skip
+  waveformPeaks?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type AudioMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "duration" | "bitrate" | "sampleRate" | "channels" | "codec" | "title" | "artist" | "album" | "year" | "genre" | "waveformPeaks" | "createdAt" | "updatedAt", ExtArgs["result"]["audioMetadata"]>
+export type AudioMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"attachmentId" | "format" | "duration" | "bitrate" | "sampleRate" | "channels" | "codec" | "title" | "artist" | "album" | "year" | "genre" | "waveformPeaks" | "createdAt" | "updatedAt", ExtArgs["result"]["audioMetadata"], runtime.Types.Skip>
 export type AudioMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AudioMetadataIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type AudioMetadataIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
+  attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 
 export type $AudioMetadataPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -841,7 +841,7 @@ export type $AudioMetadataPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type AudioMetadataGetPayload<S extends boolean | null | undefined | AudioMetadataDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AudioMetadataPayload, S>
 
 export type AudioMetadataCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AudioMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AudioMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AudioMetadataCountAggregateInputType | true
   }
 
@@ -1297,6 +1297,7 @@ export type AudioMetadataFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which AudioMetadata to fetch.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1319,6 +1320,7 @@ export type AudioMetadataFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which AudioMetadata to fetch.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1340,37 +1342,38 @@ export type AudioMetadataFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter, which AudioMetadata to fetch.
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AudioMetadata to fetch.
    */
-  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[]
+  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for AudioMetadata.
    */
-  cursor?: Prisma.AudioMetadataWhereUniqueInput
+  cursor?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AudioMetadata from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AudioMetadata.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of AudioMetadata.
    */
-  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1392,37 +1395,38 @@ export type AudioMetadataFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
   /**
    * Filter, which AudioMetadata to fetch.
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AudioMetadata to fetch.
    */
-  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[]
+  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for AudioMetadata.
    */
-  cursor?: Prisma.AudioMetadataWhereUniqueInput
+  cursor?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AudioMetadata from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AudioMetadata.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of AudioMetadata.
    */
-  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1444,32 +1448,33 @@ export type AudioMetadataFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter, which AudioMetadata to fetch.
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of AudioMetadata to fetch.
    */
-  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[]
+  orderBy?: Prisma.AudioMetadataOrderByWithRelationInput | Prisma.AudioMetadataOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing AudioMetadata.
    */
-  cursor?: Prisma.AudioMetadataWhereUniqueInput
+  cursor?: Prisma.AudioMetadataWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` AudioMetadata from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` AudioMetadata.
    */
-  skip?: number
-  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AudioMetadataScalarFieldEnum | Prisma.AudioMetadataScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1492,6 +1497,7 @@ export type AudioMetadataCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a AudioMetadata.
    */
   data: Prisma.XOR<Prisma.AudioMetadataCreateInput, Prisma.AudioMetadataUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1502,7 +1508,7 @@ export type AudioMetadataCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many AudioMetadata.
    */
   data: Prisma.AudioMetadataCreateManyInput | Prisma.AudioMetadataCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -1521,7 +1527,7 @@ export type AudioMetadataCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many AudioMetadata.
    */
   data: Prisma.AudioMetadataCreateManyInput | Prisma.AudioMetadataCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1552,6 +1558,7 @@ export type AudioMetadataUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which AudioMetadata to update.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1565,11 +1572,11 @@ export type AudioMetadataUpdateManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which AudioMetadata to update
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * Limit how many AudioMetadata to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -1591,11 +1598,11 @@ export type AudioMetadataUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
   /**
    * Filter which AudioMetadata to update
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * Limit how many AudioMetadata to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
   /**
    * Choose, which related nodes to fetch as well
    */
@@ -1630,6 +1637,7 @@ export type AudioMetadataUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the AudioMetadata was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AudioMetadataUpdateInput, Prisma.AudioMetadataUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1652,6 +1660,7 @@ export type AudioMetadataDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which AudioMetadata to delete.
    */
   where: Prisma.AudioMetadataWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1661,11 +1670,11 @@ export type AudioMetadataDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which AudioMetadata to delete
    */
-  where?: Prisma.AudioMetadataWhereInput
+  where?: Prisma.AudioMetadataWhereInput | runtime.Types.Skip
   /**
    * Limit how many AudioMetadata to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**

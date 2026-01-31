@@ -7,7 +7,7 @@ import type {
   ClientContextWorkupProps,
   RecordCountsProps
 } from "@slipstream/types";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
 import { EncryptionService } from "@slipstream/encryption";
 
 dotenv.config({ quiet: true });
@@ -18,7 +18,7 @@ export class PrismaUserMetaService extends PrismaAttachmentService {
     Lowercase<$Enums.Provider>,
     string | undefined
   >();
-  constructor(prisma: DbService, extractor: ExtractService, isProd: boolean) {
+  constructor(prisma: PrismaDbService, extractor: ExtractService, isProd: boolean) {
     super(prisma, extractor, isProd);
     this.encryption = new EncryptionService(process.env.ENCRYPTION_KEY);
   }

@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model User
@@ -66,74 +66,74 @@ export type UserCountAggregateOutputType = {
 
 
 export type UserMinAggregateInputType = {
-  id?: true
-  name?: true
-  email?: true
-  emailVerified?: true
-  email_verified?: true
-  image?: true
-  isAnonymous?: true
-  lastLoginMethod?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  name?: true | runtime.Types.Skip
+  email?: true | runtime.Types.Skip
+  emailVerified?: true | runtime.Types.Skip
+  email_verified?: true | runtime.Types.Skip
+  image?: true | runtime.Types.Skip
+  isAnonymous?: true | runtime.Types.Skip
+  lastLoginMethod?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type UserMaxAggregateInputType = {
-  id?: true
-  name?: true
-  email?: true
-  emailVerified?: true
-  email_verified?: true
-  image?: true
-  isAnonymous?: true
-  lastLoginMethod?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  name?: true | runtime.Types.Skip
+  email?: true | runtime.Types.Skip
+  emailVerified?: true | runtime.Types.Skip
+  email_verified?: true | runtime.Types.Skip
+  image?: true | runtime.Types.Skip
+  isAnonymous?: true | runtime.Types.Skip
+  lastLoginMethod?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type UserCountAggregateInputType = {
-  id?: true
-  name?: true
-  email?: true
-  emailVerified?: true
-  email_verified?: true
-  image?: true
-  isAnonymous?: true
-  lastLoginMethod?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  name?: true | runtime.Types.Skip
+  email?: true | runtime.Types.Skip
+  emailVerified?: true | runtime.Types.Skip
+  email_verified?: true | runtime.Types.Skip
+  image?: true | runtime.Types.Skip
+  isAnonymous?: true | runtime.Types.Skip
+  lastLoginMethod?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which User to aggregate.
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Users to fetch.
    */
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.UserWhereUniqueInput
+  cursor?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Users from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Users.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -166,12 +166,12 @@ export type GetUserAggregateType<T extends UserAggregateArgs> = {
 
 
 export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithAggregationInput | Prisma.UserOrderByWithAggregationInput[]
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.UserOrderByWithAggregationInput | Prisma.UserOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.UserScalarFieldEnum[] | Prisma.UserScalarFieldEnum
-  having?: Prisma.UserScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.UserScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: UserCountAggregateInputType | true
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
@@ -209,469 +209,469 @@ type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
 
 
 export type UserWhereInput = {
-  AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  OR?: Prisma.UserWhereInput[]
-  NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  id?: Prisma.StringFilter<"User"> | string
-  name?: Prisma.StringNullableFilter<"User"> | string | null
-  email?: Prisma.StringFilter<"User"> | string
-  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  email_verified?: Prisma.BoolNullableFilter<"User"> | boolean | null
-  image?: Prisma.StringNullableFilter<"User"> | string | null
-  isAnonymous?: Prisma.BoolNullableFilter<"User"> | boolean | null
-  lastLoginMethod?: Prisma.StringNullableFilter<"User"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
-  accounts?: Prisma.AccountListRelationFilter
-  sessions?: Prisma.SessionListRelationFilter
-  keys?: Prisma.UserKeyListRelationFilter
-  attachments?: Prisma.AttachmentListRelationFilter
-  conversations?: Prisma.ConversationListRelationFilter
-  conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null
-  providerStores?: Prisma.ProviderStoreListRelationFilter
-  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter
-  settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
+  AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.UserWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"User"> | string | runtime.Types.Skip
+  name?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  email?: Prisma.StringFilter<"User"> | string | runtime.Types.Skip
+  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.BoolNullableFilter<"User"> | boolean | null | runtime.Types.Skip
+  image?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.BoolNullableFilter<"User"> | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string | runtime.Types.Skip
+  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null | runtime.Types.Skip
+  accounts?: Prisma.AccountListRelationFilter | runtime.Types.Skip
+  sessions?: Prisma.SessionListRelationFilter | runtime.Types.Skip
+  keys?: Prisma.UserKeyListRelationFilter | runtime.Types.Skip
+  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
+  conversations?: Prisma.ConversationListRelationFilter | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreListRelationFilter | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter | runtime.Types.Skip
+  settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null | runtime.Types.Skip
 }
 
 export type UserOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
-  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
-  email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
-  image?: Prisma.SortOrderInput | Prisma.SortOrder
-  isAnonymous?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastLoginMethod?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  profile?: Prisma.ProfileOrderByWithRelationInput
-  accounts?: Prisma.AccountOrderByRelationAggregateInput
-  sessions?: Prisma.SessionOrderByRelationAggregateInput
-  keys?: Prisma.UserKeyOrderByRelationAggregateInput
-  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
-  conversations?: Prisma.ConversationOrderByRelationAggregateInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreOrderByWithRelationInput
-  providerStores?: Prisma.ProviderStoreOrderByRelationAggregateInput
-  localVectorStores?: Prisma.LocalVectorStoreOrderByRelationAggregateInput
-  settings?: Prisma.SettingsOrderByWithRelationInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  name?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  email?: Prisma.SortOrder | runtime.Types.Skip
+  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  email_verified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  image?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  isAnonymous?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastLoginMethod?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  profile?: Prisma.ProfileOrderByWithRelationInput | runtime.Types.Skip
+  accounts?: Prisma.AccountOrderByRelationAggregateInput | runtime.Types.Skip
+  sessions?: Prisma.SessionOrderByRelationAggregateInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyOrderByRelationAggregateInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationOrderByRelationAggregateInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreOrderByWithRelationInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreOrderByRelationAggregateInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreOrderByRelationAggregateInput | runtime.Types.Skip
+  settings?: Prisma.SettingsOrderByWithRelationInput | runtime.Types.Skip
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  email?: string
-  AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  OR?: Prisma.UserWhereInput[]
-  NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  name?: Prisma.StringNullableFilter<"User"> | string | null
-  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  email_verified?: Prisma.BoolNullableFilter<"User"> | boolean | null
-  image?: Prisma.StringNullableFilter<"User"> | string | null
-  isAnonymous?: Prisma.BoolNullableFilter<"User"> | boolean | null
-  lastLoginMethod?: Prisma.StringNullableFilter<"User"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
-  accounts?: Prisma.AccountListRelationFilter
-  sessions?: Prisma.SessionListRelationFilter
-  keys?: Prisma.UserKeyListRelationFilter
-  attachments?: Prisma.AttachmentListRelationFilter
-  conversations?: Prisma.ConversationListRelationFilter
-  conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null
-  providerStores?: Prisma.ProviderStoreListRelationFilter
-  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter
-  settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
+  id?: string | runtime.Types.Skip
+  email?: string | runtime.Types.Skip
+  AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.UserWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[] | runtime.Types.Skip
+  name?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.BoolNullableFilter<"User"> | boolean | null | runtime.Types.Skip
+  image?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.BoolNullableFilter<"User"> | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.StringNullableFilter<"User"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string | runtime.Types.Skip
+  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null | runtime.Types.Skip
+  accounts?: Prisma.AccountListRelationFilter | runtime.Types.Skip
+  sessions?: Prisma.SessionListRelationFilter | runtime.Types.Skip
+  keys?: Prisma.UserKeyListRelationFilter | runtime.Types.Skip
+  attachments?: Prisma.AttachmentListRelationFilter | runtime.Types.Skip
+  conversations?: Prisma.ConversationListRelationFilter | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.XOR<Prisma.ConversationMemoryStoreNullableScalarRelationFilter, Prisma.ConversationMemoryStoreWhereInput> | null | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreListRelationFilter | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreListRelationFilter | runtime.Types.Skip
+  settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null | runtime.Types.Skip
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
-  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
-  email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
-  image?: Prisma.SortOrderInput | Prisma.SortOrder
-  isAnonymous?: Prisma.SortOrderInput | Prisma.SortOrder
-  lastLoginMethod?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.UserCountOrderByAggregateInput
-  _max?: Prisma.UserMaxOrderByAggregateInput
-  _min?: Prisma.UserMinOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  name?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  email?: Prisma.SortOrder | runtime.Types.Skip
+  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  email_verified?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  image?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  isAnonymous?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  lastLoginMethod?: Prisma.SortOrderInput | Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.UserCountOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.UserMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.UserMinOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type UserScalarWhereWithAggregatesInput = {
-  AND?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
-  OR?: Prisma.UserScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"User"> | string
-  name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  email?: Prisma.StringWithAggregatesFilter<"User"> | string
-  emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-  email_verified?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
-  image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  isAnonymous?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
-  lastLoginMethod?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  AND?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.UserScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"User"> | string | runtime.Types.Skip
+  name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null | runtime.Types.Skip
+  email?: Prisma.StringWithAggregatesFilter<"User"> | string | runtime.Types.Skip
+  emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null | runtime.Types.Skip
+  image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string | runtime.Types.Skip
 }
 
 export type UserCreateInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateManyInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type UserUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type UserScalarRelationFilter = {
-  is?: Prisma.UserWhereInput
-  isNot?: Prisma.UserWhereInput
+  is?: Prisma.UserWhereInput | runtime.Types.Skip
+  isNot?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  emailVerified?: Prisma.SortOrder
-  email_verified?: Prisma.SortOrder
-  image?: Prisma.SortOrder
-  isAnonymous?: Prisma.SortOrder
-  lastLoginMethod?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  name?: Prisma.SortOrder | runtime.Types.Skip
+  email?: Prisma.SortOrder | runtime.Types.Skip
+  emailVerified?: Prisma.SortOrder | runtime.Types.Skip
+  email_verified?: Prisma.SortOrder | runtime.Types.Skip
+  image?: Prisma.SortOrder | runtime.Types.Skip
+  isAnonymous?: Prisma.SortOrder | runtime.Types.Skip
+  lastLoginMethod?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type UserMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  emailVerified?: Prisma.SortOrder
-  email_verified?: Prisma.SortOrder
-  image?: Prisma.SortOrder
-  isAnonymous?: Prisma.SortOrder
-  lastLoginMethod?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  name?: Prisma.SortOrder | runtime.Types.Skip
+  email?: Prisma.SortOrder | runtime.Types.Skip
+  emailVerified?: Prisma.SortOrder | runtime.Types.Skip
+  email_verified?: Prisma.SortOrder | runtime.Types.Skip
+  image?: Prisma.SortOrder | runtime.Types.Skip
+  isAnonymous?: Prisma.SortOrder | runtime.Types.Skip
+  lastLoginMethod?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type UserMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  emailVerified?: Prisma.SortOrder
-  email_verified?: Prisma.SortOrder
-  image?: Prisma.SortOrder
-  isAnonymous?: Prisma.SortOrder
-  lastLoginMethod?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  name?: Prisma.SortOrder | runtime.Types.Skip
+  email?: Prisma.SortOrder | runtime.Types.Skip
+  emailVerified?: Prisma.SortOrder | runtime.Types.Skip
+  email_verified?: Prisma.SortOrder | runtime.Types.Skip
+  image?: Prisma.SortOrder | runtime.Types.Skip
+  isAnonymous?: Prisma.SortOrder | runtime.Types.Skip
+  lastLoginMethod?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutAccountsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput
-  upsert?: Prisma.UserUpsertWithoutAccountsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountsInput, Prisma.UserUpdateWithoutAccountsInput>, Prisma.UserUncheckedUpdateWithoutAccountsInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutAccountsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountsInput, Prisma.UserUpdateWithoutAccountsInput>, Prisma.UserUncheckedUpdateWithoutAccountsInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutAttachmentsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAttachmentsInput, Prisma.UserUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAttachmentsInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAttachmentsInput, Prisma.UserUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutAttachmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAttachmentsInput, Prisma.UserUncheckedCreateWithoutAttachmentsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAttachmentsInput
-  upsert?: Prisma.UserUpsertWithoutAttachmentsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.UserUpdateWithoutAttachmentsInput>, Prisma.UserUncheckedUpdateWithoutAttachmentsInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAttachmentsInput, Prisma.UserUncheckedCreateWithoutAttachmentsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAttachmentsInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutAttachmentsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.UserUpdateWithoutAttachmentsInput>, Prisma.UserUncheckedUpdateWithoutAttachmentsInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutConversationsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationsInput, Prisma.UserUncheckedCreateWithoutConversationsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationsInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationsInput, Prisma.UserUncheckedCreateWithoutConversationsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutConversationsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationsInput, Prisma.UserUncheckedCreateWithoutConversationsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationsInput
-  upsert?: Prisma.UserUpsertWithoutConversationsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationsInput, Prisma.UserUpdateWithoutConversationsInput>, Prisma.UserUncheckedUpdateWithoutConversationsInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationsInput, Prisma.UserUncheckedCreateWithoutConversationsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationsInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutConversationsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationsInput, Prisma.UserUpdateWithoutConversationsInput>, Prisma.UserUncheckedUpdateWithoutConversationsInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutLocalVectorStoresInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutLocalVectorStoresNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput
-  upsert?: Prisma.UserUpsertWithoutLocalVectorStoresInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLocalVectorStoresInput, Prisma.UserUpdateWithoutLocalVectorStoresInput>, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLocalVectorStoresInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutLocalVectorStoresInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLocalVectorStoresInput, Prisma.UserUpdateWithoutLocalVectorStoresInput>, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutConversationMemoryStoreInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationMemoryStoreInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationMemoryStoreInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutConversationMemoryStoreNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationMemoryStoreInput
-  upsert?: Prisma.UserUpsertWithoutConversationMemoryStoreInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationMemoryStoreInput, Prisma.UserUpdateWithoutConversationMemoryStoreInput>, Prisma.UserUncheckedUpdateWithoutConversationMemoryStoreInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutConversationMemoryStoreInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutConversationMemoryStoreInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConversationMemoryStoreInput, Prisma.UserUpdateWithoutConversationMemoryStoreInput>, Prisma.UserUncheckedUpdateWithoutConversationMemoryStoreInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutProfileInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutProfileNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput
-  upsert?: Prisma.UserUpsertWithoutProfileInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProfileInput, Prisma.UserUpdateWithoutProfileInput>, Prisma.UserUncheckedUpdateWithoutProfileInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutProfileInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProfileInput, Prisma.UserUpdateWithoutProfileInput>, Prisma.UserUncheckedUpdateWithoutProfileInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutProviderStoresInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutProviderStoresNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput
-  upsert?: Prisma.UserUpsertWithoutProviderStoresInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProviderStoresInput, Prisma.UserUpdateWithoutProviderStoresInput>, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderStoresInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutProviderStoresInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProviderStoresInput, Prisma.UserUpdateWithoutProviderStoresInput>, Prisma.UserUncheckedUpdateWithoutProviderStoresInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
-  upsert?: Prisma.UserUpsertWithoutSessionsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutSessionsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutKeysInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKeysInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKeysInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutKeysNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKeysInput
-  upsert?: Prisma.UserUpsertWithoutKeysInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKeysInput, Prisma.UserUpdateWithoutKeysInput>, Prisma.UserUncheckedUpdateWithoutKeysInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKeysInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutKeysInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKeysInput, Prisma.UserUpdateWithoutKeysInput>, Prisma.UserUncheckedUpdateWithoutKeysInput> | runtime.Types.Skip
 }
 
 export type UserCreateNestedOneWithoutSettingsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSettingsInput
-  connect?: Prisma.UserWhereUniqueInput
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSettingsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
 }
 
 export type UserUpdateOneRequiredWithoutSettingsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSettingsInput
-  upsert?: Prisma.UserUpsertWithoutSettingsInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSettingsInput, Prisma.UserUpdateWithoutSettingsInput>, Prisma.UserUncheckedUpdateWithoutSettingsInput>
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput> | runtime.Types.Skip
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSettingsInput | runtime.Types.Skip
+  upsert?: Prisma.UserUpsertWithoutSettingsInput | runtime.Types.Skip
+  connect?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSettingsInput, Prisma.UserUpdateWithoutSettingsInput>, Prisma.UserUncheckedUpdateWithoutSettingsInput> | runtime.Types.Skip
 }
 
 export type UserCreateWithoutAccountsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -682,100 +682,100 @@ export type UserCreateOrConnectWithoutAccountsInput = {
 export type UserUpsertWithoutAccountsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutAccountsInput, Prisma.UserUncheckedUpdateWithoutAccountsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutAccountsInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutAccountsInput, Prisma.UserUncheckedUpdateWithoutAccountsInput>
 }
 
 export type UserUpdateWithoutAccountsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutAttachmentsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutAttachmentsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutAttachmentsInput = {
@@ -786,100 +786,100 @@ export type UserCreateOrConnectWithoutAttachmentsInput = {
 export type UserUpsertWithoutAttachmentsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutAttachmentsInput, Prisma.UserUncheckedUpdateWithoutAttachmentsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutAttachmentsInput, Prisma.UserUncheckedCreateWithoutAttachmentsInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutAttachmentsInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutAttachmentsInput, Prisma.UserUncheckedUpdateWithoutAttachmentsInput>
 }
 
 export type UserUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutAttachmentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutConversationsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutConversationsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutConversationsInput = {
@@ -890,100 +890,100 @@ export type UserCreateOrConnectWithoutConversationsInput = {
 export type UserUpsertWithoutConversationsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutConversationsInput, Prisma.UserUncheckedUpdateWithoutConversationsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutConversationsInput, Prisma.UserUncheckedCreateWithoutConversationsInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutConversationsInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutConversationsInput, Prisma.UserUncheckedUpdateWithoutConversationsInput>
 }
 
 export type UserUpdateWithoutConversationsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutConversationsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutLocalVectorStoresInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutLocalVectorStoresInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutLocalVectorStoresInput = {
@@ -994,100 +994,100 @@ export type UserCreateOrConnectWithoutLocalVectorStoresInput = {
 export type UserUpsertWithoutLocalVectorStoresInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutLocalVectorStoresInput, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutLocalVectorStoresInput, Prisma.UserUncheckedCreateWithoutLocalVectorStoresInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutLocalVectorStoresInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutLocalVectorStoresInput, Prisma.UserUncheckedUpdateWithoutLocalVectorStoresInput>
 }
 
 export type UserUpdateWithoutLocalVectorStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutLocalVectorStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutConversationMemoryStoreInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutConversationMemoryStoreInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutConversationMemoryStoreInput = {
@@ -1098,100 +1098,100 @@ export type UserCreateOrConnectWithoutConversationMemoryStoreInput = {
 export type UserUpsertWithoutConversationMemoryStoreInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedUpdateWithoutConversationMemoryStoreInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedCreateWithoutConversationMemoryStoreInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutConversationMemoryStoreInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutConversationMemoryStoreInput, Prisma.UserUncheckedUpdateWithoutConversationMemoryStoreInput>
 }
 
 export type UserUpdateWithoutConversationMemoryStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutConversationMemoryStoreInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutProfileInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -1202,100 +1202,100 @@ export type UserCreateOrConnectWithoutProfileInput = {
 export type UserUpsertWithoutProfileInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutProfileInput, Prisma.UserUncheckedUpdateWithoutProfileInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutProfileInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutProfileInput, Prisma.UserUncheckedUpdateWithoutProfileInput>
 }
 
 export type UserUpdateWithoutProfileInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutProviderStoresInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutProviderStoresInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutProviderStoresInput = {
@@ -1306,100 +1306,100 @@ export type UserCreateOrConnectWithoutProviderStoresInput = {
 export type UserUpsertWithoutProviderStoresInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutProviderStoresInput, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutProviderStoresInput, Prisma.UserUncheckedCreateWithoutProviderStoresInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutProviderStoresInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutProviderStoresInput, Prisma.UserUncheckedUpdateWithoutProviderStoresInput>
 }
 
 export type UserUpdateWithoutProviderStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutProviderStoresInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutSessionsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1410,100 +1410,100 @@ export type UserCreateOrConnectWithoutSessionsInput = {
 export type UserUpsertWithoutSessionsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutSessionsInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
 }
 
 export type UserUpdateWithoutSessionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutKeysInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutKeysInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
-  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutKeysInput = {
@@ -1514,100 +1514,100 @@ export type UserCreateOrConnectWithoutKeysInput = {
 export type UserUpsertWithoutKeysInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutKeysInput, Prisma.UserUncheckedUpdateWithoutKeysInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutKeysInput, Prisma.UserUncheckedCreateWithoutKeysInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutKeysInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutKeysInput, Prisma.UserUncheckedUpdateWithoutKeysInput>
 }
 
 export type UserUpdateWithoutKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
-  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserCreateWithoutSettingsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreCreateNestedManyWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
-  id?: string
-  name?: string | null
+  id?: string | runtime.Types.Skip
+  name?: string | null | runtime.Types.Skip
   email: string
-  emailVerified?: Date | string | null
-  email_verified?: boolean | null
-  image?: string | null
-  isAnonymous?: boolean | null
-  lastLoginMethod?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput
-  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput
-  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput
+  emailVerified?: Date | string | null | runtime.Types.Skip
+  email_verified?: boolean | null | runtime.Types.Skip
+  image?: string | null | runtime.Types.Skip
+  isAnonymous?: boolean | null | runtime.Types.Skip
+  lastLoginMethod?: string | null | runtime.Types.Skip
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedCreateNestedOneWithoutUserInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedCreateNestedManyWithoutUserInput | runtime.Types.Skip
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -1618,56 +1618,56 @@ export type UserCreateOrConnectWithoutSettingsInput = {
 export type UserUpsertWithoutSettingsInput = {
   update: Prisma.XOR<Prisma.UserUpdateWithoutSettingsInput, Prisma.UserUncheckedUpdateWithoutSettingsInput>
   create: Prisma.XOR<Prisma.UserCreateWithoutSettingsInput, Prisma.UserUncheckedCreateWithoutSettingsInput>
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
 }
 
 export type UserUpdateToOneWithWhereWithoutSettingsInput = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   data: Prisma.XOR<Prisma.UserUpdateWithoutSettingsInput, Prisma.UserUncheckedUpdateWithoutSettingsInput>
 }
 
 export type UserUpdateWithoutSettingsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUpdateManyWithoutUserNestedInput | runtime.Types.Skip
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput
-  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput
-  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput
-  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput
-  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  email?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null | runtime.Types.Skip
+  email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  isAnonymous?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null | runtime.Types.Skip
+  lastLoginMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  keys?: Prisma.UserKeyUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  conversationMemoryStore?: Prisma.ConversationMemoryStoreUncheckedUpdateOneWithoutUserNestedInput | runtime.Types.Skip
+  providerStores?: Prisma.ProviderStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
+  localVectorStores?: Prisma.LocalVectorStoreUncheckedUpdateManyWithoutUserNestedInput | runtime.Types.Skip
 }
 
 
@@ -1709,128 +1709,128 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AccountWhereInput
+  where?: Prisma.AccountWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SessionWhereInput
+  where?: Prisma.SessionWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserKeyWhereInput
+  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AttachmentWhereInput
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ConversationWhereInput
+  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountProviderStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ProviderStoreWhereInput
+  where?: Prisma.ProviderStoreWhereInput | runtime.Types.Skip
 }
 
 /**
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountLocalVectorStoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocalVectorStoreWhereInput
+  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
 }
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  name?: boolean
-  email?: boolean
-  emailVerified?: boolean
-  email_verified?: boolean
-  image?: boolean
-  isAnonymous?: boolean
-  lastLoginMethod?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
-  accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  keys?: boolean | Prisma.User$keysArgs<ExtArgs>
-  attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs>
-  conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
-  conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs>
-  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
-  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs>
-  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
-  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+  id?: boolean | runtime.Types.Skip
+  name?: boolean | runtime.Types.Skip
+  email?: boolean | runtime.Types.Skip
+  emailVerified?: boolean | runtime.Types.Skip
+  email_verified?: boolean | runtime.Types.Skip
+  image?: boolean | runtime.Types.Skip
+  isAnonymous?: boolean | runtime.Types.Skip
+  lastLoginMethod?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs> | runtime.Types.Skip
+  accounts?: boolean | Prisma.User$accountsArgs<ExtArgs> | runtime.Types.Skip
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs> | runtime.Types.Skip
+  keys?: boolean | Prisma.User$keysArgs<ExtArgs> | runtime.Types.Skip
+  attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs> | runtime.Types.Skip
+  conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs> | runtime.Types.Skip
+  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs> | runtime.Types.Skip
+  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs> | runtime.Types.Skip
+  settings?: boolean | Prisma.User$settingsArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  name?: boolean
-  email?: boolean
-  emailVerified?: boolean
-  email_verified?: boolean
-  image?: boolean
-  isAnonymous?: boolean
-  lastLoginMethod?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  name?: boolean | runtime.Types.Skip
+  email?: boolean | runtime.Types.Skip
+  emailVerified?: boolean | runtime.Types.Skip
+  email_verified?: boolean | runtime.Types.Skip
+  image?: boolean | runtime.Types.Skip
+  isAnonymous?: boolean | runtime.Types.Skip
+  lastLoginMethod?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  name?: boolean
-  email?: boolean
-  emailVerified?: boolean
-  email_verified?: boolean
-  image?: boolean
-  isAnonymous?: boolean
-  lastLoginMethod?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  name?: boolean | runtime.Types.Skip
+  email?: boolean | runtime.Types.Skip
+  emailVerified?: boolean | runtime.Types.Skip
+  email_verified?: boolean | runtime.Types.Skip
+  image?: boolean | runtime.Types.Skip
+  isAnonymous?: boolean | runtime.Types.Skip
+  lastLoginMethod?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
-  id?: boolean
-  name?: boolean
-  email?: boolean
-  emailVerified?: boolean
-  email_verified?: boolean
-  image?: boolean
-  isAnonymous?: boolean
-  lastLoginMethod?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  name?: boolean | runtime.Types.Skip
+  email?: boolean | runtime.Types.Skip
+  emailVerified?: boolean | runtime.Types.Skip
+  email_verified?: boolean | runtime.Types.Skip
+  image?: boolean | runtime.Types.Skip
+  isAnonymous?: boolean | runtime.Types.Skip
+  lastLoginMethod?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "email_verified" | "image" | "isAnonymous" | "lastLoginMethod" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "email_verified" | "image" | "isAnonymous" | "lastLoginMethod" | "createdAt" | "updatedAt", ExtArgs["result"]["user"], runtime.Types.Skip>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
-  accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
-  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
-  keys?: boolean | Prisma.User$keysArgs<ExtArgs>
-  attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs>
-  conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
-  conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs>
-  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs>
-  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs>
-  settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
-  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs> | runtime.Types.Skip
+  accounts?: boolean | Prisma.User$accountsArgs<ExtArgs> | runtime.Types.Skip
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs> | runtime.Types.Skip
+  keys?: boolean | Prisma.User$keysArgs<ExtArgs> | runtime.Types.Skip
+  attachments?: boolean | Prisma.User$attachmentsArgs<ExtArgs> | runtime.Types.Skip
+  conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs> | runtime.Types.Skip
+  conversationMemoryStore?: boolean | Prisma.User$conversationMemoryStoreArgs<ExtArgs> | runtime.Types.Skip
+  providerStores?: boolean | Prisma.User$providerStoresArgs<ExtArgs> | runtime.Types.Skip
+  localVectorStores?: boolean | Prisma.User$localVectorStoresArgs<ExtArgs> | runtime.Types.Skip
+  settings?: boolean | Prisma.User$settingsArgs<ExtArgs> | runtime.Types.Skip
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs> | runtime.Types.Skip
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1867,7 +1867,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type UserGetPayload<S extends boolean | null | undefined | UserDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$UserPayload, S>
 
 export type UserCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<UserFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<UserFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: UserCountAggregateInputType | true
   }
 
@@ -2327,6 +2327,7 @@ export type UserFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2349,6 +2350,7 @@ export type UserFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2370,37 +2372,38 @@ export type UserFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * Filter, which User to fetch.
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Users to fetch.
    */
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Users.
    */
-  cursor?: Prisma.UserWhereUniqueInput
+  cursor?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Users from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Users.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Users.
    */
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2422,37 +2425,38 @@ export type UserFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter, which User to fetch.
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Users to fetch.
    */
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Users.
    */
-  cursor?: Prisma.UserWhereUniqueInput
+  cursor?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Users from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Users.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Users.
    */
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2474,32 +2478,33 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   /**
    * Filter, which Users to fetch.
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Users to fetch.
    */
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Users.
    */
-  cursor?: Prisma.UserWhereUniqueInput
+  cursor?: Prisma.UserWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Users from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Users.
    */
-  skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2522,6 +2527,7 @@ export type UserCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a User.
    */
   data: Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2532,7 +2538,7 @@ export type UserCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -2551,7 +2557,7 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -2578,6 +2584,7 @@ export type UserUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which User to update.
    */
   where: Prisma.UserWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2591,11 +2598,11 @@ export type UserUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * Filter which Users to update
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * Limit how many Users to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2617,11 +2624,11 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * Filter which Users to update
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * Limit how many Users to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2652,6 +2659,7 @@ export type UserUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the User was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.UserUpdateInput, Prisma.UserUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2674,6 +2682,7 @@ export type UserDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which User to delete.
    */
   where: Prisma.UserWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -2683,11 +2692,11 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * Filter which Users to delete
    */
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserWhereInput | runtime.Types.Skip
   /**
    * Limit how many Users to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -2706,7 +2715,7 @@ export type User$profileArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ProfileInclude<ExtArgs> | null
-  where?: Prisma.ProfileWhereInput
+  where?: Prisma.ProfileWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -2725,12 +2734,12 @@ export type User$accountsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AccountInclude<ExtArgs> | null
-  where?: Prisma.AccountWhereInput
-  orderBy?: Prisma.AccountOrderByWithRelationInput | Prisma.AccountOrderByWithRelationInput[]
-  cursor?: Prisma.AccountWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AccountScalarFieldEnum | Prisma.AccountScalarFieldEnum[]
+  where?: Prisma.AccountWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AccountOrderByWithRelationInput | Prisma.AccountOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.AccountWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AccountScalarFieldEnum | Prisma.AccountScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2749,12 +2758,12 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.SessionInclude<ExtArgs> | null
-  where?: Prisma.SessionWhereInput
-  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
-  cursor?: Prisma.SessionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+  where?: Prisma.SessionWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.SessionWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2773,12 +2782,12 @@ export type User$keysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.UserKeyInclude<ExtArgs> | null
-  where?: Prisma.UserKeyWhereInput
-  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[]
-  cursor?: Prisma.UserKeyWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[]
+  where?: Prisma.UserKeyWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.UserKeyOrderByWithRelationInput | Prisma.UserKeyOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.UserKeyWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.UserKeyScalarFieldEnum | Prisma.UserKeyScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2797,12 +2806,12 @@ export type User$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.AttachmentInclude<ExtArgs> | null
-  where?: Prisma.AttachmentWhereInput
-  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
-  cursor?: Prisma.AttachmentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+  where?: Prisma.AttachmentWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.AttachmentWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2821,12 +2830,12 @@ export type User$conversationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationInclude<ExtArgs> | null
-  where?: Prisma.ConversationWhereInput
-  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
-  cursor?: Prisma.ConversationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+  where?: Prisma.ConversationWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.ConversationWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2845,7 +2854,7 @@ export type User$conversationMemoryStoreArgs<ExtArgs extends runtime.Types.Exten
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ConversationMemoryStoreInclude<ExtArgs> | null
-  where?: Prisma.ConversationMemoryStoreWhereInput
+  where?: Prisma.ConversationMemoryStoreWhereInput | runtime.Types.Skip
 }
 
 /**
@@ -2864,12 +2873,12 @@ export type User$providerStoresArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.ProviderStoreInclude<ExtArgs> | null
-  where?: Prisma.ProviderStoreWhereInput
-  orderBy?: Prisma.ProviderStoreOrderByWithRelationInput | Prisma.ProviderStoreOrderByWithRelationInput[]
-  cursor?: Prisma.ProviderStoreWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ProviderStoreScalarFieldEnum | Prisma.ProviderStoreScalarFieldEnum[]
+  where?: Prisma.ProviderStoreWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.ProviderStoreOrderByWithRelationInput | Prisma.ProviderStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.ProviderStoreWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.ProviderStoreScalarFieldEnum | Prisma.ProviderStoreScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2888,12 +2897,12 @@ export type User$localVectorStoresArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.LocalVectorStoreInclude<ExtArgs> | null
-  where?: Prisma.LocalVectorStoreWhereInput
-  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[]
-  cursor?: Prisma.LocalVectorStoreWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[]
+  where?: Prisma.LocalVectorStoreWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.LocalVectorStoreOrderByWithRelationInput | Prisma.LocalVectorStoreOrderByWithRelationInput[] | runtime.Types.Skip
+  cursor?: Prisma.LocalVectorStoreWhereUniqueInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.LocalVectorStoreScalarFieldEnum | Prisma.LocalVectorStoreScalarFieldEnum[] | runtime.Types.Skip
 }
 
 /**
@@ -2912,7 +2921,7 @@ export type User$settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.SettingsInclude<ExtArgs> | null
-  where?: Prisma.SettingsWhereInput
+  where?: Prisma.SettingsWhereInput | runtime.Types.Skip
 }
 
 /**

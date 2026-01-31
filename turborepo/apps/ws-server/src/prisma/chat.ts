@@ -19,11 +19,11 @@ import type {
   CTR,
   Rm
 } from "@slipstream/types";
-import { DbService } from "@slipstream/db/node";
+import { PrismaDbService } from "@slipstream/db/factory";
 
 export class PrismaChatService extends PrismaUserMetaService {
   constructor(
-    prisma: DbService,
+    prisma: PrismaDbService,
     extractor: ExtractService,
     isProd: boolean
   ) {

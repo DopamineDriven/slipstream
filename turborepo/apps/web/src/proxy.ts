@@ -1,22 +1,19 @@
 import type { NextRequest } from "next/server";
 import { NextResponse, userAgent } from "next/server";
-import { Session, User } from "better-auth";
-import { getCookieCache } from "better-auth/cookies";
 
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|opengraph-image|twitter-image|auth/(?:login|signup)).*)"
   ]
 };
-type CookieCacheProps = {
-  session: Session & Record<string, any>;
-  user: User & Record<string, any>;
-} | null;
+// type CookieCacheProps = {
+//   session: Session & Record<string, any>;
+//   user: User & Record<string, any>;
+// } | null;
 
 function detectDeviceAndSetCookies(
   request: NextRequest,
-  response: NextResponse,
-  sesh: CookieCacheProps = null
+  response: NextResponse
 ) {
   const domain =
     process.env.NODE_ENV !== "development" ? ".aicoalesce.com" : undefined;
@@ -112,10 +109,6 @@ function detectDeviceAndSetCookies(
     locale = `${locale.toLowerCase()}-${country}`;
   }
 
-  if (sesh) {
-    response.cookies.set("userId", sesh.user.id, config);
-  }
-
   // Set cookies
   response.cookies.set("hostname", hostname, config);
   response.cookies.set("locale", locale, config);
@@ -135,20 +128,17 @@ function detectDeviceAndSetCookies(
 }
 
 export default async function proxy(req: NextRequest) {
-  const session = (await getCookieCache(req)) satisfies CookieCacheProps;
 
-  if (!session && !req.nextUrl.pathname.includes("/auth")) {
-    return detectDeviceAndSetCookies(
-      req,
-      NextResponse.redirect(new URL("/auth/login", req.url)),
-      session
-    );
-  }
+  // if (!session && !req.nextUrl.pathname.includes("/auth")) {
+  //   return detectDeviceAndSetCookies(
+  //     req,
+  //     NextResponse.redirect(new URL("/auth/login", req.url))
+  //   );
+  // }
   if (req.nextUrl.pathname === "/") {
     return detectDeviceAndSetCookies(
       req,
-      NextResponse.rewrite(new URL("/chat/home", req.url)),
-      session
+      NextResponse.rewrite(new URL("/chat/home", req.url))
     );
-  } else return detectDeviceAndSetCookies(req, NextResponse.next(), session);
+  } else return detectDeviceAndSetCookies(req, NextResponse.next());
 }

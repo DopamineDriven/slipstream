@@ -8,9 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as runtime from "@prisma/client/runtime/client"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Verification
@@ -54,62 +54,62 @@ export type VerificationCountAggregateOutputType = {
 
 
 export type VerificationMinAggregateInputType = {
-  id?: true
-  identifier?: true
-  value?: true
-  expiresAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  identifier?: true | runtime.Types.Skip
+  value?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type VerificationMaxAggregateInputType = {
-  id?: true
-  identifier?: true
-  value?: true
-  expiresAt?: true
-  createdAt?: true
-  updatedAt?: true
+  id?: true | runtime.Types.Skip
+  identifier?: true | runtime.Types.Skip
+  value?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
 }
 
 export type VerificationCountAggregateInputType = {
-  id?: true
-  identifier?: true
-  value?: true
-  expiresAt?: true
-  createdAt?: true
-  updatedAt?: true
-  _all?: true
+  id?: true | runtime.Types.Skip
+  identifier?: true | runtime.Types.Skip
+  value?: true | runtime.Types.Skip
+  expiresAt?: true | runtime.Types.Skip
+  createdAt?: true | runtime.Types.Skip
+  updatedAt?: true | runtime.Types.Skip
+  _all?: true | runtime.Types.Skip
 }
 
 export type VerificationAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Filter which Verification to aggregate.
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Verifications to fetch.
    */
-  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[]
+  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.VerificationWhereUniqueInput
+  cursor?: Prisma.VerificationWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Verifications from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Verifications.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
@@ -142,12 +142,12 @@ export type GetVerificationAggregateType<T extends VerificationAggregateArgs> = 
 
 
 export type VerificationGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.VerificationWhereInput
-  orderBy?: Prisma.VerificationOrderByWithAggregationInput | Prisma.VerificationOrderByWithAggregationInput[]
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
+  orderBy?: Prisma.VerificationOrderByWithAggregationInput | Prisma.VerificationOrderByWithAggregationInput[] | runtime.Types.Skip
   by: Prisma.VerificationScalarFieldEnum[] | Prisma.VerificationScalarFieldEnum
-  having?: Prisma.VerificationScalarWhereWithAggregatesInput
-  take?: number
-  skip?: number
+  having?: Prisma.VerificationScalarWhereWithAggregatesInput | runtime.Types.Skip
+  take?: number | runtime.Types.Skip
+  skip?: number | runtime.Types.Skip
   _count?: VerificationCountAggregateInputType | true
   _min?: VerificationMinAggregateInputType
   _max?: VerificationMaxAggregateInputType
@@ -181,191 +181,191 @@ type GetVerificationGroupByPayload<T extends VerificationGroupByArgs> = Prisma.P
 
 
 export type VerificationWhereInput = {
-  AND?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[]
-  OR?: Prisma.VerificationWhereInput[]
-  NOT?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[]
-  id?: Prisma.StringFilter<"Verification"> | string
-  identifier?: Prisma.StringFilter<"Verification"> | string
-  value?: Prisma.StringFilter<"Verification"> | string
-  expiresAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
-  createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
+  AND?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  id?: Prisma.StringFilter<"Verification"> | string | runtime.Types.Skip
+  identifier?: Prisma.StringFilter<"Verification"> | string | runtime.Types.Skip
+  value?: Prisma.StringFilter<"Verification"> | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
 }
 
 export type VerificationOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
-  identifier?: Prisma.SortOrder
-  value?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  identifier?: Prisma.SortOrder | runtime.Types.Skip
+  value?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type VerificationWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
-  AND?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[]
-  OR?: Prisma.VerificationWhereInput[]
-  NOT?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[]
-  identifier?: Prisma.StringFilter<"Verification"> | string
-  value?: Prisma.StringFilter<"Verification"> | string
-  expiresAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
-  createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Verification"> | Date | string
+  id?: string | runtime.Types.Skip
+  AND?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  OR?: Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  NOT?: Prisma.VerificationWhereInput | Prisma.VerificationWhereInput[] | runtime.Types.Skip
+  identifier?: Prisma.StringFilter<"Verification"> | string | runtime.Types.Skip
+  value?: Prisma.StringFilter<"Verification"> | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFilter<"Verification"> | Date | string | runtime.Types.Skip
 }, "id">
 
 export type VerificationOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
-  identifier?: Prisma.SortOrder
-  value?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  _count?: Prisma.VerificationCountOrderByAggregateInput
-  _max?: Prisma.VerificationMaxOrderByAggregateInput
-  _min?: Prisma.VerificationMinOrderByAggregateInput
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  identifier?: Prisma.SortOrder | runtime.Types.Skip
+  value?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
+  _count?: Prisma.VerificationCountOrderByAggregateInput | runtime.Types.Skip
+  _max?: Prisma.VerificationMaxOrderByAggregateInput | runtime.Types.Skip
+  _min?: Prisma.VerificationMinOrderByAggregateInput | runtime.Types.Skip
 }
 
 export type VerificationScalarWhereWithAggregatesInput = {
-  AND?: Prisma.VerificationScalarWhereWithAggregatesInput | Prisma.VerificationScalarWhereWithAggregatesInput[]
-  OR?: Prisma.VerificationScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.VerificationScalarWhereWithAggregatesInput | Prisma.VerificationScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Verification"> | string
-  identifier?: Prisma.StringWithAggregatesFilter<"Verification"> | string
-  value?: Prisma.StringWithAggregatesFilter<"Verification"> | string
-  expiresAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string
+  AND?: Prisma.VerificationScalarWhereWithAggregatesInput | Prisma.VerificationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  OR?: Prisma.VerificationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  NOT?: Prisma.VerificationScalarWhereWithAggregatesInput | Prisma.VerificationScalarWhereWithAggregatesInput[] | runtime.Types.Skip
+  id?: Prisma.StringWithAggregatesFilter<"Verification"> | string | runtime.Types.Skip
+  identifier?: Prisma.StringWithAggregatesFilter<"Verification"> | string | runtime.Types.Skip
+  value?: Prisma.StringWithAggregatesFilter<"Verification"> | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Verification"> | Date | string | runtime.Types.Skip
 }
 
 export type VerificationCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   identifier: string
   value: string
   expiresAt: Date | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type VerificationUncheckedCreateInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   identifier: string
   value: string
   expiresAt: Date | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type VerificationUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  identifier?: Prisma.StringFieldUpdateOperationsInput | string
-  value?: Prisma.StringFieldUpdateOperationsInput | string
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  identifier?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  value?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type VerificationUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  identifier?: Prisma.StringFieldUpdateOperationsInput | string
-  value?: Prisma.StringFieldUpdateOperationsInput | string
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  identifier?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  value?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type VerificationCreateManyInput = {
-  id?: string
+  id?: string | runtime.Types.Skip
   identifier: string
   value: string
   expiresAt: Date | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
+  createdAt?: Date | string | runtime.Types.Skip
+  updatedAt?: Date | string | runtime.Types.Skip
 }
 
 export type VerificationUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  identifier?: Prisma.StringFieldUpdateOperationsInput | string
-  value?: Prisma.StringFieldUpdateOperationsInput | string
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  identifier?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  value?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type VerificationUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  identifier?: Prisma.StringFieldUpdateOperationsInput | string
-  value?: Prisma.StringFieldUpdateOperationsInput | string
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  identifier?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  value?: Prisma.StringFieldUpdateOperationsInput | string | runtime.Types.Skip
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string | runtime.Types.Skip
 }
 
 export type VerificationCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  identifier?: Prisma.SortOrder
-  value?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  identifier?: Prisma.SortOrder | runtime.Types.Skip
+  value?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type VerificationMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  identifier?: Prisma.SortOrder
-  value?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  identifier?: Prisma.SortOrder | runtime.Types.Skip
+  value?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 export type VerificationMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  identifier?: Prisma.SortOrder
-  value?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
+  id?: Prisma.SortOrder | runtime.Types.Skip
+  identifier?: Prisma.SortOrder | runtime.Types.Skip
+  value?: Prisma.SortOrder | runtime.Types.Skip
+  expiresAt?: Prisma.SortOrder | runtime.Types.Skip
+  createdAt?: Prisma.SortOrder | runtime.Types.Skip
+  updatedAt?: Prisma.SortOrder | runtime.Types.Skip
 }
 
 
 
 export type VerificationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  identifier?: boolean
-  value?: boolean
-  expiresAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  identifier?: boolean | runtime.Types.Skip
+  value?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }, ExtArgs["result"]["verification"]>
 
 export type VerificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  identifier?: boolean
-  value?: boolean
-  expiresAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  identifier?: boolean | runtime.Types.Skip
+  value?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }, ExtArgs["result"]["verification"]>
 
 export type VerificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
-  identifier?: boolean
-  value?: boolean
-  expiresAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  identifier?: boolean | runtime.Types.Skip
+  value?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }, ExtArgs["result"]["verification"]>
 
 export type VerificationSelectScalar = {
-  id?: boolean
-  identifier?: boolean
-  value?: boolean
-  expiresAt?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
+  id?: boolean | runtime.Types.Skip
+  identifier?: boolean | runtime.Types.Skip
+  value?: boolean | runtime.Types.Skip
+  expiresAt?: boolean | runtime.Types.Skip
+  createdAt?: boolean | runtime.Types.Skip
+  updatedAt?: boolean | runtime.Types.Skip
 }
 
-export type VerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "identifier" | "value" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["verification"]>
+export type VerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "identifier" | "value" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["verification"], runtime.Types.Skip>
 
 export type $VerificationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Verification"
@@ -384,7 +384,7 @@ export type $VerificationPayload<ExtArgs extends runtime.Types.Extensions.Intern
 export type VerificationGetPayload<S extends boolean | null | undefined | VerificationDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$VerificationPayload, S>
 
 export type VerificationCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<VerificationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<VerificationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: VerificationCountAggregateInputType | true
   }
 
@@ -826,6 +826,7 @@ export type VerificationFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Verification to fetch.
    */
   where: Prisma.VerificationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -844,6 +845,7 @@ export type VerificationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which Verification to fetch.
    */
   where: Prisma.VerificationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -861,37 +863,38 @@ export type VerificationFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * Filter, which Verification to fetch.
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Verifications to fetch.
    */
-  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[]
+  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Verifications.
    */
-  cursor?: Prisma.VerificationWhereUniqueInput
+  cursor?: Prisma.VerificationWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Verifications from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Verifications.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Verifications.
    */
-  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[]
+  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -909,37 +912,38 @@ export type VerificationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
   /**
    * Filter, which Verification to fetch.
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Verifications to fetch.
    */
-  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[]
+  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for searching for Verifications.
    */
-  cursor?: Prisma.VerificationWhereUniqueInput
+  cursor?: Prisma.VerificationWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Verifications from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Verifications.
    */
-  skip?: number
+  skip?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
    * Filter by unique combinations of Verifications.
    */
-  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[]
+  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -957,32 +961,33 @@ export type VerificationFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * Filter, which Verifications to fetch.
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
    * Determine the order of Verifications to fetch.
    */
-  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[]
+  orderBy?: Prisma.VerificationOrderByWithRelationInput | Prisma.VerificationOrderByWithRelationInput[] | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the position for listing Verifications.
    */
-  cursor?: Prisma.VerificationWhereUniqueInput
+  cursor?: Prisma.VerificationWhereUniqueInput | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Take `±n` Verifications from the position of the cursor.
    */
-  take?: number
+  take?: number | runtime.Types.Skip
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
    * Skip the first `n` Verifications.
    */
-  skip?: number
-  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[]
+  skip?: number | runtime.Types.Skip
+  distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[] | runtime.Types.Skip
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1001,6 +1006,7 @@ export type VerificationCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data needed to create a Verification.
    */
   data: Prisma.XOR<Prisma.VerificationCreateInput, Prisma.VerificationUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1011,7 +1017,7 @@ export type VerificationCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many Verifications.
    */
   data: Prisma.VerificationCreateManyInput | Prisma.VerificationCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -1030,7 +1036,7 @@ export type VerificationCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many Verifications.
    */
   data: Prisma.VerificationCreateManyInput | Prisma.VerificationCreateManyInput[]
-  skipDuplicates?: boolean
+  skipDuplicates?: boolean | runtime.Types.Skip
 }
 
 /**
@@ -1053,6 +1059,7 @@ export type VerificationUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which Verification to update.
    */
   where: Prisma.VerificationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1066,11 +1073,11 @@ export type VerificationUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter which Verifications to update
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * Limit how many Verifications to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -1092,11 +1099,11 @@ export type VerificationUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
   /**
    * Filter which Verifications to update
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * Limit how many Verifications to update.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
@@ -1123,6 +1130,7 @@ export type VerificationUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * In case the Verification was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.VerificationUpdateInput, Prisma.VerificationUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1141,6 +1149,7 @@ export type VerificationDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter which Verification to delete.
    */
   where: Prisma.VerificationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy | runtime.Types.Skip
 }
 
 /**
@@ -1150,11 +1159,11 @@ export type VerificationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * Filter which Verifications to delete
    */
-  where?: Prisma.VerificationWhereInput
+  where?: Prisma.VerificationWhereInput | runtime.Types.Skip
   /**
    * Limit how many Verifications to delete.
    */
-  limit?: number
+  limit?: number | runtime.Types.Skip
 }
 
 /**
