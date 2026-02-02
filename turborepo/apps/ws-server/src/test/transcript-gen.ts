@@ -1,7 +1,14 @@
 import { Fs, UnwrapPromise } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
+import { Client } from "pg";
 import type { $Enums } from "@slipstream/db/node/generated/client";
-import type { AllModelsUnion } from "@slipstream/types";
+import type {
+  AllModelsUnion,
+  AttachmentSingleton,
+  ConversationSingleton,
+  ImageGenJobSingleton,
+  MessageSingleton
+} from "@slipstream/types";
 
 dotenv.config({ quiet: true });
 
@@ -47,53 +54,133 @@ class ScriptGen extends Fs {
     } else return String(err);
   }
 
-  private data = async (env: "dev" | "prod", id: string) => {
-    const { PrismaDbService } = await import("@slipstream/db/factory");
-    const datasourceUrl = await this.resolveDbUrl(env);
-    const prismaClient = new PrismaDbService({
-      connectionString: datasourceUrl
-    }).p(false);
+  private async getRawData(
+    connectionString: string,
+    env: "dev" | "prod",
+    id: string
+  ) {
+    const client = new Client({
+      connectionString,
+      connectionTimeoutMillis: 30000
+    });
+    await client.connect();
     try {
-      prismaClient.$connect();
-      const data = await prismaClient.conversation.findUniqueOrThrow({
-        where: { id: id },
-        include: {
-          messages: {
-            orderBy: { createdAt: "asc" },
-            include: {
-              imageGenJob: true,
-              attachments: {
-                where: {
-                  OR: [
-                    { origin: { not: "GENERATED" } },
-                    {
-                      AND: [
-                        { origin: "GENERATED" },
-                        { imageGenOutput: { kind: "FINAL" } }
-                      ]
-                    }
-                  ]
-                },
-                orderBy: { createdAt: "asc" },
-                include: {
-                  image: true,
-                  document: true,
-                  imageGenOutput: true
-                }
-              }
-            }
-          }
+      const convResult = await client.query<ConversationSingleton<true>>(
+        `SELECT * FROM "Conversation" WHERE "id" = $1 LIMIT 1`,
+        [id]
+      );
+      const conversation = convResult.rows?.[0];
+
+      if (!conversation) {
+        throw new Error(
+          `No Conversation found with id: ${id} targeting the ${env} environment`
+        );
+      }
+
+      const messagesResult = await client.query<
+        MessageSingleton<true> & { imageGenJob: ImageGenJobSingleton<true> }
+      >(
+        `
+  SELECT
+    m.*,
+    row_to_json(igj.*) AS "imageGenJob"
+  FROM "Message" m
+  LEFT JOIN "ImageGenJob" igj ON igj."requestMessageId" = m."id"
+  WHERE m."conversationId" = $1
+  ORDER BY m."createdAt" ASC
+    `,
+        [id]
+      );
+
+      console.log(messagesResult.rows.length);
+
+      const msgIds = messagesResult.rows.map(i => i.id);
+
+      const attachmentsResult = await client.query<AttachmentSingleton<true>>(
+        `
+    SELECT
+      a.*,
+      row_to_json(img.*) AS "image",
+      row_to_json(doc.*) AS "document",
+      row_to_json(igo.*) AS "imageGenOutput"
+    FROM "Attachment" a
+    LEFT JOIN "ImageMetadata"   img ON img."attachmentId" = a."id"
+    LEFT JOIN "DocumentMetadata" doc ON doc."attachmentId" = a."id"
+    LEFT JOIN "ImageGenOutput"  igo ON igo."attachmentId" = a."id"
+    WHERE a."messageId" = ANY($1::text[])
+      AND (
+        a."origin" != 'GENERATED'
+        OR (a."origin" = 'GENERATED' AND igo."kind" = 'FINAL')
+      )
+    ORDER BY a."createdAt" ASC
+    `,
+        [msgIds]
+      );
+
+      const attachmentsByMessageId = new Map<
+        string,
+        typeof attachmentsResult.rows
+      >();
+
+      for (const att of attachmentsResult.rows) {
+        if (!att.messageId) continue;
+        const bucket = attachmentsByMessageId.get(att.messageId);
+        if (bucket) {
+          bucket.push(att);
+        } else {
+          attachmentsByMessageId.set(att.messageId, [att]);
         }
-      });
-      const { messages, ...rest } = data;
-      const cleanS = messages.map(t => {
-        const { attachments, ...rest } = t;
-        const cleanAttachments = attachments.map(v => {
+      }
+
+      // 5) Assemble hydrated messages
+      const messages = messagesResult.rows.map(
+        ({ imageGenJob, ...msgRest }) => {
+          const rawAttachments = attachmentsByMessageId.get(msgRest.id) ?? [];
+
+          const attachments = rawAttachments.map(
+            ({ image, document, imageGenOutput, ...attRest }) => ({
+              ...attRest,
+              size: Number(attRest.size ?? 0),
+              // row_to_json of an all-NULL join row gives {"attachmentId":null,...}
+              // normalise to null when the PK field is null
+              image: image?.attachmentId ? image : null,
+              document: document?.attachmentId ? document : null,
+              imageGenOutput: imageGenOutput?.id ? imageGenOutput : null
+            })
+          );
+
+          return {
+            ...msgRest,
+            imageGenJob: imageGenJob?.id ? imageGenJob : null,
+            attachments
+          };
+        }
+      );
+      return {
+        ...conversation,
+        conversationSettings: null,
+        messages
+      } satisfies ConversationSingleton<true>;
+    } catch {
+      //
+    } finally {
+      await client.end();
+    }
+  }
+
+  private data = async (env: "dev" | "prod", id: string) => {
+    const datasourceUrl = await this.resolveDbUrl(env);
+    try {
+      const c = await this.getRawData(datasourceUrl, env, id);
+      if (!c?.messages) throw new Error("invalid messages");
+      const cleanS = c?.messages.map(t => {
+        const cleanAttachments = t.attachments.map(v => {
           return { ...v, size: Number(v.size ?? 0) };
         });
-        return { ...rest, attachments: cleanAttachments };
+        return { ...t, attachments: cleanAttachments };
       });
-      const cleanedData = { messages: cleanS, ...rest };
+
+      const cleanedData = { ...c, messages: cleanS };
 
       const slug = this.toSlug(cleanedData.title ?? "");
 
@@ -102,21 +189,19 @@ class ScriptGen extends Fs {
         JSON.stringify(cleanedData, null, 2)
       );
 
-      return { messages: cleanS, ...rest };
+      return { ...c, messages: cleanS };
     } catch (err) {
       console.error(this.safeErrMsg(err));
-    } finally {
-      prismaClient.$disconnect();
     }
   };
 
   private async resolveDbUrl(target: "dev" | "prod") {
-    if (target === "dev" && process.env.DIRECT_URL) {
-      return process.env.DIRECT_URL;
+    if (target === "dev" && process.env.DATABASE_URL) {
+      return process.env.DATABASE_URL;
     } else {
       const { Credentials } = await import("@slipstream/credentials");
       const cred = new Credentials();
-      return await cred.get("DIRECT_URL");
+      return await cred.get("DATABASE_URL");
     }
   }
 

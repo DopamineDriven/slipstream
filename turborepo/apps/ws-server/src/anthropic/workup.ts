@@ -2,7 +2,6 @@ import { createReadStream } from "node:fs";
 import type {
   AnthropicFileRecord,
   MessageInputParams,
-  PdfBudgetEntry,
   RequestOptions
 } from "@/anthropic/types.ts";
 import type { Logger as PinoLogger } from "pino";
@@ -16,7 +15,6 @@ import type {
 } from "@slipstream/types";
 
 export class AnthropicWorkup {
-  private readonly ANTHROPIC_PAGE_BUDGET = 95;
   protected defaultClient: Anthropic;
   protected logger: PinoLogger;
   private assetCache = new Map<
@@ -50,71 +48,7 @@ export class AnthropicWorkup {
     }
     return client;
   }
-  private allocatePdfBudget(
-    msgs: MessageSingleton<true>[]
-  ): Map<string, PdfBudgetEntry> {
-    const pdfEntries: PdfBudgetEntry[] = [];
 
-    msgs.forEach((msg, turnIndex) => {
-      if (!msg.attachments) return;
-
-      for (const att of msg.attachments) {
-        const mime = att.compatStatus === "ACTIVE" ? att.compatMime : att.mime;
-        const url =
-          att.compatStatus === "ACTIVE" ? att.compatCdnUrl : att.cdnUrl;
-
-        if (mime === "application/pdf" && url) {
-          pdfEntries.push({
-            attachmentId: att.id,
-            pageCount: att.document?.pageCount ?? 10, // Fallback shouldn't hit
-            filename: att.filename ?? "document.pdf",
-            url,
-            turnIndex,
-            included: false
-          });
-        }
-      }
-    });
-
-    // Most recent first
-    pdfEntries.sort((a, b) => b.turnIndex - a.turnIndex);
-
-    // Allocate budget
-    let remaining = this.ANTHROPIC_PAGE_BUDGET;
-
-    for (const entry of pdfEntries) {
-      if (entry.pageCount <= remaining) {
-        entry.included = true;
-        remaining -= entry.pageCount;
-      }
-    }
-
-    this.logBudgetAllocation(pdfEntries);
-
-    return new Map(pdfEntries.map(e => [e.attachmentId, e]));
-  }
-  private logBudgetAllocation(entries: PdfBudgetEntry[]): void {
-    const included = entries.filter(e => e.included);
-    const excluded = entries.filter(e => !e.included);
-
-    this.logger.info(
-      {
-        totalPdfs: entries.length,
-        included: included.map(e => `${e.filename} (${e.pageCount}p)`),
-        excluded: excluded.map(e => `${e.filename} (${e.pageCount}p)`),
-        budgetUsed: `${included.reduce((s, e) => s + e.pageCount, 0)}/${this.ANTHROPIC_PAGE_BUDGET}`
-      },
-      "PDF budget allocation"
-    );
-  }
-  private createPdfReferenceBlock(
-    entry: PdfBudgetEntry
-  ): Anthropic.Beta.BetaTextBlockParam {
-    return {
-      type: "text",
-      text: `[Document: "${entry.filename}" (${entry.pageCount} pages) - ${entry.url}]`
-    };
-  }
   private handleBetaHeaders(model: AnthropicModelIdUnion) {
     switch (model) {
       // effort parameter is only supported by claude-opus-4.5
@@ -734,408 +668,6 @@ export class AnthropicWorkup {
     }
   }
 
-  private async _formatAnthropicHistoryWithFiles(
-    isNewChat: boolean,
-    msgs: MessageSingleton<true>[],
-    model: AnthropicModelIdUnion,
-    systemPrompt?: string,
-    keyFingerprint = "server",
-    keyId?: string,
-    apiKey?: string
-  ) {
-    const pdfBudget = this.allocatePdfBudget(msgs);
-    if (!isNewChat) {
-      const messages = await Promise.all(
-        msgs.map(async msg => {
-          if (msg.senderType === "USER") {
-            let i = 0;
-
-            const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
-            try {
-              if (msg.attachments && msg.attachments.length > 0) {
-                for (const attachment of msg.attachments) {
-                  const {
-                    cdnUrl,
-                    mime: ogMime,
-                    compatStatus,
-                    compatCdnUrl,
-                    compatMime
-                  } = attachment;
-                  const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
-                  const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-
-                  if (url && mime) {
-                    if (
-                      attachment.assetType === "DOCUMENT" &&
-                      mime === "application/pdf"
-                    ) {
-                      const budget = pdfBudget.get(attachment.id);
-                      if (budget?.included) {
-                        try {
-                          const fileId =
-                            await this.ensureAnthropicAssetUploaded(
-                              attachment,
-                              model,
-                              keyFingerprint,
-                              msg.userKeyId ?? undefined,
-                              apiKey
-                            );
-                          // anthropic allows for a max of 4 blocks to have a cache_control header set else the request errors
-                          if (i < 4) {
-                            i++;
-                            const docBlock = {
-                              type: "document",
-                              source: { file_id: fileId, type: "file" },
-                              citations: { enabled: true },
-                              cache_control: { type: "ephemeral", ttl: "1h" }
-                            } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                            content.push(docBlock);
-                          }
-                          const docBlock = {
-                            type: "document",
-                            citations: { enabled: true },
-                            source: { file_id: fileId, type: "file" }
-                          } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                          content.push(docBlock);
-                        } catch {
-                          if (budget)
-                            content.push(this.createPdfReferenceBlock(budget));
-                        }
-                      } else if (budget) {
-                        content.push(this.createPdfReferenceBlock(budget));
-                      }
-                    } else if (mime === "text/plain") {
-                      try {
-                        const fileId = await this.ensureAnthropicAssetUploaded(
-                          attachment,
-                          model,
-                          keyFingerprint,
-                          msg.userKeyId ?? undefined,
-                          apiKey
-                        );
-                        content.push({
-                          type: "document",
-                          source: { file_id: fileId, type: "file" },
-                          citations: { enabled: true }
-                        });
-                      } catch {
-                        content.push({
-                          type: "document",
-                          citations: { enabled: true },
-                          source: { type: "url", url }
-                        });
-                      }
-                    } else if (attachment.assetType === "IMAGE") {
-                      // Use Files API for images >= 1MB for better performance
-                      const size = attachment.size;
-                      const sizeInMB = size ? size / 1024 / 1024 : 0;
-
-                      if (sizeInMB >= 1) {
-                        try {
-                          const fileId =
-                            await this.ensureAnthropicAssetUploaded(
-                              attachment,
-                              model,
-                              keyFingerprint,
-                              msg.userKeyId ?? undefined,
-                              apiKey
-                            );
-                          // Images uploaded to Files API use file_id source
-                          const imageBlock = {
-                            type: "image",
-                            source: {
-                              type: "file",
-                              file_id: fileId
-                            }
-                          } as const satisfies Anthropic.Beta.BetaImageBlockParam;
-                          content.push(imageBlock);
-                        } catch (err) {
-                          this.logger.warn(
-                            { err, size: sizeInMB },
-                            "Failed to upload large user image to Files API, falling back to URL"
-                          );
-                          // Fallback to URL
-                          const imageBlock = {
-                            type: "image",
-                            source: {
-                              type: "url",
-                              url
-                            }
-                          } as const satisfies Anthropic.Beta.BetaImageBlockParam;
-                          content.push(imageBlock);
-                        }
-                      } else {
-                        // Smaller images use URLs for faster processing
-                        const imageBlock = {
-                          type: "image",
-                          source: {
-                            type: "url",
-                            url
-                          }
-                        } as const satisfies Anthropic.Beta.BetaImageBlockParam;
-                        content.push(imageBlock);
-                      }
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              this.logger.warn({ err }, "error in anthropic history workup");
-            } finally {
-              content.push({
-                type: "text",
-                text: msg.content
-              } as const);
-            }
-
-            return {
-              role: "user",
-              content: content.length > 0 ? content : msg.content
-            } as const satisfies Anthropic.Beta.BetaMessageParam;
-          } else {
-            const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
-
-            try {
-              if (msg.attachments && msg.attachments.length > 0) {
-                for (const attachment of msg.attachments) {
-                  const {
-                    cdnUrl,
-                    mime: ogMime,
-                    compatStatus,
-                    assetType,
-                    compatCdnUrl,
-                    compatMime
-                  } = attachment;
-                  const url = compatStatus === "ACTIVE" ? compatCdnUrl : cdnUrl;
-                  const mime = compatStatus === "ACTIVE" ? compatMime : ogMime;
-                  const size = attachment.size;
-
-                  if (url && mime && size) {
-                    if (
-                      assetType === "DOCUMENT" &&
-                      mime === "application/pdf"
-                    ) {
-                      const budget = pdfBudget.get(attachment.id);
-                      if (budget?.included) {
-                        try {
-                          const fileId =
-                            await this.ensureAnthropicAssetUploaded(
-                              attachment,
-                              model,
-                              keyFingerprint,
-                              msg?.userKeyId ?? undefined,
-                              apiKey
-                            );
-
-                          const docBlock = {
-                            type: "document",
-                            source: { file_id: fileId, type: "file" },
-                            citations: { enabled: true }
-                          } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                          content.push(docBlock);
-                        } catch {
-                          if (budget)
-                            content.push(this.createPdfReferenceBlock(budget));
-                        }
-                      } else if (budget) {
-                        content.push(this.createPdfReferenceBlock(budget));
-                      }
-                    } else if (
-                      assetType === "IMAGE" &&
-                      mime.startsWith("image/")
-                    ) {
-                      // Smaller images use URLs for faster processing
-                      const imageBlock = {
-                        type: "text",
-                        text: `\n\n[seen] ![${attachment.filename}](${url})\n\n`
-                      } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                      content.push(imageBlock);
-                    } else if (mime.includes("application")) {
-                      // Other docs use URLs
-                      const docBlock = {
-                        type: "document",
-                        citations: { enabled: true },
-                        source: {
-                          type: "url",
-                          url
-                        }
-                      } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                      content.push(docBlock);
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              this.logger.warn(
-                { err },
-                "error processing AI attachments in history"
-              );
-            } finally {
-              // Always add the text content with model tags
-              const textContent = `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${msg.content}\n</model>`;
-              content.push({
-                type: "text",
-                text: textContent
-              } as const satisfies Anthropic.Beta.BetaTextBlockParam);
-            }
-
-            return {
-              role: "assistant",
-              content:
-                content.length > 0
-                  ? content
-                  : `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${msg.content}\n</model>`
-            } as const satisfies Anthropic.Beta.BetaMessageParam;
-          }
-        })
-      );
-      const systemNote = `Note: Previous responses may be tagged with their source model for context.
-
-        Attachments marked [seen] have already been reviewed in earlier turns; do not re-fetch or re-extract these unless additional context needs warrant their retrieval.`;
-
-      const enhancedSystemPrompt = systemPrompt
-        ? `${systemPrompt}\n\n${systemNote}`
-        : systemNote;
-
-      return {
-        messages,
-        system: [
-          {
-            type: "text",
-            text: enhancedSystemPrompt
-          }
-        ] as const satisfies Anthropic.Beta.BetaTextBlockParam[]
-      };
-    } else {
-      // new chat means only one message exists period -> the first user message
-      const userMsg = msgs[0];
-      const content = Array.of<Anthropic.Beta.BetaContentBlockParam>();
-
-      if (userMsg) {
-        try {
-          if (userMsg.attachments && userMsg.attachments.length > 0) {
-            let i = 0;
-            for (const attachment of userMsg.attachments) {
-              const {
-                cdnUrl,
-                mime: ogMime,
-                compatCdnUrl,
-                compatMime
-              } = attachment;
-              const url = compatCdnUrl ?? cdnUrl;
-              const mime = compatMime ?? ogMime;
-
-              if (url && mime) {
-                // Use Files API for PDFs only
-                if (mime === "application/pdf" || mime === "text/plain") {
-                  try {
-                    const fileId = await this.ensureAnthropicAssetUploaded(
-                      attachment,
-                      model,
-                      keyFingerprint,
-                      keyId,
-                      apiKey
-                    );
-                    // anthropic allows for a max of 4 blocks to have a cache_control header set else the request errors
-                    if (i < 4) {
-                      i++;
-                      const docBlock = {
-                        type: "document",
-                        source: {
-                          type: "file",
-                          file_id: fileId
-                        },
-                        cache_control: { type: "ephemeral", ttl: "1h" }
-                      } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                      content.push(docBlock);
-                    }
-                    const docBlock = {
-                      type: "document",
-                      source: {
-                        type: "file",
-                        file_id: fileId
-                      }
-                    } as const satisfies Anthropic.Beta.BetaRequestDocumentBlock;
-                    content.push(docBlock);
-                  } catch (err) {
-                    this.logger.warn(
-                      { err },
-                      "Failed to upload PDF to Files API, falling back to URL"
-                    );
-                    // Fallback to URL
-                    const docBlock = {
-                      type: "document",
-                      citations: { enabled: true },
-                      source: {
-                        type: "url",
-                        url
-                      }
-                    } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                    content.push(docBlock);
-                  }
-                } else if (mime.startsWith("image/")) {
-                  // Images use URLs
-                  const imageBlock = {
-                    type: "image",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                  content.push(imageBlock);
-                } else if (mime.includes("application")) {
-                  // Other docs use URLs
-                  const docBlock = {
-                    type: "document",
-                    source: {
-                      type: "url",
-                      url
-                    }
-                  } as const satisfies Anthropic.Beta.BetaContentBlockParam;
-                  content.push(docBlock);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          this.logger.warn(
-            { err },
-            "error in new chat anthropic history workup"
-          );
-        } finally {
-          content.push({
-            type: "text",
-            text: userMsg.content
-          } as const satisfies Anthropic.Beta.BetaTextBlockParam);
-        }
-      }
-
-      // never pass the already database persisted user prompt
-      const messages = [
-        {
-          role: "user",
-          content: content.length >= 1 ? content : "no user message found"
-        }
-      ] as const satisfies Anthropic.Beta.BetaMessageParam[];
-
-      if (systemPrompt) {
-        return {
-          messages,
-          system: [
-            {
-              type: "text",
-              text: systemPrompt
-            }
-          ] as const satisfies Anthropic.Beta.BetaTextBlockParam[]
-        };
-      } else {
-        return {
-          messages,
-          system: undefined
-        };
-      }
-    }
-  }
   protected async formatAnthropicHistoryWithFiles(
     isNewChat: boolean,
     msgs: MessageSingleton<true>[],
@@ -1244,8 +776,8 @@ export class AnthropicWorkup {
 
         messages.push({ role: "user", content });
       } else {
-        const textParts: string[] = [];
-
+        const textParts = Array.of<string>();
+        textParts.push(msg.content);
         if (msg.attachments && msg.attachments.length > 0) {
           for (const attachment of msg.attachments) {
             const url =
@@ -1258,24 +790,31 @@ export class AnthropicWorkup {
             const filename = attachment.filename ?? "attachment";
 
             if (attachment.assetType === "IMAGE") {
-              textParts.push(`[seen] ![${filename}](${url})`);
+              if (isFreshContext) {
+                textParts.push(`![${filename}](${url})`);
+              } else {
+                textParts.push(`[seen] ![${filename}](${url})`);
+              }
             } else {
-              textParts.push(`[seen] [${filename}](${url})`);
+              if (isFreshContext) {
+                textParts.push(`[${filename}][${url}]`);
+              } else {
+                textParts.push(`[seen] [${filename}](${url})`);
+              }
             }
           }
         }
 
-        textParts.push(
-          `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${msg.content}\n</model>`
-        );
-
-        messages.push({ role: "assistant", content: textParts.join("\n\n") });
+        messages.push({
+          role: "assistant",
+          content: `<model provider="${msg.provider.toLowerCase()}" name="${msg.model}">\n${textParts.join("\n\n")}\n</model>`
+        });
       }
     }
 
-    const systemNote = `Note: Previous responses may be tagged with their source model for context.
+    const systemNote = `Note: Previous responses may be tagged with their source provider-model combo for context.
 
-        Attachments marked [seen] have already been reviewed in earlier turns; do not re-fetch or re-extract these unless additional context needs warrant their retrieval.`;
+        Attachments marked [seen] have already been reviewed in earlier turns; re-fetch or re-extract previously seen assets as warranted (as context needs arise).`;
 
     const enhancedSystemPrompt = systemPrompt
       ? `${systemPrompt}\n\n${systemNote}`

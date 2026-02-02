@@ -1,5 +1,4 @@
 import type { Voyage } from "@/voyage/types.ts";
-import { Fs } from "@d0paminedriven/fs";
 import * as dotenv from "dotenv";
 
 dotenv.config({ quiet: true });
@@ -251,62 +250,62 @@ tokenize_result = main()
   }
 }
 
-if (process.argv[3] === "exe") {
-  const fs = new Fs(process.cwd());
-  const apiKey = process.env.VOYAGE_API_KEY ?? "";
-  const voyage = new VoyageEmbeddingService(apiKey);
-  (async () => {
-    const paths = [
-      "src/test/__out__/condensed/Geminastics-Pt-I.md",
-      "src/test/__out__/condensed/Geminastics-Pt-II.md",
-      "src/test/__out__/condensed/Geminastics-Pt-III.md"
-    ] as const;
-    const docArr = Array.of<readonly string[]>();
-    const anotherOne = Array.of<string>();
-    for (const p of paths.entries()) {
-      const content = fs.fileToBuffer(p[1]).toString("utf-8");
-      if (p[0] === 0) docArr.push([content]);
-      else if (p[0] === 1) anotherOne.push(content);
-      else if (p[0] === 2) anotherOne.push(content);
-      else continue;
-    }
+// if (process.argv[3] === "exe") {
+//   const fs = new Fs(process.cwd());
+//   const apiKey = process.env.VOYAGE_API_KEY ?? "";
+//   const voyage = new VoyageEmbeddingService(apiKey);
+//   (async () => {
+//     const paths = [
+//       "src/test/__out__/condensed/Geminastics-Pt-I.md",
+//       "src/test/__out__/condensed/Geminastics-Pt-II.md",
+//       "src/test/__out__/condensed/Geminastics-Pt-III.md"
+//     ] as const;
+//     const docArr = Array.of<readonly string[]>();
+//     const anotherOne = Array.of<string>();
+//     for (const p of paths.entries()) {
+//       const content = fs.fileToBuffer(p[1]).toString("utf-8");
+//       if (p[0] === 0) docArr.push([content]);
+//       else if (p[0] === 1) anotherOne.push(content);
+//       else if (p[0] === 2) anotherOne.push(content);
+//       else continue;
+//     }
 
-    docArr.push(anotherOne);
-    return await voyage.embedChunksContextual({
-      inputs: docArr,
-      input_type: "document",
-      model: "voyage-context-3"
-    });
-  })()
-    .then(r => {
-      const toJson = JSON.stringify(r);
-      console.log(r.usage);
-      fs.withWs(
-        "src/test/__out__/voyage/contextualized/testing-4.json",
-        toJson
-      );
-    })
-    .finally(() => {});
-}
-/**
- * ephemeral code below for a quick exe demo
- */
+//     docArr.push(anotherOne);
+//     return await voyage.embedChunksContextual({
+//       inputs: docArr,
+//       input_type: "document",
+//       model: "voyage-context-3"
+//     });
+//   })()
+//     .then(r => {
+//       const toJson = JSON.stringify(r);
+//       console.log(r.usage);
+//       fs.withWs(
+//         "src/test/__out__/voyage/contextualized/testing-4.json",
+//         toJson
+//       );
+//     })
+//     .finally(() => {});
+// }
+// /**
+//  * ephemeral code below for a quick exe demo
+//  */
 
-// const apiKey = process.env.VOYAGE_API_KEY ?? "";
-// const voyage = new VoyageEmbeddingService(apiKey);
+// // const apiKey = process.env.VOYAGE_API_KEY ?? "";
+// // const voyage = new VoyageEmbeddingService(apiKey);
 
-async function _countBulk() {
-  const apiKey = process.env.VOYAGE_API_KEY ?? "";
-  const voyage = new VoyageEmbeddingService(apiKey);
-  const fs = new Fs(process.cwd());
-  const paths = ["I"] as const;
-  const fileParsed = (section: "I" | "II" | "III") =>
-    fs
-      .fileToBuffer(`src/test/__out__/condensed/Geminastics-Pt-${section}.md`)
-      .toString("utf-8");
+// async function _countBulk() {
+//   const apiKey = process.env.VOYAGE_API_KEY ?? "";
+//   const voyage = new VoyageEmbeddingService(apiKey);
+//   const fs = new Fs(process.cwd());
+//   const paths = ["I"] as const;
+//   const fileParsed = (section: "I" | "II" | "III") =>
+//     fs
+//       .fileToBuffer(`src/test/__out__/condensed/Geminastics-Pt-${section}.md`)
+//       .toString("utf-8");
 
-  const data = paths.map(t => fileParsed(t));
-  // JSON.stringify(data.map((t) => ({inputs: [t] as const}))).replace("[", "").replace("]", "").split(/},/gm).join("}\n")
+//   const data = paths.map(t => fileParsed(t));
+//   // JSON.stringify(data.map((t) => ({inputs: [t] as const}))).replace("[", "").replace("]", "").split(/},/gm).join("}\n")
 
-  return await voyage.countTokens(data, "voyage-context-3");
-}
+//   return await voyage.countTokens(data, "voyage-context-3");
+// }

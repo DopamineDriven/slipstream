@@ -123,6 +123,7 @@
     "@aws-sdk/types": "catalog:aws",
     "@d0paminedriven/fs": "catalog:dd",
     "@d0paminedriven/metadata": "catalog:dd",
+    "@d0paminedriven/pdfdown": "catalog:dd",
     "@google/genai": "^1.38.0",
     "@napi-rs/canvas": "^0.1.89",
     "@modelcontextprotocol/sdk": "^1.25.3",
@@ -135,6 +136,7 @@
     "@slipstream/storage-s3": "workspace:*",
     "@slipstream/types": "workspace:*",
     "@types/node": "catalog:node",
+    "@types/pg": "catalog:pg",
     "@types/ws": "catalog:ws",
     "@typescript/native-preview": "catalog:tsgo",
     "bullmq": "^5.67.2",
@@ -146,6 +148,7 @@
     "node-html-parser": "^7.0.2",
     "openai": "^6.17.0",
     "p-limit": "^7.2.0",
+    "pg": "catalog:pg",
     "pino": "catalog:pino",
     "pino-abstract-transport": "catalog:pino",
     "pino-pretty": "catalog:pino",
@@ -155,7 +158,6 @@
     "tiktoken": "^1.0.22",
     "tslib": "catalog:tslib",
     "typescript": "catalog:ts",
-    "unpdf": "^1.4.0",
     "ws": "catalog:ws"
   },
   "devDependencies": {
