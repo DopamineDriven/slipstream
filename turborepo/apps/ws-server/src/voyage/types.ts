@@ -19,9 +19,10 @@ export namespace Voyage {
       script: string,
       globals: object
     ) => Promise<V>;
-    export type BuiltIns = PromiseLike<{
+    export type BuiltIns = Promise<{
       tokenize_result: Promise<Tokenize.Result>;
-      count_usage_result: Promise<CountUsage.Result>;
+      raw_usage: Promise<CountUsage.Result>;
+      count_usage_result: Promise<{raw_usage: CountUsage.Result['usages'][number]}>;
     }>;
   }
   export interface PyBuiltIns {

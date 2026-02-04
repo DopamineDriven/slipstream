@@ -10,9 +10,15 @@ import { AnthropicVectorStoreWorkup } from "@/anthropic/vector-store.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { VoyageEmbeddingService } from "@/voyage/index.ts";
-import type { AnthropicModelIdUnion, EventTypeMap,UnionToRecord } from "@slipstream/types";
+import type {
+  AnthropicModelIdUnion,
+  EventTypeMap,
+  UnionToRecord
+} from "@slipstream/types";
 import { EnhancedRedisPubSub } from "@slipstream/redis-service";
-type BetaRawMessageStreamRecord = UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
+
+export type BetaRawMessageStreamRecord =
+  UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
 export class AnthropicService extends AnthropicVectorStoreWorkup {
   constructor(
     logger: LoggerService,
