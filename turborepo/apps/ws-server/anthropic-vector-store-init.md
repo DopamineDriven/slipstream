@@ -2,35 +2,54 @@
 
 ## Overview
 
-Integrate the local vector store schema (`LocalVectorStore` / `LocalVectorStoreDoc` / `LocalVectorStoreDocChunk`) with Anthropic models using Voyage `voyage-multimodal-3.5` for embeddings. This creates a custom `file_search` tool that Anthropic models invoke during generation via the standard tool_use flow, enabling semantic search over user-uploaded documents stored locally in pgvector.
+Integrate the local vector store schema (`LocalVectorStore` / `LocalVectorStoreDoc` / `LocalVectorStoreDocChunk`) with Anthropic models using Voyage `voyage-multimodal-3.5` for embeddings and `@d0paminedriven/pdfdown` for PDF extraction. Creates a custom `file_search` tool that Anthropic models invoke via standard tool_use flow for semantic search over user documents stored in pgvector.
 
 ## Architecture
 
-Unlike Grok (xAI remote collections) and Gemini (Google FSS), the Anthropic integration uses a **local** pgvector store. The embedding pipeline:
+### Embedding Pipeline
 
-1. **Index**: Attachment CDN -> tmp file -> text extraction via `ExtractService` -> 1024-token chunking -> batch Voyage multimodal-3.5 embedding -> pgvector insert via typed SQL
-2. **Search (tool_use)**: Model invokes `file_search` tool -> stream pauses at `stop_reason: "tool_use"` -> query embedded via Voyage -> cosine similarity via `searchLocalDocChunksByStore.sql` -> results returned as `tool_result` -> model continues generating with context
+```
+Attachment CDN
+  → fetchRemoteToTmp() downloads PDF to /tmp
+  → PdfDown(buffer).documentAsync() extracts { text[], images[], annotations[], metadata }
+  → Page-aware multimodal chunking:
+      - Group pages into chunks targeting ~1024 text tokens per chunk
+      - For each chunk, build a Voyage Multimodal.Input.Contents<"base64"> with:
+        • { type: "text", text: concatenated page text }
+        • { type: "image_base64", image_base64: "data:image/png;base64,..." } for each extracted image
+      - Respect per-input 32K token limit (560px = 1 image token)
+  → Batch embed via voyage.embedChunksMultimodal("base64", { inputs, model: "voyage-multimodal-3.5", input_type: "document" })
+  → Insert chunks + vectors via $queryRawTyped(insertLocalDocChunk(...))
+  → Update doc state via $queryRawTyped(updateLocalDocState(...))
+```
 
-### Voyage Multimodal-3.5 Notes
+### Search (Tool Use)
 
-- Model processes text, images, and videos. PDFs are processed as rendered page screenshots (not raw bytes).
-- For now: extract text from PDFs via `ExtractService`, embed as text content. Future: render PDF pages as images for richer visual embedding once the image extraction package is ready.
-- **Chunk size**: 1024 tokens, overlap TBD (256 recommended to match Grok's pattern)
-- **Batching**: Up to 1000 inputs per request, max 320K total tokens. We batch chunks per API call.
-- **Dimension**: 1024 (default)
-- **Input type**: `"document"` for indexing, `"query"` for search
+```
+Model generates → stop_reason: "tool_use" (name: "file_search")
+  → Extract tool_use block(s) from streamed response
+  → Embed query via voyage.embedChunksMultimodal("base64", { inputs: [{ content: [{ type: "text", text: query }] }], input_type: "query" })
+  → $queryRawTyped(searchLocalDocChunksByStore(storeId, embedding, limit, threshold))
+  → Send tool_result back → model continues with context
+```
+
+### Voyage Multimodal-3.5 Constraints
+
+- Per-input: max 32K tokens (560px of image = 1 token, 1120px of video = 1 token)
+- Per-request: max 1000 inputs, max 320K total tokens
+- Dimension: 1024
+- Input types: `"document"` for indexing, `"query"` for search
+- Content types for `"base64"` mode: `text`, `image_base64`, `video_base64`
 
 ### Custom Tool Use Flow (Multi-Turn)
 
-The current streaming handler (`index.ts`) only handles **server tools** (web search, code execution). Custom tool_use requires a multi-turn pattern:
+Current streaming handler only handles **server tools** (web search). Custom tool_use requires:
 
-1. Model generates response with `stop_reason: "tool_use"`
-2. Stream ends — we extract the `tool_use` block(s) from the accumulated response
-3. Execute `searchStore()` for each `file_search` invocation
-4. Send a **new** messages request with the original messages + assistant response + `tool_result` block(s)
-5. Stream the continuation
-
-This mirrors how Grok handles multiple simultaneous tool calls — the model can invoke `file_search` alongside web_search, and we handle all tool results before continuing.
+1. Model generates with `stop_reason: "tool_use"` — stream ends
+2. Extract accumulated `tool_use` block(s) from response
+3. Execute `searchStore()` for each `file_search` invocation (parallel if multiple)
+4. Send new messages request: original messages + assistant response + `tool_result` block(s)
+5. Stream the continuation — repeat if model calls another tool
 
 ---
 
@@ -44,275 +63,253 @@ This mirrors how Grok handles multiple simultaneous tool calls — the model can
 
 | # | Name | Key | Value | Purpose |
 |---|------|-----|-------|---------|
-| 1 | `localDocCache` | `attachmentId` | `{ docId, provenanceId, state }` | Tracks indexed local docs (remote-equivalent) |
+| 1 | `localDocCache` | `attachmentId` | `{ docId, provenanceId, state }` | Indexed local docs |
 | 2 | `localDocDbRegistry` | `attachmentId` | `insertLocalDoc.Result` | DB-side doc records |
 | 3 | `chunkStateCache` | `docId` | `{ chunkCount, tokenCount, state }` | Chunk aggregation state |
 | 4 | `localStoreRegistry` | `userId` | `storeId: string` | User -> local store ID |
-| 5 | `localStoreDbRegistry` | `userId` | `storeId: string` | User -> DB store record (same as #4 since store IS local, kept for pattern parity) |
-| 6 | `assetCache` + `fileRegistry` | inherited | inherited | Anthropic Files API cache from scaffold |
+| 5 | `localStoreDbRegistry` | `userId` | `storeId: string` | User -> DB store record |
+| 6 | `assetCache` + `fileRegistry` | inherited | inherited | Anthropic Files API cache |
 
 **Key Methods:**
 
-```ts
-// Ensure a local vector store exists for the user
-ensureLocalStore(userId: string): Promise<{ storeId: string }>
-```
-- Cache check -> DB query -> create if missing
+#### `ensureLocalStore(userId: string): Promise<{ storeId: string }>`
+- Cache check -> `prisma.findLocalVectorStore(userId, "ANTHROPIC")` -> create if missing
 - `provider: "ANTHROPIC"`, `defaultEmbeddingModel: "voyage-multimodal-3.5"`, `embeddingDim: 1024`
 
-```ts
-// Create/upsert a doc record for an attachment
-ensureDocRecord(
-  attachment: AttachmentSingleton<true>,
-  storeId: string
-): Promise<insertLocalDoc.Result>
-```
+#### `ensureDocRecord(attachment: AttachmentSingleton<true>, storeId: string): Promise<insertLocalDoc.Result>`
 - Cache check -> `$queryRawTyped(insertLocalDoc(...))` with upsert
-- Uses `prisma.toVectorStoreFilename(attachment)` for `provenanceId`
-- `embeddingModel: "voyage-multimodal-3.5"`, `hasVisualMedia: true`
+- `provenanceId` via `prisma.toVectorStoreFilename(attachment)`
+- `embeddingModel: "voyage-multimodal-3.5"`, `hasVisualMedia` based on `pdfDoc.totalImages > 0`
+
+#### `chunkAndEmbed(attachment: AttachmentSingleton<true>, docId: string, storeId: string): Promise<void>`
+
+This is the core method. PdfDown-powered extraction + page-aware multimodal chunking:
 
 ```ts
-// Extract text, chunk, embed, and store in pgvector
-chunkAndEmbed(
-  attachment: AttachmentSingleton<true>,
-  docId: string,
-  storeId: string
-): Promise<void>
-```
-- Download via `prisma.fetchRemoteToTmp("ANTHROPIC", attachment)`
-- Extract text via `prisma.extractor` (PDF -> text)
-- Chunk into 1024-token windows (use tokenizer from `VoyageEmbeddingService.tokenApproximation()` or the tiktoken-based one)
-- Batch embed chunks via `voyage.embedChunksMultimodal("url", { inputs: chunks.map(c => ({ content: [{ type: "text", text: c.text }] })), model: "voyage-multimodal-3.5", input_type: "document" })`
-- Insert each chunk: `$queryRawTyped(insertLocalDocChunk(id, docId, storeId, chunkProvenanceId, ...))`
-  - `chunkProvenanceId` via `prisma.toVectorStoreDocChunkProvenanceId(provenanceId, chunkIndex)`
-  - `contentHash` via `sha256(content + offsets + "v1_0")`
-  - `embedding` as stringified float array `"[0.1, 0.2, ...]"`
-- On success: `$queryRawTyped(updateLocalDocState(docId, "ACTIVE", chunkCount, totalTokens, textLength, imageCount, null))`
-- On error: `$queryRawTyped(updateLocalDocState(docId, "FAILED", ..., errorMsg))`
-- Cleanup: `prisma.cleanupTmpPostupload("ANTHROPIC", ...)`
+const { absTmpPath, tmpUniquename, mime } =
+  await this.prisma.fetchRemoteToTmp("ANTHROPIC", attachment);
+try {
+  // 1. Stream file to buffer (not readFileSync — use createReadStream + async iteration)
+  const rs = createReadStream(absTmpPath);
+  const iterate = rs.iterator() as NodeJS.AsyncIterator<Buffer, undefined, any>;
+  const arr = Array.of<Buffer>();
+  for await (const chunk of iterate) arr.push(chunk);
+  const buf = Buffer.concat(arr);
 
-```ts
-// Semantic search across all active docs in a user's store
-searchStore(
-  userId: string,
-  query: string,
-  limit?: number,
-  threshold?: number
-): Promise<LocalSearchResult[]>
-```
-- Resolve `storeId` from cache
-- Embed query: `voyage.embedChunksMultimodal("url", { inputs: [{ content: [{ type: "text", text: query }] }], model: "voyage-multimodal-3.5", input_type: "query" })`
-- Execute: `$queryRawTyped(searchLocalDocChunksByStore(storeId, embeddingStr, limit ?? 5, threshold ?? 0.3))`
-- Parse results, decode provenance via `prisma.parseFilename(provenanceId)`
+  // 2. Extract via PdfDown (Rust NAPI-RS, runs on libuv thread pool)
+  const { PdfDown } = await import("@d0paminedriven/pdfdown");
+  const pdfDown = new PdfDown(buf);
+  const pdfDoc = await pdfDown.documentAsync();
 
-```ts
-// Top-level orchestrator (fire-and-forget pattern like Grok's ensureXaiAssetUploaded)
-ensureAssetIndexed(
-  attachment: AttachmentSingleton<true>,
-  userId: string
-): Promise<{ docId: string; provenanceId: string }>
-```
-- `ensureLocalStore(userId)` -> `ensureDocRecord(attachment, storeId)` -> fire `chunkAndEmbed(...)` as background void promise
+  // 3. Build page-image index
+  const imagesByPage = new Map<number, PageImage[]>();
+  for (const img of pdfDoc.images) {
+    const existing = imagesByPage.get(img.page);
+    existing ? existing.push(img) : imagesByPage.set(img.page, [img]);
+  }
 
-```ts
-// Full cache reset + DB reconciliation
-syncLocalStoreRegistry(userId: string): Promise<void>
-```
+  // 4. Page-aware chunking
+  //    Walk pdfDoc.text[] sequentially, accumulate pages into chunks
+  //    targeting ~1024 text tokens per chunk
+  //    (use tokenApproximation() for fast estimation)
+  //    For each chunk, collect images from those pages via imagesByPage
+  //    Estimate image tokens: sum(img.width * img.height / (560 * 560)) per image
+  //    If total (text + image) tokens exceeds 32K per-input limit,
+  //      split: text-only chunk, then image-only chunk(s) for oversized pages
+  //    Build Voyage.Multimodal.Input.Contents<"base64">:
+  //    {
+  //      content: [
+  //        { type: "text", text: concatenatedPageText },
+  //        ...images.map(img => ({
+  //          type: "image_base64" as const,
+  //          image_base64: `data:image/png;base64,${img.data.toString("base64")}`
+  //        }))
+  //      ]
+  //    }
 
-### 2. `apps/ws-server/src/anthropic/workup.ts` — Modify
+  // 5. Batch embed: group chunks into batches (320K total tokens / 1000 inputs max)
+  //    const result = await voyage.embedChunksMultimodal("base64", {
+  //      inputs: batchInputs,
+  //      model: "voyage-multimodal-3.5",
+  //      input_type: "document"
+  //    })
 
-**Change**: `AnthropicWorkup` extends `AnthropicVectorStoreWorkup` (instead of standalone).
+  // 6. Insert chunks: for each (chunk, embedding) pair:
+  //    - id: createId() (cuid2)
+  //    - chunkProvenanceId: prisma.toVectorStoreDocChunkProvenanceId(provenanceId, chunkIndex)
+  //    - content: text portion of the chunk (stored for retrieval display)
+  //    - contentHash: sha256(content + startOffset + endOffset + "v1_0")
+  //    - embedding: `[${embedding.join(",")}]` (stringified float array for ::vector cast)
+  //    - tokenCount: estimated tokens for this chunk
+  //    - startOffset / endOffset: first page number, last page number in chunk
+  //    $queryRawTyped(insertLocalDocChunk(...))
 
-**Constructor update**: Add `VoyageEmbeddingService` parameter, pass through to super.
-
-**Add custom file_search tool to `tooling()` method:**
-
-```ts
-private fileSearchTool(): Anthropic.Beta.BetaToolUnion {
-  return {
-    name: "file_search",
-    description: "Search through the user's uploaded documents using semantic similarity. Use this tool when the user asks questions about or references their uploaded files, PDFs, or documents.",
-    input_schema: {
-      type: "object" as const,
-      properties: {
-        query: {
-          type: "string",
-          description: "The semantic search query to find relevant document passages"
-        },
-        max_results: {
-          type: "number",
-          description: "Maximum number of results (1-10, default 5)"
-        }
-      },
-      required: ["query"]
-    }
-  };
+  // 7. Update doc state
+  //    $queryRawTyped(updateLocalDocState(docId, "ACTIVE", chunkCount, totalTokens, extractedTextLength, imageCount, null))
+} catch (err) {
+  // On error: mark doc FAILED
+  // $queryRawTyped(updateLocalDocState(docId, "FAILED", null, null, null, null, this.prisma.safeErrMsg(err)))
+  this.logger.error(this.prisma.safeErrMsg(err));
+  throw new Error(this.prisma.safeErrMsg(err));
+} finally {
+  // Always cleanup tmp file — same pattern as Grok's streamUploadFileWorkup
+  this.prisma.cleanupTmpPostupload("ANTHROPIC", absTmpPath, tmpUniquename);
 }
 ```
 
-**Update `tooling()` to conditionally include `file_search`:**
-- Accept a `hasLocalStore: boolean` param (resolved before call)
-- When `true`, add `this.fileSearchTool()` to the tools array
+**Note on non-PDF documents:** For non-PDF attachments (images, plain text), fall back to simpler paths:
+- Images: single multimodal input with `image_base64` or `image_url`
+- Text files: read content, chunk by tokens, embed as text-only inputs
 
-**Update `formatAnthropicHistoryWithFiles()`:**
-- When processing DOCUMENT attachments in fresh context, also fire `this.ensureAssetIndexed(attachment, userId)` as background void promise (fire-and-forget indexing)
+#### `searchStore(userId: string, query: string, limit?: number, threshold?: number): Promise<LocalSearchResult[]>`
+- Resolve storeId from `localStoreRegistry`
+- Embed query: `voyage.embedChunksMultimodal("base64", { inputs: [{ content: [{ type: "text", text: query }] }], model: "voyage-multimodal-3.5", input_type: "query" })`
+- Execute: `$queryRawTyped(searchLocalDocChunksByStore(storeId, embeddingStr, limit ?? 5, threshold ?? 0.3))`
+- Parse results, decode provenance via `prisma.parseFilename(provenanceId)`
 
-**Add `executeFileSearch()` method:**
+#### `ensureAssetIndexed(attachment: AttachmentSingleton<true>, userId: string): Promise<{ docId: string; provenanceId: string }>`
+- Top-level orchestrator (fire-and-forget, like Grok's `ensureXaiAssetUploaded`)
+- `ensureLocalStore(userId)` -> `ensureDocRecord(attachment, storeId)` -> fire `chunkAndEmbed(...)` as background void promise
+
+#### `syncLocalStoreRegistry(userId: string): Promise<void>`
+- Clear all 6 caches, repopulate from DB, reconcile doc states
+
+#### `fileSearchTool(): Anthropic.Beta.BetaToolUnion`
+Custom tool definition for Anthropic models:
 ```ts
-protected async executeFileSearch(
-  userId: string,
-  input: { query: string; max_results?: number }
-): Promise<string>
+{
+  name: "file_search",
+  description: "Search through the user's uploaded documents using semantic similarity. Use this when the user asks questions about or references their uploaded files, PDFs, or documents.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      query: { type: "string", description: "The semantic search query to find relevant document passages" },
+      max_results: { type: "number", description: "Maximum number of results (1-10, default 5)" }
+    },
+    required: ["query"]
+  }
+}
 ```
-- Calls `this.searchStore(userId, input.query, input.max_results)`
-- Formats results as structured text for the tool_result content
 
-**Add `createStreamWithToolLoop()` method:**
-```ts
-protected async createStreamWithToolLoop(params, options, userId): AsyncGenerator
-```
-- Wraps the standard streaming call in a loop
-- When `stop_reason === "tool_use"`: extracts tool_use blocks, executes them (file_search -> `executeFileSearch()`), builds tool_result messages, sends continuation request
-- When `stop_reason === "end_turn"`: final response, break
-- Yields chunks throughout for the streaming handler to process
+#### `executeFileSearch(userId, input: { query, max_results? }): Promise<string>`
+- Calls `searchStore()`, formats results as structured text for `tool_result`
 
-### 3. `apps/ws-server/src/anthropic/index.ts` — Modify
+#### `createStreamWithToolLoop(params, options, userId): AsyncGenerator`
+- Wraps streaming in a loop
+- When `stop_reason === "tool_use"`: extract tool_use blocks, execute them (file_search -> `executeFileSearch()`), build tool_result messages, send continuation request
+- When `stop_reason === "end_turn"`: break
+- Yields chunks throughout for the streaming handler
 
-**Constructor update**: Accept `VoyageEmbeddingService`, pass to super.
+#### Override `tooling()` from parent
+- Conditionally includes `fileSearchTool()` when user has a local store
 
-**Update `handleAnthropicAiChatRequest()`:**
-- Before creating stream: check `this.localStoreRegistry.has(userId)` or `await prisma.hasLocalVectorStore(userId, "ANTHROPIC")` to determine if file_search tool should be included
-- Replace direct `anthropic.beta.messages.create(params, options)` with the new `createStreamWithToolLoop()` that handles multi-turn tool use
-- Add handling for `tool_use` content blocks in the chunk processing:
-  - Track `tool_use` blocks being streamed (accumulate `input_json_delta` for custom tools)
-  - When the stream stops for tool_use, execute the tools and continue
+#### Override `formatAnthropicHistoryWithFiles()` from parent
+- Adds: fire `ensureAssetIndexed(attachment, userId)` as background void promise when processing DOCUMENT attachments in fresh context
+
+### 2. `apps/ws-server/src/anthropic/workup.ts` — Modify (Base Class)
+
+**Toggle privates to protected**: `assetCache`, `fileRegistry`, and any private methods needed by the vector store child class. Matches Grok pattern where all caches are `protected`.
+
+**Constructor**: Add `VoyageEmbeddingService` param, store as `protected voyage`.
+
+No other structural changes — workup stays focused on its existing concerns (file uploads, formatting, streaming, tooling). Vector store layer adds on top.
+
+### 3. `apps/ws-server/src/anthropic/index.ts` — Modify (LAST STEP)
+
+**IMPORTANT**: Do NOT modify this file until the vector store service is near-complete and type-safe. This keeps the editor clean during development — no cascading red lint/TS errors while we build out the vector store layer.
+
+When ready (near completion):
+- Change `AnthropicService extends AnthropicWorkup` -> `AnthropicService extends AnthropicVectorStoreWorkup`
+- **Constructor**: Accept `VoyageEmbeddingService`, pass to super.
+- **Update `handleAnthropicAiChatRequest()`**:
+  - Check if user has a local store to determine tool inclusion
+  - Use `createStreamWithToolLoop()` instead of direct streaming
+  - Handle `tool_use` content blocks: accumulate `input_json_delta` for custom tools, execute on `content_block_stop`
 
 ### 4. `apps/ws-server/src/prisma/attachment-provider.ts` — Modify
 
 Add local vector store DB methods:
 
 ```ts
-createAnthropicLocalVectorStore(userId: string, storeName: string)
-// -> prisma.localVectorStore.create({ data: { userId, provider: "ANTHROPIC", storeName, defaultEmbeddingModel: "voyage-multimodal-3.5", embeddingDim: 1024 } })
-
-findLocalVectorStore(userId: string, provider: $Enums.Provider)
-// -> prisma.localVectorStore.findUnique({ where: { userId_provider_local: { userId, provider } } })
-
-hasLocalVectorStore(userId: string, provider: $Enums.Provider)
-// -> boolean existence check
-
-findLocalVectorStoreDocs(storeId: string)
-// -> prisma.localVectorStoreDoc.findMany({ where: { storeId, deletedAt: null } })
+createAnthropicLocalVectorStore(userId, storeName)
+findLocalVectorStore(userId, provider)
+hasLocalVectorStore(userId, provider)
+findLocalVectorStoreDocs(storeId)
 ```
 
 ### 5. `apps/ws-server/src/anthropic/types.ts` — Modify
 
-Add types:
-
-```ts
-interface LocalSearchResult {
-  chunkId: string;
-  docId: string;
-  content: string;
-  score: number;
-  chunkIndex: number;
-  tokenCount: number;
-  provenanceId: string;
-  attachmentId: string;
-  conversationId: string;
-  messageId: string;
-  filename: string;
-  mimeType: string;
-  embeddingModel: string;
-}
-
-interface FileSearchToolInput {
-  query: string;
-  max_results?: number;
-}
-
-interface ToolUseAccumulator {
-  id: string;
-  name: string;
-  inputJson: string;
-}
-```
+Add `LocalSearchResult`, `FileSearchToolInput`, `ToolUseAccumulator` interfaces.
 
 ---
 
 ## Typed SQL Usage
-
-All vector operations use `prisma.$queryRawTyped(...)` with generated typed SQL from `@slipstream/db`:
 
 | Operation | SQL Function | When |
 |-----------|-------------|------|
 | Create/upsert doc | `insertLocalDoc(...)` | `ensureDocRecord()` |
 | Insert chunk + embedding | `insertLocalDocChunk(...)` | `chunkAndEmbed()` |
 | Update doc state | `updateLocalDocState(...)` | After chunking completes/fails |
-| Search by store | `searchLocalDocChunksByStore(...)` | `searchStore()` (tool execution) |
+| Search by store | `searchLocalDocChunksByStore(...)` | `searchStore()` |
 | Search single doc | `searchLocalDocChunks(...)` | Future: targeted doc search |
 
-Embedding passed as string `"[0.1, 0.2, ...]"` — SQL casts to `::vector`.
+Embedding passed as string `"[0.1,0.2,...]"` — SQL casts to `::vector`.
 
-## Provenance ID Strategy (lines 1167-1195 of attachment-provider.ts)
+## Provenance ID Strategy (attachment-provider.ts:1167-1195)
 
-Reuse existing methods exactly:
 - `toVectorStoreFilename(att)` -> `${conversationId}-${messageId}-${attachmentId}-${hexFilename}.${ext}`
 - `toVectorStoreDocChunkProvenanceId(provenanceId, chunkIndex)` -> `${provenanceId}#${chunkIndex}`
 - `parseFilename(provenanceId)` -> `{ conversationId, messageId, attachmentId, fileName, extension }`
 
-## Class Hierarchy After Changes
+## Class Hierarchy
 
 ```
-AnthropicVectorStoreWorkup (vector-store.ts)  [EXPANDED from scaffold]
-  - constructor(logger, voyage, prisma, apiKey)
-  - 6 caches
+AnthropicWorkup (workup.ts)  [EXISTING — toggle privates to protected as needed]
+  - protected caches (assetCache, fileRegistry)
+  - file uploads, formatting, streaming, beta headers, tooling
+  - syncFileRegistry(), ensureAnthropicAssetUploaded()
+    ^  extends
+AnthropicVectorStoreWorkup (vector-store.ts)  [EXPANDED]
+  - 6 local store caches (all protected, matching Grok pattern)
+  - PdfDown extraction, page-aware multimodal chunking
   - ensureLocalStore(), ensureDocRecord(), chunkAndEmbed(), searchStore()
   - ensureAssetIndexed(), syncLocalStoreRegistry()
-    ^
-    |  extends
-AnthropicWorkup (workup.ts)  [MODIFIED]
-  - constructor(logger, voyage, prisma, apiKey)  // adds voyage param
   - fileSearchTool(), executeFileSearch(), createStreamWithToolLoop()
-  - tooling() now conditionally includes file_search
-  - formatAnthropicHistoryWithFiles() fires ensureAssetIndexed() in background
-    ^
-    |  extends
-AnthropicService (index.ts)  [MODIFIED]
-  - constructor(logger, voyage, prisma, redis, apiKey)  // adds voyage param
-  - handleAnthropicAiChatRequest() uses createStreamWithToolLoop()
-  - Handles tool_use streaming blocks for file_search
+  - overrides/extends tooling() to conditionally include file_search
+  - overrides/extends formatAnthropicHistoryWithFiles() to fire ensureAssetIndexed()
+    ^  extends
+AnthropicService (index.ts)
+  - handleAnthropicAiChatRequest() uses tool loop
 ```
 
-## Wiring: Where AnthropicService is Instantiated
+**Inheritance direction**: `AnthropicVectorStoreWorkup extends AnthropicWorkup` (mirrors Grok: `GrokCollectionsService extends GrokWorkupService`). Vector store builds ON TOP of the existing workup, gaining access to all protected file upload, formatting, and streaming methods. Private methods in workup toggled to protected as needed — caches too (matching Grok's pattern where all 6 caches are protected).
 
-Two instantiation sites need updating:
+## Wiring
 
-**1. `apps/ws-server/src/index.ts:126`:**
+**`apps/ws-server/src/index.ts:126`:**
 ```ts
-// Before:
-const anthropic = new AnthropicService(logger, prisma, redisInstance, cfg.ANTHROPIC_API_KEY);
-
-// After:
 const voyage = new VoyageEmbeddingService(cfg.VOYAGE_API_KEY ?? "");
 const anthropic = new AnthropicService(logger, voyage, prisma, redisInstance, cfg.ANTHROPIC_API_KEY);
 ```
 
-**2. `apps/ws-server/src/mixins/index.ts:154`:**
+**`apps/ws-server/src/mixins/index.ts:154`:**
 ```ts
-// Same pattern — pass voyage instance through deps or instantiate inline
 new AnthropicService(deps.logger, deps.voyage, deps.prisma, deps.redis, this.#anthropicApiKey ?? "");
 ```
 
-`VOYAGE_API_KEY` is already defined in the credentials service types (`packages/credentials-service/src/types/index.ts:75`). Just needs to be passed through from config/env.
+`VOYAGE_API_KEY` already in credentials service types (`packages/credentials-service/src/types/index.ts:75`).
+
+## Dependencies
+
+- `@d0paminedriven/pdfdown` — already installed (v0.6.0 in node_modules)
+- `@slipstream/db/sql-node` — generated typed SQL (already generated)
+- `@anthropic-ai/sdk` — already a dependency
+- No new packages to install
 
 ## Verification
 
-1. **Type check**: `npx tsc --noEmit` in ws-server
-2. **Manual DB test**: Insert a doc via `insertLocalDoc`, chunks via `insertLocalDocChunk`, search via `searchLocalDocChunksByStore` — verify pgvector round-trip
-3. **Integration**: Upload a PDF in chat with Anthropic model, verify:
-   - `LocalVectorStore` created for user
-   - `LocalVectorStoreDoc` created with correct provenance
-   - `LocalVectorStoreDocChunk` rows with embeddings
-   - Ask a question about the PDF -> model invokes `file_search` -> results returned -> model answers with context
-4. **Multi-tool**: Verify Anthropic model can use `file_search` alongside `web_search` in the same response
+1. **Type check**: `pnpm typecheck` in ws-server
+2. **DB round-trip**: Insert doc via `insertLocalDoc`, chunks via `insertLocalDocChunk`, search via `searchLocalDocChunksByStore` — verify vector similarity works
+3. **PdfDown integration**: Extract a test PDF, verify page text + images, build multimodal inputs, embed, insert, search
+4. **E2E**: Upload a PDF in chat with Anthropic model -> doc gets indexed -> ask question about it -> model invokes `file_search` -> returns answers with context
+5. **Multi-tool**: Verify `file_search` works alongside `web_search` in same response

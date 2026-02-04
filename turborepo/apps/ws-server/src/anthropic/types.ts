@@ -2,6 +2,7 @@ import type { ProviderChatRequestEntity } from "@/types/index.ts";
 import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
 import type { MessageSingleton } from "@slipstream/types";
+import type { searchLocalDocChunksByStore } from "@slipstream/db/sql-node";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -62,3 +63,18 @@ export type CreateMessageStreamRT =
   Stream<Anthropic.Beta.BetaRawMessageStreamEvent> & {
     _request_id?: string | null;
   };
+
+/** Direct alias of the typed SQL search result — includes joined doc fields + computed score */
+export type LocalSearchResult = searchLocalDocChunksByStore.Result;
+
+
+export interface FileSearchToolInput {
+  query: string;
+  max_results?: number;
+}
+
+export interface ToolUseAccumulator {
+  id: string;
+  name: string;
+  inputJson: string;
+}

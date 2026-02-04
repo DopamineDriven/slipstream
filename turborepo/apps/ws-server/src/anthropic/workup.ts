@@ -13,19 +13,21 @@ import type {
   AttachmentSingleton,
   MessageSingleton
 } from "@slipstream/types";
+import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 
 export class AnthropicWorkup {
   protected defaultClient: Anthropic;
   protected logger: PinoLogger;
-  private assetCache = new Map<
+  protected assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
   >();
   // Registry of all Anthropic files with access tracking
-  private fileRegistry = new Map<string, AnthropicFileRecord>();
-  private lastRegistrySync: Date | null = null;
+  protected fileRegistry = new Map<string, AnthropicFileRecord>();
+  protected lastRegistrySync: Date | null = null;
   constructor(
     logger: LoggerService,
+    protected voyage: VoyageEmbeddingService,
     protected prisma: PrismaService,
     protected apiKey: string
   ) {
@@ -49,7 +51,7 @@ export class AnthropicWorkup {
     return client;
   }
 
-  private handleBetaHeaders(model: AnthropicModelIdUnion) {
+  protected handleBetaHeaders(model: AnthropicModelIdUnion) {
     switch (model) {
       // effort parameter is only supported by claude-opus-4.5
       case "claude-opus-4-5-20251101": {
@@ -205,7 +207,7 @@ export class AnthropicWorkup {
     }
   }
 
-  private handleMaxTokensAndThinking(
+  protected handleMaxTokensAndThinking(
     mod: AnthropicModelIdUnion,
     max_tokens?: number
   ) {
@@ -243,7 +245,7 @@ export class AnthropicWorkup {
     } as const satisfies Anthropic.Beta.BetaToolUnion;
   }
 
-  private tooling(
+  protected tooling(
     m: AnthropicModelIdUnion,
     user_location:
       | Anthropic.Beta.Messages.BetaWebSearchTool20250305.UserLocation
@@ -389,7 +391,7 @@ export class AnthropicWorkup {
     return { synced: true, totalFiles, lastSync: this.lastRegistrySync };
   }
 
-  private async markFileAccessed(
+  protected async markFileAccessed(
     fileId: string,
     dbRecordId: string,
     cacheKey: string
@@ -546,7 +548,7 @@ export class AnthropicWorkup {
     }
   }
 
-  private async ensureAnthropicAssetUploaded(
+  protected async ensureAnthropicAssetUploaded(
     attachment: AttachmentSingleton<true>,
     model: AnthropicModelIdUnion,
     keyFingerprint: string,

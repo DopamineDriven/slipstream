@@ -4,25 +4,55 @@ packages:
   - tooling/*
 
 catalogs:
+  auth:
+    better-auth: ^1.4.18
   aws:
-    "@aws-sdk/client-s3": ^3.978.0
-    "@aws-sdk/client-secrets-manager": ^3.978.0
-    "@aws-sdk/credential-providers": ^3.978.0
-    "@aws-sdk/lib-storage": ^3.978.0
-    "@aws-sdk/s3-request-presigner": ^3.978.0
+    "@aws-sdk/client-s3": ^3.982.0
+    "@aws-sdk/client-secrets-manager": ^3.982.0
+    "@aws-sdk/credential-providers": ^3.982.0
+    "@aws-sdk/lib-storage": ^3.982.0
+    "@aws-sdk/s3-request-presigner": ^3.982.0
     "@aws-sdk/types": ^3.973.1
+  babel:
+    babel-plugin-react-compiler: ^1.0.0
+  biome:
+    "@biomejs/biome": ^2.3.14
+  bui:
+    "@base-ui-components/react": ^1.0.0-rc.0
   clsx:
     clsx: ^2.1.1
+  colorjs:
+    "colorjs.io": ^0.6.1
+  cookies:
+    js-cookie: ^3.0.5
+    "@types/js-cookie": ^3.0.6
+  csstype:
+    csstype: ^3.2.3
+  cva:
+    class-variance-authority: ^0.7.1
   dd:
     "@d0paminedriven/fs": ^11.0.0
     "@d0paminedriven/metadata": ^6.0.1
-    "@d0paminedriven/pdfdown": ^0.6.0
+    "@d0paminedriven/pdfdown": ^0.9.1
+  decimal:
+    "decimal.js": ^10.6.0
   dotenv:
     dotenv: ^17.2.3
     dotenv-cli: ^11.0.0
     dotenv-expand: ^12.0.3
   eslint:
+    "@eslint/compat": ^2.0.2
+    "@eslint/js": ^9.39.2
     eslint: ^9.39.2
+    eslint-plugin-import: ^2.32.0
+    eslint-plugin-jsx-a11y: ^6.10.2
+    eslint-plugin-react: ^7.37.5
+    eslint-plugin-react-compiler: 19.1.0-rc.2
+    eslint-plugin-react-hooks: ^7.0.1
+  fflate:
+    fflate: ^0.8.2
+  gtag:
+    "@types/gtag.js": ^0.0.20
   jiti:
     jiti: ^2.6.1
   katex:
@@ -30,12 +60,16 @@ catalogs:
     "@types/katex": ^0.16.8
   lightningcss:
     unplugin-lightningcss: ^0.4.5
+  mdast:
+    "@types/mdast": ^4.0.4
   motion:
-    motion: ^12.29.2
-    motion-dom: ^12.29.2
+    motion: ^12.31.0
+    motion-dom: ^12.30.1
     motion-plus: ^1.5.1
-    motion-plus-dom: ^2.6.1
+    motion-plus-dom: ^2.7.1
     motion-utils: ^12.29.2
+  nanoid:
+    nanoid: ^5.1.6
   next:
     next: ^16.1.6
     next-themes: ^0.4.6
@@ -44,42 +78,91 @@ catalogs:
   node:
     "@types/node": ^25.2.0
   pg:
-    pg: ^8.17.2
+    pg: ^8.18.0
     "@types/pg": ^8.16.0
   pino:
     pino: ^10.3.0
     pino-abstract-transport: ^3.0.0
     pino-pretty: ^13.1.3
+  polyfill:
+    urlpattern-polyfill: ^10.1.0
   prettier:
     prettier: ^3.8.1
+    prettier-plugin-tailwindcss: ^0.7.2
+    "@ianvs/prettier-plugin-sort-imports": ^4.7.0
   prisma:
     prisma: ^7.3.0
     "@prisma/adapter-pg": ^7.3.0
     "@prisma/client": ^7.3.0
     "@prisma/client-runtime-utils": ^7.3.0
     "@prisma/extension-accelerate": ^3.0.1
+  radix:
+    "@radix-ui/react-accordion": ^1.2.12
+    "@radix-ui/react-alert-dialog": ^1.1.15
+    "@radix-ui/react-aspect-ratio": ^1.1.8
+    "@radix-ui/react-avatar": ^1.1.11
+    "@radix-ui/react-checkbox": ^1.3.3
+    "@radix-ui/react-dialog": ^1.1.15
+    "@radix-ui/react-dropdown-menu": ^2.1.16
+    "@radix-ui/react-label": ^2.1.8
+    "@radix-ui/react-menubar": ^1.1.16
+    "@radix-ui/react-popover": ^1.1.15
+    "@radix-ui/react-primitive": ^2.1.4
+    "@radix-ui/react-progress": ^1.1.8
+    "@radix-ui/react-radio-group": ^1.3.8
+    "@radix-ui/react-scroll-area": ^1.2.10
+    "@radix-ui/react-select": ^2.2.6
+    "@radix-ui/react-separator": ^1.1.8
+    "@radix-ui/react-slider": ^1.3.6
+    "@radix-ui/react-slot": ^1.2.4
+    "@radix-ui/react-switch": ^1.2.6
+    "@radix-ui/react-tabs": ^1.1.13
+    "@radix-ui/react-toggle": ^1.1.10
+    "@radix-ui/react-toggle-group": ^1.1.11
+    "@radix-ui/react-tooltip": ^1.2.8
   react:
     react: ^19.2.4
     react-dom: ^19.2.4
-    react-resizable-panels: ^4.5.5
+    react-resizable-panels: ^4.5.9
+    vaul: ^1.1.2
     "@types/react": ^19.2.10
     "@types/react-dom": ^19.2.3
   redis:
     redis: ^5.10.0
+  rehype:
+    rehype-katex: ^7.0.1
+    rehype-pretty-code: ^0.14.1
+    rehype-react: ^8.0.0
+    rehype-sanitize: ^6.0.0
+    rehype-stringify: ^10.0.1
+  remark:
+    remark-directive: ^4.0.0
+    remark-gfm: ^4.0.1
+    remark-math: ^6.0.0
+    remark-parse: ^11.0.0
+    remark-rehype: ^11.1.2
   rolldown:
     rolldown: ^1.0.0-rc.2
-    rolldown-plugin-dts: ^0.21.8
+    rolldown-plugin-dts: ^0.21.9
     rolldown-plugin-wasm: ^0.2.1
+  safeql:
+    "@ts-safeql/eslint-plugin": ^4.2.0
   sharp:
     sharp: ^0.34.5
   shiki:
-    shiki: ^3.21.0
-    "@shikijs/transformers": ^3.21.0
+    shiki: ^3.22.0
+    "@shikijs/transformers": ^3.22.0
   smithy:
-    "@smithy/node-http-handler": ^4.4.8
+    "@smithy/node-http-handler": ^4.4.9
   styles:
-    autoprefixer: ^10.4.23
+    autoprefixer: ^10.4.24
     postcss: ^8.5.6
+  swr:
+    swr: ^2.4.0
+  tanstack:
+    "@tanstack/react-virtual": ^3.13.18
+  test:
+    "@playwright/test": ^1.58.1
   ts:
     typescript: ^5.9.3
   tsdown:
@@ -87,15 +170,19 @@ catalogs:
   tseslint:
     typescript-eslint: ^8.54.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260201.1
+    "@typescript/native-preview": ^7.0.0-dev.20260203.1
   tslib:
     tslib: ^2.8.1
+  tsup:
+    "@microsoft/api-extractor": ^7.56.0
+    terser: ^5.46.0
+    tsup: ^8.5.1
   tsx:
     tsx: ^4.21.0
   turbo:
-    turbo: ^2.8.1
-    eslint-config-turbo: ^2.8.1
-    eslint-plugin-turbo: ^2.8.1
+    turbo: ^2.8.3
+    eslint-config-turbo: ^2.8.3
+    eslint-plugin-turbo: ^2.8.3
   tw:
     tailwindcss: ^4.1.18
     tailwind-merge: ^3.4.0
@@ -104,10 +191,24 @@ catalogs:
     "@tailwindcss/forms": ^0.5.11
     "@tailwindcss/typography": ^0.5.19
     "@tailwindcss/postcss": ^4.1.18
+  unified:
+    unified: ^11.0.5
+  unist:
+    "@types/unist": ^3.0.3
+    unist-util-remove: ^4.0.0
+    unist-util-visit: ^5.1.0
+  utils:
+    "@changesets/cli": ^2.29.8
+    husky: ^9.1.7
+    knip: ^5.83.0
   vercel:
-    vercel: ^50.9.6
+    vercel: ^50.10.0
     "@vercel/analytics": ^1.6.1
-    "@vercel/functions": ^3.4.0
+    "@vercel/functions": ^3.4.1
+  vfile:
+    vfile: ^6.0.3
+  webpack:
+    webpack: ^5.105.0
   ws:
     ws: ^8.19.0
     "@types/ws": ^8.18.1

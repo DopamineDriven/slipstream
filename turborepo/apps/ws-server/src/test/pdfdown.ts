@@ -157,11 +157,16 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
 
   const pdfDown = new PdfDown(readIt);
 
-  const data = await pdfDown.documentAsync();
+  const [structuredText, images, annots, meta] = await Promise.all([
+    pdfDown.structuredTextAsync(),
+    pdfDown.imagesPerPageAsync(),
+    pdfDown.annotationsPerPageAsync(),
+    pdfDown.metadataAsync()
+  ]);
+
   const imgWithSizeArr = Array.of<PageImageWithSize>();
-  const { images, ...dataRest } = data;
   if (images.length > 0) {
-    for (const img of data.images) {
+    for (const img of images) {
       const { data, ...rest } = img;
       // extract remote returns a number of metadata fields but robust extension detection is what we're after here
       // automatically handles local buffers or remote urls passed in
@@ -175,18 +180,24 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
       imgWithSizeArr.push({ ...rest, size: data.byteLength / 1024 / 1024 });
     }
   }
+
   const toJson = JSON.stringify(
-    { ...dataRest, images: imgWithSizeArr },
+    { meta, annots, images: imgWithSizeArr, structuredText },
     null,
     2
   );
   const x = pdfChoiceArr.findIndex(s => s === path);
   const templatize = `export const pdfIndex${x} = ${toJson};`;
   fs.withWs(`src/test/__out__/pdfdown/${filename}/index.ts`, templatize);
-  return { ...data, imagesWithSize: imgWithSizeArr };
+  return {
+    ...meta,
+    ...annots,
+    images: { ...imgWithSizeArr },
+    ...structuredText
+  };
 }
 
-readAndExtract("The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf").then(v => {
+readAndExtract("Self-Imposed-Chains.pdf").then(v => {
   if (v.creationDate && v.creator && v.modificationDate && v.producer) {
     const {
       creationDate,
@@ -207,3 +218,4 @@ readAndExtract("The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf").then(v => {
     });
   }
 });
+// /home/dopaminedriven/cloneathon/t3-chat-clone/turborepo/apps/ws-server/src/test/__out__/condensed/Self-Imposed-Chains.pdf
