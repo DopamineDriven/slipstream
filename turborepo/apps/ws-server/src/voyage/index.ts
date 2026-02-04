@@ -347,6 +347,15 @@ def main():
             print(f"element[0]: {raw_usage[0]}")
         print(f"type: {type(raw_usage)}")
         print(f"raw_usage: {raw_usage}")
+        return_dict = {
+            "text_tokens": raw_usage["text_tokens"],
+            "image_pixels": raw_usage["image_pixels"],
+            "video_pixels": raw_usage["video_pixels"],
+            "total_tokens": raw_usage["total_tokens"],
+            "model": model
+        }
+        toStringgggg=json.dumps(return_dict)
+        print(f"jsonify: {toStringgggg}")
         return {
             "raw_usage": raw_usage,
             "model": model
