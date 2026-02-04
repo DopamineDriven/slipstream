@@ -129,6 +129,7 @@ export const pdfChoiceArr = [
   "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VII.pdf",
   "The-Path-to-Hell-is-Paved-with-Good-Intentions-Pt-VIII.pdf",
   "The-Path-to-Hell-is-Paved-with-Good-Intentions.pdf",
+  "Warlord-of-Whimsy.pdf",
   "Warlord-of-Whimsy-Pt-I.pdf",
   "Warlord-of-Whimsy-Pt-II.pdf",
   "Warlord-of-Whimsy-Pt-III.pdf",
@@ -151,23 +152,35 @@ export const pdfChoiceArr = [
 
 async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   const filename = path.slice(0, path.lastIndexOf("."));
-  const readIt = fs.fileToBuffer(`src/test/__out__/condensed/${path}`);
+  const imgPages = new Set<number>();
+  const annotPages = new Set<number>();
 
+  const readIt = fs.fileToBuffer(`src/test/__out__/condensed/${path}`);
+  const size = readIt.byteLength / 1024 / 1024;
+  console.log(`filesize: ${size} MB`);
   const { PdfDown } = await import("@d0paminedriven/pdfdown");
 
   const pdfDown = new PdfDown(readIt);
-
+  const tStart = performance.now();
   const [structuredText, images, annots, meta] = await Promise.all([
     pdfDown.structuredTextAsync(),
     pdfDown.imagesPerPageAsync(),
     pdfDown.annotationsPerPageAsync(),
     pdfDown.metadataAsync()
   ]);
+  console.log(`rust job finished in ${performance.now()-tStart} ms`)
 
+  if (annots.length > 0) {
+    for (const annot of annots) {
+      annotPages.add(annot.page);
+    }
+  }
+  console.log(`char length: ${structuredText.map(t => t.body).join(`\n\n`).length}`);
   const imgWithSizeArr = Array.of<PageImageWithSize>();
   if (images.length > 0) {
     for (const img of images) {
       const { data, ...rest } = img;
+      imgPages.add(rest.page);
       // extract remote returns a number of metadata fields but robust extension detection is what we're after here
       // automatically handles local buffers or remote urls passed in
       const ext = (await fs.extractRemote(data))?.format ?? "png";
@@ -191,30 +204,43 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   fs.withWs(`src/test/__out__/pdfdown/${filename}/index.ts`, templatize);
   return {
     ...meta,
-    ...annots,
-    images: { ...imgWithSizeArr },
-    ...structuredText
+    imagePages: Array.from(imgPages),
+    annotPages: Array.from(annotPages),
+    annots,
+    imgWithSizeArr,
+    structuredText
   };
 }
-
-readAndExtract("Self-Imposed-Chains.pdf").then(v => {
-  if (v.creationDate && v.creator && v.modificationDate && v.producer) {
+const perf = performance.now();
+readAndExtract("Warlord-of-Whimsy.pdf").then(v => {
+  console.log(performance.now() - perf);
+  if (v.creationDate && v.creator && v.producer) {
+    const imgSizes = v.imgWithSizeArr.map((t) =>t.size);
+    let i =0;
+    for(const img of imgSizes) {
+      i+=img;
+    }
     const {
       creationDate,
       creator,
-      modificationDate,
+      pageCount,
       producer,
       version,
+      annotPages,
+      imagePages,
       isLinearized
     } = v;
 
     console.log({
       creationDate,
       creator,
-      modificationDate,
+      pageCount,
       producer,
       version,
-      isLinearized
+      imgSizeMb: i,
+      isLinearized,
+      annotPages,
+      imagePages
     });
   }
 });

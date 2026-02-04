@@ -2,6 +2,11 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { FssDoc, StoreDocDbRegistryProps } from "@/gemini/types.ts";
 import type {
+  CreateLocalStoreParams,
+  CreateLocalStoreRT,
+  FindManyLocalStoreDocsShape
+} from "@/prisma/types.ts";
+import type {
   CreateGrokProviderStoreDocParams,
   CreateManyGrokProviderStoreDocsProps,
   xAIDocDbRegistryProps
@@ -28,7 +33,11 @@ export type AttachmentSingletonProviderWorkup<T extends $Enums.Provider> =
   AttachmentSingleton<true> & { provider: T };
 export class PrismaAttachmentProviderService extends PrismaUtilsService {
   public extractor: ExtractService;
-  constructor(prisma: PrismaDbService, extractor: ExtractService, isProd: boolean) {
+  constructor(
+    prisma: PrismaDbService,
+    extractor: ExtractService,
+    isProd: boolean
+  ) {
     super(prisma, isProd);
     this.extractor = extractor;
   }
@@ -1461,6 +1470,186 @@ export class PrismaAttachmentProviderService extends PrismaUtilsService {
         `something went wrong creating Grok vector store...${this.safeErrMsg(err)}`
       );
     }
+  }
+  public async localVectorStoreCheck(
+    provider: $Enums.Provider,
+    userId: string
+  ) {
+    const vectorStoreCounts = await this.prismaClient.localVectorStore.count({
+      where: { provider, userId }
+    });
+    return vectorStoreCounts > 0;
+  }
+
+  private lsBigintToNum(data: CreateLocalStoreRT<false>) {
+    const { totalBytes, ...rest } = data;
+    return {
+      totalBytes: totalBytes ? Number(totalBytes) : null,
+      ...rest
+    } satisfies CreateLocalStoreRT<true>;
+  }
+
+  public async createLocalVectorStore({
+    createdAt,
+    provider,
+    storeName,
+    userId,
+    defaultEmbeddingModel = "voyage-multimodal-3.5",
+    documentsCount = 0,
+    embeddingDim = 1024,
+    lastSyncedAt = new Date(Date.now()),
+    schemaVersion = "v1_0",
+    totalBytes = 0n,
+    totalChunks = 0
+  }: CreateLocalStoreParams) {
+    const select = {
+      createdAt: true,
+      totalBytes: true,
+      totalChunks: true,
+      defaultEmbeddingModel: true,
+      embeddingDim: true,
+      fileCount: true,
+      schemaVersion: true,
+      storeName: true,
+      lastSyncedAt: true,
+      provider: true,
+      userId: true,
+      id: true,
+      updatedAt: true
+    } as const;
+
+    return await this.prismaClient.$transaction(async prisma => {
+      const hasStore = await prisma.localVectorStore.count({
+        where: { provider, userId }
+      });
+      if (hasStore > 0) {
+        return this.lsBigintToNum(
+          await prisma.localVectorStore.findUniqueOrThrow({
+            where: { userId_provider_local: { provider, userId } },
+            select
+          })
+        );
+      } else {
+        return this.lsBigintToNum(
+          await prisma.localVectorStore.create({
+            data: {
+              provider,
+              storeName,
+              createdAt,
+              userId,
+              fileCount: documentsCount,
+              embeddingDim,
+              lastSyncedAt,
+              schemaVersion,
+              totalBytes,
+              totalChunks,
+              defaultEmbeddingModel
+            },
+            select
+          })
+        );
+      }
+    });
+  }
+  public collapsePageRef(target: (string | number)[]) {
+    return target.join("::");
+  }
+
+  public expandPageRef(target: string | null) {
+    if (target === null) return null;
+    return target
+      .split("::")
+      .map(t => (/[0-9]{1,5}/.test(t) ? Number.parseInt(t) : t));
+  }
+
+  public async findManyLocalStoreDocs(
+    provider: $Enums.Provider,
+    userId: string
+  ) {
+    return await this.prismaClient.$transaction(async prisma => {
+      const localstoreDocsFindMany = await prisma.attachment.findMany({
+        where: {
+          AND: [{ localVectorStoreDocs: { some: { provider } }, userId }]
+        },
+        select: {
+          id: true,
+          compatCdnUrl: true,
+          localVectorStoreDocs: {
+            where: { provider },
+            select: {
+              id: true,
+              createdAt: true,
+              lastAccessed: true,
+              provenanceId: true,
+              embeddingDim: true,
+              embeddingModel: true,
+              extractedTextLength: true,
+              hasVisualMedia: true,
+              pageCount: true,
+              annotPages: true,
+              imagePages: true,
+              ext: true,
+              conversationId: true,
+              messageId: true,
+
+              schemaVersion: true,
+              storeId: true,
+              imageCount: true,
+              visualMediaHint: true,
+              tokenCount: true,
+              modelSelectionReason: true,
+              updatedAt: true,
+              indexedAt: true,
+              provider: true,
+              errorMessage: true,
+              filename: true,
+              mimeType: true,
+              chunkCount: true,
+              state: true,
+              size: true,
+              store: { select: { id: true, storeName: true } }
+            }
+          }
+        }
+      });
+
+      const arr = Array.of<FindManyLocalStoreDocsShape>();
+      for (const attachment of localstoreDocsFindMany) {
+        const attachmentId = attachment.id;
+        if (attachment.localVectorStoreDocs.length > 0) {
+          for (const doc of attachment.localVectorStoreDocs) {
+            const {
+              store,
+              annotPages: annotPgs,
+              imagePages: imgPgs,
+              size,
+              provenanceId,
+              ...docRest
+            } = doc;
+            const annotPages = this.expandPageRef(annotPgs) as number[] | null;
+            const imagePages = this.expandPageRef(imgPgs) as number[] | null;
+            const { conversationId, messageId, extension } =
+              this.parseFilename(provenanceId);
+            const { storeName, id: storeId } = store;
+            const record = {
+              ...docRest,
+              ext: extension,
+              attachmentId,
+              conversationId,
+              annotPages,
+              imagePages,
+              messageId,
+              storeName,
+              storeId,
+              provenanceId,
+              size: size ? Number(size) : null
+            } satisfies FindManyLocalStoreDocsShape;
+            arr.push(record);
+          }
+        }
+      }
+      return arr;
+    });
   }
 
   public async vectorStoreInfoByProvider(

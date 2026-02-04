@@ -17,6 +17,7 @@
       "anthropic": [
         "dist/anthropic/index.d.ts",
         "dist/anthropic/types.d.ts",
+        "dist/anthropic/vector-store.d.ts",
         "dist/anthropic/workup.d.ts"
       ],
       "byte-codec": [
@@ -63,6 +64,7 @@
         "dist/prisma/attachment.d.ts",
         "dist/prisma/chat.d.ts",
         "dist/prisma/index.d.ts",
+        "dist/prisma/types.d.ts",
         "dist/prisma/user-meta.d.ts",
         "dist/prisma/utils.d.ts"
       ],

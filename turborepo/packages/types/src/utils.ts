@@ -7,13 +7,13 @@ export type BigIntKeys<T> = {
   [K in keyof T]: T[K] extends bigint ? K : never;
 }[keyof T];
 
-export type SerializeBigInt<T, Serialized extends boolean = boolean> = DX<{
+export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
   [K in keyof T]: T[K] extends bigint | null | undefined
     ? Serialized extends true
       ? Exclude<T[K], bigint> | number
       : T[K]
     : T[K];
-}>;
+}
 
 // precision (field-level) targeting
 export type PrecisionSerializeBigIntField<
@@ -27,7 +27,9 @@ export type PrecisionSerializeBigIntField<
       : bigint | null
     : T[K];
 }>;
-
+export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
+  SerializeBigInt<V, P> & Q
+>;
 export type Rm<T, P extends keyof T = keyof T> = {
   [S in keyof T as Exclude<S, P>]: T[S];
 };

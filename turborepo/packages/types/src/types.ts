@@ -1,4 +1,4 @@
-import type { DX, SerializeBigInt } from "@/utils.ts";
+import type { SerializeBigInt } from "@/utils.ts";
 import type {
   Account,
   Attachment,
@@ -27,226 +27,157 @@ import type {
   VideoMetadata
 } from "@slipstream/db/node/generated/client";
 
-export type NormalizeAndInject<V, Q = object, P extends boolean = boolean> = DX<
-  SerializeBigInt<V, P> & Q
->;
+export interface UserSingleton<T extends boolean = false> extends User {
+  conversations?: ConversationSingleton<T>[];
+  attachments?: AttachmentSingleton<T>[];
+  keys?: UserKeySingleton<T>[];
+  accounts?: AccountSingleton<T>[];
+  sessions?: SessionSingleton<T>[];
+  profile?: ProfileSingleton<T>;
+  providerStores?: ProviderStoreSingleton<T>[];
+  localVectorStores?: LocalVectorStoreSingleton<T>[];
+  settings?: SettingsSingleton<T>;
+  conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
+}
 
-export type UserSingleton<T extends boolean = false> = NormalizeAndInject<
-  User,
-  {
-    conversations?: ConversationSingleton<T>[];
-    attachments?: AttachmentSingleton<T>[];
-    keys?: UserKeySingleton<T>[];
-    accounts?: AccountSingleton<T>[];
-    sessions?: SessionSingleton<T>[];
-    profile?: ProfileSingleton<T>;
-    providerStores?: ProviderStoreSingleton<T>[];
-    localVectorStores?: LocalVectorStoreSingleton<T>[];
-    settings?: SettingsSingleton<T>;
-    conversationMemoryStore?: ConversationMemoryStoreSingleton<T>;
-  },
-  T
->;
+export interface SessionSingleton<T extends boolean = false> extends Session {
+  user?: UserSingleton<T>;
+}
 
-export type SessionSingleton<T extends boolean = false> = NormalizeAndInject<
-  Session,
-  {
-    user?: UserSingleton<T>;
-  },
-  T
->;
+export interface AccountSingleton<T extends boolean = false> extends Account {
+  user?: UserSingleton<T>;
+}
 
-export type AccountSingleton<T extends boolean = false> = NormalizeAndInject<
-  Account,
-  {
-    user?: UserSingleton<T>;
-  },
-  T
->;
+export interface ProfileSingleton<T extends boolean = false> extends Profile {
+  user?: UserSingleton<T>;
+}
 
-export type ProfileSingleton<T extends boolean = false> = NormalizeAndInject<
-  Profile,
-  {
-    user?: UserSingleton<T>;
-  },
-  T
->;
+export interface SettingsSingleton<T extends boolean = false> extends Settings {
+  user?: UserSingleton<T>;
+}
 
-export type SettingsSingleton<T extends boolean = false> = NormalizeAndInject<
-  Settings,
-  {
-    user?: UserSingleton<T>;
-  },
-  T
->;
+export interface LocalVectorStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStore, T> {
+  user?: UserSingleton<T>;
+  docs?: LocalVectorStoreDocSingleton<T>[];
+}
 
-export type LocalVectorStoreSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    LocalVectorStore,
-    {
-      user?: UserSingleton<T>;
-      docs?: LocalVectorStoreDocSingleton<T>[];
-    },
-    T
-  >;
+export interface LocalVectorStoreDocSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStoreDoc, T> {
+  store?: LocalVectorStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
+  chunks?: LocalVectorStoreDocChunkSingleton<T>[];
+}
 
-export type LocalVectorStoreDocSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    LocalVectorStoreDoc,
-    {
-      store?: LocalVectorStoreSingleton<T>;
-      attachment?: AttachmentSingleton<T>;
-      chunks?: LocalVectorStoreDocChunkSingleton<T>[];
-    },
-    T
-  >;
-export type LocalVectorStoreDocChunkSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    LocalVectorStoreDocChunk,
-    { doc?: LocalVectorStoreDocSingleton<T> },
-    T
-  >;
+export interface LocalVectorStoreDocChunkSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<LocalVectorStoreDocChunk, T> {
+  doc?: LocalVectorStoreDocSingleton<T>;
+}
 
-export type ImageSingleton = ImageMetadata;
-export type DocumentSingleton = DocumentMetadata;
-export type VideoSingleton = VideoMetadata;
-export type AudioSingleton = AudioMetadata;
+export interface ImageSingleton extends ImageMetadata {}
+export interface DocumentSingleton extends DocumentMetadata {}
+export interface VideoSingleton extends VideoMetadata {}
+export interface AudioSingleton extends AudioMetadata {}
 
-export type AttachmentProviderSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    AttachmentProvider,
-    { attachment?: AttachmentSingleton<T>; userKey?: UserKeySingleton<T> },
-    T
-  >;
+export interface AttachmentProviderSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<AttachmentProvider, T> {
+  attachment?: AttachmentSingleton<T>;
+  userKey?: UserKeySingleton<T>;
+}
 
-export type ProviderStoreSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ProviderStore,
-    { docs?: ProviderStoreDocumentSingleton<T>[] },
-    T
-  >;
+export interface ProviderStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ProviderStore, T> {
+  docs?: ProviderStoreDocumentSingleton<T>[];
+}
 
-export type ProviderStoreDocumentSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ProviderStoreDocument,
-    {
-      store?: ProviderStoreSingleton<T>;
-      attachment?: AttachmentSingleton<T>;
-    },
-    T
-  >;
-export type ConversationMemoryStoreSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ConversationMemoryStore,
-    {
-      contexts?: ConversationMemoryContextSingleton<T>[];
-    },
-    T
-  >;
+export interface ProviderStoreDocumentSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ProviderStoreDocument, T> {
+  store?: ProviderStoreSingleton<T>;
+  attachment?: AttachmentSingleton<T>;
+}
 
-export type ConversationMemoryContextSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ConversationMemoryContext,
-    {
-      memoryStore?: ConversationMemoryStoreSingleton<T>;
-      conversation?: ConversationSingleton<T>;
-      memoryChunks?: ConversationMemoryChunkSingleton<T>[];
-    },
-    T
-  >;
+export interface ConversationMemoryStoreSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ConversationMemoryStore, T> {
+  contexts?: ConversationMemoryContextSingleton<T>[];
+}
 
-export type ConversationMemoryChunkSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ConversationMemoryChunk,
-    {
-      context?: ConversationMemoryContextSingleton<T>;
-      messages?: MessageSingleton<T>[];
-    },
-    T
-  >;
+export interface ConversationMemoryContextSingleton<
+  T extends boolean = false
+> extends ConversationMemoryContext {
+  memoryStore?: ConversationMemoryStoreSingleton<T>;
+  conversation?: ConversationSingleton<T>;
+  memoryChunks?: ConversationMemoryChunkSingleton<T>[];
+}
+export interface ConversationMemoryChunkSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<ConversationMemoryChunk, T> {
+  context?: ConversationMemoryContextSingleton<T>;
+  messages?: MessageSingleton<T>[];
+}
 
-export type ConvoSettingsSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ConversationSettings,
-    {
-      conversation?: ConversationSingleton<T>;
-    },
-    T
-  >;
+export interface ConvoSettingsSingleton<
+  T extends boolean = false
+> extends ConversationSettings {
+  conversation?: ConversationSingleton<T>;
+}
 
-export type ImageGenJobSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ImageGenJob,
-    {
-      outputs?: ImageGenOutputSingleton<T>[];
-      userKey?: UserKeySingleton<T>;
-      requestMessage?: MessageSingleton<T>;
-    },
-    T
-  >;
+export interface ImageGenJobSingleton<
+  T extends boolean = boolean
+> extends ImageGenJob {
+  outputs?: ImageGenOutputSingleton<T>[];
+  userKey?: UserKeySingleton<T>;
+  requestMessage?: MessageSingleton<T>;
+}
 
-export type ImageGenOutputSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    ImageGenOutput,
-    {
-      job?: ImageGenJobSingleton<T>;
-    },
-    T
-  >;
+export interface ImageGenOutputSingleton<
+  T extends boolean = false
+> extends ImageGenOutput {
+  job?: ImageGenJobSingleton<T>;
+}
 
-export type AttachmentSingleton<T extends boolean = false> = NormalizeAndInject<
-  Attachment,
-  {
-    localVectorStoreDocs?: LocalVectorStoreDocSingleton<T>[];
-    providerLinks?: AttachmentProviderSingleton<T>[];
-    providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
-    image: ImageSingleton | null;
-    document: DocumentSingleton | null;
-    imageGenOutput: ImageGenOutputSingleton<T> | null;
-  },
-  T
->;
+export interface AttachmentSingleton<
+  T extends boolean = false
+> extends SerializeBigInt<Attachment, T> {
+  localVectorStoreDocs?: LocalVectorStoreDocSingleton<T>[];
+  providerLinks?: AttachmentProviderSingleton<T>[];
+  providerStoreDocs?: ProviderStoreDocumentSingleton<T>[];
+  image: ImageSingleton | null;
+  document: DocumentSingleton | null;
+  imageGenOutput: ImageGenOutputSingleton<T> | null;
+}
 
-export type UserKeySingleton<T extends boolean = false> = NormalizeAndInject<
-  UserKey,
-  {
-    user?: UserSingleton<T>;
-    messages?: MessageSingleton<T>[];
-    imageGenJobs?: ImageGenJobSingleton<T>[];
-    attachmentProviders?: AttachmentProviderSingleton<T>[];
-  },
-  T
->;
+export interface UserKeySingleton<T extends boolean = false> extends UserKey {
+  user?: UserSingleton<T>;
+  messages?: MessageSingleton<T>[];
+  imageGenJobs?: ImageGenJobSingleton<T>[];
+  attachmentProviders?: AttachmentProviderSingleton<T>[];
+}
 
-export type MessageSingleton<T extends boolean = false> = NormalizeAndInject<
-  Message,
-  {
-    imageGenJob?: ImageGenJobSingleton<T> | null;
-    userKey?: UserKeySingleton<T> | null;
-    attachments: AttachmentSingleton<T>[];
-    conversationMemoryChunk?: ConversationMemoryChunkSingleton<T>;
-  },
-  T
->;
+export interface MessageSingleton<T extends boolean = false> extends Message {
+  imageGenJob?: ImageGenJobSingleton<T> | null;
+  userKey?: UserKeySingleton<T> | null;
+  attachments: AttachmentSingleton<T>[];
+  conversationMemoryChunk?: ConversationMemoryChunkSingleton<T>;
+}
 
-export type ConversationSingleton<T extends boolean = false> =
-  NormalizeAndInject<
-    Conversation,
-    {
-      conversationSettings: ConvoSettingsSingleton<T> | null;
-      messages: MessageSingleton<T>[];
-      attachments?: AttachmentSingleton<T>[];
-      user?: UserSingleton<T>;
-      conversationContextState?: ConversationMemoryContextSingleton<T>;
-    },
-    T
-  >;
-
-export type ConversationSingletonOneOff<T extends boolean = false> =
-  NormalizeAndInject<
-    ConversationSingleton<T>,
-    {
-      apiKey?: string | null;
-    },
-    T
-  >;
+export interface ConversationSingleton<
+  T extends boolean = false
+> extends Conversation {
+  conversationSettings: ConvoSettingsSingleton<T> | null;
+  messages: MessageSingleton<T>[];
+  attachments?: AttachmentSingleton<T>[];
+  user?: UserSingleton<T>;
+  conversationContextState?: ConversationMemoryContextSingleton<T>;
+}
+export interface ConversationSingletonOneOff<
+  T extends boolean = false
+> extends ConversationSingleton<T> {
+  apiKey?: string | null;
+}

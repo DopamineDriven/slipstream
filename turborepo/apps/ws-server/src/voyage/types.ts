@@ -8,6 +8,11 @@ export namespace Voyage {
     | "rerank"
     | "files"
     | "batches";
+
+  /**
+   * default to 1024
+   */
+  export type EmbeddingDims = 256 | 512 | 1024 |2048;
   export type PromiseConditional<T> = Promise<T> | PromiseLike<T>;
   export namespace PyBuiltIns {
     export type Exec = <const V = unknown>(

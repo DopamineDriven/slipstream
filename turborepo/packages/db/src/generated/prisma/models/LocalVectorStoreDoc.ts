@@ -66,6 +66,8 @@ export type LocalVectorStoreDocMinAggregateOutputType = {
   pageCount: number | null
   extractedTextLength: number | null
   imageCount: number | null
+  imagePages: string | null
+  annotPages: string | null
   modelSelectionReason: string | null
   indexedAt: Date | null
   errorMessage: string | null
@@ -98,6 +100,8 @@ export type LocalVectorStoreDocMaxAggregateOutputType = {
   pageCount: number | null
   extractedTextLength: number | null
   imageCount: number | null
+  imagePages: string | null
+  annotPages: string | null
   modelSelectionReason: string | null
   indexedAt: Date | null
   errorMessage: string | null
@@ -130,6 +134,8 @@ export type LocalVectorStoreDocCountAggregateOutputType = {
   pageCount: number
   extractedTextLength: number
   imageCount: number
+  imagePages: number
+  annotPages: number
   modelSelectionReason: number
   indexedAt: number
   errorMessage: number
@@ -184,6 +190,8 @@ export type LocalVectorStoreDocMinAggregateInputType = {
   pageCount?: true
   extractedTextLength?: true
   imageCount?: true
+  imagePages?: true
+  annotPages?: true
   modelSelectionReason?: true
   indexedAt?: true
   errorMessage?: true
@@ -216,6 +224,8 @@ export type LocalVectorStoreDocMaxAggregateInputType = {
   pageCount?: true
   extractedTextLength?: true
   imageCount?: true
+  imagePages?: true
+  annotPages?: true
   modelSelectionReason?: true
   indexedAt?: true
   errorMessage?: true
@@ -248,6 +258,8 @@ export type LocalVectorStoreDocCountAggregateInputType = {
   pageCount?: true
   extractedTextLength?: true
   imageCount?: true
+  imagePages?: true
+  annotPages?: true
   modelSelectionReason?: true
   indexedAt?: true
   errorMessage?: true
@@ -367,6 +379,8 @@ export type LocalVectorStoreDocGroupByOutputType = {
   pageCount: number | null
   extractedTextLength: number | null
   imageCount: number | null
+  imagePages: string | null
+  annotPages: string | null
   modelSelectionReason: string | null
   indexedAt: Date | null
   errorMessage: string | null
@@ -422,6 +436,8 @@ export type LocalVectorStoreDocWhereInput = {
   pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
+  imagePages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
+  annotPages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
   errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
@@ -457,6 +473,8 @@ export type LocalVectorStoreDocOrderByWithRelationInput = {
   pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder
   imageCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  imagePages?: Prisma.SortOrderInput | Prisma.SortOrder
+  annotPages?: Prisma.SortOrderInput | Prisma.SortOrder
   modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -496,6 +514,8 @@ export type LocalVectorStoreDocWhereUniqueInput = Prisma.AtLeast<{
   pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
+  imagePages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
+  annotPages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
   errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
@@ -531,6 +551,8 @@ export type LocalVectorStoreDocOrderByWithAggregationInput = {
   pageCount?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedTextLength?: Prisma.SortOrderInput | Prisma.SortOrder
   imageCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  imagePages?: Prisma.SortOrderInput | Prisma.SortOrder
+  annotPages?: Prisma.SortOrderInput | Prisma.SortOrder
   modelSelectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   indexedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -571,6 +593,8 @@ export type LocalVectorStoreDocScalarWhereWithAggregatesInput = {
   pageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
   extractedTextLength?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
   imageCount?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | number | null
+  imagePages?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
+  annotPages?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
   modelSelectionReason?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
   indexedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | Date | string | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDoc"> | string | null
@@ -601,6 +625,8 @@ export type LocalVectorStoreDocCreateInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -636,6 +662,8 @@ export type LocalVectorStoreDocUncheckedCreateInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -667,6 +695,8 @@ export type LocalVectorStoreDocUpdateInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -702,6 +732,8 @@ export type LocalVectorStoreDocUncheckedUpdateInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -735,6 +767,8 @@ export type LocalVectorStoreDocCreateManyInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -765,6 +799,8 @@ export type LocalVectorStoreDocUpdateManyMutationInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -797,6 +833,8 @@ export type LocalVectorStoreDocUncheckedUpdateManyInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -844,6 +882,8 @@ export type LocalVectorStoreDocCountOrderByAggregateInput = {
   pageCount?: Prisma.SortOrder
   extractedTextLength?: Prisma.SortOrder
   imageCount?: Prisma.SortOrder
+  imagePages?: Prisma.SortOrder
+  annotPages?: Prisma.SortOrder
   modelSelectionReason?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
@@ -886,6 +926,8 @@ export type LocalVectorStoreDocMaxOrderByAggregateInput = {
   pageCount?: Prisma.SortOrder
   extractedTextLength?: Prisma.SortOrder
   imageCount?: Prisma.SortOrder
+  imagePages?: Prisma.SortOrder
+  annotPages?: Prisma.SortOrder
   modelSelectionReason?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
@@ -918,6 +960,8 @@ export type LocalVectorStoreDocMinOrderByAggregateInput = {
   pageCount?: Prisma.SortOrder
   extractedTextLength?: Prisma.SortOrder
   imageCount?: Prisma.SortOrder
+  imagePages?: Prisma.SortOrder
+  annotPages?: Prisma.SortOrder
   modelSelectionReason?: Prisma.SortOrder
   indexedAt?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
@@ -1063,6 +1107,8 @@ export type LocalVectorStoreDocCreateWithoutAttachmentInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1096,6 +1142,8 @@ export type LocalVectorStoreDocUncheckedCreateWithoutAttachmentInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1158,6 +1206,8 @@ export type LocalVectorStoreDocScalarWhereInput = {
   pageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   extractedTextLength?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
   imageCount?: Prisma.IntNullableFilter<"LocalVectorStoreDoc"> | number | null
+  imagePages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
+  annotPages?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   modelSelectionReason?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
   indexedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDoc"> | Date | string | null
   errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDoc"> | string | null
@@ -1188,6 +1238,8 @@ export type LocalVectorStoreDocCreateWithoutStoreInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1221,6 +1273,8 @@ export type LocalVectorStoreDocUncheckedCreateWithoutStoreInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1278,6 +1332,8 @@ export type LocalVectorStoreDocCreateWithoutChunksInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1312,6 +1368,8 @@ export type LocalVectorStoreDocUncheckedCreateWithoutChunksInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1358,6 +1416,8 @@ export type LocalVectorStoreDocUpdateWithoutChunksInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1392,6 +1452,8 @@ export type LocalVectorStoreDocUncheckedUpdateWithoutChunksInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1423,6 +1485,8 @@ export type LocalVectorStoreDocCreateManyAttachmentInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1453,6 +1517,8 @@ export type LocalVectorStoreDocUpdateWithoutAttachmentInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1486,6 +1552,8 @@ export type LocalVectorStoreDocUncheckedUpdateWithoutAttachmentInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1518,6 +1586,8 @@ export type LocalVectorStoreDocUncheckedUpdateManyWithoutAttachmentInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1549,6 +1619,8 @@ export type LocalVectorStoreDocCreateManyStoreInput = {
   pageCount?: number | null
   extractedTextLength?: number | null
   imageCount?: number | null
+  imagePages?: string | null
+  annotPages?: string | null
   modelSelectionReason?: string | null
   indexedAt?: Date | string | null
   errorMessage?: string | null
@@ -1579,6 +1651,8 @@ export type LocalVectorStoreDocUpdateWithoutStoreInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1612,6 +1686,8 @@ export type LocalVectorStoreDocUncheckedUpdateWithoutStoreInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1644,6 +1720,8 @@ export type LocalVectorStoreDocUncheckedUpdateManyWithoutStoreInput = {
   pageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   extractedTextLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   imageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  imagePages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  annotPages?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelSelectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indexedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1707,6 +1785,8 @@ export type LocalVectorStoreDocSelect<ExtArgs extends runtime.Types.Extensions.I
   pageCount?: boolean
   extractedTextLength?: boolean
   imageCount?: boolean
+  imagePages?: boolean
+  annotPages?: boolean
   modelSelectionReason?: boolean
   indexedAt?: boolean
   errorMessage?: boolean
@@ -1743,6 +1823,8 @@ export type LocalVectorStoreDocSelectCreateManyAndReturn<ExtArgs extends runtime
   pageCount?: boolean
   extractedTextLength?: boolean
   imageCount?: boolean
+  imagePages?: boolean
+  annotPages?: boolean
   modelSelectionReason?: boolean
   indexedAt?: boolean
   errorMessage?: boolean
@@ -1777,6 +1859,8 @@ export type LocalVectorStoreDocSelectUpdateManyAndReturn<ExtArgs extends runtime
   pageCount?: boolean
   extractedTextLength?: boolean
   imageCount?: boolean
+  imagePages?: boolean
+  annotPages?: boolean
   modelSelectionReason?: boolean
   indexedAt?: boolean
   errorMessage?: boolean
@@ -1811,6 +1895,8 @@ export type LocalVectorStoreDocSelectScalar = {
   pageCount?: boolean
   extractedTextLength?: boolean
   imageCount?: boolean
+  imagePages?: boolean
+  annotPages?: boolean
   modelSelectionReason?: boolean
   indexedAt?: boolean
   errorMessage?: boolean
@@ -1823,7 +1909,7 @@ export type LocalVectorStoreDocSelectScalar = {
   updatedAt?: boolean
 }
 
-export type LocalVectorStoreDocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "conversationId" | "messageId" | "provider" | "provenanceId" | "filename" | "mimeType" | "ext" | "size" | "schemaVersion" | "embeddingModel" | "embeddingDim" | "hasVisualMedia" | "visualMediaHint" | "pageCount" | "extractedTextLength" | "imageCount" | "modelSelectionReason" | "indexedAt" | "errorMessage" | "lastAccessed" | "state" | "chunkCount" | "tokenCount" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDoc"]>
+export type LocalVectorStoreDocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "attachmentId" | "conversationId" | "messageId" | "provider" | "provenanceId" | "filename" | "mimeType" | "ext" | "size" | "schemaVersion" | "embeddingModel" | "embeddingDim" | "hasVisualMedia" | "visualMediaHint" | "pageCount" | "extractedTextLength" | "imageCount" | "imagePages" | "annotPages" | "modelSelectionReason" | "indexedAt" | "errorMessage" | "lastAccessed" | "state" | "chunkCount" | "tokenCount" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDoc"]>
 export type LocalVectorStoreDocInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   store?: boolean | Prisma.LocalVectorStoreDefaultArgs<ExtArgs>
   attachment?: boolean | Prisma.AttachmentDefaultArgs<ExtArgs>
@@ -1866,6 +1952,8 @@ export type $LocalVectorStoreDocPayload<ExtArgs extends runtime.Types.Extensions
     pageCount: number | null
     extractedTextLength: number | null
     imageCount: number | null
+    imagePages: string | null
+    annotPages: string | null
     modelSelectionReason: string | null
     indexedAt: Date | null
     errorMessage: string | null
@@ -2321,6 +2409,8 @@ export interface LocalVectorStoreDocFieldRefs {
   readonly pageCount: Prisma.FieldRef<"LocalVectorStoreDoc", 'Int'>
   readonly extractedTextLength: Prisma.FieldRef<"LocalVectorStoreDoc", 'Int'>
   readonly imageCount: Prisma.FieldRef<"LocalVectorStoreDoc", 'Int'>
+  readonly imagePages: Prisma.FieldRef<"LocalVectorStoreDoc", 'String'>
+  readonly annotPages: Prisma.FieldRef<"LocalVectorStoreDoc", 'String'>
   readonly modelSelectionReason: Prisma.FieldRef<"LocalVectorStoreDoc", 'String'>
   readonly indexedAt: Prisma.FieldRef<"LocalVectorStoreDoc", 'DateTime'>
   readonly errorMessage: Prisma.FieldRef<"LocalVectorStoreDoc", 'String'>

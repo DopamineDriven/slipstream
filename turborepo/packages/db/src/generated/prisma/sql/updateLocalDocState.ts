@@ -13,12 +13,14 @@ import { type $DbEnums } from "./$DbEnums.ts"
  * @param tokenCount
  * @param extractedTextLength
  * @param imageCount
+ * @param imagePages
+ * @param annotPages
  * @param errorMessage
  */
-export const updateLocalDocState = $runtime.makeTypedQueryFactory("\nUPDATE \"LocalVectorStoreDoc\"\nSET\nstate                = $2::\"LocalStoreDocState\",\n\"chunkCount\"         = COALESCE($3, \"chunkCount\"),\n\"tokenCount\"         = COALESCE($4, \"tokenCount\"),\n\"extractedTextLength\"= COALESCE($5, \"extractedTextLength\"),\n\"imageCount\"         = COALESCE($6, \"imageCount\"),\n\"errorMessage\"       = $7,\n\"indexedAt\"           = CASE WHEN $2 = 'ACTIVE' THEN NOW() ELSE \"indexedAt\" END,\n\"updatedAt\"           = NOW()\nWHERE id = $1\nRETURNING id, state::\"text\" as state, \"chunkCount\", \"indexedAt\";") as (docId: string, state: $DbEnums["LocalStoreDocState"], chunkCount: number | null, tokenCount: number | null, extractedTextLength: number | null, imageCount: number | null, errorMessage: string | null) => $runtime.TypedSql<updateLocalDocState.Parameters, updateLocalDocState.Result>
+export const updateLocalDocState = $runtime.makeTypedQueryFactory("\nUPDATE \"LocalVectorStoreDoc\"\nSET\nstate                = $2::\"LocalStoreDocState\",\n\"chunkCount\"         = COALESCE($3, \"chunkCount\"),\n\"tokenCount\"         = COALESCE($4, \"tokenCount\"),\n\"extractedTextLength\"= COALESCE($5, \"extractedTextLength\"),\n\"imageCount\"         = COALESCE($6, \"imageCount\"),\n\"imagePages\"         = COALESCE($7, \"imagePages\"),\n\"annotPages\"         = COALESCE($8, \"annotPages\"),\n\"errorMessage\"       = $9,\n\"indexedAt\"           = CASE WHEN $2 = 'ACTIVE' THEN NOW() ELSE \"indexedAt\" END,\n\"updatedAt\"           = NOW()\nWHERE id = $1\nRETURNING id, state::\"text\" as state, \"chunkCount\", \"indexedAt\";") as (docId: string, state: $DbEnums["LocalStoreDocState"], chunkCount: number | null, tokenCount: number | null, extractedTextLength: number | null, imageCount: number | null, imagePages: string | null, annotPages: string | null, errorMessage: string | null) => $runtime.TypedSql<updateLocalDocState.Parameters, updateLocalDocState.Result>
 
 export namespace updateLocalDocState {
-  export type Parameters = [docId: string, state: $DbEnums["LocalStoreDocState"], chunkCount: number | null, tokenCount: number | null, extractedTextLength: number | null, imageCount: number | null, errorMessage: string | null]
+  export type Parameters = [docId: string, state: $DbEnums["LocalStoreDocState"], chunkCount: number | null, tokenCount: number | null, extractedTextLength: number | null, imageCount: number | null, imagePages: string | null, annotPages: string | null, errorMessage: string | null]
   export type Result = {
     id: string
     state: string | null

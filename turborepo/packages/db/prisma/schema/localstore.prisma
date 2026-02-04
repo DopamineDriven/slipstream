@@ -68,6 +68,8 @@ model LocalVectorStoreDoc {
   pageCount            Int?
   extractedTextLength  Int?
   imageCount           Int?
+  imagePages           String? // 1::15::18::21::etc
+  annotPages           String? // 1::12::25::165::etc
   modelSelectionReason String? // "mime:application/pdf" | "probe:hasVisualMedia" | etc
   indexedAt            DateTime?
   errorMessage         String?

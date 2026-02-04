@@ -2681,6 +2681,8 @@ export const LocalVectorStoreDocScalarFieldEnum = {
   pageCount: 'pageCount',
   extractedTextLength: 'extractedTextLength',
   imageCount: 'imageCount',
+  imagePages: 'imagePages',
+  annotPages: 'annotPages',
   modelSelectionReason: 'modelSelectionReason',
   indexedAt: 'indexedAt',
   errorMessage: 'errorMessage',
