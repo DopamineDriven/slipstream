@@ -444,6 +444,8 @@ export const LocalVectorStoreDocChunkScalarFieldEnum = {
   tokenCount: 'tokenCount',
   startOffset: 'startOffset',
   endOffset: 'endOffset',
+  state: 'state',
+  errorMessage: 'errorMessage',
   schemaVersion: 'schemaVersion',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',

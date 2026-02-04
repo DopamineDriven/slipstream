@@ -9,8 +9,6 @@ export * from "./sql/getMemoryChunksByConversation.ts"
 
 export * from "./sql/insertLocalDoc.ts"
 
-export * from "./sql/insertLocalDocChunk.ts"
-
 export * from "./sql/insertMemoryChunk.ts"
 
 export * from "./sql/searchConversationMemory.ts"
@@ -20,6 +18,8 @@ export * from "./sql/searchLocalDocChunks.ts"
 export * from "./sql/searchLocalDocChunksByStore.ts"
 
 export * from "./sql/searchMemoryByConversation.ts"
+
+export * from "./sql/updateLocalDocChunkState.ts"
 
 export * from "./sql/updateLocalDocState.ts"
 

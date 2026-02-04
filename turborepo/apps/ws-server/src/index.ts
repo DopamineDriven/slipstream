@@ -120,12 +120,14 @@ async function exe() {
       cfg.X_AI_KEY,
       process.env.X_AI_MANAGEMENT_API_KEY ?? cfg.X_AI_MANAGEMENT_API_KEY
     );
-
+    const { VoyageEmbeddingService } = await import("@/voyage/index.ts");
+    const voyage = new VoyageEmbeddingService(cfg.VOYAGE_API_KEY);
     const { AnthropicService } = await import("@/anthropic/index.ts");
 
     const anthropic = new AnthropicService(
       logger,
       prisma,
+      voyage,
       redisInstance,
       cfg.ANTHROPIC_API_KEY
     );
@@ -166,6 +168,7 @@ async function exe() {
       dependencies: {
         logger,
         prisma,
+        voyage,
         redis: redisInstance,
         s3,
         isProd

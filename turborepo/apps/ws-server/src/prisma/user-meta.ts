@@ -1,6 +1,5 @@
 import type { UserData } from "@/types/index.ts";
 import { ExtractService } from "@/extract/index.ts";
-import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 import * as dotenv from "dotenv";
 import type { $Enums, UserKey } from "@slipstream/db/node/generated/client";
 import type {
@@ -9,10 +8,11 @@ import type {
 } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
 import { EncryptionService } from "@slipstream/encryption";
+import { PrismaUtilsService } from "./utils.ts";
 
 dotenv.config({ quiet: true });
 
-export class PrismaUserMetaService extends PrismaAttachmentService {
+export class PrismaUserMetaService extends PrismaUtilsService {
   protected encryption: EncryptionService;
   protected userProviderKeyMap = new Map<
     Lowercase<$Enums.Provider>,

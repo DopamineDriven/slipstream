@@ -1,8 +1,9 @@
 import type { ProviderChatRequestEntity } from "@/types/index.ts";
+import type { PageImage } from "@d0paminedriven/pdfdown";
 import Anthropic from "@anthropic-ai/sdk";
 import { Stream } from "@anthropic-ai/sdk/core/streaming.mjs";
-import type { MessageSingleton } from "@slipstream/types";
 import type { searchLocalDocChunksByStore } from "@slipstream/db/sql-node";
+import type { MessageSingleton } from "@slipstream/types";
 
 export interface AnthropicFileRecord {
   id: string;
@@ -67,7 +68,6 @@ export type CreateMessageStreamRT =
 /** Direct alias of the typed SQL search result — includes joined doc fields + computed score */
 export type LocalSearchResult = searchLocalDocChunksByStore.Result;
 
-
 export interface FileSearchToolInput {
   query: string;
   max_results?: number;
@@ -77,4 +77,26 @@ export interface ToolUseAccumulator {
   id: string;
   name: string;
   inputJson: string;
+  callerType: "code_execution_20250825";
+  callerToolId: string;
+}
+
+export interface BlockBuilder {
+  type: string;
+  id?: string;
+  name?: string;
+  text?: string;
+  thinking?: string;
+  inputJson?: string;
+  input?: unknown;
+  signature?: string;
+  caller?: Anthropic.Beta.BetaServerToolCaller;
+}
+
+export interface ChunkDraft {
+  text: string;
+  startOffset: number;
+  endOffset: number;
+  images: PageImage[];
+  tokenCount: number;
 }

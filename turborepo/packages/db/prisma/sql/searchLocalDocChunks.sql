@@ -18,6 +18,7 @@ SELECT
 FROM "LocalVectorStoreDocChunk" chunk
 WHERE chunk."docId" = $1
   AND chunk."deletedAt" IS NULL
+  AND chunk.state = 'READY'::"LocalStoreChunkState"
   AND chunk.embedding IS NOT NULL
   AND 1 - (chunk.embedding <=> $2::vector) >= $4
 ORDER BY chunk.embedding <=> $2::vector

@@ -1341,6 +1341,18 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
           args: Prisma.LocalVectorStoreDocChunkFindManyArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
         }
+        create: {
+          args: Prisma.LocalVectorStoreDocChunkCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
+        }
+        createMany: {
+          args: Prisma.LocalVectorStoreDocChunkCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LocalVectorStoreDocChunkCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
+        }
         delete: {
           args: Prisma.LocalVectorStoreDocChunkDeleteArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
@@ -1360,6 +1372,10 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         updateManyAndReturn: {
           args: Prisma.LocalVectorStoreDocChunkUpdateManyAndReturnArgs<ExtArgs>
           result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>[]
+        }
+        upsert: {
+          args: Prisma.LocalVectorStoreDocChunkUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocalVectorStoreDocChunkPayload>
         }
         aggregate: {
           args: Prisma.LocalVectorStoreDocChunkAggregateArgs<ExtArgs>
@@ -2713,6 +2729,8 @@ export const LocalVectorStoreDocChunkScalarFieldEnum = {
   tokenCount: 'tokenCount',
   startOffset: 'startOffset',
   endOffset: 'endOffset',
+  state: 'state',
+  errorMessage: 'errorMessage',
   schemaVersion: 'schemaVersion',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
@@ -3319,6 +3337,20 @@ export type EnumLocalStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputTyp
  * Reference to a field of type 'LocalStoreDocState[]'
  */
 export type ListEnumLocalStoreDocStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreDocState[]'>
+    
+
+
+/**
+ * Reference to a field of type 'LocalStoreChunkState'
+ */
+export type EnumLocalStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreChunkState'>
+    
+
+
+/**
+ * Reference to a field of type 'LocalStoreChunkState[]'
+ */
+export type ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LocalStoreChunkState[]'>
     
 
 

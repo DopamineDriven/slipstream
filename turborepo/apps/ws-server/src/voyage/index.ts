@@ -208,6 +208,102 @@ export class VoyageEmbeddingService {
     return result;
   }
 
+  /**
+   * Exact multimodal token counts via Voyage Python SDK's `count_usage`.
+   * Local computation — no API call, just tokenization + pixel counting.
+   *
+   * Each input is an array of items: `{ t: string }` for text, `{ i: string }` for
+   * base64 image data (raw base64, no `data:` prefix — we strip it if present).
+   */
+  public async countUsage(
+    inputs: readonly (readonly ({ t: string } | { i: string })[])[] ,
+    model: Voyage.Multimodal.Model = "voyage-multimodal-3.5"
+  ) {
+    const script = this.pyCountUsageScript(inputs, model, this.apiKey);
+
+    try {
+      const { python } = await import("pythonia");
+      const builtins = await python<Voyage.PyBuiltIns>("builtins");
+      const execFunc = await builtins.exec;
+      const globalsFunc = await builtins.globals;
+      const globalDict = await globalsFunc();
+
+      await execFunc(script, globalDict);
+
+      const result = await globalDict.count_usage_result;
+
+      if (!result) {
+        throw new Error("Voyage count_usage returned null (Python bridge)");
+      }
+
+      if ("error" in result) {
+        throw new Error(
+          `Voyage count_usage error: ${(result as Voyage.CountUsage.Error).error}`
+        );
+      }
+
+      return result as Voyage.CountUsage.Result;
+    } catch (err) {
+      console.error("VoyageCountUsageBridge error:", err);
+      throw err;
+    }
+  }
+
+  private pyCountUsageScript(
+    inputs: readonly (readonly ({ t: string } | { i: string })[])[],
+    model: Voyage.Multimodal.Model = "voyage-multimodal-3.5",
+    apiKey = this.apiKey
+  ) {
+    // Serialize inputs as JSON — text items and base64 image strings
+    const serialized = inputs.map(input =>
+      input.map(item => {
+        if ("t" in item) {
+          return { t: item.t.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n").replace(/\r/g, "\\r") };
+        }
+        // Strip data URL prefix if present
+        const raw = item.i.includes(",") ? item.i.slice(item.i.indexOf(",") + 1) : item.i;
+        return { i: raw };
+      })
+    );
+
+    const inputsJson = JSON.stringify(serialized);
+
+    // prettier-ignore
+    return `import voyageai, base64, io, json
+from PIL import Image
+
+def main():
+    try:
+        vo = voyageai.Client(api_key="${apiKey}")
+
+        raw_inputs = json.loads('${inputsJson.replace(/'/g, "\\'")}')
+        model = "${model}"
+
+        inputs = []
+        for raw_input in raw_inputs:
+            sequence = []
+            for item in raw_input:
+                if "t" in item:
+                    sequence.append(item["t"])
+                elif "i" in item:
+                    img_bytes = base64.b64decode(item["i"])
+                    img = Image.open(io.BytesIO(img_bytes))
+                    sequence.append(img)
+            inputs.append(sequence)
+
+        usage = vo.count_usage(inputs, model=model)
+
+        return {
+            "usages": usage,
+            "model": model
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+count_usage_result = main()
+  `;
+  }
+
   private pyTokenizeScript(
     texts: readonly string[],
     model: Voyage.ModelUnion = "voyage-context-3",

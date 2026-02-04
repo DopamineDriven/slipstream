@@ -1,5 +1,6 @@
 import type { Voyage } from "@/voyage/types.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { XOR } from "@slipstream/types";
 
 export interface CreateLocalStoreParams {
   provider: $Enums.Provider;
@@ -16,6 +17,7 @@ export interface CreateLocalStoreParams {
 }
 
 export interface CreateLocalStoreRT<T extends boolean = boolean> {
+  id: string;
   createdAt: Date;
   provider: $Enums.Provider;
   storeName: string;
@@ -26,7 +28,6 @@ export interface CreateLocalStoreRT<T extends boolean = boolean> {
   schemaVersion: $Enums.LocalStoreSchemaVersion;
   totalBytes: T extends true ? number | null : bigint | null;
   totalChunks: number;
-  id: string;
   fileCount: number;
   updatedAt: Date;
 }
@@ -62,4 +63,75 @@ export interface FindManyLocalStoreDocsShape {
   pageCount: number | null;
   imagePages: number[] | null;
   annotPages: number[] | null;
+}
+
+export interface CreateGeminiDocParams {
+  userId: string;
+  attachmentId: string;
+  storeId: string;
+  docRef: string;
+  docUri: string;
+  storeRef: string;
+  filename: string;
+  indexedAt: Date;
+  mimeType: string;
+  state: $Enums.ProviderDocState;
+  size?: bigint;
+}
+
+export interface CreateManyGeminiDocsAgg {
+  readonly storeId: string;
+  readonly attachmentId: string;
+  readonly docRef: string;
+  readonly filename: string;
+  readonly mimeType: string;
+  readonly provider: "GEMINI";
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly lastAccessed: string;
+  readonly size: number;
+  readonly docUri: `https://generativelanguage.googleapis.com/v1beta/${string}`;
+  readonly state: "ACTIVE" | "FAILED" | "PENDING" | "PROCESSING";
+  readonly indexedAt: string;
+}
+
+export type VectorStoreInfoByProviderProps = XOR<
+  {
+    readonly totalBytes: 0;
+    readonly storeRef: undefined;
+    readonly dbId: undefined;
+    readonly hasStore: false;
+    readonly storeName: undefined;
+    readonly fileCount: 0;
+    readonly provider: $Enums.Provider;
+  },
+  {
+    readonly totalBytes: number;
+    readonly storeRef: string;
+    readonly dbId: string;
+    readonly hasStore: true;
+    readonly storeName: string;
+    readonly provider: $Enums.Provider;
+    readonly fileCount: number;
+  }
+>;
+
+export interface FindManyProviderStoreDocsAgg {
+  id: string;
+  size: number | null;
+  filename: string;
+  createdAt: Date;
+  updatedAt: Date;
+  attachmentId: string;
+  provider: $Enums.Provider;
+  state: $Enums.ProviderDocState;
+  errorMessage: string | null;
+  storeId: string;
+  storeRef: string;
+  storeName: string;
+  docRef: string;
+  docUri: string | null;
+  indexedAt: Date | null;
+  mimeType: string;
+  lastAccessed: Date | null;
 }

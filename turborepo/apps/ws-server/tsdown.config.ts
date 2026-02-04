@@ -1,27 +1,14 @@
 import { relative } from "node:path";
-import type { UserConfig as Options } from "tsdown";
+import type { UserConfig } from "tsdown";
 import { defineConfig } from "tsdown";
 
 export default defineConfig(
-  (
-    options: Omit<
-      Options,
-      | "entry"
-      | "target"
-      | "dts"
-      | "watch"
-      | "format"
-      | "cwd"
-      | "sourcemap"
-      | "clean"
-      | "outDir"
-      | "tsconfig"
-    >
-  ) =>
+  (options: UserConfig) =>
     ({
       ...options,
       entry: [
         "src/index.ts",
+        "src/anthropic/base.ts",
         "src/anthropic/index.ts",
         "src/anthropic/types.ts",
         "src/anthropic/vector-store.ts",
@@ -49,6 +36,8 @@ export default defineConfig(
         "src/prisma/attachment.ts",
         "src/prisma/chat.ts",
         "src/prisma/index.ts",
+        "src/prisma/local-store.ts",
+        "src/prisma/provider-store.ts",
         "src/prisma/types.ts",
         "src/prisma/user-meta.ts",
         "src/prisma/utils.ts",
@@ -84,5 +73,5 @@ export default defineConfig(
       clean: true,
       outDir: "dist",
       unbundle: true
-    }) satisfies Options
+    }) satisfies UserConfig
 );

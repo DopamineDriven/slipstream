@@ -55,6 +55,8 @@ export type LocalVectorStoreDocChunkMinAggregateOutputType = {
   tokenCount: number | null
   startOffset: number | null
   endOffset: number | null
+  state: $Enums.LocalStoreChunkState | null
+  errorMessage: string | null
   schemaVersion: $Enums.LocalStoreSchemaVersion | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -76,6 +78,8 @@ export type LocalVectorStoreDocChunkMaxAggregateOutputType = {
   tokenCount: number | null
   startOffset: number | null
   endOffset: number | null
+  state: $Enums.LocalStoreChunkState | null
+  errorMessage: string | null
   schemaVersion: $Enums.LocalStoreSchemaVersion | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -97,6 +101,8 @@ export type LocalVectorStoreDocChunkCountAggregateOutputType = {
   tokenCount: number
   startOffset: number
   endOffset: number
+  state: number
+  errorMessage: number
   schemaVersion: number
   deletedAt: number
   createdAt: number
@@ -134,6 +140,8 @@ export type LocalVectorStoreDocChunkMinAggregateInputType = {
   tokenCount?: true
   startOffset?: true
   endOffset?: true
+  state?: true
+  errorMessage?: true
   schemaVersion?: true
   deletedAt?: true
   createdAt?: true
@@ -155,6 +163,8 @@ export type LocalVectorStoreDocChunkMaxAggregateInputType = {
   tokenCount?: true
   startOffset?: true
   endOffset?: true
+  state?: true
+  errorMessage?: true
   schemaVersion?: true
   deletedAt?: true
   createdAt?: true
@@ -176,6 +186,8 @@ export type LocalVectorStoreDocChunkCountAggregateInputType = {
   tokenCount?: true
   startOffset?: true
   endOffset?: true
+  state?: true
+  errorMessage?: true
   schemaVersion?: true
   deletedAt?: true
   createdAt?: true
@@ -284,6 +296,8 @@ export type LocalVectorStoreDocChunkGroupByOutputType = {
   tokenCount: number
   startOffset: number | null
   endOffset: number | null
+  state: $Enums.LocalStoreChunkState
+  errorMessage: string | null
   schemaVersion: $Enums.LocalStoreSchemaVersion
   deletedAt: Date | null
   createdAt: Date
@@ -328,6 +342,8 @@ export type LocalVectorStoreDocChunkWhereInput = {
   tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
   startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
   endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDocChunk"> | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
@@ -350,6 +366,8 @@ export type LocalVectorStoreDocChunkOrderByWithRelationInput = {
   tokenCount?: Prisma.SortOrder
   startOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   endOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   schemaVersion?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -376,6 +394,8 @@ export type LocalVectorStoreDocChunkWhereUniqueInput = Prisma.AtLeast<{
   tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
   startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
   endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDocChunk"> | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
@@ -398,6 +418,8 @@ export type LocalVectorStoreDocChunkOrderByWithAggregationInput = {
   tokenCount?: Prisma.SortOrder
   startOffset?: Prisma.SortOrderInput | Prisma.SortOrder
   endOffset?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   schemaVersion?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -427,10 +449,58 @@ export type LocalVectorStoreDocChunkScalarWhereWithAggregatesInput = {
   tokenCount?: Prisma.IntWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number
   startOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null
   endOffset?: Prisma.IntNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | number | null
+  state?: Prisma.EnumLocalStoreChunkStateWithAggregatesFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionWithAggregatesFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LocalVectorStoreDocChunk"> | Date | string
+}
+
+export type LocalVectorStoreDocChunkCreateInput = {
+  id?: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  doc: Prisma.LocalVectorStoreDocCreateNestedOneWithoutChunksInput
+}
+
+export type LocalVectorStoreDocChunkUncheckedCreateInput = {
+  id?: string
+  docId: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateInput = {
@@ -447,6 +517,8 @@ export type LocalVectorStoreDocChunkUpdateInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -469,10 +541,35 @@ export type LocalVectorStoreDocChunkUncheckedUpdateInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type LocalVectorStoreDocChunkCreateManyInput = {
+  id?: string
+  docId: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateManyMutationInput = {
@@ -489,6 +586,8 @@ export type LocalVectorStoreDocChunkUpdateManyMutationInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -510,6 +609,8 @@ export type LocalVectorStoreDocChunkUncheckedUpdateManyInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,6 +648,8 @@ export type LocalVectorStoreDocChunkCountOrderByAggregateInput = {
   tokenCount?: Prisma.SortOrder
   startOffset?: Prisma.SortOrder
   endOffset?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
   schemaVersion?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -575,6 +678,8 @@ export type LocalVectorStoreDocChunkMaxOrderByAggregateInput = {
   tokenCount?: Prisma.SortOrder
   startOffset?: Prisma.SortOrder
   endOffset?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
   schemaVersion?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -596,6 +701,8 @@ export type LocalVectorStoreDocChunkMinOrderByAggregateInput = {
   tokenCount?: Prisma.SortOrder
   startOffset?: Prisma.SortOrder
   endOffset?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
   schemaVersion?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -610,14 +717,24 @@ export type LocalVectorStoreDocChunkSumOrderByAggregateInput = {
 }
 
 export type LocalVectorStoreDocChunkCreateNestedManyWithoutDocInput = {
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput> | Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput[] | Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput | Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput[]
+  createMany?: Prisma.LocalVectorStoreDocChunkCreateManyDocInputEnvelope
   connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
 }
 
 export type LocalVectorStoreDocChunkUncheckedCreateNestedManyWithoutDocInput = {
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput> | Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput[] | Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput | Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput[]
+  createMany?: Prisma.LocalVectorStoreDocChunkCreateManyDocInputEnvelope
   connect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
 }
 
 export type LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput = {
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput> | Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput[] | Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput | Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput[]
+  upsert?: Prisma.LocalVectorStoreDocChunkUpsertWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpsertWithWhereUniqueWithoutDocInput[]
+  createMany?: Prisma.LocalVectorStoreDocChunkCreateManyDocInputEnvelope
   set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
   disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
   delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
@@ -628,6 +745,10 @@ export type LocalVectorStoreDocChunkUpdateManyWithoutDocNestedInput = {
 }
 
 export type LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput = {
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput> | Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput[] | Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput[]
+  connectOrCreate?: Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput | Prisma.LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput[]
+  upsert?: Prisma.LocalVectorStoreDocChunkUpsertWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpsertWithWhereUniqueWithoutDocInput[]
+  createMany?: Prisma.LocalVectorStoreDocChunkCreateManyDocInputEnvelope
   set?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
   disconnect?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
   delete?: Prisma.LocalVectorStoreDocChunkWhereUniqueInput | Prisma.LocalVectorStoreDocChunkWhereUniqueInput[]
@@ -635,6 +756,70 @@ export type LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocNestedInput = {
   update?: Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput[]
   updateMany?: Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput | Prisma.LocalVectorStoreDocChunkUpdateManyWithWhereWithoutDocInput[]
   deleteMany?: Prisma.LocalVectorStoreDocChunkScalarWhereInput | Prisma.LocalVectorStoreDocChunkScalarWhereInput[]
+}
+
+export type EnumLocalStoreChunkStateFieldUpdateOperationsInput = {
+  set?: $Enums.LocalStoreChunkState
+}
+
+export type LocalVectorStoreDocChunkCreateWithoutDocInput = {
+  id?: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput = {
+  id?: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type LocalVectorStoreDocChunkCreateOrConnectWithoutDocInput = {
+  where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
+  create: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput>
+}
+
+export type LocalVectorStoreDocChunkCreateManyDocInputEnvelope = {
+  data: Prisma.LocalVectorStoreDocChunkCreateManyDocInput | Prisma.LocalVectorStoreDocChunkCreateManyDocInput[]
+  skipDuplicates?: boolean
+}
+
+export type LocalVectorStoreDocChunkUpsertWithWhereUniqueWithoutDocInput = {
+  where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
+  update: Prisma.XOR<Prisma.LocalVectorStoreDocChunkUpdateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedUpdateWithoutDocInput>
+  create: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateWithoutDocInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateWithoutDocInput>
 }
 
 export type LocalVectorStoreDocChunkUpdateWithWhereUniqueWithoutDocInput = {
@@ -665,10 +850,34 @@ export type LocalVectorStoreDocChunkScalarWhereInput = {
   tokenCount?: Prisma.IntFilter<"LocalVectorStoreDocChunk"> | number
   startOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
   endOffset?: Prisma.IntNullableFilter<"LocalVectorStoreDocChunk"> | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.StringNullableFilter<"LocalVectorStoreDocChunk"> | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFilter<"LocalVectorStoreDocChunk"> | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.DateTimeNullableFilter<"LocalVectorStoreDocChunk"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LocalVectorStoreDocChunk"> | Date | string
+}
+
+export type LocalVectorStoreDocChunkCreateManyDocInput = {
+  id?: string
+  storeId: string
+  chunkProvenanceId: string
+  provenanceId: string
+  attachmentId: string
+  conversationId: string
+  messageId: string
+  chunkIndex: number
+  content: string
+  contentHash: string
+  tokenCount: number
+  startOffset?: number | null
+  endOffset?: number | null
+  state?: $Enums.LocalStoreChunkState
+  errorMessage?: string | null
+  schemaVersion?: $Enums.LocalStoreSchemaVersion
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type LocalVectorStoreDocChunkUpdateWithoutDocInput = {
@@ -685,6 +894,8 @@ export type LocalVectorStoreDocChunkUpdateWithoutDocInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -705,6 +916,8 @@ export type LocalVectorStoreDocChunkUncheckedUpdateWithoutDocInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -725,6 +938,8 @@ export type LocalVectorStoreDocChunkUncheckedUpdateManyWithoutDocInput = {
   tokenCount?: Prisma.IntFieldUpdateOperationsInput | number
   startOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   endOffset?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  state?: Prisma.EnumLocalStoreChunkStateFieldUpdateOperationsInput | $Enums.LocalStoreChunkState
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schemaVersion?: Prisma.EnumLocalStoreSchemaVersionFieldUpdateOperationsInput | $Enums.LocalStoreSchemaVersion
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -748,6 +963,8 @@ export type LocalVectorStoreDocChunkSelect<ExtArgs extends runtime.Types.Extensi
   tokenCount?: boolean
   startOffset?: boolean
   endOffset?: boolean
+  state?: boolean
+  errorMessage?: boolean
   schemaVersion?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -755,6 +972,29 @@ export type LocalVectorStoreDocChunkSelect<ExtArgs extends runtime.Types.Extensi
   doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["localVectorStoreDocChunk"]>
 
+export type LocalVectorStoreDocChunkSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  docId?: boolean
+  storeId?: boolean
+  chunkProvenanceId?: boolean
+  provenanceId?: boolean
+  attachmentId?: boolean
+  conversationId?: boolean
+  messageId?: boolean
+  chunkIndex?: boolean
+  content?: boolean
+  contentHash?: boolean
+  tokenCount?: boolean
+  startOffset?: boolean
+  endOffset?: boolean
+  state?: boolean
+  errorMessage?: boolean
+  schemaVersion?: boolean
+  deletedAt?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["localVectorStoreDocChunk"]>
 
 export type LocalVectorStoreDocChunkSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -771,6 +1011,8 @@ export type LocalVectorStoreDocChunkSelectUpdateManyAndReturn<ExtArgs extends ru
   tokenCount?: boolean
   startOffset?: boolean
   endOffset?: boolean
+  state?: boolean
+  errorMessage?: boolean
   schemaVersion?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -793,14 +1035,19 @@ export type LocalVectorStoreDocChunkSelectScalar = {
   tokenCount?: boolean
   startOffset?: boolean
   endOffset?: boolean
+  state?: boolean
+  errorMessage?: boolean
   schemaVersion?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type LocalVectorStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDocChunk"]>
+export type LocalVectorStoreDocChunkOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "docId" | "storeId" | "chunkProvenanceId" | "provenanceId" | "attachmentId" | "conversationId" | "messageId" | "chunkIndex" | "content" | "contentHash" | "tokenCount" | "startOffset" | "endOffset" | "state" | "errorMessage" | "schemaVersion" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["localVectorStoreDocChunk"]>
 export type LocalVectorStoreDocChunkInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
+}
+export type LocalVectorStoreDocChunkIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doc?: boolean | Prisma.LocalVectorStoreDocDefaultArgs<ExtArgs>
 }
 export type LocalVectorStoreDocChunkIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -827,6 +1074,8 @@ export type $LocalVectorStoreDocChunkPayload<ExtArgs extends runtime.Types.Exten
     tokenCount: number
     startOffset: number | null
     endOffset: number | null
+    state: $Enums.LocalStoreChunkState
+    errorMessage: string | null
     schemaVersion: $Enums.LocalStoreSchemaVersion
     deletedAt: Date | null
     createdAt: Date
@@ -921,6 +1170,58 @@ export interface LocalVectorStoreDocChunkDelegate<ExtArgs extends runtime.Types.
   findMany<T extends LocalVectorStoreDocChunkFindManyArgs>(args?: Prisma.SelectSubset<T, LocalVectorStoreDocChunkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
   /**
+   * Create a LocalVectorStoreDocChunk.
+   * @param {LocalVectorStoreDocChunkCreateArgs} args - Arguments to create a LocalVectorStoreDocChunk.
+   * @example
+   * // Create one LocalVectorStoreDocChunk
+   * const LocalVectorStoreDocChunk = await prisma.localVectorStoreDocChunk.create({
+   *   data: {
+   *     // ... data to create a LocalVectorStoreDocChunk
+   *   }
+   * })
+   * 
+   */
+  create<T extends LocalVectorStoreDocChunkCreateArgs>(args: Prisma.SelectSubset<T, LocalVectorStoreDocChunkCreateArgs<ExtArgs>>): Prisma.Prisma__LocalVectorStoreDocChunkClient<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+  /**
+   * Create many LocalVectorStoreDocChunks.
+   * @param {LocalVectorStoreDocChunkCreateManyArgs} args - Arguments to create many LocalVectorStoreDocChunks.
+   * @example
+   * // Create many LocalVectorStoreDocChunks
+   * const localVectorStoreDocChunk = await prisma.localVectorStoreDocChunk.createMany({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   *     
+   */
+  createMany<T extends LocalVectorStoreDocChunkCreateManyArgs>(args?: Prisma.SelectSubset<T, LocalVectorStoreDocChunkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Create many LocalVectorStoreDocChunks and returns the data saved in the database.
+   * @param {LocalVectorStoreDocChunkCreateManyAndReturnArgs} args - Arguments to create many LocalVectorStoreDocChunks.
+   * @example
+   * // Create many LocalVectorStoreDocChunks
+   * const localVectorStoreDocChunk = await prisma.localVectorStoreDocChunk.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many LocalVectorStoreDocChunks and only return the `id`
+   * const localVectorStoreDocChunkWithIdOnly = await prisma.localVectorStoreDocChunk.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends LocalVectorStoreDocChunkCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, LocalVectorStoreDocChunkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a LocalVectorStoreDocChunk.
    * @param {LocalVectorStoreDocChunkDeleteArgs} args - Arguments to delete one LocalVectorStoreDocChunk.
    * @example
@@ -1013,6 +1314,25 @@ export interface LocalVectorStoreDocChunkDelegate<ExtArgs extends runtime.Types.
    * 
    */
   updateManyAndReturn<T extends LocalVectorStoreDocChunkUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, LocalVectorStoreDocChunkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+  /**
+   * Create or update one LocalVectorStoreDocChunk.
+   * @param {LocalVectorStoreDocChunkUpsertArgs} args - Arguments to update or create a LocalVectorStoreDocChunk.
+   * @example
+   * // Update or create a LocalVectorStoreDocChunk
+   * const localVectorStoreDocChunk = await prisma.localVectorStoreDocChunk.upsert({
+   *   create: {
+   *     // ... data to create a LocalVectorStoreDocChunk
+   *   },
+   *   update: {
+   *     // ... in case it already exists, update
+   *   },
+   *   where: {
+   *     // ... the filter for the LocalVectorStoreDocChunk we want to update
+   *   }
+   * })
+   */
+  upsert<T extends LocalVectorStoreDocChunkUpsertArgs>(args: Prisma.SelectSubset<T, LocalVectorStoreDocChunkUpsertArgs<ExtArgs>>): Prisma.Prisma__LocalVectorStoreDocChunkClient<runtime.Types.Result.GetResult<Prisma.$LocalVectorStoreDocChunkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
   /**
@@ -1198,6 +1518,8 @@ export interface LocalVectorStoreDocChunkFieldRefs {
   readonly tokenCount: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'Int'>
   readonly startOffset: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'Int'>
   readonly endOffset: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'Int'>
+  readonly state: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'LocalStoreChunkState'>
+  readonly errorMessage: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'String'>
   readonly schemaVersion: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'LocalStoreSchemaVersion'>
   readonly deletedAt: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"LocalVectorStoreDocChunk", 'DateTime'>
@@ -1407,6 +1729,63 @@ export type LocalVectorStoreDocChunkFindManyArgs<ExtArgs extends runtime.Types.E
 }
 
 /**
+ * LocalVectorStoreDocChunk create
+ */
+export type LocalVectorStoreDocChunkCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LocalVectorStoreDocChunk
+   */
+  select?: Prisma.LocalVectorStoreDocChunkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LocalVectorStoreDocChunk
+   */
+  omit?: Prisma.LocalVectorStoreDocChunkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocalVectorStoreDocChunkInclude<ExtArgs> | null
+  /**
+   * The data needed to create a LocalVectorStoreDocChunk.
+   */
+  data: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
+}
+
+/**
+ * LocalVectorStoreDocChunk createMany
+ */
+export type LocalVectorStoreDocChunkCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * The data used to create many LocalVectorStoreDocChunks.
+   */
+  data: Prisma.LocalVectorStoreDocChunkCreateManyInput | Prisma.LocalVectorStoreDocChunkCreateManyInput[]
+  skipDuplicates?: boolean
+}
+
+/**
+ * LocalVectorStoreDocChunk createManyAndReturn
+ */
+export type LocalVectorStoreDocChunkCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LocalVectorStoreDocChunk
+   */
+  select?: Prisma.LocalVectorStoreDocChunkSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the LocalVectorStoreDocChunk
+   */
+  omit?: Prisma.LocalVectorStoreDocChunkOmit<ExtArgs> | null
+  /**
+   * The data used to create many LocalVectorStoreDocChunks.
+   */
+  data: Prisma.LocalVectorStoreDocChunkCreateManyInput | Prisma.LocalVectorStoreDocChunkCreateManyInput[]
+  skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocalVectorStoreDocChunkIncludeCreateManyAndReturn<ExtArgs> | null
+}
+
+/**
  * LocalVectorStoreDocChunk update
  */
 export type LocalVectorStoreDocChunkUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1479,6 +1858,37 @@ export type LocalVectorStoreDocChunkUpdateManyAndReturnArgs<ExtArgs extends runt
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.LocalVectorStoreDocChunkIncludeUpdateManyAndReturn<ExtArgs> | null
+}
+
+/**
+ * LocalVectorStoreDocChunk upsert
+ */
+export type LocalVectorStoreDocChunkUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LocalVectorStoreDocChunk
+   */
+  select?: Prisma.LocalVectorStoreDocChunkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LocalVectorStoreDocChunk
+   */
+  omit?: Prisma.LocalVectorStoreDocChunkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocalVectorStoreDocChunkInclude<ExtArgs> | null
+  /**
+   * The filter to search for the LocalVectorStoreDocChunk to update in case it exists.
+   */
+  where: Prisma.LocalVectorStoreDocChunkWhereUniqueInput
+  /**
+   * In case the LocalVectorStoreDocChunk found by the `where` argument doesn't exist, create a new LocalVectorStoreDocChunk with this data.
+   */
+  create: Prisma.XOR<Prisma.LocalVectorStoreDocChunkCreateInput, Prisma.LocalVectorStoreDocChunkUncheckedCreateInput>
+  /**
+   * In case the LocalVectorStoreDocChunk was found with the provided `where` argument, update it with this data.
+   */
+  update: Prisma.XOR<Prisma.LocalVectorStoreDocChunkUpdateInput, Prisma.LocalVectorStoreDocChunkUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

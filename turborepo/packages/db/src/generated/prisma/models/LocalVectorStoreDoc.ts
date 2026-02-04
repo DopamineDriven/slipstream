@@ -1081,6 +1081,12 @@ export type EnumLocalStoreDocStateFieldUpdateOperationsInput = {
   set?: $Enums.LocalStoreDocState
 }
 
+export type LocalVectorStoreDocCreateNestedOneWithoutChunksInput = {
+  create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutChunksInput>
+  connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutChunksInput
+  connect?: Prisma.LocalVectorStoreDocWhereUniqueInput
+}
+
 export type LocalVectorStoreDocUpdateOneRequiredWithoutChunksNestedInput = {
   create?: Prisma.XOR<Prisma.LocalVectorStoreDocCreateWithoutChunksInput, Prisma.LocalVectorStoreDocUncheckedCreateWithoutChunksInput>
   connectOrCreate?: Prisma.LocalVectorStoreDocCreateOrConnectWithoutChunksInput

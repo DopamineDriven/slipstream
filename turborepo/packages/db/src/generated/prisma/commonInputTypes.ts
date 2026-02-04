@@ -558,6 +558,23 @@ export type EnumLocalStoreDocStateWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumLocalStoreDocStateFilter<$PrismaModel>
 }
 
+export type EnumLocalStoreChunkStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.LocalStoreChunkState | Prisma.EnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel> | $Enums.LocalStoreChunkState
+}
+
+export type EnumLocalStoreChunkStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LocalStoreChunkState | Prisma.EnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocalStoreChunkStateWithAggregatesFilter<$PrismaModel> | $Enums.LocalStoreChunkState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel>
+}
+
 export type BigIntFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
@@ -1282,6 +1299,23 @@ export type NestedEnumLocalStoreDocStateWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumLocalStoreDocStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumLocalStoreDocStateFilter<$PrismaModel>
+}
+
+export type NestedEnumLocalStoreChunkStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.LocalStoreChunkState | Prisma.EnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel> | $Enums.LocalStoreChunkState
+}
+
+export type NestedEnumLocalStoreChunkStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LocalStoreChunkState | Prisma.EnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  in?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LocalStoreChunkState[] | Prisma.ListEnumLocalStoreChunkStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocalStoreChunkStateWithAggregatesFilter<$PrismaModel> | $Enums.LocalStoreChunkState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLocalStoreChunkStateFilter<$PrismaModel>
 }
 
 export type NestedBigIntFilter<$PrismaModel = never> = {

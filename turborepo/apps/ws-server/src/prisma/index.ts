@@ -15,15 +15,23 @@ import { PrismaDbService } from "@slipstream/db/factory";
  *
  *  ⬆
  *
- * `@/prisma/user-meta.ts`
- *
- *  ⬆
- *
  * `@/prisma/attachment.ts`
  *
  *  ⬆
  *
+ * `@/prisma/local-store.ts`
+ *
+ *  ⬆
+ *
+ * `@/prisma/provider-store.ts`
+ *
+ *  ⬆
+ *
  * `@/prisma/attachment-provider.ts`
+ * 
+ *  ⬆
+ *
+ * `@/prisma/user-meta.ts`
  *
  *  ⬆
  *

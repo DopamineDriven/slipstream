@@ -15,6 +15,7 @@
         "dist/*/index.d.ts"
       ],
       "anthropic": [
+        "dist/anthropic/base.d.ts",
         "dist/anthropic/index.d.ts",
         "dist/anthropic/types.d.ts",
         "dist/anthropic/vector-store.d.ts",
@@ -64,6 +65,8 @@
         "dist/prisma/attachment.d.ts",
         "dist/prisma/chat.d.ts",
         "dist/prisma/index.d.ts",
+        "dist/prisma/local-store.d.ts",
+        "dist/prisma/provider-store.d.ts",
         "dist/prisma/types.d.ts",
         "dist/prisma/user-meta.d.ts",
         "dist/prisma/utils.d.ts"

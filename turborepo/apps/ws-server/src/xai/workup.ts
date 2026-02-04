@@ -594,7 +594,8 @@ export class GrokWorkupService {
 
     const data = await res.json<Collection>();
 
-    const prismaCreate = await this.prisma.createGrokVectorStore(
+    const prismaCreate = await this.prisma.createProviderVectorStore(
+      "GROK",
       userId,
       data.collection_id,
       data.collection_name,
@@ -1092,7 +1093,8 @@ export class GrokWorkupService {
       if (storeInfo.hasStore) {
         storeDbId = storeInfo.dbId;
       } else {
-        const dbStore = await this.prisma.createGrokVectorStore(
+        const dbStore = await this.prisma.createProviderVectorStore(
+          "GROK",
           userId,
           collectionId,
           collection.store.collection_name,
@@ -1246,7 +1248,8 @@ export class GrokWorkupService {
 
     if (!storeDbData?.dbId) {
       if (collectionData.hasStore) {
-        const dbData = await this.prisma.createGrokVectorStore(
+        const dbData = await this.prisma.createProviderVectorStore(
+          "GROK",
           userId,
           collectionData.store.collection_id,
           collectionData.store.collection_name,

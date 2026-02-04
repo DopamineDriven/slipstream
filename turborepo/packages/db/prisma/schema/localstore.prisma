@@ -15,6 +15,12 @@ enum LocalStoreDocState {
   FAILED
 }
 
+enum LocalStoreChunkState {
+  QUEUED
+  READY
+  ERROR
+}
+
 enum LocalStoreSchemaVersion {
   v1_0
 }
@@ -117,7 +123,10 @@ model LocalVectorStoreDocChunk {
   startOffset Int?
   endOffset   Int?
 
-  embedding Unsupported("vector(1024)")
+  state        LocalStoreChunkState @default(QUEUED)
+  errorMessage String?
+
+  embedding Unsupported("vector(1024)")?
 
   schemaVersion LocalStoreSchemaVersion @default(v1_0)
   deletedAt     DateTime?
@@ -133,6 +142,8 @@ model LocalVectorStoreDocChunk {
   @@index([attachmentId])
   @@index([conversationId, messageId])
   @@index([contentHash])
+  @@index([state])
+  @@index([docId, state])
   @@index([embedding], map: "idx_local_doc_chunk_embedding_hnsw")
   @@index([storeId], map: "idx_local_doc_chunk_store_active")
 }

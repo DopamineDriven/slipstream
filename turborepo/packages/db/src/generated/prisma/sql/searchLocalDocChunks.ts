@@ -11,7 +11,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param limit
  * @param threshold
  */
-export const searchLocalDocChunks = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"contentHash\",\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"LocalVectorStoreDocChunk\" chunk\nWHERE chunk.\"docId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (docId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchLocalDocChunks.Parameters, searchLocalDocChunks.Result>
+export const searchLocalDocChunks = $runtime.makeTypedQueryFactory("\nSELECT\nchunk.id,\nchunk.\"chunkProvenanceId\",\nchunk.\"chunkIndex\",\nchunk.content,\nchunk.\"contentHash\",\nchunk.\"tokenCount\",\nchunk.\"startOffset\",\nchunk.\"endOffset\",\nchunk.\"provenanceId\",\nchunk.\"attachmentId\",\n1 - (chunk.embedding <=> $2::vector) as score\nFROM \"LocalVectorStoreDocChunk\" chunk\nWHERE chunk.\"docId\" = $1\nAND chunk.\"deletedAt\" IS NULL\nAND chunk.state = 'READY'::\"LocalStoreChunkState\"\nAND chunk.embedding IS NOT NULL\nAND 1 - (chunk.embedding <=> $2::vector) >= $4\nORDER BY chunk.embedding <=> $2::vector\nLIMIT $3;") as (docId: string, embedding: string, limit: number, threshold: number) => $runtime.TypedSql<searchLocalDocChunks.Parameters, searchLocalDocChunks.Result>
 
 export namespace searchLocalDocChunks {
   export type Parameters = [docId: string, embedding: string, limit: number, threshold: number]

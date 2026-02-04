@@ -10,7 +10,6 @@ import type {
   HandleAiChatReqUpdateWithImgGenSansAttachmentsProps
 } from "@/types/index.ts";
 import { ExtractService } from "@/extract/index.ts";
-import { PrismaUserMetaService } from "@/prisma/user-meta.ts";
 import type { ImageGenOutputCreateNestedOneWithoutAttachmentInput } from "@slipstream/db/node/generated/models";
 import type {
   AIChatRequest,
@@ -20,8 +19,9 @@ import type {
   Rm
 } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
+import { PrismaAttachmentService } from "@/prisma/attachment.ts";
 
-export class PrismaChatService extends PrismaUserMetaService {
+export class PrismaChatService extends PrismaAttachmentService {
   constructor(
     prisma: PrismaDbService,
     extractor: ExtractService,

@@ -212,7 +212,7 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
   };
 }
 const perf = performance.now();
-readAndExtract("Warlord-of-Whimsy.pdf").then(v => {
+readAndExtract("Warlord-of-Whimsy-Pt-XV.pdf").then(v => {
   console.log(performance.now() - perf);
   if (v.creationDate && v.creator && v.producer) {
     const imgSizes = v.imgWithSizeArr.map((t) =>t.size);

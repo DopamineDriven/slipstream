@@ -21,6 +21,7 @@ export namespace Voyage {
     ) => Promise<V>;
     export type BuiltIns = PromiseLike<{
       tokenize_result: Promise<Tokenize.Result>;
+      count_usage_result: Promise<CountUsage.Result>;
     }>;
   }
   export interface PyBuiltIns {
@@ -64,6 +65,26 @@ export namespace Voyage {
       counts: number[];
       total: number;
       model: ModelUnion;
+    }
+
+    export interface Error {
+      error: string;
+    }
+
+    export type Response = Result | Error;
+  }
+
+  export namespace CountUsage {
+    export interface InputUsage {
+      text_tokens: number;
+      image_pixels: number;
+      video_pixels: number;
+      total_tokens: number;
+    }
+
+    export interface Result {
+      usages: InputUsage[];
+      model: Multimodal.Model;
     }
 
     export interface Error {

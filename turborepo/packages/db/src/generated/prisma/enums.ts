@@ -212,6 +212,15 @@ export const LocalStoreDocState = {
 export type LocalStoreDocState = (typeof LocalStoreDocState)[keyof typeof LocalStoreDocState]
 
 
+export const LocalStoreChunkState = {
+  QUEUED: 'QUEUED',
+  READY: 'READY',
+  ERROR: 'ERROR'
+} as const
+
+export type LocalStoreChunkState = (typeof LocalStoreChunkState)[keyof typeof LocalStoreChunkState]
+
+
 export const LocalStoreSchemaVersion = {
   v1_0: 'v1_0'
 } as const

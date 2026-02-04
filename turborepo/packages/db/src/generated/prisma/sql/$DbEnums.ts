@@ -19,6 +19,7 @@ export interface $DbEnums {
   ImageGenStage: "QUEUED" | "PROCESSING" | "PERSISTING" | "FINALIZING" | "COMPLETED" | "REFUSAL" | "FAILED" | "ABORTED"
   VisualMediaHint: "animations" | "charts" | "drawings" | "images" | "mixed" | "slides"
   LocalStoreDocState: "QUEUED" | "PENDING" | "PROCESSING" | "ACTIVE" | "FAILED"
+  LocalStoreChunkState: "QUEUED" | "READY" | "ERROR"
   LocalStoreSchemaVersion: "v1_0"
   MemoryChunkingState: "QUEUED" | "CHUNKING" | "EMBEDDING" | "INDEXED" | "ERROR"
   MemoryChunkBoundaryReason: "TOKEN_LIMIT" | "IDLE_TIME" | "TOPIC_SHIFT" | "SESSION_END" | "OTHER"
