@@ -13,6 +13,7 @@ export class DbService {
     this.prismaClient = new PrismaClient({
       adapter: this.adapter,
       errorFormat: "pretty"
+      // log: ["query", "info"]
     });
   }
 }

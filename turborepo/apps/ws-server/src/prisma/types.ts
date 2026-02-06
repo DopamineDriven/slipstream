@@ -32,6 +32,18 @@ export interface CreateLocalStoreRT<T extends boolean = boolean> {
   updatedAt: Date;
 }
 
+export interface ChunkArrShape {
+  id: string;
+  errorMessage: string | null;
+  state: $Enums.LocalStoreChunkState;
+  chunkProvenanceId: string;
+  chunkIndex: number;
+  content: string;
+  contentHash: string;
+  startOffset: number | null;
+  endOffset: number | null;
+}
+
 export interface FindManyLocalStoreDocsShape {
   id: string;
   size: number | null;
@@ -63,6 +75,7 @@ export interface FindManyLocalStoreDocsShape {
   pageCount: number | null;
   imagePages: number[] | null;
   annotPages: number[] | null;
+  chunks: ChunkArrShape[];
 }
 
 export interface CreateGeminiDocParams {

@@ -161,7 +161,7 @@ export class PrismaProviderStoreService extends PrismaAttachmentProviderService 
           dd.updateTime
         ) {
           const filename = dd.displayName;
-          const { attachmentId } = this.parseFilename(dd.displayName);
+          const { attachmentId } = this.parseDocname(dd.displayName);
           const docUri =
             `https://generativelanguage.googleapis.com/v1beta/${dd.name}` as const;
           const docRef = dd.name;

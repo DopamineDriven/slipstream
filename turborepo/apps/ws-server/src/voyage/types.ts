@@ -22,7 +22,7 @@ export namespace Voyage {
     export type BuiltIns = Promise<{
       tokenize_result: Promise<Tokenize.Result>;
       raw_usage: Promise<CountUsage.Result>;
-      count_usage_result: Promise<{raw_usage: CountUsage.Result['usages'][number]}>;
+      count_usage_result: Promise<string>;
     }>;
   }
   export interface PyBuiltIns {

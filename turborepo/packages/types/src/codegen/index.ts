@@ -127,12 +127,16 @@ const providerModelChatApi = {
     "grok-3",
     "grok-3-mini",
     "grok-2-vision-1212"
+    // TODO ADD THESE ONCE LOCAL VECTOR STORE FINISHED
+    // "grok-imagine-image",
+    // "grok-imagine-video"
   ],
   /**
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-names
    * @url https://docs.anthropic.com/en/docs/about-claude/models/overview#model-aliases
    */
   anthropic: [
+    "claude-opus-4-6",
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001",

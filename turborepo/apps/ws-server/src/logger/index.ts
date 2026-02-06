@@ -1,16 +1,17 @@
+import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
 import type {
   LoggerOptions,
   Logger as PinoLogger,
-  TransportSingleOptions
-} from "pino";
+  TransportMultiOptions} from "pino";
 import type { PrettyOptions } from "pino-pretty";
 import { UserData } from "@/types/index.ts";
 import pino, { stdTimeFunctions } from "pino";
-import { EventTypeMap } from "@slipstream/types";
 
-export interface EventLogContext<T extends keyof EventTypeMap> {
+
+export interface EventLogContext<T extends Record<string, object>> {
   type: T;
-  payload?: { [P in T]: EventTypeMap[P] }[T];
+  payload?: { [P in keyof T]: T[P] };
 }
 
 export interface LogContext {
@@ -63,14 +64,14 @@ export class LoggerService {
         timestamp: stdTimeFunctions.isoTime,
         formatters: {
           level: label => ({ level: label })
-        },
-        base: {
-          service: cfg.serviceName,
-          environment: cfg.isProd,
-          region: cfg.region,
-          taskArn: cfg.taskArn,
-          taskDefinition: cfg.taskDefinition
         }
+        // base: {
+        //   service: cfg.serviceName,
+        //   environment: cfg.isProd,
+        //   region: cfg.region,
+        //   taskArn: cfg.taskArn,
+        //   taskDefinition: cfg.taskDefinition
+        // }
       });
     }
     return this.#pino;
@@ -102,31 +103,45 @@ export class LoggerService {
       base: {
         service: this.config.serviceName,
         environment: this.config.isProd,
-        region: this.config.region,
-        taskArn: this.config.taskArn,
-        taskDefinition: this.config.taskDefinition
+        region: this.config.region
       },
       ...customOptions
     } satisfies LoggerOptions;
 
-    // Development: pretty transport
+    if (this.config.isProd) {
+      return pino(baseOptions);
+    }
+
+    // Dev: multi-target transport doesn't allow custom formatters
+    const { formatters: _, ...devBase } = baseOptions;
+
+    const logsDir = resolve(process.cwd(), "logs");
+    mkdirSync(logsDir, { recursive: true });
+
     const prettyOptions = {
       colorize: true,
       levelFirst: true,
       translateTime: "SYS:standard",
-      ignore: "pid,hostname",
-      messageFormat: "{lvl} {pid}"
+      ignore: "pid,hostname,environment,region,service",
+      singleLine: false
     } satisfies PrettyOptions;
 
     const transport = {
-      target: "pino-pretty",
-      options: prettyOptions
-    } satisfies TransportSingleOptions;
+      targets: [
+        {
+          target: "pino-pretty",
+          options: prettyOptions,
+          level: "debug"
+        },
+        {
+          target: "pino/file",
+          options: { destination: resolve(logsDir, "dev.log"), mkdir: true },
+          level: "debug"
+        }
+      ]
+    } satisfies TransportMultiOptions;
 
-    const devOptions = { ...baseOptions, transport } satisfies LoggerOptions & {
-      transport: TransportSingleOptions;
-    };
-    return pino(devOptions);
+    return pino({ ...devBase, transport });
   }
 
   // Core logging methods with context
@@ -155,43 +170,24 @@ export class LoggerService {
   // Specialized logging methods for your WebSocket server
   public logConnection(userId: string, metadata: Record<string, unknown>) {
     this.logger.info(
-      "WebSocket connection established" +
-        JSON.stringify({
-          userId,
-          action: "ws_connect",
-          ...metadata
-        })
+      { userId, action: "ws_connect", ...metadata },
+      "WebSocket connection established"
     );
   }
 
   public logDisconnection(userId: string, reason?: string) {
     this.logger.info(
-      "WebSocket connection closed " +
-        JSON.stringify({
-          userId,
-          action: "ws_disconnect",
-          reason
-        })
+      { userId, action: "ws_disconnect", reason },
+      "WebSocket connection closed"
     );
   }
 
   public logEvent<
-    const T extends keyof EventTypeMap,
-    const L extends
-      | "fatal"
-      | "error"
-      | "warn"
-      | "info"
-      | "debug"
-      | "trace" = "info"
-  >(level: L, { type, payload }: EventLogContext<T>) {
-    switch (payload?.type) {
-      case `${type}`: {
-        this.logger[level](JSON.stringify(payload, null, 2));
-        break;
-      }
-      default:
-        break;
+    const L extends "fatal" | "error" | "warn" | "info" | "debug" | "trace" =
+      "info"
+  >(level: L, { type, payload }: { type: any; payload: Record<string, any> }) {
+    if (payload?.type === `${type}`) {
+      this.logger[level](payload, type);
     }
   }
 
@@ -203,16 +199,14 @@ export class LoggerService {
     prompt?: string;
   }) {
     this.logger.info(
-      "AI chat request initiated \n".concat(
-        JSON.stringify({
-          ...context,
-          action: "ai_request",
-          // Don't log full prompt in production for privacy
-          prompt: this.config.isProd
-            ? `[${context.prompt?.length ?? 0} chars]`
-            : context.prompt
-        })
-      )
+      {
+        ...context,
+        action: "ai_request",
+        prompt: this.config.isProd
+          ? `[${context.prompt?.length ?? 0} chars]`
+          : context.prompt
+      },
+      "AI chat request initiated"
     );
   }
 
@@ -227,26 +221,21 @@ export class LoggerService {
   }) {
     if (context.error) {
       this.logger.error(
-        "AI chat request failed " + JSON.stringify({ ...context })
+        { ...context, action: "ai_response" },
+        "AI chat request failed"
       );
     } else {
       this.logger.info(
-        "AI chat request completed " +
-          JSON.stringify({
-            ...context,
-            action: "ai_response"
-          })
+        { ...context, action: "ai_response" },
+        "AI chat request completed"
       );
     }
   }
 
   public logAssetOperation(operation: string, context: LogContext) {
     this.logger.info(
-      `Asset operation: ${operation}` +
-        JSON.stringify({
-          ...context,
-          action: `asset_${operation}`
-        })
+      { ...context, action: `asset_${operation}` },
+      `Asset operation: ${operation}`
     );
   }
 
@@ -260,24 +249,15 @@ export class LoggerService {
     durationMs: number,
     context?: LogContext
   ) {
+    const mergeObj = {
+      ...context,
+      duration: Math.round(durationMs),
+      action: "performance"
+    };
     if (durationMs > 5000) {
-      this.logger.warn(
-        `Operation completed: ${operation} ` +
-          JSON.stringify({
-            ...context,
-            duration: Math.round(durationMs),
-            action: "performance"
-          })
-      );
+      this.logger.warn(mergeObj, `Operation completed: ${operation}`);
     } else {
-      this.logger.debug(
-        `Operation completed: ${operation} ` +
-          JSON.stringify({
-            ...context,
-            duration: Math.round(durationMs),
-            action: "performance"
-          })
-      );
+      this.logger.debug(mergeObj, `Operation completed: ${operation}`);
     }
   }
 

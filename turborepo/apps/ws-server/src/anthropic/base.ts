@@ -39,16 +39,36 @@ export class AnthropicBaseService {
     withLocalStore = false
   ) {
     switch (model) {
+      case "claude-opus-4-6": {
+        if (withLocalStore) {
+          return [
+            "advanced-tool-use-2025-11-20",
+            "context-1m-2025-08-07",
+            "compact-2026-01-12",
+            "files-api-2025-04-14",
+            "extended-cache-ttl-2025-04-11",
+            "code-execution-2025-08-25"
+          ] satisfies Anthropic.Beta.AnthropicBeta[];
+        } else {
+          return [
+            "compact-2026-01-12",
+            "context-1m-2025-08-07",
+            "files-api-2025-04-14",
+            "extended-cache-ttl-2025-04-11",
+            "web-fetch-2025-09-10",
+            "code-execution-2025-08-25"
+          ] satisfies Anthropic.Beta.AnthropicBeta[];
+        }
+      }
       // effort parameter is only supported by claude opus 4.5
       case "claude-opus-4-5-20251101": {
         if (withLocalStore) {
-          // advanced-tool-use supported by claude sonnet|opus 4.5 only
+          // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
           return [
             "advanced-tool-use-2025-11-20",
             "effort-2025-11-24",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
-            "web-fetch-2025-09-10",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         } else {
@@ -61,17 +81,16 @@ export class AnthropicBaseService {
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         }
       }
-      // input context window 1m is only supported by claude sonnet 4 & 4.5
+      // input context window 1m is only supported by claude sonnet 4 & 4.5 / Opus 4.6
       case "claude-sonnet-4-5-20250929":
       case "claude-sonnet-4-20250514": {
-        // advanced-tool-use supported by claude sonnet|opus 4.5 only
+        // advanced-tool-use supported by claude sonnet|opus 4.5/4.6 only
         if (withLocalStore && model === "claude-sonnet-4-5-20250929") {
           return [
             "advanced-tool-use-2025-11-20",
             "files-api-2025-04-14",
             "extended-cache-ttl-2025-04-11",
             "context-1m-2025-08-07",
-            "web-fetch-2025-09-10",
             "code-execution-2025-08-25"
           ] satisfies Anthropic.Beta.AnthropicBeta[];
         } else {
@@ -116,6 +135,7 @@ export class AnthropicBaseService {
   }
 
   protected outputTokenCeilingByModel = {
+    "claude-opus-4-6": 128000,
     "claude-3-haiku-20240307": 4096,
     "claude-3-5-haiku-20241022": 8192,
     "claude-opus-4-20250514": 32000,
@@ -128,6 +148,7 @@ export class AnthropicBaseService {
   } as const;
 
   protected inputTokenCeilingByModel = {
+    "claude-opus-4-6": 1000000,
     "claude-3-haiku-20240307": 200000,
     "claude-3-5-haiku-20241022": 200000,
     "claude-opus-4-20250514": 200000,
@@ -156,6 +177,7 @@ export class AnthropicBaseService {
 
   protected handleThinking(mod: AnthropicModelIdUnion, max_tokens?: number) {
     switch (mod) {
+      case "claude-opus-4-6":
       case "claude-3-7-sonnet-20250219":
       case "claude-opus-4-1-20250805":
       case "claude-opus-4-20250514":
@@ -164,11 +186,21 @@ export class AnthropicBaseService {
       case "claude-opus-4-5-20251101":
       case "claude-sonnet-4-5-20250929": {
         if (this.handleMaxTokens(mod, max_tokens) >= 1024) {
+          if (mod === "claude-opus-4-6") {
+            return {
+              type: "adaptive"
+            } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
+          }
           return {
             type: "enabled",
             budget_tokens: this.getMaxTokens(mod) - 1024
           } as const satisfies Anthropic.Beta.BetaThinkingConfigEnabled;
         } else {
+          if (mod === "claude-opus-4-6") {
+            return {
+              type: "adaptive"
+            } as const satisfies Anthropic.Beta.BetaThinkingConfigAdaptive;
+          }
           return {
             type: "disabled"
           } as const satisfies Anthropic.Beta.BetaThinkingConfigDisabled;

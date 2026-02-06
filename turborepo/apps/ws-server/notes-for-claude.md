@@ -1,289 +1,219 @@
-# Step 7: Programmatic Tool Calling in `index.ts`
+● Done. The summary is written to /home/dopaminedriven/.claude/plans/peaceful-crunching-locket.md and covers:                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                  
+  - The problem (original 400 error + root cause)                                                                                                                                                                                                                                 
+  - Every code change with exact line numbers in current files                                                                                                                                                                                                                    
+  - The Anthropic PTC docs Steps 3 and 5 with full code examples                                                                                                                                                                                                                  
+  - Current status: the fix didn't work, we need to investigate further                                                                                                                                                                                                           
+  - 6 hypotheses for what to investigate next (thinking blocks in continuations, caller serialization, block ordering, content structure mismatch, etc.)                                                                                                                          
+  - Architecture, data structures, file map, SDK type notes
 
-## Context — what's already done
+  You can paste this into the continuation context when compacting. Ready to dig into why it still doesn't work whenever you are.
 
-Steps 1–6 are complete:
-- Schema: `LocalStoreChunkState` enum, chunk `state`/`errorMessage` fields, indexes
-- SQL: `updateLocalDocChunkState.sql`, search filters for `chunk.state = 'READY'`
-- Caches: simplified to 2 Maps
-- Two-phase chunk flow: QUEUED → embed → READY/ERROR with retry, overflow image chunks
-- `fileSearchTool()`: `allowed_callers: ["code_execution_20250825"]`, JSON output schema in description
-- `executeFileSearch()`: returns JSON array `[{ filename, score, content, startOffset, endOffset, chunkIndex }]`
-- `createStreamWorkup()`: detects `hasLocalStore` via `localVectorStoreCheck`, passes to `tooling()` and `handleBetaHeaders()`
-- `ToolUseAccumulator` type: `{ id, name, inputJson, callerType: "code_execution_20250825", callerToolId }`
+# Session Summary: PTC Multi-Round Continuation Fix for Anthropic Local Vector Store
 
-## What this step does
+## What We're Doing
 
-Add PTC event handling inline in `index.ts`. The single-pass stream becomes a **bounded tool loop** that can re-enter the stream when `stop_reason === "tool_use"`.
+Fixing a 400 error from the Anthropic API during multi-round PTC (Programmatic Tool Calling) continuation requests. The user has a local vector store implementation powered by Voyage Multimodal 3.5 embeddings + pgvector that integrates with Anthropic's `code_execution` server tool and a custom client-side `file_search` tool (with `allowed_callers: ["code_execution_20250825"]`). The code_execution tool calls file_search programmatically, requiring multi-round tool use continuations.
 
----
+## The Original Error
 
-## PTC flow (from Anthropic docs)
-
-1. Claude writes Python code that calls `await file_search(query="...")` inside code execution sandbox
-2. API **pauses** code execution and returns a response with `stop_reason: "tool_use"`
-3. The response content contains:
-   - `server_tool_use` block (code_execution, with `id: "srvtoolu_..."` and `input.code`)
-   - `tool_use` block (file_search, with `caller: { type: "code_execution_20250825", tool_id: "srvtoolu_..." }`)
-4. We execute `file_search` server-side, then send a **continuation request** with:
-   - Full message history so far (assistant content blocks + user `tool_result` blocks)
-   - `container: "<container_id>"` to reuse the paused code execution container
-   - **Critical**: user message must contain **only** `tool_result` blocks, no text
-5. Code execution resumes, processes the result, and may call more tools (loop) or finish
-6. Final response has `stop_reason: "end_turn"` with `code_execution_tool_result` block + text
-
-## SDK types involved
-
-| Type | Location | Key fields |
-|------|----------|------------|
-| `BetaRawMessageStartEvent` | `message_start` | `message.container: BetaContainer \| null` |
-| `BetaRawMessageDeltaEvent` | `message_delta` | `delta.container: BetaContainer \| null`, `delta.stop_reason` |
-| `BetaRawContentBlockStartEvent` | `content_block_start` | `content_block: BetaToolUseBlock \| BetaServerToolUseBlock \| ...` |
-| `BetaToolUseBlock` | tool_use content | `id`, `name`, `input`, `caller?: BetaDirectCaller \| BetaServerToolCaller` |
-| `BetaServerToolCaller` | caller field | `{ type: "code_execution_20250825", tool_id: string }` |
-| `BetaContainer` | container info | `{ id: string, expires_at: string }` |
-| `MessageCreateParams` | continuation | `container?: BetaContainerParams \| string \| null` |
-
----
-
-## Changes to `index.ts`
-
-### Principle: minimal diff to existing stream loop
-
-The existing `for await (const chunk of stream)` loop handles thinking, text, web search, citations, and finalization. We add tool accumulation **alongside** the existing event handling, then branch after the stream ends.
-
-### New state variables (alongside existing ones)
-
-```ts
-const toolAccumulators = new Map<number, ToolUseAccumulator>();
-let containerId: string | undefined;
-// Track all assistant content blocks for message history reconstruction
-const assistantContentBlocks = Array.of<Anthropic.Beta.BetaContentBlockParam>();
+```
+messages.1: `code_execution` tool use with id `srvtoolu_011Q7YgVHypufuAQu9TiBryV` was found
+without a corresponding `code_execution_tool_result` block
 ```
 
-### New event handling (additions to existing `content_block_start` / `content_block_delta` / `message_delta`)
+## Root Cause (Identified & Partially Fixed)
 
-**`content_block_start`** — add a new branch for `type === "tool_use"`:
-```ts
-if (chunk.content_block.type === "tool_use") {
-  const block = chunk.content_block;
-  if (block.caller && block.caller.type === "code_execution_20250825") {
-    toolAccumulators.set(chunk.index, {
-      id: block.id,
-      name: block.name,
-      inputJson: "",
-      callerType: "code_execution_20250825",
-      callerToolId: block.caller.tool_id
-    });
-  }
-}
-```
+The `content_block_start` handler and `buildAssistantContentBlocks` in `index.ts` did NOT handle `code_execution_tool_result` blocks. These blocks arrive COMPLETE at `content_block_start` (no delta streaming). They were silently dropped, so continuation requests were missing the `code_execution_tool_result` that pairs with the prior round's `server_tool_use(code_execution)`.
 
-**`content_block_delta`** — the existing `input_json_delta` handler currently only logs during web search. Add accumulation for PTC tool calls:
-```ts
-if (chunk.delta.type === "input_json_delta") {
-  const acc = toolAccumulators.get(chunk.index);
-  if (acc) {
-    acc.inputJson += chunk.delta.partial_json;
-  } else if (anthropicWebsearchToolUse === true) {
-    // existing web search logging
-  }
-}
-```
+## What Was Changed (Code Already Written)
 
-**`message_delta`** — capture container ID:
-```ts
-if (chunk.delta.container) {
-  containerId = chunk.delta.container.id;
-}
-```
+### File 1: `apps/ws-server/src/anthropic/types.ts`
+- **`BlockBuilder` interface** (line 85-97): Added `tool_use_id?: string` and `codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"]`
+- **`RoundRecord` interface** (line 99-105): NEW — tracks per-round state: `{ round, requestId, containerId, assistantBlocks, toolResults }`
+- **`MessageInputParams`** (line 41-62): User added `container?: string | Anthropic.Beta.Messages.BetaContainerParams` — fixed the pre-existing TS2352 error about `container` not existing on params type
 
-**`message_delta` stop_reason** — change existing guard to also capture `"tool_use"`:
-```ts
-if (chunk.delta.stop_reason) {
-  if (chunk.delta.stop_reason === "tool_use" || chunk.delta.stop_reason === "pause_turn") {
-    done = chunk.delta.stop_reason;  // now we DO set done for tool_use
-  } else {
-    done = chunk.delta.stop_reason;
-  }
-}
-```
+### File 2: `apps/ws-server/src/anthropic/index.ts`
+- **Imports** (line 1-19): Added `RoundRecord`, removed unused `MessageInputParams` and `MessageSingleton`
+- **Type aliases** (line 21-48): Added `ContentBlockStartRecord`, `ContentBlockDeltaRecord`, `MessageDeltaRecord`, `MessageStartRecord` using `UnionToRecord` utility; removed misnamed `BetaRawMessageStreamRecContentBlockStart`
+- **`roundRegistry`** (line 57-62): NEW class-level `Map<string, RoundRecord[]>` — per-request round history keyed by `reqMsgId`, ephemeral during streaming, serialized to `responseOutput` on completion
+- **`buildAssistantContentBlocks`** (line 99-183):
+  - `tool_use` blocks (line 140-168): Now includes `caller` field per Anthropic PTC docs Step 3 — uses intersection type `BetaToolUseBlockParam & { caller?: BetaServerToolCaller }` and casts via `as BetaContentBlockParam`
+  - `code_execution_tool_result` blocks (line 169-179): NEW case — reconstructs `BetaCodeExecutionToolResultBlockParam` from `bb.tool_use_id` and `bb.codeExecutionContent`
+- **`content_block_start` handler** (line 417-427): NEW — captures `code_execution_tool_result` blocks: stores `tool_use_id` and `content` on the block builder (arrives complete, no deltas)
+- **`createStreamWorkup` call** (line 219-231): User changed `msgs` to `messages: msgs` to match updated `MessageInputParams`
+- **`responseOutput` persistence** (line 718-721): Changed from just `containerId` to `JSON.stringify({ containerId, rounds: this.roundRegistry.get(reqMsgId) ?? [] })`
+- **Round registry appends**: On `pause_turn` (line 832-841, empty toolResults) and on `tool_use` (line 921-930, with populated toolResults)
+- **Continuation params** (line 843-852, 944-952): User changed `as typeof params` to `satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming` — proper type checking now works because `container` is on the base type
+- **Registry cleanup**: On final response (line 776), stream creation error (line 284), empty response bail-out (line 809)
 
-### After the stream loop: branch on `done`
+### File 3: `apps/ws-server/src/anthropic/vector-store.ts` (User-Modified)
+- `createStreamWorkup` updated to accept and pass through `container` parameter
+- `MessageInputParams` field rename from `msgs` to `messages` propagated
 
-Currently the stream loop has one exit: `if (done) { persist + ws.send + break }`.
+## Current Status: IT DIDN'T WORK
 
-New structure — wrap the entire stream in a **bounded outer loop**:
+The user tested and the fix **did not resolve** the 400 error. We need to dig deeper into what's still wrong.
 
-```ts
-const MAX_TOOL_ROUNDS = 8;
+## Key Reference: Anthropic PTC Docs (Steps 1-5)
 
-for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-  // create stream (first round uses initial params, subsequent rounds use continuation params)
+Source: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling#example-workflow
 
-  for await (const chunk of stream) {
-    // ... existing event handling + new tool accumulation ...
-
-    if (done === "tool_use" && toolAccumulators.size > 0) {
-      break;  // exit inner loop to handle tools
+### Step 3 (Critical — the continuation format):
+```typescript
+const response = await anthropic.beta.messages.create({
+  model: "claude-opus-4-6",
+  betas: ["advanced-tool-use-2025-11-20"],
+  max_tokens: 4096,
+  container: "container_xyz789",  // Reuse the container
+  messages: [
+    { role: "user", content: "original user message" },
+    {
+      role: "assistant",
+      content: [
+        { type: "text", text: "I'll query..." },
+        {
+          type: "server_tool_use",
+          id: "srvtoolu_abc123",
+          name: "code_execution",
+          input: { code: "..." }
+        },
+        {
+          type: "tool_use",
+          id: "toolu_def456",
+          name: "query_database",
+          input: { sql: "<sql>" },
+          caller: {
+            type: "code_execution_20250825",
+            tool_id: "srvtoolu_abc123"
+          }
+        }
+      ]
+    },
+    {
+      role: "user",
+      content: [
+        {
+          type: "tool_result",
+          tool_use_id: "toolu_def456",
+          content: "[{\"customer_id\": \"C1\", ...}]"
+        }
+      ]
     }
+  ],
+  tools: [...]
+});
+```
 
-    if (done && done !== "tool_use" && done !== "pause_turn") {
-      // persist, ws.send, redis — existing finalization code
-      return;  // exit method entirely
+### Step 5 (Final response structure):
+```json
+{
+  "content": [
+    {
+      "type": "code_execution_tool_result",
+      "tool_use_id": "srvtoolu_abc123",
+      "content": {
+        "type": "code_execution_result",
+        "stdout": "...",
+        "stderr": "",
+        "return_code": 0,
+        "content": []
+      }
+    },
+    {
+      "type": "text",
+      "text": "I've analyzed..."
     }
-  }
-
-  // If we're here, stop_reason was "tool_use" — execute tools and continue
-  if (done !== "tool_use" || toolAccumulators.size === 0) {
-    break;  // unexpected state, exit outer loop
-  }
-
-  // Execute file_search tools
-  const toolResults: Anthropic.Beta.BetaToolResultBlockParam[] = [];
-  for (const acc of toolAccumulators.values()) {
-    if (acc.name === "file_search") {
-      const input = JSON.parse(acc.inputJson || "{}");
-      const json = await this.executeFileSearch(userId, input);
-      toolResults.push({ type: "tool_result", tool_use_id: acc.id, content: json });
-    } else {
-      toolResults.push({
-        type: "tool_result", tool_use_id: acc.id,
-        content: `Unknown tool: ${acc.name}`, is_error: true
-      });
-    }
-  }
-
-  // Build continuation params
-  // assistantContentBlocks: all content blocks from this round's response
-  // toolResults: ONLY tool_result blocks, no text (PTC requirement)
-  params = {
-    ...params,
-    container: containerId,
-    messages: [
-      ...params.messages,
-      { role: "assistant", content: assistantContentBlocks },
-      { role: "user", content: toolResults }
-    ]
-  };
-
-  // Reset per-round state
-  toolAccumulators.clear();
-  assistantContentBlocks.length = 0;
-  done = null;
+  ],
+  "stop_reason": "end_turn"
 }
 ```
 
-### Content block tracking for message history (per-block via events)
+### Important constraints from docs:
+- **Tool result only responses**: When responding to programmatic tool calls, the user message must contain **ONLY** `tool_result` blocks — no text content allowed
+- `caller` SHOULD be included on `tool_use` blocks in the assistant continuation message
+- Container must be reused via the `container` parameter
+- Container expires after ~4.5 minutes of inactivity
 
-For the continuation request, we need the assistant's content blocks from the current round.
+## Architecture Overview
 
-**New state**: `blockBuilders` — a `Map<number, BlockBuilder>` keyed by `chunk.index`:
-
-```ts
-interface BlockBuilder {
-  type: string;
-  id?: string;
-  name?: string;
-  text?: string;          // accumulated from text_delta
-  thinking?: string;      // accumulated from thinking_delta
-  inputJson?: string;     // accumulated from input_json_delta
-  input?: unknown;        // server_tool_use input (comes fully formed)
-  signature?: string;     // accumulated from signature_delta
-  caller?: Anthropic.Beta.BetaServerToolCaller;
-}
+```
+AnthropicService (index.ts)
+  extends AnthropicVectorStoreWorkup (vector-store.ts)
+    extends AnthropicWorkup (workup.ts — not modified)
+      extends AnthropicBaseService (base.ts — not modified)
 ```
 
-**`content_block_start`** — open a builder for every block:
+- **`AnthropicBaseService`** (`base.ts`): Model config, beta headers, token limits, thinking config
+- **`AnthropicVectorStoreWorkup`** (`vector-store.ts`): Local vector store logic, PDF chunking, Voyage embeddings, file_search tool def, createStreamWorkup, formatAnthropicHistoryWithFiles
+- **`AnthropicService`** (`index.ts`): Streaming handler with multi-round tool use loop, block builders, continuation logic
 
-```ts
-const bb: BlockBuilder = { type: chunk.content_block.type };
+## Key Data Structures
 
-if (chunk.content_block.type === "server_tool_use") {
-  bb.id = chunk.content_block.id;
-  bb.name = chunk.content_block.name;
-  bb.input = chunk.content_block.input;
-}
-if (chunk.content_block.type === "tool_use") {
-  bb.id = chunk.content_block.id;
-  bb.name = chunk.content_block.name;
-  bb.inputJson = "";
-  if (chunk.content_block.caller?.type === "code_execution_20250825") {
-    bb.caller = chunk.content_block.caller;
-  }
-}
-if (chunk.content_block.type === "text") {
-  bb.text = "";
-}
-if (chunk.content_block.type === "thinking") {
-  bb.thinking = "";
-}
-blockBuilders.set(chunk.index, bb);
+- **`blockBuilders`**: `Map<number, BlockBuilder>` keyed by `chunk.index` — accumulates content blocks within a single stream round; cleared between rounds
+- **`toolAccumulators`**: `Map<number, ToolUseAccumulator>` keyed by `chunk.index` — tracks tool_use blocks that need execution; cleared between rounds
+- **`roundRegistry`**: `Map<string, RoundRecord[]>` keyed by `reqMsgId` — persists round history across the entire request; serialized to `responseOutput` on completion
+- **`ptcContainerRegistry`**: `Map<string, string>` keyed by `conversationId` — persists container ID across separate user turns (not just tool rounds)
+
+## Expected Multi-Round Flow
+
+```
+Round 0:
+  Request: [user message]
+  Response: [thinking, text, server_tool_use(code_execution), tool_use(file_search)]
+  stop_reason: "tool_use"
+
+Round 0→1 continuation:
+  Messages: [...original, assistant:[thinking,text,server_tool_use,tool_use], user:[tool_result]]
+
+Round 1:
+  Response: [code_execution_tool_result, text] OR [code_execution_tool_result, server_tool_use, tool_use]
+  stop_reason: "end_turn" OR "tool_use"
+
+If Round 1 has stop_reason "tool_use":
+Round 1→2 continuation:
+  Messages: [...original, R0_assistant, R0_user, R1_assistant:[code_execution_tool_result, server_tool_use, tool_use], R1_user:[tool_result]]
 ```
 
-**`content_block_delta`** — accumulate into the builder:
+## What to Investigate Next
 
-```ts
-const bb = blockBuilders.get(chunk.index);
-if (bb) {
-  if (chunk.delta.type === "text_delta") bb.text = (bb.text ?? "") + chunk.delta.text;
-  if (chunk.delta.type === "thinking_delta") bb.thinking = (bb.thinking ?? "") + chunk.delta.thinking;
-  if (chunk.delta.type === "input_json_delta") bb.inputJson = (bb.inputJson ?? "") + chunk.delta.partial_json;
-  if (chunk.delta.type === "signature_delta") bb.signature = (bb.signature ?? "") + chunk.delta.signature;
-}
-```
+The fix didn't work. Possible issues to investigate:
 
-**After inner stream ends** — convert builders to `BetaContentBlockParam[]`:
+1. **Log the actual error response** — what exact error message and HTTP status is returned now? Is it the same 400 or a different error?
+2. **Compare our continuation payload against the docs format** — log the exact JSON of `params.messages` being sent in Round 1+ and compare field-by-field against Step 3
+3. **`thinking` blocks in continuation** — the docs example doesn't include `thinking` blocks in the assistant content of continuation requests. The `buildAssistantContentBlocks` method includes them. Extended thinking may need special handling for PTC continuations.
+4. **`caller` type assertion** — we cast `toolUseBlock as Anthropic.Beta.BetaContentBlockParam`. Verify the API actually receives the `caller` field (it might get stripped by the SDK serializer)
+5. **Block ordering** — does the API require blocks in a specific order? (text first, then server_tool_use, then tool_use)
+6. **`code_execution_tool_result` content structure** — verify the captured `content` matches what the API expects in `BetaCodeExecutionToolResultBlockParam["content"]` vs what arrives in the stream `BetaCodeExecutionToolResultBlock["content"]`
 
-```ts
-for (const [, bb] of blockBuilders) {
-  if (bb.type === "text") {
-    assistantContentBlocks.push({ type: "text", text: bb.text ?? "" });
-  }
-  if (bb.type === "thinking") {
-    assistantContentBlocks.push({ type: "thinking", thinking: bb.thinking ?? "", signature: bb.signature ?? "" });
-  }
-  if (bb.type === "server_tool_use") {
-    assistantContentBlocks.push({ type: "server_tool_use", id: bb.id!, name: bb.name!, input: bb.input });
-  }
-  if (bb.type === "tool_use") {
-    assistantContentBlocks.push({
-      type: "tool_use", id: bb.id!, name: bb.name!,
-      input: JSON.parse(bb.inputJson || "{}"),
-      caller: bb.caller
-    });
-  }
-}
-```
+## Files Referenced
 
-This captures **every** content block type with exact content, suitable for the assistant message in continuation params. The existing event handling (text → ws.send, thinking → thinkingChunks, etc.) continues to work alongside this — the builders are additive, not replacement.
-
-### What does NOT change
-
-- All existing text/thinking/webSearch/citation streaming → ws.send and redis.publish untouched
-- The `handleAiChatResponse` persist call at `done === "end_turn"` stays exactly where it is
-- Redis stream state saves every 10 chunks stays
-- No new methods on vector-store.ts — `executeFileSearch` is already there
-
----
-
-## Files modified
-
-| File | What |
+| File | Role |
 |------|------|
-| `apps/ws-server/src/anthropic/index.ts` | Outer tool loop, tool_use accumulation, container tracking, continuation requests |
-| `apps/ws-server/src/anthropic/types.ts` | Already updated — `ToolUseAccumulator` has `callerType` + `callerToolId` |
+| `apps/ws-server/src/anthropic/index.ts` | Main streaming handler — **point of failure** |
+| `apps/ws-server/src/anthropic/types.ts` | BlockBuilder, RoundRecord, MessageInputParams |
+| `apps/ws-server/src/anthropic/vector-store.ts` | createStreamWorkup, fileSearchTool, executeFileSearch, formatAnthropicHistoryWithFiles |
+| `apps/ws-server/src/anthropic/base.ts` | handleBetaHeaders, handleMaxTokensAndThinking |
+| `apps/ws-server/src/voyage/index.ts` | VoyageEmbeddingService |
+| `apps/ws-server/src/prisma/local-store.ts` | PrismaLocalStoreService, searchLocalStoreChunks |
+| `apps/ws-server/src/prisma/provider-store.ts` | Reference: remote provider store patterns |
+| `apps/ws-server/src/xai/workup.ts` | Reference: well-executed vector store (Grok) |
+| `apps/ws-server/src/xai/collections.ts` | Reference: well-executed collections (Grok) |
+| `packages/db/prisma/schema/localstore.prisma` | LocalVectorStore, LocalVectorStoreDoc, LocalVectorStoreDocChunk models |
+| `packages/types/src/types.ts` | Database types |
+| `packages/types/src/utils.ts` | Type utilities including `UnionToRecord` |
+| `apps/ws-server/claude-inspect.md` | Server logs showing the original failure |
 
-## Design decisions (confirmed)
+## SDK Type Notes
 
-1. **Stream everything** — thinking/text deltas stream to the client during tool rounds, same as web search behavior
-2. **`pause_turn` handled identically** to `tool_use` — same outer loop, same continuation pattern
-3. **Per-block event tracking** — `content_block_start` opens blocks, deltas accumulate, `content_block_stop` finalizes
+- `BetaCodeExecutionToolResultBlock` (response) / `BetaCodeExecutionToolResultBlockParam` (request) — both exist
+- Code execution results arrive COMPLETE at `content_block_start`, NOT via deltas
+- `BetaRawContentBlockDelta` union does NOT include any code execution delta types
+- `BetaToolUseBlockParam` does NOT have `caller` — but the docs show it should be included. We use an intersection type + cast.
+- `BetaServerToolUseBlockParam` DOES have `caller`
+- `BetaContainerParams`: `{ id?: string | null; skills?: Array<BetaSkillParams> | null }`
+- `MessageCreateParamsBase` has `container?: BetaContainerParams | string | null`
 
-## Verification
+## Zero TS Diagnostics
 
-1. `pnpm typecheck` passes
-2. Non-PTC requests (no local store, haiku model) work exactly as before — outer loop runs once, exits on `end_turn`
-3. PTC request with file_search: stream shows thinking → code execution → tool_use pause → tool result → code execution resumes → end_turn with final text
-4. Container ID is captured and reused across tool rounds
-5. `tool_result` continuation message contains ONLY `tool_result` blocks (no text)
+As of the last check, `index.ts` has zero TypeScript diagnostics. The pre-existing TS2352 errors about `container` were resolved by the user's fix to `MessageInputParams` + `createStreamWorkup`.

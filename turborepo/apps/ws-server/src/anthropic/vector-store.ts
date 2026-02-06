@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import type {
   ChunkDraft,
   FileSearchToolInput,
   LocalSearchResult,
-  MessageInputParams,
-  RequestOptions
+  MessageInputParams
 } from "@/anthropic/types.ts";
-import type { CreateLocalStoreRT } from "@/prisma/types.ts";
 import type { Voyage } from "@/voyage/types.ts";
 import type { PageImage, StructuredPageText } from "@d0paminedriven/pdfdown";
 import { AnthropicWorkup } from "@/anthropic/workup.ts";
@@ -21,17 +21,32 @@ import type {
   MessageSingleton
 } from "@slipstream/types";
 
+// export interface FileSearchToolInput {
+//   readonly query: string;
+//   readonly max_results?: number;
+//   readonly filename_filter?: string;
+// }
+
+// interface FileSearchResult {
+//   readonly filename: string;
+//   readonly score: number;
+//   readonly content: string;
+//   readonly startOffset: number | null;
+//   readonly endOffset: number | null;
+//   readonly chunkIndex: number;
+// }
+
+// interface FileSearchResponse {
+//   readonly results: FileSearchResult[];
+//   readonly metadata: {
+//     readonly query: string;
+//     readonly totalResults: number;
+//     readonly scoreRange: { readonly min: number; readonly max: number } | null;
+//     readonly filenameFilter?: string;
+//   };
+// }
+
 export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
-  // ─── Caches ─────────────────────────────────────────────────────────
-
-  /** userId → full store record (parent-level, not large) */
-  protected localStoreCache = new Map<string, CreateLocalStoreRT<true>>();
-  /** attachmentId → { docId, provenanceId, state } */
-  protected docCache = new Map<
-    string,
-    { docId: string; provenanceId: string; state: string | null }
-  >();
-
   // ─── Store lifecycle ─────────────────────────────────────────────────
   constructor(
     logger: LoggerService,
@@ -61,7 +76,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
     const provenanceId = this.prisma.toVectorStoreFilename(attachment);
     const { ext, mime } = this.prisma.urlExtWorkupEmbeddings(attachment);
-    const { fileName } = this.prisma.parseFilename(provenanceId);
+    const { fileName } = this.prisma.parseDocname(provenanceId);
     const conversationId = attachment.conversationId ?? "";
     const messageId = attachment.messageId ?? "";
 
@@ -84,7 +99,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     const entry = {
       docId: doc.id,
       provenanceId: doc.provenanceId,
-      state: doc.state as string | null
+      state: doc.state
     };
     this.docCache.set(attachment.id, entry);
     return entry;
@@ -97,6 +112,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     docId: string,
     storeId: string
   ) {
+
     const provenanceId = this.prisma.toVectorStoreFilename(attachment);
     const conversationId = attachment.conversationId ?? "";
     const messageId = attachment.messageId ?? "";
@@ -308,17 +324,42 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       });
 
       // Exact token counts via Voyage Python bridge (count_usage — local, no API call)
-      // Build the countUsage input shape: array of arrays of { t: text } | { i: base64 }
-      const usageInputs = multimodalInputs.map(input =>
-        input.content.map(item =>
-          item.type === "text"
-            ? { t: item.text }
-            : { i: (item as Voyage.Multimodal.Input.ImageBase64).image_base64 }
-        )
-      );
+      // Write chunk images to tmp so Python reads via PIL.Image.open(path)
+      const tmpImageFiles = Array.of<string>();
+      const usageInputs = chunks.map(chunk => {
+        const sequence = Array.of<{ t: string } | { f: string }>();
+        sequence.push({ t: chunk.text });
+        for (const img of chunk.images) {
+          const tmpName = this.prisma.extractor.uniqueTmpName(
+            `voyage-usage-${docId}-img-${img.page}-${img.imageIndex}`,
+            "png"
+          );
+          const absTmpPath = resolve(tmpdir(), tmpName);
+          this.prisma.extractor.writeTmp(tmpName, img.data);
+          sequence.push({ f: absTmpPath });
+          tmpImageFiles.push(tmpName);
+        }
+        return sequence;
+      });
 
-      const usageResult = await this.voyage.countUsage(usageInputs);
-      const inputTokenCounts = usageResult.usages.map(u => u.total_tokens);
+      const inputTokenCounts = Array.of<number>();
+      try {
+        for (const sequence of usageInputs) {
+          const result = await this.voyage.countUsageFromPaths(
+            [sequence],
+            "voyage-multimodal-3.5"
+          );
+          inputTokenCounts.push(result.total_tokens);
+        }
+      } finally {
+        for (const tmpName of tmpImageFiles) {
+          try {
+            this.prisma.extractor.rmTmpFile(tmpName);
+          } catch {
+            /* best-effort */
+          }
+        }
+      }
 
       // If any input exceeds 32K, strip images from text chunk and create
       // dedicated image-only overflow chunks with page references.
@@ -330,12 +371,12 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
         const chunk = chunks[i];
         if (!chunk || chunk.images.length === 0) continue;
 
-        this.logger.info(
-          {
-            chunkIndex: i,
-            tokens: inputTokenCounts[i],
-            offset: `${chunk.startOffset}-${chunk.endOffset}`
-          },
+        console.info({
+          chunkIndex: i,
+          tokens: inputTokenCounts[i],
+          offset: `${chunk.startOffset}-${chunk.endOffset}`
+        });
+        console.info(
           `Chunk ${i} exceeds ${MAX_INPUT_TOKENS} tokens (${inputTokenCounts[i]}), splitting images to overflow chunks`
         );
 
@@ -408,25 +449,38 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
       // Get exact token counts for any new overflow inputs
       if (chunks.length > originalChunkCount) {
-        const overflowUsageInputs = multimodalInputs
-          .slice(originalChunkCount)
-          .map(input =>
-            input.content.map(item =>
-              item.type === "text"
-                ? { t: item.text }
-                : {
-                    i: (item as Voyage.Multimodal.Input.ImageBase64)
-                      .image_base64
-                  }
-            )
-          );
-        const overflowUsage = await this.voyage.countUsage(overflowUsageInputs);
-        for (let o = 0; o < overflowUsage.usages.length; o++) {
-          const usage = overflowUsage.usages[o];
-          if (!usage) continue;
-          inputTokenCounts.push(usage.total_tokens);
-          const overflowChunk = chunks[originalChunkCount + o];
-          if (overflowChunk) overflowChunk.tokenCount = usage.total_tokens;
+        const overflowTmpFiles = Array.of<string>();
+        try {
+          for (let o = originalChunkCount; o < chunks.length; o++) {
+            const chunk = chunks[o];
+            if (!chunk) continue;
+            const sequence = Array.of<{ t: string } | { f: string }>();
+            sequence.push({ t: chunk.text });
+            for (const img of chunk.images) {
+              const tmpName = this.prisma.extractor.uniqueTmpName(
+                `voyage-overflow-${docId}-img-${img.page}-${img.imageIndex}`,
+                "png"
+              );
+              const absTmpPath = resolve(tmpdir(), tmpName);
+              this.prisma.extractor.writeTmp(tmpName, img.data);
+              sequence.push({ f: absTmpPath });
+              overflowTmpFiles.push(tmpName);
+            }
+            const result = await this.voyage.countUsageFromPaths(
+              [sequence],
+              "voyage-multimodal-3.5"
+            );
+            inputTokenCounts.push(result.total_tokens);
+            chunk.tokenCount = result.total_tokens;
+          }
+        } finally {
+          for (const tmpName of overflowTmpFiles) {
+            try {
+              this.prisma.extractor.rmTmpFile(tmpName);
+            } catch {
+              /* best-effort */
+            }
+          }
         }
       }
 
@@ -473,7 +527,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
           });
 
           if ("detail" in result) {
-            this.logger.error(
+            console.error(
               `Voyage batch error: ${this.prisma.safeErrMsg(result.detail)}`
             );
           } else {
@@ -488,7 +542,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             }
           }
         } catch (batchErr) {
-          this.logger.error(
+          console.error(
             { batchStart, batchSize: batchInputs.length },
             `Voyage batch failed: ${this.prisma.safeErrMsg(batchErr)}`
           );
@@ -542,8 +596,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       let errorCount = 0;
 
       if (failedChunks.length > 0) {
-        this.logger.info(
-          { docId, failed: failedChunks.length },
+        console.info({ docId, failed: failedChunks.length });
+        console.info(
           `Retrying ${failedChunks.length} chunks text-only (images stripped)`
         );
 
@@ -606,8 +660,11 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
             );
             totalTokenCount += chunk.tokenCount;
             readyCount++;
-            this.logger.info(
-              { chunkId, offset: `${chunk.startOffset}-${chunk.endOffset}` },
+            console.info({
+              chunkId,
+              offset: `${chunk.startOffset}-${chunk.endOffset}`
+            });
+            console.info(
               `Retry succeeded (text-only) for chunk at offset ${chunk.startOffset}`
             );
           } catch (retryErr) {
@@ -731,10 +788,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
     // Fire-and-forget — same pattern as Grok's ensureXaiAssetUploaded
     void this.chunkAndEmbed(attachment, docId, storeId).catch(err => {
-      this.logger.error(
-        { docId, err: this.prisma.safeErrMsg(err) },
-        "Background chunkAndEmbed failed"
-      );
+      console.error({ docId, err: this.prisma.safeErrMsg(err) });
+      console.error("Background chunkAndEmbed failed");
     });
 
     return { docId, provenanceId };
@@ -796,7 +851,7 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
       userId,
       input.query,
       Math.min(input.max_results ?? 5, 10),
-      0.3
+      0
     );
 
     if (results.length === 0) {
@@ -859,8 +914,8 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     } else {
       if (hasLocalStore) {
         return [
-          this.webSearchTool(user_location),
-          this.webFetchTool(),
+          // this.webSearchTool(user_location),
+          // this.webFetchTool(),
           this.codeExecutionTool(),
           this.fileSearchTool()
         ];
@@ -1043,9 +1098,9 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
 
   protected async createStreamWorkup({
     isNewChat,
-    msgs,
+    messages: msgs,
     userId,
-    apiKey,
+    apiKey,container,
     keyId,
     max_tokens,
     model: m,
@@ -1084,23 +1139,217 @@ export class AnthropicVectorStoreWorkup extends AnthropicWorkup {
     const tools = this.tooling(model, user_location, hasLocalStore);
 
     const betas = this.handleBetaHeaders(model, hasLocalStore);
-    return {
-      params: {
-        max_tokens: maxTokens,
-        stream: true,
-        thinking,
-        top_p: topP,
-        temperature,
-        system,
-        model,
-        tools,
-        tool_choice: { type: "auto" },
-        metadata: { user_id: userId },
-        messages,
-        service_tier: "auto",
-        betas
-      } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming,
-      options: { stream: true } satisfies RequestOptions
-    };
+    this.logger.info(betas, "beta headers");
+    // only opus 4.5 and 4.6 support effort config
+    if (model === "claude-opus-4-6" || model === "claude-opus-4-5-20251101") {
+      return {
+        params: {
+          max_tokens: maxTokens,
+          stream: true,
+          thinking,
+          top_p: topP,
+          temperature,
+          system,
+          container,
+          model,
+          tools,
+          // only 4.6 supports max effort
+          output_config: {
+            effort: model === "claude-opus-4-6" ? "max" : "high"
+          },
+          tool_choice: { type: "auto" },
+          metadata: { user_id: userId },
+          messages,
+          service_tier: "auto",
+          betas
+        } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming
+      };
+    } else {
+      return {
+        params: {
+          max_tokens: maxTokens,
+          stream: true,
+          thinking,
+          top_p: topP,
+          temperature,
+          system,
+          container,
+          model,
+          tools,
+          tool_choice: { type: "auto" },
+          metadata: { user_id: userId },
+          messages,
+          service_tier: "auto",
+          betas
+        } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming
+      };
+    }
   }
 }
+
+/**
+ protected fileSearchTool() {
+  return {
+    name: "file_search",
+    description: [
+      "Search the user's uploaded documents using semantic similarity.",
+      "Returns a JSON array of matching chunks, ranked by relevance score.",
+      "Each element contains:",
+      '  { "filename": string, "score": number (0-1, higher=more relevant),',
+      '    "content": string, "startOffset": number | null,',
+      '    "endOffset": number | null, "chunkIndex": number }.',
+      "",
+      "Guidelines:",
+      "- Break complex questions into multiple targeted queries.",
+      "- Use specific terms from the domain rather than generic phrases.",
+      "- If initial results have low scores (<0.3), rephrase and retry.",
+      "- Combine results from multiple queries for comprehensive answers.",
+      "- Quote relevant passages from 'content' when citing documents."
+    ].join("\n"),
+    input_schema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description:
+            "Semantic search query. Be specific and use domain terminology from the user's question.",
+          minLength: 1,
+          maxLength: 512
+        },
+        max_results: {
+          type: "integer",
+          description:
+            "Maximum number of chunks to return. Use higher values for broad questions, lower for specific lookups.",
+          minimum: 1,
+          maximum: 20,
+          default: 5
+        },
+        filename_filter: {
+          type: "string",
+          description:
+            "Optional: filter results to a specific filename (exact match). Omit to search all documents."
+        }
+      },
+      required: ["query"] as const,
+      additionalProperties: false as const
+    },
+    allowed_callers: ["code_execution_20250825"],
+    input_examples: [
+      { query: "protein binding affinity", max_results: 5 },
+      {
+        query: "quarterly revenue growth",
+        max_results: 10,
+        filename_filter: "Q3-report.pdf"
+      }
+    ]
+  } as const satisfies Anthropic.Beta.BetaToolUnion;
+}
+
+protected async executeFileSearch(
+  userId: string,
+  input: FileSearchToolInput
+): Promise<string> {
+  const maxResults = Math.min(Math.max(input.max_results ?? 5, 1), 20);
+  const query = input.query.trim();
+
+  if (query.length === 0) {
+    return JSON.stringify({
+      results: [],
+      metadata: {
+        query: input.query,
+        totalResults: 0,
+        scoreRange: null
+      }
+    } satisfies FileSearchResponse);
+  }
+
+  // Fetch more than needed so we can apply a meaningful threshold
+  // after seeing the actual score distribution
+  const fetchLimit = Math.min(maxResults * 3, 60);
+
+  const raw = await this.searchStore(
+    userId,
+    query,
+    fetchLimit,
+    0.0 // Don't pre-filter — let us inspect the full distribution
+  );
+
+  if (raw.length === 0) {
+    return JSON.stringify({
+      results: [],
+      metadata: {
+        query,
+        totalResults: 0,
+        scoreRange: null
+      }
+    } satisfies FileSearchResponse);
+  }
+
+  // ── Score diagnostics ──────────────────────────────────────
+  const scores = raw.map(r => r.score ?? 0);
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+
+  this.logger.debug(
+    {
+      query,
+      fetchedCount: raw.length,
+      scoreMin: min.toFixed(4),
+      scoreMax: max.toFixed(4),
+      scoreMean: mean.toFixed(4),
+      // If max < 0.5 with Voyage, something is likely wrong
+      // with distance-vs-similarity conversion
+      possibleDistanceNotSimilarity: max < 0.5 && raw.length > 3
+    },
+    "file_search score distribution"
+  );
+
+  // ── Apply filename filter if provided ──────────────────────
+  let filtered = input.filename_filter
+    ? raw.filter(r => r.filename === input.filename_filter)
+    : raw;
+
+  // ── Adaptive threshold ─────────────────────────────────────
+  // Instead of a fixed cutoff, use relative scoring:
+  // keep results within 40% of the best score, but always
+  // keep at least 1 result if anything was returned
+  const bestScore = Math.max(...filtered.map(r => r.score ?? 0));
+  const adaptiveThreshold = bestScore * 0.6;
+
+  filtered = filtered.filter(r => (r.score ?? 0) >= adaptiveThreshold);
+
+  if (filtered.length === 0 && raw.length > 0) {
+    // Fallback: return the single best match
+    const best = raw.reduce((a, b) =>
+      (a.score ?? 0) > (b.score ?? 0) ? a : b
+    );
+    filtered = [best];
+  }
+
+  const results = filtered
+    .slice(0, maxResults)
+    .map(
+      (r): FileSearchResult => ({
+        filename: r.filename,
+        score: Number((r.score ?? 0).toFixed(4)),
+        content: r.content,
+        startOffset: r.startOffset ?? null,
+        endOffset: r.endOffset ?? null,
+        chunkIndex: r.chunkIndex
+      })
+    );
+
+  return JSON.stringify({
+    results,
+    metadata: {
+      query,
+      totalResults: results.length,
+      scoreRange: { min, max },
+      ...(input.filename_filter
+        ? { filenameFilter: input.filename_filter }
+        : {})
+    }
+  } satisfies FileSearchResponse);
+}
+ */

@@ -34,6 +34,7 @@ export const pdfChoiceArr = [
   "Fauxcket-Pt-XI.pdf",
   "Fauxcket-Pt-XII.pdf",
   "Fauxcket.pdf",
+  "frankenpdf.pdf",
   "Geminastics-Pt-I.pdf",
   "Geminastics-Pt-II.pdf",
   "Geminastics-Pt-III.pdf",
@@ -79,6 +80,7 @@ export const pdfChoiceArr = [
   "Parasympathetic-Protocol-Pt-X.pdf",
   "Parasympathetic-Protocol-Pt-XI.pdf",
   "Parasympathetic-Protocol.pdf",
+  "pdf_reference_1-7.pdf",
   "Self-Imposed-Chains-Part-X.pdf",
   "Self-Imposed-Chains-Pt-I.pdf",
   "Self-Imposed-Chains-Pt-II.pdf",
@@ -168,14 +170,16 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
     pdfDown.annotationsPerPageAsync(),
     pdfDown.metadataAsync()
   ]);
-  console.log(`rust job finished in ${performance.now()-tStart} ms`)
+  console.log(`rust job finished in ${performance.now() - tStart} ms`);
 
   if (annots.length > 0) {
     for (const annot of annots) {
       annotPages.add(annot.page);
     }
   }
-  console.log(`char length: ${structuredText.map(t => t.body).join(`\n\n`).length}`);
+  console.log(
+    `char length: ${structuredText.map(t => t.body).join(`\n\n`).length}`
+  );
   const imgWithSizeArr = Array.of<PageImageWithSize>();
   if (images.length > 0) {
     for (const img of images) {
@@ -193,32 +197,33 @@ async function readAndExtract(path: Unenumerate<typeof pdfChoiceArr>) {
       imgWithSizeArr.push({ ...rest, size: data.byteLength / 1024 / 1024 });
     }
   }
-
+  const body = structuredText.map(t => ({ [t.page]: t.body }));
   const toJson = JSON.stringify(
-    { meta, annots, images: imgWithSizeArr, structuredText },
+    { meta, annots, images: imgWithSizeArr, structuredText: body },
     null,
     2
   );
   const x = pdfChoiceArr.findIndex(s => s === path);
   const templatize = `export const pdfIndex${x} = ${toJson};`;
   fs.withWs(`src/test/__out__/pdfdown/${filename}/index.ts`, templatize);
+
   return {
     ...meta,
     imagePages: Array.from(imgPages),
     annotPages: Array.from(annotPages),
     annots,
     imgWithSizeArr,
-    structuredText
+    body
   };
 }
 const perf = performance.now();
-readAndExtract("Warlord-of-Whimsy-Pt-XV.pdf").then(v => {
-  console.log(performance.now() - perf);
+readAndExtract("Warlord-of-Whimsy-Pt-I.pdf").then(v => {
+  console.log(`ts script finished in: ${performance.now() - perf} ms`);
   if (v.creationDate && v.creator && v.producer) {
-    const imgSizes = v.imgWithSizeArr.map((t) =>t.size);
-    let i =0;
-    for(const img of imgSizes) {
-      i+=img;
+    const imgSizes = v.imgWithSizeArr.map(t => t.size);
+    let i = 0;
+    for (const img of imgSizes) {
+      i += img;
     }
     const {
       creationDate,

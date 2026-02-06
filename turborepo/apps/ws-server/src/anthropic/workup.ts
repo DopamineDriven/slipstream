@@ -1,16 +1,29 @@
 import { createReadStream } from "node:fs";
 import type { AnthropicFileRecord } from "@/anthropic/types.ts";
+import type { CreateLocalStoreRT } from "@/prisma/types.ts";
 import type { VoyageEmbeddingService } from "@/voyage/index.ts";
 import { AnthropicBaseService } from "@/anthropic/base.ts";
 import { LoggerService } from "@/logger/index.ts";
 import { PrismaService } from "@/prisma/index.ts";
 import { Anthropic, toFile } from "@anthropic-ai/sdk";
+import type { $Enums } from "@slipstream/db/node/generated/client";
 import type {
   AnthropicModelIdUnion,
   AttachmentSingleton
 } from "@slipstream/types";
 
 export class AnthropicWorkup extends AnthropicBaseService {
+  /** userId → full store record (parent-level, not large) */
+  protected localStoreCache = new Map<string, CreateLocalStoreRT<true>>();
+  /** attachmentId → { docId, provenanceId, state } */
+  protected docCache = new Map<
+    string,
+    {
+      docId: string;
+      provenanceId: string;
+      state: $Enums.LocalStoreDocState | null;
+    }
+  >();
   protected assetCache = new Map<
     string,
     { fileId: string; dbRecordId: string; lastCheckedAt: Date | null }
@@ -54,13 +67,48 @@ export class AnthropicWorkup extends AnthropicBaseService {
     }
   }
 
+  protected async syncLocalStoreDocs(userId: string) {
+    try {
+      const localStoreDocs = await this.prisma.findManyLocalStoreDocs(
+        "ANTHROPIC",
+        userId
+      );
+      if (localStoreDocs.length > 0) {
+        for (const localDoc of localStoreDocs) {
+          this.docCache.set(localDoc.attachmentId, {
+            docId: localDoc.id,
+            provenanceId: localDoc.provenanceId,
+            state: localDoc.state
+          });
+        }
+      }
+    } catch (err) {
+      err;
+    }
+  }
+
   public async syncFileRegistry(userId: string, cleanupStaleFiles = true) {
-    const hasAnthropicMessages = await this.prisma.hasProviderMessages(
-      userId,
-      "ANTHROPIC"
-    );
-    if (!hasAnthropicMessages)
-      return { synced: true, totalFiles: 0, lastSync: new Date() };
+    const [hasAnthropicStoredFiles, hasLocalAnthropicStoreDocs] =
+      await Promise.all([
+        this.prisma.hasProviderMessages(userId, "ANTHROPIC"),
+        this.prisma.hasLocalVectorStoreDocs(userId, "ANTHROPIC")
+      ]);
+    if (!hasAnthropicStoredFiles && !hasLocalAnthropicStoreDocs) {
+      return {
+        synced: true,
+        totalFiles: 0,
+        totalDocs: 0,
+        lastSync: new Date()
+      };
+    }
+
+    // anthropic provider hosted files from attachments
+    this.fileRegistry.clear();
+    this.assetCache.clear();
+    // local vector store document store and documents
+    this.docCache.clear();
+    this.localStoreCache.clear();
+
     const tryApiKey = await this.prisma.handleApiKeyLookup("anthropic", userId);
 
     console.info(
@@ -68,6 +116,7 @@ export class AnthropicWorkup extends AnthropicBaseService {
     );
 
     let totalFiles = 0;
+    let totalDocs = 0;
 
     const apiKey = tryApiKey.apiKey ?? this.apiKey;
     // Preserve existing lastAccessedAt data before clearing
@@ -78,8 +127,6 @@ export class AnthropicWorkup extends AnthropicBaseService {
         existingAccessData.set(id, record.lastAccessedAt);
       }
     }
-
-    this.assetCache.clear();
 
     const dbResId = new Map<string, string>();
     try {
@@ -127,8 +174,6 @@ export class AnthropicWorkup extends AnthropicBaseService {
       console.error({ error }, "Failed to populate asset cache from database");
     }
 
-    // Clear and rebuild registry
-    this.fileRegistry.clear();
     const arrToDelete = Array.of<AnthropicFileRecord>();
     for await (const batch of this.getAllAnthropicFiles(apiKey)) {
       for (const file of batch.data) {

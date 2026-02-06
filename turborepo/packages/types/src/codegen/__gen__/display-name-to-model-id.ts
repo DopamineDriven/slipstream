@@ -73,6 +73,7 @@ export const displayNameToModelId = {
     "Grok 2 Vision": "grok-2-vision-1212"
   },
   anthropic: {
+    "Claude Opus 4.6": "claude-opus-4-6",
     "Claude Sonnet 4.5": "claude-sonnet-4-5-20250929",
     "Claude Opus 4.5": "claude-opus-4-5-20251101",
     "Claude Haiku 4.5": "claude-haiku-4-5-20251001",

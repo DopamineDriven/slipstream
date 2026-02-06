@@ -3,6 +3,7 @@ import type {
   CreateMessageStreamRT,
   FileSearchToolInput,
   ProviderAnthropicChatRequestEntity,
+  RoundRecord,
   ToolUseAccumulator
 } from "@/anthropic/types.ts";
 import type { Anthropic } from "@anthropic-ai/sdk";
@@ -19,7 +20,47 @@ import { EnhancedRedisPubSub } from "@slipstream/redis-service";
 
 export type BetaRawMessageStreamRecord =
   UnionToRecord<Anthropic.Beta.Messages.BetaRawMessageStreamEvent>;
+
+/** Record keyed by `type` for BetaContentBlockParam (request/continuation param blocks) */
+export type ContentBlockObj =
+  UnionToRecord<Anthropic.Beta.BetaContentBlockParam>;
+
+export type MapContentBlock<T extends keyof ContentBlockObj> = {
+  [P in T]: ContentBlockObj[P];
+}[T];
+
+/** Record keyed by `type` for content blocks arriving at content_block_start (response blocks) */
+export type ContentBlockStartRecord = UnionToRecord<
+  BetaRawMessageStreamRecord["content_block_start"]["content_block"]
+>;
+
+/** Record keyed by `type` for delta payloads arriving at content_block_delta */
+export type ContentBlockDeltaRecord = UnionToRecord<
+  BetaRawMessageStreamRecord["content_block_delta"]["delta"]
+>;
+
+/** Record keyed by stop_reason/delta fields from message_delta events */
+export type MessageDeltaRecord =
+  BetaRawMessageStreamRecord["message_delta"];
+
+/** Typed access to the message_start event's message (includes container, usage, etc.) */
+export type MessageStartRecord =
+  BetaRawMessageStreamRecord["message_start"];
+
 export class AnthropicService extends AnthropicVectorStoreWorkup {
+  /**
+   * PTC container ID registry: conversationId → containerId
+   * Preserves container ID across tool rounds, cleared on final ai_chat_response
+   */
+  private readonly ptcContainerRegistry = new Map<string, string>();
+
+  /**
+   * Per-request round history: userMsgId → RoundRecord[]
+   * Tracks all tool invocations and assistant responses per round.
+   * Ephemeral during streaming, serialized to responseOutput on completion.
+   */
+  private readonly roundRegistry = new Map<string, RoundRecord[]>();
+
   constructor(
     logger: LoggerService,
     prisma: PrismaService,
@@ -28,6 +69,117 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     apiKey: string
   ) {
     super(logger, voyage, prisma, apiKey);
+  }
+
+  /**
+   * Finalize streamed server_tool_use blocks: parse accumulated inputJson into input.
+   * The code_execution server_tool_use input (containing Claude's Python code) is
+   * streamed via input_json_delta — it's NOT available at content_block_start.
+   */
+  private finalizeBlockBuilders(blockBuilders: Map<number, BlockBuilder>) {
+    for (const [, bb] of blockBuilders) {
+      if (bb.type === "server_tool_use" && bb.inputJson) {
+        try {
+          bb.input = JSON.parse<Record<string, any>>(bb.inputJson);
+        } catch (e) {
+          this.logger.warn(
+            { inputJsonLen: bb.inputJson.length, error: String(e) },
+            "Failed to parse server_tool_use input_json_delta"
+          );
+          bb.input = { _raw: bb.inputJson };
+        }
+      }
+    }
+  }
+
+  /**
+   * Convert block builders into BetaContentBlockParam[] for the assistant message
+   * in a continuation request.
+   */
+  private buildAssistantContentBlocks(
+    blockBuilders: Map<number, BlockBuilder>
+  ) {
+    const blocks = Array.of<Anthropic.Beta.BetaContentBlockParam>();
+
+    for (const [, bb] of blockBuilders) {
+      if (bb.type === "text") {
+        blocks.push({
+          type: "text",
+          text: bb.text ?? ""
+        } satisfies Anthropic.Beta.BetaTextBlockParam);
+      }
+      if (bb.type === "thinking" && bb.signature) {
+        blocks.push({
+          type: "thinking",
+          thinking: bb.thinking ?? "",
+          signature: bb.signature
+        } satisfies Anthropic.Beta.BetaThinkingBlockParam);
+      }
+      if (bb.type === "server_tool_use" && bb.id && bb.name) {
+        const name =
+          bb.name as Anthropic.Beta.BetaServerToolUseBlockParam["name"];
+        blocks.push({
+          type: "server_tool_use",
+          id: bb.id,
+          name,
+          input: bb.input
+        } satisfies Anthropic.Beta.BetaServerToolUseBlockParam);
+
+        // Sanity check: code_execution must have input.code
+        if (bb.name === "code_execution" && bb.input && "code" in bb.input) {
+          const code = bb.inputJson;
+          this.logger.info(
+            {
+              hasCode: typeof code === "string",
+              codeLen: typeof code === "string" ? code.length : 0
+            },
+            "PTC server_tool_use replay check"
+          );
+        }
+      }
+      if (bb.type === "tool_use" && bb.id && bb.name) {
+        // PTC: input arrives fully formed at content_block_start (bb.input)
+        // Model-generated: input streamed via input_json_delta (bb.inputJson)
+        const input: Record<string, any> =
+          bb.input ??
+          (bb.inputJson ? JSON.parse<Record<string, any>>(bb.inputJson) : {});
+
+        // Per Anthropic PTC docs (Step 3): include `caller` in the
+        // continuation assistant message so the API can associate the
+        // tool_use with its parent server_tool_use (code_execution).
+        const toolUseBlock: Anthropic.Beta.BetaToolUseBlockParam & {
+          caller?: Anthropic.Beta.BetaServerToolCaller;
+        } = {
+          type: "tool_use",
+          id: bb.id,
+          name: bb.name,
+          input
+        };
+
+        if (bb.caller) {
+          toolUseBlock.caller = bb.caller;
+          this.logger.debug(
+            { callerType: bb.caller.type, toolId: bb.caller.tool_id },
+            "PTC tool_use caller included in continuation"
+          );
+        }
+
+        blocks.push(toolUseBlock as Anthropic.Beta.BetaContentBlockParam);
+      }
+      if (
+        bb.type === "code_execution_tool_result" &&
+        bb.tool_use_id &&
+        bb.codeExecutionContent
+      ) {
+        blocks.push({
+          type: "code_execution_tool_result",
+          tool_use_id: bb.tool_use_id,
+          content: bb.codeExecutionContent
+        } satisfies Anthropic.Beta.BetaCodeExecutionToolResultBlockParam);
+      }
+    }
+
+    return blocks;
   }
 
   public async handleAnthropicAiChatRequest({
@@ -50,6 +202,9 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
     topP,
     user_location
   }: ProviderAnthropicChatRequestEntity) {
+    // it's conditional but it's actually always defined
+    // incomning user msg request
+    const reqMsgId = userMsgId ?? "";
     const model = m as AnthropicModelIdUnion;
     const provider = "anthropic" as const;
     let anthropicThinkingStartTime: number | null = null,
@@ -59,12 +214,11 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       anthropicAgg = "",
       anthropicWebsearchToolUse = false,
       anthropicCi = 0;
-
     const anthropic = this.getClient(apiKey ?? undefined);
 
     let { params } = await this.createStreamWorkup({
       isNewChat,
-      msgs,
+      messages: msgs,
       userId,
       apiKey,
       keyId,
@@ -76,27 +230,105 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
       user_location
     });
 
-    const options = { stream: true } as const;
-
     // PTC state
     const toolAccumulators = new Map<number, ToolUseAccumulator>();
-    let containerId: string | undefined;
-    const assistantContentBlocks =
-      Array.of<Anthropic.Beta.BetaContentBlockParam>();
     const blockBuilders = new Map<number, BlockBuilder>();
+
+    // Container ID: check registry for existing container (30-day lifetime)
+    // Using conversationId to persist container across turns in same conversation
+    let containerId = this.ptcContainerRegistry.get(conversationId);
+    if (containerId) {
+      this.logger.info(
+        { conversationId, containerId },
+        "PTC reusing existing container from registry"
+      );
+    }
 
     const MAX_TOOL_ROUNDS = 8;
 
     for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-      const stream = (await anthropic.beta.messages.create(
-        params,
-        options
-      )) satisfies CreateMessageStreamRT;
+      if (round > 0) {
+        this.logger.info(
+          { round, containerId, messageCount: params.messages.length },
+          "PTC sending continuation request"
+        );
+      }
+      const s = msgs.findLastIndex(t => t.senderType === "USER");
+      let userMsgId: string | null = null;
+      if (s !== -1 && msgs?.[s]?.id) {
+        userMsgId = msgs[s]?.id;
+      } else {
+        userMsgId = reqMsgId;
+      }
+      userMsgId;
+      let stream: CreateMessageStreamRT;
+      try {
+        stream = (await anthropic.beta.messages.create(
+          params
+        )) satisfies CreateMessageStreamRT;
+      } catch (e) {
+        this.logger.error(
+          e instanceof Error
+            ? {
+                round,
+                status: e?.cause,
+                name: e.name,
+                errorMessage: e?.message,
+                errorBody: e?.stack
+                  ? JSON.stringify(e.stack).slice(0, 2000)
+                  : undefined
+              }
+            : this.prisma.safeErrMsg(e),
+          "PTC stream creation failed"
+        );
+        this.roundRegistry.delete(reqMsgId);
+        throw e;
+      }
+
+      // — Diagnostic: log when stream is created (especially for Round 1+)
+      // Track request ID (changes each round) vs container ID (should persist)
+      const requestId = stream._request_id;
+      this.logger.info(
+        {
+          round,
+          streamCreated: true,
+          requestId,
+          containerIdBefore: containerId ?? "(not yet set)"
+        },
+        "PTC round stream created"
+      );
 
       let done: Anthropic.Beta.BetaStopReason | null = null;
       let usage: number | undefined = undefined;
 
       for await (const chunk of stream) {
+        // — Diagnostic: log every chunk received to diagnose Round 1 hang
+        this.logger.debug(
+          { round, chunkType: chunk.type },
+          "PTC chunk received"
+        );
+
+        console.info(
+          {
+            event:
+              chunk.type === "content_block_delta"
+                ? chunk.delta.type === "input_json_delta"
+                  ? chunk.delta.partial_json
+                  : chunk.delta.type === "thinking_delta"
+                    ? chunk.delta.thinking
+                    : chunk.delta.type === "signature_delta"
+                      ? chunk.delta.signature
+                      : chunk.delta.type === "text_delta"
+                        ? chunk.delta.text
+                        : chunk.delta.type === "compaction_delta"
+                          ? chunk.delta.content
+                          : chunk.delta.type === "citations_delta"
+                            ? chunk.delta.citation
+                            : ""
+                : ""
+          },
+          `event tracje [${Date.now()}]`
+        );
         let text: string | undefined = undefined,
           thinkingText: string | undefined = undefined,
           webSearchRes: Anthropic.Beta.BetaWebSearchResultBlock | null = null;
@@ -111,26 +343,54 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             }
             bb.id = chunk.content_block.id;
             bb.name = chunk.content_block.name;
-            bb.input = chunk.content_block.input;
+            // server_tool_use input may be partial at start — full input streamed via input_json_delta
+            bb.input = chunk.content_block.input as Record<string, any>;
+            bb.inputJson = "";
           }
 
           if (chunk.content_block.type === "tool_use") {
             bb.id = chunk.content_block.id;
             bb.name = chunk.content_block.name;
-            bb.inputJson = "";
-            if (
-              "caller" in chunk.content_block &&
-              chunk.content_block.caller?.type === "code_execution_20250825"
-            ) {
-              bb.caller = chunk.content_block.caller;
-              toolAccumulators.set(chunk.index, {
-                id: chunk.content_block.id,
-                name: chunk.content_block.name,
-                inputJson: "",
-                callerType: "code_execution_20250825",
-                callerToolId: chunk.content_block.caller.tool_id
-              });
+            // PTC tool_use blocks have input fully formed at start (not streamed via deltas)
+            // Model-generated tool_use blocks have input: {} at start, streamed via input_json_delta
+            const startInput = chunk.content_block.input as Record<
+              string,
+              any
+            > | null;
+            const hasStartInput =
+              startInput != null && Object.keys(startInput).length > 0;
+            bb.inputJson = hasStartInput ? JSON.stringify(startInput) : "";
+            bb.input = hasStartInput ? startInput : undefined;
+
+            const caller = chunk.content_block.caller;
+            if (caller?.type === "code_execution_20250825") {
+              bb.caller = caller;
             }
+
+            this.logger.info(
+              {
+                toolUseId: chunk.content_block.id,
+                toolName: chunk.content_block.name,
+                index: chunk.index,
+                hasCaller: !!caller,
+                callerType: caller?.type,
+                callerToolId:
+                  caller?.type === "code_execution_20250825"
+                    ? caller.tool_id
+                    : undefined,
+                hasStartInput
+              },
+              "PTC content_block_start: tool_use detected"
+            );
+
+            toolAccumulators.set(chunk.index, {
+              id: chunk.content_block.id,
+              name: chunk.content_block.name,
+              inputJson: hasStartInput ? JSON.stringify(startInput) : "",
+              callerType: "code_execution_20250825",
+              callerToolId:
+                caller?.type === "code_execution_20250825" ? caller.tool_id : ""
+            });
           }
 
           if (chunk.content_block.type === "text") {
@@ -152,6 +412,18 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
                 anthropicWebsearchToolUse = false;
               }
             }
+          }
+
+          if (chunk.content_block.type === "code_execution_tool_result") {
+            bb.tool_use_id = chunk.content_block.tool_use_id;
+            bb.codeExecutionContent = chunk.content_block.content;
+            this.logger.info(
+              {
+                toolUseId: chunk.content_block.tool_use_id,
+                index: chunk.index
+              },
+              "PTC content_block_start: code_execution_tool_result captured"
+            );
           }
 
           blockBuilders.set(chunk.index, bb);
@@ -208,14 +480,39 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         }
 
         if (chunk.type === "message_start") {
+          // — Diagnostic: log full message_start to detect immediate stop/error
+          const prevContainerId = containerId;
+          let newContainerId: string | undefined;
+
           if (
             "container" in chunk.message &&
             chunk.message.container &&
             typeof chunk.message.container === "object" &&
             "id" in chunk.message.container
           ) {
-            containerId = chunk.message.container.id as string;
+            newContainerId = chunk.message.container.id as string;
+            containerId = newContainerId;
+
+            // Store in registry for 30-day container lifetime across turns
+            this.ptcContainerRegistry.set(conversationId, newContainerId);
           }
+
+          this.logger.info(
+            {
+              round,
+              messageId: chunk.message.id,
+              stopReason: chunk.message.stop_reason,
+              contentLength: chunk.message.content?.length ?? 0,
+              usage: chunk.message.usage,
+              prevContainerId: prevContainerId ?? "(none)",
+              newContainerId: newContainerId ?? "(not in response)",
+              containerIdChanged:
+                prevContainerId !== newContainerId &&
+                newContainerId !== undefined,
+              registrySize: this.ptcContainerRegistry.size
+            },
+            "PTC message_start details"
+          );
         }
 
         if (chunk.type === "message_delta") {
@@ -397,8 +694,14 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
           break;
         }
 
-        // — Finalize on end_turn / max_tokens / stop_sequence (non-tool stop reasons)
-        if (done && done !== "tool_use" && done !== "pause_turn") {
+        // — Break inner loop on pause_turn (no tool results needed, just continue)
+        if (done === "pause_turn") {
+          break;
+        }
+
+        // — Finalize on end_turn / max_tokens / stop_sequence / refusal
+        // (tool_use and pause_turn already broke out above)
+        if (done) {
           const d = await this.prisma.handleAiChatResponse({
             chunk: anthropicAgg,
             conversationId,
@@ -412,6 +715,10 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             userId,
             systemPrompt,
             model,
+            responseOutput: JSON.stringify({
+              containerId,
+              rounds: this.roundRegistry.get(reqMsgId) ?? []
+            }),
             thinkingText:
               anthropicThinkingAgg.length > 0
                 ? anthropicThinkingAgg
@@ -466,62 +773,141 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
             done: true
           });
           void this.redis.del(`stream:state:${conversationId}`);
+          this.roundRegistry.delete(reqMsgId);
           return;
         }
       }
-      // — Inner stream ended. If not tool_use, exit outer loop.
-      if (done !== "tool_use" || toolAccumulators.size === 0) {
-        break;
+
+      // — Abort the underlying fetch connection so it doesn't linger
+      if ("controller" in stream && stream.controller) {
+        stream.controller.abort();
       }
 
-      // — Convert block builders to assistant content blocks for continuation
-      for (const [, bb] of blockBuilders) {
-        if (bb.type === "text") {
-          assistantContentBlocks.push({
-            type: "text",
-            text: bb.text ?? ""
-          } satisfies Anthropic.Beta.BetaTextBlockParam);
+      // — Detect empty response (message_start → message_stop with no content)
+      // This happens when the API returns HTTP 200 but produces no content blocks
+      const isEmptyResponse = done === null && blockBuilders.size === 0;
+
+      if (isEmptyResponse) {
+        this.logger.warn(
+          {
+            round,
+            containerId,
+            toolAccumulatorsSize: toolAccumulators.size,
+            requestId
+          },
+          "PTC received empty response (no content blocks, no stop_reason)"
+        );
+
+        // For continuation rounds (round > 0), an empty response likely means
+        // the container state issue or continuation format problem.
+        // Break out and let caller handle incomplete response.
+        if (round > 0) {
+          this.logger.error(
+            { round, containerId },
+            "PTC continuation returned empty - possible container/format issue"
+          );
+          this.roundRegistry.delete(reqMsgId);
+          break;
         }
-        if (bb.type === "thinking" && bb.signature) {
-          assistantContentBlocks.push({
-            type: "thinking",
-            thinking: bb.thinking ?? "",
-            signature: bb.signature
-          } satisfies Anthropic.Beta.BetaThinkingBlockParam);
-        }
-        if (bb.type === "server_tool_use" && bb.id && bb.name) {
-          const name =
-            bb.name as Anthropic.Beta.BetaServerToolUseBlockParam["name"];
-          assistantContentBlocks.push({
-            type: "server_tool_use",
-            id: bb.id,
-            name,
-            input: bb.input
-          } satisfies Anthropic.Beta.BetaServerToolUseBlockParam);
-        }
-        if (bb.type === "tool_use" && bb.id && bb.name) {
-          const toolBlock: Anthropic.Beta.BetaToolUseBlockParam = {
-            type: "tool_use",
-            id: bb.id,
-            name: bb.name,
-            input: JSON.parse<unknown>(bb.inputJson ?? "{}"),
-            caller: bb.caller
-          };
-          assistantContentBlocks.push(toolBlock);
-        }
+      }
+
+      // — Finalize block builders: parse streamed server_tool_use input
+      this.finalizeBlockBuilders(blockBuilders);
+
+      // — Build assistant content blocks from finalized builders
+      const assistantContentBlocks =
+        this.buildAssistantContentBlocks(blockBuilders);
+
+      // — Handle pause_turn: append assistant blocks, continue (no tool_result)
+      if (done === "pause_turn") {
+        this.logger.info(
+          {
+            round,
+            containerId,
+            blockTypes: assistantContentBlocks.map(b => b.type)
+          },
+          "PTC pause_turn — continuing without tool results"
+        );
+
+        // Append to round registry (no tool results for pause_turn)
+        const pauseRounds = this.roundRegistry.get(reqMsgId) ?? [];
+        pauseRounds.push({
+          round,
+          requestId: requestId ?? null,
+          containerId,
+          assistantBlocks: assistantContentBlocks,
+          toolResults: []
+        });
+        this.roundRegistry.set(reqMsgId, pauseRounds);
+
+        params = {
+          ...params,
+          container: containerId,
+          messages: [
+            ...params.messages,
+            { role: "assistant" as const, content: assistantContentBlocks }
+          ]
+        } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming;
+
+        blockBuilders.clear();
+        done = null;
+        continue;
+      }
+
+      // — Inner stream ended with tool_use. If not, exit outer loop.
+      if (done !== "tool_use" || toolAccumulators.size === 0) {
+        break;
       }
 
       // — Execute file_search tools
       const toolResults: Anthropic.Beta.BetaToolResultBlockParam[] = [];
       for (const acc of toolAccumulators.values()) {
         if (acc.name === "file_search") {
-          const input = JSON.parse<FileSearchToolInput>(acc.inputJson ?? "{}");
-          const json = await this.executeFileSearch(userId, input);
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: acc.id,
-            content: json
-          });
+          try {
+            const parsed: Record<string, any> = acc.inputJson
+              ? JSON.parse<Record<string, any>>(acc.inputJson)
+              : {};
+
+            if (!("query" in parsed) || typeof parsed.query !== "string") {
+              throw new Error(
+                `file_search input missing "query": ${acc.inputJson}`
+              );
+            }
+
+            const input: FileSearchToolInput = {
+              query: parsed.query,
+              max_results:
+                typeof parsed.max_results === "number"
+                  ? parsed.max_results
+                  : undefined
+            };
+
+            this.logger.info(
+              { query: input.query, max_results: input.max_results },
+              "PTC file_search query"
+            );
+            const json = await this.executeFileSearch(userId, input);
+            this.logger.info(
+              { resultLength: json.length },
+              "PTC file_search result"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: json
+            });
+          } catch (e) {
+            this.logger.error(
+              { inputJson: acc.inputJson, error: String(e) },
+              "PTC file_search execution failed"
+            );
+            toolResults.push({
+              type: "tool_result",
+              tool_use_id: acc.id,
+              content: `file_search error: ${String(e)}`,
+              is_error: true
+            });
+          }
         } else {
           toolResults.push({
             type: "tool_result",
@@ -532,8 +918,25 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         }
       }
 
+      // Append to round registry
+      const rounds = this.roundRegistry.get(reqMsgId) ?? [];
+      rounds.push({
+        round,
+        requestId: requestId ?? null,
+        containerId,
+        assistantBlocks: assistantContentBlocks,
+        toolResults
+      });
+      this.roundRegistry.set(reqMsgId, rounds);
+
       this.logger.info(
-        { round, toolCount: toolResults.length, containerId },
+        {
+          round,
+          toolCount: toolResults.length,
+          containerId,
+          assistantBlockTypes: assistantContentBlocks.map(b => b.type),
+          toolResultIds: toolResults.map(r => r.tool_use_id)
+        },
         "PTC tool round complete, sending continuation"
       );
 
@@ -543,15 +946,26 @@ export class AnthropicService extends AnthropicVectorStoreWorkup {
         container: containerId,
         messages: [
           ...params.messages,
-          { role: "assistant", content: assistantContentBlocks },
-          { role: "user", content: toolResults }
+          { role: "assistant" as const, content: assistantContentBlocks },
+          { role: "user" as const, content: toolResults }
         ]
-      } as typeof params;
+      } satisfies Anthropic.Beta.Messages.MessageCreateParamsStreaming;
+
+      // — Diagnostic: log exact continuation payload before sending
+      this.logger.info(
+        {
+          round,
+          containerId,
+          assistantBlocks: JSON.stringify(assistantContentBlocks, null, 2),
+          toolResults: JSON.stringify(toolResults, null, 2)
+        },
+        "PTC continuation payload debug"
+      );
 
       // — Reset per-round state
       toolAccumulators.clear();
       blockBuilders.clear();
-      assistantContentBlocks.length = 0;
+      done = null;
     }
   }
 }

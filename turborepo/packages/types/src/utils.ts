@@ -1,4 +1,5 @@
 import type { $Enums } from "@slipstream/db/node/generated/client";
+
 export type Unenumerate<T> = T extends (infer U)[] | readonly (infer U)[]
   ? U
   : T;
@@ -13,7 +14,7 @@ export type SerializeBigInt<T, Serialized extends boolean = boolean> = {
       ? Exclude<T[K], bigint> | number
       : T[K]
     : T[K];
-}
+};
 
 // precision (field-level) targeting
 export type PrecisionSerializeBigIntField<

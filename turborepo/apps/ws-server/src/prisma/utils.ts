@@ -377,7 +377,7 @@ export class PrismaUtilsService extends ModelService {
     chunk: number
   ) {
     if (typeof a === "string") {
-      if (!this.canParseFilename(a)) {
+      if (!this.canParseDocname(a)) {
         throw new Error(
           this.safeErrMsg(
             `error in toVectorStoreDocChunkProvenanceId -- invalid provenance id ${a} provided`
@@ -390,14 +390,13 @@ export class PrismaUtilsService extends ModelService {
     const provenanceId = this.toVectorStoreFilename(a);
     return `${provenanceId}#${chunk}`;
   }
-  public canParseFilename(filename: string) {
+  public canParseDocname(filename: string) {
     return this.parseFilenameRegex.test(filename);
   }
-
-  public parseFilename(filename: string) {
-    if (!this.canParseFilename(filename)) {
+  public parseDocname(filename: string) {
+    if (!this.canParseDocname(filename)) {
       throw new Error(
-        "always guard parseFilename with its canParseFilename helper!"
+        "always guard parseDocname with its canParseDocname helper!"
       );
     }
     const [conversationId, messageId, attachmentId, fileNameExt] =
@@ -418,6 +417,7 @@ export class PrismaUtilsService extends ModelService {
       extension
     };
   }
+
   public canParseVectorStoreChunkProvenanceId(doc: string) {
     return this.parseFileWithChunkRegex.test(doc);
   }

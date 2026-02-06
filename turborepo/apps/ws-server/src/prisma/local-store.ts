@@ -7,6 +7,7 @@ import type { Voyage } from "@/voyage/types.ts";
 import { ExtractService } from "@/extract/index.ts";
 import { PrismaProviderStoreService } from "@/prisma/provider-store.ts";
 import type { $Enums } from "@slipstream/db/node/generated/client";
+import type { Rm, Unenumerate } from "@slipstream/types";
 import { PrismaDbService } from "@slipstream/db/factory";
 import {
   searchLocalDocChunksByStore,
@@ -21,6 +22,16 @@ export class PrismaLocalStoreService extends PrismaProviderStoreService {
     isProd: boolean
   ) {
     super(prisma, extractor, isProd);
+  }
+
+  public async hasLocalVectorStoreDocs(
+    userId: string,
+    provider: $Enums.Provider
+  ) {
+    const count = await this.prismaClient.attachment.count({
+      where: { AND: [{ localVectorStoreDocs: { some: { provider } }, userId }] }
+    });
+    return count > 0;
   }
   private lsBigintToNum(data: CreateLocalStoreRT<false>) {
     const { totalBytes, ...rest } = data;
@@ -147,7 +158,19 @@ export class PrismaLocalStoreService extends PrismaProviderStoreService {
               chunkCount: true,
               state: true,
               size: true,
-              store: { select: { id: true, storeName: true } }
+              chunks: {
+                select: {
+                  chunkProvenanceId: true,
+                  chunkIndex: true,
+                  startOffset: true,
+                  errorMessage: true,
+                  content: true,
+                  endOffset: true,
+                  state: true,
+                  contentHash: true,
+                  id: true
+                }
+              }
             }
           }
         }
@@ -159,28 +182,60 @@ export class PrismaLocalStoreService extends PrismaProviderStoreService {
         if (attachment.localVectorStoreDocs.length > 0) {
           for (const doc of attachment.localVectorStoreDocs) {
             const {
-              store,
+              chunks,
+              chunkCount,
               annotPages: annotPgs,
               imagePages: imgPgs,
               size,
               provenanceId,
               ...docRest
             } = doc;
+
             const annotPages = this.expandPageRef(annotPgs) as number[] | null;
+
             const imagePages = this.expandPageRef(imgPgs) as number[] | null;
+
             const { conversationId, messageId, extension } =
-              this.parseFilename(provenanceId);
-            const { storeName, id: storeId } = store;
+              this.parseDocname(provenanceId);
+
+            const localStoreName = this.localVectorStoreDisplayName(
+              userId,
+              "ANTHROPIC"
+            );
+            const chunkArr =
+              Array.of<
+                Rm<Unenumerate<typeof chunks>, "content" | "errorMessage">
+              >();
+
+            const chunkErrArr = Array.of<Unenumerate<typeof chunks>>();
+
+            // TODO REPROCESS FAILED CHUNKS IN THE BACKGROUND VIA A VOID CALL BEFORE RETURN
+            for (const t of chunks) {
+              const { errorMessage, content, ...chunkRest } = t;
+              if (t.state === "ERROR") {
+                chunkErrArr.push({
+                  errorMessage,
+                  content,
+                  ...chunkRest
+                });
+              } else {
+                chunkArr.push({
+                  ...chunkRest
+                });
+              }
+            }
+
             const record = {
               ...docRest,
               ext: extension,
               attachmentId,
+              chunkCount,
               conversationId,
               annotPages,
               imagePages,
               messageId,
-              storeName,
-              storeId,
+              chunks,
+              storeName: localStoreName,
               provenanceId,
               size: size ? Number(size) : null
             } satisfies FindManyLocalStoreDocsShape;
@@ -323,7 +378,7 @@ export class PrismaLocalStoreService extends PrismaProviderStoreService {
     schemaVersion: $Enums.LocalStoreSchemaVersion = "v1_0"
   ) {
     const { attachmentId, conversationId, messageId } =
-      this.parseFilename(provenanceId);
+      this.parseDocname(provenanceId);
     const chunkProvenanceId = this.toVectorStoreDocChunkProvenanceId(
       provenanceId,
       chunkIndex
@@ -339,7 +394,7 @@ export class PrismaLocalStoreService extends PrismaProviderStoreService {
         messageId,
         attachmentId,
         state: "QUEUED",
-        content,
+        content: content.replace(/\0/g, ""),
         contentHash,
         startOffset,
         endOffset,

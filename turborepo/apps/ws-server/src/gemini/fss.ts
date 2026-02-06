@@ -462,7 +462,7 @@ export class FileSearchStoreService {
     };
     if (t.displayName) {
       const { attachmentId, conversationId, extension, fileName, messageId } =
-        this.prisma.parseFilename(t.displayName);
+        this.prisma.parseDocname(t.displayName);
       const originalFilename = `${fileName}.${extension}`;
       metaObj = {
         attachmentId,
@@ -827,7 +827,7 @@ export class FileSearchStoreService {
     mimeType?: string
   ) {
     const { attachmentId, conversationId, messageId, extension, fileName } =
-      this.prisma.parseFilename(displayName);
+      this.prisma.parseDocname(displayName);
     return {
       file: absPath,
       fileSearchStoreName,

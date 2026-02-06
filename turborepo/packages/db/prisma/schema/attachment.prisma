@@ -113,6 +113,7 @@ model Attachment {
   message              Message?                @relation(fields: [messageId], references: [id], onDelete: SetNull)
   providerLinks        AttachmentProvider[]
   providerStoreDocs    ProviderStoreDocument[]
+  userStoreDoc         UserStoreDoc?
   user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   image                ImageMetadata?
   video                VideoMetadata?
@@ -124,6 +125,8 @@ model Attachment {
   @@index([assetType, createdAt])
   @@index([conversationId, createdAt])
   @@index([draftId])
+  @@index([cdnUrl])
+  @@index([compatCdnUrl])
   @@index([assetType])
   @@index([batchId, conversationId])
   @@index([userId, createdAt])

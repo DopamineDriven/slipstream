@@ -1,6 +1,7 @@
 {
-  "total": 62586,
-  "imgPixels": 10569617,
-  "textTokens": 43716,
-  "vidPixels": 0
+  "text_tokens": 43716,
+  "image_pixels": 10569617,
+  "video_pixels": 0,
+  "total_tokens": 62586,
+  "model": "voyage-multimodal-3.5"
 }

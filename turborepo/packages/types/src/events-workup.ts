@@ -64,7 +64,6 @@ export type AssetReadyPayload = {
   updatedAt: Date;
 };
 
-
 /**
  * Asset status lifecycle
  *

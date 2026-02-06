@@ -7,11 +7,11 @@ catalogs:
   auth:
     better-auth: ^1.4.18
   aws:
-    "@aws-sdk/client-s3": ^3.982.0
-    "@aws-sdk/client-secrets-manager": ^3.982.0
-    "@aws-sdk/credential-providers": ^3.982.0
-    "@aws-sdk/lib-storage": ^3.982.0
-    "@aws-sdk/s3-request-presigner": ^3.982.0
+    "@aws-sdk/client-s3": ^3.984.0
+    "@aws-sdk/client-secrets-manager": ^3.984.0
+    "@aws-sdk/credential-providers": ^3.984.0
+    "@aws-sdk/lib-storage": ^3.984.0
+    "@aws-sdk/s3-request-presigner": ^3.984.0
     "@aws-sdk/types": ^3.973.1
   babel:
     babel-plugin-react-compiler: ^1.0.0
@@ -37,7 +37,7 @@ catalogs:
   decimal:
     "decimal.js": ^10.6.0
   dotenv:
-    dotenv: ^17.2.3
+    dotenv: ^17.2.4
     dotenv-cli: ^11.0.0
     dotenv-expand: ^12.0.3
   eslint:
@@ -63,8 +63,8 @@ catalogs:
   mdast:
     "@types/mdast": ^4.0.4
   motion:
-    motion: ^12.31.0
-    motion-dom: ^12.30.1
+    motion: ^12.33.0
+    motion-dom: ^12.33.0
     motion-plus: ^1.5.1
     motion-plus-dom: ^2.7.1
     motion-utils: ^12.29.2
@@ -76,7 +76,7 @@ catalogs:
     eslint-config-next: ^16.1.6
     "@next/eslint-plugin-next": ^16.1.6
   node:
-    "@types/node": ^25.2.0
+    "@types/node": ^25.2.1
   pg:
     pg: ^8.18.0
     "@types/pg": ^8.16.0
@@ -89,7 +89,7 @@ catalogs:
   prettier:
     prettier: ^3.8.1
     prettier-plugin-tailwindcss: ^0.7.2
-    "@ianvs/prettier-plugin-sort-imports": ^4.7.0
+    "@ianvs/prettier-plugin-sort-imports": ^4.7.1
   prisma:
     prisma: ^7.3.0
     "@prisma/adapter-pg": ^7.3.0
@@ -123,9 +123,9 @@ catalogs:
   react:
     react: ^19.2.4
     react-dom: ^19.2.4
-    react-resizable-panels: ^4.5.9
+    react-resizable-panels: ^4.6.0
     vaul: ^1.1.2
-    "@types/react": ^19.2.10
+    "@types/react": ^19.2.13
     "@types/react-dom": ^19.2.3
   redis:
     redis: ^5.10.0
@@ -142,8 +142,8 @@ catalogs:
     remark-parse: ^11.0.0
     remark-rehype: ^11.1.2
   rolldown:
-    rolldown: ^1.0.0-rc.2
-    rolldown-plugin-dts: ^0.21.9
+    rolldown: ^1.0.0-rc.3
+    rolldown-plugin-dts: ^0.22.1
     rolldown-plugin-wasm: ^0.2.1
   safeql:
     "@ts-safeql/eslint-plugin": ^4.2.0
@@ -166,15 +166,15 @@ catalogs:
   ts:
     typescript: ^5.9.3
   tsdown:
-    tsdown: ^0.20.1
+    tsdown: ^0.20.3
   tseslint:
     typescript-eslint: ^8.54.0
   tsgo:
-    "@typescript/native-preview": ^7.0.0-dev.20260203.1
+    "@typescript/native-preview": ^7.0.0-dev.20260205.1
   tslib:
     tslib: ^2.8.1
   tsup:
-    "@microsoft/api-extractor": ^7.56.0
+    "@microsoft/api-extractor": ^7.56.2
     terser: ^5.46.0
     tsup: ^8.5.1
   tsx:
@@ -202,7 +202,7 @@ catalogs:
     husky: ^9.1.7
     knip: ^5.83.0
   vercel:
-    vercel: ^50.10.0
+    vercel: ^50.12.3
     "@vercel/analytics": ^1.6.1
     "@vercel/functions": ^3.4.1
   vfile:

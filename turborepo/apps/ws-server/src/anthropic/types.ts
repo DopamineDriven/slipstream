@@ -40,7 +40,7 @@ export type RequestOptions = Parameters<
 
 export type MessageInputParams = {
   isNewChat: boolean;
-  msgs: MessageSingleton<true>[];
+  messages: MessageSingleton<true>[];
   userId: string;
   apiKey: string | undefined;
   keyId: string | null;
@@ -49,6 +49,7 @@ export type MessageInputParams = {
   systemPrompt: string | undefined;
   temperature: number | undefined;
   topP: number | undefined;
+  container?: string | Anthropic.Beta.Messages.BetaContainerParams;
   user_location:
     | {
         type: "approximate";
@@ -88,9 +89,19 @@ export interface BlockBuilder {
   text?: string;
   thinking?: string;
   inputJson?: string;
-  input?: unknown;
+  input?: Record<string, any>;
   signature?: string;
   caller?: Anthropic.Beta.BetaServerToolCaller;
+  tool_use_id?: string;
+  codeExecutionContent?: Anthropic.Beta.BetaCodeExecutionToolResultBlockParam["content"];
+}
+
+export interface RoundRecord {
+  round: number;
+  requestId: string | null;
+  containerId: string | undefined;
+  assistantBlocks: Anthropic.Beta.BetaContentBlockParam[];
+  toolResults: Anthropic.Beta.BetaToolResultBlockParam[];
 }
 
 export interface ChunkDraft {

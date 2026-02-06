@@ -80,7 +80,7 @@ export class GrokWorkupService {
       for (const file of batch.data) {
         if (file.filename && file.id && file.bytes) {
           totalFiles += 1;
-          const { attachmentId } = this.prisma.parseFilename(file.filename);
+          const { attachmentId } = this.prisma.parseDocname(file.filename);
           this.fileCache.set(attachmentId, file);
         }
       }
@@ -147,7 +147,7 @@ export class GrokWorkupService {
         if (s.data.length > 0) {
           for (const doc of s.data) {
             if (doc.file_metadata.file_id && doc.file_metadata.name) {
-              const { attachmentId } = this.prisma.parseFilename(
+              const { attachmentId } = this.prisma.parseDocname(
                 doc.file_metadata.name
               );
               this.docCache.set(attachmentId, doc);
@@ -951,11 +951,11 @@ export class GrokWorkupService {
   protected async promoteToCollection(
     documentId: string,
     collectionId: string,
-    xaiFilename: string,
+    provenanceId: string,
     mgmtKey = this.xaiManagementKey
   ) {
     const { attachmentId, conversationId, fileName, extension, messageId } =
-      this.prisma.parseFilename(xaiFilename);
+      this.prisma.parseDocname(provenanceId);
     return await fetch(
       `https://management-api.x.ai/v1/collections/${collectionId}/documents/${documentId}`,
       {

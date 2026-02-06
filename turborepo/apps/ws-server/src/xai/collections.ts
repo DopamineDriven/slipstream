@@ -692,7 +692,7 @@ export class GrokCollectionsService extends GrokWorkupService {
       const expandedObj = {
         score,
         file_id,
-        decodedFilename: this.prisma.parseFilename(hexEncodedFilename),
+        decodedFilename: this.prisma.parseDocname(hexEncodedFilename),
         ...rest
       };
       aggregate.push(expandedObj);

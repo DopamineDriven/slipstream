@@ -72,6 +72,7 @@ export const modelIdsByProvider = {
     "grok-2-vision-1212"
   ],
   anthropic: [
+    "claude-opus-4-6",
     "claude-sonnet-4-5-20250929",
     "claude-opus-4-5-20251101",
     "claude-haiku-4-5-20251001",
